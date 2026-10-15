@@ -425,3 +425,230 @@ sudo env -u RUN_PLUGIN_UPDATER UPDATE_ONLY=1 bash ./linux/install.sh
 **وضعیت کلی: Pending — آماده‌سازی Debian و اتصال Shared Folder انجام شده؛ توسعه فضای دیسک، کپی نصب بازی و اجرای آزمایشی CS2 هنوز انجام نشده‌اند.**
 
 گام بعدی پس از بازگشت به این پارت: ابتدا فضای آزاد میزبان را بررسی کن؛ سپس VM را خاموش کرده، دیسک مجازی را به ۳۰۰ GB افزایش بده و خروجی دستورات تشخیص دیسک را بفرست. قبل از کپی ۹۰ GB فایل، ساختار جدید دیسک و فضای قابل استفاده داخل Debian باید تأیید شود.
+
+
+---
+
+## ۱۲. دفتر کامل فرمان‌های اجراشده در Debian و بررسی اولیه دیتابیس
+
+این بخش، سابقه عملی پارت ۲ را برای ادامه کار نگه می‌دارد. خروجی‌های حجیم ترمینال عیناً تکرار نشده‌اند، اما فرمان‌ها، نتایج مهم و خطاهای مشاهده‌شده ثبت شده‌اند. این سابقه باید از دستورهای پیشنهادیِ اجرا‌نشده جدا در نظر گرفته شود.
+
+### ۱۲.۱. بررسی سیستم‌عامل و منابع
+
+فرمان‌هایی که برای بررسی اولیه اجرا شدند:
+
+    cat /etc/os-release
+    uname -m
+    ip -br address
+    ip route
+    free -h
+    df -h /
+    nproc
+    systemctl status ssh --no-pager
+
+نتایج ثبت‌شده:
+
+| بررسی | نتیجه مشاهده‌شده |
+|---|---|
+| سیستم‌عامل | Debian GNU/Linux 13 (Trixie)، DEBIAN_VERSION_FULL=13.7 |
+| معماری | x86_64 |
+| CPU مجازی | nproc مقدار 4 |
+| رابط شبکه | ens33 فعال |
+| IP داخلی | 192.168.1.5/24 |
+| Gateway | 192.168.1.1 |
+| SSH | ssh.service در وضعیت active (running) |
+| RAM قبل از تغییر VM | ابتدا حدود 1.9Gi در خروجی free -h دیده شد؛ این مقدار با هدف ۶ گیگابایت سازگار نبود |
+| RAM پس از تغییر VM | total برابر 5.6Gi، used برابر 1.1Gi، free برابر 4.0Gi و available برابر 4.5Gi |
+| Swap | حدود 6.1Gi؛ در خروجی آخر مصرف صفر داشت |
+| فایل‌سیستم / | قبل از افزایش احتمالی دیسک: 112G ظرفیت، 5.0G مصرف و 101G آزاد |
+
+محیط گرافیکی Debian نصب شده و فعلاً عمداً نگه داشته می‌شود تا کاربر تازه‌کار بتواند از رابط گرافیکی استفاده کند. حذف آن تصمیم این مرحله نیست.
+
+### ۱۲.۲. بررسی اتصال اینترنت
+
+فرمان‌های اجراشده:
+
+    getent hosts github.com
+    curl -I --max-time 15 https://github.com
+    curl -I -L --max-time 20 https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
+    sudo apt update
+
+نتایج مشاهده‌شده:
+
+- DNS برای github.com آدرس 140.82.121.3 برگرداند.
+- درخواست HTTPS به GitHub پاسخ HTTP/2 200 داشت.
+- درخواست به Steam CDN نیز HTTP/2 200 دریافت کرد.
+- sudo apt update مخازن Debian Trixie، trixie-updates و trixie-security را با موفقیت بررسی کرد و در زمان آن تست، همه بسته‌ها به‌روز گزارش شدند.
+
+این تست‌ها دسترسی اینترنت را در همان زمان تأیید می‌کنند؛ تضمین دسترسی دائمی یا مجازبودن Remote MySQL از سمت هاست نیستند.
+
+### ۱۲.۳. نصب و بررسی ابزارهای VMware Shared Folders
+
+فرمان اجراشده:
+
+    sudo apt install -y open-vm-tools open-vm-tools-desktop fuse3 rsync
+
+خروجی نشان داد هر چهار بسته نصب بوده و نسخه‌های فعلی به‌روز هستند؛ بسته جدیدی نصب یا به‌روزرسانی نشد.
+
+فرمان زیر:
+
+    vmware-hgfsclient
+
+خروجی:
+
+    W
+
+سپس اشتراک با این فرمان‌ها mount شد:
+
+    sudo mkdir -p /mnt/hgfs
+    sudo vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other
+    ls -la /mnt/hgfs
+
+در ادامه برای mount مجدد، این فرمان‌ها هم اجرا شدند:
+
+    sudo umount /mnt/hgfs
+    sudo vmhgfs-fuse .host:/ /mnt/hgfs -o allow_other
+    vmware-hgfsclient
+    ls -la /mnt/hgfs
+
+نتیجه نهایی نشان داد اشتراک W زیر مسیر /mnt/hgfs/W نمایش داده می‌شود.
+
+**تفسیر مسیر:** فهرست واقعی /mnt/hgfs/W شامل DEPENDENCIES.json، .git، game، linux، server، steamcmd، tmp و دیگر اجزای ریشه ریپوی KUS است. بنابراین در پیکربندی فعلی، محتوای ریشه قابل مشاهده ریپو در /mnt/hgfs/W قرار دارد. مسیر /mnt/hgfs/W/cs2-kus-addons وجود ندارد؛ اسم W نام Shared Folder گزارش‌شده توسط VMware است.
+
+> Shared Folder در حال حاضر mount شده است، اما Read-only بودن آن هنوز تأیید نشده است. پیش از هر عملیات پرریسک باید این گزینه در تنظیمات VMware بررسی و در صورت امکان فعال شود. فایل‌های منبع Windows نباید پاک، جابه‌جا یا بازنویسی شوند.
+
+### ۱۲.۴. مسیرهای اشتباه امتحان‌شده و اصلاح آن‌ها
+
+این مسیرها بررسی شدند اما در ساختار فعلی وجود نداشتند:
+
+    ls -la /mnt/hgfs/KUS_SOURCE
+    ls -la /mnt/hgfs/KUS_SOURCE/game
+    ls -la /mnt/hgfs/KUS_SOURCE/linux
+    ls -la /mnt/hgfs/KUS_SOURCE/server
+
+    ls -la /mnt/hgfs/W/cs2-kus-addons
+    ls -la /mnt/hgfs/W/cs2-kus-addons/game
+    ls -la /mnt/hgfs/W/cs2-kus-addons/server
+
+همه این مسیرهای درون‌اشتراک با خطای No such file or directory مواجه شدند. علت، مطابق فهرست موفق بعدی، این است که ریشه محتوای ریپو از قبل در /mnt/hgfs/W قابل مشاهده است و فولدر cs2-kus-addons یک سطح دیگر داخل آن نیست.
+
+فرمان‌های درست برای بررسی ساختار فعلی:
+
+    ls -la /mnt/hgfs/W/
+    ls -la /mnt/hgfs/W/game
+    ls -la /mnt/hgfs/W/game/csgo
+    ls -la /mnt/hgfs/W/linux
+    ls -la /mnt/hgfs/W/server
+
+این فرمان‌ها فقط فایل‌ها و پوشه‌ها را فهرست می‌کنند و محتوا را تغییر نمی‌دهند.
+
+### ۱۲.۵. اندازه پوشه‌ها و فایل‌های بازی موجود
+
+فرمان‌های اجراشده:
+
+    du -sh /mnt/hgfs/W/
+    du -sh /mnt/hgfs/W/game
+    du -sh /mnt/hgfs/W/server
+    du -sh /mnt/hgfs/W/steamcmd
+    du -sh /mnt/hgfs/W/tmp
+
+نتایج گزارش‌شده:
+
+| مسیر | اندازه تقریبی مشاهده‌شده |
+|---|---:|
+| /mnt/hgfs/W/ | 92G |
+| /mnt/hgfs/W/game | 1.1G |
+| /mnt/hgfs/W/server | 90G |
+| /mnt/hgfs/W/steamcmd | 182M |
+| /mnt/hgfs/W/tmp | 454M |
+
+برای جست‌وجوی فایل‌های اجرایی و gameinfo.gi این فرمان هم اجرا شد:
+
+    find /mnt/hgfs/W/server -maxdepth 8 \
+      \( -iname cs2.exe -o -iname cs2 -o -iname gameinfo.gi \) \
+      -print 2>/dev/null | head -50
+
+فایل‌های مشاهده‌شده شامل این مسیرها بودند:
+
+    /mnt/hgfs/W/server/game/bin/win64/cs2.exe
+    /mnt/hgfs/W/server/game/core/gameinfo.gi
+    /mnt/hgfs/W/server/game/csgo/gameinfo.gi
+    /mnt/hgfs/W/server/game/csgo_lv/gameinfo.gi
+
+این مشاهده وجود فایل اجرایی Windows را تأیید می‌کند؛ اما وجود یا نبود تمام فایل‌های Linux را به‌تنهایی ثابت نمی‌کند.
+
+### ۱۲.۶. خطای Git در Shared Folder
+
+فرمان اجراشده:
+
+    git -C /mnt/hgfs/W rev-parse --show-toplevel
+
+نتیجه:
+
+    fatal: detected dubious ownership in repository at '/mnt/hgfs/W'
+
+فعلاً دستور پیشنهادی Git برای افزودن safe.directory اجرا نشده است. برای کپی فایل‌ها و اندازه‌گیری پوشه‌ها لازم نیست Git روی Shared Folder اجرا شود. این پیام به‌تنهایی نشانه خرابی مخزن نیست.
+
+### ۱۲.۷. تصمیم کپی فایل‌ها و تغییر اندازه دیسک
+
+بر اساس اندازه‌های مشاهده‌شده و تصمیم کاربر:
+
+- هدف جدید ظرفیت دیسک VM برابر 300 GB و از نوع Thin Provision است.
+- افزایش دیسک مجازی هنوز انجام نشده است.
+- کاربر تصمیم گرفته است کل پوشه نصب موجود Windows با اندازه تقریبی 90 GB از مسیر /mnt/hgfs/W/server به یک مقصد محلی داخل Debian کپی شود.
+- عملیات موردنظر باید کپی باشد، نه جابه‌جایی؛ منبع Windows باید باقی بماند.
+- Thin Provision فضای واقعی میزبان را مصرف می‌کند و مانع پرشدن درایوی که فایل‌های VMware روی آن قرار دارند نمی‌شود.
+- فایل اجرایی Windows با نام cs2.exe برای اجرای مستقیم روی Linux قابل استفاده نیست. کپی کامل فقط برای نگهداری و بررسی فایل‌های موجود و جلوگیری از دانلودهای غیرضروری است؛ سرور Linux همچنان به فایل‌ها و runtime بومی Linux نیاز دارد.
+
+### ۱۲.۸. دستورهای مرحله بعد که هنوز اجرا نشده‌اند
+
+این دستورات برای بررسی دیسک پس از افزایش اندازه مجازی پیشنهاد شده‌اند، اما هنوز اجرا نشده‌اند:
+
+    lsblk -o NAME,SIZE,FSTYPE,TYPE,MOUNTPOINTS
+    lsblk -f
+    findmnt /
+    df -h /
+
+ابتدا باید فضای آزاد واقعی درایو میزبان داخل Windows بررسی شود. سپس VM خاموش شود و دیسک مجازی در VMware به هدف 300 GB افزایش یابد. پس از بوت، خروجی دستورات بالا باید بررسی شود. افزایش اندازه دیسک مجازی لزوماً پارتیشن و فایل‌سیستم داخل Debian را خودکار بزرگ نمی‌کند؛ روش توسعه آن فقط پس از دیدن ساختار واقعی دیسک مشخص می‌شود.
+
+تا پیش از تأیید فضای کافی و ساختار دیسک جدید، کپی 90 GB داده شروع نشود. همچنین هیچ‌یک از اسکریپت‌های نصب یا به‌روزرسانی KUS در این مرحله اجرا نشده‌اند. به‌خصوص linux/update.sh اجرا نشود؛ نسخه بررسی‌شده آن می‌تواند مسیر updater افزونه‌ها را فعال کند که برای push تغییرات به شاخه GitHub تلاش می‌کند.
+
+---
+
+## ۱۳. موضوع بعدی — اتصال افزونه‌ها به MariaDB مرکزی (باز و بدون تصمیم قطعی)
+
+این موضوع یک مرحله معماری مستقل است. تا وقتی درباره مدل دسترسی، روش اتصال و رفتار سیستم هنگام قطع شبکه به جمع‌بندی نرسیده‌ایم، نباید این یادداشت‌ها را به‌عنوان طرح نهایی یا مجوز تغییر کد تلقی کرد.
+
+### یافته‌های اولیه از دو ریپوی وب و Agent
+
+- وب‌سایت PHP endpointهایی در پوشه agent دارد؛ از جمله db.php، agent_login.php، auth.php، heartbeat.php و sync_bulk.php.
+- sync_bulk.php برای تعدادی از جدول‌های پلاگین‌ها نگاشت دیتابیس تعریف می‌کند و Bulk Upsert انجام می‌دهد.
+- Agent فعلی هم از HTTPS API استفاده می‌کند و هم در بعضی سرویس‌ها مستقیماً به MySQL ریموت وصل می‌شود.
+- DatabaseSyncService.cs ساختار و داده‌ها را بین دیتابیس محلی و ریموت همگام می‌کند. مسیر عمومی آن شامل پاک‌کردن جدول مقصد پیش از درج مجدد داده‌هاست؛ این روش برای همگام‌سازی چندنودی تأیید نشده است.
+- ارسال Bulk Sync در ApiClient.cs باید از نظر هدر Authorization با انتظار sync_bulk.php بررسی و یکپارچه شود.
+- جریان صدور و اعتبارسنجی توکن در endpointهای PHP یکدست نیست و باید قبل از گسترش استفاده بررسی شود.
+- بعضی فایل‌های PHP دارای اطلاعات اتصال ثابت داخل سورس هستند. این سند عمداً جزئیات محرمانه را درج نمی‌کند. انتقال امن تنظیمات و چرخش credentialها باید برنامه‌ریزی شود تا سایت/API فعلی ناخواسته از کار نیفتد.
+
+فایل‌های مرجع برای بررسی بعدی:
+
+- [PHP: agent/db.php](https://github.com/larnzs/FragCity-RawPHPbackend/blob/main/agent/db.php)
+- [PHP: agent/auth.php](https://github.com/larnzs/FragCity-RawPHPbackend/blob/main/agent/auth.php)
+- [PHP: agent/agent_login.php](https://github.com/larnzs/FragCity-RawPHPbackend/blob/main/agent/agent_login.php)
+- [PHP: agent/heartbeat.php](https://github.com/larnzs/FragCity-RawPHPbackend/blob/main/agent/heartbeat.php)
+- [PHP: agent/sync_bulk.php](https://github.com/larnzs/FragCity-RawPHPbackend/blob/main/agent/sync_bulk.php)
+- [C#: ApiClient.cs](https://github.com/larnzs/FragCity-WebAPIClient/blob/main/FragCity.Agent.Core/Api/ApiClient.cs)
+- [C#: DatabaseSyncService.cs](https://github.com/larnzs/FragCity-WebAPIClient/blob/main/FragCity.Agent.Core/Services/DatabaseSyncService.cs)
+- [C#: NodeMetricsService.cs](https://github.com/larnzs/FragCity-WebAPIClient/blob/main/FragCity.Agent.Core/Database/agent_nodes/NodeMetricsService.cs)
+- [C#: ServerPortsService.cs](https://github.com/larnzs/FragCity-WebAPIClient/blob/main/FragCity.Agent.Core/Database/server_ports/ServerPortsService.cs)
+
+### سؤال‌های باز پیش از تصمیم نهایی
+
+- آیا هاست فعلی، Remote MariaDB امن و پایدار را از IP ثابت مجاز می‌کند؟ آیا TLS معتبر در دسترس است؟
+- کدام داده‌های پلاگین باید بین سرورهای رسمی FragCity مشترک باشند و کدام‌ها باید برای هر مشتری/سرور جدا بمانند؟
+- کدام عملیات از HTTPS API انجام شوند و کدام پلاگین‌ها واقعاً به اتصال مستقیم SQL نیاز دارند؟
+- حداقل مجوز SQL هر نود یا دسته پلاگین چیست؟
+- هنگام قطع اینترنت یا دسترسی به دیتابیس، پلاگین‌ها باید چه کنند؟ آیا retry، صف محلی یا همگام‌سازی تأخیری لازم است؟
+- Schema migration، بکاپ، بازیابی و جلوگیری از داده تکراری چطور مدیریت شوند؟
+- کدام قسمت‌های PHP و Agent باید اصلاح شوند و چه بخش‌هایی باید تا پایان مهاجرت دست‌نخورده باقی بمانند؟
+
+**وضعیت این مرحله:** تحقیق و جمع‌بندی هنوز ادامه دارد. هیچ تصمیم نهایی درباره اتصال Remote MariaDB ثبت نشده و هنوز هیچ تغییری در کد PHP، Agent یا ریپوی cs2-kus-addons برای این موضوع انجام نشده است.
