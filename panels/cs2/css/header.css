@@ -1,0 +1,993 @@
+/* =========================================================
+   FragCity CS2 Panel
+   Header / User Dropdown / Language
+========================================================= */
+
+
+/* =========================================================
+   Top Navbar
+========================================================= */
+
+.top-navbar {
+
+    min-height:
+        68px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    padding:
+        12px 24px;
+
+    background:
+        #0B1220;
+
+    border-bottom:
+        1px solid
+        #1E293B;
+
+    position:
+        relative;
+
+    z-index:
+        1000;
+
+}
+
+
+/* =========================================================
+   Page Title
+========================================================= */
+
+.top-nav-title {
+
+    color:
+        #F8FAFC;
+
+    font-size:
+        .92rem;
+
+    font-weight:
+        700;
+
+    white-space:
+        nowrap;
+
+}
+
+
+/* =========================================================
+   Right Area
+========================================================= */
+
+.top-nav-right {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        flex-end;
+
+    gap:
+        14px;
+
+}
+
+
+/* =========================================================
+   User Area
+========================================================= */
+
+.frag-user-area {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+}
+
+
+.frag-dropdown {
+
+    position:
+        relative;
+
+}
+
+
+/* =========================================================
+   User Trigger
+========================================================= */
+
+.frag-user-trigger {
+
+    min-height:
+        42px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        9px;
+
+    padding:
+        4px 7px 4px 13px;
+
+    border-radius:
+        999px;
+
+    border:
+        1px solid
+        #24344F;
+
+    background:
+        #111827;
+
+    color:
+        #F8FAFC;
+
+    cursor:
+        pointer;
+
+    font-family:
+        inherit;
+
+}
+
+
+.frag-user-trigger:hover {
+
+    background:
+        #172033;
+
+    border-color:
+        #35537F;
+
+}
+
+
+.frag-username {
+
+    max-width:
+        140px;
+
+    overflow:
+        hidden;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+
+    color:
+        #F8FAFC;
+
+    font-size:
+        .82rem;
+
+    font-weight:
+        700;
+
+}
+
+
+.frag-arrow {
+
+    order:
+        0;
+
+    color:
+        #64748B;
+
+    font-size:
+        .68rem;
+
+}
+
+
+.frag-dropdown.open
+.frag-arrow {
+
+    color:
+        #60A5FA;
+
+}
+
+
+/* =========================================================
+   Avatar
+========================================================= */
+
+.frag-avatar-wrap {
+
+    position:
+        relative;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    width:
+        32px;
+
+    height:
+        32px;
+
+    min-width:
+        32px;
+
+    border-radius:
+        50%;
+
+    overflow:
+        hidden;
+
+    background:
+        #0F172A;
+
+}
+
+
+.frag-avatar {
+
+    display:
+        block;
+
+    width:
+        32px;
+
+    height:
+        32px;
+
+    object-fit:
+        cover;
+
+    border-radius:
+        50%;
+
+}
+
+
+.frag-avatar-fallback {
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(59,130,246,.10);
+
+    color:
+        #60A5FA;
+
+}
+
+
+.frag-avatar-wrap.is-broken
+.frag-avatar-fallback {
+
+    display:
+        flex;
+
+}
+
+
+.frag-avatar-wrap.is-broken
+.frag-avatar-image {
+
+    display:
+        none;
+
+}
+
+
+.frag-avatar-placeholder {
+
+    background:
+        rgba(59,130,246,.10);
+
+    color:
+        #60A5FA;
+
+    font-size:
+        .8rem;
+
+}
+
+
+/* =========================================================
+   Dropdown
+========================================================= */
+
+.frag-dropdown-menu {
+
+    position:
+        absolute;
+
+    top:
+        calc(100% + 10px);
+
+    inset-inline-end:
+        0;
+
+    width:
+        270px;
+
+    padding:
+        8px 0;
+
+    background:
+        #111827;
+
+    border:
+        1px solid
+        #253754;
+
+    border-radius:
+        14px;
+
+    box-shadow:
+        0 20px 50px
+        rgba(0,0,0,.42);
+
+    display:
+        none;
+
+    z-index:
+        2000;
+
+}
+
+
+.frag-dropdown.open
+.frag-dropdown-menu {
+
+    display:
+        block;
+
+}
+
+
+/* =========================================================
+   Dropdown Header
+========================================================= */
+
+.frag-drop-header {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+    padding:
+        13px 16px;
+
+}
+
+
+.frag-drop-avatar-wrap {
+
+    position:
+        relative;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    width:
+        46px;
+
+    height:
+        46px;
+
+    min-width:
+        46px;
+
+    border-radius:
+        50%;
+
+    overflow:
+        hidden;
+
+    background:
+        #0F172A;
+
+    border:
+        2px solid
+        rgba(59,130,246,.55);
+
+}
+
+
+.frag-drop-avatar {
+
+    width:
+        46px;
+
+    height:
+        46px;
+
+    object-fit:
+        cover;
+
+    border-radius:
+        50%;
+
+}
+
+
+.frag-drop-avatar-fallback {
+
+    position:
+        absolute;
+
+    inset:
+        0;
+
+    display:
+        none;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    background:
+        rgba(59,130,246,.10);
+
+    color:
+        #60A5FA;
+
+}
+
+
+.frag-drop-avatar-wrap.is-broken
+.frag-drop-avatar-fallback {
+
+    display:
+        flex;
+
+}
+
+
+.frag-drop-avatar-wrap.is-broken
+.frag-drop-avatar {
+
+    display:
+        none;
+
+}
+
+
+.frag-drop-avatar-placeholder {
+
+    color:
+        #60A5FA;
+
+    background:
+        rgba(59,130,246,.10);
+
+    font-size:
+        1.1rem;
+
+}
+
+
+/* =========================================================
+   Dropdown Info
+========================================================= */
+
+.frag-drop-info {
+
+    display:
+        flex;
+
+    flex:
+        1;
+
+    min-width:
+        0;
+
+    flex-direction:
+        column;
+
+    gap:
+        5px;
+
+}
+
+
+.frag-drop-name {
+
+    color:
+        #F8FAFC;
+
+    font-size:
+        .86rem;
+
+    font-weight:
+        800;
+
+    overflow:
+        hidden;
+
+    text-overflow:
+        ellipsis;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.frag-drop-steam {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    width:
+        fit-content;
+
+    max-width:
+        100%;
+
+    padding:
+        3px 8px;
+
+    border-radius:
+        999px;
+
+    background:
+        #0B1220;
+
+    color:
+        #64748B;
+
+    font-family:
+        Consolas,
+        monospace;
+
+    font-size:
+        .65rem;
+
+    direction:
+        ltr;
+
+}
+
+
+/* =========================================================
+   Divider
+========================================================= */
+
+.frag-drop-divider {
+
+    height:
+        1px;
+
+    margin:
+        7px 0;
+
+    background:
+        rgba(148,163,184,.10);
+
+}
+
+
+/* =========================================================
+   Links
+========================================================= */
+
+.frag-drop-link {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        11px;
+
+    min-height:
+        40px;
+
+    padding:
+        9px 17px;
+
+    color:
+        #CBD5E1;
+
+    text-decoration:
+        none;
+
+    font-size:
+        .8rem;
+
+    direction:
+        rtl;
+
+}
+
+
+.frag-drop-link:hover {
+
+    background:
+        rgba(59,130,246,.06);
+
+    color:
+        #F8FAFC;
+
+}
+
+
+.frag-drop-link i {
+
+    width:
+        20px;
+
+    text-align:
+        center;
+
+    color:
+        #64748B;
+
+}
+
+
+.frag-drop-link:hover i {
+
+    color:
+        #60A5FA;
+
+}
+
+
+.frag-drop-link.logout:hover {
+
+    background:
+        rgba(239,68,68,.08);
+
+    color:
+        #FCA5A5;
+
+}
+
+
+.frag-drop-link.logout:hover i {
+
+    color:
+        #F87171;
+
+}
+
+
+/* =========================================================
+   Login Button
+========================================================= */
+
+.frag-login-btn {
+
+    min-height:
+        40px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        8px;
+
+    padding:
+        0 15px;
+
+    border-radius:
+        10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #3B82F6,
+            #2563EB
+        );
+
+    border:
+        1px solid
+        rgba(96,165,250,.22);
+
+    color:
+        #FFFFFF;
+
+    text-decoration:
+        none;
+
+    font-size:
+        .8rem;
+
+    font-weight:
+        700;
+
+}
+
+
+.frag-login-btn:hover {
+
+    background:
+        #2563EB;
+
+}
+
+
+/* =========================================================
+   Language
+========================================================= */
+
+.lang-switcher {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        4px;
+
+    padding:
+        4px;
+
+    background:
+        #111827;
+
+    border:
+        1px solid
+        #22304A;
+
+    border-radius:
+        10px;
+
+}
+
+
+.lang-btn {
+
+    min-height:
+        32px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        6px;
+
+    padding:
+        0 9px;
+
+    border-radius:
+        7px;
+
+    background:
+        transparent;
+
+    color:
+        #64748B;
+
+    text-decoration:
+        none;
+
+    font-size:
+        .72rem;
+
+    font-weight:
+        700;
+
+}
+
+
+.lang-btn img {
+
+    width:
+        16px;
+
+    height:
+        12px;
+
+    object-fit:
+        cover;
+
+    border-radius:
+        2px;
+
+}
+
+
+.lang-btn:hover {
+
+    color:
+        #E2E8F0;
+
+    background:
+        rgba(59,130,246,.05);
+
+}
+
+
+.lang-btn.active {
+
+    color:
+        #FFFFFF;
+
+    background:
+        #3B82F6;
+
+}
+
+
+/* =========================================================
+   Responsive
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .top-navbar {
+
+        padding:
+            10px 15px;
+
+    }
+
+    .top-nav-title {
+
+        max-width:
+            42vw;
+
+        overflow:
+            hidden;
+
+        text-overflow:
+            ellipsis;
+
+        white-space:
+            nowrap;
+
+    }
+
+    .frag-username {
+
+        display:
+            none;
+
+    }
+
+    .frag-user-trigger {
+
+        padding:
+            4px;
+
+    }
+
+    .frag-arrow {
+
+        display:
+            none;
+
+    }
+
+    .frag-login-btn span {
+
+        display:
+            none;
+
+    }
+
+    .frag-login-btn {
+
+        width:
+            40px;
+
+        padding:
+            0;
+
+    }
+
+    .lang-btn {
+
+        padding:
+            0 7px;
+
+    }
+
+    .lang-btn img {
+
+        display:
+            none;
+
+    }
+
+}
+
+@media (max-width: 430px) {
+
+    .top-nav-right {
+
+        gap:
+            7px;
+
+    }
+
+    .lang-btn {
+
+        font-size:
+            .65rem;
+
+    }
+
+    .frag-dropdown-menu {
+
+        width:
+            245px;
+
+        inset-inline-end:
+            -70px;
+
+    }
+
+}

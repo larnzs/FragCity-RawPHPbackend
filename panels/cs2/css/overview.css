@@ -1,0 +1,903 @@
+/* =========================================================
+   FragCity CS2 Panel
+   Overview Page Specific Styles
+========================================================= */
+
+
+/* =========================================================
+   Page
+========================================================= */
+
+.overview-page {
+    direction: inherit;
+}
+
+
+/* =========================================================
+   Error Alert
+========================================================= */
+
+.overview-alert-error {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+
+    padding: 12px 16px;
+
+    border-radius: 9px;
+
+    background:
+        rgba(239, 68, 68, 0.10);
+
+    border:
+        1px solid
+        rgba(239, 68, 68, 0.25);
+
+    color:
+        #FCA5A5;
+
+    font-size:
+        0.85rem;
+
+}
+
+.overview-alert-error i {
+
+    color:
+        #F87171;
+
+}
+
+
+/* =========================================================
+   Empty / No Selected Server
+========================================================= */
+
+.overview-server-empty {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        50px;
+
+    margin-top:
+        20px;
+
+    text-align:
+        center;
+
+}
+
+.overview-empty-message {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        10px;
+
+    margin-bottom:
+        22px;
+
+    color:
+        #F87171;
+
+    font-size:
+        1rem;
+
+    line-height:
+        1.8;
+
+}
+
+.overview-empty-message i {
+
+    color:
+        #EF4444;
+
+}
+
+.overview-back-button {
+
+    display:
+        inline-flex;
+
+    width:
+        auto;
+
+    padding:
+        10px 20px;
+
+}
+
+
+/* =========================================================
+   Server Header
+========================================================= */
+
+.server-overview-header {
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        flex-start;
+
+    gap:
+        20px;
+
+    flex-wrap:
+        wrap;
+
+    margin-bottom:
+        20px;
+
+}
+
+.server-overview-title-area {
+
+    flex:
+        1;
+
+    min-width:
+        280px;
+
+}
+
+.overview-server-title {
+
+    margin-bottom:
+        4px;
+
+}
+
+.server-tags {
+
+    display:
+        flex;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        8px;
+
+    margin-top:
+        10px;
+
+}
+
+.server-tags .tag {
+
+    background:
+        rgba(59, 130, 246, 0.05);
+
+    border:
+        1px solid
+        rgba(59, 130, 246, 0.16);
+
+    padding:
+        5px 10px;
+
+    border-radius:
+        7px;
+
+    font-size:
+        0.78rem;
+
+    color:
+        #94A3B8;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    white-space:
+        nowrap;
+
+}
+
+.server-tags .tag i {
+
+    color:
+        #60A5FA;
+
+    font-size:
+        0.72rem;
+
+}
+
+
+/* =========================================================
+   Header Actions
+========================================================= */
+
+.server-overview-actions {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        8px;
+
+    flex-wrap:
+        wrap;
+
+}
+
+.overview-server-action-form {
+
+    display:
+        inline-flex;
+
+    gap:
+        8px;
+
+    align-items:
+        center;
+
+    margin:
+        0;
+
+}
+
+
+/* =========================================================
+   Custom Buttons
+========================================================= */
+
+.btn-custom {
+
+    height:
+        38px;
+
+    padding:
+        0 16px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        6px;
+
+    font-size:
+        0.82rem;
+
+    font-weight:
+        600;
+
+    border-radius:
+        9px;
+
+    border:
+        1px solid
+        rgba(148, 163, 184, 0.18);
+
+    background:
+        #172033;
+
+    color:
+        #FFFFFF;
+
+    cursor:
+        pointer;
+
+    white-space:
+        nowrap;
+
+    text-decoration:
+        none;
+
+    line-height:
+        normal;
+
+}
+
+.btn-custom:hover {
+
+    background:
+        #1E293B;
+
+    border-color:
+        #30415F;
+
+}
+
+.btn-custom-start {
+
+    background:
+        #16A34A;
+
+    border-color:
+        #16A34A;
+
+    color:
+        #FFFFFF;
+
+}
+
+.btn-custom-start:hover {
+
+    background:
+        #15803D;
+
+    border-color:
+        #15803D;
+
+}
+
+.btn-custom-stop {
+
+    background:
+        #DC2626;
+
+    border-color:
+        #DC2626;
+
+    color:
+        #FFFFFF;
+
+}
+
+.btn-custom-stop:hover {
+
+    background:
+        #B91C1C;
+
+    border-color:
+        #B91C1C;
+
+}
+
+.btn-custom-disabled {
+
+    background:
+        rgba(148, 163, 184, 0.04);
+
+    border-color:
+        rgba(148, 163, 184, 0.08);
+
+    color:
+        #64748B;
+
+    cursor:
+        not-allowed;
+
+    opacity:
+        0.65;
+
+}
+
+.btn-custom-disabled:hover {
+
+    background:
+        rgba(148, 163, 184, 0.04);
+
+    border-color:
+        rgba(148, 163, 184, 0.08);
+
+}
+
+.btn-icon-only {
+
+    width:
+        38px;
+
+    height:
+        38px;
+
+    padding:
+        0;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border-radius:
+        9px;
+
+    background:
+        #172033;
+
+    border:
+        1px solid
+        var(--panel-border);
+
+    color:
+        #94A3B8;
+
+    cursor:
+        pointer;
+
+}
+
+.btn-icon-only:hover {
+
+    background:
+        #1E293B;
+
+    color:
+        #FFFFFF;
+
+    border-color:
+        #30415F;
+
+}
+
+
+/* =========================================================
+   Tabs
+========================================================= */
+
+.server-sub-tabs {
+
+    margin-bottom:
+        25px;
+
+}
+
+
+/* =========================================================
+   Server Card
+========================================================= */
+
+.overview-card-title-inline {
+
+    margin:
+        0;
+
+}
+
+.overview-cs2-logo {
+
+    padding:
+        0;
+
+    overflow:
+        hidden;
+
+    background:
+        transparent;
+
+}
+
+.overview-cs2-logo img {
+
+    display:
+        block;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        cover;
+
+}
+
+.server-status-box {
+
+    margin-bottom:
+        20px;
+
+    padding-bottom:
+        15px;
+
+    border-bottom:
+        1px solid
+        var(--panel-border);
+
+}
+
+.status-badge {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+}
+
+.status-badge .dot {
+
+    width:
+        6px;
+
+    height:
+        6px;
+
+    border-radius:
+        50%;
+
+}
+
+.status-badge.online .dot {
+
+    background:
+        #22C55E;
+
+    box-shadow:
+        0 0 8px
+        rgba(34,197,94,.55);
+
+}
+
+.status-badge.pending .dot {
+
+    background:
+        #3B82F6;
+
+    box-shadow:
+        0 0 8px
+        rgba(59,130,246,.55);
+
+}
+
+.status-badge.stopped .dot {
+
+    background:
+        #EF4444;
+
+    box-shadow:
+        0 0 8px
+        rgba(239,68,68,.45);
+
+}
+
+
+/* =========================================================
+   Server Details
+========================================================= */
+
+.overview-expire-date {
+
+    color:
+        #F87171;
+
+}
+
+.ip-box {
+
+    background:
+        #0B1220;
+
+    padding:
+        4px 10px;
+
+    border-radius:
+        7px;
+
+    border:
+        1px solid
+        var(--panel-border);
+
+}
+
+.ip-box code {
+
+    color:
+        #93C5FD;
+
+}
+
+.copy-icon {
+
+    border:
+        none;
+
+    background:
+        transparent;
+
+    padding:
+        2px;
+
+    color:
+        #64748B;
+
+    cursor:
+        pointer;
+
+    font-size:
+        0.85rem;
+
+}
+
+.copy-icon:hover {
+
+    color:
+        #60A5FA;
+
+}
+
+.copy-icon.copied {
+
+    color:
+        #22C55E;
+
+}
+
+.overview-card-actions {
+
+    margin-top:
+        15px;
+
+}
+
+.overview-card-actions .btn-secondary:disabled {
+
+    opacity:
+        .5;
+
+    cursor:
+        not-allowed;
+
+}
+
+
+/* =========================================================
+   Active Instance
+========================================================= */
+
+.active-instance-card .card-header-flex {
+
+    margin-bottom:
+        18px;
+
+}
+
+
+/* =========================================================
+   Console
+========================================================= */
+
+.overview-log-error {
+
+    color:
+        #F87171;
+
+}
+
+.console-input-wrapper input:disabled {
+
+    background:
+        rgba(148,163,184,.03);
+
+    color:
+        #475569;
+
+    cursor:
+        not-allowed;
+
+}
+
+
+/* =========================================================
+   Usage
+========================================================= */
+
+.overview-usage-muted {
+
+    opacity:
+        .65;
+
+}
+
+.overview-usage-status {
+
+    color:
+        #F87171;
+
+    font-size:
+        .78rem;
+
+    font-weight:
+        700;
+
+}
+
+.overview-usage-empty {
+
+    padding:
+        25px 0;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        8px;
+
+    text-align:
+        center;
+
+    color:
+        #94A3B8;
+
+    font-size:
+        .85rem;
+
+    line-height:
+        1.8;
+
+}
+
+.overview-usage-empty i {
+
+    color:
+        #EF4444;
+
+    font-size:
+        1.5rem;
+
+}
+
+.overview-metric-danger {
+
+    color:
+        #F87171 !important;
+
+    font-weight:
+        700;
+
+}
+
+.progress-fill.overview-metric-danger {
+
+    background:
+        #EF4444 !important;
+
+}
+
+
+/* =========================================================
+   Responsive
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .server-overview-header {
+
+        flex-direction:
+            column;
+
+    }
+
+    .server-overview-actions {
+
+        width:
+            100%;
+
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .overview-empty-message {
+
+        flex-direction:
+            column;
+
+    }
+
+    .overview-server-action-form {
+
+        width:
+            100%;
+
+        flex-wrap:
+            wrap;
+
+    }
+
+    .overview-server-action-form .btn-custom {
+
+        flex:
+            1;
+
+    }
+
+    .server-overview-actions {
+
+        width:
+            100%;
+
+    }
+
+    .btn-icon-only {
+
+        flex:
+            0 0 38px;
+
+    }
+
+}
+
+@media (max-width: 480px) {
+
+    .server-tags .tag {
+
+        font-size:
+            .72rem;
+
+    }
+
+    .overview-server-title {
+
+        font-size:
+            1.35rem;
+
+    }
+
+    .server-card-buttons {
+
+        flex-direction:
+            column;
+
+    }
+
+    .server-card-buttons .btn-secondary {
+
+        width:
+            100%;
+
+    }
+
+}

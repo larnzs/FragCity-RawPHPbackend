@@ -1,0 +1,87 @@
+/* =========================================================
+   Saved Compact Sidebar Preference
+========================================================= */
+
+@media (min-width: 701px) {
+
+    html.panel-compact-sidebar
+    .sidebar {
+
+        width:
+            82px;
+
+        min-width:
+            82px;
+
+    }
+
+
+    html.panel-compact-sidebar
+    .sidebar-brand {
+
+        padding-inline:
+            10px;
+
+    }
+
+
+    html.panel-compact-sidebar
+    .sidebar-brand-link {
+
+        justify-content:
+            center;
+
+    }
+
+
+    html.panel-compact-sidebar
+    .sidebar-brand-content {
+
+        display:
+            none;
+
+    }
+
+
+    html.panel-compact-sidebar
+    .sidebar-menu {
+
+        padding-inline:
+            9px;
+
+    }
+
+
+    html.panel-compact-sidebar
+    .sidebar-item {
+
+        justify-content:
+            center;
+
+        padding-inline:
+            10px;
+
+    }
+
+
+    html.panel-compact-sidebar
+    .sidebar-item span {
+
+        display:
+            none;
+
+    }
+
+
+    html.panel-compact-sidebar
+    .sidebar-item i {
+
+        width:
+            auto;
+
+        min-width:
+            0;
+
+    }
+
+}

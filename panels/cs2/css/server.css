@@ -1,0 +1,527 @@
+/* =========================================================
+   Server Page
+========================================================= */
+
+.server-page-header {
+    margin-bottom: 24px;
+}
+
+
+/* =========================================================
+   Toolbar
+========================================================= */
+
+.server-toolbar {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    margin-bottom:
+        22px;
+
+}
+
+
+.server-search-filter {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+}
+
+
+.server-search-box {
+
+    position:
+        relative;
+
+    width:
+        min(360px, 100%);
+
+}
+
+
+.server-search-box > i {
+
+    position:
+        absolute;
+
+    top:
+        50%;
+
+    right:
+        15px;
+
+    transform:
+        translateY(-50%);
+
+    color:
+        #64748B;
+
+    pointer-events:
+        none;
+
+}
+
+
+.server-search-box input {
+
+    width:
+        100%;
+
+    height:
+        42px;
+
+    padding:
+        0 42px 0 38px;
+
+    background:
+        #0B1220;
+
+    border:
+        1px solid
+        #22304A;
+
+    border-radius:
+        10px;
+
+    color:
+        #F8FAFC;
+
+    outline:
+        none;
+
+    font-family:
+        inherit;
+
+    font-size:
+        .82rem;
+
+}
+
+
+.server-search-box input::placeholder {
+
+    color:
+        #64748B;
+
+}
+
+
+.server-search-box input:focus {
+
+    border-color:
+        #3B82F6;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(59,130,246,.10);
+
+}
+
+
+.server-search-clear {
+
+    position:
+        absolute;
+
+    top:
+        50%;
+
+    left:
+        7px;
+
+    width:
+        28px;
+
+    height:
+        28px;
+
+    transform:
+        translateY(-50%);
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border:
+        none;
+
+    background:
+        transparent;
+
+    color:
+        #64748B;
+
+    border-radius:
+        7px;
+
+    cursor:
+        pointer;
+
+    opacity:
+        0;
+
+    pointer-events:
+        none;
+
+}
+
+
+.server-search-clear.visible {
+
+    opacity:
+        1;
+
+    pointer-events:
+        auto;
+
+}
+
+
+.server-search-clear:hover {
+
+    background:
+        rgba(59,130,246,.08);
+
+    color:
+        #93C5FD;
+
+}
+
+
+/* =========================================================
+   Filter
+========================================================= */
+
+.server-filter-wrapper {
+
+    position:
+        relative;
+
+}
+
+
+.server-filter-btn {
+
+    min-height:
+        42px;
+
+}
+
+
+.server-filter-btn i {
+
+    font-size:
+        .68rem;
+
+}
+
+
+.server-filter-menu {
+
+    position:
+        absolute;
+
+    top:
+        calc(100% + 8px);
+
+    inset-inline-start:
+        0;
+
+    min-width:
+        150px;
+
+    display:
+        none;
+
+    padding:
+        6px;
+
+    background:
+        #111827;
+
+    border:
+        1px solid
+        #253754;
+
+    border-radius:
+        10px;
+
+    box-shadow:
+        0 16px 38px
+        rgba(0,0,0,.28);
+
+    z-index:
+        20;
+
+}
+
+
+.server-filter-menu.open {
+
+    display:
+        block;
+
+}
+
+
+.server-filter-menu button {
+
+    width:
+        100%;
+
+    padding:
+        9px 11px;
+
+    border:
+        none;
+
+    border-radius:
+        7px;
+
+    background:
+        transparent;
+
+    color:
+        #CBD5E1;
+
+    text-align:
+        start;
+
+    cursor:
+        pointer;
+
+}
+
+
+.server-filter-menu button:hover {
+
+    background:
+        rgba(59,130,246,.07);
+
+    color:
+        #FFFFFF;
+
+}
+
+
+/* =========================================================
+   Table
+========================================================= */
+
+.server-card-container {
+
+    overflow:
+        hidden;
+
+}
+
+
+.server-table-header {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        2fr 1fr 1fr 1fr 1fr;
+
+    min-width:
+        800px;
+
+    padding:
+        14px 22px;
+
+    background:
+        #0B1220;
+
+    border-bottom:
+        1px solid
+        #22304A;
+
+    color:
+        #64748B;
+
+    font-size:
+        .72rem;
+
+    font-weight:
+        700;
+
+}
+
+
+.server-table-header div {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+}
+
+
+.server-table-header i {
+
+    font-size:
+        .65rem;
+
+}
+
+
+/* =========================================================
+   Empty
+========================================================= */
+
+.server-empty-state {
+
+    min-height:
+        430px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        50px 20px;
+
+    text-align:
+        center;
+
+}
+
+
+/* =========================================================
+   Grid View
+========================================================= */
+
+.server-card-container.server-grid-view {
+
+    padding:
+        15px;
+
+}
+
+
+.server-card-container.server-grid-view
+.server-table-header {
+
+    display:
+        none;
+
+}
+
+
+.server-card-container.server-grid-view
+.server-empty-state {
+
+    min-height:
+        380px;
+
+    border:
+        1px solid
+        rgba(59,130,246,.10);
+
+    border-radius:
+        12px;
+
+}
+
+
+/* =========================================================
+   Responsive
+========================================================= */
+
+@media (max-width: 750px) {
+
+    .server-toolbar {
+
+        align-items:
+            stretch;
+
+        flex-direction:
+            column;
+
+    }
+
+    .server-search-filter {
+
+        width:
+            100%;
+
+        flex-direction:
+            column;
+
+        align-items:
+            stretch;
+
+    }
+
+    .server-search-box {
+
+        width:
+            100%;
+
+    }
+
+    .server-filter-wrapper {
+
+        width:
+            100%;
+
+    }
+
+    .server-filter-btn {
+
+        width:
+            100%;
+
+    }
+
+    .view-options {
+
+        align-self:
+            flex-start;
+
+    }
+
+    .server-card-container {
+
+        overflow-x:
+            auto;
+
+    }
+
+}

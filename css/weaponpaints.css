@@ -1,0 +1,4397 @@
+/* =========================================================
+   FragCity Weapon Paints
+   Premium Weapon Customization UI
+   Location:
+   /css/weaponpaints.css
+========================================================= */
+
+
+/* =========================================================
+   01. Design Tokens
+========================================================= */
+
+:root {
+
+    --wp-bg:
+        #080b12;
+
+    --wp-bg-deep:
+        #05070c;
+
+    --wp-surface:
+        #0d121c;
+
+    --wp-surface-2:
+        #111927;
+
+    --wp-surface-3:
+        #151f30;
+
+    --wp-surface-hover:
+        #182438;
+
+    --wp-border:
+        rgba(148, 163, 184, 0.11);
+
+    --wp-border-strong:
+        rgba(96, 165, 250, 0.25);
+
+    --wp-text:
+        #f8fafc;
+
+    --wp-text-soft:
+        #dbe4f0;
+
+    --wp-text-muted:
+        #8ea0b8;
+
+    --wp-text-dim:
+        #62728a;
+
+    --wp-blue:
+        #3b82f6;
+
+    --wp-blue-soft:
+        #60a5fa;
+
+    --wp-blue-deep:
+        #2563eb;
+
+    --wp-cyan:
+        #38bdf8;
+
+    --wp-green:
+        #22c55e;
+
+    --wp-red:
+        #ef4444;
+
+    --wp-gold:
+        #f5b042;
+
+    --wp-radius-sm:
+        10px;
+
+    --wp-radius:
+        16px;
+
+    --wp-radius-lg:
+        22px;
+
+    --wp-shadow:
+        0 18px 55px
+        rgba(0, 0, 0, 0.28);
+
+    --wp-shadow-soft:
+        0 10px 32px
+        rgba(0, 0, 0, 0.18);
+
+    --wp-transition:
+        220ms
+        cubic-bezier(
+            0.22,
+            0.61,
+            0.36,
+            1
+        );
+
+}
+
+
+/* =========================================================
+   02. Base App
+========================================================= */
+
+.wp-app {
+
+    width:
+        100%;
+
+    min-height:
+        100vh;
+
+    padding:
+        0 0 42px;
+
+    color:
+        var(--wp-text);
+
+    direction:
+        rtl;
+
+    position:
+        relative;
+
+    isolation:
+        isolate;
+
+}
+
+
+.wp-app::before {
+
+    content:
+        "";
+
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    z-index:
+        -2;
+
+    pointer-events:
+        none;
+
+    background:
+
+        radial-gradient(
+            circle at 12% 6%,
+            rgba(59, 130, 246, 0.09),
+            transparent 26%
+        ),
+
+        radial-gradient(
+            circle at 88% 10%,
+            rgba(56, 189, 248, 0.055),
+            transparent 24%
+        ),
+
+        linear-gradient(
+            180deg,
+            #080b12 0%,
+            #080b12 60%,
+            #060910 100%
+        );
+
+}
+
+
+.wp-app button,
+.wp-app input,
+.wp-app select,
+.wp-app textarea {
+
+    font-family:
+        inherit;
+
+}
+
+
+.wp-app a {
+
+    color:
+        inherit;
+
+}
+
+
+.wp-app img {
+
+    display:
+        block;
+
+    max-width:
+        100%;
+
+}
+
+
+/* =========================================================
+   03. Authentication State
+========================================================= */
+
+.wp-auth-state {
+
+    min-height:
+        320px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        40px;
+
+    color:
+        var(--wp-text);
+
+    text-align:
+        center;
+
+    font-size:
+        1rem;
+
+}
+
+
+/* =========================================================
+   04. Header
+========================================================= */
+
+.wp-header {
+
+    position:
+        sticky;
+
+    top:
+        0;
+
+    z-index:
+        100;
+
+    padding:
+        18px
+        22px
+        14px;
+
+    background:
+        rgba(
+            8,
+            11,
+            18,
+            0.84
+        );
+
+    border-bottom:
+        1px solid
+        rgba(
+            148,
+            163,
+            184,
+            0.08
+        );
+
+    backdrop-filter:
+        blur(
+            18px
+        );
+
+    -webkit-backdrop-filter:
+        blur(
+            18px
+        );
+
+}
+
+
+.wp-header-main {
+
+    width:
+        min(
+            100%,
+            1550px
+        );
+
+    margin:
+        0 auto;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        18px;
+
+}
+
+
+.wp-search-wrap {
+
+    flex:
+        1 1 360px;
+
+    max-width:
+        520px;
+
+    position:
+        relative;
+
+}
+
+
+.wp-search-wrap > i {
+
+    position:
+        absolute;
+
+    top:
+        50%;
+
+    right:
+        16px;
+
+    transform:
+        translateY(-50%);
+
+    color:
+        var(--wp-text-dim);
+
+    font-size:
+        0.9rem;
+
+    pointer-events:
+        none;
+
+    transition:
+        color
+        var(--wp-transition);
+
+}
+
+
+.wp-search {
+
+    width:
+        100%;
+
+    height:
+        46px;
+
+    padding:
+        0 44px
+        0 16px;
+
+    color:
+        var(--wp-text);
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            0.78
+        );
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        14px;
+
+    outline:
+        none;
+
+    font-size:
+        0.82rem;
+
+    box-shadow:
+        inset
+        0 1px 0
+        rgba(
+            255,
+            255,
+            255,
+            0.018
+        );
+
+    transition:
+        border-color
+        var(--wp-transition),
+        box-shadow
+        var(--wp-transition),
+        background-color
+        var(--wp-transition);
+
+}
+
+
+.wp-search::placeholder {
+
+    color:
+        #60728a;
+
+}
+
+
+.wp-search:hover {
+
+    background:
+        rgba(
+            17,
+            27,
+            43,
+            0.9
+        );
+
+}
+
+
+.wp-search:focus {
+
+    border-color:
+        rgba(
+            59,
+            130,
+            246,
+            0.5
+        );
+
+    background:
+        #0f1724;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(
+            59,
+            130,
+            246,
+            0.08
+        );
+
+}
+
+
+.wp-search:focus
++
+i {
+
+    color:
+        var(--wp-blue-soft);
+
+}
+
+
+/* =========================================================
+   05. Team Switcher
+========================================================= */
+
+.wp-team-switcher {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        5px;
+
+    padding:
+        4px;
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            0.84
+        );
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        14px;
+
+    box-shadow:
+        var(--wp-shadow-soft);
+
+}
+
+
+.wp-team-btn {
+
+    min-width:
+        58px;
+
+    height:
+        38px;
+
+    padding:
+        0 12px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        7px;
+
+    border-radius:
+        10px;
+
+    color:
+        var(--wp-text-muted);
+
+    text-decoration:
+        none;
+
+    font-size:
+        0.76rem;
+
+    font-weight:
+        800;
+
+    transition:
+        transform
+        var(--wp-transition),
+        color
+        var(--wp-transition),
+        background
+        var(--wp-transition),
+        box-shadow
+        var(--wp-transition);
+
+}
+
+
+.wp-team-btn:hover {
+
+    color:
+        var(--wp-text);
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.045
+        );
+
+    transform:
+        translateY(
+            -1px
+        );
+
+}
+
+
+.wp-team-btn.is-active {
+
+    color:
+        #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--wp-blue-deep),
+            var(--wp-blue)
+        );
+
+    box-shadow:
+        0 8px 22px
+        rgba(
+            37,
+            99,
+            235,
+            0.28
+        );
+
+}
+
+
+.wp-team-btn i {
+
+    font-size:
+        0.78rem;
+
+}
+
+
+.wp-team-btn--t.is-active {
+
+    background:
+        linear-gradient(
+            135deg,
+            #b45309,
+            #f59e0b
+        );
+
+    box-shadow:
+        0 8px 22px
+        rgba(
+            245,
+            158,
+            11,
+            0.22
+        );
+
+}
+
+
+.wp-team-btn--ct.is-active {
+
+    background:
+        linear-gradient(
+            135deg,
+            #1d4ed8,
+            #38bdf8
+        );
+
+}
+
+
+.wp-team-btn--both.is-active {
+
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5,
+            #3b82f6
+        );
+
+}
+
+
+/* =========================================================
+   06. Tabs
+========================================================= */
+
+.wp-tabs {
+
+    width:
+        min(
+            100%,
+            1550px
+        );
+
+    margin:
+        14px auto
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    overflow-x:
+        auto;
+
+    scrollbar-width:
+        none;
+
+}
+
+
+.wp-tabs::-webkit-scrollbar {
+
+    display:
+        none;
+
+}
+
+
+.wp-tab {
+
+    position:
+        relative;
+
+    flex:
+        0 0 auto;
+
+    min-height:
+        42px;
+
+    padding:
+        0 16px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        8px;
+
+    color:
+        var(--wp-text-muted);
+
+    background:
+        transparent;
+
+    border:
+        1px solid
+        transparent;
+
+    border-radius:
+        12px;
+
+    font-size:
+        0.77rem;
+
+    font-weight:
+        700;
+
+    white-space:
+        nowrap;
+
+    cursor:
+        pointer;
+
+    transition:
+        color
+        var(--wp-transition),
+        background
+        var(--wp-transition),
+        border-color
+        var(--wp-transition),
+        transform
+        var(--wp-transition);
+
+}
+
+
+.wp-tab:hover {
+
+    color:
+        var(--wp-text);
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.04
+        );
+
+    border-color:
+        rgba(
+            148,
+            163,
+            184,
+            0.07
+        );
+
+}
+
+
+.wp-tab.is-active,
+.wp-tab.active {
+
+    color:
+        #ffffff;
+
+    background:
+        rgba(
+            59,
+            130,
+            246,
+            0.12
+        );
+
+    border-color:
+        rgba(
+            59,
+            130,
+            246,
+            0.25
+        );
+
+}
+
+
+.wp-tab.is-active::after,
+.wp-tab.active::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        14px;
+
+    right:
+        14px;
+
+    bottom:
+        -1px;
+
+    height:
+        2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            var(--wp-blue-soft),
+            transparent
+        );
+
+    border-radius:
+        999px;
+
+}
+
+
+.wp-tab i {
+
+    color:
+        var(--wp-blue-soft);
+
+    font-size:
+        0.82rem;
+
+}
+
+
+/* =========================================================
+   07. Main Container
+========================================================= */
+
+.wp-main {
+
+    width:
+        min(
+            calc(100% - 36px),
+            1550px
+        );
+
+    margin:
+        24px auto
+        0;
+
+}
+
+
+.wp-main .tab-content {
+
+    min-height:
+        420px;
+
+}
+
+
+.wp-main .tab-pane {
+
+    outline:
+        none;
+
+}
+
+
+/* =========================================================
+   08. Section Head
+========================================================= */
+
+.wp-section-head {
+
+    display:
+        flex;
+
+    align-items:
+        flex-end;
+
+    justify-content:
+        space-between;
+
+    gap:
+        18px;
+
+    margin-bottom:
+        18px;
+
+}
+
+
+.wp-section-kicker {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    color:
+        var(--wp-blue-soft);
+
+    font-size:
+        0.73rem;
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        0.02em;
+
+}
+
+
+.wp-section-kicker i {
+
+    font-size:
+        0.76rem;
+
+}
+
+
+.wp-section-title {
+
+    margin:
+        6px 0 0;
+
+    color:
+        var(--wp-text);
+
+    font-size:
+        clamp(
+            1.15rem,
+            2vw,
+            1.45rem
+        );
+
+    font-weight:
+        800;
+
+    letter-spacing:
+        -0.02em;
+
+}
+
+
+.wp-section-meta {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        flex-end;
+
+    flex-wrap:
+        wrap;
+
+    gap:
+        7px;
+
+}
+
+
+.wp-meta-pill {
+
+    min-height:
+        34px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    padding:
+        0 11px;
+
+    color:
+        var(--wp-text-muted);
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            0.7
+        );
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        999px;
+
+    font-size:
+        0.68rem;
+
+    white-space:
+        nowrap;
+
+}
+
+
+.wp-meta-pill i {
+
+    color:
+        var(--wp-blue-soft);
+
+}
+
+
+/* =========================================================
+   09. Item Grid
+========================================================= */
+
+.wp-items-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                185px,
+                1fr
+            )
+        );
+
+    gap:
+        16px;
+
+}
+
+
+.wp-items-grid--skins {
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                195px,
+                1fr
+            )
+        );
+
+}
+
+
+.wp-item {
+
+    min-width:
+        0;
+
+    display:
+        block;
+
+}
+
+
+.wp-item.is-hidden {
+
+    display:
+        none !important;
+
+}
+
+
+/* =========================================================
+   10. Cards
+========================================================= */
+
+.wp-card {
+
+    position:
+        relative;
+
+    width:
+        100%;
+
+    min-height:
+        100%;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    overflow:
+        hidden;
+
+    padding:
+        0;
+
+    color:
+        var(--wp-text);
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(
+                17,
+                25,
+                39,
+                0.96
+            ),
+            rgba(
+                10,
+                16,
+                27,
+                0.98
+            )
+        );
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        var(--wp-radius);
+
+    box-shadow:
+        0 10px 28px
+        rgba(
+            0,
+            0,
+            0,
+            0.12
+        );
+
+    transition:
+        transform
+        var(--wp-transition),
+        border-color
+        var(--wp-transition),
+        background
+        var(--wp-transition),
+        box-shadow
+        var(--wp-transition);
+
+}
+
+
+.wp-card--clickable {
+
+    text-align:
+        right;
+
+    cursor:
+        pointer;
+
+}
+
+
+.wp-card:hover {
+
+    transform:
+        translateY(
+            -5px
+        );
+
+    border-color:
+        rgba(
+            96,
+            165,
+            250,
+            0.25
+        );
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(
+                22,
+                34,
+                53,
+                0.98
+            ),
+            rgba(
+                10,
+                17,
+                29,
+                0.99
+            )
+        );
+
+    box-shadow:
+        0 20px 38px
+        rgba(
+            0,
+            0,
+            0,
+            0.23
+        ),
+
+        0 0 0 1px
+        rgba(
+            59,
+            130,
+            246,
+            0.08
+        );
+
+}
+
+
+.wp-card-glow {
+
+    position:
+        absolute;
+
+    top:
+        -40px;
+
+    left:
+        15%;
+
+    width:
+        70%;
+
+    height:
+        100px;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(
+                59,
+                130,
+                246,
+                0.13
+            ),
+            transparent
+        );
+
+    filter:
+        blur(
+            20px
+        );
+
+    pointer-events:
+        none;
+
+}
+
+
+.wp-card-media {
+
+    position:
+        relative;
+
+    height:
+        170px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        18px;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(
+                255,
+                255,
+                255,
+                0.018
+            ),
+            rgba(
+                255,
+                255,
+                255,
+                0
+            )
+        );
+
+    border-bottom:
+        1px solid
+        rgba(
+            148,
+            163,
+            184,
+            0.06
+        );
+
+}
+
+
+.wp-card-media::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    inset:
+        18px;
+
+    border-radius:
+        18px;
+
+    background:
+        radial-gradient(
+            circle at 50% 45%,
+            rgba(
+                59,
+                130,
+                246,
+                0.07
+            ),
+            transparent 62%
+        );
+
+    pointer-events:
+        none;
+
+}
+
+
+.wp-card-image {
+
+    position:
+        relative;
+
+    z-index:
+        1;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        contain;
+
+    object-position:
+        center;
+
+    filter:
+        drop-shadow(
+            0 14px 18px
+            rgba(
+                0,
+                0,
+                0,
+                0.34
+            )
+        );
+
+    transition:
+        transform
+        400ms
+        cubic-bezier(
+            0.22,
+            0.61,
+            0.36,
+            1
+        );
+
+}
+
+
+.wp-card:hover
+.wp-card-image {
+
+    transform:
+        scale(
+            1.045
+        );
+
+}
+
+
+.wp-image-placeholder {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    min-height:
+        120px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        var(--wp-text-dim);
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(
+                148,
+                163,
+                184,
+                0.03
+            ),
+            rgba(
+                59,
+                130,
+                246,
+                0.03
+            )
+        );
+
+    border:
+        1px dashed
+        rgba(
+            148,
+            163,
+            184,
+            0.12
+        );
+
+    border-radius:
+        12px;
+
+    font-size:
+        0.72rem;
+
+}
+
+
+.wp-image-placeholder.is-hidden {
+
+    display:
+        none;
+
+}
+
+
+.wp-card-image.is-hidden {
+
+    display:
+        none;
+
+}
+
+
+.wp-card-content {
+
+    min-height:
+        112px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        8px;
+
+    padding:
+        14px;
+
+}
+
+
+.wp-card-title {
+
+    margin:
+        0;
+
+    color:
+        var(--wp-text);
+
+    font-size:
+        0.79rem;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.55;
+
+    display:
+        -webkit-box;
+
+    -webkit-line-clamp:
+        2;
+
+    -webkit-box-orient:
+        vertical;
+
+    overflow:
+        hidden;
+
+}
+
+
+.wp-card-subtitle {
+
+    color:
+        var(--wp-text-muted);
+
+    font-size:
+        0.66rem;
+
+    line-height:
+        1.45;
+
+}
+
+
+.wp-card-action {
+
+    margin-top:
+        auto;
+
+}
+
+
+.wp-card .wp-btn {
+
+    width:
+        100%;
+
+}
+
+
+/* =========================================================
+   11. Buttons
+========================================================= */
+
+.wp-btn {
+
+    min-height:
+        42px;
+
+    padding:
+        0 15px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        7px;
+
+    color:
+        #ffffff;
+
+    border:
+        1px solid
+        transparent;
+
+    border-radius:
+        11px;
+
+    font-size:
+        0.74rem;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+
+    cursor:
+        pointer;
+
+    transition:
+        transform
+        var(--wp-transition),
+        background
+        var(--wp-transition),
+        border-color
+        var(--wp-transition),
+        box-shadow
+        var(--wp-transition);
+
+}
+
+
+.wp-btn:hover {
+
+    transform:
+        translateY(
+            -1px
+        );
+
+}
+
+
+.wp-btn--sm {
+
+    min-height:
+        36px;
+
+    padding:
+        0 12px;
+
+    font-size:
+        0.68rem;
+
+}
+
+
+.wp-btn--primary {
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--wp-blue-deep),
+            var(--wp-blue)
+        );
+
+    box-shadow:
+        0 8px 20px
+        rgba(
+            37,
+            99,
+            235,
+            0.17
+        );
+
+}
+
+
+.wp-btn--primary:hover {
+
+    box-shadow:
+        0 12px 26px
+        rgba(
+            37,
+            99,
+            235,
+            0.28
+        );
+
+}
+
+
+.wp-btn--secondary {
+
+    color:
+        var(--wp-blue-soft);
+
+    background:
+        rgba(
+            59,
+            130,
+            246,
+            0.07
+        );
+
+    border-color:
+        rgba(
+            59,
+            130,
+            246,
+            0.18
+        );
+
+}
+
+
+/* =========================================================
+   12. Select
+========================================================= */
+
+.wp-select {
+
+    width:
+        100%;
+
+    height:
+        40px;
+
+    padding:
+        0 12px;
+
+    color:
+        var(--wp-text);
+
+    background:
+        #0c1420;
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        10px;
+
+    outline:
+        none;
+
+    font-size:
+        0.7rem;
+
+    cursor:
+        pointer;
+
+    transition:
+        border-color
+        var(--wp-transition),
+        box-shadow
+        var(--wp-transition);
+
+}
+
+
+.wp-select:hover {
+
+    border-color:
+        rgba(
+            96,
+            165,
+            250,
+            0.22
+        );
+
+}
+
+
+.wp-select:focus {
+
+    border-color:
+        rgba(
+            59,
+            130,
+            246,
+            0.45
+        );
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            59,
+            130,
+            246,
+            0.07
+        );
+
+}
+
+
+/* =========================================================
+   13. Pagination
+========================================================= */
+
+.wp-pagination-wrap {
+
+    margin-top:
+        24px;
+
+    padding-top:
+        18px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        16px;
+
+    border-top:
+        1px solid
+        rgba(
+            148,
+            163,
+            184,
+            0.08
+        );
+
+}
+
+
+.wp-pagination-info {
+
+    color:
+        var(--wp-text-muted);
+
+    font-size:
+        0.7rem;
+
+}
+
+
+.wp-pagination {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    flex-wrap:
+        wrap;
+
+}
+
+
+.wp-page-btn {
+
+    width:
+        38px;
+
+    height:
+        38px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        var(--wp-text-muted);
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            0.7
+        );
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        10px;
+
+    font-size:
+        0.72rem;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none;
+
+    transition:
+        background
+        var(--wp-transition),
+        border-color
+        var(--wp-transition),
+        color
+        var(--wp-transition),
+        transform
+        var(--wp-transition);
+
+}
+
+
+.wp-page-btn:hover {
+
+    color:
+        #ffffff;
+
+    border-color:
+        rgba(
+            59,
+            130,
+            246,
+            0.22
+        );
+
+    background:
+        rgba(
+            59,
+            130,
+            246,
+            0.08
+        );
+
+    transform:
+        translateY(
+            -1px
+        );
+
+}
+
+
+.wp-page-btn.is-active {
+
+    color:
+        #ffffff;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--wp-blue-deep),
+            var(--wp-blue)
+        );
+
+    border-color:
+        var(--wp-blue);
+
+    box-shadow:
+        0 8px 20px
+        rgba(
+            37,
+            99,
+            235,
+            0.2
+        );
+
+}
+
+
+.wp-page-btn--nav {
+
+    color:
+        var(--wp-blue-soft);
+
+}
+
+
+/* =========================================================
+   14. Empty State
+========================================================= */
+
+.wp-empty-state {
+
+    min-height:
+        420px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    text-align:
+        center;
+
+    padding:
+        50px 20px;
+
+}
+
+
+.wp-empty-icon {
+
+    width:
+        78px;
+
+    height:
+        78px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin-bottom:
+        20px;
+
+    color:
+        var(--wp-blue-soft);
+
+    background:
+        rgba(
+            59,
+            130,
+            246,
+            0.08
+        );
+
+    border:
+        1px solid
+        rgba(
+            59,
+            130,
+            246,
+            0.15
+        );
+
+    border-radius:
+        22px;
+
+    font-size:
+        1.6rem;
+
+}
+
+
+.wp-empty-state h2 {
+
+    margin:
+        0;
+
+    color:
+        var(--wp-text);
+
+    font-size:
+        1rem;
+
+}
+
+
+/* =========================================================
+   15. Fade / Page Transition
+========================================================= */
+
+.page-fader {
+
+    opacity:
+        0;
+
+    transform:
+        translateY(
+            10px
+        );
+
+    transition:
+        opacity
+        350ms
+        ease,
+
+        transform
+        350ms
+        cubic-bezier(
+            0.22,
+            0.61,
+            0.36,
+            1
+        );
+
+}
+
+
+.page-fader.ready {
+
+    opacity:
+        1;
+
+    transform:
+        translateY(
+            0
+        );
+
+}
+
+
+.wp-grid-fader {
+
+    min-height:
+        120px;
+
+}
+
+
+/* =========================================================
+   16. Bootstrap Tab Override
+========================================================= */
+
+.wp-app .tab-pane {
+
+    opacity:
+        0;
+
+    transform:
+        translateY(
+            8px
+        );
+
+}
+
+
+.wp-app .tab-pane.show.active {
+
+    opacity:
+        1;
+
+    transform:
+        translateY(
+            0
+        );
+
+    transition:
+        opacity
+        260ms
+        ease,
+
+        transform
+        320ms
+        cubic-bezier(
+            0.22,
+            0.61,
+            0.36,
+            1
+        );
+
+}
+
+
+/* =========================================================
+   17. Modal
+========================================================= */
+
+.wp-modal .modal-dialog {
+
+    margin:
+        28px auto;
+
+}
+
+
+.wp-modal .modal-content {
+
+    overflow:
+        hidden;
+
+    color:
+        var(--wp-text);
+
+    background:
+        linear-gradient(
+            180deg,
+            #0d1420,
+            #09101a
+        );
+
+    border:
+        1px solid
+        rgba(
+            96,
+            165,
+            250,
+            0.17
+        );
+
+    border-radius:
+        22px;
+
+    box-shadow:
+        0 35px 100px
+        rgba(
+            0,
+            0,
+            0,
+            0.52
+        );
+
+}
+
+
+.wp-modal-header {
+
+    padding:
+        17px 20px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        15px;
+
+    background:
+        rgba(
+            8,
+            13,
+            22,
+            0.72
+        );
+
+    border-bottom:
+        1px solid
+        rgba(
+            148,
+            163,
+            184,
+            0.08
+        );
+
+}
+
+
+.wp-modal-title-wrap {
+
+    min-width:
+        0;
+
+}
+
+
+.wp-modal-eyebrow {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    color:
+        var(--wp-blue-soft);
+
+    font-size:
+        0.67rem;
+
+    font-weight:
+        800;
+
+}
+
+
+.wp-modal-title {
+
+    margin:
+        5px 0 0;
+
+    color:
+        var(--wp-text);
+
+    font-size:
+        1rem;
+
+    font-weight:
+        800;
+
+}
+
+
+.wp-modal-body {
+
+    padding:
+        20px;
+
+    max-height:
+        calc(
+            100vh - 180px
+        );
+
+    overflow-y:
+        auto;
+
+    scrollbar-width:
+        thin;
+
+    scrollbar-color:
+        #334155
+        transparent;
+
+}
+
+
+.wp-modal-body::-webkit-scrollbar {
+
+    width:
+        7px;
+
+}
+
+
+.wp-modal-body::-webkit-scrollbar-track {
+
+    background:
+        transparent;
+
+}
+
+
+.wp-modal-body::-webkit-scrollbar-thumb {
+
+    background:
+        #334155;
+
+    border-radius:
+        999px;
+
+}
+
+
+.modal-backdrop.show {
+
+    opacity:
+        0.78;
+
+}
+
+
+/* =========================================================
+   18. Modal Close
+========================================================= */
+
+.modal-x-btn {
+
+    width:
+        40px;
+
+    height:
+        40px;
+
+    flex:
+        0 0 auto;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    color:
+        var(--wp-text-muted);
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.035
+        );
+
+    border:
+        1px solid
+        rgba(
+            148,
+            163,
+            184,
+            0.1
+        );
+
+    border-radius:
+        11px;
+
+    cursor:
+        pointer;
+
+    transition:
+        color
+        var(--wp-transition),
+        background
+        var(--wp-transition),
+        border-color
+        var(--wp-transition),
+        transform
+        var(--wp-transition);
+
+}
+
+
+.modal-x-btn:hover {
+
+    color:
+        #ffffff;
+
+    background:
+        rgba(
+            239,
+            68,
+            68,
+            0.12
+        );
+
+    border-color:
+        rgba(
+            239,
+            68,
+            68,
+            0.2
+        );
+
+    transform:
+        rotate(
+            3deg
+        );
+
+}
+
+
+/* =========================================================
+   19. Generic Selection Grid
+========================================================= */
+
+.selection-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                150px,
+                1fr
+            )
+        );
+
+    gap:
+        12px;
+
+}
+
+
+.selection-grid--glove {
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                170px,
+                1fr
+            )
+        );
+
+}
+
+
+.selection-card {
+
+    position:
+        relative;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        8px;
+
+    padding:
+        11px;
+
+    color:
+        var(--wp-text);
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            0.76
+        );
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        14px;
+
+    cursor:
+        pointer;
+
+    transition:
+        transform
+        var(--wp-transition),
+        border-color
+        var(--wp-transition),
+        background
+        var(--wp-transition),
+        box-shadow
+        var(--wp-transition);
+
+}
+
+
+.selection-card:hover {
+
+    transform:
+        translateY(
+            -3px
+        );
+
+    border-color:
+        rgba(
+            96,
+            165,
+            250,
+            0.25
+        );
+
+}
+
+
+.selection-card.is-selected {
+
+    border-color:
+        rgba(
+            59,
+            130,
+            246,
+            0.55
+        );
+
+    background:
+        rgba(
+            59,
+            130,
+            246,
+            0.09
+        );
+
+    box-shadow:
+        0 0 0 1px
+        rgba(
+            59,
+            130,
+            246,
+            0.12
+        ),
+
+        0 12px 26px
+        rgba(
+            37,
+            99,
+            235,
+            0.1
+        );
+
+}
+
+
+.selection-card input {
+
+    position:
+        absolute;
+
+    opacity:
+        0;
+
+    pointer-events:
+        none;
+
+}
+
+
+.selection-image {
+
+    height:
+        115px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        8px;
+
+    overflow:
+        hidden;
+
+    border-radius:
+        11px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.018
+        );
+
+}
+
+
+.selection-image .wp-card-image {
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+}
+
+
+.selection-title {
+
+    color:
+        var(--wp-text-soft);
+
+    font-size:
+        0.72rem;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.5;
+
+}
+
+
+.selection-meta {
+
+    color:
+        var(--wp-text-dim);
+
+    font-size:
+        0.62rem;
+
+}
+
+
+.selection-footer {
+
+    display:
+        flex;
+
+    justify-content:
+        flex-end;
+
+    margin-top:
+        18px;
+
+    padding-top:
+        16px;
+
+    border-top:
+        1px solid
+        rgba(
+            148,
+            163,
+            184,
+            0.08
+        );
+
+}
+
+
+/* =========================================================
+   20. Dynamic Skin Modal
+========================================================= */
+
+.skin-modal-dialog {
+
+    max-width:
+        1180px;
+
+}
+
+
+.skin-modal-dialog .wp-modal-body {
+
+    min-height:
+        300px;
+
+}
+
+
+.wp-skin-config-layout {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        minmax(
+            0,
+            1.3fr
+        )
+        minmax(
+            320px,
+            0.7fr
+        );
+
+    gap:
+        20px;
+
+}
+
+
+.wp-skin-preview {
+
+    min-height:
+        420px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        24px;
+
+    background:
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(
+                59,
+                130,
+                246,
+                0.1
+            ),
+            transparent 48%
+        ),
+
+        linear-gradient(
+            180deg,
+            rgba(
+                255,
+                255,
+                255,
+                0.018
+            ),
+            rgba(
+                255,
+                255,
+                255,
+                0
+            )
+        );
+
+    border:
+        1px solid
+        rgba(
+            148,
+            163,
+            184,
+            0.08
+        );
+
+    border-radius:
+        18px;
+
+}
+
+
+.wp-skin-preview img {
+
+    max-height:
+        360px;
+
+    object-fit:
+        contain;
+
+    filter:
+        drop-shadow(
+            0 22px 30px
+            rgba(
+                0,
+                0,
+                0,
+                0.45
+            )
+        );
+
+}
+
+
+.wp-skin-controls {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        13px;
+
+}
+
+
+.wp-control-card {
+
+    padding:
+        14px;
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            0.72
+        );
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        14px;
+
+}
+
+
+.wp-control-label {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        12px;
+
+    margin-bottom:
+        9px;
+
+    color:
+        var(--wp-text-soft);
+
+    font-size:
+        0.72rem;
+
+    font-weight:
+        800;
+
+}
+
+
+.wp-control-value {
+
+    color:
+        var(--wp-blue-soft);
+
+    font-family:
+        monospace;
+
+    font-size:
+        0.7rem;
+
+}
+
+
+.wp-control-input {
+
+    width:
+        100%;
+
+    height:
+        42px;
+
+    padding:
+        0 11px;
+
+    color:
+        var(--wp-text);
+
+    background:
+        #0b1320;
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        10px;
+
+    outline:
+        none;
+
+}
+
+
+.wp-control-input:focus {
+
+    border-color:
+        rgba(
+            59,
+            130,
+            246,
+            0.48
+        );
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            59,
+            130,
+            246,
+            0.07
+        );
+
+}
+
+
+.wp-range {
+
+    width:
+        100%;
+
+    accent-color:
+        var(--wp-blue);
+
+}
+
+
+.wp-addons-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(
+                0,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+
+}
+
+
+.wp-addon-btn {
+
+    min-height:
+        44px;
+
+    padding:
+        0 12px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        7px;
+
+    color:
+        var(--wp-text-soft);
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.025
+        );
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        10px;
+
+    cursor:
+        pointer;
+
+    font-size:
+        0.7rem;
+
+    font-weight:
+        700;
+
+    transition:
+        background
+        var(--wp-transition),
+        border-color
+        var(--wp-transition),
+        color
+        var(--wp-transition);
+
+}
+
+
+.wp-addon-btn:hover {
+
+    color:
+        #ffffff;
+
+    background:
+        rgba(
+            59,
+            130,
+            246,
+            0.07
+        );
+
+    border-color:
+        rgba(
+            59,
+            130,
+            246,
+            0.22
+        );
+
+}
+
+
+/* =========================================================
+   21. Sticker / Keychain Search
+========================================================= */
+
+.wp-addon-toolbar {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        10px;
+
+    margin-bottom:
+        15px;
+
+}
+
+
+.wp-addon-search {
+
+    flex:
+        1;
+
+    height:
+        42px;
+
+    padding:
+        0 13px;
+
+    color:
+        var(--wp-text);
+
+    background:
+        #0b1320;
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        10px;
+
+    outline:
+        none;
+
+}
+
+
+.wp-addon-search:focus {
+
+    border-color:
+        rgba(
+            59,
+            130,
+            246,
+            0.42
+        );
+
+}
+
+
+.wp-addon-grid {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fill,
+            minmax(
+                135px,
+                1fr
+            )
+        );
+
+    gap:
+        10px;
+
+}
+
+
+.wp-addon-card {
+
+    padding:
+        10px;
+
+    color:
+        var(--wp-text);
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            0.68
+        );
+
+    border:
+        1px solid
+        var(--wp-border);
+
+    border-radius:
+        12px;
+
+    cursor:
+        pointer;
+
+    transition:
+        transform
+        var(--wp-transition),
+        border-color
+        var(--wp-transition),
+        background
+        var(--wp-transition);
+
+}
+
+
+.wp-addon-card:hover {
+
+    transform:
+        translateY(
+            -3px
+        );
+
+    border-color:
+        rgba(
+            96,
+            165,
+            250,
+            0.25
+        );
+
+    background:
+        rgba(
+            24,
+            36,
+            56,
+            0.78
+        );
+
+}
+
+
+.wp-addon-card img {
+
+    width:
+        100%;
+
+    height:
+        90px;
+
+    object-fit:
+        contain;
+
+}
+
+
+.wp-addon-card-title {
+
+    margin-top:
+        8px;
+
+    color:
+        var(--wp-text-soft);
+
+    font-size:
+        0.64rem;
+
+    font-weight:
+        700;
+
+    line-height:
+        1.45;
+
+}
+
+
+/* =========================================================
+   22. Loading / Progress
+========================================================= */
+
+.wp-loading {
+
+    min-height:
+        180px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        12px;
+
+    color:
+        var(--wp-text-muted);
+
+}
+
+
+.wp-loading-spinner {
+
+    width:
+        34px;
+
+    height:
+        34px;
+
+    border:
+        3px solid
+        rgba(
+            148,
+            163,
+            184,
+            0.12
+        );
+
+    border-top-color:
+        var(--wp-blue);
+
+    border-radius:
+        50%;
+
+    animation:
+        wpSpin
+        0.75s
+        linear
+        infinite;
+
+}
+
+
+@keyframes wpSpin {
+
+    to {
+
+        transform:
+            rotate(
+                360deg
+            );
+
+    }
+
+}
+
+
+/* =========================================================
+   23. Toast / Status
+========================================================= */
+
+.wp-toast {
+
+    position:
+        fixed;
+
+    left:
+        50%;
+
+    bottom:
+        24px;
+
+    z-index:
+        3000;
+
+    min-width:
+        260px;
+
+    max-width:
+        min(
+            420px,
+            calc(
+                100vw - 32px
+            )
+        );
+
+    padding:
+        13px
+        16px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        9px;
+
+    color:
+        #e8f0fb;
+
+    background:
+        rgba(
+            13,
+            20,
+            32,
+            0.95
+        );
+
+    border:
+        1px solid
+        rgba(
+            96,
+            165,
+            250,
+            0.18
+        );
+
+    border-radius:
+        12px;
+
+    box-shadow:
+        0 22px 55px
+        rgba(
+            0,
+            0,
+            0,
+            0.32
+        );
+
+    transform:
+        translate(
+            -50%,
+            16px
+        );
+
+    opacity:
+        0;
+
+    visibility:
+        hidden;
+
+    transition:
+        opacity
+        240ms
+        ease,
+
+        transform
+        240ms
+        ease,
+
+        visibility
+        240ms
+        ease;
+
+}
+
+
+.wp-toast.is-visible {
+
+    opacity:
+        1;
+
+    visibility:
+        visible;
+
+    transform:
+        translate(
+            -50%,
+            0
+        );
+
+}
+
+
+/* =========================================================
+   24. Search Filtering State
+========================================================= */
+
+.wp-item.is-search-hidden {
+
+    display:
+        none !important;
+
+}
+
+
+.wp-search-empty {
+
+    grid-column:
+        1 / -1;
+
+    min-height:
+        240px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        10px;
+
+    color:
+        var(--wp-text-muted);
+
+    text-align:
+        center;
+
+}
+
+
+.wp-search-empty i {
+
+    color:
+        var(--wp-blue-soft);
+
+    font-size:
+        1.5rem;
+
+}
+
+
+/* =========================================================
+   25. Reduced Motion
+========================================================= */
+
+@media (
+    prefers-reduced-motion:
+    reduce
+) {
+
+    .wp-app *,
+    .wp-app *::before,
+    .wp-app *::after {
+
+        animation-duration:
+            0.01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        transition-duration:
+            0.01ms !important;
+
+        scroll-behavior:
+            auto !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   26. Responsive
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .wp-header-main {
+
+        flex-wrap:
+            wrap;
+
+    }
+
+
+    .wp-search-wrap {
+
+        max-width:
+            none;
+
+        flex-basis:
+            100%;
+
+        order:
+            1;
+
+    }
+
+
+    .wp-team-switcher {
+
+        order:
+            2;
+
+    }
+
+
+    .wp-tabs {
+
+        margin-top:
+            12px;
+
+    }
+
+
+    .wp-items-grid,
+    .wp-items-grid--skins {
+
+        grid-template-columns:
+            repeat(
+                auto-fill,
+                minmax(
+                    165px,
+                    1fr
+                )
+            );
+
+    }
+
+
+    .wp-skin-config-layout {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+}
+
+
+@media (max-width: 760px) {
+
+    .wp-header {
+
+        padding:
+            13px
+            13px
+            10px;
+
+    }
+
+
+    .wp-main {
+
+        width:
+            min(
+                calc(100% - 24px),
+                1550px
+            );
+
+        margin-top:
+            17px;
+
+    }
+
+
+    .wp-section-head {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+    }
+
+
+    .wp-section-meta {
+
+        justify-content:
+            flex-start;
+
+    }
+
+
+    .wp-items-grid,
+    .wp-items-grid--skins {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+        gap:
+            11px;
+
+    }
+
+
+    .wp-card-media {
+
+        height:
+            145px;
+
+    }
+
+
+    .wp-card-content {
+
+        min-height:
+            104px;
+
+        padding:
+            11px;
+
+    }
+
+
+    .wp-pagination-wrap {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+    }
+
+
+    .wp-pagination {
+
+        width:
+            100%;
+
+        justify-content:
+            center;
+
+    }
+
+
+    .selection-grid,
+    .selection-grid--glove {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+    }
+
+
+    .wp-addon-grid {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .wp-team-btn {
+
+        min-width:
+            52px;
+
+        padding:
+            0 9px;
+
+    }
+
+
+    .wp-team-btn span {
+
+        font-size:
+            0.68rem;
+
+    }
+
+
+    .wp-tab {
+
+        padding:
+            0 12px;
+
+        font-size:
+            0.7rem;
+
+    }
+
+
+    .wp-items-grid,
+    .wp-items-grid--skins {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+    }
+
+
+    .wp-card-media {
+
+        height:
+            125px;
+
+        padding:
+            12px;
+
+    }
+
+
+    .wp-card-title {
+
+        font-size:
+            0.7rem;
+
+    }
+
+
+    .wp-card-subtitle {
+
+        font-size:
+            0.59rem;
+
+    }
+
+
+    .wp-section-title {
+
+        font-size:
+            1.05rem;
+
+    }
+
+
+    .wp-meta-pill {
+
+        font-size:
+            0.61rem;
+
+    }
+
+
+    .wp-pagination-info {
+
+        width:
+            100%;
+
+        text-align:
+            center;
+
+    }
+
+
+    .wp-pagination {
+
+        gap:
+            4px;
+
+    }
+
+
+    .wp-page-btn {
+
+        width:
+            34px;
+
+        height:
+            34px;
+
+    }
+
+
+    .selection-grid,
+    .selection-grid--glove {
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(
+                    0,
+                    1fr
+                )
+            );
+
+    }
+
+
+    .selection-image {
+
+        height:
+            95px;
+
+    }
+
+
+    .wp-skin-preview {
+
+        min-height:
+            280px;
+
+    }
+
+
+    .wp-skin-preview img {
+
+        max-height:
+            230px;
+
+    }
+
+
+    .wp-addons-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+}
+/* =========================================================
+   27. Full-Bleed Integration Fix
+   ---------------------------------------------------------
+   Weapon Paints is rendered inside the main site's
+   .app-container -> .main-content -> .content-fader stack.
+   Those global wrappers may add padding/backgrounds intended
+   for normal pages. This page must own the full viewport area.
+========================================================= */
+
+html:has(.wp-app) {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    min-height: 100vh !important;
+    background: var(--wp-bg) !important;
+    overflow-x: hidden;
+}
+
+/* overflow-x is intentionally NOT set here (see html rule above).
+   Setting it on both html and body at once turns body into its own
+   independent scroll container, which breaks position:sticky on
+   #siteHeader (a direct child of body) since it would then stick
+   relative to body's scrollport instead of the page's. */
+body:has(.wp-app) {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    min-height: 100vh !important;
+    background: var(--wp-bg) !important;
+}
+
+body:has(.wp-app) .app-container,
+body:has(.wp-app) .main-content,
+body:has(.wp-app) .content-fader {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: var(--wp-bg) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+body:has(.wp-app) .content-fader {
+    min-height: 0 !important;
+}
+
+body:has(.wp-app) .main-content {
+    position: relative;
+    min-height: 0 !important;
+}
+
+body:has(.wp-app) .wp-app {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 0 42px !important;
+    background: transparent !important;
+}
+
+body:has(.wp-app) .wp-header {
+    width: 100%;
+}
+
+/* Keep the inner content comfortably centered while the page itself
+   remains edge-to-edge. */
+body:has(.wp-app) .wp-header-main,
+body:has(.wp-app) .wp-tabs {
+    width: min(calc(100% - 32px), 1550px);
+}
+
+body:has(.wp-app) .wp-main {
+    width: min(calc(100% - 32px), 1550px);
+    max-width: 1550px;
+}
+
+/* Prevent Bootstrap/global button styles from changing the custom cards. */
+body:has(.wp-app) .wp-card {
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: inherit;
+}
+
+/* Stable image area: cards keep their dimensions even while images load. */
+.wp-card-media,
+.selection-image,
+.wp-skin-preview {
+    contain: layout paint;
+}
+
+/* Failed images are handled by weaponpaints-fix.js. */
+.wp-card-image.is-broken,
+.wp-card-image.is-hidden {
+    display: none !important;
+}
+
+@media (max-width: 760px) {
+
+    body:has(.wp-app) .wp-header-main,
+    body:has(.wp-app) .wp-tabs,
+    body:has(.wp-app) .wp-main {
+        width: min(calc(100% - 24px), 1550px);
+    }
+
+}
+
+/* =========================================================
+   28. Weapon Paints Bugfix + Motion Enhancement
+========================================================= */
+
+/*
+ * Bootstrap modals are moved to <body> by weaponpaints.js.
+ * Keep their stacking order above the backdrop so the dialog
+ * can never end up behind the dark focus layer.
+ */
+.wp-modal {
+    z-index: 1060 !important;
+}
+
+.modal-backdrop {
+    z-index: 1050 !important;
+    transition: opacity 320ms cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+}
+
+.modal-backdrop.show {
+    opacity: 0.78 !important;
+}
+
+.wp-modal.fade {
+    transition: opacity 320ms cubic-bezier(0.22, 0.61, 0.36, 1) !important;
+}
+
+.wp-modal .modal-dialog {
+    opacity: 0;
+    transform: translateY(22px) scale(0.975);
+    transform-origin: center center;
+    transition:
+        opacity 320ms ease,
+        transform 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    will-change: opacity, transform;
+}
+
+.wp-modal.show .modal-dialog {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.wp-modal .modal-content {
+    transition:
+        border-color 280ms ease,
+        box-shadow 360ms ease;
+}
+
+.wp-modal.show .modal-content {
+    box-shadow:
+        0 35px 100px rgba(0, 0, 0, 0.55),
+        0 0 0 1px rgba(59, 130, 246, 0.03);
+}
+
+/*
+ * The parent page has a transform-based page fade.
+ * The modal itself is moved to <body>, so we only make the
+ * page transition smoother here without affecting z-index.
+ */
+.page-fader {
+    transition:
+        opacity 460ms ease,
+        transform 460ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Main tab switch animation */
+.wp-app .tab-pane {
+    opacity: 0;
+    transform: translateY(12px) scale(0.995);
+    transition:
+        opacity 340ms ease,
+        transform 420ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.wp-app .tab-pane.show.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.wp-app .tab-pane.wp-tab-entering {
+    animation:
+        wpTabEnter 440ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes wpTabEnter {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.992);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Softer tab interactions */
+.wp-tab {
+    transition:
+        color 280ms ease,
+        background-color 280ms ease,
+        border-color 320ms ease,
+        box-shadow 320ms ease,
+        transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.wp-tab:hover {
+    transform: translateY(-1px);
+}
+
+.wp-tab:active {
+    transform: translateY(0) scale(0.985);
+}
+
+/* Smoother cards */
+.wp-card {
+    transition:
+        transform 360ms cubic-bezier(0.22, 0.61, 0.36, 1),
+        border-color 320ms ease,
+        background-color 320ms ease,
+        box-shadow 360ms ease;
+}
+
+.wp-card:hover {
+    transform: translateY(-3px);
+}
+
+.wp-card:active {
+    transform: translateY(-1px) scale(0.995);
+}
+
+/* Softer paint/glove/add-on selection cards */
+.selection-card,
+.wp-addon-card {
+    transition:
+        transform 340ms cubic-bezier(0.22, 0.61, 0.36, 1),
+        border-color 300ms ease,
+        background-color 300ms ease,
+        box-shadow 360ms ease;
+}
+
+.selection-card:hover,
+.wp-addon-card:hover {
+    transform: translateY(-4px);
+}
+
+.selection-card:active,
+.wp-addon-card:active {
+    transform: translateY(-1px) scale(0.992);
+}
+
+.selection-card.is-selected,
+.wp-addon-card.is-selected {
+    animation:
+        wpSelectionPulse 360ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes wpSelectionPulse {
+    from {
+        box-shadow:
+            0 0 0 0 rgba(59, 130, 246, 0),
+            0 8px 18px rgba(37, 99, 235, 0);
+    }
+
+    to {
+        box-shadow:
+            0 0 0 1px rgba(59, 130, 246, 0.12),
+            0 12px 26px rgba(37, 99, 235, 0.10);
+    }
+}
+
+/* Buttons */
+.wp-btn {
+    transition:
+        transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1),
+        background-color 280ms ease,
+        border-color 280ms ease,
+        box-shadow 320ms ease,
+        color 240ms ease;
+}
+
+.wp-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+}
+
+.wp-btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.985);
+}
+
+/* Form submission state */
+.wp-form-submitting {
+    pointer-events: none;
+}
+
+.wp-form-submitting .wp-btn[type="submit"] {
+    opacity: 0.72;
+    transform: scale(0.985);
+}
+
+/* Smooth close button */
+.modal-x-btn {
+    transition:
+        transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1),
+        color 240ms ease,
+        background-color 280ms ease,
+        border-color 280ms ease;
+}
+
+.modal-x-btn:hover {
+    transform: rotate(4deg) scale(1.04);
+}
+
+.modal-x-btn:active {
+    transform: scale(0.95);
+}
+
+/* Prevent accidental click-through while modal is active */
+body.modal-open .wp-fullbleed-target,
+body.modal-open .wp-app {
+    pointer-events: none;
+}
+
+body.modal-open .wp-modal,
+body.modal-open .wp-modal * {
+    pointer-events: auto;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+    .wp-modal .modal-dialog,
+    .wp-app .tab-pane,
+    .wp-card,
+    .selection-card,
+    .wp-addon-card,
+    .wp-btn,
+    .wp-tab {
+        transition: none !important;
+        animation: none !important;
+    }
+
+}
+
+
+/* =========================================================
+   29. Weapon Paints Custom Modal Manager
+   Bootstrap modal behavior is intentionally disabled for WP modals.
+   The custom manager keeps the dialog above the backdrop and avoids
+   stacking-context / AJAX-fragment issues.
+========================================================= */
+
+body.wp-modal-open {
+    overflow: hidden !important;
+}
+
+body.wp-modal-open .wp-app,
+body.wp-modal-open .wp-fullbleed-target {
+    pointer-events: none !important;
+}
+
+.wp-modal-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 5000 !important;
+    background: rgba(2, 6, 12, 0.78) !important;
+    backdrop-filter: blur(4px) !important;
+    -webkit-backdrop-filter: blur(4px) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition:
+        opacity 320ms cubic-bezier(.22,.61,.36,1),
+        visibility 320ms ease !important;
+}
+
+.wp-modal-backdrop.is-visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+/* Root modal layer: always above the custom backdrop. */
+body > .wp-modal {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 5010 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 24px !important;
+    display: none !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    background: transparent !important;
+    opacity: 1 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+body > .wp-modal.wp-is-open {
+    display: flex !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+body > .wp-modal .modal-dialog {
+    width: min(1180px, calc(100vw - 48px)) !important;
+    max-width: none !important;
+    margin: 24px auto !important;
+    opacity: 0 !important;
+    transform: translateY(22px) scale(.975) !important;
+    transition:
+        opacity 280ms ease,
+        transform 420ms cubic-bezier(.22,.61,.36,1) !important;
+    pointer-events: auto !important;
+}
+
+body > .wp-modal.wp-is-open .modal-dialog {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+}
+
+body > .wp-modal .modal-content {
+    position: relative !important;
+    z-index: 2 !important;
+    pointer-events: auto !important;
+}
+
+body > .wp-modal * {
+    pointer-events: auto;
+}
+
+body > .wp-modal .modal-body,
+body > .wp-modal .wp-modal-body {
+    pointer-events: auto !important;
+}
+
+/* Keep the dynamic skin dialog comfortably sized on desktop. */
+body > .wp-modal#skinModal .modal-dialog {
+    width: min(1180px, calc(100vw - 48px)) !important;
+}
+
+@media (max-width: 760px) {
+
+    body > .wp-modal {
+        padding: 12px !important;
+    }
+
+    body > .wp-modal .modal-dialog,
+    body > .wp-modal#skinModal .modal-dialog {
+        width: calc(100vw - 24px) !important;
+        margin: 12px auto !important;
+    }
+
+}
+
+/* Disable Bootstrap's click behavior when a WP trigger is handled by our manager. */
+.wp-app [data-wp-modal-trigger="1"] {
+    position: relative;
+}
+
+/* Form submission feedback without blocking the whole page forever. */
+.wp-form-submitting {
+    opacity: .92;
+}
+
+.wp-form-submitting .wp-btn[type="submit"] {
+    pointer-events: none !important;
+}

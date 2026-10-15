@@ -1,0 +1,402 @@
+/* =========================================================
+   Maps Page
+========================================================= */
+
+.maps-page-header {
+
+    margin-bottom:
+        22px;
+
+}
+
+
+/* =========================================================
+   Active Map
+========================================================= */
+
+.active-map-card {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+    margin-bottom:
+        24px;
+
+}
+
+.active-map-info {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        15px;
+
+}
+
+.active-map-icon {
+
+    background:
+        rgba(59,130,246,.10);
+
+    color:
+        #60A5FA;
+
+    border:
+        1px solid
+        rgba(59,130,246,.18);
+
+}
+
+.active-map-label {
+
+    color:
+        #64748B;
+
+    font-size:
+        .78rem;
+
+    margin-bottom:
+        4px;
+
+}
+
+.active-map-name {
+
+    color:
+        #F8FAFC;
+
+    font-size:
+        1.12rem;
+
+    font-weight:
+        800;
+
+}
+
+.active-map-status {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+}
+
+
+/* =========================================================
+   List Header
+========================================================= */
+
+.maps-list-header {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    margin-bottom:
+        15px;
+
+}
+
+.maps-list-header h2 {
+
+    margin:
+        0 0 4px;
+
+    color:
+        #F8FAFC;
+
+    font-size:
+        1rem;
+
+    font-weight:
+        800;
+
+}
+
+.maps-list-header p {
+
+    margin:
+        0;
+
+    color:
+        #64748B;
+
+    font-size:
+        .78rem;
+
+}
+
+
+/* =========================================================
+   Table
+========================================================= */
+
+.maps-card {
+
+    overflow:
+        hidden;
+
+}
+
+.maps-table-header {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        2fr
+        1.5fr
+        1fr
+        1fr;
+
+    min-width:
+        780px;
+
+    padding:
+        14px 22px;
+
+    background:
+        #0B1220;
+
+    border-bottom:
+        1px solid
+        #22304A;
+
+    color:
+        #64748B;
+
+    font-size:
+        .72rem;
+
+    font-weight:
+        700;
+
+}
+
+.maps-table-row {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        2fr
+        1.5fr
+        1fr
+        1fr;
+
+    align-items:
+        center;
+
+    min-width:
+        780px;
+
+    min-height:
+        72px;
+
+    padding:
+        12px 22px;
+
+    border-bottom:
+        1px solid
+        rgba(148,163,184,.07);
+
+}
+
+.maps-table-row:last-child {
+
+    border-bottom:
+        none;
+
+}
+
+.maps-table-row:hover {
+
+    background:
+        rgba(59,130,246,.035);
+
+}
+
+.maps-table-row.is-selected {
+
+    background:
+        rgba(59,130,246,.07);
+
+    border-color:
+        rgba(59,130,246,.16);
+
+}
+
+
+/* =========================================================
+   Map Name
+========================================================= */
+
+.map-name-cell {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        9px;
+
+    color:
+        #F8FAFC;
+
+    font-size:
+        .84rem;
+
+}
+
+.map-name-cell i {
+
+    color:
+        #60A5FA;
+
+}
+
+.map-type-cell {
+
+    color:
+        #94A3B8;
+
+    font-size:
+        .78rem;
+
+}
+
+.map-status-muted {
+
+    color:
+        #64748B;
+
+}
+
+
+/* =========================================================
+   Buttons
+========================================================= */
+
+.map-load-btn {
+
+    min-height:
+        36px;
+
+    padding:
+        0 13px;
+
+    border-radius:
+        9px;
+
+    border:
+        1px solid
+        #22304A;
+
+    background:
+        #0F172A;
+
+    color:
+        #CBD5E1;
+
+    font-family:
+        inherit;
+
+    font-size:
+        .74rem;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+}
+
+.map-load-btn:hover:not(:disabled) {
+
+    color:
+        #FFFFFF;
+
+    background:
+        #172033;
+
+    border-color:
+        #3B82F6;
+
+    box-shadow:
+        0 6px 16px
+        rgba(59,130,246,.10);
+
+}
+
+.map-load-btn:disabled {
+
+    cursor:
+        not-allowed;
+
+    background:
+        rgba(34,197,94,.08);
+
+    border-color:
+        rgba(34,197,94,.20);
+
+    color:
+        #4ADE80;
+
+}
+
+
+/* =========================================================
+   Responsive
+========================================================= */
+
+@media (max-width: 850px) {
+
+    .active-map-card {
+
+        align-items:
+            flex-start;
+
+        flex-direction:
+            column;
+
+    }
+
+    .maps-card {
+
+        overflow-x:
+            auto;
+
+    }
+
+    .maps-table-header,
+    .maps-table-row {
+
+        min-width:
+            780px;
+
+    }
+
+}

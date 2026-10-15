@@ -1,0 +1,1067 @@
+/* =========================================================
+   FragCity CS2 Panel
+   Servers Page
+========================================================= */
+
+
+/* =========================================================
+   Page Header
+========================================================= */
+
+.servers-page-header {
+
+    margin-bottom:
+        24px;
+
+}
+
+
+/* =========================================================
+   Toolbar
+========================================================= */
+
+.servers-toolbar {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        16px;
+
+    margin-bottom:
+        18px;
+
+    flex-wrap:
+        wrap;
+
+}
+
+.servers-search-box {
+
+    position:
+        relative;
+
+    width:
+        min(380px, 100%);
+
+}
+
+.servers-search-box > i {
+
+    position:
+        absolute;
+
+    top:
+        50%;
+
+    right:
+        15px;
+
+    transform:
+        translateY(-50%);
+
+    color:
+        #64748B;
+
+    pointer-events:
+        none;
+
+    z-index:
+        2;
+
+}
+
+.servers-search-box input {
+
+    width:
+        100%;
+
+    height:
+        44px;
+
+    padding:
+        0 44px 0 42px;
+
+    box-sizing:
+        border-box;
+
+    background:
+        #0B1220;
+
+    border:
+        1px solid
+        #22304A;
+
+    border-radius:
+        11px;
+
+    color:
+        #F8FAFC;
+
+    outline:
+        none;
+
+    font-family:
+        inherit;
+
+    font-size:
+        .86rem;
+
+}
+
+.servers-search-box input::placeholder {
+
+    color:
+        #64748B;
+
+}
+
+.servers-search-box input:focus {
+
+    border-color:
+        #3B82F6;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(59,130,246,.10);
+
+}
+
+.servers-search-clear {
+
+    position:
+        absolute;
+
+    top:
+        50%;
+
+    left:
+        8px;
+
+    width:
+        28px;
+
+    height:
+        28px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    transform:
+        translateY(-50%);
+
+    background:
+        transparent;
+
+    border:
+        none;
+
+    border-radius:
+        7px;
+
+    color:
+        #64748B;
+
+    cursor:
+        pointer;
+
+    opacity:
+        0;
+
+    pointer-events:
+        none;
+
+}
+
+.servers-search-clear.visible {
+
+    opacity:
+        1;
+
+    pointer-events:
+        auto;
+
+}
+
+.servers-search-clear:hover {
+
+    background:
+        rgba(148,163,184,.10);
+
+    color:
+        #E2E8F0;
+
+}
+
+.servers-toolbar-meta {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    min-height:
+        38px;
+
+    padding:
+        0 12px;
+
+    background:
+        rgba(59,130,246,.05);
+
+    border:
+        1px solid
+        rgba(59,130,246,.14);
+
+    border-radius:
+        9px;
+
+    color:
+        #64748B;
+
+    font-size:
+        .78rem;
+
+}
+
+.servers-count-label {
+
+    color:
+        #60A5FA;
+
+    font-weight:
+        800;
+
+}
+
+
+/* =========================================================
+   Main Card
+========================================================= */
+
+.servers-card {
+
+    background:
+        #111827;
+
+    border:
+        1px solid
+        #22304A;
+
+    border-radius:
+        16px;
+
+    overflow:
+        hidden;
+
+    min-height:
+        400px;
+
+    box-shadow:
+        0 18px 45px
+        rgba(0,0,0,.18);
+
+}
+
+
+/* =========================================================
+   Table Header
+========================================================= */
+
+.servers-table-header {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        2fr
+        1fr
+        1fr
+        1fr
+        .7fr
+        1.2fr;
+
+    min-width:
+        900px;
+
+    padding:
+        14px 22px;
+
+    background:
+        #0B1220;
+
+    border-bottom:
+        1px solid
+        #22304A;
+
+    color:
+        #64748B;
+
+    font-size:
+        .72rem;
+
+    font-weight:
+        700;
+
+    letter-spacing:
+        .04em;
+
+}
+
+.servers-table-header > div {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+}
+
+
+/* =========================================================
+   List
+========================================================= */
+
+.servers-list {
+
+    width:
+        100%;
+
+}
+
+
+/* =========================================================
+   Table Row
+========================================================= */
+
+.servers-table-row {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        2fr
+        1fr
+        1fr
+        1fr
+        .7fr
+        1.2fr;
+
+    align-items:
+        center;
+
+    min-width:
+        900px;
+
+    min-height:
+        82px;
+
+    padding:
+        13px 22px;
+
+    border-bottom:
+        1px solid
+        rgba(148,163,184,.07);
+
+}
+
+.servers-table-row:last-child {
+
+    border-bottom:
+        none;
+
+}
+
+.servers-table-row:hover {
+
+    background:
+        rgba(59,130,246,.035);
+
+}
+
+
+/* =========================================================
+   Server Name
+========================================================= */
+
+.server-name-cell {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+    min-width:
+        0;
+
+}
+
+.server-game-icon {
+
+    width:
+        42px;
+
+    height:
+        42px;
+
+    min-width:
+        42px;
+
+    border-radius:
+        10px;
+
+    overflow:
+        hidden;
+
+    border:
+        1px solid
+        rgba(59,130,246,.18);
+
+    background:
+        #0B1220;
+
+}
+
+.server-game-icon img {
+
+    display:
+        block;
+
+    width:
+        100%;
+
+    height:
+        100%;
+
+    object-fit:
+        cover;
+
+}
+
+.server-name-info {
+
+    min-width:
+        0;
+
+}
+
+.server-name {
+
+    color:
+        #F8FAFC;
+
+    font-size:
+        .87rem;
+
+    font-weight:
+        700;
+
+    white-space:
+        nowrap;
+
+    overflow:
+        hidden;
+
+    text-overflow:
+        ellipsis;
+
+}
+
+.server-ip {
+
+    margin-top:
+        4px;
+
+    color:
+        #64748B;
+
+    font-family:
+        Consolas,
+        "Courier New",
+        monospace;
+
+    font-size:
+        .72rem;
+
+    direction:
+        ltr;
+
+}
+
+
+/* =========================================================
+   Game
+========================================================= */
+
+.server-game-cell {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+}
+
+.server-game-badge {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    padding:
+        6px 9px;
+
+    background:
+        rgba(59,130,246,.07);
+
+    border:
+        1px solid
+        rgba(59,130,246,.15);
+
+    border-radius:
+        8px;
+
+    color:
+        #93C5FD;
+
+    font-size:
+        .74rem;
+
+    font-weight:
+        600;
+
+}
+
+.server-game-badge i {
+
+    color:
+        #60A5FA;
+
+}
+
+
+/* =========================================================
+   Status
+========================================================= */
+
+.server-status-cell {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+}
+
+.server-status-badge {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    font-size:
+        .74rem;
+
+    font-weight:
+        700;
+
+    color:
+        #94A3B8;
+
+}
+
+.status-dot {
+
+    width:
+        7px;
+
+    height:
+        7px;
+
+    border-radius:
+        50%;
+
+    flex-shrink:
+        0;
+
+}
+
+.server-status-badge.online {
+
+    color:
+        #4ADE80;
+
+}
+
+.server-status-badge.online .status-dot {
+
+    background:
+        #22C55E;
+
+    box-shadow:
+        0 0 8px
+        rgba(34,197,94,.55);
+
+}
+
+.server-status-badge.pending {
+
+    color:
+        #60A5FA;
+
+}
+
+.server-status-badge.pending .status-dot {
+
+    background:
+        #3B82F6;
+
+    box-shadow:
+        0 0 8px
+        rgba(59,130,246,.55);
+
+}
+
+.server-status-badge.stopped {
+
+    color:
+        #F87171;
+
+}
+
+.server-status-badge.stopped .status-dot {
+
+    background:
+        #EF4444;
+
+    box-shadow:
+        0 0 8px
+        rgba(239,68,68,.45);
+
+}
+
+.server-status-badge.unknown {
+
+    color:
+        #64748B;
+
+}
+
+.server-status-badge.unknown .status-dot {
+
+    background:
+        #64748B;
+
+}
+
+
+/* =========================================================
+   Expire
+========================================================= */
+
+.server-expire-cell {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    color:
+        #94A3B8;
+
+    font-size:
+        .76rem;
+
+    white-space:
+        nowrap;
+
+}
+
+.server-expire-cell i {
+
+    color:
+        #64748B;
+
+}
+
+
+/* =========================================================
+   Slots
+========================================================= */
+
+.server-slots-cell {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    color:
+        #CBD5E1;
+
+    font-size:
+        .8rem;
+
+    font-weight:
+        700;
+
+}
+
+.server-slots-cell i {
+
+    color:
+        #60A5FA;
+
+}
+
+
+/* =========================================================
+   Dashboard Button
+========================================================= */
+
+.server-action-cell {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+}
+
+.server-dashboard-btn {
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        8px;
+
+    min-height:
+        38px;
+
+    padding:
+        0 12px;
+
+    border-radius:
+        9px;
+
+    background:
+        rgba(59,130,246,.10);
+
+    border:
+        1px solid
+        rgba(59,130,246,.22);
+
+    color:
+        #93C5FD;
+
+    text-decoration:
+        none;
+
+    font-size:
+        .74rem;
+
+    font-weight:
+        700;
+
+    white-space:
+        nowrap;
+
+}
+
+.server-dashboard-btn:hover {
+
+    background:
+        #3B82F6;
+
+    border-color:
+        #3B82F6;
+
+    color:
+        #FFFFFF;
+
+}
+
+.server-dashboard-btn i {
+
+    font-size:
+        .7rem;
+
+}
+
+
+/* =========================================================
+   Empty State
+========================================================= */
+
+.servers-empty-state {
+
+    min-height:
+        430px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        50px 24px;
+
+    text-align:
+        center;
+
+}
+
+.servers-empty-icon {
+
+    width:
+        64px;
+
+    height:
+        64px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin-bottom:
+        18px;
+
+    border-radius:
+        18px;
+
+    background:
+        rgba(59,130,246,.08);
+
+    border:
+        1px solid
+        rgba(59,130,246,.18);
+
+    color:
+        #60A5FA;
+
+    font-size:
+        1.4rem;
+
+}
+
+.servers-login-icon {
+
+    background:
+        rgba(239,68,68,.08);
+
+    border-color:
+        rgba(239,68,68,.18);
+
+    color:
+        #F87171;
+
+}
+
+.servers-empty-description {
+
+    margin-bottom:
+        25px;
+
+}
+
+.servers-buy-button {
+
+    display:
+        inline-flex;
+
+    width:
+        auto;
+
+    padding:
+        11px 18px;
+
+}
+
+
+/* =========================================================
+   Search Empty
+========================================================= */
+
+.servers-search-empty {
+
+    min-height:
+        320px;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        40px 20px;
+
+    text-align:
+        center;
+
+}
+
+.servers-search-empty-icon {
+
+    width:
+        58px;
+
+    height:
+        58px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    margin-bottom:
+        14px;
+
+    border-radius:
+        16px;
+
+    background:
+        rgba(59,130,246,.08);
+
+    border:
+        1px solid
+        rgba(59,130,246,.16);
+
+    color:
+        #60A5FA;
+
+}
+
+
+/* =========================================================
+   Responsive
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .servers-card {
+
+        overflow-x:
+            auto;
+
+    }
+
+    .servers-table-header,
+    .servers-table-row {
+
+        min-width:
+            900px;
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .servers-toolbar {
+
+        align-items:
+            stretch;
+
+        flex-direction:
+            column;
+
+    }
+
+    .servers-search-box {
+
+        width:
+            100%;
+
+    }
+
+    .servers-toolbar-meta {
+
+        align-self:
+            flex-start;
+
+    }
+
+    .servers-empty-state {
+
+        min-height:
+            350px;
+
+        padding:
+            40px 18px;
+
+    }
+
+}

@@ -1,0 +1,434 @@
+/* =========================================
+   FragCity Profile Page
+   Scoped to .profile-fullscreen to avoid
+   affecting other pages/components.
+   Theme: FragCity Blue
+   ========================================= */
+
+.profile-fullscreen {
+    width: calc(100% + 50px);
+    min-height: calc(100vh - 66px);
+    margin: -25px;
+    color: #e9edf7;
+    background: #0b0f18;
+    font-family: 'Vazirmatn', 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+}
+
+/* Toast */
+.profile-fullscreen .toast-message {
+    position: fixed;
+    top: 84px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-width: 220px;
+    max-width: calc(100vw - 40px);
+    padding: 12px 30px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.profile-fullscreen .toast-message.show {
+    display: flex;
+}
+
+.profile-fullscreen .toast-message.success {
+    background: #2ecc71;
+    color: #fff;
+}
+
+.profile-fullscreen .toast-message.error {
+    background: #e74c3c;
+    color: #fff;
+}
+
+/* Banner */
+.profile-fullscreen .banner-section {
+    height: 220px;
+    position: relative;
+    flex-shrink: 0;
+    background-color: #121827;
+    background-size: cover;
+    background-position: center 30%;
+    background-repeat: no-repeat;
+}
+
+.profile-fullscreen .banner-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(5, 9, 18, 0.12) 0%, rgba(5, 9, 18, 0.26) 45%, rgba(5, 9, 18, 0.82) 100%),
+        linear-gradient(90deg, rgba(50, 115, 246, 0.06), transparent 45%, rgba(50, 115, 246, 0.05));
+}
+
+.profile-fullscreen .upload-btn {
+    position: absolute;
+    right: 16px;
+    bottom: 12px;
+    z-index: 2;
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    border-radius: 50%;
+    background: rgba(8, 13, 24, 0.72);
+    color: #fff;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    transition: 0.2s ease;
+}
+
+.profile-fullscreen .upload-btn:hover {
+    background: var(--accent-blue);
+    border-color: rgba(255, 255, 255, 0.34);
+    box-shadow: 0 0 18px rgba(50, 115, 246, 0.35);
+}
+
+.profile-fullscreen .profile-file-input {
+    display: none;
+}
+
+/* Hero */
+.profile-fullscreen .profile-hero {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 2rem 1rem;
+    background: linear-gradient(135deg, #111725 0%, #0b0f18 100%);
+    border-bottom: 1px solid #20283a;
+}
+
+.profile-fullscreen .avatar-section {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    flex-shrink: 0;
+    margin-top: -65px;
+    margin-right: 20px;
+}
+
+.profile-fullscreen .avatar-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-fullscreen .main-avatar,
+.profile-fullscreen .main-avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid var(--accent-blue);
+    object-fit: cover;
+    background: #151c2b;
+    box-shadow: 0 0 0 5px rgba(50, 115, 246, 0.08), 0 0 24px rgba(50, 115, 246, 0.28);
+}
+
+.profile-fullscreen .main-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    color: #77a4ff;
+}
+
+.profile-fullscreen .avatar-edit-btn {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #eef3ff;
+    border-radius: 50%;
+    background: var(--accent-blue);
+    color: #fff;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.profile-fullscreen .avatar-edit-btn:hover {
+    background: #255ed4;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(50, 115, 246, 0.35);
+}
+
+.profile-fullscreen .avatar-edit-btn i {
+    font-size: 1rem;
+}
+
+.profile-fullscreen .rank-badge {
+    position: absolute;
+    left: -10px;
+    bottom: -10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    background: var(--accent-blue);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(50, 115, 246, 0.35);
+}
+
+.profile-fullscreen .name-and-xp {
+    flex: 1;
+    min-width: 0;
+}
+
+.profile-fullscreen .name-and-xp h1 {
+    margin: 0 0 0.2rem;
+    font-size: 1.6rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: linear-gradient(135deg, #ffffff, #72a1ff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.profile-fullscreen .steam-id {
+    margin: 0.2rem 0 0.5rem;
+    color: #7d879c;
+    font-size: 0.75rem;
+    font-family: monospace;
+    direction: ltr;
+    text-align: right;
+}
+
+.profile-fullscreen .xp-bar-container {
+    position: relative;
+    width: 100%;
+    height: 20px;
+    overflow: hidden;
+    border-radius: 30px;
+    background: #151b29;
+    border: 1px solid #263149;
+}
+
+.profile-fullscreen .xp-bar {
+    width: 0;
+    height: 100%;
+    border-radius: 30px;
+    background: linear-gradient(90deg, #255ed4, var(--accent-blue), #65a0ff);
+    box-shadow: 0 0 14px rgba(50, 115, 246, 0.28);
+    transition: width 0.45s ease;
+}
+
+.profile-fullscreen .xp-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    white-space: nowrap;
+}
+
+/* Stats */
+.profile-fullscreen .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    background: #0b0f18;
+}
+
+.profile-fullscreen .stat-card {
+    padding: 0.9rem 0.65rem;
+    text-align: center;
+    background: linear-gradient(180deg, #121927 0%, #0f1521 100%);
+    border: 1px solid #222d42;
+    border-radius: 16px;
+    transition: all 0.2s ease;
+}
+
+.profile-fullscreen .stat-card:hover {
+    border-color: rgba(50, 115, 246, 0.72);
+    box-shadow: 0 0 22px rgba(50, 115, 246, 0.16);
+    transform: translateY(-2px);
+}
+
+.profile-fullscreen .stat-label {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: #6ea0ff;
+    font-weight: 600;
+    font-size: 0.7rem;
+}
+
+.profile-fullscreen .stat-label i {
+    margin-left: 3px;
+    font-size: 0.7rem;
+}
+
+.profile-fullscreen .stat-value {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 800;
+}
+
+/* Avatar Crop Modal */
+.profile-fullscreen .avatar-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(4, 8, 15, 0.86);
+    backdrop-filter: blur(5px);
+}
+
+.profile-fullscreen .avatar-modal.is-open {
+    display: flex;
+}
+
+.profile-fullscreen .avatar-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    padding: 20px;
+    background: #151c2b;
+    border: 1px solid rgba(50, 115, 246, 0.62);
+    border-radius: 24px;
+    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.55);
+}
+
+.profile-fullscreen .avatar-modal-content h3 {
+    margin: 0;
+    color: #6ea0ff;
+}
+
+.profile-fullscreen .img-container {
+    max-height: 400px;
+    overflow: hidden;
+    margin: 15px 0;
+    border-radius: 12px;
+    background: #0d121d;
+}
+
+.profile-fullscreen #cropImage {
+    display: block;
+    max-width: 100%;
+}
+
+.profile-fullscreen .close-modal {
+    position: absolute;
+    top: 8px;
+    left: 14px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #c9d2e4;
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.profile-fullscreen .close-modal:hover {
+    color: #6ea0ff;
+}
+
+.profile-fullscreen .crop-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.profile-fullscreen .btn-crop,
+.profile-fullscreen .btn-cancel {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 40px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.profile-fullscreen .btn-crop {
+    background: var(--accent-blue);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(50, 115, 246, 0.24);
+}
+
+.profile-fullscreen .btn-crop:hover {
+    background: #255ed4;
+}
+
+.profile-fullscreen .btn-cancel {
+    background: #2a3345;
+    color: #fff;
+}
+
+.profile-fullscreen .btn-cancel:hover {
+    background: #344056;
+}
+
+@media (max-width: 700px) {
+    .profile-fullscreen {
+        width: calc(100% + 28px);
+        margin: -18px -14px;
+    }
+
+    .profile-fullscreen .profile-hero {
+        flex-direction: column;
+        text-align: center;
+        padding: 0.8rem 1rem 1rem;
+    }
+
+    .profile-fullscreen .avatar-section {
+        width: 100px;
+        height: 100px;
+        margin-top: -50px;
+        margin-right: 0;
+    }
+
+    .profile-fullscreen .name-and-xp h1 {
+        font-size: 1.3rem;
+        text-align: center;
+    }
+
+    .profile-fullscreen .steam-id {
+        text-align: center;
+    }
+
+    .profile-fullscreen .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+        padding: 1rem;
+    }
+
+    .profile-fullscreen .toast-message {
+        top: 70px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .profile-fullscreen .xp-bar,
+    .profile-fullscreen .stat-card,
+    .profile-fullscreen .upload-btn,
+    .profile-fullscreen .avatar-edit-btn,
+    .btn-crop,
+    .profile-fullscreen .btn-cancel {
+        transition: none;
+    }
+}

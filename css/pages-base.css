@@ -1,0 +1,102 @@
+/* =========================================================
+   FragCity Public Page Base / Full-Width Fix
+========================================================= */
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    overflow-x: hidden;
+    background: #070b12;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* Cancels the old white/padded canvas around full public pages. */
+body:has(.privacy-page, .rules-page, .support-page, .manual-page, .vip-page, .about-page) .main-content,
+body:has(.privacy-page, .rules-page, .support-page, .manual-page, .vip-page, .about-page) .content-fader {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #070b12 !important;
+}
+
+.privacy-page,
+.rules-page,
+.support-page,
+.manual-page,
+.vip-page,
+.about-page {
+    width: 100%;
+    min-height: calc(100vh - 52px);
+    margin: 0;
+    color: #dbeafe;
+    background:
+        radial-gradient(circle at top right, rgba(37,99,235,.08), transparent 34%),
+        radial-gradient(circle at bottom left, rgba(14,165,233,.05), transparent 30%),
+        #070b12;
+}
+
+.privacy-page,
+.rules-page,
+.manual-page,
+.vip-page,
+.about-page {
+    padding: clamp(28px, 4vw, 52px) clamp(16px, 4vw, 56px) 64px;
+    direction: rtl;
+    font-family: 'Vazirmatn', sans-serif;
+}
+
+.page-support-link,
+.support-login-link,
+.manual-external-link {
+    color: #60a5fa !important;
+    text-decoration: none;
+    transition: color .22s ease;
+}
+
+.page-support-link:hover,
+.support-login-link:hover,
+.manual-external-link:hover {
+    color: #93c5fd !important;
+    text-decoration: underline;
+}
+
+/* Shared page entrance motion */
+.privacy-page,
+.rules-page,
+.support-page,
+.manual-page,
+.vip-page,
+.about-page {
+    animation: publicPageIn .42s cubic-bezier(.22,.61,.36,1) both;
+}
+
+@keyframes publicPageIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
