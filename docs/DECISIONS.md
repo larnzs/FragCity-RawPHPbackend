@@ -81,10 +81,35 @@
 
 **فایل‌های اختصاصی هر Instance:** پوشه‌های game/csgo/addons/ و game/csgo/cfg/ و فایل‌های متنی مشخصی که تنظیمات GameMode را تعریف می‌کنند. فهرست دقیق فایل‌های GameMode باید در طراحی فنی بعدی ثبت شود. بقیهٔ فایل‌های Base به‌عنوان فایل‌های مشترک و غیرقابل‌تغییر از سوی Instanceها در نظر گرفته می‌شوند؛ تنها فرایند مرکزی Update مجاز است Base را جایگزین کند.
 
-**اسکریپت Pterodactyl:** یک فرایند Deploy اختصاصی FragCity بعداً ساخته می‌شود که payload پوشهٔ مود/افزونهٔ اختصاصی Instance را از منبع مدیریت‌شدهٔ خودمان در همان Instance قرار دهد. این اسکریپت نباید SteamCMD را اجرا کند، بازی پایه را نصب/به‌روزرسانی کند یا جایگزین چرخهٔ عمر Wings/Pterodactyl شود. روش Provision کردن cfg و فایل‌های GameMode مستقل هنوز مشخص نشده است.
+**اسکریپت Pterodactyl:** جزئیات اولیه در ADR-011 تکمیل شده است: Deploy باید کل payload خصوصی شامل addons/، cfg/ و فایل‌های متنی مشخص‌شدهٔ GameMode را به هر Instance بدهد. این اسکریپت نباید SteamCMD را اجرا کند، بازی پایه را نصب/به‌روزرسانی کند یا جایگزین چرخهٔ عمر Wings/Pterodactyl شود. در زمان ساخت، preset مود اعمال نمی‌شود و هر Instance پس از قبولی baseline جداگانه کانفیگ خواهد شد.
 
 **سیاست Update بازی پایه:** به‌محض تشخیص انتشار Update جدید CS2، چرخهٔ Update هماهنگ‌شده باید خودکار آغاز شود. تمام Instanceهایی که از Base مشترک استفاده می‌کنند متوقف می‌شوند؛ سپس SteamCMD یک‌بار روی Base مرکزی اجرا می‌شود. هیچ Instance نباید هنگام Update یا روی فایل‌های نیمه‌به‌روزشده Start/Restart شود. پس از تأیید موفقیت Update، Instanceهایی که پیش از عملیات در حال اجرا بودند می‌توانند دوباره Start شوند؛ در صورت شکست، آن‌ها باید متوقف بمانند تا مسیر بازیابی اجرا شود.
 
 **موارد باز برای پیاده‌سازی:** جزئیات فنی تشخیص Update جدید، قفل عملیات و جلوگیری از Start هم‌زمان، روش mount/link/overlay یا مسیر فیزیکی فایل‌های مشترک، اعتبارسنجی و rollback، و جزئیات deploy فایل‌های اختصاصی. هیچ ابزار ثالثی مانند VPK Sync در این تصمیم به‌عنوان پیاده‌سازی منتخب تعیین نشده است.
 
 **مرجع:** [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md)، [Platform PoC](PLATFORM-POC.md)، [Testing Bench](TESTING-BENCH.md).
+
+
+## ADR-011 — پکیج اولیهٔ Instance و پیکربندی اختصاصی بدون Preset
+
+**وضعیت:** تصمیم معماری تأییدشده برای PoC؛ پیکربندی مودهای نهایی و Production هنوز انجام/تأیید نشده است.  
+**تصمیم:** هنگام ساخت هر Instance، یک payload استاندارد و کامل FragCity از منبع مدیریت‌شدهٔ خودمان deploy می‌شود. payload اختصاصی هر Instance شامل کل پوشهٔ `game/csgo/addons/`، پوشهٔ `game/csgo/cfg/` و فایل‌های متنی تعیین‌شدهٔ GameMode است. این مسیرها باید در Volume/لایهٔ اختصاصی همان Instance قرار بگیرند؛ صرفاً یک پوشهٔ مشترک برای همهٔ سرورها کافی نیست.
+
+**بدون preset در مرحلهٔ نخست:** در زمان Provisioning هنوز پروفایل مود نهایی مثل Aim map pool + HS Only، Public Fun یا DM/FFA Rifle Only انتخاب و اعمال نمی‌شود. تمام Instanceها ابتدا همان baseline کامل و سالم را می‌گیرند، اما از همان ابتدا port/allocation، تنظیمات عمومی و پوشه‌های payload آن‌ها جدا است. پس از قبولی آزمون ساخت، اجرا و جداسازی، هر Instance جداگانه کانفیگ می‌شود.
+
+**پیکربندی‌های بعدی:** تنظیمات مود می‌توانند در فایل‌های اختصاصی `cfg/`، فایل‌های GameMode و تنظیمات افزونه‌ها مانند `addons/counterstrikesharp/configs/plugins/` اعمال شوند. تغییر یک Instance نباید تنظیمات یا رفتار Instance دیگر را عوض کند. نمونه‌های مود در این ADR فقط مثال‌اند؛ به‌معنی تعریف محصول یا preset خودکار در مرحلهٔ اول نیستند.
+
+**مرز اسکریپت Deploy:** اسکریپت Provisioning/Deploy فقط payload اختصاصی Instance را قرار می‌دهد و پوشه‌های مستقل را آماده می‌کند؛ SteamCMD اجرا نمی‌کند، Base Game را نصب/Update نمی‌کند و خود سرور را Start نمی‌کند.
+
+**مرجع:** [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md)، [Platform PoC](PLATFORM-POC.md)، [Testing Bench](TESTING-BENCH.md).
+
+## ADR-012 — استفاده از File Manager داخلی Pterodactyl
+
+**وضعیت:** جهت PoC تأییدشده؛ نحوهٔ اتصال آن به سایت FragCity و پنل C# موجود هنوز Pending است.  
+**تصمیم:** قابلیت پایهٔ مرور، مشاهده و ویرایش فایل‌های هر سرور از طریق File Manager خود Pterodactyl ارزیابی می‌شود تا همان قابلیت از ابتدا در FragCity دوباره ساخته نشود. Pterodactyl مجوزهای فایل و عملیات کنترل سرور را جداگانه ارائه می‌کند؛ برای Subuserها می‌توان مجوزهای لازم را محدود کرد.
+
+**مرزها:** Pterodactyl یک رابط/پنل مشتری مستقل است و به‌صورت خودکار داخل سایت FragCity یا پنل C# فعلی embed نمی‌شود. لینک‌دهی یا SSO/Integration با سایت بعداً جداگانه بررسی می‌شود. این تصمیم به معنی حذف فوری پنل/برنامهٔ C# موجود نیست؛ ابتدا باید هم‌پوشانی‌ها و شکاف‌های واقعی آن مشخص شوند.
+
+**امنیت فایل‌ها:** مشتری فقط باید به فایل‌های Instance واگذارشدهٔ خودش دسترسی داشته باشد. File Manager باید فایل‌های private مانند `addons/`، `cfg/` و فایل‌های GameMode را به شکل قابل ویرایش در دسترس قرار دهد، بدون اینکه امکان نوشتن در Base مشترک یا دسترسی به Instanceهای دیگر ایجاد شود. نمایش و عملکرد mount/overlay از طریق File Manager و SFTP بخشی از PoC است.
+
+**مرجع قابلیت‌ها:** [Pterodactyl permission model](https://github.com/pterodactyl/panel/blob/1.0-develop/app/Models/Permission.php)، [Client permissions API](https://docs.pterodactyl.io/v1/api/client-general/get-show-permissions).
