@@ -27,6 +27,14 @@
     "legacy_services": {
       "extends": "main",
       "name": ""
+    },
+    "ranks_plugin": {
+      "extends": "main",
+      "name": ""
+    },
+    "simpleadmin_plugin": {
+      "extends": "main",
+      "name": ""
     }
   },
   "integrations": {
@@ -229,6 +237,15 @@
     },
     "tst.index": {
       "database_profile": "main"
+    },
+    "database.ranks_plugin": {
+      "database_profile": "ranks_plugin"
+    },
+    "database.simpleadmin_plugin": {
+      "database_profile": "simpleadmin_plugin"
+    },
+    "database.weaponpaints_plugin": {
+      "database_profile": "weaponpaints"
     }
   }
 }
