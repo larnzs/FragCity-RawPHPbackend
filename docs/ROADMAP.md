@@ -8,7 +8,7 @@
 |---|---|---|---|
 | P0 — Requirements & Local Development | مستندات آماده؛ اجرا Pending | الزامات، معماری، updater محلی، Laragon/WAMP و مرزبندی Production | clone محلی آماده، DB کاملاً جدا و تست اولیه قابل تکرار باشد |
 | P1 — Security & Baseline | ممیزی ایستا اولیه انجام؛ اصلاح Pending | بازبینی secret، API، ورودی‌ها و مدل مالکیت داده | خطرهای مسدودکننده شناسایی و برنامه اصلاح تصویب شود |
-| P2 — Game Panel PoC | Pending | یک Node، Base Game مشترک و حداقل دو CS2 Instance با payload کامل private | چرخهٔ عمر، جداسازی addons/cfg/GameMode، File Manager و Update هماهنگ‌شده پایدار باشد |
+| P2 — Game Panel PoC | Pending | یک Node، Base Game مشترک، دو Instance با baseline خصوصی کامل و updater انتخابی پلاگین/Runtime | چرخهٔ عمر، جداسازی Instanceها، حفاظت کانفیگ، File Manager و Update هماهنگ‌شده پایدار باشد |
 | P3 — Billing Integration | Pending | سفارش Sandbox/ساختگی تا Provisioning | duplicate و سفارش ناموفق به‌شکل امن مدیریت شود |
 | P4 — Fixed-Duration Product | Pending | بسته‌ها، Wallet، `expires_at` و expiry action | تمام تست‌های مدل مالی قبول شوند |
 | P5 — Isolation & Recovery | Pending | مجوز مشتری، Backup/Restore، retry و rollback | تست‌های امنیتی/بازیابی قبول شوند |
@@ -48,7 +48,7 @@
 4. Egg/template مناسب CS2 انتخاب و مجوز SteamCMD/اجزای لازم تأیید شود.
 5. یک instance آزمایشی نصب/اجرا و stop/restart/delete/backup/restore تست شود.
 6. Console، فایل‌ها، محدودیت RAM/CPU/Disk و پورت‌ها بررسی شود.
-7. پیش از هر Start، payload مجاز شامل addons/cfg و فایل‌های .txt تعیین‌شده از شاخهٔ `integration/kus-monorepo` ریپوی `cs2-kus-addons` به مسیر private همان Instance sync/update شود؛ این فایل‌ها به Base Game کپی/merge نمی‌شوند و Sync مسئول اجرای SteamCMD یا CS2 نیست. Instance دوم نیز باید sync خصوصی مستقل داشته باشد.
+7. هنگام Provisioning اولیه، baseline کامل `addons/`، `cfg/` و فایل‌های متنی تعیین‌شده از شاخهٔ `integration/kus-monorepo` ریپوی `cs2-kus-addons` به فضای private هر Instance کپی شود. پیش از Startهای بعدی updater فقط پلاگین‌ها و Runtimeهای مدیریت‌شده را به‌روزرسانی کند؛ `cfg/`، فایل‌های `.txt` تنظیماتی و `addons/counterstrikesharp/configs/` نباید تغییر کنند و هیچ فایل payload به Base Game کپی/merge نشود. این updater مسئول اجرای SteamCMD یا CS2 نیست.
 8. در اولین ساخت هیچ preset مود نهایی اعمال نکن؛ ابتدا سلامت payload، اجرای سرور و جداسازی فایل‌ها را ثابت کن. سپس هر Instance را جداگانه کانفیگ کن.
 9. File Manager داخلی Pterodactyl را برای ویرایش cfg و تنظیمات افزونه تست کن؛ مجوزهای فایل، SFTP و Console را جداگانه بررسی کن. سایت/پنل C# فعلی حذف‌شده فرض نشود؛ نیاز به لینک‌دهی/SSO و شکاف‌های UI بعداً ارزیابی می‌شود.
 10. Update مرکزی Base و sync خصوصی payload دو عملیات جدا هستند: Update بازی همهٔ Instanceهای متکی را متوقف کرده و SteamCMD را یک‌بار روی Base اجرا می‌کند؛ sync payload پیش از هر Start فقط به مسیر private Instance می‌نویسد. بازگشت فقط Instanceهای قبلاً Running انجام شود. جزئیات در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) آمده است.
