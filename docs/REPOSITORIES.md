@@ -58,3 +58,37 @@
 ## 6. بررسی معماری چند Instance CS2
 
 نتایج اولیه و معیارهای آزمون در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) ثبت شده است. فعلاً K4ryuu VPK Sync فقط نامزد آزمایش است؛ shared files روی Node فعال نشده‌اند. مسیر Pterodactyl + Wings همچنان نامزد مرجع مدیریت مشتری و چرخهٔ عمر است.
+
+
+## 7. CS2 multi-instance candidates by operating system
+
+These are candidates for a separate test programme, not approved production dependencies.
+
+### Linux native
+
+| Candidate | GitHub | Focus | Current test status |
+|---|---|---|---|
+| Pterodactyl Panel + Wings | [panel](https://github.com/pterodactyl/panel) / [wings](https://github.com/pterodactyl/wings) | Tenant-managed Server records, lifecycle, resources and isolation | Pending live test |
+| K4ryuu CS2-Egg VPK Sync | [VPK Sync docs](https://github.com/K4ryuu/CS2-Egg/blob/main/docs/features/vpk-sync.md) | Optional VPK-sharing strategy inside a Panel-managed node | Pending static security review and live test |
+| GamesTwoLife/cs2-multiserver | [GitHub](https://github.com/GamesTwoLife/cs2-multiserver) | Shared base install, per-instance configs and ports, tmux/systemd automation | Pending live test |
+| Trimeon/cs2-install | [GitHub](https://github.com/Trimeon/cs2-install) | Master install linked to individual instances; optional Docker | Pending live test |
+| Auto-Tournament/cs2-server-manager | [GitHub](https://github.com/Auto-Tournament/cs2-server-manager) | Shared install and update control | Commercial licence gate; verify before any commercial use |
+| 1zc/CS2-Pterodactyl | [GitHub](https://github.com/1zc/CS2-Pterodactyl) | CS2 Docker image and Egg baseline | Pending live test |
+
+### Windows native
+
+| Candidate | GitHub | Focus | Current test status |
+|---|---|---|---|
+| WindowsGSH + CS2 module | [WindowsGSH](https://github.com/WindowsGSH/WindowsGSH) / [CounterStrike2 module](https://github.com/WindowsGSH/WindowsGSH.CounterStrike2) | Native Windows GUI for game server lifecycle | Module marks itself NEEDS LIVE TEST; commercial use requires prior written permission according to WindowsGSH README |
+| Game Server Admin | [fpaezf/Game-Server-Admin](https://github.com/fpaezf/Game-Server-Admin) | Bulk server install/update/start/stop, watchdog and console | Work in Progress; licence, security and live behaviour need review |
+| Legacy CS2 Server Manager | [fpaezf/CS2-server-manager](https://github.com/fpaezf/CS2-server-manager) | Historical Windows UI | Deprecated by its own README; not the primary test target |
+| Existing FragCity Windows workflow | [FragCity/cs2-kus-addons](https://github.com/larnzs/cs2-kus-addons) | Known-good deployment baseline for a separate controlled comparison | Protected repository; no changes in this project without separate explicit request |
+
+### Cross-platform / compatibility lane
+
+| Candidate | GitHub | Focus | Current test status |
+|---|---|---|---|
+| CS2 Server CLI | [maxdeepfield/cs2-server-cli](https://github.com/maxdeepfield/cs2-server-cli) | README claims multi-server support on Windows/Linux/macOS | Claim unverified; build and lifecycle tests required on each OS |
+| MSM under WSL2 | [GamesTwoLife/cs2-multiserver](https://github.com/GamesTwoLife/cs2-multiserver) | WSL2 compatibility | Does not count as native Windows support or Linux-production validation |
+
+See [Testing Bench](TESTING-BENCH.md) for the test matrix and [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md) for provisional prioritisation.
