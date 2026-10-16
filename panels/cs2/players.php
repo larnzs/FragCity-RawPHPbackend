@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../settings/loader.php';
 // panel/players.php
 declare(strict_types=1);
 
@@ -77,21 +78,11 @@ $page_title = $t['nav_title'];
 ========================================================= */
 function connectServicesDb(): PDO
 {
-    $host = '127.0.0.1';
-    $port = '3306';
-    $dbname = 'kyonxcbt_fragcity_services';
-    $dbUser = 'kyonxcbt_admin';
-    $dbPass = 'Atrisayeafsorde824@';
-
-    return new PDO(
-        "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4",
-        $dbUser,
-        $dbPass,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]
-    );
+    $cfg=fragcity_settings('files.panels.cs2.players',array());
+    $profile=isset($cfg['database_profile'])?$cfg['database_profile']:'main';
+    $pdo=fragcity_create_pdo($profile);
+    if(!$pdo)throw new PDOException('Database unavailable or not configured.');
+    return $pdo;
 }
 
 /* =========================================================

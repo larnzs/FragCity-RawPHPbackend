@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../settings/loader.php';
 // panel/servers.php
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -82,11 +83,8 @@ $page_title = $t['nav_title'];
    Database
 ========================================================= */
 
-$host = '127.0.0.1';
-$port = '3306';
-$dbname = 'kyonxcbt_fragcity_services';
-$dbUser = 'kyonxcbt_admin';
-$dbPass = 'Atrisayeafsorde824@';
+$serversSettings=fragcity_settings('files.panels.cs2.servers',array());
+$serversProfile=isset($serversSettings['database_profile'])?$serversSettings['database_profile']:'main';
 
 $pdo = null;
 $servers = [];
@@ -108,17 +106,8 @@ $isLoggedIn = !empty($sessionSteamId);
    Database Connection
 ========================================================= */
 
-try {
-    $pdo = new PDO(
-        "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4",
-        $dbUser,
-        $dbPass
-    );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    $servers = [];
-}
+$pdo=fragcity_create_pdo($serversProfile);
+if(!$pdo){$servers=array();}
 
 /* =========================================================
    Get User Servers (Joined with registered_servers & agent_nodes)

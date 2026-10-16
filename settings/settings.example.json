@@ -246,6 +246,15 @@
     },
     "database.weaponpaints_plugin": {
       "database_profile": "weaponpaints"
+    },
+    "panels.cs2.overview": {
+      "database_profile": "main"
+    },
+    "panels.cs2.players": {
+      "database_profile": "main"
+    },
+    "panels.cs2.servers": {
+      "database_profile": "main"
     }
   }
 }

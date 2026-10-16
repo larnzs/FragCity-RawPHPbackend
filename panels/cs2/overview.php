@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../settings/loader.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -103,11 +104,8 @@ $t = $translations[$lang];
 $current_page = 'overview';
 $page_title = $t['nav_title'];
 
-$host = '127.0.0.1';
-$port = '3306';
-$dbname = 'kyonxcbt_fragcity_services';
-$dbUser = 'kyonxcbt_admin';
-$dbPass = 'Atrisayeafsorde824@';
+$overviewSettings=fragcity_settings('files.panels.cs2.overview',array());
+$overviewProfile=isset($overviewSettings['database_profile'])?$overviewSettings['database_profile']:'main';
 
 $pdo = null;
 $server = null;
@@ -124,13 +122,8 @@ if (isset($_GET['error']) && $_GET['error'] === 'high_usage') {
     $errorMsg = $t['high_usage_error'];
 }
 
-try {
-    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4", $dbUser, $dbPass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    $server = null;
-}
+$pdo=fragcity_create_pdo($overviewProfile);
+if(!$pdo){$server=null;}
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['server_action']) && !empty($sessionSteamId) && !empty($serverId)) {
     $action = $_POST['server_action'];
