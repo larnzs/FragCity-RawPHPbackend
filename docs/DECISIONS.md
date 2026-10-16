@@ -93,7 +93,7 @@
 ## ADR-011 — پکیج اولیهٔ Instance و پیکربندی اختصاصی بدون Preset
 
 **وضعیت:** تصمیم معماری تأییدشده برای PoC؛ پیکربندی مودهای نهایی و Production هنوز انجام/تأیید نشده است.  
-**تصمیم:** هنگام ساخت هر Instance، یک payload استاندارد و کامل FragCity از منبع مدیریت‌شدهٔ خودمان deploy می‌شود. payload اختصاصی هر Instance شامل کل پوشهٔ `game/csgo/addons/`، پوشهٔ `game/csgo/cfg/` و فایل‌های متنی تعیین‌شدهٔ GameMode است. این مسیرها باید در Volume/لایهٔ اختصاصی همان Instance قرار بگیرند؛ صرفاً یک پوشهٔ مشترک برای همهٔ سرورها کافی نیست.
+**تصمیم:** هر Instance در زمان Provisioning و پیش از هر Start محتوای استاندارد FragCity را در مسیرهای خصوصی خودش دریافت/همگام می‌کند. payload اختصاصی هر Instance شامل کل پوشهٔ `game/csgo/addons/`، پوشهٔ `game/csgo/cfg/` و فایل‌های متنی تعیین‌شدهٔ GameMode است. این مسیرها باید در Volume/لایهٔ اختصاصی همان Instance قرار بگیرند؛ صرفاً یک پوشهٔ مشترک برای همهٔ سرورها کافی نیست.
 
 **بدون preset در مرحلهٔ نخست:** در زمان Provisioning هنوز پروفایل مود نهایی مثل Aim map pool + HS Only، Public Fun یا DM/FFA با تنظیمات اختصاصی انتخاب و اعمال نمی‌شود. تمام Instanceها ابتدا همان baseline کامل و سالم را می‌گیرند، اما از همان ابتدا port/allocation، تنظیمات عمومی و پوشه‌های payload آن‌ها جدا است. پس از قبولی آزمون ساخت، اجرا و جداسازی، هر Instance جداگانه کانفیگ می‌شود.
 
@@ -113,3 +113,21 @@
 **امنیت فایل‌ها:** مشتری فقط باید به فایل‌های Instance واگذارشدهٔ خودش دسترسی داشته باشد. File Manager باید فایل‌های private مانند `addons/`، `cfg/` و فایل‌های GameMode را به شکل قابل ویرایش در دسترس قرار دهد، بدون اینکه امکان نوشتن در Base مشترک یا دسترسی به Instanceهای دیگر ایجاد شود. نمایش و عملکرد mount/overlay از طریق File Manager و SFTP بخشی از PoC است.
 
 **مرجع قابلیت‌ها:** [Pterodactyl permission model](https://github.com/pterodactyl/panel/blob/1.0-develop/app/Models/Permission.php)، [Client permissions API](https://docs.pterodactyl.io/v1/api/client-general/get-show-permissions).
+
+
+## ADR-013 — همگام‌سازی payload خصوصی پیش از هر Start
+
+**وضعیت:** رفتار موردنظر تأییدشده برای PoC؛ روش mount/overlay و sync policy برای حفظ تغییرات اختصاصی هنوز باید طراحی و آزمایش شود.  
+**منبع:** شاخهٔ `integration/kus-monorepo` در [`larnzs/cs2-kus-addons/game/csgo`](https://github.com/larnzs/cs2-kus-addons/tree/integration/kus-monorepo/game/csgo).
+
+**رفتار هر Instance:** پیش از هر بار اجرای process بازی، یک pre-start step باید payload تعریف‌شده را در مسیر خصوصی همان Instance sync/copy/update کند: کل `addons/`، کل `cfg/` و فایل‌های `.txt` تعیین‌شده زیر `game/csgo/`. این مرحله برای تمام Instanceها انجام می‌شود، بدون استثنا؛ payload فقط به فضای خصوصی همان Instance نوشته می‌شود، نه به Base Game مشترک.
+
+**جداسازی منابع:** فایل‌های اصلی CS2 از نصب مرکزی مشترک خوانده می‌شوند. فایل‌های payload و تنظیمات Instance از مسیر خصوصی همان Instance خوانده می‌شوند. هیچ فایل payload روی فایل‌های فیزیکی Base Game paste، copy یا merge نمی‌شود. پس از sync موفق، Pterodactyl/Wings باید Base و payload خصوصی را در نمای اجرایی جداشده به process ارائه کند؛ روش فنی mount/overlay هنوز باید در PoC انتخاب شود.
+
+**ترتیب پیش از Start:** (۱) جلوگیری از Start هم‌زمان همان Instance، (۲) sync/update کردن payload خصوصی، (۳) بررسی موفقیت sync، (۴) آماده‌کردن نمای اجرایی Base مشترک + فایل‌های خصوصی همان Instance، (۵) اجرای CS2 از طریق Startup مدیریت‌شدهٔ Pterodactyl. اگر sync شکست بخورد، Instance نباید با payload ناقص اجرا شود.
+
+**مرز اسکریپت:** pre-start sync خودش SteamCMD را اجرا نمی‌کند، Base Game را نصب/Update نمی‌کند و process بازی را مستقیماً اجرا نمی‌کند؛ فقط پس از تکمیل موفقیت‌آمیز آن، فرمان معمول Startup می‌تواند CS2 را اجرا کند.
+
+**حفظ کانفیگ:** چون `cfg/` و تنظیمات افزونه‌ها در هر Instance شخصی‌سازی می‌شوند، sync در هر Start نباید ناخواسته تغییرات اختصاصی را پاک کند. منبع payload، اولویت نسخهٔ ریپو در برابر overrideهای Instance، و اینکه کدام فایل‌ها replace/update/preserve می‌شوند باید با قانون صریح مشخص و آزموده شود؛ این جزئیات هنوز نهایی نشده‌اند.
+
+**مرجع:** ADR-010 (Base مشترک)، ADR-011 (payload خصوصی)، [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md)، [Testing Bench](TESTING-BENCH.md).
