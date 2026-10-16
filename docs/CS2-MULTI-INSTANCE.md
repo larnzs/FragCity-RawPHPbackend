@@ -94,27 +94,28 @@ Pterodactyl در رابط وب خودش File Manager برای فایل‌های 
 اولین خروجی Provisioning یک Instance آمادهٔ آزمایش است، نه یک محصول نهایی با مود قفل‌شده. هر Instance باید این موارد را مستقل داشته باشد:
 
 - allocation/port و شناسه/تنظیمات عمومی مربوط به همان سرور؛
-- payload کامل و یکسان FragCity شامل `addons/`، `cfg/` و فایل‌های متنی GameMode تعیین‌شده؛
+- baseline کامل و یکسان FragCity شامل `addons/`، `cfg/` و فایل‌های متنی GameMode تعیین‌شده که یک بار هنگام Provisioning اولیه کپی می‌شود؛
 - کپی/لایهٔ خصوصی این مسیرها، از جمله تنظیمات افزونه‌ها در `addons/counterstrikesharp/configs/plugins/`؛
 - اتصال به فایل‌های Base مشترک CS2 بدون نصب یا کپی مجدد کل بازی.
 
-در مرحلهٔ اولیه هیچ preset خودکاری برای Aim map pool + HS Only (بدون تغییر مود)، Public Fun یا DM/FFA با تنظیمات اختصاصی اعمال نمی‌شود. ابتدا سلامت baseline کامل افزونه‌ها و عدم نشت تنظیمات بین Instanceها تأیید می‌شود؛ سپس هر سرور به‌صورت جداگانه کانفیگ می‌شود. این مثال‌ها مسیرهای ممکن برای تنظیم بعدی‌اند، نه presetهایی که باید اکنون هنگام ساخت انتخاب شوند.
+در مرحلهٔ اولیه هیچ preset خودکاری برای Aim map pool + HS Only (بدون تغییر مود)، Public Fun یا DM/FFA با تنظیمات اختصاصی اعمال نمی‌شود. ابتدا سلامت baseline کامل افزونه‌ها و عدم نشت تنظیمات بین Instanceها تأیید می‌شود؛ سپس هر سرور به‌صورت جداگانه کانفیگ می‌شود. بعد از Provisioning، updater پیش از Start فقط پلاگین‌ها و Runtimeهای مدیریت‌شده را به‌روزرسانی می‌کند و فایل‌های `cfg/`، فایل‌های `.txt` تنظیماتی و `addons/counterstrikesharp/configs/` را دست‌نخورده نگه می‌دارد.
 
 File Manager خود Pterodactyl باید بتواند فایل‌های خصوصی Instance را با مجوز مناسب باز کند و ویرایش کند. کاربر نباید بتواند از آن مسیر به Base مشترک یا فایل Instance دیگر دسترسی نوشتن پیدا کند؛ این مورد همراه با mount/overlay در PoC بررسی می‌شود.
 
 ### 3.8 ترتیب اجرای هر Instance و sync پیش از Start
 
 1. Pterodactyl درخواست Start را دریافت می‌کند.
-2. پیش از اجرای process بازی، payload مجاز شامل `addons/`، `cfg/` و فایل‌های `.txt` تعیین‌شده از ریپوی مرجع به مسیر خصوصی همین Instance sync/copy/update می‌شود؛ این کار برای هر Instance جداگانه انجام می‌شود.
-3. موفقیت sync بررسی می‌شود؛ در صورت خطا، سرور نباید با payload ناقص اجرا شود.
-4. Pterodactyl/Wings، فایل‌های Base مشترک را از مسیر Base و فایل‌های افزونه/تنظیمات را از فضای خصوصی همان Instance به شکل یک نمای اجرایی مجزا در اختیار CS2 قرار می‌دهد.
-5. پس از آن فرمان Startup معمول Pterodactyl process خود CS2 را اجرا می‌کند. مرحلهٔ sync نه SteamCMD را اجرا می‌کند، نه Base را نصب/Update می‌کند و نه خودش process بازی را Start می‌کند.
+2. pre-start updater فقط پلاگین‌ها و Runtimeهای مدیریت‌شده را طبق allowlist به‌روزرسانی می‌کند؛ کل درخت `addons/`، `cfg/` یا فایل‌های `.txt` را به‌صورت کور از منبع mirror نمی‌کند.
+3. `cfg/`، فایل‌های `.txt` تعیین‌شده و `addons/counterstrikesharp/configs/` باید بدون هیچ تغییر یا حذف باقی بمانند؛ موفقیت updater و سلامت فایل‌های تغییرکرده بررسی می‌شود.
+4. اگر updater شکست بخورد یا فایل ناقص بماند، Start متوقف می‌شود.
+5. Pterodactyl/Wings فایل‌های Base مشترک و لایهٔ خصوصی همین Instance را از مسیرهای مجزا در نمای اجرایی قرار می‌دهد.
+6. پس از موفقیت مرحله‌های قبلی، Startup معمول Pterodactyl process بازی را اجرا می‌کند. این updater نه SteamCMD را اجرا می‌کند، نه Base را نصب/Update می‌کند و نه خودش process بازی را Start می‌کند.
 
 **ممنوعیت صریح:** هیچ فایل payload از ریپوی `cs2-kus-addons/game/csgo` روی فایل‌های فیزیکی Base Game paste/copy/merge نمی‌شود. فقط payload تعیین‌شده به مسیر خصوصی Instance می‌رود.
 
 ### 3.9 حفظ کانفیگ در زمان sync
 
-چون `cfg/` و تنظیمات پلاگین‌ها در هر Instance ممکن است به‌صورت مستقل تغییر کنند، باید قبل از Production مشخص شود sync از ریپو کدام فایل‌ها را جایگزین یا آپدیت می‌کند و کدام تنظیمات اختصاصی Instance را حفظ می‌کند. sync کور که کانفیگ شخصی را ناخواسته از بین ببرد قابل قبول نیست؛ قانون precedence هنوز تصمیم نهایی نیست.
+سیاست حفاظت کانفیگ قطعی است و باید عیناً از سیاست updater موجود `cs2-kus-addons` پیروی کند: `cfg/`، فایل‌های متنی تنظیماتی/GameMode و کل `addons/counterstrikesharp/configs/` در هر اجرای pre-start محافظت می‌شوند. updater فقط پلاگین‌ها و Runtimeهای مدیریت‌شده را به‌روزرسانی می‌کند. Provisioning اولیه baseline کامل را یک بار می‌کپی‌کند؛ بعد از آن تغییر کانفیگ منبع به‌صورت خودکار روی Instanceهای موجود نوشته نمی‌شود. مهاجرت عمدی کانفیگ‌ها، اگر لازم شود، مسیر/فرایندی جداگانه خواهد داشت.
 
 File Manager خود Pterodactyl باید امکان ویرایش فایل‌های خصوصی را بدهد، اما نباید اجازهٔ نوشتن در Base مشترک یا Instanceهای دیگر ایجاد شود.
 
@@ -208,13 +209,13 @@ File Manager خود Pterodactyl باید امکان ویرایش فایل‌ها
 - **مدیریت مشتریان و چرخهٔ عمر:** Pterodactyl Panel + Wings مسیر مرجع PoC است؛ Production هنوز تأیید نشده.
 - **مدل فایل:** یک Base Game مرکزی و مشترک؛ کل addons/، cfg/ و فایل‌های متنی تعیین‌شدهٔ GameMode به‌صورت private برای هر Instance آماده می‌شوند.
 - **Provisioning اولیه:** payload کامل و پایه برای همه یکسان است، اما در ساخت اولیه preset مود نهایی اعمال نمی‌شود؛ هر Instance port، تنظیمات و پوشه‌های خودش را دارد و بعداً جداگانه کانفیگ می‌شود.
-- **Startup sync:** پیش از هر Start، addons/cfg و فایل‌های .txt تعیین‌شده به مسیر private همان Instance sync/update می‌شوند؛ این payload هرگز روی Base Game نوشته یا merge نمی‌شود.
+- **Startup update:** پیش از هر Start فقط پلاگین‌ها و Runtimeهای مدیریت‌شده در مسیر private همان Instance به‌روزرسانی می‌شوند؛ `cfg/`، فایل‌های `.txt` تنظیماتی و `addons/counterstrikesharp/configs/` محافظت می‌شوند. payload کامل فقط یک بار در Provisioning اولیه کپی می‌شود و هیچ payloadی به Base Game کپی یا merge نمی‌شود.
 - **SteamCMD:** فقط برای نصب/Update Base مرکزی اجرا می‌شود؛ اسکریپت Deploy هر Instance نباید SteamCMD اجرا کند یا سرور را Start کند.
 - **File Manager:** ویرایش فایل‌های private از طریق Pterodactyl در PoC تست می‌شود؛ جایگزینی/ادغام آن با پنل C# هنوز تصمیم نهایی نیست.
 - **سیاست Update:** توقف تمام Instanceهای مصرف‌کننده، Update یک‌بارهٔ Base، اعتبارسنجی و سپس بازگرداندن Instanceهایی که قبل از Update Running بودند.
 - **منبع payload:** ریپوی خود FragCity یعنی larnzs/cs2-kus-addons؛ هیچ تغییری در آن ریپو در این مرحله انجام نشده است.
 - **نامزدهای ثالث:** فقط مرجع مقایسه‌ای‌اند؛ K4ryuu VPK Sync یا یک standalone manager انتخاب نشده است.
-- **موارد پیاده‌سازی باز:** مسیر Base، روش mount/link/overlay، نام دقیق فایل‌های GameMode، provisioning cfg، trigger/lock/recovery برای Update و استقرار امن script در Pterodactyl.
+- **موارد پیاده‌سازی باز:** مسیر Base، روش mount/link/overlay، فهرست دقیق فایل‌های GameMode، allowlist مسیرهای قابل‌به‌روزرسانی پلاگین/Runtime، checksum حفاظت کانفیگ، trigger/lock/recovery برای Update و استقرار امن script در Pterodactyl.
 
 ## منابع
 
