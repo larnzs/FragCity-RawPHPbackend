@@ -102,7 +102,7 @@ Releaseهای کاندید در زمان ثبت قبلی مستند شده‌ا�
 
 جهت معماری PoC این است که چند Instance از یک Base Game مرکزی استفاده کنند؛ مدل کپی کامل برای هر Instance انتخاب پیش‌فرض نیست. یک Instance ابتدا برای تأیید نصب و چرخهٔ عمر آزمایش می‌شود، سپس Instance دوم روی همان Base ساخته می‌شود و جداسازی addons/، cfg/، فایل‌های GameMode، پورت‌ها، مجوزها و Backup بررسی می‌شود.
 
-Update Base باید هماهنگ باشد: همهٔ Instanceهای مصرف‌کننده متوقف شوند، SteamCMD فقط روی Base مرکزی اجرا شود، نتیجه اعتبارسنجی شود و سپس فقط Instanceهایی که پیش از Update در حال اجرا بودند برگردند. روش دقیق نگاشت مسیرها/mountها و مکانیزم lock/recovery هنوز Pending است. K4ryuu VPK Sync فقط گزینهٔ مقایسه‌ای اختیاری است؛ نصب آن پیش‌شرط Shared Base نیست.
+به‌محض تشخیص Update جدید CS2، چرخهٔ Base باید خودکار و هماهنگ اجرا شود: همهٔ Instanceهای مصرف‌کننده متوقف شوند، SteamCMD فقط روی Base مرکزی اجرا شود، نتیجه اعتبارسنجی شود و سپس فقط Instanceهایی که پیش از Update در حال اجرا بودند برگردند. روش دقیق نگاشت مسیرها/mountها و مکانیزم lock/recovery هنوز Pending است. K4ryuu VPK Sync فقط گزینهٔ مقایسه‌ای اختیاری است؛ نصب آن پیش‌شرط Shared Base نیست.
 
 اسکریپت Deploy افزونه‌های FragCity که در آینده با Pterodactyl ادغام می‌شود، فقط payload مود/افزونهٔ اختصاصی Instance را قرار می‌دهد و SteamCMD، نصب/Update بازی یا Start سرور را اجرا نمی‌کند. جزئیات cfg و فایل‌های GameMode در طراحی فنی جداگانه تعیین می‌شود. مرجع آزمون [Testing Bench](TESTING-BENCH.md) و [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) است.
 
