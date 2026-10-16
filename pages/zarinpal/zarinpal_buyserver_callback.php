@@ -118,7 +118,7 @@ $data = [
 
 $curl = curl_init();
 curl_setopt_array($curl, array(
-    CURLOPT_URL            => 'https://payment.zarinpal.com/pg/v4/payment/request.json',
+    CURLOPT_URL => (isset($zarinpalSettings['request_url']) ? $zarinpalSettings['request_url'] : ''),
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_ENCODING       => '',
     CURLOPT_MAXREDIRS      => 10,
