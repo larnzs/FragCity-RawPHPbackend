@@ -97,6 +97,9 @@
 ## P7 — نود دوم و ظرفیت
 
 - نود دوم با install runbook و تنظیمات مستقل اضافه شود.
+- پس از قبولی PoC یک Node و جداسازی دو Instance، برای افزودن نودها Golden Image/Template نسخه‌بندی‌شده تهیه و Clone آزمایشی مستقل انجام شود؛ جزئیات و فهرست هویت‌ها/secretهای یکتا در [Node Golden Image](NODE-GOLDEN-IMAGE.md) است.
+- برای VMهای VMware کل VM خاموش و کل پوشهٔ VM کپی/Clone شود؛ برای Bare Metal مسیر Provisioning تکرارپذیر لازم است و VMDK به‌تنهایی روش نصب روی سخت‌افزار نیست.
+- Template تا زمان قبولی آزمون Clone و health check صرفاً آزمایشی می‌ماند؛ افزودن Node باید با config مختص نود انجام شود و به تغییر کد سایت نیاز نداشته باشد.
 - ابتدا یک Base مشترک با یک Instance، سپس دو Instance برای آزمون جداسازی، و بعد ۳ و ۵ سرور برای سنجش ظرفیت اجرا شوند.
 - RAM، CPU، disk I/O، latency، packet loss، crash و log ثبت شود.
 - ۸ تا ۱۰ سرور فقط پس از داده واقعی بررسی شود.
