@@ -61,10 +61,11 @@
 - در نسخهٔ بررسی‌شده، برای خط مبنای بدون plugin updater نباید `linux/install.sh` اجرا شود؛ آن مسیر صریحاً `RUN_PLUGIN_UPDATER=1` را به `setup.sh` می‌دهد و updater می‌تواند برای push به GitHub تلاش کند. گزینهٔ آزمایشی مستندشده `linux/setup.sh` با `RUN_PLUGIN_UPDATER=0` است، پس از Snapshot و بررسی مجدد اسکریپت.
 
 
-## ثبت تصمیم تکمیلی — payload پیش از هر Start
+## ثبت تصمیم تکمیلی — baseline خصوصی و updater انتخابی
 
-- طبق ADR-013، پیش از هر Start، پوشه‌های `addons/`، `cfg/` و فایل‌های `.txt` تعیین‌شده از شاخهٔ `integration/kus-monorepo` به مسیر خصوصی هر Instance sync/update می‌شوند.
-- payload به هیچ عنوان روی فایل‌های فیزیکی Base Game کپی یا merge نمی‌شود؛ سرور از Base مشترک و مسیر خصوصی Instance به‌صورت جداگانه استفاده می‌کند.
-- [Platform PoC](PLATFORM-POC.md) آزمون T20 را برای تکرار sync، جداسازی مسیرها و جلوگیری از اجرای سرور پس از sync ناقص اضافه کرد.
-- قانون دقیق replace/update/preserve برای کانفیگ‌های اختصاصی هنگام sync هنوز باز است و باید قبل از Production روشن شود.
-- این مرحله فقط مستندات را تغییر داد؛ ریپوی `cs2-kus-addons`، فایل‌های Debian و نصب/اجرای Pterodactyl دست‌نخورده ماندند.
+- هنگام Provisioning اولیه، baseline کامل `addons/`، `cfg/` و فایل‌های `.txt` تعیین‌شده از شاخهٔ `integration/kus-monorepo` در مسیر private هر Instance قرار می‌گیرد.
+- طبق سیاست updater موجود `cs2-kus-addons`، قبل از Startهای بعدی فقط پلاگین‌ها و Runtimeهای مدیریت‌شده به‌روزرسانی می‌شوند؛ `cfg/`، فایل‌های `.txt` تنظیماتی/GameMode و کل `addons/counterstrikesharp/configs/` محافظت می‌شوند و نباید بازنویسی یا حذف شوند.
+- payload هرگز روی فایل‌های فیزیکی Base Game کپی یا merge نمی‌شود؛ سرور از Base مشترک و مسیر خصوصی Instance به‌صورت جداگانه استفاده می‌کند.
+- [Platform PoC](PLATFORM-POC.md) آزمون T20 را برای اثبات تغییر انتخابی فایل‌ها، ثابت‌ماندن checksum مسیرهای محافظت‌شده و جلوگیری از Start پس از updater ناقص نگه می‌دارد.
+- تغییرات کانفیگ جدید در ریپو به‌صورت خودکار روی Instanceهای موجود اعمال نمی‌شوند؛ انتقال عمدی کانفیگ در صورت نیاز، فرایندی جداگانه خواهد بود.
+- این مرحله فقط مستندات FragCity را تغییر می‌دهد؛ ریپوی `cs2-kus-addons`، فایل‌های Debian و نصب/اجرای Pterodactyl دست‌نخورده می‌مانند.
