@@ -6,7 +6,7 @@
 
 | فاز | وضعیت | خروجی اصلی | شرط خروج |
 |---|---|---|---|
-| P0 — Requirements & Documentation | در حال جمع‌بندی | الزامات، معماری، فهرست ریپوها، ADR و ماتریس PoC | اختلاف‌های باز برچسب‌گذاری شده باشند |
+| P0 — Requirements & Local Development | مستندات آماده؛ اجرا Pending | الزامات، معماری، updater محلی، Laragon/WAMP و مرزبندی Production | clone محلی آماده، DB کاملاً جدا و تست اولیه قابل تکرار باشد |
 | P1 — Security & Baseline | ممیزی ایستا اولیه انجام؛ اصلاح Pending | بازبینی secret، API، ورودی‌ها و مدل مالکیت داده | خطرهای مسدودکننده شناسایی و برنامه اصلاح تصویب شود |
 | P2 — Game Panel PoC | Pending | یک نود آزمایشی و یک CS2 instance | چرخهٔ عمر و منابع پایدار کار کند |
 | P3 — Billing Integration | Pending | سفارش Sandbox/ساختگی تا Provisioning | duplicate و سفارش ناموفق به‌شکل امن مدیریت شود |
@@ -22,6 +22,11 @@
 - [x] تایمر با خرید موفق شروع می‌شود و خاموش‌بودن سرور آن را متوقف نمی‌کند.
 - [x] اتصال Remote MariaDB روی 3306 در cPanel فعلی قابل اتکا نیست؛ مسیر API/HTTPS مبنای فعلی است.
 - [x] مسیر PoC مرجع: Paymenter + Pterodactyl/Wings.
+- [x] فایل ریشهٔ `update.bat` برای دریافت محلی تغییرات از `origin/main`؛ فقط `git switch main` و `git pull --ff-only origin main`، با محافظ working tree.
+- [x] راهنمای توسعهٔ محلی Laragon/WAMP اضافه شد؛ updater هیچ deployی روی cPanel یا Debian انجام نمی‌دهد.
+- [ ] clone ریپو در DocumentRoot محلی و VirtualHost آزمایشی ایجاد شود.
+- [ ] پیش از اجرای صفحات وابسته به DB، hard-coded credentials از سورس جدا و local-only configuration اعمال شود؛ تا آن زمان تست DB مسدود است.
+- [ ] schema واقعی و seed ساختگی/ناشناس‌شده برای دیتابیس محلی تهیه و تست شود.
 - [ ] قاعدهٔ نهایی تمدید قبل/بعد انقضا تصویب شود.
 - [ ] سیاست suspend/stop و مهلت نگهداری/حذف داده بعد انقضا تصویب شود.
 - [ ] درگاه پرداخت، واحد پول، شرایط refund و قابلیت Wallet در Billing منتخب مشخص شود.
