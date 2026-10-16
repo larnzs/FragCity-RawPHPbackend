@@ -115,4 +115,4 @@
 
 ## P2B — Testing Bench برای CS2 Multi-Instance
 
-این فاز مستقل از تست Billing است. هدف، مقایسهٔ ابزارهای Linux/Windows/cross-platform و روش‌های ذخیره‌سازی است. هیچ Shared Base یا ابزار lifecycle دوم روی سرور اصلی فعال نمی‌شود تا آزمون isolation و recovery موفق شود. مرجع authoritative برای وضعیت هر candidate و نتیجه‌ها [Testing Bench](TESTING-BENCH.md) است.
+این فاز مستقل از تست Billing است. مسیر اصلی و معیار پذیرش، Linux native روی Debian همراه Pterodactyl/Wings است. Windows فقط برای تست دستی سرور CS2، لاگ‌ها، Load پلاگین‌ها و تنظیم config استفاده می‌شود و مدیرهای جایگزین Windows/cross-platform فعلاً Deferred هستند؛ فقط در صورت blocker مشخص در مسیر Linux دوباره بررسی می‌شوند. هیچ Shared Base یا ابزار lifecycle دوم روی سرور اصلی فعال نمی‌شود تا آزمون isolation و recovery موفق شود. مرجع authoritative برای وضعیت هر candidate و نتیجه‌ها [Testing Bench](TESTING-BENCH.md) است.
