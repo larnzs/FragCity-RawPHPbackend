@@ -23,6 +23,10 @@
     "plugin_sync": {
       "extends": "main",
       "name": ""
+    },
+    "legacy_services": {
+      "extends": "main",
+      "name": ""
     }
   },
   "integrations": {
@@ -189,6 +193,42 @@
         "en"
       ],
       "preference_storage": "browser"
+    },
+    "agent.agent_commands_api": {
+      "database_profile": "main"
+    },
+    "agent.agent_getservers_api": {
+      "database_profile": "main"
+    },
+    "agent.api_sync_skins": {
+      "database_profile": "weaponpaints"
+    },
+    "agent.rcon_commands_api": {
+      "database_profile": "main"
+    },
+    "agent.server_configs_api": {
+      "database_profile": "main"
+    },
+    "agent.server_ports_api": {
+      "database_profile": "main"
+    },
+    "pages.buyserveropen": {
+      "database_profile": "main"
+    },
+    "pages.serverlist": {
+      "database_profile": "main"
+    },
+    "pages.vip": {
+      "database_profile": "main"
+    },
+    "pages.forgot_password": {
+      "database_profile": "legacy_services"
+    },
+    "pages.reset_password": {
+      "database_profile": "legacy_services"
+    },
+    "tst.index": {
+      "database_profile": "main"
     }
   }
 }

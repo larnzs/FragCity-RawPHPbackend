@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../settings/loader.php';
 // pages/buyserveropen.php
 
 $thresholdTime = date('Y-m-d H:i:s', time() - 60);
@@ -8,11 +9,10 @@ if (isset($_GET['ajax_check_nodes']) && $_GET['ajax_check_nodes'] === '1') {
     header('Content-Type: application/json; charset=utf-8');
 
     try {
-        $pdoAjax = new PDO(
-            'mysql:host=localhost;port=3306;dbname=kyonxcbt_fragcity_services;charset=utf8mb4',
-            'kyonxcbt_admin',
-            'Atrisayeafsorde824@'
-        );
+        $ajaxSettings=fragcity_settings('files.pages.buyserveropen',array());
+        $ajaxProfile=isset($ajaxSettings['database_profile'])?$ajaxSettings['database_profile']:'main';
+        $pdoAjax=fragcity_create_pdo($ajaxProfile);
+        if(!$pdoAjax)throw new PDOException('Database unavailable or not configured.');
         $pdoAjax->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
         $nodeStmt = $pdoAjax->prepare(
@@ -91,11 +91,10 @@ $serverName = '';
 $lanMode = 0;
 
 try {
-    $pdo = new PDO(
-        'mysql:host=localhost;port=3306;dbname=kyonxcbt_fragcity_services;charset=utf8mb4',
-        'kyonxcbt_admin',
-        'Atrisayeafsorde824@'
-    );
+    $buySettings=fragcity_settings('files.pages.buyserveropen',array());
+    $buyProfile=isset($buySettings['database_profile'])?$buySettings['database_profile']:'main';
+    $pdo=fragcity_create_pdo($buyProfile);
+    if(!$pdo)throw new PDOException('Database unavailable or not configured.');
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
