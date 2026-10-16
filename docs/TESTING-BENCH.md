@@ -97,8 +97,8 @@ For each candidate, record:
 
 ### Stage 2 — Two instances on shared Base with private payload folders
 
-1. Create two instances on the same shared Base. Initially deploy the same complete FragCity payload to each: private `addons/`, `cfg/` and the selected GameMode text files, with unique allocations/ports and general settings.
-2. Do not apply a specific mode preset during this stage. Start both baseline instances and verify they are reachable on their own expected ports.
+1. Create two instances on the same shared Base. Before each Start, sync the designated payload (`addons/`, `cfg/`, and allowlisted `.txt` files from `game/csgo/`) into that instance's private storage.
+2. Do not apply a specific mode preset during this stage. Start both baseline instances and verify they are reachable on their own expected ports. Verify no payload file is copied/merged onto the physical shared Base directory.
 3. Change one instance's hostname, a file in `cfg/`, an addon/plugin configuration file under `addons/counterstrikesharp/configs/plugins/`, a GameMode text file and a disposable private test file; verify the other instance does not change.
 4. Check process identity, process arguments, working directory, PID tracking, console routing, logs and restart behaviour.
 5. Verify collision protection covers game, query, GOTV and every additional port required by that server's configuration.
@@ -111,11 +111,11 @@ For each candidate, record:
 
 1. Inventory paths and classify each as shared Base/read-only, Instance-private configuration, Instance-private addon/mod payload, or Instance-writable runtime data. Record evidence; never infer solely from a folder name.
 2. Establish a working one-instance disk/startup baseline on the central Base. A full independent-copy footprint may be measured for comparison but is not the target design.
-3. Validate the proposed method for exposing Base files into each Pterodactyl instance (mount, link, overlay or other mechanism) separately. Treat VPK Sync as optional unless it is shown to be needed.
+3. Validate the proposed method for exposing Base files into each Pterodactyl instance (mount, link, overlay or other mechanism) separately. Base files must remain in the shared install; private payload files must come from that Instance's private path and must not be pasted/merged into the Base directory. Treat VPK Sync as optional unless it is shown to be needed.
 4. Compare shared paths and private files from each instance; prove that addons/, cfg/, GameMode text files and mutable runtime data are not inadvertently shared.
 5. Attempt to modify a private test file from one instance; the other must not see an unauthorised change. Never run this against real customer data.
 6. Simulate detection of a newly available CS2 update. Detection must automatically start the coordinated update cycle: all instances using the Base stop before SteamCMD runs centrally, and new start/restart requests are blocked for the whole update window.
-7. Verify that SteamCMD runs once against the central Base and is not invoked by each instance's deploy/install script.
+7. Verify that SteamCMD runs once against the central Base for game updates and is not invoked by the per-start payload sync script. The per-start script only syncs the designated KUS payload to the private Instance path and completes before the game process is launched.
 8. Validate update success/version/file state before allowing starts again. Restore only instances that were running before the update; leave previously stopped instances stopped.
 9. Simulate an interrupted/failed update and verify no instance starts against a partial Base; confirm recovery/rollback and status reporting.
 10. Reinstall or delete one instance and confirm the shared Base and other instances remain intact. Test backup/restore of one instance and after a Base update.
@@ -152,7 +152,7 @@ Never infer performance from repository marketing figures. Preserve raw results 
 ### Stage 6 — Pterodactyl-specific checks
 
 - The Panel owns each Server record; Wings/Docker lifecycle must be the only authority starting/stopping the Pterodactyl-managed process.
-- Confirm the Egg/template works on the target Linux Node. Its per-instance payload step must deploy the full private `addons/`, `cfg/` and selected GameMode text files without invoking SteamCMD, installing/updating the Base Game, or starting the server; Base update belongs to the central updater.
+- Confirm the Egg/template works on the target Linux Node. Its pre-start payload step must sync the private `addons/`, `cfg/` and allowlisted `.txt` files before launch, without invoking SteamCMD, installing/updating the Base Game, writing payload files to the shared Base directory, or launching CS2 by itself; Base update belongs to the central updater.
 - Confirm allocations, container path, user/group permissions, CPU/RAM/disk limits, console, File Manager, SFTP, logs and backup.
 - Use the browser File Manager to edit a private `cfg/` file and plugin config for one instance; confirm the edit persists and never modifies the other instance.
 - Test subuser permissions separately for `file.read-content`, `file.update`, `file.create`, `file.delete`, `file.sftp`, console and power controls; do not grant broader permissions than required.
