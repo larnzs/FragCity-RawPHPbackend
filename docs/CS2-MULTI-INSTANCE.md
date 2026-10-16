@@ -55,7 +55,7 @@ Pterodactyl در رابط وب خودش File Manager برای فایل‌های 
 
 ریپوی larnzs/cs2-kus-addons منبع مدیریت‌شدهٔ FragCity باقی می‌ماند و شامل بستهٔ فعلی game/csgo است. با این حال، وجود کل بسته در ریپو به این معنی نیست که باید کل پوشهٔ بازی در هر Instance کپی شود یا SteamCMD از داخل اسکریپت Instance اجرا شود.
 
-بعداً یک اسکریپت Deploy متصل به روش مدیریت Pterodactyl ساخته می‌شود که payload کامل و مدیریت‌شدهٔ FragCity را به هر Instance منتقل کند: کل پوشهٔ اختصاصی `game/csgo/addons/`، پوشهٔ `game/csgo/cfg/` و فایل‌های متنی مشخص‌شدهٔ GameMode. این مسیرها برای هر Instance باید مستقل باشند و به‌شکل overlay/private layer روی Base مشترک در دسترس آن Instance قرار بگیرند. این اسکریپت **SteamCMD را اجرا نمی‌کند، Base Game را نصب/Update نمی‌کند و سرور را Start نمی‌کند**. منبع حقیقت payload ریپوی خودمان است؛ ساختار یا فایل‌های bundleشده در پروژه‌های چند-Instance ثالث به‌عنوان مرجع FragCity کپی یا تحمیل نمی‌شوند.
+پیش از هر Start، یک pre-start step تحت کنترل چرخهٔ عمر Pterodactyl باید payload مدیریت‌شدهٔ FragCity را از شاخهٔ `integration/kus-monorepo` ریپوی `larnzs/cs2-kus-addons` به مسیر خصوصی همان Instance sync/copy/update کند: کل `game/csgo/addons/`، کل `game/csgo/cfg/` و فایل‌های `.txt` تعیین‌شده زیر `game/csgo/`. این کار برای تمام Instanceها انجام می‌شود و هر Instance نسخهٔ مستقل خودش را دارد. **این فایل‌ها به Base Game مشترک کپی یا merge نمی‌شوند.** مرحلهٔ sync نباید SteamCMD را اجرا کند، Base را نصب/Update کند یا process بازی را خودش Start کند. پس از sync موفق، Base از مسیر مشترک و payload/تنظیمات از مسیر خصوصی Instance در نمای اجرایی جداشده به CS2 ارائه می‌شوند؛ روش mount/overlay هنوز باید در PoC انتخاب شود. منبع حقیقت payload ریپوی خودمان است؛ ساختار یا فایل‌های bundleشدهٔ پروژه‌های چند-Instance ثالث تحمیل نمی‌شوند.
 
 ### 3.4 سیاست Update برای Base مشترک
 
@@ -101,6 +101,22 @@ Pterodactyl در رابط وب خودش File Manager برای فایل‌های 
 در مرحلهٔ اولیه هیچ preset خودکاری برای Aim map pool + HS Only (بدون تغییر مود)، Public Fun یا DM/FFA با تنظیمات اختصاصی اعمال نمی‌شود. ابتدا سلامت baseline کامل افزونه‌ها و عدم نشت تنظیمات بین Instanceها تأیید می‌شود؛ سپس هر سرور به‌صورت جداگانه کانفیگ می‌شود. این مثال‌ها مسیرهای ممکن برای تنظیم بعدی‌اند، نه presetهایی که باید اکنون هنگام ساخت انتخاب شوند.
 
 File Manager خود Pterodactyl باید بتواند فایل‌های خصوصی Instance را با مجوز مناسب باز کند و ویرایش کند. کاربر نباید بتواند از آن مسیر به Base مشترک یا فایل Instance دیگر دسترسی نوشتن پیدا کند؛ این مورد همراه با mount/overlay در PoC بررسی می‌شود.
+
+### 3.8 ترتیب اجرای هر Instance و sync پیش از Start
+
+1. Pterodactyl درخواست Start را دریافت می‌کند.
+2. پیش از اجرای process بازی، payload مجاز شامل `addons/`، `cfg/` و فایل‌های `.txt` تعیین‌شده از ریپوی مرجع به مسیر خصوصی همین Instance sync/copy/update می‌شود؛ این کار برای هر Instance جداگانه انجام می‌شود.
+3. موفقیت sync بررسی می‌شود؛ در صورت خطا، سرور نباید با payload ناقص اجرا شود.
+4. Pterodactyl/Wings، فایل‌های Base مشترک را از مسیر Base و فایل‌های افزونه/تنظیمات را از فضای خصوصی همان Instance به شکل یک نمای اجرایی مجزا در اختیار CS2 قرار می‌دهد.
+5. پس از آن فرمان Startup معمول Pterodactyl process خود CS2 را اجرا می‌کند. مرحلهٔ sync نه SteamCMD را اجرا می‌کند، نه Base را نصب/Update می‌کند و نه خودش process بازی را Start می‌کند.
+
+**ممنوعیت صریح:** هیچ فایل payload از ریپوی `cs2-kus-addons/game/csgo` روی فایل‌های فیزیکی Base Game paste/copy/merge نمی‌شود. فقط payload تعیین‌شده به مسیر خصوصی Instance می‌رود.
+
+### 3.9 حفظ کانفیگ در زمان sync
+
+چون `cfg/` و تنظیمات پلاگین‌ها در هر Instance ممکن است به‌صورت مستقل تغییر کنند، باید قبل از Production مشخص شود sync از ریپو کدام فایل‌ها را جایگزین یا آپدیت می‌کند و کدام تنظیمات اختصاصی Instance را حفظ می‌کند. sync کور که کانفیگ شخصی را ناخواسته از بین ببرد قابل قبول نیست؛ قانون precedence هنوز تصمیم نهایی نیست.
+
+File Manager خود Pterodactyl باید امکان ویرایش فایل‌های خصوصی را بدهد، اما نباید اجازهٔ نوشتن در Base مشترک یا Instanceهای دیگر ایجاد شود.
 
 ## 4. گزینه‌ها بر اساس سیستم‌عامل
 
@@ -192,6 +208,7 @@ File Manager خود Pterodactyl باید بتواند فایل‌های خصوص
 - **مدیریت مشتریان و چرخهٔ عمر:** Pterodactyl Panel + Wings مسیر مرجع PoC است؛ Production هنوز تأیید نشده.
 - **مدل فایل:** یک Base Game مرکزی و مشترک؛ کل addons/، cfg/ و فایل‌های متنی تعیین‌شدهٔ GameMode به‌صورت private برای هر Instance آماده می‌شوند.
 - **Provisioning اولیه:** payload کامل و پایه برای همه یکسان است، اما در ساخت اولیه preset مود نهایی اعمال نمی‌شود؛ هر Instance port، تنظیمات و پوشه‌های خودش را دارد و بعداً جداگانه کانفیگ می‌شود.
+- **Startup sync:** پیش از هر Start، addons/cfg و فایل‌های .txt تعیین‌شده به مسیر private همان Instance sync/update می‌شوند؛ این payload هرگز روی Base Game نوشته یا merge نمی‌شود.
 - **SteamCMD:** فقط برای نصب/Update Base مرکزی اجرا می‌شود؛ اسکریپت Deploy هر Instance نباید SteamCMD اجرا کند یا سرور را Start کند.
 - **File Manager:** ویرایش فایل‌های private از طریق Pterodactyl در PoC تست می‌شود؛ جایگزینی/ادغام آن با پنل C# هنوز تصمیم نهایی نیست.
 - **سیاست Update:** توقف تمام Instanceهای مصرف‌کننده، Update یک‌بارهٔ Base، اعتبارسنجی و سپس بازگرداندن Instanceهایی که قبل از Update Running بودند.
