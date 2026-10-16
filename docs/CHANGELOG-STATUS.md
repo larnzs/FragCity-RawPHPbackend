@@ -40,3 +40,13 @@
 - WindowsGSH، Game-Server-Admin، CS2 Server CLI، MSM، cs2-install، K4ryuu VPK Sync و Pterodactyl Eggها در لاین‌های مناسب ثبت شدند.
 - **هیچ ابزار تازه‌ای نصب یا زنده تست نشده است**؛ status همهٔ candidateها Pending/Blocked است تا نتیجه با evidence ثبت شود.
 - این تغییرات فقط مستندات `FragCity-RawPHPbackend` را تغییر داده؛ `cs2-kus-addons` تغییر نکرده است.
+
+
+## Linux CS2 baseline — progress checkpoint, ۱۶ اکتبر ۲۰۲۶
+
+- طبق گزارش کاربر، Git و `ca-certificates` نصب شده و Clone مخزن خصوصی `larnzs/cs2-kus-addons` روی شاخهٔ `integration/kus-monorepo` انجام شده است.
+- مسیر محلی مورد انتظار: `/home/fragcityadmin/projects/cs2-kus-addons`. خروجی نهایی `git status --short --branch` و `git log -1 --oneline` هنوز در گفتگو ثبت نشده و باید هنگام ادامه کار ثبت شود.
+- تصمیم جدید: هیچ فایل بازی/پلاگینی از Windows جابه‌جا یا کپی نمی‌شود؛ ابتدا نصب native Linux و سلامت payload خود Repository بررسی می‌شود.
+- هیچ installer، repository updater یا plugin updater روی Clone Linux اجرا نشده است. نصب CS2، اجرای Instance و بررسی واقعی Load شدن پلاگین‌ها همچنان Pending است.
+- [Debian PoC Log](DEBIAN-POC.md) مراحل انجام‌شده و فرمان‌های بعدی را ثبت می‌کند؛ [Testing Bench](TESTING-BENCH.md) کاندید L-00 را برای خط مبنای KUS Linux پیگیری می‌کند.
+- در نسخهٔ بررسی‌شده، برای خط مبنای بدون plugin updater نباید `linux/install.sh` اجرا شود؛ آن مسیر صریحاً `RUN_PLUGIN_UPDATER=1` را به `setup.sh` می‌دهد و updater می‌تواند برای push به GitHub تلاش کند. گزینهٔ آزمایشی مستندشده `linux/setup.sh` با `RUN_PLUGIN_UPDATER=0` است، پس از Snapshot و بررسی مجدد اسکریپت.
