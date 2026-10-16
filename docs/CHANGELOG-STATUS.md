@@ -59,3 +59,12 @@
 - هیچ installer، repository updater یا plugin updater روی Clone Linux اجرا نشده است. نصب CS2، اجرای Instance و بررسی واقعی Load شدن پلاگین‌ها همچنان Pending است.
 - [Debian PoC Log](DEBIAN-POC.md) مراحل انجام‌شده و فرمان‌های بعدی را ثبت می‌کند؛ [Testing Bench](TESTING-BENCH.md) کاندید L-00 را برای خط مبنای KUS Linux پیگیری می‌کند.
 - در نسخهٔ بررسی‌شده، برای خط مبنای بدون plugin updater نباید `linux/install.sh` اجرا شود؛ آن مسیر صریحاً `RUN_PLUGIN_UPDATER=1` را به `setup.sh` می‌دهد و updater می‌تواند برای push به GitHub تلاش کند. گزینهٔ آزمایشی مستندشده `linux/setup.sh` با `RUN_PLUGIN_UPDATER=0` است، پس از Snapshot و بررسی مجدد اسکریپت.
+
+
+## ثبت تصمیم تکمیلی — payload پیش از هر Start
+
+- طبق ADR-013، پیش از هر Start، پوشه‌های `addons/`، `cfg/` و فایل‌های `.txt` تعیین‌شده از شاخهٔ `integration/kus-monorepo` به مسیر خصوصی هر Instance sync/update می‌شوند.
+- payload به هیچ عنوان روی فایل‌های فیزیکی Base Game کپی یا merge نمی‌شود؛ سرور از Base مشترک و مسیر خصوصی Instance به‌صورت جداگانه استفاده می‌کند.
+- [Platform PoC](PLATFORM-POC.md) آزمون T20 را برای تکرار sync، جداسازی مسیرها و جلوگیری از اجرای سرور پس از sync ناقص اضافه کرد.
+- قانون دقیق replace/update/preserve برای کانفیگ‌های اختصاصی هنگام sync هنوز باز است و باید قبل از Production روشن شود.
+- این مرحله فقط مستندات را تغییر داد؛ ریپوی `cs2-kus-addons`، فایل‌های Debian و نصب/اجرای Pterodactyl دست‌نخورده ماندند.
