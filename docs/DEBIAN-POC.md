@@ -110,47 +110,119 @@ systemctl status ssh --no-pager
 
 پورت‌های نهایی و قواعد فایروال هنوز در این مرحله تثبیت نشده‌اند و پس از مشاهده IP واقعی VM تعیین می‌شوند.
 
-## ۷. دریافت و آماده‌سازی نسخه Linux ریپوی KUS
+## ۷. Clone کردن Repository لینوکس — وضعیت فعلی
 
-ریپوی **larnzs/cs2-kus-addons** و شاخه **integration/kus-monorepo** زیرساخت موجود سرور بازی هستند. برای نصب آزمایشی می‌توان نسخه مخزن را روی VM کلون کرد و از ورودی‌های Linux موجود استفاده کرد؛ **این کار مجوز ویرایش، commit یا push کردن تغییرات به ریپو نیست.**
+در Debian، Git از ابتدا نصب نبود. کاربر مراحل نصب Git و دریافت مخزن را انجام داده است.
 
-مسیرهای موجود برای مطالعه قبل از اجرا:
+### فرمان‌های اجراشده / ثبت‌شده
 
-- [راهنمای Linux](https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/linux/README.md)
-- [اسکریپت نصب Linux](https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/linux/install.sh)
-- [اسکریپت به‌روزرسانی Linux](https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/linux/update.sh)
-- [اسکریپت اجرای Linux](https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/linux/run.sh)
-
-به دلیل خصوصی بودن مخزن، دریافت آن باید با دسترسی مجاز GitHub انجام شود. احراز هویت و توکن‌ها را در دستورهای قابل ذخیره، لاگ یا فایل tracked قرار نده.
-
-### هشدار مهم برای اجرای اسکریپت‌ها
-
-**در تست اولیه، linux/update.sh اجرا نشود.** طبق نسخه‌ای که برای این پارت بررسی شد، این ورودی مسیر به‌روزرسانی افزونه‌ها را فعال می‌کند و فرایند نصبِ فراخوانی‌شده با RUN_PLUGIN_UPDATER=1 ممکن است تلاش کند تغییرات افزونه‌ها را به شاخه integration/kus-monorepo push کند. این رفتار برای یک تست محلی اولیه لازم نیست و با اصل عدم‌تغییر مخزن در این پارت سازگار نیست.
-
-پیش از هر اجرا باید نسخه فعلی اسکریپت‌ها دوباره بررسی شود. برای نصب آزمایشی، مسیر مستقیم نصب با حالت **عدم شروع سرور** مدنظر است:
+نصب Git و گواهی‌های CA:
 
 ~~~bash
-sudo env -u RUN_PLUGIN_UPDATER UPDATE_ONLY=1 bash ./linux/install.sh
+sudo apt update
+sudo apt install -y git ca-certificates
+git --version
 ~~~
 
-این دستور صرفاً روی VM اجرا شود، از پوشه clone همان ریپو و پس از بررسی دستی اسکریپت. در نسخه‌ای که بررسی شده، حالت UPDATE_ONLY=1 اجازه نصب و به‌روزرسانی فایل‌های بازی و overlay کردن payload را می‌دهد اما از شروع CS2 در انتهای همان اسکریپت جلوگیری می‌کند. پاکسازی یا حذف فایل‌های موجود از سمت این فرایند مجاز نیست و کانفیگ‌های دستی باید محفوظ بمانند.
+Clone کردن شاخهٔ موردنظر در Home کاربر، داخل پوشهٔ پروژه‌ها:
 
-این اسکریپت ممکن است بسته‌های Debian را به‌روزرسانی کند و فایل‌های Steam Linux Runtime و CS2 را دانلود کند؛ برای همین فضای آزاد میزبان و VM باید کافی باشد.
+~~~bash
+mkdir -p ~/projects
+cd ~/projects
+git clone --branch integration/kus-monorepo --single-branch https://github.com/larnzs/cs2-kus-addons.git
+~~~
 
-> **قانون ثابت:** از طریق این فرایند هیچ commit، push یا تغییر محتوایی در ریپوی cs2-kus-addons ایجاد نمی‌کنیم. اگر در آینده تغییر در خود ریپو لازم شود، فقط پس از درخواست صریح کاربر بررسی خواهد شد.
+مسیر محلی مورد انتظار با حساب فعلی Debian:
 
-## ۸. راه‌اندازی آزمایشی نخستین سرور
+~~~text
+/home/fragcityadmin/projects/cs2-kus-addons
+~~~
 
-بعد از اتمام نصب با UPDATE_ONLY=1، هنوز نباید سرور را کورکورانه اجرا کرد. ابتدا باید موارد زیر بررسی شوند:
+برای بررسی محلی بودن Clone، شاخه و آخرین commit:
 
-1. وجود فایل اجرایی CS2 و فایل‌های runtime لینوکس.
-2. نتیجه overlay شدن payload و وجود افزونه‌های مورد انتظار.
-3. سلامت فایل gameinfo.gi در runtime نصب‌شده.
-4. مسیر و محتوای کانفیگ مورد استفاده سرور و مقادیر پورت، مپ، ظرفیت بازیکن و رمز RCON.
-5. نحوه شروع از طریق ورودی Linux مناسب، بدون فعال شدن ناخواسته updater.
-6. اطمینان از اینکه رمز RCON قوی، یکتا و خارج از Git است؛ رمز واقعی نباید در README ثبت شود.
+~~~bash
+cd ~/projects/cs2-kus-addons
+pwd
+git status --short --branch
+git log -1 --oneline
+~~~
 
-پس از این بررسی‌ها، روش اجرای سرور برای همین VM و همین نسخه اسکریپت تثبیت می‌شود. فرمان شروع و مقادیر واقعی فقط بعد از بررسی فایل‌های فعلی و مشخص شدن تنظیمات مورد نیاز ثبت خواهند شد؛ این سند فعلاً موفقیت اجرای سرور را ادعا نمی‌کند.
+**وضعیت:** نصب Git و Clone مخزن طبق گزارش کاربر انجام شده‌اند. خروجی نهایی `git status` و `git log` در گفتگو ثبت نشده؛ در شروع نشست بعد باید اجرا شوند تا شاخه، commit و وضعیت working tree عیناً ثبت شود. مسیر بالا از دستور Clone به‌دست می‌آید؛ اگر مسیر Home یا نام کاربر متفاوت بود، مسیر واقعی `pwd` معیار است.
+
+Repository: [larnzs/cs2-kus-addons — integration/kus-monorepo](https://github.com/larnzs/cs2-kus-addons/tree/integration/kus-monorepo)
+
+### فایل‌های مهم برای مرحلهٔ نصب
+
+- [راهنمای Linux](https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/linux/README.md)
+- [نصب/به‌روزرسانی کامل، بدون اجرای CS2](https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/linux/install.sh)
+- [به‌روزرسانی فقط Repository](https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/linux/update.sh)
+- [پروویژن فایل‌های Linux و بازی](https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/linux/setup.sh)
+- [راهنمای Instanceهای Linux](https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/linux/instances/README.md)
+- [Template اجرای Instance](https://github.com/larnzs/cs2-kus-addons/tree/integration/kus-monorepo/linux/instances/instance-template)
+
+به‌دلیل خصوصی بودن مخزن، Clone باید با مجوز معتبر GitHub انجام شود. PAT یا رمزها نباید در دستور، URL، فایل tracked یا log قرار داده شوند.
+
+## ۸. برنامهٔ امن نصب بومی Linux و بررسی سلامت
+
+### تصمیم فعلی: نصب تازه، بدون جابه‌جایی فایل‌های بازی Windows
+
+در این مرحله فایل‌های بازی یا پلاگین‌ها از Windows به Linux کپی یا جابه‌جا نمی‌شوند. نصب بومی CS2 و payload پلاگین‌ها از خود Clone ریپو و از مسیر Linux انجام می‌شود. فایل‌های Windows روی Shared Folder منبع این نصب نیستند.
+
+ابتدا باید مشخص شود Clone روی شاخهٔ صحیح است و working tree تغییر ناخواسته ندارد:
+
+~~~bash
+cd ~/projects/cs2-kus-addons
+pwd
+git status --short --branch
+git log -1 --oneline
+~~~
+
+بررسی Syntax (این دستورات فایل نصب یا اجرای سرور را اجرا نمی‌کنند):
+
+~~~bash
+bash -n linux/setup.sh
+bash -n linux/install.sh
+bash -n linux/update.sh
+find linux/instances/instance-template scripts/update -type f -name '*.sh' -print0 | xargs -0 -n1 bash -n
+~~~
+
+اگر Clone تمیز است و VM snapshot گرفته شده، خط مبنای نصب را با مسیر زیر انجام بده:
+
+~~~bash
+sudo -E env RUN_PLUGIN_UPDATER=0 bash ./linux/setup.sh
+~~~
+
+این دستور باید از ریشهٔ Clone اجرا شود. با `RUN_PLUGIN_UPDATER=0`، مرحلهٔ اختیاری updater پلاگین‌ها که در `linux/setup.sh` شرطی است اجرا نمی‌شود؛ در نتیجه نباید آن مسیرِ commit/push افزونه‌ها فعال شود. با این حال، اسکریپت همچنان تغییرات سیستمی انجام می‌دهد: ممکن است بسته‌های Debian را ارتقا دهد، نیازمندی‌ها و SteamCMD را نصب کند، Steam Linux Runtime و CS2 بومی Linux را دریافت/به‌روزرسانی کند، payload ثبت‌شده را به‌صورت overlay روی مسیر runtime بنویسد و `gameinfo.gi` را برای MetaMod اصلاح کند. سرور CS2 را اجرا نمی‌کند.
+
+**قبل از اجرای این دستور:**
+- در VMware از VM یک Snapshot بگیر.
+- مطمئن شو هیچ سرور CS2 در حال اجرا نیست.
+- بررسی Syntax بالا را انجام بده.
+- نسخهٔ فعلی `linux/setup.sh` را بخوان و مطمئن شو منطق آن با توضیح این سند تغییر نکرده است.
+- Clone و سورس GitHub را در این مرحله ویرایش یا Push نکن.
+
+### تفاوت سه ورودی Linux
+
+| ورودی | رفتار | وضعیت در baseline فعلی |
+|---|---|---|
+| `linux/setup.sh` | نصب نیازمندی‌ها، SteamCMD، Steam Linux Runtime، CS2 Linux و overlay کردن payload؛ در پایان سرور را اجرا نمی‌کند. updater پلاگین فقط وقتی `RUN_PLUGIN_UPDATER=1` باشد اجرا می‌شود. | **مسیر پیشنهادی برای نصب پایه، با متغیر صریح `RUN_PLUGIN_UPDATER=0` و پس از بررسی فایل.** |
+| `linux/update.sh` | شاخهٔ `integration/kus-monorepo` را انتخاب و `git pull --ff-only` می‌کند؛ پلاگین، بازی و runtime را نصب/به‌روزرسانی نمی‌کند. | فعلاً اجرا نکن؛ Clone تازه است و اول باید وضعیت شاخه ثبت شود. |
+| `linux/install.sh` | ترکیب به‌روزرسانی Git، فعال‌کردن plugin updater، اجرای setup و نصب/overlay بازی؛ سرور را اجرا نمی‌کند. در نسخه بررسی‌شده برای اجرای updater، `RUN_PLUGIN_UPDATER=1` را به `setup.sh` پاس می‌دهد و updater می‌تواند تلاش کند تغییراتش را به شاخهٔ GitHub Push کند. | **برای اولین خط مبنا انتخاب نشود** چون Push خودکار بخشی از مسیر کامل آن است. |
+
+> **تصحیح مستندات قبلی:** دستور `sudo env -u RUN_PLUGIN_UPDATER UPDATE_ONLY=1 bash ./linux/install.sh` به‌عنوان راه تضمین‌شدهٔ جلوگیری از plugin updater معتبر نیست؛ `install.sh` متغیر را برای فرزند خود صریحاً روی `1` قرار می‌دهد. همچنین در نسخهٔ بررسی‌شده، `UPDATE_ONLY=1` به‌تنهایی مسیر کامل نصب را به یک حالت امن بدون updater تبدیل نمی‌کند. از آن دستور استفاده نکن.
+
+### بررسی سلامت بعد از نصب پایه
+
+بعد از پایان اسکریپت، پیش از اجرای سرور موارد زیر بررسی می‌شوند:
+
+1. وجود `/home/steam/cs2/game/bin/linuxsteamrt64/cs2` و `/home/steam/steamrt/run`.
+2. وجود MetaMod و CounterStrikeSharp و بررسی صحیح `gameinfo.gi`.
+3. بررسی اینکه payload و وابستگی‌های مورد انتظار در runtime نصب شده‌اند.
+4. فهرست کردن plugin DLLها و مقایسه با manifest/README؛ وجود فایل به‌تنهایی موفقیت Load را ثابت نمی‌کند.
+5. سپس ساخت یک Instance آزمایشی از template و تنظیم `instance.env` محلی با پورت و رمز RCON قوی و یکتا.
+6. فقط Instance خودش سرور را از طریق `watchdog.sh` اجرا می‌کند. installerها و updaterها برای اجرای سرور استفاده نمی‌شوند.
+
+پلاگین‌های وابسته به دیتابیس جداگانه بررسی می‌شوند؛ شکست اتصال دیتابیس با شکست Load شدن MetaMod/CounterStrikeSharp اشتباه گرفته نمی‌شود. فعلاً هیچ ادعایی دربارهٔ سلامت واقعی CS2 یا plugin runtime ثبت نشده است.
 
 ## ۹. معیارهای پذیرش پارت ۲
 
@@ -170,7 +242,7 @@ sudo env -u RUN_PLUGIN_UPDATER UPDATE_ONLY=1 bash ./linux/install.sh
 
 ## ۱۰. خروجی مورد انتظار پارت ۲
 
-> هدف پارت ۲، آماده‌سازی ماشین Debian 13.7 روی VMware و اجرای آزمایشی یک سرور CS2 با Linux payload فعلی است. برای مرحله فعلی، ۴ vCPU و ۶ گیگابایت RAM اختصاص داده شده‌اند؛ محیط گرافیکی حفظ می‌شود. به‌دلیل تصمیم به کپی‌کردن نصب فعلی ویندوز، ظرفیت دیسک مجازی ۳۰۰ گیگابایت Thin Provision هدف‌گذاری شده است، اما افزایش دیسک و کپی فایل‌ها هنوز انجام نشده‌اند. این پارت تنها پس از آزمایش واقعی شبکه، نصب payload، اجرای سرور و ثبت مصرف منابع کامل خواهد شد.
+> هدف فعلی پارت ۲، نصب بومی فایل‌های CS2 و payload پلاگین‌ها از Clone لینوکسی `cs2-kus-addons` روی Debian 13.7 و سپس اجرای یک Instance آزمایشی است. برای مرحله فعلی، ۴ vCPU و حدود ۵.۶ GiB RAM گزارش شده‌اند و محیط گرافیکی حفظ می‌شود. تصمیم قبلی برای کپی نصب Windows به Linux کنار گذاشته شده است؛ در این مسیر فایل‌های Windows از Shared Folder جابه‌جا یا کپی نمی‌شوند و فعلاً افزایش دیسک به ۳۰۰ GB وابسته به این کار نیست. تکمیل پارت به نصب و اجرای واقعی، بررسی Load پلاگین‌ها و ثبت مصرف منابع وابسته است.
 
 **مرحله بعد پس از تست:** ثبت نتیجه واقعی و حل مشکلات احتمالی اجرای CS2؛ سپس تصمیم درباره نحوه انتقال نصب به معماری نودهای Pterodactyl، بدون بازنویسی یا تغییر شتاب‌زده زیرساخت موجود.
 
@@ -403,28 +475,46 @@ sudo env -u RUN_PLUGIN_UPDATER UPDATE_ONLY=1 bash ./linux/install.sh
 
 فعلاً دستور پیشنهادی Git برای افزودن safe.directory اجرا نشده است. برای کپی فایل‌ها و اندازه‌گیری پوشه‌ها لازم نیست Git روی Shared Folder اجرا شود. این پیام به‌تنهایی نشانه خرابی مخزن نیست.
 
-### ۱۲.۷. تصمیم کپی فایل‌ها و تغییر اندازه دیسک
+### ۱۲.۷. تصمیم Storage — نسخهٔ جاری (تصمیم قبلی لغو شده)
 
-بر اساس اندازه‌های مشاهده‌شده و تصمیم کاربر:
+در زمان ثبت‌های قبلی، کپی پوشهٔ `server` از Shared Folder ویندوز با اندازه تقریبی ۹۰ GB و افزایش دیسک VM به ۳۰۰ GB پیشنهاد شده بود. **این برنامه با تصمیم جدید کاربر در ۱۶ اکتبر ۲۰۲۶ جایگزین شده است: بازی و پلاگین‌ها از Clone ریپوی Linux نصب می‌شوند و هیچ پوشه‌ای از نصب بازی Windows جابه‌جا یا کپی نمی‌شود.**
 
-- هدف جدید ظرفیت دیسک VM برابر 300 GB و از نوع Thin Provision است.
-- افزایش دیسک مجازی هنوز انجام نشده است.
-- کاربر تصمیم گرفته است کل پوشه نصب موجود Windows با اندازه تقریبی 90 GB از مسیر /mnt/hgfs/W/server به یک مقصد محلی داخل Debian کپی شود.
-- عملیات موردنظر باید کپی باشد، نه جابه‌جایی؛ منبع Windows باید باقی بماند.
-- Thin Provision فضای واقعی میزبان را مصرف می‌کند و مانع پرشدن درایوی که فایل‌های VMware روی آن قرار دارند نمی‌شود.
-- فایل اجرایی Windows با نام cs2.exe برای اجرای مستقیم روی Linux قابل استفاده نیست. کپی کامل فقط برای نگهداری و بررسی فایل‌های موجود و جلوگیری از دانلودهای غیرضروری است؛ سرور Linux همچنان به فایل‌ها و runtime بومی Linux نیاز دارد.
+- منبع Windows در `/mnt/hgfs/W/server` فقط در صورت نیاز برای مقایسهٔ read-only باقی می‌ماند؛ مبنای نصب Linux نیست.
+- فایل اجرایی Windows در `server/game/bin/win64/cs2.exe` برای اجرای مستقیم در Linux استفاده نمی‌شود.
+- افزایش دیسک به ۳۰۰ GB دیگر پیش‌نیاز کپی Windows نیست و فقط در صورت نیاز واقعی فضای نصب native/داده‌های بعدی دوباره ارزیابی می‌شود.
+- فایل‌های بازی native در مسیر پیش‌فرض اسکریپت فعلی `/home/steam/cs2` و Steam Linux Runtime در `/home/steam/steamrt` قرار می‌گیرند؛ مقصد نهایی باید از روی نسخهٔ فعلی اسکریپت تأیید شود.
 
-### ۱۲.۸. دستورهای مرحله بعد که هنوز اجرا نشده‌اند
+### ۱۲.۸. گام بعد از Clone
 
-این دستورات برای بررسی دیسک پس از افزایش اندازه مجازی پیشنهاد شده‌اند، اما هنوز اجرا نشده‌اند:
+1. وارد `~/projects/cs2-kus-addons` شو و مسیر، branch، آخرین commit و working tree را با `pwd`, `git status --short --branch` و `git log -1 --oneline` بررسی کن.
+2. Syntax اسکریپت‌های Linux را با `bash -n` بررسی کن.
+3. قبل از هر نصب، در VMware Snapshot بگیر و مطمئن شو CS2 فعال نیست.
+4. برای خط مبنای نصب از `sudo -E env RUN_PLUGIN_UPDATER=0 bash ./linux/setup.sh` استفاده کن؛ این دستور فقط پس از بازبینی نسخهٔ جاری اسکریپت اجرا شود. از `linux/install.sh` و `linux/update.sh` برای اولین نصب کنترل‌شده استفاده نکن.
+5. پس از نصب، وجود فایل‌های native Linux و payload را بررسی کن؛ سپس یک Instance بساز و فقط از `watchdog.sh` آن را اجرا کن.
 
-    lsblk -o NAME,SIZE,FSTYPE,TYPE,MOUNTPOINTS
-    lsblk -f
-    findmnt /
-    df -h /
-
-ابتدا باید فضای آزاد واقعی درایو میزبان داخل Windows بررسی شود. سپس VM خاموش شود و دیسک مجازی در VMware به هدف 300 GB افزایش یابد. پس از بوت، خروجی دستورات بالا باید بررسی شود. افزایش اندازه دیسک مجازی لزوماً پارتیشن و فایل‌سیستم داخل Debian را خودکار بزرگ نمی‌کند؛ روش توسعه آن فقط پس از دیدن ساختار واقعی دیسک مشخص می‌شود.
-
-تا پیش از تأیید فضای کافی و ساختار دیسک جدید، کپی 90 GB داده شروع نشود. همچنین هیچ‌یک از اسکریپت‌های نصب یا به‌روزرسانی KUS در این مرحله اجرا نشده‌اند. به‌خصوص linux/update.sh اجرا نشود؛ نسخه بررسی‌شده آن می‌تواند مسیر updater افزونه‌ها را فعال کند که برای push تغییرات به شاخه GitHub تلاش می‌کند.
+در حال حاضر کاربر نصب Git و Clone را گزارش کرده است؛ خروجی branch/status/log، اجرای Syntax، نصب CS2 بومی Linux، اجرای Instance و بررسی واقعی پلاگین‌ها هنوز در این سند تأیید نشده‌اند.
 
 ---
+
+
+## ۱۳. پیشرفت جدید — Git و Clone لینوکسی (۱۶ اکتبر ۲۰۲۶)
+
+### انجام‌شده طبق گزارش کاربر
+
+- [x] نصب Git و `ca-certificates` از طریق APT آغاز و انجام شده است.
+- [x] مخزن خصوصی `larnzs/cs2-kus-addons` با شاخهٔ `integration/kus-monorepo` از HTTPS Clone شده است.
+- [x] مقصد مورد انتظار: `/home/fragcityadmin/projects/cs2-kus-addons`؛ چون Clone با `~/projects` انجام شده است.
+- [x] عمداً در همین مرحله هیچ اسکریپت install/update/start اجرا نشده است.
+
+### نیازمند ثبت خروجی عینی
+
+- [ ] ثبت خروجی `git status --short --branch` و اطمینان از اینکه شاخه `integration/kus-monorepo` فعال و working tree تمیز است.
+- [ ] ثبت خروجی `git log -1 --oneline` برای تثبیت commit مبنای نصب.
+- [ ] بررسی Syntax اسکریپت‌های Linux.
+- [ ] اجرای کنترل‌شدهٔ `linux/setup.sh` با `RUN_PLUGIN_UPDATER=0`، پس از Snapshot و بازبینی اسکریپت.
+- [ ] بررسی نصب CS2 native، Steam Linux Runtime، MetaMod، CounterStrikeSharp و دیگر payloadها.
+- [ ] اجرای یک Instance آزمایشی و ارزیابی log و وضعیت هر پلاگین.
+
+### محدودهٔ این ثبت
+
+این ثبت، پیشرفت Clone را مستند می‌کند؛ **نصب CS2 و پلاگین‌ها و اجرای واقعی سرور هنوز انجام‌شده محسوب نمی‌شوند**. هیچ تغییر جدیدی در خود `larnzs/cs2-kus-addons` ایجاد نشده است. تغییرات فقط در مستندات FragCity ثبت شده‌اند.
