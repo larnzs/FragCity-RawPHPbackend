@@ -81,17 +81,17 @@ Releaseهای کاندید در زمان ثبت قبلی مستند شده‌ا�
 | T15 | Rollback | backup، ارتقا روی آزمایشگاه، rollback | مسیر برگشت مستند و آزموده | بالا |
 | T16 | پرداخت | موفق، رد، لغو، callback تکراری، مبلغ دست‌کاری‌شده | فقط تأیید معتبر سمت سرور اثر مالی بگذارد | مسدودکننده |
 | T17 | migration | تطبیق شناسه‌ها و داده نمونه | بدون گم‌شدن مالکیت/موجودی؛ گزارش اختلاف و rollback | قبل از مهاجرت |
-| T18 | Shared Base و Update هماهنگ‌شده | ساخت دو Instance روی یک Base مرکزی؛ deploy payload کامل addons/cfg/GameMode برای هر کدام؛ Update یک‌باره با SteamCMD | مسیرهای private بین Instanceها مستقل باشد؛ هنگام Update سروری اجرا نشود؛ پس از اعتبارسنجی فقط Instanceهای قبلاً Running برگردند و شکست قابل بازیابی باشد | پس از T02 و پیش از Production |
+| T18 | Shared Base و Update هماهنگ‌شده | ساخت دو Instance روی یک Base مرکزی؛ کپی baseline کامل خصوصی در Provisioning اولیه؛ Update یک‌بارهٔ Base با SteamCMD | مسیرهای private بین Instanceها مستقل باشد؛ updater پیش از Start فقط پلاگین/Runtime مجاز را به‌روزرسانی کند؛ هنگام Update سروری اجرا نشود؛ پس از اعتبارسنجی فقط Instanceهای قبلاً Running برگردند | پس از T02 و پیش از Production |
 | T19 | File Manager و مجوزهای مشتری | ویرایش cfg و تنظیمات افزونه از طریق UI مرورگر Pterodactyl؛ آزمون مجوزهای file.update، read-content، SFTP و Console به‌صورت مجزا | مشتری بتواند فایل‌های Instance خودش را طبق مجوز ویرایش کند ولی نتواند Base مشترک یا فایل Instance دیگر را بخواند/تغییر دهد؛ رفتار mount/overlay ثبت شود | مسدودکننده برای مشتریان |
-| T20 | Sync خصوصی payload پیش از هر Start | Start/Stop/Start دو Instance؛ بررسی sync از شاخهٔ `integration/kus-monorepo` به مسیر خصوصی هر Instance و بررسی checksum/pathها | هر Start payload اختصاصی را sync/update کند؛ هیچ فایل payload روی Base کپی/merge نشود؛ failure از Start جلوگیری کند؛ قانون overwrite/preserve شخصی‌سازی‌ها قبل از Production تثبیت شود | مسدودکننده |
+| T20 | Update انتخابی پلاگین/Runtime و حفاظت کانفیگ | قبل/بعد از چند Start برای دو Instance، checksum مسیرهای مجاز و محافظت‌شده مقایسه شود | فقط پلاگین‌ها/Runtimeهای allowlist تغییر کنند؛ `cfg/`، `.txt`های تنظیماتی و `addons/counterstrikesharp/configs/` بدون هیچ تغییر باقی بمانند؛ هیچ فایل payload به Base کپی/merge نشود؛ شکست updater مانع Start شود | مسدودکننده |
 
 ## 6. ترتیب PoC
 
 1. نسخه‌های دقیق و patched پنل، Wings، Docker و Egg/template را تثبیت کن.
 2. فقط یک Debian Node و یک سرور CS2 روی Base مرکزی بساز.
 3. چرخهٔ عمر، منابع، کنسول، File Manager، SFTP و Backup را بررسی کن؛ ویرایش فایل‌های private باید از رابط مرورگر عملی باشد.
-4. یک Instance را روی Base مرکزی بساز و pre-start sync را طوری تنظیم کن که پیش از اجرای process، addons/cfg و فایل‌های .txt تعیین‌شده را فقط به فضای private آن Instance sync کند؛ هیچ فایل payload روی Base کپی/merge نشود. در این مرحله preset مود نهایی اعمال نکن.
-5. Instance دوم را روی همان Base بساز؛ sync باید برای آن نیز مستقل اجرا شود، allocation/portها یکتا بمانند و ویرایش فایل یک Instance دیگری را تغییر ندهد.
+4. یک Instance را روی Base مرکزی بساز و هنگام Provisioning baseline کامل `addons/`، `cfg/` و فایل‌های متنی تعیین‌شده را فقط به فضای private آن کپی کن؛ هیچ فایل payload روی Base کپی/merge نشود. در این مرحله preset مود نهایی اعمال نکن.
+5. Instance دوم را روی همان Base بساز؛ baseline خصوصی آن باید مستقل باشد. سپس چند بار pre-start updater را اجرا کن و بررسی کن فقط پلاگین‌ها/Runtimeهای مجاز تغییر کرده‌اند، فایل‌های محافظت‌شدهٔ کانفیگ باقی مانده‌اند و allocation/portها یکتا هستند.
 6. ترتیب اجرای Base مشترک و payload خصوصی را اثبات کن، سپس رفتار Update هماهنگ‌شده را آزمایش کن: تشخیص Update جدید، توقف همهٔ Instanceهای مصرف‌کننده، اجرای یک‌بارهٔ SteamCMD روی Base، جلوگیری از Start هنگام Update و بازگرداندن فقط Instanceهای قبلاً Running.
 7. مجوزهای File Manager و Subuserها را جداگانه بررسی کن؛ دسترسی به فایل‌های Base مشترک و Volume/دادهٔ سایر Instanceها نباید از مسیر مشتری ممکن باشد.
 8. Paymenter را در محیط آزمایشی وصل کن؛ یک سفارش ساختگی را تا Provisioning دنبال کن.
@@ -110,7 +110,7 @@ Releaseهای کاندید در زمان ثبت قبلی مستند شده‌ا�
 
 به‌محض تشخیص Update جدید CS2، چرخهٔ Base باید خودکار و هماهنگ اجرا شود: همهٔ Instanceهای مصرف‌کننده متوقف شوند، SteamCMD فقط روی Base مرکزی اجرا شود، نتیجه اعتبارسنجی شود و سپس فقط Instanceهایی که پیش از Update در حال اجرا بودند برگردند. روش دقیق نگاشت مسیرها/mountها و مکانیزم lock/recovery هنوز Pending است. K4ryuu VPK Sync فقط گزینهٔ مقایسه‌ای اختیاری است؛ نصب آن پیش‌شرط Shared Base نیست.
 
-اسکریپت Deploy افزونه‌های FragCity که در آینده با Pterodactyl ادغام می‌شود، payload کامل و مدیریت‌شدهٔ addons/، cfg/ و فایل‌های متنی تعیین‌شدهٔ GameMode را در لایهٔ خصوصی همان Instance قرار می‌دهد؛ SteamCMD، نصب/Update بازی یا Start سرور را اجرا نمی‌کند. فایل‌ها ابتدا به‌صورت baseline عمومی می‌آیند و preset مود برای مرحلهٔ اول اعمال نمی‌شود. مجوز File Manager و دسترسی به overlay هم باید تست شود. مرجع آزمون [Testing Bench](TESTING-BENCH.md) و [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) است.
+Provisioning، baseline کامل `addons/`، `cfg/` و فایل‌های متنی تعیین‌شدهٔ GameMode را به لایهٔ خصوصی همان Instance کپی می‌کند؛ preset مود در مرحلهٔ اول اعمال نمی‌شود. پیش از Startهای بعدی، updater فقط پلاگین‌ها و Runtimeهای مدیریت‌شده را به‌روزرسانی می‌کند و `cfg/`، فایل‌های متنی تنظیماتی و `addons/counterstrikesharp/configs/` را دست‌نخورده می‌گذارد. هیچ‌یک از این مسیرها به Base Game کپی/merge نمی‌شوند؛ SteamCMD و Update بازی فقط در چرخهٔ مرکزی Base هستند و updater افزونه‌ها سرور را Start نمی‌کند. مجوز File Manager و دسترسی به overlay نیز باید تست شود. مرجع آزمون [Testing Bench](TESTING-BENCH.md) و [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) است.
 
 ## 9. تفکیک OS در تست
 
