@@ -1,0 +1,26 @@
+# Local-only environment secrets (patterns do not untrack files already in Git)
+.env
+.env.*
+!.env.example
+config.local.php
+**/config.local.php
+config.local.*.php
+**/config.local.*.php
+
+# Local database exports, backups, temporary files and logs
+*.sql
+*.sql.gz
+*.dump
+*.bak
+*.backup
+*.old
+*.tmp
+*.log
+/error_log
+**/error_log
+
+# Operating system and IDE files
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/
