@@ -27,6 +27,11 @@
 | OVHcloud Game Panel | [ovh/game-panel](https://github.com/ovh/game-panel) | مدیریت سرورهای بازی با Docker، شامل CS2 | benchmark برای رابط/مدیریت | چندنودی، صورتحساب و عملیاتی‌بودن باید جداگانه اثبات شود |
 | FOSSBilling | [FOSSBilling/FOSSBilling](https://github.com/FOSSBilling/FOSSBilling) | فروشگاه و صورتحساب | جایگزین Paymenter در صورت مشکل سازگاری | وضعیت beta و integration جامعه‌ای Pterodactyl باید بررسی شود |
 | LinuxGSM | [GameServerManagers/LinuxGSM](https://github.com/GameServerManagers/LinuxGSM) | نصب/مدیریت CLI سرور بازی | ابزار فرعی یا سرورهای غیرمدیریت‌شده | جایگزین Billing/Panel نیست؛ نباید دو مدیر مستقل یک instance را هم‌زمان کنترل کنند |
+| K4ryuu/CS2-Egg VPK Sync | [K4ryuu/CS2-Egg](https://github.com/K4ryuu/CS2-Egg/blob/main/docs/features/vpk-sync.md) | گزینهٔ همگام‌سازی VPKهای مشترک برای سرورهای Pterodactyl | بالاترین اولویت برای PoC اشتراک فایل در کنار مسیر اصلی | هنوز نصب/ممیزی نشده؛ مسیرها، مجوزهای root، قفل Update و Rollback باید بررسی شوند |
+| CS2 Multi Server Manager | [GamesTwoLife/cs2-multiserver](https://github.com/GamesTwoLife/cs2-multiserver) | مدیر Bash چند instance با base install مشترک و cfg/پورت مستقل | مرجع معماری shared-base و مدیریت چند سرور | جایگزین Pterodactyl/Billing نیست؛ روی یک instance با Wings نباید هم‌زمان lifecycle را کنترل کند |
+| cs2-install | [Trimeon/cs2-install](https://github.com/Trimeon/cs2-install) | master نصب بازی و instanceهای لینک‌شده، با امکان استفاده از Docker | مرجع جایگزین برای اشتراک base install | پنل مشتری و billing ندارد؛ باید مرز مسئولیت با Pterodactyl ثابت شود |
+| CS2 Server Manager | [Auto-Tournament/cs2-server-manager](https://github.com/Auto-Tournament/cs2-server-manager) | مدیریت چند سرور از یک نصب مشترک و کنترل Update | مرجع تکنیکی برای tournament/update workflow | مجوز PolyForm Noncommercial؛ استفادهٔ تجاری بدون بررسی مجوز مناسب مجاز فرض نشود |
+| 1zc/CS2-Pterodactyl | [1zc/CS2-Pterodactyl](https://github.com/1zc/CS2-Pterodactyl) | Egg و Docker image اجرای CS2 برای Pterodactyl | گزینهٔ بررسی برای Egg پایه | خودِ پروژه راهکار کامل shared storage نیست؛ نسخهٔ دقیق و سازگاری بررسی شود |
 
 ## 4. پایش و ابزارهای کمکی در آینده
 
@@ -48,3 +53,8 @@
 7. شکاف‌های باقی‌مانده و کد اختصاصی FragCity.
 
 تا زمان ثبت این موارد، وضعیت ریپو در جدول «نامزد» باقی می‌ماند، نه «Production».
+
+
+## 6. بررسی معماری چند Instance CS2
+
+نتایج اولیه و معیارهای آزمون در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) ثبت شده است. فعلاً K4ryuu VPK Sync فقط نامزد آزمایش است؛ shared files روی Node فعال نشده‌اند. مسیر Pterodactyl + Wings همچنان نامزد مرجع مدیریت مشتری و چرخهٔ عمر است.
