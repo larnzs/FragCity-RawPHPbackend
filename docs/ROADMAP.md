@@ -8,7 +8,7 @@
 |---|---|---|---|
 | P0 — Requirements & Local Development | مستندات آماده؛ اجرا Pending | الزامات، معماری، updater محلی، Laragon/WAMP و مرزبندی Production | clone محلی آماده، DB کاملاً جدا و تست اولیه قابل تکرار باشد |
 | P1 — Security & Baseline | ممیزی ایستا اولیه انجام؛ اصلاح Pending | بازبینی secret، API، ورودی‌ها و مدل مالکیت داده | خطرهای مسدودکننده شناسایی و برنامه اصلاح تصویب شود |
-| P2 — Game Panel PoC | Pending | یک نود آزمایشی و یک CS2 instance | چرخهٔ عمر و منابع پایدار کار کند |
+| P2 — Game Panel PoC | Pending | یک Node، Base Game مشترک و حداقل دو CS2 Instance | چرخهٔ عمر، جداسازی داده‌های خصوصی و Update هماهنگ‌شده پایدار باشد |
 | P3 — Billing Integration | Pending | سفارش Sandbox/ساختگی تا Provisioning | duplicate و سفارش ناموفق به‌شکل امن مدیریت شود |
 | P4 — Fixed-Duration Product | Pending | بسته‌ها، Wallet، `expires_at` و expiry action | تمام تست‌های مدل مالی قبول شوند |
 | P5 — Isolation & Recovery | Pending | مجوز مشتری، Backup/Restore، retry و rollback | تست‌های امنیتی/بازیابی قبول شوند |
@@ -49,7 +49,7 @@
 5. یک instance آزمایشی نصب/اجرا و stop/restart/delete/backup/restore تست شود.
 6. Console، فایل‌ها، محدودیت RAM/CPU/Disk و پورت‌ها بررسی شود.
 7. پس از موفقیت سرور اول، سرور دوم ساخته و جداسازی account/Volume/cfg/addons/ports/backup بررسی شود.
-8. اشتراک فایل فقط به‌عنوان آزمونی جداگانه و پس از baseline بررسی شود؛ مراحل و پذیرش در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) آمده است.
+8. معماری هدف PoC از ابتدا Base Game مشترک است: پس از تست Instance اول، Instance دوم روی همان Base ساخته شود؛ جداسازی addons/cfg/GameMode و Update هماهنگ‌شده آزموده شود. روش فنی mount/link و deploy افزونه‌ها هنوز باید انتخاب و اعتبارسنجی شود؛ K4ryuu VPK Sync فقط گزینهٔ مقایسه‌ای اختیاری است. جزئیات در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) آمده است.
 9. تمام candidateهای شناخته‌شده در [Testing Bench](TESTING-BENCH.md) با laneهای Linux، Windows و Cross-platform بررسی شوند؛ statusها و خروجی‌ها قبل از انتخاب نهایی ثبت شوند.
 10. پیشنهادهای اولیه در [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md) نگهداری شوند؛ این فهرست به‌تنهایی انتخاب Production محسوب نمی‌شود.
 
@@ -95,7 +95,7 @@
 ## P7 — نود دوم و ظرفیت
 
 - نود دوم با install runbook و تنظیمات مستقل اضافه شود.
-- ابتدا یک سرور، سپس ۳، سپس ۵ سرور بارگذاری شود.
+- ابتدا یک Base مشترک با یک Instance، سپس دو Instance برای آزمون جداسازی، و بعد ۳ و ۵ سرور برای سنجش ظرفیت اجرا شوند.
 - RAM، CPU، disk I/O، latency، packet loss، crash و log ثبت شود.
 - ۸ تا ۱۰ سرور فقط پس از داده واقعی بررسی شود.
 
