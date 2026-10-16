@@ -1,18 +1,13 @@
 <?php
-// panel/config.php
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-/* =========================================================
-   Language & Translations
-========================================================= */
-if (isset($_GET['lang']) && in_array($_GET['lang'], ['fa', 'en'], true)) {
-    $_SESSION['lang'] = $_GET['lang'];
-}
-$lang = $_SESSION['lang'] ?? 'fa';
-$is_fa = ($lang === 'fa');
+require_once __DIR__ . '/../../settings/loader.php';
+// Central JSON settings for this CS2 panel page.
+$panelSettings=fragcity_settings('files.panels.cs2.config',array());
+$panelProfile=isset($panelSettings['database_profile'])?$panelSettings['database_profile']:'main';
+$panelAllowedLanguages=isset($panelSettings['allowed_languages'])&&is_array($panelSettings['allowed_languages'])?$panelSettings['allowed_languages']:array('fa','en');
+$panelDefaultLanguage=isset($panelSettings['default_language'])?$panelSettings['default_language']:'fa';
+if(session_status()===PHP_SESSION_NONE)session_start();
+if(isset($_GET['lang'])&&in_array($_GET['lang'],$panelAllowedLanguages,true))$_SESSION['lang']=$_GET['lang'];
+$lang=isset($_SESSION['lang'])?$_SESSION['lang']:$panelDefaultLanguage;$is_fa=($lang==='fa');
 
 $translations = [
     'fa' => [
@@ -85,42 +80,17 @@ $t = $translations[$lang];
 /* =========================================================
    Database Connection & Session
 ========================================================= */
-$host = '127.0.0.1';
-$port = '3306';
-$dbname = 'kyonxcbt_fragcity_services';
-$dbUser = 'kyonxcbt_admin';
-$dbPass = 'Atrisayeafsorde824@';
-
-$pdo = null;
-$sessionSteamId = $_SESSION['steamid'] ?? $_SESSION['steam_id'] ?? $_SESSION['user']['steamid'] ?? $_SESSION['user_steamid'] ?? '';
-$isLoggedIn = !empty($sessionSteamId);
-
-try {
-    $pdo = new PDO("mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4", $dbUser, $dbPass);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die("Database connection failed.");
-}
+$pdo=fragcity_create_pdo($panelProfile);
+$sessionSteamId=$_SESSION['steamid']??$_SESSION['steam_id']??$_SESSION['user']['steamid']??$_SESSION['user_steamid']??'';
+$isLoggedIn=!empty($sessionSteamId);
 
 $servers = [];
 $active_server = null;
 $success_message = '';
 $error_message = '';
 
-$all_configs = [
-    '1v1.cfg', '45.cfg', 'aim.cfg', 'awp.cfg', 'battle.cfg', 'bhop.cfg', 'br.cfg', 
-    'Casual-1.6.cfg', 'casual.cfg', 'casuala.cfg', 'casualw.cfg', 'comp.cfg', 'course.cfg', 
-    'ctf.cfg', 'deathmatch.cfg', 'deathrun.cfg', 'dm-valve.cfg', 'dm.cfg', 'executes.cfg', 
-    'gamemode_armsrace.cfg', 'gamemode_casual.cfg', 'gamemode_competitive.cfg', 
-    'gamemode_competitive2v2.cfg', 'gamemode_competitive2v2_offline.cfg', 'gamemode_competitive_offline.cfg', 
-    'gamemode_competitive_short.cfg', 'gamemode_competitive_tmm.cfg', 'gamemode_cooperative.cfg', 
-    'gamemode_coopmission.cfg', 'gamemode_custom.cfg', 'gamemode_deathmatch.cfg', 
-    'gamemode_deathmatch_short.cfg', 'gamemode_deathmatch_tmm.cfg', 'gamemode_demolition.cfg', 
-    'gamemode_dm_freeforall.cfg', 'gamemode_new_user_training.cfg', 'gamemode_retakecasual.cfg', 
-    'gamemode_teamdeathmatch.cfg', 'gamemode_workshop.cfg', 'gg.cfg', 'hns.cfg', 'kz.cfg', 
-    'minigames.cfg', 'mods.cfg', 'oitc.cfg', 'prac.cfg', 'practice.cfg', 'prefire.cfg', 
-    'retake.cfg', 'scoutzknivez.cfg', 'soccer.cfg', 'surf.cfg', 'wingman.cfg'
+$all_configs=isset($panelSettings['all_configs'])&&is_array($panelSettings['all_configs'])?array_values(array_filter($panelSettings['all_configs'],'is_string')):array();
+
 ];
 
 if ($isLoggedIn && $pdo) {

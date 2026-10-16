@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/settings/loader.php';
 ob_start();
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -7,29 +8,9 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 /* =========================================================
  | Database
  ========================================================== */
-$db_host = 'localhost';
-$db_port = '3306';
-$db_name = 'kyonxcbt_fragcity_services';
-$db_user = 'kyonxcbt_admin';
-$db_pass = 'Atrisayeafsorde824@';
-
-$pdo = null;
-
-try {
-    $pdo = new PDO(
-        "mysql:host={$db_host};port={$db_port};dbname={$db_name};charset=utf8mb4",
-        $db_user,
-        $db_pass,
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ]
-    );
-} catch (PDOException $e) {
-    // Keep the site renderable even if the database is temporarily unavailable.
-    $pdo = null;
-}
+$indexSettings=fragcity_settings('files.index',array());
+$indexProfile=isset($indexSettings['database_profile'])?$indexSettings['database_profile']:'main';
+$pdo=fragcity_create_pdo($indexProfile);
 
 /* =========================================================
  | Helpers

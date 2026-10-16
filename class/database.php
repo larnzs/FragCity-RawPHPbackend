@@ -1,29 +1,12 @@
-<?php
-class DataBase {
-	
-    private $PDO;
-
-    public function __construct() {
-        try {
-            $this->PDO = new PDO("mysql:host=".DB_HOST."; port=".DB_PORT."; dbname=".DB_NAME, DB_USER, DB_PASS, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
-        }
-        catch(PDOException $ex)
-        {
-            echo "<div style='display: flex; flex-direction: column;align-items: center;justify-content: center;text-align: center;'><h2>Problem with database!</h2>";
-            die("<pre style='padding: 10px;text-wrap: balance; border: 2px solid #ed6bd3;background: #252525; color: #ed6bd3; width: 50%;'>" . $ex . "</pre>");
-        }
-    }
-    public function select($query, $bindings = []) {
-        $STH = $this->PDO->prepare($query);
-        $STH->execute($bindings);
-        $result = $STH->fetchAll(PDO::FETCH_ASSOC);
-		$result ??= false;
-		return $result;
-    }
-
-    public function query($query, $bindings = []){
-        $STH = $this->PDO->prepare($query);
-        return $STH->execute($bindings);
-    }
-
+<?php
+require_once __DIR__ . '/config.php';
+class DataBase {
+ private $PDO=null;
+ public function __construct(){
+  if(DB_NAME===''||DB_USER===''){error_log('[FragCity] Weapon-paints DB is not configured.');return;}
+  try{$o=array(PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC,PDO::ATTR_EMULATE_PREPARES=>false);if(defined('PDO::MYSQL_ATTR_INIT_COMMAND'))$o[PDO::MYSQL_ATTR_INIT_COMMAND]='SET NAMES utf8mb4';$this->PDO=new PDO('mysql:host='.DB_HOST.';port='.DB_PORT.';dbname='.DB_NAME.';charset=utf8mb4',DB_USER,DB_PASS,$o);}
+  catch(PDOException $e){error_log('[FragCity] Weapon-paints DB connection failed: '.$e->getMessage());}
+ }
+ public function select($q,$b=array()){if(!$this->PDO)return false;try{$s=$this->PDO->prepare($q);$s->execute($b);return $s->fetchAll(PDO::FETCH_ASSOC);}catch(PDOException $e){error_log('[FragCity] Weapon-paints SELECT failed: '.$e->getMessage());return false;}}
+ public function query($q,$b=array()){if(!$this->PDO)return false;try{$s=$this->PDO->prepare($q);return $s->execute($b);}catch(PDOException $e){error_log('[FragCity] Weapon-paints query failed: '.$e->getMessage());return false;}}
 }

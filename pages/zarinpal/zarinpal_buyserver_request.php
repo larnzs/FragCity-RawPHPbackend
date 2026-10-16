@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../settings/loader.php';
+$zarinpalSettings=fragcity_settings('integrations.zarinpal',array());
 // pages/zarinpal/zarinpal_buyserver_request.php
 session_start();
 
@@ -33,17 +35,7 @@ if (!isset($_SESSION['user_logged_in']) || empty($_SESSION['steamid'])) {
 
 $steamid = $_SESSION['steamid'];
 
-try {
-    $pdo = new PDO(
-        'mysql:host=localhost;port=3306;dbname=kyonxcbt_fragcity_services;charset=utf8mb4',
-        'kyonxcbt_admin',
-        'Atrisayeafsorde824@'
-    );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    terminateRequest('❌ خطا در اتصال به دیتابیس.');
-}
+$fileSettings=fragcity_settings('files.pages.zarinpal.buyserver_request',array());$dbProfile=isset($fileSettings['database_profile'])?$fileSettings['database_profile']:'main';$pdo=fragcity_create_pdo($dbProfile);if(!$pdo){terminateRequest('اتصال دیتابیس در دسترس نیست یا تنظیم نشده است.');}
 
 // ---------------- دریافت و اعتبارسنجی اطلاعات فرم ----------------
 $selectedSlots    = (int)($_POST['slots'] ?? 10);
@@ -110,7 +102,7 @@ if (!empty($_SESSION['email']) && is_string($_SESSION['email'])) {
 $email = is_string($email) ? $email : "";
 
 // ---------------- ارسال درخواست به زرین‌پال ----------------
-$merchant_id = "0d7e7e6c-211f-4c2e-bf11-77ef8c36994a";
+$merchant_id=isset($zarinpalSettings['merchant_id'])?(string)$zarinpalSettings['merchant_id']:'';
 $callback_url = "https://fragcity.ir/pages/zarinpal/zarinpal_buyserver_callback.php";
 
 $data = [

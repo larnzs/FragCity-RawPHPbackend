@@ -1,35 +1,12 @@
 <?php
-// panel/settings.php
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-
-/* =========================================================
-   Language
-========================================================= */
-
-if (
-    isset($_GET['lang']) &&
-    in_array(
-        $_GET['lang'],
-        ['fa', 'en'],
-        true
-    )
-) {
-    $_SESSION['lang'] =
-        $_GET['lang'];
-}
-
-
-$lang =
-    $_SESSION['lang']
-    ?? 'fa';
-
-
-$is_fa =
-    ($lang === 'fa');
+require_once __DIR__ . '/../../settings/loader.php';
+// General options are read from the central JSON config.
+$panelSettingsOptions=fragcity_settings('files.panels.cs2.settings',array());
+$panelSettingsAllowedLanguages=isset($panelSettingsOptions['allowed_languages'])&&is_array($panelSettingsOptions['allowed_languages'])?$panelSettingsOptions['allowed_languages']:array('fa','en');
+$panelSettingsDefaultLanguage=isset($panelSettingsOptions['default_language'])?$panelSettingsOptions['default_language']:'fa';
+if(session_status()===PHP_SESSION_NONE)session_start();
+if(isset($_GET['lang'])&&in_array($_GET['lang'],$panelSettingsAllowedLanguages,true))$_SESSION['lang']=$_GET['lang'];
+$lang=isset($_SESSION['lang'])?$_SESSION['lang']:$panelSettingsDefaultLanguage;$is_fa=($lang==='fa');
 
 
 /* =========================================================

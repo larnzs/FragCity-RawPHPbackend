@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../../settings/loader.php';
+$zarinpalSettings=fragcity_settings('integrations.zarinpal',array());
 // pages/zarinpal/zarinpal_wallet_callback.php
 session_start();
 
@@ -10,17 +12,7 @@ $error_message = '';
 $amount = 0;
 $ref_id = '';
 
-try {
-    $pdo = new PDO(
-        'mysql:host=localhost;port=3306;dbname=kyonxcbt_fragcity_services;charset=utf8mb4',
-        'kyonxcbt_admin',
-        'Atrisayeafsorde824@'
-    );
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    die('❌ خطا در اتصال به دیتابیس.');
-}
+$fileSettings=fragcity_settings('files.pages.zarinpal.wallet_callback',array());$dbProfile=isset($fileSettings['database_profile'])?$fileSettings['database_profile']:'main';$pdo=fragcity_create_pdo($dbProfile);if(!$pdo){http_response_code(503);exit('Database unavailable or not configured.');}
 
 if ($status !== 'OK' || empty($authority)) {
     $is_success = false;
@@ -32,7 +24,7 @@ if ($status !== 'OK' || empty($authority)) {
             ->execute([$authority]);
     }
 } else {
-    $merchant_id = "0d7e7e6c-211f-4c2e-bf11-77ef8c36994a";
+    $merchant_id=isset($zarinpalSettings['merchant_id'])?(string)$zarinpalSettings['merchant_id']:'';
 
     // پیدا کردن تراکنش
     $stmt = $pdo->prepare("SELECT * FROM wallet_transactions WHERE authority = ? LIMIT 1");

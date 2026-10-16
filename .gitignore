@@ -7,6 +7,10 @@ config.local.php
 config.local.*.php
 **/config.local.*.php
 
+# Runtime settings include per-environment database credentials and API secrets
+/settings/settings.json
+/settings/*.local.json
+
 # Put local database exports under these ignored paths
 /local-dumps/
 /database/local/

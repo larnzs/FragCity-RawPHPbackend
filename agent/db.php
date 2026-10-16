@@ -1,20 +1,7 @@
-<?php
-$host = '89.39.208.82'; // یا آدرس سرور دیتابیس (مثلاً localhost)
-$db   = 'kyonxcbt_fragcity_services';
-$user = 'kyonxcbt_admin';
-$pass = 'Atrisayeafsorde824@';
-$charset = 'utf8mb4';
-
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-$options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    PDO::ATTR_EMULATE_PREPARES   => false,
-];
-
-try {
-    $pdo = new PDO($dsn, $user, $pass, $options);
-} catch (\PDOException $e) {
-    die(json_encode(['status' => 'error', 'message' => 'Database connection failed.']));
-}
-?>
+<?php
+
+require_once __DIR__ . '/../settings/loader.php';
+$cfg=fragcity_settings('files.agent.db',array());
+$profile=isset($cfg['database_profile'])?$cfg['database_profile']:'main';
+$pdo=fragcity_create_pdo($profile);
+if(!$pdo){http_response_code(503);die(json_encode(array('status'=>'error','message'=>'Database unavailable or not configured.')));}
