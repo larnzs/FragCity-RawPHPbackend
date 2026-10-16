@@ -81,17 +81,22 @@ Releaseهای کاندید در زمان ثبت قبلی مستند شده‌ا�
 | T15 | Rollback | backup، ارتقا روی آزمایشگاه، rollback | مسیر برگشت مستند و آزموده | بالا |
 | T16 | پرداخت | موفق، رد، لغو، callback تکراری، مبلغ دست‌کاری‌شده | فقط تأیید معتبر سمت سرور اثر مالی بگذارد | مسدودکننده |
 | T17 | migration | تطبیق شناسه‌ها و داده نمونه | بدون گم‌شدن مالکیت/موجودی؛ گزارش اختلاف و rollback | قبل از مهاجرت |
-| T18 | Shared Base و Update هماهنگ‌شده | ساخت دو Instance روی یک Base مرکزی؛ جداسازی addons/cfg/GameMode؛ توقف همهٔ Instanceها و اجرای یک‌بارهٔ SteamCMD روی Base | هیچ تنظیم خصوصی بین Instanceها نشت نکند؛ در زمان Update هیچ Instanceای اجرا نشود؛ پس از اعتبارسنجی فقط Instanceهای قبلاً Running برگردند و شکست Update قابل بازیابی باشد | پس از T02 و پیش از Production |
+| T18 | Shared Base و Update هماهنگ‌شده | ساخت دو Instance روی یک Base مرکزی؛ deploy payload کامل addons/cfg/GameMode برای هر کدام؛ Update یک‌باره با SteamCMD | مسیرهای private بین Instanceها مستقل باشد؛ هنگام Update سروری اجرا نشود؛ پس از اعتبارسنجی فقط Instanceهای قبلاً Running برگردند و شکست قابل بازیابی باشد | پس از T02 و پیش از Production |
+| T19 | File Manager و مجوزهای مشتری | ویرایش cfg و تنظیمات افزونه از طریق UI مرورگر Pterodactyl؛ آزمون مجوزهای file.update، read-content، SFTP و Console به‌صورت مجزا | مشتری بتواند فایل‌های Instance خودش را طبق مجوز ویرایش کند ولی نتواند Base مشترک یا فایل Instance دیگر را بخواند/تغییر دهد؛ رفتار mount/overlay ثبت شود | مسدودکننده برای مشتریان |
 
 ## 6. ترتیب PoC
 
-1. نسخه‌های دقیق و patched را تثبیت کن.
-2. فقط یک Debian node و یک سرور CS2 را با Pterodactyl بساز.
-3. چرخهٔ عمر، منابع، کنسول، فایل‌ها و Backup را بررسی کن.
-4. Paymenter را در محیط آزمایشی وصل کن؛ یک سفارش ساختگی را تا Provisioning دنبال کن.
-5. منطق Wallet، کسر بسته، `expires_at` و انقضا را جداگانه آزمایش کن.
-6. در صورت شکست مسیر A یا احتیاج به توسعهٔ بیش از حد، یک PoC محدود GameAP بساز.
-7. فقط بر اساس شواهد تصمیم Production گرفته شود.
+1. نسخه‌های دقیق و patched پنل، Wings، Docker و Egg/template را تثبیت کن.
+2. فقط یک Debian Node و یک سرور CS2 روی Base مرکزی بساز.
+3. چرخهٔ عمر، منابع، کنسول، File Manager، SFTP و Backup را بررسی کن؛ ویرایش فایل‌های private باید از رابط مرورگر عملی باشد.
+4. یک Instance را با payload کامل FragCity شامل addons/cfg و فایل‌های متنی مشخص‌شدهٔ GameMode بساز. در این مرحله preset مود نهایی اعمال نکن.
+5. Instance دوم را روی همان Base با payload کامل و مسیرهای private مستقل بساز؛ allocation/portها یکتا باشند و ویرایش فایل یک Instance نباید دیگری را تغییر دهد.
+6. رفتار Update هماهنگ‌شده را آزمایش کن: تشخیص Update جدید، توقف همهٔ Instanceهای مصرف‌کننده، اجرای یک‌بارهٔ SteamCMD روی Base، جلوگیری از Start هنگام Update و بازگرداندن فقط Instanceهای قبلاً Running.
+7. مجوزهای File Manager و Subuserها را جداگانه بررسی کن؛ دسترسی به فایل‌های Base مشترک و Volume/دادهٔ سایر Instanceها نباید از مسیر مشتری ممکن باشد.
+8. Paymenter را در محیط آزمایشی وصل کن؛ یک سفارش ساختگی را تا Provisioning دنبال کن.
+9. منطق Wallet، کسر بسته، `expires_at` و expiry را جداگانه آزمایش کن.
+10. اگر مسیر A شکست خورد یا توسعهٔ بیش از حد لازم داشت، یک PoC محدود GameAP بساز.
+11. فقط بر اساس شواهد آزمون دربارهٔ Production تصمیم بگیر.
 
 ## 7. شرط توقف
 
@@ -104,7 +109,7 @@ Releaseهای کاندید در زمان ثبت قبلی مستند شده‌ا�
 
 به‌محض تشخیص Update جدید CS2، چرخهٔ Base باید خودکار و هماهنگ اجرا شود: همهٔ Instanceهای مصرف‌کننده متوقف شوند، SteamCMD فقط روی Base مرکزی اجرا شود، نتیجه اعتبارسنجی شود و سپس فقط Instanceهایی که پیش از Update در حال اجرا بودند برگردند. روش دقیق نگاشت مسیرها/mountها و مکانیزم lock/recovery هنوز Pending است. K4ryuu VPK Sync فقط گزینهٔ مقایسه‌ای اختیاری است؛ نصب آن پیش‌شرط Shared Base نیست.
 
-اسکریپت Deploy افزونه‌های FragCity که در آینده با Pterodactyl ادغام می‌شود، فقط payload مود/افزونهٔ اختصاصی Instance را قرار می‌دهد و SteamCMD، نصب/Update بازی یا Start سرور را اجرا نمی‌کند. جزئیات cfg و فایل‌های GameMode در طراحی فنی جداگانه تعیین می‌شود. مرجع آزمون [Testing Bench](TESTING-BENCH.md) و [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) است.
+اسکریپت Deploy افزونه‌های FragCity که در آینده با Pterodactyl ادغام می‌شود، payload کامل و مدیریت‌شدهٔ addons/، cfg/ و فایل‌های متنی تعیین‌شدهٔ GameMode را در لایهٔ خصوصی همان Instance قرار می‌دهد؛ SteamCMD، نصب/Update بازی یا Start سرور را اجرا نمی‌کند. فایل‌ها ابتدا به‌صورت baseline عمومی می‌آیند و preset مود برای مرحلهٔ اول اعمال نمی‌شود. مجوز File Manager و دسترسی به overlay هم باید تست شود. مرجع آزمون [Testing Bench](TESTING-BENCH.md) و [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) است.
 
 ## 9. تفکیک OS در تست
 
