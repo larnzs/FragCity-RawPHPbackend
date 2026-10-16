@@ -91,8 +91,6 @@ $error_message = '';
 
 $all_configs=isset($panelSettings['all_configs'])&&is_array($panelSettings['all_configs'])?array_values(array_filter($panelSettings['all_configs'],'is_string')):array();
 
-];
-
 if ($isLoggedIn && $pdo) {
     try {
         $thresholdTime = date('Y-m-d H:i:s', time() - 60);
