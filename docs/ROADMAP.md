@@ -52,7 +52,7 @@
 8. در اولین ساخت هیچ preset مود نهایی اعمال نکن؛ ابتدا سلامت payload، اجرای سرور و جداسازی فایل‌ها را ثابت کن. سپس هر Instance را جداگانه کانفیگ کن.
 9. File Manager داخلی Pterodactyl را برای ویرایش cfg و تنظیمات افزونه تست کن؛ مجوزهای فایل، SFTP و Console را جداگانه بررسی کن. سایت/پنل C# فعلی حذف‌شده فرض نشود؛ نیاز به لینک‌دهی/SSO و شکاف‌های UI بعداً ارزیابی می‌شود.
 10. Update مرکزی Base و updater انتخابی payload دو عملیات جدا هستند: Update بازی همهٔ Instanceهای متکی را متوقف کرده و SteamCMD را یک‌بار روی Base اجرا می‌کند؛ updater پیش از هر Start فقط پلاگین‌ها و Runtimeهای مدیریت‌شده را در مسیر private همان Instance به‌روزرسانی می‌کند و مسیرهای محافظت‌شدهٔ کانفیگ را تغییر نمی‌دهد. بازگشت فقط Instanceهای قبلاً Running انجام شود. جزئیات در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) آمده است.
-11. تمام candidateهای شناخته‌شده در [Testing Bench](TESTING-BENCH.md) با laneهای Linux، Windows و Cross-platform بررسی شوند؛ statusها و خروجی‌ها قبل از انتخاب نهایی ثبت شوند.
+11. مسیر Linux/Pterodactyl معیار پذیرش اصلی است. Windows فقط برای تست دستی CS2، لاگ‌ها، Load پلاگین‌ها و تنظیم config استفاده می‌شود؛ آزمون managerهای Windows و cross-platform تا زمان بروز blocker مشخص در مسیر Linux، Deferred می‌ماند. شواهد هر تست در [Testing Bench](TESTING-BENCH.md) ثبت شود.
 12. پیشنهادهای اولیه در [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md) نگهداری شوند؛ این فهرست به‌تنهایی انتخاب Production محسوب نمی‌شود.
 
 **شرط عبور:** پنل، وضعیت واقعی سرور و مالکیت منابع هماهنگ باشند؛ محدودیت‌های امنیتی مشتری قابل تست باشند.
