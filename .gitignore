@@ -7,8 +7,9 @@ config.local.php
 config.local.*.php
 **/config.local.*.php
 
-# Local database exports, backups, temporary files and logs
-*.sql
+# Put local database exports under these ignored paths
+/local-dumps/
+/database/local/
 *.sql.gz
 *.dump
 *.bak
