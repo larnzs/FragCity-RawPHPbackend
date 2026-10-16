@@ -30,3 +30,13 @@
 - [Platform PoC](PLATFORM-POC.md) آزمون T18 را برای دو instance و shared VPK اضافه کرده است.
 - [Repository Inventory](REPOSITORIES.md) گزینه‌های K4ryuu/CS2-Egg، GamesTwoLife/cs2-multiserver، Trimeon/cs2-install، Auto-Tournament/cs2-server-manager و 1zc/CS2-Pterodactyl را ثبت می‌کند.
 - این تغییرات مستندسازی‌اند؛ روی Debian چیزی نصب یا اجرا نشده و shared files فعال نشده‌اند.
+
+
+## ثبت مستندات — Testing Bench و جداسازی سیستم‌عامل‌ها، ۱۶ اکتبر ۲۰۲۶
+
+- [Testing Bench](TESTING-BENCH.md) ایجاد شد تا هر candidate و روش ذخیره‌سازی با status، مراحل، معیار قبولی و قالب ثبت شواهد تست شود.
+- [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md) ایجاد شد تا ایده‌های محتمل از انتخاب Production و نتایج واقعی جدا بمانند.
+- [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) گزینه‌ها را به Linux native، Windows native و Cross-platform/WSL2 تفکیک می‌کند.
+- WindowsGSH، Game-Server-Admin، CS2 Server CLI، MSM، cs2-install، K4ryuu VPK Sync و Pterodactyl Eggها در لاین‌های مناسب ثبت شدند.
+- **هیچ ابزار تازه‌ای نصب یا زنده تست نشده است**؛ status همهٔ candidateها Pending/Blocked است تا نتیجه با evidence ثبت شود.
+- این تغییرات فقط مستندات `FragCity-RawPHPbackend` را تغییر داده؛ `cs2-kus-addons` تغییر نکرده است.
