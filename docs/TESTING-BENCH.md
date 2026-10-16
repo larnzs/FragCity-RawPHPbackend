@@ -95,11 +95,11 @@ For each candidate, record:
 6. Install a representative plugin stack only after an unmodded baseline passes. Validate CounterStrikeSharp/Metamod separately where relevant.
 7. Capture redacted logs and exact version info.
 
-### Stage 2 — Two independent instances
+### Stage 2 — Two instances on shared Base with private payload folders
 
-1. Create two instances with different names, ports, maps/game modes and settings.
-2. Start both simultaneously and verify that each is reachable on its own expected port.
-3. Change one instance's hostname, `cfg/`, addon files/configuration, GameMode text files and a disposable private test file; verify the other instance does not change.
+1. Create two instances on the same shared Base. Initially deploy the same complete FragCity payload to each: private `addons/`, `cfg/` and the selected GameMode text files, with unique allocations/ports and general settings.
+2. Do not apply a specific mode preset during this stage. Start both baseline instances and verify they are reachable on their own expected ports.
+3. Change one instance's hostname, a file in `cfg/`, an addon/plugin configuration file under `addons/counterstrikesharp/configs/plugins/`, a GameMode text file and a disposable private test file; verify the other instance does not change.
 4. Check process identity, process arguments, working directory, PID tracking, console routing, logs and restart behaviour.
 5. Verify collision protection covers game, query, GOTV and every additional port required by that server's configuration.
 6. Reboot the host and verify exactly the configured servers return without starting duplicates.
@@ -152,8 +152,11 @@ Never infer performance from repository marketing figures. Preserve raw results 
 ### Stage 6 — Pterodactyl-specific checks
 
 - The Panel owns each Server record; Wings/Docker lifecycle must be the only authority starting/stopping the Pterodactyl-managed process.
-- Confirm the Egg/template works on the target Linux Node. Its per-instance addon/mod deploy step must not invoke SteamCMD, install/update the Base Game, or start the server; Base update belongs to the central updater.
+- Confirm the Egg/template works on the target Linux Node. Its per-instance payload step must deploy the full private `addons/`, `cfg/` and selected GameMode text files without invoking SteamCMD, installing/updating the Base Game, or starting the server; Base update belongs to the central updater.
 - Confirm allocations, container path, user/group permissions, CPU/RAM/disk limits, console, File Manager, SFTP, logs and backup.
+- Use the browser File Manager to edit a private `cfg/` file and plugin config for one instance; confirm the edit persists and never modifies the other instance.
+- Test subuser permissions separately for `file.read-content`, `file.update`, `file.create`, `file.delete`, `file.sftp`, console and power controls; do not grant broader permissions than required.
+- Confirm the shared Base cannot be edited through customer-visible File Manager/SFTP and custom mounts/overlays behave as expected.
 - Verify whether custom mounts are visible in File Manager/SFTP; do not assume they are.
 - If VPK Sync is evaluated, confirm its install/update daemon, status protocol, lock, recovery path and privileged scripts before installing; it is not a required dependency of the selected design.
 - A standalone manager such as MSM or cs2-install must not independently stop, update, or rewrite a Pterodactyl-owned instance unless an explicit integration owns and tests that boundary.
