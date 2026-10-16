@@ -2,6 +2,15 @@
 
 ## آخرین وضعیت ثبت‌شده
 
+### Shared Base، payload اولیهٔ Instance و File Manager — ۱۶ اکتبر ۲۰۲۶
+
+- تصمیم‌های این مرحله در [ADR-011/012](DECISIONS.md) ثبت شد: هر Instance ابتدا payload کامل addons/cfg/GameMode text را در مسیر خصوصی خودش دریافت می‌کند؛ preset مود در Provisioning اولیه اعمال نمی‌شود و کانفیگ Aim/HS، Public Fun یا DM/FFA بعداً جداگانه انجام می‌شود.
+- [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) و [Roadmap](ROADMAP.md) اصلاح شدند تا اسکریپت Deploy را از SteamCMD و اجرای سرور جدا کنند و Base مشترک را حفظ کنند.
+- [Platform PoC](PLATFORM-POC.md) آزمون T19 را برای File Manager و مجوزهای دقیق مشتری اضافه کرد؛ [Testing Bench](TESTING-BENCH.md) جداسازی دو Instance و ویرایش فایل‌ها از رابط وب را پوشش می‌دهد.
+- Pterodactyl دارای File Manager داخلی و مجوزهای جداگانهٔ فایل/کنسول/power است؛ اما اتصال آن به سایت یا پنل C# فعلی (لینک‌دهی/SSO) هنوز تصمیم نشده است.
+- آدرس پنل فعلی FragCity از طریق ابزار وب قابل دسترسی نبود؛ دربارهٔ جزئیات پیاده‌سازی فعلی آن نتیجه‌گیری نشده است.
+- این مرحله فقط مستندات `FragCity-RawPHPbackend` را تغییر می‌دهد؛ `cs2-kus-addons` تغییر نکرده و هیچ Pterodactyl یا Update script روی Debian نصب/اجرا نشده است.
+
 ### توسعهٔ محلی Windows — به‌روزرسانی ۱۶ اکتبر ۲۰۲۶
 
 - فایل `update.bat` در ریشهٔ ریپو اضافه شد: فقط `main` را انتخاب و `git pull --ff-only origin main` اجرا می‌کند؛ برای دیدن نتیجه در پایان مکث دارد.
@@ -27,7 +36,7 @@
 ## ثبت مستندات — ۱۶ اکتبر ۲۰۲۶
 
 - سند [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) دربارهٔ یک Panel/چند Server، جداسازی Volumeها، مدل‌های اشتراک فایل و بررسی ریپوهای GitHub اضافه شد.
-- [Platform PoC](PLATFORM-POC.md) آزمون T18 را برای دو instance و shared VPK اضافه کرده است.
+- [Platform PoC](PLATFORM-POC.md) آزمون T18 را برای Shared Base/Update هماهنگ‌شده و T19 را برای File Manager و مجوزهای مشتری نگه می‌دارد؛ K4ryuu VPK Sync فقط گزینهٔ مقایسه‌ای اختیاری است.
 - [Repository Inventory](REPOSITORIES.md) گزینه‌های K4ryuu/CS2-Egg، GamesTwoLife/cs2-multiserver، Trimeon/cs2-install، Auto-Tournament/cs2-server-manager و 1zc/CS2-Pterodactyl را ثبت می‌کند.
 - این تغییرات مستندسازی‌اند؛ روی Debian چیزی نصب یا اجرا نشده و shared files فعال نشده‌اند.
 
