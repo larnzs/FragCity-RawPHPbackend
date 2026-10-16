@@ -81,7 +81,7 @@ Releaseهای کاندید در زمان ثبت قبلی مستند شده‌ا�
 | T15 | Rollback | backup، ارتقا روی آزمایشگاه، rollback | مسیر برگشت مستند و آزموده | بالا |
 | T16 | پرداخت | موفق، رد، لغو، callback تکراری، مبلغ دست‌کاری‌شده | فقط تأیید معتبر سمت سرور اثر مالی بگذارد | مسدودکننده |
 | T17 | migration | تطبیق شناسه‌ها و داده نمونه | بدون گم‌شدن مالکیت/موجودی؛ گزارش اختلاف و rollback | قبل از مهاجرت |
-| T18 | Multi-instance/shared files | ساخت دو سرور CS2 و ارزیابی K4ryuu VPK Sync | جداسازی cfg/addons/backup/permissions تأیید شود؛ Update مشترک ایمن و قابل بازگشت باشد؛ پورت و داده تداخل نداشته باشند | پس از T02 و قبل از پذیرش Production |
+| T18 | Shared Base و Update هماهنگ‌شده | ساخت دو Instance روی یک Base مرکزی؛ جداسازی addons/cfg/GameMode؛ توقف همهٔ Instanceها و اجرای یک‌بارهٔ SteamCMD روی Base | هیچ تنظیم خصوصی بین Instanceها نشت نکند؛ در زمان Update هیچ Instanceای اجرا نشود؛ پس از اعتبارسنجی فقط Instanceهای قبلاً Running برگردند و شکست Update قابل بازیابی باشد | پس از T02 و پیش از Production |
 
 ## 6. ترتیب PoC
 
@@ -98,16 +98,17 @@ Releaseهای کاندید در زمان ثبت قبلی مستند شده‌ا�
 تست در صورت دسترسی مشتری به دادهٔ دیگری، اختلاف غیرقابل توضیح در Wallet، ایجاد instance تکراری، از دست رفتن داده، شکست Restore یا آسیب‌پذیری بحرانی بدون patch متوقف می‌شود.
 
 
-## 8. آزمون چند Instance و اشتراک فایل بازی
+## 8. آزمون Shared Base برای FragCity
 
-جزئیات معماری و مقایسهٔ ریپوها در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) است.
+جهت معماری PoC این است که چند Instance از یک Base Game مرکزی استفاده کنند؛ مدل کپی کامل برای هر Instance انتخاب پیش‌فرض نیست. یک Instance ابتدا برای تأیید نصب و چرخهٔ عمر آزمایش می‌شود، سپس Instance دوم روی همان Base ساخته می‌شود و جداسازی addons/، cfg/، فایل‌های GameMode، پورت‌ها، مجوزها و Backup بررسی می‌شود.
 
-ترتیب آزمون: ابتدا یک سرور با فایل‌های مستقل؛ سپس یک سرور دوم و آزمون جداسازی؛ در نهایت ارزیابی shared VPK با K4ryuu/CS2-Egg در آزمایشگاه. قابلیت اشتراک تا قبل از موفقیت آزمون‌های MI-01 تا MI-10 فعال نشود. برای همهٔ ابزارها و لاین‌ها، ماتریس عمومی [Testing Bench](TESTING-BENCH.md) authoritative است؛ گزینه‌های موقت در [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md) هستند. فایل‌های cfg، افزونه‌ها و داده‌های writable نباید صرفاً به‌دلیل اشتراک فایل‌های حجیم بازی با هم مشترک شوند.
+Update Base باید هماهنگ باشد: همهٔ Instanceهای مصرف‌کننده متوقف شوند، SteamCMD فقط روی Base مرکزی اجرا شود، نتیجه اعتبارسنجی شود و سپس فقط Instanceهایی که پیش از Update در حال اجرا بودند برگردند. روش دقیق نگاشت مسیرها/mountها و مکانیزم lock/recovery هنوز Pending است. K4ryuu VPK Sync فقط گزینهٔ مقایسه‌ای اختیاری است؛ نصب آن پیش‌شرط Shared Base نیست.
 
+اسکریپت Deploy افزونه‌های FragCity که در آینده با Pterodactyl ادغام می‌شود، فقط payload مود/افزونهٔ اختصاصی Instance را قرار می‌دهد و SteamCMD، نصب/Update بازی یا Start سرور را اجرا نمی‌کند. جزئیات cfg و فایل‌های GameMode در طراحی فنی جداگانه تعیین می‌شود. مرجع آزمون [Testing Bench](TESTING-BENCH.md) و [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) است.
 
 ## 9. تفکیک OS در تست
 
-- مسیر اصلی Node/Panel و shared VPK روی Linux native آزمایش می‌شود.
+- مسیر اصلی Node/Panel، Base Game مشترک و Update هماهنگ‌شده روی Linux native آزمایش می‌شود.
 - مدیرهای native Windows در محیط جداگانه بررسی می‌شوند؛ موفقیت Windows جایگزین قبولی Linux نیست.
 - ادعاهای cross-platform باید مستقلاً روی هر دو OS ثابت شوند؛ WSL2 یک نتیجهٔ native Windows به‌حساب نمی‌آید.
 - فهرست نامزدها و مراحل را در [Testing Bench](TESTING-BENCH.md) و [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) ببین.
