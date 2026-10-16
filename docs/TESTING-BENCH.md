@@ -114,7 +114,7 @@ For each candidate, record:
 3. Validate the proposed method for exposing Base files into each Pterodactyl instance (mount, link, overlay or other mechanism) separately. Treat VPK Sync as optional unless it is shown to be needed.
 4. Compare shared paths and private files from each instance; prove that addons/, cfg/, GameMode text files and mutable runtime data are not inadvertently shared.
 5. Attempt to modify a private test file from one instance; the other must not see an unauthorised change. Never run this against real customer data.
-6. Simulate an update trigger. All instances using the Base must stop before SteamCMD runs centrally, and new start/restart requests must be blocked for the whole update window.
+6. Simulate detection of a newly available CS2 update. Detection must automatically start the coordinated update cycle: all instances using the Base stop before SteamCMD runs centrally, and new start/restart requests are blocked for the whole update window.
 7. Verify that SteamCMD runs once against the central Base and is not invoked by each instance's deploy/install script.
 8. Validate update success/version/file state before allowing starts again. Restore only instances that were running before the update; leave previously stopped instances stopped.
 9. Simulate an interrupted/failed update and verify no instance starts against a partial Base; confirm recovery/rollback and status reporting.
