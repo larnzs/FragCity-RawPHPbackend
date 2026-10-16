@@ -71,6 +71,8 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | [Roadmap](docs/ROADMAP.md) | فازهای اجرا، وابستگی‌ها و نقاط توقف |
 | [Platform PoC](docs/PLATFORM-POC.md) | گزینه‌ها، نسخه‌های کاندید و ماتریس آزمون |
 | [CS2 Multi-Instance](docs/CS2-MULTI-INSTANCE.md) | معماری چند سرور، گزینه‌های اشتراک فایل بازی و بررسی ریپوهای GitHub |
+| [Testing Bench](docs/TESTING-BENCH.md) | برنامهٔ کامل آزمون ابزارهای CS2 بر اساس Linux، Windows و Cross-platform؛ ماتریس و ثبت نتایج |
+| [Probably and Suggestions](docs/PROBABLY-AND-SUGGESTIONS.md) | فرضیه‌ها و پیشنهادهای موقت، اولویت‌های بررسی و معیار تغییر پیشنهاد |
 | [Architecture Decisions](docs/DECISIONS.md) | تصمیم‌های ثبت‌شده، فرضیه‌ها و پرسش‌های باز |
 | [Database & API](docs/DATABASE-API.md) | وضعیت اتصال دیتابیس، API فعلی و مسیر همگام‌سازی |
 | [Security Review](docs/SECURITY-AUDIT.md) | یافته‌های ممیزی ایستا و ترتیب اصلاح |
