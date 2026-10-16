@@ -35,6 +35,16 @@ Initial candidate status is deliberately Pending. Public project descriptions ar
 
 ### Lane L — Linux native
 
+#### L-00 — Current KUS Linux repository baseline
+
+The first test in this lane is not Pterodactyl or shared storage. It is the existing Linux installer and plugin payload from [`larnzs/cs2-kus-addons`](https://github.com/larnzs/cs2-kus-addons/tree/integration/kus-monorepo), on branch `integration/kus-monorepo`.
+
+- **Reported complete:** Git installed on Debian and repository cloned under the expected path `/home/fragcityadmin/projects/cs2-kus-addons`.
+- **Still pending:** capture `git status --short --branch` and `git log -1 --oneline`; shell syntax checks; snapshot VM; native CS2/Steam Runtime installation with the repository setup script while the plugin updater is explicitly disabled; first controlled instance launch; verify actual plugin load logs.
+- **Not yet passed:** Linux game install, CS2 startup, MetaMod/CounterStrikeSharp load, individual plugin health or database-backed plugin behaviour.
+
+This baseline must be measured before comparing alternative multi-instance managers or shared storage. See [Debian PoC Log](DEBIAN-POC.md).
+
 Primary target: the Debian 13 lab Node with Pterodactyl/Wings under evaluation. The first round should validate one server and then two independent servers. Use the exact installed Debian version, kernel, Docker/Wings/Panel/Egg versions and filesystem in every record.
 
 Candidates:
@@ -164,7 +174,7 @@ For every candidate, record:
 
 | ID | Candidate | Lane | Intended test | Initial status |
 |---|---|---|---|---|
-| L-01 | Pterodactyl Panel + Wings + CS2 Egg | Linux | Baseline, lifecycle, tenant isolation | NOT REVIEWED |
+| L-00 | Current KUS Linux repository baseline | Linux | Native install and health of CS2, MetaMod/CounterStrikeSharp and tracked plugins | CLONE REPORTED COMPLETE; install and runtime test pending |\n| L-01 | Pterodactyl Panel + Wings + CS2 Egg | Linux | Baseline, lifecycle, tenant isolation | NOT REVIEWED |
 | L-02 | K4ryuu/CS2-Egg VPK Sync | Linux | Shared VPK, update locking, rollback | NOT REVIEWED |
 | L-03 | GamesTwoLife/cs2-multiserver | Linux | Shared base, independent config, ports, watchdog | NOT REVIEWED |
 | L-04 | Trimeon/cs2-install | Linux | Master install, instances, optional Docker | NOT REVIEWED |
@@ -215,3 +225,8 @@ The testing programme is not complete until:
 - Backup/restore, update interruption, delete/reinstall and restart/reboot behaviour pass.
 - Licence, security and commercial-use blockers are resolved for the recommended path.
 - A separate ADR records the final decision; no candidate is considered production-ready merely because its README claims the feature.
+
+
+## 8. Current lab checkpoint — KUS Linux clone
+
+Current state is **clone reported complete; install not run**. Expected clone path: `/home/fragcityadmin/projects/cs2-kus-addons`, branch `integration/kus-monorepo`. The Git status and last commit output must be captured before installing. First baseline commands and the reason to avoid `linux/install.sh` for this first run are documented in [Debian PoC Log](DEBIAN-POC.md). Keep this test independent of the Windows game files; do not copy or move the Windows installation into the Linux runtime.
