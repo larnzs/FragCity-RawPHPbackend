@@ -70,6 +70,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | [Repository Inventory](docs/REPOSITORIES.md) | جدول ریپوهای داخلی و متن‌باز، نقش، وضعیت و ریسک |
 | [Roadmap](docs/ROADMAP.md) | فازهای اجرا، وابستگی‌ها و نقاط توقف |
 | [Platform PoC](docs/PLATFORM-POC.md) | گزینه‌ها، نسخه‌های کاندید و ماتریس آزمون |
+| [CS2 Multi-Instance](docs/CS2-MULTI-INSTANCE.md) | معماری چند سرور، گزینه‌های اشتراک فایل بازی و بررسی ریپوهای GitHub |
 | [Architecture Decisions](docs/DECISIONS.md) | تصمیم‌های ثبت‌شده، فرضیه‌ها و پرسش‌های باز |
 | [Database & API](docs/DATABASE-API.md) | وضعیت اتصال دیتابیس، API فعلی و مسیر همگام‌سازی |
 | [Security Review](docs/SECURITY-AUDIT.md) | یافته‌های ممیزی ایستا و ترتیب اصلاح |
