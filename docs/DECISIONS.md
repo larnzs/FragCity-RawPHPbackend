@@ -61,17 +61,30 @@
 
 ## ADR-008 — چند Instance و اشتراک فایل‌های پایهٔ CS2
 
-**وضعیت:** تصمیم اجرایی موقت برای PoC؛ تأیید Production نشده است.  
-**تصمیم:** ابتدا هر CS2 Server در Pterodactyl با Volume و فایل‌های مستقل ساخته می‌شود. پس از قبولی جداسازی دو instance، اشتراک فایل‌های منتخب بازی به‌صورت آزمایش جداگانه بررسی می‌شود؛ گزینهٔ اول برای آزمایش، K4ryuu/CS2-Egg VPK Sync است.  
-**دلیل:** مدیریت و مجوز مشتری باید با Pterodactyl/Wings باقی بماند، ولی فایل‌های حجیم ثابت می‌توانند در صورت اثبات سازگاری و صرفه‌جویی به اشتراک گذاشته شوند.  
-**حفاظت‌ها:** cfg، افزونه‌ها، داده‌های runtime و فایل‌های writable مختص هر instance می‌مانند؛ Update مرکزی باید قفل و Rollback داشته باشد؛ اجرای ابزار مدیریت lifecycle دوم روی همان instance بدون جداسازی مسئولیت‌ها ممنوع است.  
-**مرجع آزمون:** [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) و T18 در [Platform PoC](PLATFORM-POC.md).
-
+**وضعیت:** جایگزین‌شده با ADR-010؛ این بخش سابقهٔ تصمیم قبلی را نگه می‌دارد.  
+**تصمیم قبلی:** برای شروع PoC قرار بود هر سرور فایل‌های مستقل کامل داشته باشد و سپس K4ryuu/CS2-Egg VPK Sync بررسی شود. این دیگر هدف معماری فعلی FragCity نیست.  
+**یادداشت:** مدل shared base اکنون در ADR-010 ثبت شده است؛ روش فنی اجرا همچنان باید در PoC آزموده شود.
 
 ## ADR-009 — تفکیک Test Bench و candidateها بر اساس سیستم‌عامل
 
 **وضعیت:** ساختار مستندات تأییدشده؛ انتخاب ابزار/Production هنوز Pending.  
 **تصمیم:** بررسی چند Instance CS2 پروژه‌ای مستقل است و باید candidateهای Linux-native، Windows-native و Cross-platform را در لاین‌های جداگانه آزمایش کند. Testing Bench مرجع وضعیت، معیار قبولی، شواهد و نتیجه است؛ Probably and Suggestions فقط فرضیه و توصیهٔ اولیه را نگه می‌دارد.  
 **دلیل:** اجرای موفق روی یک OS، امکان Shared Base یا صحت isolation را برای OS دیگر ثابت نمی‌کند. همین‌طور README به‌تنهایی تضمین اجرای صحیح یا مجوز استفادهٔ تجاری نیست.  
-**شرط:** هیچ candidate قبل از Static Review، licence/security gate، آزمون دو Instance، backup/restore و ثبت نتیجهٔ قابل تکرار به Production ارتقا پیدا نمی‌کند. Shared-storage test فقط پس از baseline مستقل اجرا می‌شود.  
+**شرط:** هیچ candidate قبل از Static Review، licence/security gate، آزمون دو Instance، backup/restore و ثبت نتیجهٔ قابل تکرار به Production ارتقا پیدا نمی‌کند. مدل shared base انتخاب معماری فعلی FragCity برای PoC است؛ ابزارهای ثالث فقط در صورت نیاز، پس از بازبینی و آزمون مستقل مقایسه می‌شوند.  
 **مرجع:** [Testing Bench](TESTING-BENCH.md)، [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md)، [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md).
+
+
+## ADR-010 — بازی پایهٔ مشترک و فایل‌های اختصاصی Instance
+
+**وضعیت:** جهت معماری تأییدشده برای PoC؛ پیاده‌سازی و Production هنوز آزمون نشده است.  
+**تصمیم:** هر Node لینوکسی یک CS2 Base Game مرکزی دارد که SteamCMD فقط همان را نصب/به‌روزرسانی می‌کند. همهٔ Instanceهای تحت این Base از فایل‌های مشترک بازی استفاده می‌کنند؛ برای هر سرور نسخهٔ جداگانه‌ای از کل بازی نصب نمی‌شود.
+
+**فایل‌های اختصاصی هر Instance:** پوشه‌های game/csgo/addons/ و game/csgo/cfg/ و فایل‌های متنی مشخصی که تنظیمات GameMode را تعریف می‌کنند. فهرست دقیق فایل‌های GameMode باید در طراحی فنی بعدی ثبت شود. بقیهٔ فایل‌های Base به‌عنوان فایل‌های مشترک و غیرقابل‌تغییر از سوی Instanceها در نظر گرفته می‌شوند؛ تنها فرایند مرکزی Update مجاز است Base را جایگزین کند.
+
+**اسکریپت Pterodactyl:** یک فرایند Deploy اختصاصی FragCity بعداً ساخته می‌شود که payload پوشهٔ مود/افزونهٔ اختصاصی Instance را از منبع مدیریت‌شدهٔ خودمان در همان Instance قرار دهد. این اسکریپت نباید SteamCMD را اجرا کند، بازی پایه را نصب/به‌روزرسانی کند یا جایگزین چرخهٔ عمر Wings/Pterodactyl شود. روش Provision کردن cfg و فایل‌های GameMode مستقل هنوز مشخص نشده است.
+
+**سیاست Update بازی پایه:** هنگام اعمال Update جدید CS2، تمام Instanceهایی که از Base مشترک استفاده می‌کنند باید متوقف شوند؛ سپس SteamCMD یک‌بار روی Base مرکزی اجرا شود. هیچ Instance نباید هنگام Update یا روی فایل‌های نیمه‌به‌روزشده Start/Restart شود. پس از تأیید موفقیت Update، Instanceهایی که پیش از عملیات در حال اجرا بودند می‌توانند دوباره Start شوند؛ در صورت شکست، آن‌ها باید متوقف بمانند تا مسیر بازیابی اجرا شود.
+
+**موارد باز برای پیاده‌سازی:** سازوکار تشخیص Update جدید، قفل عملیات و جلوگیری از Start هم‌زمان، روش mount/link/overlay یا مسیر فیزیکی فایل‌های مشترک، اعتبارسنجی و rollback، و جزئیات deploy فایل‌های اختصاصی. هیچ ابزار ثالثی مانند VPK Sync در این تصمیم به‌عنوان پیاده‌سازی منتخب تعیین نشده است.
+
+**مرجع:** [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md)، [Platform PoC](PLATFORM-POC.md)، [Testing Bench](TESTING-BENCH.md).
