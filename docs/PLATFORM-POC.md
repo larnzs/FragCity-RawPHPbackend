@@ -112,9 +112,12 @@ Releaseهای کاندید در زمان ثبت قبلی مستند شده‌ا�
 
 Provisioning، baseline کامل `addons/`، `cfg/` و فایل‌های متنی تعیین‌شدهٔ GameMode را به لایهٔ خصوصی همان Instance کپی می‌کند؛ preset مود در مرحلهٔ اول اعمال نمی‌شود. پیش از Startهای بعدی، updater فقط پلاگین‌ها و Runtimeهای مدیریت‌شده را به‌روزرسانی می‌کند و `cfg/`، فایل‌های متنی تنظیماتی و `addons/counterstrikesharp/configs/` را دست‌نخورده می‌گذارد. هیچ‌یک از این مسیرها به Base Game کپی/merge نمی‌شوند؛ SteamCMD و Update بازی فقط در چرخهٔ مرکزی Base هستند و updater افزونه‌ها سرور را Start نمی‌کند. مجوز File Manager و دسترسی به overlay نیز باید تست شود. مرجع آزمون [Testing Bench](TESTING-BENCH.md) و [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) است.
 
-## 9. تفکیک OS در تست
+## 9. تصمیم مسیر سیستم‌عامل
 
-- مسیر اصلی Node/Panel، Base Game مشترک و Update هماهنگ‌شده روی Linux native آزمایش می‌شود.
-- مدیرهای native Windows در محیط جداگانه بررسی می‌شوند؛ موفقیت Windows جایگزین قبولی Linux نیست.
-- ادعاهای cross-platform باید مستقلاً روی هر دو OS ثابت شوند؛ WSL2 یک نتیجهٔ native Windows به‌حساب نمی‌آید.
-- فهرست نامزدها و مراحل را در [Testing Bench](TESTING-BENCH.md) و [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) ببین.
+- **مسیر مرجع و معیار پذیرش:** Linux native روی Debian برای نصب/Update CS2، Steam Linux Runtime، اجرای Instanceها، Base مشترک، updaterها، Pterodactyl/Wings و تست اتصال محلی پلاگین‌ها به MySQL/MariaDB.
+- **نقش Windows native:** محیط راحت توسعه برای اجرای دستی سرور CS2، بررسی Console/log، آزمایش Load شدن پلاگین‌ها و تنظیم دستی configها. Windows میزبان Pterodactyl/Wings این معماری نیست و قبولی Windows جای تست Linux را نمی‌گیرد.
+- **انتقال تنظیمات:** هیچ انتقال یا sync خودکاری از نصب Windows به Runtime لینوکس تعریف نمی‌شود. تنظیمات لازم برای Linux باید به‌صورت کنترل‌شده در لایهٔ خصوصی Instance اعمال و روی Debian تست شوند.
+- **ابزارهای مدیریت Windows و cross-platform:** آزمون managerهای جایگزین در حال حاضر Deferred است؛ فقط در صورت بروز blocker مستند در مسیر Linux/Pterodactyl دوباره بررسی می‌شود. WSL2 نیز معیار قبولی Linux native نیست.
+- **دامنهٔ فعلی:** تا پایان اعتبارسنجی نصب Linux، Instanceهای مستقل و دیتابیس محلی، اتصال سایت و Billing شروع نمی‌شود.
+
+جزئیات شواهد و وضعیت آزمون‌ها در [Testing Bench](TESTING-BENCH.md) و مدل Instance در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) ثبت می‌شود.
