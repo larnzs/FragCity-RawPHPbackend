@@ -50,7 +50,7 @@ Golden Image به معنی «کپی بدون تغییر و آمادهٔ Producti
 
 - hostname و تنظیمات شبکه/IP/route.
 - شناسهٔ ماشین لینوکس، از جمله `/etc/machine-id`.
-- کلیدهای SSH میزبان در `/etc/ssh/ssh_host_*\؛ Clone جدید نباید هویت SSH نود مرجع را به ارث ببرد.
+- کلیدهای SSH میزبان در `/etc/ssh/ssh_host_*`؛ Clone جدید نباید هویت SSH نود مرجع را به ارث ببرد.
 - پیکربندی نود در Pterodactyl/Wings، شامل UUID و credential/token مستقل آن نود، آدرس Panel، تنظیمات TLS و مسیرهای داده.
 - گواهی‌ها و private keyهای TLS مختص سرویس، در صورتی که برای هر نود صادر می‌شوند.
 - credentialهای دیتابیس/API، tokenها و هر secret دیگر.
