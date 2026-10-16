@@ -61,18 +61,44 @@
 
 Pterodactyl از Mountهای اضافی پشتیبانی می‌کند، اما وجود یک Mount به معنی دسترسی معمول از File Manager یا SFTP سرور نیست. مسیر host، حالت Read-only و مجوزها باید جداگانه مدیریت شوند. این مدل می‌تواند برای داده‌های مشترک مفید باشد، ولی به‌خودی‌خود همهٔ ملاحظات lifecycle، Update و isolation را حل نمی‌کند.
 
-## 4. نتایج بررسی GitHub
+## 4. گزینه‌ها بر اساس سیستم‌عامل
 
-| پروژه | ایده و کاربرد | میزان ارتباط با FragCity | محدودیت یا ریسک مهم |
+این تفکیک مهم است: ابزار لینوکسی که shared-base را پشتیبانی می‌کند، الزاماً روی Windows native اجرا نمی‌شود؛ و نرم‌افزار Windows که چند process را مدیریت می‌کند، لزوماً فایل‌های بازی را مشترک نمی‌کند یا tenant isolation لازم برای SaaS را فراهم نمی‌کند.
+
+### 4.1 Linux native — گزینه‌های اصلی برای Nodeهای میزبانی
+
+| پروژه | ایده و کاربرد | پیشنهاد در FragCity | موانع/شرط آزمون |
 |---|---|---|---|
-| [K4ryuu/CS2-Egg](https://github.com/K4ryuu/CS2-Egg) — [VPK Sync docs](https://github.com/K4ryuu/CS2-Egg/blob/main/docs/features/vpk-sync.md) | اشتراک/همگام‌سازی فایل‌های VPK برای سرورهای Pterodactyl با نصب مرکزی و symlink، hardlink یا copy | **بالاترین اولویت برای PoC اشتراک فایل در کنار Pterodactyl** | باید نسخه، مسیرها، مجوزها، قفل Update، سازگاری با Egg منتخب، رفتار Panel/backup/reinstall و Rollback تست شوند. |
-| [GamesTwoLife/cs2-multiserver](https://github.com/GamesTwoLife/cs2-multiserver) | مدیر Bash برای چند instance با base install مشترک، cfg مستقل، پورت‌دهی خودکار، tmux، systemd/cron و مدیریت افزونه‌ها | مرجع معماری بسیار مناسب برای فهم multi-instance واقعی | مدیر مستقل سرور است؛ به‌تنهایی حساب مشتری، permissionهای Panel، Billing یا Server entry در Pterodactyl ایجاد نمی‌کند. نباید دو مدیر، یک instance را هم‌زمان کنترل کنند. |
-| [dasisdormax/cs2-multiserver](https://github.com/dasisdormax/cs2-multiserver) | پروژهٔ اصلی که ایدهٔ چند instance مشترک را معرفی کرده است | برای بررسی تاریخچه و طراحی اولیه | fork مربوط به GamesTwoLife خود را نسخهٔ نگهداری‌شده معرفی می‌کند و اصلاحات بیشتری برای CS2 توضیح می‌دهد؛ ابتدا fork جدیدتر بررسی شود. |
-| [Trimeon/cs2-install](https://github.com/Trimeon/cs2-install) | نصب مرکزی cs2-master و instanceهای جدا در cs2-servers که به master لینک می‌شوند؛ پشتیبانی اختیاری از Docker | الگوی سادهٔ جایگزین برای اشتراک base install و حفظ cfg مستقل | پنل مشتری و Billing جایگزین ندارد؛ یک مدیر lifecycle دیگر است و باید از کنترل هم‌زمان یک instance توسط دو ابزار جلوگیری شود. |
-| [Auto-Tournament/cs2-server-manager](https://github.com/Auto-Tournament/cs2-server-manager) | چند سرور روی یک نصب مشترک، tmux، کنترل Update و مدیریت Tournament | از نظر تکنیکی آموزنده است، مخصوصاً برای Updateهای قابل‌کنترل | به Ready Up و اکوسیستم Auto Tournament نزدیک است؛ مجوز PolyForm Noncommercial دارد و استفادهٔ تجاری به مجوز مناسب نیاز دارد. پیش از هر استفادهٔ تجاری باید مجوز فعلی و شرایطش مستقلاً بررسی شود. |
-| [1zc/CS2-Pterodactyl](https://github.com/1zc/CS2-Pterodactyl) | Docker image و Egg برای اجرای CS2 در Pterodactyl | گزینهٔ بررسی برای Egg پایه و سازگاری با CS2 | خودش یک راهکار کامل multi-instance/shared-storage نیست؛ قابلیت‌های نسخهٔ دقیق باید بررسی شود. |
+| [Pterodactyl Panel + Wings](https://github.com/pterodactyl/panel) | پنل مرکزی مدیریت Server entityها، دسترسی مشتری، allocations، منابع و lifecycle روی Linux/Docker | پایهٔ اصلی PoC مدیریت مشتریان | نصب و نسخهٔ patched، جداسازی مشتری، backup/restore، Egg و چرخهٔ عمر CS2 باید در Linux واقعی تست شوند. |
+| [K4ryuu/CS2-Egg VPK Sync](https://github.com/K4ryuu/CS2-Egg/blob/main/docs/features/vpk-sync.md) | همگام‌سازی VPK از نصب مرکزی به Volumeهای سرورهای Pterodactyl/Pelican؛ symlink/hardlink/copy و daemon | اولین گزینهٔ shared storage بعد از قبولی baseline | installer/daemon دارای سطح دسترسی میزبان است؛ مسیرها، مجوزها، lock، Self-Update، failure recovery و rollback باید بررسی شوند. |
+| [GamesTwoLife/cs2-multiserver](https://github.com/GamesTwoLife/cs2-multiserver) | Bash manager برای instanceهای مستقل با base install مشترک، پورت‌دهی، tmux، systemd/cron و addon helper | مرجع معماری و مقایسهٔ standalone | این ابزار خودش Pterodactyl Server entry، tenant permissions یا billing ایجاد نمی‌کند؛ دو manager نباید هم‌زمان یک instance را کنترل کنند. |
+| [Trimeon/cs2-install](https://github.com/Trimeon/cs2-install) | یک `cs2-master` و instanceهای جدا که فایل‌های پایه را لینک می‌کنند؛ Docker اختیاری | گزینهٔ standalone برای مقایسه با MSM | بررسی update propagation، directory layout، permissions، addons و backup/restore لازم است. |
+| [Auto-Tournament/cs2-server-manager](https://github.com/Auto-Tournament/cs2-server-manager) | اجرای چند سرور از نصب مشترک و کنترل زمان Update | منبع فنی برای الگوهای shared files و update | README مجوز PolyForm Noncommercial را نشان می‌دهد؛ مجوز/شرایط تجاری باید پیش از هر استفادهٔ تجاری حل شوند. |
+| [1zc/CS2-Pterodactyl](https://github.com/1zc/CS2-Pterodactyl) | Docker image و Egg برای اجرای CS2 در Pterodactyl | گزینهٔ baseline برای مقایسهٔ Egg | خودِ Egg راهکار کامل shared-storage نیست؛ تطابق نسخه و Startup parameters بررسی شود. |
 
-این جدول نتیجهٔ بررسی README و مستندات قابل‌دسترسی ریپوها در تاریخ بالا است؛ به معنی ممیزی امنیتی کامل، اجرای کد یا تأیید آماده‌بودن برای Production نیست. وضعیت Release، آخرین تغییرات، مجوز و advisoryها پیش از نصب باید دوباره بررسی شوند.
+**WSL2:** README پروژهٔ GamesTwoLife می‌گوید Bash تحت Linux یا WSL2 روی Windows قابل استفاده است. این مسیر را فقط در مسیر compatibility جداگانه تست می‌کنیم؛ قبولی WSL2 مساوی اجرای native Windows یا تأیید Linux production نیست.
+
+### 4.2 Windows native — ابزارهای مدیریت روی Windows
+
+| پروژه | قابلیت ادعاشده/قابل بررسی | پیشنهاد در FragCity | موانع/شرط آزمون |
+|---|---|---|---|
+| [WindowsGSH](https://github.com/WindowsGSH/WindowsGSH) + [CounterStrike2 module](https://github.com/WindowsGSH/WindowsGSH.CounterStrike2) | اپلیکیشن دسکتاپ Windows برای نصب، تنظیم، اجرا، query و Backup سرورهای بازی | گزینهٔ جدی برای آزمایش native Windows | ماژول CS2 در README خودش `NEEDS LIVE TEST` دارد؛ RCON و مدیریت addonها محدودیت اعلام‌شده دارند. مجوز WindowsGSH منبع‌در‌دسترس است، OSI-approved نیست، و طبق README استفادهٔ تجاری به اجازهٔ کتبی قبلی نیاز دارد؛ بنابراین استفادهٔ تجاری تا رفع blocker مجاز فرض نشود. |
+| [fpaezf/Game-Server-Admin](https://github.com/fpaezf/Game-Server-Admin) | GUI با bulk install/update/start/stop، watchdog و خواندن console | گزینهٔ مقایسه‌ای روی Windows | README آن را Work in Progress معرفی می‌کند. وضعیت مجوز، release، محافظت secretها، اجرای بدون UI، جداسازی pathها و رفتار crash باید تست شود. |
+| [fpaezf/CS2-server-manager](https://github.com/fpaezf/CS2-server-manager) | ابزار قدیمی مدیریت CS2 روی Windows | فقط منبع تاریخی، نه انتخاب اول تست | README صراحتاً Deprecated شده و به Game-Server-Admin ارجاع می‌دهد؛ برای تست اصلی نسخهٔ جدیدتر ارجح است. |
+| **FragCity Windows deployment workflow** | خط مبنای مقایسه برای install/update، حفظ cfg و رفتار instance فعلی | baseline آزمایشی داخلی | تست باید در task مجزا و با copy/snapshot کنترل‌شده انجام شود. هیچ تغییر در `cs2-kus-addons` در این پروژه/سند انجام نمی‌شود. |
+
+**نکته:** مدیریت چند process در Windows با داشتن فایل‌های مشترک برابر نیست. برای هر ابزار باید ثابت کنیم نصب سرورها مستقل/مشترک چگونه پیاده شده، فایل‌های writable چطور جداسازی می‌شوند، Update به چه پوشه‌ای می‌نویسد و حذف یک instance چه اثری روی بقیه دارد.
+
+### 4.3 Cross-platform — نیازمند اثبات روی هر دو OS
+
+| پروژه | توضیح | پیشنهاد در FragCity | شرط |
+|---|---|---|---|
+| [maxdeepfield/cs2-server-cli](https://github.com/maxdeepfield/cs2-server-cli) | README ادعای پشتیبانی Windows، Linux و macOS، و multi-server، config، backup/restore و مدیریت plugin را دارد | نامزد آزمایشی مشترک | باید از source/build اثبات شود که هر فرمان واقعاً روی Windows و Linux کار می‌کند؛ shared base تأیید نشده و نباید فرض شود. |
+| [GamesTwoLife/cs2-multiserver via WSL2](https://github.com/GamesTwoLife/cs2-multiserver) | قابلیت اجرای Bash از طریق WSL2 را مستند کرده است | آزمایش سازگاری اختیاری | WSL2 یک runtime لینوکسی روی Windows است؛ نتیجه به‌عنوان پشتیبانی native Windows ثبت نشود. |
+
+### 4.4 خلاصهٔ بررسی فعلی
+
+این لیست بر پایهٔ README/مستندات عمومی و بررسی ایستای محدود است؛ اجرای کد، ممیزی کامل امنیتی، تست واقعی CS2 و قبولی هر معیار هنوز ثبت نشده است. تمام نامزدها و statusها در [Testing Bench](TESTING-BENCH.md) نگهداری می‌شوند؛ فرضیه‌ها و پیشنهادهای موقت در [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md) قرار دارند.
 
 ## 5. معماری پیشنهادی مرحله‌ای برای FragCity
 
