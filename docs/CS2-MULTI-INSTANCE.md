@@ -136,7 +136,9 @@ File Manager خود Pterodactyl باید امکان ویرایش فایل‌ها
 
 **WSL2:** README پروژهٔ GamesTwoLife می‌گوید Bash تحت Linux یا WSL2 روی Windows قابل استفاده است. این مسیر را فقط در مسیر compatibility جداگانه تست می‌کنیم؛ قبولی WSL2 مساوی اجرای native Windows یا تأیید Linux production نیست.
 
-### 4.2 Windows native — ابزارهای مدیریت روی Windows
+### 4.2 Windows native — محیط تست دستی، نه میزبان Pterodactyl
+
+**تصمیم فعلی FragCity:** Windows native فقط برای اجرای دستی CS2، مشاهدهٔ Console/log، بررسی Load شدن پلاگین‌ها و تنظیم دستی کانفیگ‌ها استفاده می‌شود؛ اجرای نهایی چند-Instance تحت Pterodactyl/Wings روی Linux native خواهد بود. موفقیت تست Windows قبولی Linux را ثابت نمی‌کند. بررسی managerهای Windows زیر فقط فهرست مرجع تاریخی/اختیاری است و دروازهٔ اجباری PoC نیست؛ مگر اینکه مسیر Linux مانع مشخصی داشته باشد.
 
 | پروژه | قابلیت ادعاشده/قابل بررسی | پیشنهاد در FragCity | موانع/شرط آزمون |
 |---|---|---|---|
