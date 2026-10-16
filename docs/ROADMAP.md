@@ -8,7 +8,7 @@
 |---|---|---|---|
 | P0 — Requirements & Local Development | مستندات آماده؛ اجرا Pending | الزامات، معماری، updater محلی، Laragon/WAMP و مرزبندی Production | clone محلی آماده، DB کاملاً جدا و تست اولیه قابل تکرار باشد |
 | P1 — Security & Baseline | ممیزی ایستا اولیه انجام؛ اصلاح Pending | بازبینی secret، API، ورودی‌ها و مدل مالکیت داده | خطرهای مسدودکننده شناسایی و برنامه اصلاح تصویب شود |
-| P2 — Game Panel PoC | Pending | یک Node، Base Game مشترک و حداقل دو CS2 Instance | چرخهٔ عمر، جداسازی داده‌های خصوصی و Update هماهنگ‌شده پایدار باشد |
+| P2 — Game Panel PoC | Pending | یک Node، Base Game مشترک و حداقل دو CS2 Instance با payload کامل private | چرخهٔ عمر، جداسازی addons/cfg/GameMode، File Manager و Update هماهنگ‌شده پایدار باشد |
 | P3 — Billing Integration | Pending | سفارش Sandbox/ساختگی تا Provisioning | duplicate و سفارش ناموفق به‌شکل امن مدیریت شود |
 | P4 — Fixed-Duration Product | Pending | بسته‌ها، Wallet، `expires_at` و expiry action | تمام تست‌های مدل مالی قبول شوند |
 | P5 — Isolation & Recovery | Pending | مجوز مشتری، Backup/Restore، retry و rollback | تست‌های امنیتی/بازیابی قبول شوند |
@@ -48,10 +48,12 @@
 4. Egg/template مناسب CS2 انتخاب و مجوز SteamCMD/اجزای لازم تأیید شود.
 5. یک instance آزمایشی نصب/اجرا و stop/restart/delete/backup/restore تست شود.
 6. Console، فایل‌ها، محدودیت RAM/CPU/Disk و پورت‌ها بررسی شود.
-7. پس از موفقیت سرور اول، سرور دوم ساخته و جداسازی account/Volume/cfg/addons/ports/backup بررسی شود.
-8. معماری هدف PoC از ابتدا Base Game مشترک است: پس از تست Instance اول، Instance دوم روی همان Base ساخته شود؛ جداسازی addons/cfg/GameMode و Update هماهنگ‌شده آزموده شود. روش فنی mount/link و deploy افزونه‌ها هنوز باید انتخاب و اعتبارسنجی شود؛ K4ryuu VPK Sync فقط گزینهٔ مقایسه‌ای اختیاری است. جزئیات در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) آمده است.
-9. تمام candidateهای شناخته‌شده در [Testing Bench](TESTING-BENCH.md) با laneهای Linux، Windows و Cross-platform بررسی شوند؛ statusها و خروجی‌ها قبل از انتخاب نهایی ثبت شوند.
-10. پیشنهادهای اولیه در [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md) نگهداری شوند؛ این فهرست به‌تنهایی انتخاب Production محسوب نمی‌شود.
+7. پس از موفقیت Instance اول، Instance دوم را روی همان Base بساز؛ برای هر دو یک payload کامل و یکسان از نظر محتوا ولی private از نظر مسیر addons/cfg/GameMode deploy کن و پورت/تنظیمات عمومی‌شان را جدا نگه دار.
+8. در اولین ساخت هیچ preset مود نهایی اعمال نکن؛ ابتدا سلامت payload، اجرای سرور و جداسازی فایل‌ها را ثابت کن. سپس هر Instance را جداگانه کانفیگ کن.
+9. File Manager داخلی Pterodactyl را برای ویرایش cfg و تنظیمات افزونه تست کن؛ مجوزهای فایل، SFTP و Console را جداگانه بررسی کن. سایت/پنل C# فعلی حذف‌شده فرض نشود؛ نیاز به لینک‌دهی/SSO و شکاف‌های UI بعداً ارزیابی می‌شود.
+10. Update مرکزی و رفتار توقف همهٔ Instanceها، اجرای یک‌بارهٔ SteamCMD و بازگشت فقط Instanceهای قبلاً Running را آزمون کن؛ جزئیات در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) آمده است.
+11. تمام candidateهای شناخته‌شده در [Testing Bench](TESTING-BENCH.md) با laneهای Linux، Windows و Cross-platform بررسی شوند؛ statusها و خروجی‌ها قبل از انتخاب نهایی ثبت شوند.
+12. پیشنهادهای اولیه در [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md) نگهداری شوند؛ این فهرست به‌تنهایی انتخاب Production محسوب نمی‌شود.
 
 **شرط عبور:** پنل، وضعیت واقعی سرور و مالکیت منابع هماهنگ باشند؛ محدودیت‌های امنیتی مشتری قابل تست باشند.
 
