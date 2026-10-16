@@ -79,3 +79,12 @@
 - بررسی ابزارهای مدیریت Windows و cross-platform فعلاً Deferred است و فقط با یک blocker روشن در مسیر Linux بازبینی می‌شود.
 - سایت، Billing و اتصال فروش همچنان خارج از دامنهٔ فعلی هستند تا مرحلهٔ Linux/Instance/MySQL آزمایشگاهی به نتیجه برسد.
 - این تغییر فقط مستندات `FragCity-RawPHPbackend` را تغییر داد؛ ریپوی `cs2-kus-addons` و Debian دست‌نخورده ماندند.
+
+
+## Debian Node Golden Image — ثبت طرح، ۱۶ اکتبر ۲۰۲۶
+
+- سند [Node Golden Image & Cloning Policy](NODE-GOLDEN-IMAGE.md) اضافه شد تا تهیهٔ Template را پس از قبولی PoC پایه، نه قبل از تست، استاندارد کند.
+- برای VMware باید کل VM خاموش و کل پوشهٔ VM همراه فایل پیکربندی و دیسک‌های وابسته Clone شود؛ VMDK تنها، VM کامل نیست. هنگام اجرای هم‌زمان منبع و Clone، هویت جدید VMware انتخاب شود.
+- برای Bare Metal، مسیر موردنظر Provisioning تکرارپذیر/اسکریپت یا ابزار مدیریت پیکربندی است؛ VMDK روش مستقیم استقرار روی سرور فیزیکی فرض نمی‌شود.
+- طرح لایهٔ مشترک را از هویت و secret مختص Node جدا می‌کند؛ `machine-id`، SSH host keys، hostname/network، Wings config/token، TLS keys و credential/data مختص نود نباید بدون بازتولید یا تنظیم مستقل به Clone منتقل شوند.
+- وضعیت واقعی: فقط مستندات تغییر کرده‌اند. Golden Image ساخته نشده، Clone آزمایشی انجام نشده و هیچ فرمانی روی Debian اجرا نشده است. `cs2-kus-addons` تغییر نکرده است.
