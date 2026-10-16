@@ -50,6 +50,8 @@
 6. Console، فایل‌ها، محدودیت RAM/CPU/Disk و پورت‌ها بررسی شود.
 7. پس از موفقیت سرور اول، سرور دوم ساخته و جداسازی account/Volume/cfg/addons/ports/backup بررسی شود.
 8. اشتراک فایل فقط به‌عنوان آزمونی جداگانه و پس از baseline بررسی شود؛ مراحل و پذیرش در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) آمده است.
+9. تمام candidateهای شناخته‌شده در [Testing Bench](TESTING-BENCH.md) با laneهای Linux، Windows و Cross-platform بررسی شوند؛ statusها و خروجی‌ها قبل از انتخاب نهایی ثبت شوند.
+10. پیشنهادهای اولیه در [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md) نگهداری شوند؛ این فهرست به‌تنهایی انتخاب Production محسوب نمی‌شود.
 
 **شرط عبور:** پنل، وضعیت واقعی سرور و مالکیت منابع هماهنگ باشند؛ محدودیت‌های امنیتی مشتری قابل تست باشند.
 
@@ -107,3 +109,8 @@
 ## معیارهای توقف اجباری
 
 پایلوت در هر یک از شرایط زیر متوقف می‌شود: دسترسی یک مشتری به دیگری، اختلاف غیرقابل توضیح در Wallet، ساخت duplicate instance کنترل‌نشده، از دست رفتن داده، شکست بازیابی، token/API بدون مجوز، یا آسیب‌پذیری بحرانی بدون patch.
+
+
+## P2B — Testing Bench برای CS2 Multi-Instance
+
+این فاز مستقل از تست Billing است. هدف، مقایسهٔ ابزارهای Linux/Windows/cross-platform و روش‌های ذخیره‌سازی است. هیچ Shared Base یا ابزار lifecycle دوم روی سرور اصلی فعال نمی‌شود تا آزمون isolation و recovery موفق شود. مرجع authoritative برای وضعیت هر candidate و نتیجه‌ها [Testing Bench](TESTING-BENCH.md) است.
