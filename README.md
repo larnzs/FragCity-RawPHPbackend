@@ -74,6 +74,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | [Database & API](docs/DATABASE-API.md) | وضعیت اتصال دیتابیس، API فعلی و مسیر همگام‌سازی |
 | [Security Review](docs/SECURITY-AUDIT.md) | یافته‌های ممیزی ایستا و ترتیب اصلاح |
 | [Debian PoC Log](docs/DEBIAN-POC.md) | مشخصات واقعی VM، فرمان‌های اجراشده، وضعیت و هشدارهای عملیاتی |
+| [Current Status](docs/CHANGELOG-STATUS.md) | وضعیت جاری، انتخاب‌های انجام‌شده و مواردی که هنوز اجرا نشده‌اند |
 
 ## محیط فعلی و محدودیت‌های شناخته‌شده
 
