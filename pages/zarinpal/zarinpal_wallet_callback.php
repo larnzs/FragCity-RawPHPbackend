@@ -53,7 +53,7 @@ if ($status !== 'OK' || empty($authority)) {
 
             $curl = curl_init();
             curl_setopt_array($curl, array(
-                CURLOPT_URL            => 'https://payment.zarinpal.com/pg/v4/payment/verify.json',
+                CURLOPT_URL => (isset($zarinpalSettings['verify_url']) ? $zarinpalSettings['verify_url'] : ''),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_ENCODING       => '',
                 CURLOPT_MAXREDIRS      => 10,
