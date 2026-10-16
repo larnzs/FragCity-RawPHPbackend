@@ -47,7 +47,8 @@
     "zarinpal": {
       "merchant_id": "",
       "request_url": "https://payment.zarinpal.com/pg/v4/payment/request.json",
-      "verify_url": "https://payment.zarinpal.com/pg/v4/payment/verify.json"
+      "verify_url": "https://payment.zarinpal.com/pg/v4/payment/verify.json",
+      "startpay_base_url": "https://payment.zarinpal.com/pg/StartPay/"
     }
   },
   "files": {

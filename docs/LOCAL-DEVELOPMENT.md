@@ -43,7 +43,7 @@ copy settings\settings.example.json settings\settings.json
 - نام دیتابیس، username و password در نمونه خالی هستند؛ اتصال تا تکمیل تنظیمات غیرفعال می‌ماند.
 - برای توسعه یک دیتابیس مستقل و user محدود بساز؛ credentialهای Production را وارد نکن.
 - timezone از `app.timezone` خوانده می‌شود؛ پیش‌فرض UTC است.
-- **Nginx قوانین `.htaccess` را اجرا نمی‌کند.** مسیر `/settings/` را در server block مسدود کن، یا JSON را بیرون DocumentRoot نگه دار و `FRAGCITY_SETTINGS_FILE` را تنظیم کن.
+- **Nginx قوانین `.htaccess` را اجرا نمی‌کند.** قبل از ساخت `settings.json`، snippet موجود در `settings/nginx-protect.conf` را داخل server block وارد کن، یا JSON را بیرون DocumentRoot نگه دار و `FRAGCITY_SETTINGS_FILE` را تنظیم کن.
 - روی cPanel باید runtime settings مخصوص Production جداگانه و امن آماده شود.
 - پرداخت واقعی و عملیات مالی در تست محلی غیرفعال بمانند.
 

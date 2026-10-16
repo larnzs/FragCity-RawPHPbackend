@@ -87,7 +87,9 @@ if (!empty($_SESSION['email']) && is_string($_SESSION['email'])) {
 // ---------------- ارسال درخواست به زرین‌پال ----------------
 $merchant_id=isset($zarinpalSettings['merchant_id'])?(string)$zarinpalSettings['merchant_id']:'';
 // آدرس دقیق کال‌بک بر اساس ساختار جدید
-$callback_url = "https://fragcity.ir/pages/zarinpal/zarinpal_wallet_callback.php";
+$siteBaseUrl = rtrim((string) fragcity_settings('app.site_base_url', ''), '/');
+if ($siteBaseUrl === '') terminateRequest('آدرس سایت در تنظیمات مشخص نشده است.');
+$callback_url = $siteBaseUrl . '/pages/zarinpal/zarinpal_wallet_callback.php';
 
 $data = [
     "merchant_id"  => $merchant_id,
@@ -126,7 +128,8 @@ if (isset($result['data']['code']) && $result['data']['code'] == 100) {
     $updateStmt = $pdo->prepare("UPDATE wallet_transactions SET authority = ? WHERE id = ?");
     $updateStmt->execute([$authority, $transactionId]);
     
-    header("Location: https://payment.zarinpal.com/pg/StartPay/" . $authority);
+    $startPayBase = rtrim((string) ($zarinpalSettings['startpay_base_url'] ?? 'https://payment.zarinpal.com/pg/StartPay/'), '/') . '/';
+            header('Location: ' . $startPayBase . rawurlencode((string) $authority));
     exit;
 } else {
     $errorMsg = $result['errors']['message'] ?? 'خطای ناشناخته';

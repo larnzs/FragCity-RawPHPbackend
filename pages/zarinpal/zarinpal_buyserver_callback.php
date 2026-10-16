@@ -103,7 +103,9 @@ $email = is_string($email) ? $email : "";
 
 // ---------------- ارسال درخواست به زرین‌پال ----------------
 $merchant_id=isset($zarinpalSettings['merchant_id'])?(string)$zarinpalSettings['merchant_id']:'';
-$callback_url = "https://fragcity.ir/pages/zarinpal/zarinpal_buyserver_callback.php";
+$siteBaseUrl = rtrim((string) fragcity_settings('app.site_base_url', ''), '/');
+if ($siteBaseUrl === '') terminateRequest('آدرس سایت در تنظیمات مشخص نشده است.');
+$callback_url = $siteBaseUrl . '/pages/zarinpal/zarinpal_buyserver_callback.php';
 
 $data = [
     "merchant_id"  => $merchant_id,
@@ -153,7 +155,9 @@ if (isset($result['data']['code']) && $result['data']['code'] == 100) {
         ]);
 
         // انتقال کاربر به درگاه زرین‌پال
-        echo "<script>window.location.href = 'https://payment.zarinpal.com/pg/StartPay/" . $authority . "';</script>";
+        $startPayBase = rtrim((string) ($zarinpalSettings['startpay_base_url'] ?? 'https://payment.zarinpal.com/pg/StartPay/'), '/') . '/';
+        $startPayUrl = $startPayBase . rawurlencode((string) $authority);
+        echo '<script>window.location.href = ' . json_encode($startPayUrl, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) . ';</script>';
         exit;
 
     } catch (Exception $e) {
