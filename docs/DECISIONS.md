@@ -66,3 +66,12 @@
 **دلیل:** مدیریت و مجوز مشتری باید با Pterodactyl/Wings باقی بماند، ولی فایل‌های حجیم ثابت می‌توانند در صورت اثبات سازگاری و صرفه‌جویی به اشتراک گذاشته شوند.  
 **حفاظت‌ها:** cfg، افزونه‌ها، داده‌های runtime و فایل‌های writable مختص هر instance می‌مانند؛ Update مرکزی باید قفل و Rollback داشته باشد؛ اجرای ابزار مدیریت lifecycle دوم روی همان instance بدون جداسازی مسئولیت‌ها ممنوع است.  
 **مرجع آزمون:** [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) و T18 در [Platform PoC](PLATFORM-POC.md).
+
+
+## ADR-009 — تفکیک Test Bench و candidateها بر اساس سیستم‌عامل
+
+**وضعیت:** ساختار مستندات تأییدشده؛ انتخاب ابزار/Production هنوز Pending.  
+**تصمیم:** بررسی چند Instance CS2 پروژه‌ای مستقل است و باید candidateهای Linux-native، Windows-native و Cross-platform را در لاین‌های جداگانه آزمایش کند. Testing Bench مرجع وضعیت، معیار قبولی، شواهد و نتیجه است؛ Probably and Suggestions فقط فرضیه و توصیهٔ اولیه را نگه می‌دارد.  
+**دلیل:** اجرای موفق روی یک OS، امکان Shared Base یا صحت isolation را برای OS دیگر ثابت نمی‌کند. همین‌طور README به‌تنهایی تضمین اجرای صحیح یا مجوز استفادهٔ تجاری نیست.  
+**شرط:** هیچ candidate قبل از Static Review، licence/security gate، آزمون دو Instance، backup/restore و ثبت نتیجهٔ قابل تکرار به Production ارتقا پیدا نمی‌کند. Shared-storage test فقط پس از baseline مستقل اجرا می‌شود.  
+**مرجع:** [Testing Bench](TESTING-BENCH.md)، [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md)، [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md).
