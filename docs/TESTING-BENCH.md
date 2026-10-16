@@ -2,7 +2,7 @@
 
 > Last reviewed: 2026-10-16  
 > Overall status: PLANNED — no candidate in this document has passed a live test on the FragCity lab.  
-> Purpose: one controlled test programme for Linux, Windows, cross-platform managers, and shared CS2 storage.
+> Purpose: validate Linux-native CS2 hosting with Pterodactyl and shared storage; Windows is a manual development/test lane for CS2, plugin loading and config tuning.
 
 ## 1. Rules of the bench
 
@@ -55,21 +55,19 @@ Candidates:
 - **L-05 Auto-Tournament/cs2-server-manager** — native Linux shared-install manager; commercial licence gate must be resolved before any commercial deployment.
 - **L-06 1zc/CS2-Pterodactyl** — candidate CS2 Egg/image to compare as the Panel baseline, not a shared-storage manager by itself.
 
-### Lane W — Windows native
+### Lane W — Windows native manual testing
 
-Primary target: the existing Windows lab host, but tests must be scheduled so they do not disrupt other use. Record Windows edition/build, filesystem, free space, Defender/Firewall state and exact tool release.
+Windows is retained as the developer's convenient native environment for manual CS2 testing. The intended scenarios are to launch a standalone test server, inspect Console/log output, verify plugin loading and manually tune plugin/config files. Record Windows edition/build and the exact CS2/plugin versions when the result may help diagnose a problem.
 
-Candidates:
-- **W-01 WindowsGSH + WindowsGSH.CounterStrike2 module** — native desktop server manager and CS2 module. The module README currently labels it **NEEDS LIVE TEST**. WindowsGSH describes its licence as source-available, not OSI-approved, and states that commercial use requires prior written permission; therefore licence clearance is a production gate. CS2 RCON and addon management are listed as unsupported/unverified in the module README.
-- **W-02 fpaezf/Game-Server-Admin** — Windows GUI, bulk install/update/start/stop, watchdog and console monitoring; README describes it as Work in Progress. Verify current licence, release, safe credential handling and whether instances really use independent install paths. Shared game files are not assumed.
-- **W-03 FragCity's existing Windows install/update workflow** — comparison baseline only. Do not modify another protected repository as part of these tests; any code changes need a separate explicit task and branch.
-- **W-04 fpaezf/CS2-server-manager (legacy)** — explicitly deprecated in its README and points to Game-Server-Admin. Do not treat this legacy repo as the preferred test target; use it only to understand history if needed.
+This lane does **not** host the target Pterodactyl/Wings architecture, prove Linux compatibility, or qualify a Windows multi-instance manager for production. Do not automatically copy the Windows game installation or its configuration tree into Linux. Any configuration needed by a Linux Instance must be applied through its private Linux-side path and validated on Debian.
+
+WindowsGSH, Game-Server-Admin and legacy Windows managers remain optional references only. They are **DEFERRED** unless the Linux/Pterodactyl route encounters a specific documented blocker. Manual Windows test results may guide plugin/config debugging, but the Linux-native lane remains authoritative.
 
 ### Lane X — Cross-platform and compatibility
 
-- **X-01 maxdeepfield/cs2-server-cli** — README claims Windows, Linux and macOS support and multi-server operations. Treat the claim as unverified until builds and lifecycle tests pass on both Windows and Linux. Do not assume shared base files; verify implementation.
-- **X-02 GamesTwoLife/cs2-multiserver on WSL2** — the README says Bash on Linux or WSL2. This is a compatibility experiment only, not proof of native Windows support and not a substitute for Linux production testing.
-- **X-03 FragCity Windows/Linux deployment scripts comparison** — run as a separate comparison task if explicitly authorised. A passing Windows test does not imply Linux parity and vice versa.
+- **X-01 maxdeepfield/cs2-server-cli** — optional cross-platform manager reference; testing both operating systems is not a current acceptance requirement.
+- **X-02 GamesTwoLife/cs2-multiserver on WSL2** — deferred compatibility experiment; WSL2 is not a substitute for native Debian validation.
+- **X-03 FragCity Windows/Linux deployment scripts comparison** — deferred. A passing Windows test does not imply Linux parity and vice versa; run only if an explicit reason is recorded.
 
 ## 4. Test stages
 
@@ -181,12 +179,12 @@ For every candidate, record:
 | L-04 | Trimeon/cs2-install | Linux | Master install, instances, optional Docker | NOT REVIEWED |
 | L-05 | Auto-Tournament/cs2-server-manager | Linux | Shared install, hardlink storage, updates | BLOCKED pending commercial licence review |
 | L-06 | 1zc/CS2-Pterodactyl | Linux | Egg/image baseline comparison | NOT REVIEWED |
-| W-01 | WindowsGSH + CS2 module | Windows | Native install, multi-server lifecycle, A2S, backup | BLOCKED pending licence/security review; module needs live test |
-| W-02 | fpaezf/Game-Server-Admin | Windows | Bulk operations, watchdog, console, independent paths | NOT REVIEWED |
-| W-03 | Current FragCity Windows deployment workflow | Windows | Known-good baseline comparison | DEFERRED to a separate authorised test task |
-| W-04 | Legacy fpaezf/CS2-server-manager | Windows | No live test planned; deprecated upstream | DEFERRED |
-| X-01 | maxdeepfield/cs2-server-cli | Cross-platform | Build + lifecycle on both Windows and Linux | NOT REVIEWED |
-| X-02 | GamesTwoLife/cs2-multiserver under WSL2 | Windows compatibility | WSL2 compatibility only | NOT REVIEWED |
+| W-01 | Manual native CS2/plugin/config validation | Windows | Start standalone test server, inspect logs, verify plugins and manually tune config | PLANNED; supplementary only, not Linux acceptance |
+| W-02 | WindowsGSH / Game-Server-Admin managers | Windows | Optional alternative management references | DEFERRED unless a documented Linux/Pterodactyl blocker appears |
+| W-03 | Current FragCity Windows install/update scripts | Windows | Reference only for manual CS2/plugin testing; not target host manager | DEFERRED as a management candidate |
+| W-04 | Legacy fpaezf/CS2-server-manager | Windows | Deprecated upstream; historical reference only | DEFERRED |
+| X-01 | maxdeepfield/cs2-server-cli | Cross-platform | Optional manager comparison if Linux route is blocked | DEFERRED |
+| X-02 | GamesTwoLife/cs2-multiserver under WSL2 | Windows compatibility | Optional compatibility reference, not target host | DEFERRED |
 
 ## 6. Results log template
 
@@ -221,7 +219,7 @@ The testing programme is not complete until:
 - At least one native Linux Pterodactyl baseline passes.
 - A two-instance isolation test passes.
 - Linux shared-file candidates are either passed or explicitly rejected with evidence.
-- At least one Windows-native candidate and the cross-platform candidate receive documented build/live-test outcomes or a reasoned blocker.
+- Windows manual testing may be used to diagnose CS2/plugin/config behavior, but it is supplementary only; Windows manager and cross-platform manager candidates are not required gates for the current Linux-first architecture.
 - The trade-off between full copy and shared-file storage is quantified on the actual lab.
 - Backup/restore, update interruption, delete/reinstall and restart/reboot behaviour pass.
 - Licence, security and commercial-use blockers are resolved for the recommended path.
