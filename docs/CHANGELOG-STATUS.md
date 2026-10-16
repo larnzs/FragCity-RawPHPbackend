@@ -22,3 +22,11 @@
 ## سابقهٔ مستندات
 
 جزئیات تاریخی نصب/بررسی Debian و گزارش‌های اولیه در [Debian PoC Log](DEBIAN-POC.md) حفظ شده‌اند. معماری فعلی و تصمیم‌های اصلاح‌شده در [Architecture](ARCHITECTURE.md)، [Decisions](DECISIONS.md) و [Roadmap](ROADMAP.md) معیار جاری‌اند؛ پیشنهادهای قدیمی که با تصمیم‌های جدید تعارض دارند، مبنای اجرا نیستند.
+
+
+## ثبت مستندات — ۱۶ اکتبر ۲۰۲۶
+
+- سند [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) دربارهٔ یک Panel/چند Server، جداسازی Volumeها، مدل‌های اشتراک فایل و بررسی ریپوهای GitHub اضافه شد.
+- [Platform PoC](PLATFORM-POC.md) آزمون T18 را برای دو instance و shared VPK اضافه کرده است.
+- [Repository Inventory](REPOSITORIES.md) گزینه‌های K4ryuu/CS2-Egg، GamesTwoLife/cs2-multiserver، Trimeon/cs2-install، Auto-Tournament/cs2-server-manager و 1zc/CS2-Pterodactyl را ثبت می‌کند.
+- این تغییرات مستندسازی‌اند؛ روی Debian چیزی نصب یا اجرا نشده و shared files فعال نشده‌اند.
