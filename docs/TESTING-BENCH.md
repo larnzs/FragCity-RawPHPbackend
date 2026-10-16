@@ -10,7 +10,7 @@
 2. Use a disposable VM, snapshot, or isolated test directory per candidate. Do not install competing lifecycle managers over the same live instance.
 3. Never test against production website DB, payment credentials, customer data, or production game server directories.
 4. Keep Steam credentials, GSLT, RCON secrets, API tokens, and logs containing secrets out of GitHub and screen captures.
-5. Run the independent-copy baseline before testing shared files. Shared storage is an optional optimization, not a prerequisite for proving the server works.
+5. Establish a working one-instance baseline, then validate two instances on the selected shared Base with private writable paths. A full independent-copy setup is a fallback/comparison only, not FragCity's current target architecture.
 6. A test can be technically successful and still be rejected for security, licence, maintenance, or commercial-use reasons.
 7. Do not touch `larnzs/cs2-kus-addons` as part of this document/project unless explicitly requested in a separate task. It may be used as a comparison reference only, with its own controlled test plan.
 8. An “OK” result means that the named scenario passed on the exact OS/build/commit recorded in the test record; it does not automatically approve production use.
@@ -45,11 +45,11 @@ The first test in this lane is not Pterodactyl or shared storage. It is the exis
 
 This baseline must be measured before comparing alternative multi-instance managers or shared storage. See [Debian PoC Log](DEBIAN-POC.md).
 
-Primary target: the Debian 13 lab Node with Pterodactyl/Wings under evaluation. The first round should validate one server and then two independent servers. Use the exact installed Debian version, kernel, Docker/Wings/Panel/Egg versions and filesystem in every record.
+Primary target: the Debian 13 lab Node with Pterodactyl/Wings under evaluation. The first round should validate one server on the central Base and then two Pterodactyl instances sharing that Base, with private addons/cfg/GameMode files verified independently. Use the exact installed Debian version, kernel, Docker/Wings/Panel/Egg versions and filesystem in every record.
 
 Candidates:
 - **L-01 Pterodactyl Panel + Wings + one CS2 Egg** — baseline control plane and lifecycle.
-- **L-02 K4ryuu/CS2-Egg VPK Sync** — optional shared VPK storage on a Pterodactyl/Pelican-style node.
+- **L-02 K4ryuu/CS2-Egg VPK Sync** — optional comparison candidate only if it helps implement/validate shared files; not the selected architecture by itself.
 - **L-03 GamesTwoLife/cs2-multiserver** — native Bash multi-instance manager with a shared base installation.
 - **L-04 Trimeon/cs2-install** — native Linux master install plus per-instance directories; optional Docker mode.
 - **L-05 Auto-Tournament/cs2-server-manager** — native Linux shared-install manager; commercial licence gate must be resolved before any commercial deployment.
@@ -99,7 +99,7 @@ For each candidate, record:
 
 1. Create two instances with different names, ports, maps/game modes and settings.
 2. Start both simultaneously and verify that each is reachable on its own expected port.
-3. Change one instance's hostname, `server.cfg`, addon configuration and a disposable test file; verify the other instance does not change.
+3. Change one instance's hostname, `cfg/`, addon files/configuration, GameMode text files and a disposable private test file; verify the other instance does not change.
 4. Check process identity, process arguments, working directory, PID tracking, console routing, logs and restart behaviour.
 5. Verify collision protection covers game, query, GOTV and every additional port required by that server's configuration.
 6. Reboot the host and verify exactly the configured servers return without starting duplicates.
@@ -107,22 +107,20 @@ For each candidate, record:
 
 **Gate:** no port collision, no cross-instance configuration mutation, no process-control ambiguity and no data loss.
 
-### Stage 3 — Shared-storage evaluation
+### Stage 3 — Shared Base and coordinated-update validation
 
-This stage only runs after stages 1 and 2 pass.
+1. Inventory paths and classify each as shared Base/read-only, Instance-private configuration, Instance-private addon/mod payload, or Instance-writable runtime data. Record evidence; never infer solely from a folder name.
+2. Establish a working one-instance disk/startup baseline on the central Base. A full independent-copy footprint may be measured for comparison but is not the target design.
+3. Validate the proposed method for exposing Base files into each Pterodactyl instance (mount, link, overlay or other mechanism) separately. Treat VPK Sync as optional unless it is shown to be needed.
+4. Compare shared paths and private files from each instance; prove that addons/, cfg/, GameMode text files and mutable runtime data are not inadvertently shared.
+5. Attempt to modify a private test file from one instance; the other must not see an unauthorised change. Never run this against real customer data.
+6. Simulate an update trigger. All instances using the Base must stop before SteamCMD runs centrally, and new start/restart requests must be blocked for the whole update window.
+7. Verify that SteamCMD runs once against the central Base and is not invoked by each instance's deploy/install script.
+8. Validate update success/version/file state before allowing starts again. Restore only instances that were running before the update; leave previously stopped instances stopped.
+9. Simulate an interrupted/failed update and verify no instance starts against a partial Base; confirm recovery/rollback and status reporting.
+10. Reinstall or delete one instance and confirm the shared Base and other instances remain intact. Test backup/restore of one instance and after a Base update.
 
-1. Inventory paths and mark each as shared-read-only, shared-versioned, or instance-private/writable. Never infer this solely from a folder name.
-2. Establish independent-copy disk-usage and startup baselines before changing storage.
-3. Test the proposed method separately: symlink, hardlink, bind mount, VPK Sync, or a copy-based fallback. Record filesystem and container path constraints.
-4. Compare the same file from each instance; verify whether it is actually shared (inode/file identity where applicable), rather than relying only on similar file sizes.
-5. Test that instance-private `cfg/`, `addons/`, plugin configs, `gameinfo.gi`, logs, demos and mutable runtime data remain independent where required.
-6. Attempt to modify a test file from one instance; the other must not see an unauthorised change. Never run this against real customer data.
-7. Test a central game update while all servers are stopped, then test the guard when a start/restart request arrives during an update.
-8. Simulate an interrupted/failed update and verify no instance starts on a partially replaced installation; confirm recovery or rollback.
-9. Reinstall or delete one instance and confirm the shared base and other instances remain intact.
-10. Test both backup/restore of one instance and restoration after a shared-base update.
-
-**Gate:** every shared path is documented; updates are atomic or safely gated; deleting/restoring one instance cannot damage another; failure is detected and recoverable.
+**Gate:** shared Base files are only changed by the central update process; per-instance data remain isolated; the update barrier prevents starts against partially updated files; failure is detected and recoverable.
 
 ### Stage 4 — Backup, permissions and security
 
@@ -154,10 +152,10 @@ Never infer performance from repository marketing figures. Preserve raw results 
 ### Stage 6 — Pterodactyl-specific checks
 
 - The Panel owns each Server record; Wings/Docker lifecycle must be the only authority starting/stopping the Pterodactyl-managed process.
-- Confirm the Egg install and startup commands work on the target Linux Node.
+- Confirm the Egg/template works on the target Linux Node. Its per-instance addon/mod deploy step must not invoke SteamCMD, install/update the Base Game, or start the server; Base update belongs to the central updater.
 - Confirm allocations, container path, user/group permissions, CPU/RAM/disk limits, console, File Manager, SFTP, logs and backup.
 - Verify whether custom mounts are visible in File Manager/SFTP; do not assume they are.
-- Confirm VPK Sync's install/update daemon, status protocol, lock, recovery path and privileged scripts before installing.
+- If VPK Sync is evaluated, confirm its install/update daemon, status protocol, lock, recovery path and privileged scripts before installing; it is not a required dependency of the selected design.
 - A standalone manager such as MSM or cs2-install must not independently stop, update, or rewrite a Pterodactyl-owned instance unless an explicit integration owns and tests that boundary.
 
 ### Stage 7 — Decision record
