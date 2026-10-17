@@ -27,6 +27,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          cp .github/workflows/bootstrap-flute.yml /tmp/bootstrap-flute.yml
           git clone --depth 1 --branch v1.0.7 --single-branch https://github.com/Flute-CMS/cms.git /tmp/flute-upstream
           actual="$(git -C /tmp/flute-upstream rev-parse HEAD)"
           expected="4d62a49e90bd812df4a885aa1a4f6bc5a6f50f99"
@@ -40,6 +41,9 @@ jobs:
               exit 1
             }
           done
+          # Avoid importing upstream Actions workflows; the connected GitHub App
+          # is intentionally not granted permission to create or update workflows.
+          rm -rf /tmp/flute-upstream/.github/workflows
 
       - name: Replace branch working tree with Flute source
         shell: bash
@@ -47,6 +51,8 @@ jobs:
           set -euo pipefail
           find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf -- {} +
           find /tmp/flute-upstream -mindepth 1 -maxdepth 1 ! -name .git -exec cp -a --target-directory=. -- {} +
+          mkdir -p .github/workflows
+          cp /tmp/bootstrap-flute.yml .github/workflows/bootstrap-flute.yml
           test -f README.md
           test -f composer.json
           test -f LICENSE
