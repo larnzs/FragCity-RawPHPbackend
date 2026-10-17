@@ -318,8 +318,10 @@ http://localhost/
 
 ```bat
 git fetch origin
-git worktree add W:\fragcity-flute-base flute-base
+git worktree add -b flute-base-updater W:\fragcity-flute-base origin/flute-base
 ```
+
+این یک branch محلیِ مخصوص updater می‌سازد تا هم‌زمان شاخهٔ `www` در پوشهٔ Laragon فعال بماند. اسکریپت commit را از worktree جداگانه مستقیماً به remote branch یعنی `flute-base` push می‌کند؛ branch محلی `flute-base-updater` صرفاً برای جلوگیری از تداخل با پوشهٔ سایت است.
 
 سپس برای به‌روزرسانی baseline، فایل زیر را اجرا کن:
 
