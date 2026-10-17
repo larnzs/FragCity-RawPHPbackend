@@ -99,7 +99,7 @@
 
 ### اصلاحات محتوایی تکمیلی
 
-1. در Pterodactyl PoC، preflight PHP برای moduleهای اصلی موردنیاز Panel از جمله openssl، tokenizer، posix، mysqli و pdo_mysql کامل شد. خروجی قبلی فقط subset مشخص‌شده را فیلتر می‌کرد؛ بنابراین خروجی قدیمی به‌عنوان مدرک دیده‌شدن همهٔ این moduleها تلقی نمی‌شود.
+1. در Pterodactyl PoC، preflight PHP برای moduleهای موردنیاز Panel از جمله bcmath، curl، dom، gd، intl، json، mbstring، mysqli، openssl، pdo، pdo_mysql، posix، tokenizer، xml و zip کامل شد. خروجی قبلی فقط subset مشخص‌شده را فیلتر می‌کرد؛ بنابراین خروجی قدیمی به‌عنوان مدرک دیده‌شدن همهٔ این moduleها تلقی نمی‌شود. بلوک نهایی مرحلهٔ ۱۱ پس از این فهرست نهایی دوباره با `bash -n` قبول شد.
 2. Configuration Guide به فارسی و به شکل مرحله‌به‌مرحله بازنویسی شد؛ همچنین روشن شد وجود Loader مرکزی به معنی مهاجرت کامل همهٔ مسیرهای PHP نیست و credentialهای hard-coded یافتهٔ باز هستند.
 3. Local Development صریحاً توضیح می‌دهد مسیرهای C:\laragon\www صرفاً نمونه‌اند و نباید روی Flute Release موجود در Laragon Portable بازنویسی شوند. نیاز PHP سایت در Windows از PHP 8.3 مربوط به Panel در Debian تفکیک شد.
 4. Security Audit با وضعیت جاری هماهنگ شد. در نسخهٔ فعلی agent/heartbeat.php هنوز عبارت مشکوک $checkStmt$checkStmt->fetch(...) دیده می‌شود؛ این ایراد و سایر یافته‌های امنیتی حل‌شده تلقی نمی‌شوند. این بازبینی، کد اجرایی را تغییر نداده است.
