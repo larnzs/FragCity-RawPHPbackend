@@ -1,0 +1,61 @@
+{
+    "name": "cycle/schema-migrations-generator",
+    "type": "library",
+    "license": "MIT",
+    "description": "Cycle ORM Migration generation",
+    "support": {
+        "issues": "https://github.com/cycle/schema-migrations-generator/issues",
+        "source": "https://github.com/cycle/schema-migrations-generator",
+        "docs": "https://cycle-orm.dev/docs",
+        "chat": "https://discord.gg/spiralphp"
+    },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/cycle"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "cycle/database": "^2.11.3",
+        "cycle/schema-builder": "^2.11.1",
+        "cycle/migrations": "^4.2.4"
+    },
+    "require-dev": {
+        "cycle/annotated": "^3.5",
+        "cycle/orm": "^2.9.1",
+        "phpunit/phpunit": "^9.6.22",
+        "spiral/code-style": "^2.2.0",
+        "spiral/dumper": "^3.3.1",
+        "spiral/framework": "^3.14.8",
+        "vimeo/psalm": "^5.26.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Cycle\\Schema\\Generator\\Migrations\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cycle\\Schema\\Generator\\Migrations\\Tests\\": "tests/Migrations/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": false
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "cs:diff": "php-cs-fixer fix --dry-run -v --diff",
+        "cs:fix": "php-cs-fixer fix -v",
+        "psalm": "psalm",
+        "psalm:baseline": "psalm --set-baseline=psalm-baseline.xml",
+        "test": "phpunit --color=always",
+        "test:unit": "phpunit --exclude-group driver --colors=always",
+        "test:sqlite": "phpunit --group driver-sqlite --colors=always",
+        "test:pgsql": "phpunit --group driver-postgres --colors=always",
+        "test:mysql": "phpunit --group driver-mysql --colors=always",
+        "test:mssql": "phpunit --group driver-sqlserver --colors=always"
+    }
+}

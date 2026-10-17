@@ -1,0 +1,1 @@
+<p yoyo:props="id"><?php echo $id; ?></p>

@@ -1,0 +1,169 @@
+{
+    "name": "cycle/active-record",
+    "description": "Provides a simple way to work with your database using Active Record pattern and Cycle ORM",
+    "license": "MIT",
+    "type": "library",
+    "keywords": [
+        "cycle",
+        "orm",
+        "cycle-orm",
+        "active-record",
+        "database",
+        "model",
+        "activerecord"
+    ],
+    "authors": [
+        {
+            "name": "Aleksei Gagarin (roxblnfk)",
+            "email": "alexey.gagarin@spiralscout.com"
+        },
+        {
+            "name": "Andrij Orlenko",
+            "email": "the@wayof.dev"
+        }
+    ],
+    "homepage": "https://cycle-orm.dev",
+    "support": {
+        "issues": "https://github.com/cycle/active-record/issues",
+        "source": "https://github.com/cycle/active-record",
+        "security": "https://github.com/cycle/active-record/blob/master/.github/SECURITY.md"
+    },
+    "require": {
+        "php": "^8.2",
+        "cycle/orm": "^2.7",
+        "psr/container": "^2.0"
+    },
+    "require-dev": {
+        "buggregator/trap": "^1.5",
+        "cycle/entity-behavior": "^1.3",
+        "ergebnis/phpunit-slow-test-detector": "^2.14",
+        "fakerphp/faker": "^1.23",
+        "illuminate/support": "^10.48 || ^11.0",
+        "mockery/mockery": "^1.6",
+        "pestphp/pest": "^2.34",
+        "phpstan/extension-installer": "^1.3",
+        "phpstan/phpstan": "^1.10",
+        "phpstan/phpstan-deprecation-rules": "^1.1",
+        "phpstan/phpstan-phpunit": "^1.3",
+        "phpstan/phpstan-strict-rules": "^1.5",
+        "phpunit/phpunit": "^10.5",
+        "psalm/plugin-phpunit": "~0.19.0",
+        "rector/rector": "^1.0",
+        "roave/infection-static-analysis-plugin": "^1.35",
+        "roave/security-advisories": "dev-latest",
+        "spiral/boot": "^3.12",
+        "spiral/cycle-bridge": "^2.9",
+        "spiral/framework": "^3.12",
+        "spiral/logger": "^3.12",
+        "spiral/testing": "^2.7",
+        "vimeo/psalm": "^5.23",
+        "wayofdev/cs-fixer-config": "^1.4"
+    },
+    "suggest": {
+        "spiral/cycle-bridge": "Provides integration with Spiral Framework",
+        "wayofdev/laravel-cycle-orm-adapter": "Laravel adapter for Cycle ORM",
+        "yiisoft/yii-cycle": "Yii Cycle ORM integration"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Cycle\\ActiveRecord\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Cycle\\App\\": "tests/app/",
+            "Cycle\\Tests\\": "tests/src/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "ergebnis/composer-normalize": true,
+            "infection/extension-installer": true,
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true,
+            "spiral/composer-publish-plugin": true
+        },
+        "audit": {
+            "abandoned": "report"
+        },
+        "platform": {
+            "php": "8.2.17"
+        },
+        "sort-packages": true
+    },
+    "extra": {
+        "composer-normalize": {
+            "indent-size": 4,
+            "indent-style": "space"
+        },
+        "config-plugin": {
+            "bootstrap": "src/Bridge/Yii3/yii-bootstrap.php"
+        },
+        "laravel": {
+            "providers": [
+                "Cycle\\ActiveRecord\\Bridge\\Laravel\\Providers\\ActiveRecordProvider"
+            ]
+        },
+        "spiral": {
+            "bootloaders": [
+                "Cycle\\ActiveRecord\\Bridge\\Spiral\\Bootloader\\ActiveRecordBootloader"
+            ]
+        }
+    },
+    "scripts": {
+        "cs:diff": "php-cs-fixer fix --dry-run -v --diff",
+        "cs:fix": "php-cs-fixer fix -v",
+        "infect": [
+            "Composer\\Config::disableProcessTimeout",
+            "@putenv XDEBUG_MODE=coverage",
+            "roave-infection-static-analysis-plugin"
+        ],
+        "infect:ci": [
+            "Composer\\Config::disableProcessTimeout",
+            "@putenv XDEBUG_MODE=coverage",
+            "roave-infection-static-analysis-plugin --threads=2 --ansi --logger-github --ignore-msi-with-no-mutations --only-covered"
+        ],
+        "psalm": "psalm --show-info=true",
+        "psalm:baseline": "psalm --set-baseline=psalm-baseline.xml",
+        "psalm:ci": "psalm --output-format=github --shepherd --show-info=false --stats --threads=4",
+        "refactor": "rector process --config=rector.php",
+        "refactor:ci": "rector process --config=rector.php --dry-run --ansi",
+        "stan": "phpstan analyse --memory-limit=2G",
+        "stan:baseline": "phpstan analyse --generate-baseline --memory-limit=2G --allow-empty-baseline",
+        "stan:ci": "phpstan analyse --memory-limit=2G --error-format=github",
+        "test": [
+            "@putenv XDEBUG_MODE=coverage",
+            "pest --color=always"
+        ],
+        "test:arch": [
+            "@putenv XDEBUG_MODE=coverage",
+            "pest --color=always --configuration pest.xml.dist"
+        ],
+        "test:cc": [
+            "@putenv XDEBUG_MODE=coverage",
+            "pest --coverage --coverage-clover=.build/phpunit/logs/clover.xml --color=always"
+        ],
+        "test:mysql": [
+            "@putenv XDEBUG_MODE=coverage",
+            "@putenv DB_DRIVER=mysql",
+            "pest --color=always"
+        ],
+        "test:pgsql": [
+            "@putenv XDEBUG_MODE=coverage",
+            "@putenv DB_DRIVER=pgsql",
+            "pest --color=always"
+        ],
+        "test:sqlite": [
+            "@putenv XDEBUG_MODE=coverage",
+            "@putenv DB_DRIVER=sqlite",
+            "pest --color=always"
+        ],
+        "test:sqlserver": [
+            "@putenv XDEBUG_MODE=coverage",
+            "@putenv DB_DRIVER=sqlserver",
+            "pest --color=always"
+        ]
+    }
+}

@@ -1,0 +1,68 @@
+{
+    "name": "yiisoft/friendly-exception",
+    "type": "library",
+    "description": "An interface for friendlier exception",
+    "keywords": [
+        "exception",
+        "exceptions",
+        "error handling",
+        "friendly"
+    ],
+    "homepage": "https://www.yiiframework.com/",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/yiisoft/friendly-exception/issues?state=open",
+        "source": "https://github.com/yiisoft/friendly-exception",
+        "forum": "https://www.yiiframework.com/forum/",
+        "wiki": "https://www.yiiframework.com/wiki/",
+        "irc": "ircs://irc.libera.chat:6697/yii",
+        "chat": "https://t.me/yii3en"
+    },
+    "funding": [
+        {
+            "type": "opencollective",
+            "url": "https://opencollective.com/yiisoft"
+        },
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/yiisoft"
+        }
+    ],
+    "require": {
+        "php": "7.4.* || 8.0 - 8.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Yiisoft\\FriendlyException\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Yiisoft\\FriendlyException\\Tests\\": "tests"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "bamarni/composer-bin-plugin": true,
+            "composer/package-versions-deprecated": true
+        }
+    },
+    "require-dev": {
+        "bamarni/composer-bin-plugin": "^1.8.3",
+        "maglnet/composer-require-checker": "^3.8 || ^4.3",
+        "phpunit/phpunit": "^9.6.22",
+        "spatie/phpunit-watcher": "^1.23.6"
+    },
+    "extra": {
+        "bamarni-bin": {
+            "bin-links": true,
+            "target-directory": "tools",
+            "forward-command": true
+        }
+    },
+    "scripts": {
+        "test": "phpunit --testdox --no-interaction",
+        "test-watch": "phpunit-watcher watch"
+    }
+}
