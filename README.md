@@ -131,3 +131,141 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 6. حذف یا بازنویسی هیچ‌کدام از ریپوهای موجود بخشی از فاز مستندسازی نیست.
 
 **وضعیت نهایی فعلی:** معماری مرجع PoC مشخص است؛ dependencyهای پایهٔ وب/DB و Composer 2.10.3 روی fc-node-01 نصب و بررسی شده‌اند. دریافت/پیکربندی Pterodactyl Panel، Wings/Docker، اجرای CS2 تحت مدیریت Panel و انتقال تولیدی Pending هستند؛ اصلاح کدهای امنیتی نیز به برنامه‌ریزی و تست مجزا نیاز دارد.
+
+
+---
+
+## راهنمای مرحله‌به‌مرحله: اجرای Flute CMS در Laragon Portable با Nginx
+
+این بخش تجربهٔ واقعی راه‌اندازی اولیهٔ Flute در محیط محلی FragCity را ثبت می‌کند. علت و راه‌حل هر خطا را نگه می‌داریم تا هنگام نصب مجدد یا انتقال به سیستم دیگر، مراحل قابل تکرار باشند.
+
+**وضعیت ثبت‌شده:** ریشهٔ سایت روی پوشهٔ `public` تنظیم شد؛ سپس خطای Nginx `404 Not Found` در مسیر `/install` با اصلاح `try_files` برطرف شد.
+
+### مرحلهٔ ۰ — پیش‌نیازها و فرض مسیرها
+
+در این راهنما فرض می‌شود Laragon Portable در مسیر زیر است و فایل‌های Flute مستقیماً در `www` قرار دارند:
+
+- ریشهٔ پروژهٔ Flute: `W:\\laragon_portable\\www`
+- ریشهٔ قابل دسترسی از مرورگر: `W:\\laragon_portable\\www\\public`
+- تنظیمات Nginx: `W:\\laragon_portable\\etc\\nginx`
+- پوشهٔ Virtual Hostها: `W:\\laragon_portable\\etc\\nginx\\sites-enabled`
+
+اگر پروژه داخل یک زیرپوشه مانند `www\\FragCity-RawPHPbackend` کلون شده است، مسیرهای این راهنما باید با مسیر واقعی پروژه تطبیق داده شوند؛ `root` همیشه باید به پوشهٔ `public` همان پروژه اشاره کند.
+
+Laragon Portable در محیط ثبت‌شده از **Nginx** استفاده می‌کند؛ مراحل Apache برای این نصب کاربرد ندارند.
+
+### مرحلهٔ ۱ — دریافت بستهٔ درست Flute (Release، نه Source)
+
+مخزن توسعهٔ FragCity از این branch استفاده می‌کند:
+
+- مخزن: [FragCity-RawPHPbackend](https://github.com/larnzs/FragCity-RawPHPbackend)
+- branch پایهٔ Flute: [`flute-base`](https://github.com/larnzs/FragCity-RawPHPbackend/tree/flute-base)
+- نسخهٔ Release ثبت‌شده: [Flute CMS v1.0.7](https://github.com/Flute-CMS/cms/releases/tag/v1.0.7)
+
+**نکتهٔ مهم دربارهٔ `vendor`:** دریافت Source code از GitHub معمولاً دایرکتوری `vendor` را همراه ندارد؛ اما بستهٔ Release مورد استفاده در این راهنما شامل وابستگی‌های آمادهٔ Composer است. در branch `flute-base` وجود `vendor/autoload.php` و اطلاعات نصب‌شده در `vendor/composer/installed.php` بررسی شده است.
+
+برای clone کردن branch پایه:
+
+```bash
+git clone --branch flute-base --single-branch https://github.com/larnzs/FragCity-RawPHPbackend.git
+```
+
+این مخزن خصوصی است؛ هنگام clone در صورت درخواست GitHub Authentication از روش احراز هویت مجاز استفاده شود.
+
+پس از clone این فایل را بررسی کنید:
+
+```text
+vendor/autoload.php
+```
+
+اگر این فایل موجود نیست، قبل از تغییر تنظیمات Nginx بررسی کنید که branch و بستهٔ درست دریافت شده باشد. صرفاً با تغییر DocumentRoot نمی‌توان نبودن `vendor` را حل کرد. برای این baseline، هدف استفاده از بستهٔ کامل Release است؛ `composer update` هم برای حل این وضعیت اجرا نشود، چون وابستگی‌ها را تغییر می‌دهد.
+
+### مرحلهٔ ۲ — تنظیم Document Root روی `public`
+
+خطای نصب Flute ممکن است اعلام کند که وب‌سرور به ریشهٔ اشتباه اشاره می‌کند و مسیر فعلی `W:\\laragon_portable\\www` است، درحالی‌که مسیر لازم `W:\\laragon_portable\\www\\public` است.
+
+در این پروژه باید ریشهٔ وب فقط پوشهٔ `public` باشد. تنظیم در Nginx انجام می‌شود و نباید پوشهٔ اصلی پروژه یا فایل‌های `vendor` و تنظیمات خصوصی مستقیماً در دسترس وب باشند.
+
+### مرحلهٔ ۳ — پیدا کردن Virtual Host مربوط به `localhost`
+
+۱. این پوشه را با File Explorer باز کنید:
+
+```text
+W:\\laragon_portable\\etc\\nginx\\sites-enabled
+```
+
+۲. فایل تنظیماتی را باز کنید که داخل آن این مقدار وجود دارد:
+
+```nginx
+server_name localhost;
+```
+
+نام فایل ممکن است بسته به نصب Laragon متفاوت باشد؛ بر اساس محتوای `server_name localhost;` آن را تشخیص دهید و نام فایل را فرض نکنید.
+
+۳. در همان بلوک `server { ... }` بررسی کنید که Document Root و index به این شکل باشند:
+
+```nginx
+root W:/laragon_portable/www/public;
+index index.html index.htm index.php;
+```
+
+اگر پروژه در زیرپوشه‌ای از `www` است، مسیر `root` را مطابق محل واقعی آن اصلاح کنید.
+
+### مرحلهٔ ۴ — رفع خطای 404 برای `/install`
+
+#### علت خطا
+
+Flute هنگام اجرا، اگر هنوز نصب نشده باشد، از آدرس اصلی سایت به `/install` هدایت می‌کند. این رفتار در کد Installer Flute تعریف شده است.
+
+در Virtual Host اولیهٔ Laragon، این تنظیم وجود داشت:
+
+```nginx
+location / {
+    try_files $uri $uri/ =404;
+    autoindex on;
+}
+```
+
+پارامتر `=404` باعث می‌شود Nginx برای مسیری مانند `/install` که فایل یا دایرکتوری واقعی نیست، پیش از رسیدن درخواست به router برنامه خطای 404 بدهد.
+
+#### اصلاح انجام‌شده
+
+بلوک `location /` را با این تنظیم جایگزین کنید:
+
+```nginx
+location / {
+    try_files $uri $uri/ /index.php?$query_string;
+}
+```
+
+این کار درخواست‌های غیرواقعی مانند `/install` را به `public/index.php` می‌فرستد تا خود Flute route مناسب را پردازش کند. گزینهٔ `autoindex on` هم حذف شده است تا فهرست فایل‌های دایرکتوری‌ها خودکار نمایش داده نشود.
+
+**فقط همین بلوک را اصلاح کنید.** بلوک PHP/FastCGI موجود در Laragon، به‌خصوص `location ~ \.php$` و `fastcgi_pass php_upstream;` را بدون دلیل تغییر ندهید. بلوک `location /` تکراری ایجاد نکنید و تنظیمات سایر Virtual Hostها را دست‌کاری نکنید.
+
+### مرحلهٔ ۵ — ری‌استارت و بررسی
+
+۱. فایل Virtual Host را ذخیره کنید.
+۲. در Laragon گزینهٔ **Restart All** را بزنید.
+۳. در مرورگر ابتدا باز کنید:
+
+```text
+http://localhost/
+```
+
+اگر نصب هنوز انجام نشده باشد، Flute باید به `/install` هدایت شود و ویزارد نصب را نمایش دهد.
+
+در صورت بروز مشکل، این آدرس‌ها را جداگانه آزمایش کنید:
+
+- `http://localhost/`
+- `http://localhost/index.php`
+- `http://localhost/install`
+
+اگر صفحهٔ خطا footer مانند `nginx/1.14.0` نشان می‌دهد، با وجود به‌روزرسانی Nginx بررسی کنید Laragon واقعاً کدام باینری را اجرا کرده است؛ ممکن است نسخهٔ قدیمی هنوز فعال باشد. این نکته را از روی footer به‌تنهایی قطعی فرض نکنید.
+
+اگر خطا پابرجا بود، محتوای کامل همان بلوک `server { ... }` که `server_name localhost;` دارد و نتیجهٔ تست سه آدرس را ثبت کنید. به‌جای تغییر تصادفی فایل‌های PHP یا نصب دوبارهٔ Flute، ابتدا تأیید کنید درخواست به Virtual Host درست و سپس به `index.php` می‌رسد.
+
+### مرحلهٔ ۶ — محدودهٔ این موفقیت
+
+رفع خطای 404 به معنای تکمیل نصب Flute یا آماده‌بودن محیط Production نیست؛ این مرحله فقط مسیریابی Nginx به ورودی برنامه را اصلاح می‌کند. نصب را ابتدا با دیتابیس آزمایشی جداگانه انجام دهید، secretهای Production را در محیط محلی قرار ندهید و پیش از استفادهٔ واقعی، نسخه‌های PHP، افزونه‌ها و دیتابیس موردنیاز Flute را با محیط هدف تطبیق دهید.
+
+**نتیجهٔ ثبت‌شده:** در Laragon Portable با Nginx، خطای `/install` ناشی از `try_files $uri $uri/ =404;` بود؛ با تغییر آن به `try_files $uri $uri/ /index.php?$query_string;` و Restart All، ویزارد نصب قابل دسترسی شد.
