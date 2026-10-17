@@ -652,8 +652,8 @@ sudo apt install -y \
 | mariadb | active |
 | redis-server | active |
 | php8.3-fpm | active |
-| Composer | هنوز نصب نشده |
-| Pterodactyl Panel | هنوز دانلود/نصب نشده |
+| Composer | در زمان این snapshot هنوز نصب نشده بود؛ نصب 2.10.3 در بخش بعدی ثبت شده است |
+| Pterodactyl Panel | در زمان این snapshot هنوز دانلود/نصب نشده بود |
 | Docker / Wings | هنوز نصب نشده |
 
 ### پورت‌ها بعد از نصب
@@ -693,6 +693,6 @@ dpkg-query -W -f='nginx package: ${Version}\n' nginx
 
 این خروجی خطای قبلی `nginx -v: command not found` را روشن کرد: وقتی مسیر کامل `/usr/sbin/nginx` استفاده شد، نسخه با موفقیت گزارش شد. این خطا به معنی ازکارافتادن سرویس نبود؛ listener روی TCP/80 و وضعیت `active` پیش‌تر تأیید شده بود.
 
-**گام بعدی:** دریافت و پیکربندی Panel هنوز اجرا نشده است. Release و دستورهای نصب باید در شروع گام بعد از منبع رسمی بررسی شوند. جزئیات روند آموزشی و فرمان قابل تکرار در [Pterodactyl PoC، بخش ۱۰](PTERODACTYL-POC.md) ثبت شده است؛ تاریخ/مقدار checksum تاریخی است و هنگام اجرای مجدد باید مقدار فعلی صفحه رسمی Composer را دید.
+**گام بعدی:** دانلود و استخراج asset رسمی Panel v1.15.1 هنوز اجرا نشده است. فرمان، توضیح مبتدی‌پسند، معیار قبولی و برخورد با خطا در [Pterodactyl PoC، بخش ۱۱](PTERODACTYL-POC.md) ثبت شده است. Composer 2.10.3 و نسخهٔ Nginx در بخش بالاتر همین لاگ تأیید شده‌اند.
 
 **مرز مرحله:** در لاگ فعلی هنوز database/user اختصاصی Panel، secrets، `.env`، APP_KEY، migration، حساب مدیر، queue worker یا cron ایجاد نشده‌اند. Docker، Wings و CS2 container هم هنوز نصب/ساخته نشده‌اند.
