@@ -95,7 +95,7 @@ git add -A
 if errorlevel 1 goto :fail
 
 echo [INFO] Checking staged filenames for common secret/runtime files...
-powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; $p=@(git diff --cached --name-only); $bad=@($p | Where-Object { $n=$_ -replace '\\','/'; (($n -match '(^|/)\.env($|\.)') -and ($n -notmatch '(^|/)\.env\.example$')) -or ($n -match '(^|/)(settings\.json|.*\.(sql|sqlite|db|dump|bak|log))$') -or ($n -match '(^|/)storage/(logs|cache|backup|app/cache)(/|$)') -or ($n -match '(^|/)config/(database|secrets?|local)(\.[^/]+)?$') }); if($bad.Count -gt 0){ Write-Output 'BLOCKED: review these sensitive/runtime paths before committing:'; $bad | ForEach-Object { Write-Output ('  ' + $_) }; exit 17 }"
+powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; $p=@(git diff --cached --name-only); $bad=@($p | Where-Object { $n=$_ -replace '\\','/'; (($n -match '(^|/)\.env($|\.)') -and ($n -notmatch '(^|/)\.env\.example$')) -or ($n -match '(^|/)(settings\.json|.*\.(sql|sqlite|db|dump|bak|log))$') -or ($n -match '(^|/)storage/(logs|cache|backup|app/cache)(/|$)') -or ($n -match '(^|/)config(/|$)') -or ($n -match '(^|/)settings/(?!settings\.example\.json$)') }); if($bad.Count -gt 0){ Write-Output 'BLOCKED: review these sensitive/runtime paths before committing:'; $bad | ForEach-Object { Write-Output ('  ' + $_) }; exit 17 }"
 if errorlevel 1 (
     echo.
     echo [SAFETY] Suspected secret/runtime files were detected.
