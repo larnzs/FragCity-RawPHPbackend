@@ -165,3 +165,22 @@
 **دامنهٔ فعلی:** این تصمیم فقط لایهٔ Linux/CS2/Instance/MySQL آزمایشگاهی را پوشش می‌دهد؛ سایت، Billing و اتصال به سامانه‌های فروش تا عبور از مراحل سرور و دیتابیس وارد اجرا نمی‌شوند.
 
 **مرجع:** [Platform PoC](PLATFORM-POC.md)، [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md)، [Testing Bench](TESTING-BENCH.md)، [Roadmap](ROADMAP.md).
+
+
+## ADR-016 — محیط یکپارچهٔ آزمایشی Pterodactyl روی fc-node-01
+
+**وضعیت:** تصمیم تأییدشده برای PoC؛ Production همچنان Pending.
+
+**تصمیم:** در مرحلهٔ فعلی، Pterodactyl Panel، دیتابیس محلی Panel، Redis و سپس Wings/Docker روی همان Debian 13 VM با hostname برابر fc-node-01 آزمایش شوند. هدف، یادگیری و اثبات اجرای صحیح سرورهای بازی پیش از ادغام فروش و سایت است.
+
+**مرز سایت و دیتابیس:** Flute CMS جداگانه توسعه داده می‌شود و در این مرحله روی Panel نصب یا merge نمی‌شود. MariaDB سایت فعلی cPanel با دیتابیس Pterodactyl یکی نیست و نود به آن اتصال مستقیم نخواهد داشت. اتصال آیندهٔ سایت به Panel از طریق API امن HTTPS بررسی می‌شود.
+
+**نسخهٔ کاندید:** Pterodactyl Panel 1.x stable و Wings 1.x stable؛ قبل از دانلود، release و security advisory جاری دوباره بررسی شود. از نسخهٔ Open Beta برای این مسیر استفاده نمی‌شود مگر تصمیم جداگانه ثبت شود.
+
+**محدودیت منابع ثبت‌شده:** ۴ vCPU، حدود ۵٫۶ GiB RAM و ۲۸ GiB فضای آزاد / در snapshot. این اندازه‌ها ظرفیت چند سرور CS2 را ثابت نمی‌کنند. قبل از ایجاد game container باید فضای مصرف‌شدهٔ نصب native و احتمال دانلود مجدد Base Game بررسی شود.
+
+**معیار خروج:** Panel با دیتابیس مستقل بالا بیاید؛ سپس Wings به Panel متصل شود و یک CS2 server از داخل Panel با چرخهٔ Start/Stop/Restart قابل تکرار اجرا شود. ساخت دو Instance، isolation، File Manager، Backup/Restore و معماری Base Game مشترک پس از قبولی تست نخستین سرور آزمایش می‌شوند.
+
+**شرط بازنگری:** اگر منابع، شبکه، ذخیره‌سازی یا محدودیت‌های VMware مانع اجرای پایدار شدند، پیش از Production محل Panel و Nodeها دوباره تفکیک و تصمیم ثبت شود.
+
+**مرجع:** [Pterodactyl PoC](PTERODACTYL-POC.md)، [Debian PoC Log](DEBIAN-POC.md)، [Roadmap](ROADMAP.md).
