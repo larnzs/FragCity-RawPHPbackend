@@ -83,3 +83,34 @@
 - [Pterodactyl v1.x Getting Started](https://docs.pterodactyl.io/v1/panel/getting-started)
 - [Panel v1.15.1 Release](https://github.com/pterodactyl/panel/releases/tag/v1.15.1)
 - [Panel v1.15.1 composer.json](https://raw.githubusercontent.com/pterodactyl/panel/v1.15.1/composer.json)
+
+
+## ۸. بازبینی تکمیلی تمام اسناد — ۱۷ اکتبر ۲۰۲۶
+
+در این دور README و همهٔ ۱۸ فایل Markdown زیر docs با درخت فعلی ریپو مقایسه شدند.
+
+### نتایج ساختاری
+
+- ۱۹ فایل Markdown بررسی شدند.
+- مقصدهای پیوند Markdown با درخت فایل ریپو تطبیق داده شدند؛ پیوند داخلی شکسته‌ای پیدا نشد.
+- code fenceهای backtick و tilde بررسی شدند؛ fence نامتوازن پیدا نشد.
+- snapshotهای قدیمی با بخش‌های جدیدتر Debian/Pterodactyl مقایسه شدند. وضعیت قدیمی فقط وقتی حفظ می‌شود که روشن باشد مربوط به قبل از نصب بوده است.
+- راهنمای اجرایی باید فرمان کامل، محل اجرا، پیش‌نیاز، خروجی مورد انتظار، رفتار در خطا و محدودیت امنیتی داشته باشد. سندهای معماری و تصمیم‌نامه نباید آموزش نصبی مصنوعی داشته باشند؛ باید وضعیت و ارتباط آن‌ها با Runbook روشن باشد.
+
+### اصلاحات محتوایی تکمیلی
+
+1. در Pterodactyl PoC، preflight PHP برای moduleهای اصلی موردنیاز Panel از جمله openssl، tokenizer، posix، mysqli و pdo_mysql کامل شد. خروجی قبلی فقط subset مشخص‌شده را فیلتر می‌کرد؛ بنابراین خروجی قدیمی به‌عنوان مدرک دیده‌شدن همهٔ این moduleها تلقی نمی‌شود.
+2. Configuration Guide به فارسی و به شکل مرحله‌به‌مرحله بازنویسی شد؛ همچنین روشن شد وجود Loader مرکزی به معنی مهاجرت کامل همهٔ مسیرهای PHP نیست و credentialهای hard-coded یافتهٔ باز هستند.
+3. Local Development صریحاً توضیح می‌دهد مسیرهای C:\laragon\www صرفاً نمونه‌اند و نباید روی Flute Release موجود در Laragon Portable بازنویسی شوند. نیاز PHP سایت در Windows از PHP 8.3 مربوط به Panel در Debian تفکیک شد.
+4. Security Audit با وضعیت جاری هماهنگ شد. در نسخهٔ فعلی agent/heartbeat.php هنوز عبارت مشکوک $checkStmt$checkStmt->fetch(...) دیده می‌شود؛ این ایراد و سایر یافته‌های امنیتی حل‌شده تلقی نمی‌شوند. این بازبینی، کد اجرایی را تغییر نداده است.
+5. README نقطهٔ ورود است؛ Runbook فرمان‌ها را نگه می‌دارد و Debian Log فقط خروجی‌های واقعاً اجراشده را ثبت می‌کند. این تفکیک عمدی است تا نسخه‌های متناقض از یک فرمان ساخته نشوند.
+
+### وضعیت اجرای بعدی
+
+- انجام‌شده: PHP 8.3، Nginx، MariaDB، Redis، Composer 2.10.3 و بررسی نسخهٔ Nginx.
+- گام بعدی: دریافت، بررسی و استخراج archive رسمی Panel v1.15.1 با فرمان Pterodactyl PoC، بخش ۱۱. این گام هنوز روی Debian اجرا نشده است.
+- محدودیت مهم: حدود ۲۸ GiB فضای آزاد در برابر نصب native CS2 حدود ۷۰ GiB؛ ساخت container بازی تا حل Storage ممنوع است.
+
+### دامنهٔ آزمون و محدودیت
+
+بررسی پیوندها و code fenceها، ساختار Markdown را تأیید می‌کند؛ به‌تنهایی صحت محتوا یا عملکرد برنامه را اثبات نمی‌کند. دو فرمان اصلی Bash پیش‌تر با bash -n بررسی شده بودند؛ چون preflight یکی از آن‌ها در این دور تغییر کرد، syntax نسخهٔ جدید باید دوباره بررسی شود. هیچ‌یک از مراحل جدید Panel، migration دیتابیس، تغییر کد PHP، Rotation credential یا آزمون runtime در جریان این ممیزی اجرا نشده‌اند.
