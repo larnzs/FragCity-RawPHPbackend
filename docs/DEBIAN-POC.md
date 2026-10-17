@@ -519,3 +519,44 @@ sudo -E env RUN_PLUGIN_UPDATER=0 bash ./linux/setup.sh
 ### محدودهٔ این ثبت
 
 این ثبت، پیشرفت Clone را مستند می‌کند؛ **نصب CS2 و پلاگین‌ها و اجرای واقعی سرور هنوز انجام‌شده محسوب نمی‌شوند**. هیچ تغییر جدیدی در خود `larnzs/cs2-kus-addons` ایجاد نشده است. تغییرات فقط در مستندات FragCity ثبت شده‌اند.
+
+
+---
+
+## ۱۴. وضعیت واقعی fc-node-01 پیش از نصب Pterodactyl — ۱۷ اکتبر ۲۰۲۶
+
+کاربر فرمان‌های بررسی سیستم را اجرا کرد و نتایج زیر گزارش شد:
+
+| مورد | مقدار |
+|---|---|
+| OS | Debian GNU/Linux 13 (trixie) |
+| Kernel | 6.12.113+deb13-amd64 |
+| Virtualization | VMware |
+| CPU | ۴ vCPU |
+| RAM | ۵٫۶ GiB total، مقدار available برابر ۳٫۷ GiB |
+| Swap | ۶٫۱ GiB |
+| دیسک / | ۱۱۲ GiB total، ۷۹ GiB used، ۲۸ GiB available، ۷۵٪ used |
+
+در بررسی command -v، PHP، Composer، Nginx، MariaDB/MySQL، Redis server، Docker و Wings موجود نبودند. در snapshot فوق هیچ فرایند CS2 فعالی هم مشاهده نشد. این نتیجه به معنی نصب نبودن Pterodactyl در این مرحله است؛ نصب Panel هنوز شروع نشده است.
+
+فرمان بررسی پورت‌ها به‌علت رد شدن رمز sudo کامل نشد؛ بنابراین IP ماشین و پورت‌های listening پیش از نصب Nginx هنوز ثبت نشده‌اند و باید دوباره بررسی شوند.
+
+### تصمیم فعلی
+
+طبق توافق ۱۷ اکتبر ۲۰۲۶، همین fc-node-01 به‌عنوان **محیط یکپارچهٔ آزمایشی** برای Pterodactyl Panel، MariaDB محلی، Redis، Wings و Docker استفاده می‌شود. این تصمیم به‌معنی Production بودن نود نیست. Flute CMS و MariaDB فعلی cPanel از این فاز جدا باقی می‌مانند؛ اتصال آیندهٔ سایت به پنل از HTTPS API انجام می‌شود، نه اتصال مستقیم دیتابیس cPanel.
+
+فضای آزاد فعلی حدود ۲۸ GiB است. نصب Panel و وابستگی‌های وب در مرحلهٔ بعد ارزیابی می‌شود؛ اما قبل از ساخت CS2 container باید اندازهٔ نصب native موجود و احتمال دانلود دوبارهٔ Base Game بررسی شود. روش اشتراک Base Game داخل Docker هنوز پیاده‌سازی یا تأیید نشده و نباید فرض شود که Egg استاندارد بازی از مسیر فعلی /home/steam/cs2 به‌طور خودکار استفاده می‌کند.
+
+جزئیات نسخه‌های کاندید، وابستگی‌ها، مراحل، معیارهای پذیرش و کارهای باقیمانده در [Pterodactyl PoC](PTERODACTYL-POC.md) ثبت شده‌اند.
+
+### وضعیت پایان این ثبت
+
+- [x] Snapshot منابع Debian ثبت شد.
+- [x] تصمیم اجرای PoC روی همان fc-node-01 ثبت شد.
+- [x] Flute CMS و دیتابیس cPanel خارج از scope این نصب ثبت شدند.
+- [ ] sudo، IP و پورت‌های listening دوباره تأیید شوند.
+- [ ] Panel و دیتابیس محلی نصب شوند.
+- [ ] Wings/Docker پس از بررسی Storage و شبکه نصب شوند.
+- [ ] یک CS2 server از داخل Panel اجرا و lifecycle آن آزمایش شود.
+
+این snapshot از خروجی گزارش‌شدهٔ کاربر تهیه شده است؛ هنوز هیچ package جدیدی نصب نشده است.
