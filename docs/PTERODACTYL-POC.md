@@ -171,7 +171,7 @@ PoC هنوز موفق محسوب نمی‌شود تا Panel به‌صورت پا
 - سرویس‌های `nginx`, `mariadb`, `redis-server` و `php8.3-fpm` همگی `active` گزارش شده‌اند.
 - Nginx روی TCP/80 گوش می‌دهد. MariaDB روی `127.0.0.1:3306` و Redis روی `127.0.0.1:6379` و `[::1]:6379` گوش می‌دهند؛ در snapshot پورت 3306 و 6379 روی رابط شبکهٔ عمومی باز نیستند.
 - Composer 2.10.3 نصب و تأیید شده است. فایل‌های Panel، database/user اختصاصی Panel، `.env`، APP_KEY، migrations، حساب مدیر، queue/cron، Docker و Wings هنوز نصب/تنظیم نشده‌اند.
-- دستور `nginx -v` در shell کاربر با پیام `command not found` مواجه شده، درحالی‌که سرویس Nginx active و پورت 80 در حال listen است. به‌احتمال زیاد مسیر `/usr/sbin` در PATH این shell نیست؛ نسخهٔ باینری را در ادامه با `sudo /usr/sbin/nginx -v` و نسخهٔ بسته را با `dpkg-query` بررسی می‌کنیم. این پیام را به‌عنوان شکست نصب Nginx ثبت نمی‌کنیم.
+- دستور `nginx -v` در shell کاربر با پیام `command not found` مواجه شد، اما سرویس active بود و پورت 80 را listen می‌کرد. بررسی بعدی با `sudo /usr/sbin/nginx -v` موفق شد و نسخهٔ `nginx/1.26.3` و بستهٔ `1.26.3-3+deb13u9` را تأیید کرد؛ پس این مورد مشکل PATH کاربر بود، نه شکست نصب Nginx.
 - فضای آزاد همچنان حدود 28 GiB است و نصب فعلی native بازی CS2 در `/home/steam/cs2` حدود 70 GiB است؛ اخطار storage پیش از ساخت container به قوت خود باقی است.
 
 **مرحلهٔ بعد:** بررسی دوبارهٔ release پایدار Panel و سپس نوشتن/اجرای گام دریافت archive و پیکربندی Panel، با ثبت خروجی هر مرحله. هنوز دیتابیس یا `.env` پنل ساخته نشده است.
@@ -195,7 +195,7 @@ Candidate: 8.3.35-1+0~20260925.87+debian13~1.gbp19383d
 
 پیام Skipping ... binary-i386/Packages از SURY به‌دلیل پشتیبانی‌نشدن معماری i386 در این مخزن بود؛ APT هم‌زمان index معماری amd64 را دریافت کرد و candidate را نشان داد.
 
-**وضعیت در زمان ثبت این بخش:** فقط مخزن و keyring نصب شده بودند و بسته‌های PHP 8.3، Nginx، MariaDB و Redis هنوز نصب نشده بودند. این وضعیت تاریخی است و با اجرای موفق مرحلهٔ ۹ جایگزین شده است؛ وضعیت کنونی در بخش‌های ۷ و ۹ و گام بعدی در بخش ۱۰ ثبت شده‌اند. Composer/Panel، Wings و Docker همچنان نصب نشده‌اند.
+**وضعیت در زمان ثبت این بخش:** فقط مخزن و keyring نصب شده بودند و بسته‌های PHP 8.3، Nginx، MariaDB و Redis هنوز نصب نشده بودند. این وضعیت تاریخی است و با اجرای موفق مرحله‌های ۹ و ۱۰ جایگزین شده است؛ وضعیت کنونی در بخش ۷ و گام بعدی در بخش ۱۱ ثبت شده است. در زمان آن snapshot، Panel، Wings و Docker نصب نشده بودند.
 
 
 ## ۹. نتیجهٔ نصب بسته‌های پایهٔ Panel — انجام‌شده
@@ -222,7 +222,7 @@ sudo apt install -y \
 | PHP extensions | bcmath, curl, gd, intl, mbstring, PDO, pdo_mysql, xml, zip و Zend OPcache مشاهده شدند |
 | MariaDB client/server package | خروجی `mariadb --version`: MariaDB 11.8.6 |
 | Redis | 8.0.2 |
-| Nginx package | هنگام apt نصب شد؛ نسخهٔ باینری به‌خاطر PATH باید با مسیر کامل تأیید شود |
+| Nginx package/binary | نسخهٔ باینری `nginx/1.26.3`؛ بستهٔ `1.26.3-3+deb13u9` |
 | nginx service | active |
 | mariadb service | active |
 | redis-server service | active |
@@ -235,7 +235,7 @@ sudo apt install -y \
 | Composer | نصب و تأیید شده: 2.10.3 |
 | Panel / Docker / Wings | هنوز نصب نشده‌اند |
 
-در خروجی فیلتر extension، `Zend OPcache` دو بار دیده شد؛ یک بار برای extension و یک بار در بخش Zend Engine. این duplication خطا نیست. اجرای `nginx -v` در shell کاربر `command not found` داد، اما systemd سرویس را active گزارش کرد و `ss` نیز listener مربوط به Nginx را نشان داد. بنابراین بررسی نسخهٔ باینری با مسیر کامل بخشی از مرحلهٔ بعد است.
+در خروجی فیلتر extension، `Zend OPcache` دو بار دیده شد؛ یک بار برای extension و یک بار در بخش Zend Engine. این duplication خطا نیست. `nginx -v` در shell کاربر `command not found` داد، اما بررسی با مسیر کامل `sudo /usr/sbin/nginx -v` نسخهٔ Nginx را تأیید کرد.
 
 ### بررسی دوبارهٔ وضعیت
 
