@@ -18,7 +18,7 @@
 
 1. **Laragon را انتخاب کن** مگر اینکه WAMP از قبل آماده باشد. نسخهٔ PHP باید با PHP هاست فعلی تا حد ممکن هماهنگ باشد؛ فایل .htaccess فعلی هاست از PHP 8.4 نام می‌برد.
 2. Git for Windows، Apache، PHP و MySQL/MariaDB محلی نصب/فعال باشند. نسخه و extensionهای واقعی موردنیاز باید پس از بررسی includeهای دیتابیس ثبت شوند.
-3. از GitHub یک clone مجزا در مسیر وب Laragon ایجاد کن. برای نمونه، اگر GitHub CLI/Git Credential Manager دسترسی خصوصی را پیکربندی کرده باشد:
+3. از GitHub یک clone مجزا در مسیر وب Laragon ایجاد کن. **مسیر `C:\laragon\www\FragCity-RawPHPbackend` در فرمان زیر فقط نمونهٔ نصب معمولی Laragon است.** در نصب Portable ثبت‌شدهٔ این پروژه، Laragon در `W:\laragon_portable` قرار دارد؛ مسیر مقصد را با نصب واقعی خودت هماهنگ کن. پوشهٔ `W:\laragon_portable\www` در README برای Flute Release استفاده شده است؛ آن را با clone ریپوی دیگری بازنویسی یا مخلوط نکن. برای تست RawPHPbackend، مسیر و Virtual Host مستقل تعریف کن. اگر GitHub CLI/Git Credential Manager دسترسی خصوصی را پیکربندی کرده باشد:
 
    ~~~bat
    git clone --branch main --single-branch https://github.com/larnzs/FragCity-RawPHPbackend.git C:\laragon\www\FragCity-RawPHPbackend
@@ -47,7 +47,7 @@ copy settings\settings.example.json settings\settings.json
 - روی cPanel باید runtime settings مخصوص Production جداگانه و امن آماده شود.
 - پرداخت واقعی و عملیات مالی در تست محلی غیرفعال بمانند.
 
-**سازگاری PHP:** برنامه از امکانات PHP 8.x مثل `match` و `str_starts_with` استفاده می‌کند. در Laragon از Menu → PHP → Version، نسخهٔ PHP 8.4 را انتخاب کن. timezone Parse error ناشی از نسخهٔ PHP قدیمی را حل نمی‌کند.
+**سازگاری PHP:** برنامه از امکانات PHP 8.x مثل `match` و `str_starts_with` استفاده می‌کند. در Laragon از Menu → PHP → Version، نسخهٔ PHP 8.4 را انتخاب کن. timezone Parse error ناشی از نسخهٔ PHP قدیمی را حل نمی‌کند. این انتخاب مخصوص سایت در Windows است؛ Pterodactyl Panel v1.15.1 در Debian جداگانه با PHP 8.3 اجرا می‌شود، پس نسخهٔ PHP این دو محیط را با هم اشتباه نگیر.
 
 ## 4. استفاده از updater روزمره
 
