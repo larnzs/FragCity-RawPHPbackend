@@ -8,6 +8,7 @@
 - `tar -tzf` بدون خطا فهرست فایل‌ها را نشان داد؛ فایل‌های `artisan`, `.env.example`, `composer.json`, `public/index.php` همگی `OK` بودند.
 - فایل‌ها در `/var/www/pterodactyl` استخراج شدند؛ حجم پوشه حدود 17 MiB و فضای آزاد پارتیشن root حدود 27 GiB است.
 - خروجی مالکیت اولیه نشان داد پوشهٔ اصلی `root:root` و `storage`/ `bootstrap/cache` مالک `1001:steam` دارند. گام بعد اصلاح مالکیت به `www-data:www-data` و تأیید افزونه‌های لازم PHP است.
+- آخرین خروجی ارسالی کاربر با نتیجهٔ ثبت‌شده تطبیق داده شد: حجم پوشه حدود 17 MiB و فضای آزاد root حدود 27 GiB است؛ قدم بعدی طبق [Pterodactyl PoC بخش ۱۲](PTERODACTYL-POC.md) بررسی extensionهای لازم و اصلاح مالکیت/مجوز است.
 - هنوز database/user، `.env`، Composer dependencies، APP_KEY، migrations، admin user، Nginx site، cron/queue، Docker و Wings نصب یا پیکربندی نشده‌اند.
 - وضعیت و فرمان تکرارپذیر در [Pterodactyl PoC بخش ۱۱](PTERODACTYL-POC.md) و [Debian PoC Log](DEBIAN-POC.md) ثبت شده است. هیچ چیزی در `cs2-kus-addons` تغییر نکرده است.
 
