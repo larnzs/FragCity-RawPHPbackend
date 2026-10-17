@@ -310,27 +310,23 @@ http://localhost/
 
 ### اسکریپت به‌روزرسانی رسمی Flute در `flute-base`
 
-- [`update-flute-release.bat`](https://github.com/larnzs/FragCity-RawPHPbackend/blob/flute-base/update-flute-release.bat) — اجراکنندهٔ ویندوز.
-- [PowerShell helper](https://github.com/larnzs/FragCity-RawPHPbackend/blob/flute-base/.fragcity-tools/update-flute-release.ps1) — آخرین stable Release رسمی را از GitHub API پیدا می‌کند، ZIPهای واقعی Release را بررسی می‌کند، فقط بسته‌ای را می‌پذیرد که `vendor/autoload.php`، `composer.json` و `public/index.php` داشته باشد، سپس baseline را به‌روز کرده و branch `flute-base` را push می‌کند. آرشیو خودکار GitHub با عنوان Source Code جایگزین Release کامل نمی‌شود.
+- [`update-flute-release.sh`](https://github.com/larnzs/FragCity-RawPHPbackend/blob/flute-base/update-flute-release.sh) — اسکریپت Bash محلی؛ آخرین Stable Release رسمی را از GitHub API پیدا می‌کند، ZIPهای Release را بررسی می‌کند و فقط بسته‌ای را می‌پذیرد که `vendor/autoload.php`، `composer.json` و `public/index.php` داشته باشد. سپس baseline را به‌روز و به branch `flute-base` روی GitHub Push می‌کند.
+- دیگر فایل‌های `update-flute-release.bat` و PowerShell helper لازم نیستند؛ updater رسمی فقط `.sh` است و Flute قرار نیست از این worktree اجرا شود. این branch صرفاً baseline برای مقایسه‌ی نسخه‌هاست.
 
-این updater در برابر working tree تغییرکرده متوقف می‌شود، فایل‌های محلیِ untracked/ignored را در صورت برخورد با فایل‌های Release بازنویسی نمی‌کند، فایل‌های tracked حذف‌شده از Release را به‌صورت جداگانه حذف می‌کند و force-push انجام نمی‌دهد.
+Updater قبل از تغییر فایل‌ها، clean بودن working tree و branch مجاز را بررسی می‌کند. اگر ZIP کامل با `vendor` پیدا نشود، فایل‌های محلی را تغییر نمی‌دهد. فایل‌های untracked/ignored را در صورت برخورد با مسیرهای Release بازنویسی نمی‌کند؛ فایل‌های tracked که در Release جدید حذف شده‌اند به‌صورت فایل‌به‌فایل حذف می‌شوند. اسکریپت از force-push استفاده نمی‌کند.
 
-**اجرای پیشنهادی:** updater رسمی را در یک Git worktree جدا اجرا کن، نه در همان پوشه‌ای که Laragon از آن سایت را سرو می‌کند. پس از اینکه clone محلی روی شاخهٔ `www` قرار گرفت، یک بار از ریشهٔ مخزن اجرا کن:
+**محل اجرا:** اسکریپت را از یک checkout یا Git worktree جدا برای baseline اجرا کن، نه از پوشه‌ی Laragon که branch `www` را سرو می‌کند. Bash و ابزارهای `git`، `curl`، `jq`، `unzip`، `find`، `realpath`، `wc`، `grep`، `cmp`، `mktemp`، `cp`، `rm`، `mkdir` و `dirname` باید نصب باشند.
 
-```bat
+در یک clone محلی از مخزن، از ریشه‌ی repository اجرا کن:
+
+```bash
 git fetch origin
-git worktree add -b flute-base-updater W:\fragcity-flute-base origin/flute-base
+git worktree add -b flute-base-updater ../fragcity-flute-base origin/flute-base
+cd ../fragcity-flute-base
+bash ./update-flute-release.sh
 ```
 
-این یک branch محلیِ مخصوص updater می‌سازد تا هم‌زمان شاخهٔ `www` در پوشهٔ Laragon فعال بماند. اسکریپت commit را از worktree جداگانه مستقیماً به remote branch یعنی `flute-base` push می‌کند؛ branch محلی `flute-base-updater` صرفاً برای جلوگیری از تداخل با پوشهٔ سایت است.
-
-سپس برای به‌روزرسانی baseline، فایل زیر را اجرا کن:
-
-```text
-W:\fragcity-flute-base\update-flute-release.bat
-```
-
-این روش شاخهٔ `www` و صفحهٔ در حال توسعه را از تغییر مستقیم به Release جدید جدا نگه می‌دارد. اگر آن worktree از قبل ساخته شده، دوباره `git worktree add` را اجرا نکن؛ همان پوشه را باز کن و اسکریپت را اجرا کن.
+اگر worktree محلی `flute-base-updater` از قبل ساخته شده، `git worktree add` را دوباره اجرا نکن؛ فقط وارد همان پوشه شو و `bash ./update-flute-release.sh` را اجرا کن. اسکریپت commit را در worktree می‌سازد و با دستور بدون force به remote branch یعنی `flute-base` Push می‌کند. branch فعال توسعه‌ی FragCity یعنی `www` جدا باقی می‌ماند.
 
 ### مرز مهم: Git در برابر دیتابیس
 
