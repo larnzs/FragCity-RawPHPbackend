@@ -280,3 +280,55 @@ http://localhost/
 رفع خطای 404 به معنای تکمیل نصب Flute یا آماده‌بودن محیط Production نیست؛ این مرحله فقط مسیریابی Nginx به ورودی برنامه را اصلاح می‌کند. نصب را ابتدا با دیتابیس آزمایشی جداگانه انجام دهید، secretهای Production را در محیط محلی قرار ندهید و پیش از استفادهٔ واقعی، نسخه‌های PHP، افزونه‌ها و دیتابیس موردنیاز Flute را با محیط هدف تطبیق دهید.
 
 **نتیجهٔ ثبت‌شده:** در Laragon Portable با Nginx، خطای `/install` ناشی از `try_files $uri $uri/ =404;` بود؛ با تغییر آن به `try_files $uri $uri/ /index.php?$query_string;` و Restart All، ویزارد نصب قابل دسترسی شد.
+
+
+---
+
+## گردش‌کار Git برای Flute و FragCity
+
+برای جلوگیری از مخلوط‌شدن کد اختصاصی FragCity با سورس رسمی Flute، از این سه شاخه استفاده می‌کنیم:
+
+| Branch | مسئولیت |
+|---|---|
+| `main` | سایت PHP قدیمی FragCity و مستندات موجود؛ تا پایان مهاجرت حفظ می‌شود |
+| `flute-base` | baseline رسمی Flute؛ آپدیت‌های Release اینجا ثبت می‌شوند تا تغییرات نسخه‌ها قابل مقایسه باشند |
+| `www` | شاخهٔ فعال توسعهٔ سایت FragCity بر پایهٔ Flute؛ تغییرات محلی و تغییرات اختصاصی اینجا قرار می‌گیرند |
+
+### اسکریپت‌های شاخهٔ `www`
+
+- [`upload-changes.bat`](https://github.com/larnzs/FragCity-RawPHPbackend/blob/www/upload-changes.bat) — تغییرات فایل‌های محلی را بررسی می‌کند، فایل‌های رایج محرمانه/دادهٔ محلی را برای جلوگیری از آپلود تصادفی مسدود می‌کند، commit می‌سازد و `www` را به GitHub push می‌کند. اگر از `flute-base` اجرا شود، تلاش می‌کند ابتدا به `www` محلی/remote سوئیچ کند.
+- [`update.bat`](https://github.com/larnzs/FragCity-RawPHPbackend/blob/www/update.bat) — فقط شاخهٔ `www` را از GitHub با `git pull --ff-only` به‌روز می‌کند. اگر فایل محلی تغییرکرده یا untracked وجود داشته باشد، متوقف می‌شود و آن‌ها را پاک نمی‌کند.
+
+روش معمول:
+
+1. کد را در Laragon و branch محلی `www` تغییر بده.
+2. `upload-changes.bat` را اجرا کن تا changes بررسی و به GitHub ارسال شوند.
+3. وقتی تغییرات جدیدی روی GitHub در شاخهٔ `www` ثبت شد، بعد از commit/push کردن یا پشتیبان‌گیری از تغییرات محلی، `update.bat` را اجرا کن.
+
+هر دو اسکریپت بدون force-push کار می‌کنند. در صورت خطای Git، تاریخچه را بازبینی کن؛ برای حل تعارض به‌صورت کورکورانه از `reset --hard` یا `push --force` استفاده نکن.
+
+### اسکریپت به‌روزرسانی رسمی Flute در `flute-base`
+
+- [`update-flute-release.bat`](https://github.com/larnzs/FragCity-RawPHPbackend/blob/flute-base/update-flute-release.bat) — اجراکنندهٔ ویندوز.
+- [PowerShell helper](https://github.com/larnzs/FragCity-RawPHPbackend/blob/flute-base/.fragcity-tools/update-flute-release.ps1) — آخرین stable Release رسمی را از GitHub API پیدا می‌کند، ZIPهای واقعی Release را بررسی می‌کند، فقط بسته‌ای را می‌پذیرد که `vendor/autoload.php`، `composer.json` و `public/index.php` داشته باشد، سپس baseline را به‌روز کرده و branch `flute-base` را push می‌کند. آرشیو خودکار GitHub با عنوان Source Code جایگزین Release کامل نمی‌شود.
+
+این updater در برابر working tree تغییرکرده متوقف می‌شود، فایل‌های محلیِ untracked/ignored را در صورت برخورد با فایل‌های Release بازنویسی نمی‌کند، فایل‌های tracked حذف‌شده از Release را به‌صورت جداگانه حذف می‌کند و force-push انجام نمی‌دهد.
+
+**اجرای پیشنهادی:** updater رسمی را در یک Git worktree جدا اجرا کن، نه در همان پوشه‌ای که Laragon از آن سایت را سرو می‌کند. پس از اینکه clone محلی روی شاخهٔ `www` قرار گرفت، یک بار از ریشهٔ مخزن اجرا کن:
+
+```bat
+git fetch origin
+git worktree add W:\fragcity-flute-base flute-base
+```
+
+سپس برای به‌روزرسانی baseline، فایل زیر را اجرا کن:
+
+```text
+W:\fragcity-flute-base\update-flute-release.bat
+```
+
+این روش شاخهٔ `www` و صفحهٔ در حال توسعه را از تغییر مستقیم به Release جدید جدا نگه می‌دارد. اگر آن worktree از قبل ساخته شده، دوباره `git worktree add` را اجرا نکن؛ همان پوشه را باز کن و اسکریپت را اجرا کن.
+
+### مرز مهم: Git در برابر دیتابیس
+
+این اسکریپت‌ها **فایل‌های Git** را همگام می‌کنند؛ آن‌ها تنظیماتی را که Flute داخل دیتابیس محلی ذخیره کرده، به GitHub آپلود یا از آن دانلود نمی‌کنند. همچنین فایل‌های واقعیِ رمز، API token، اتصال دیتابیس یا اطلاعات مشتری نباید به مخزن push شوند. هر تنظیمی که باید در نصب جدید تکرارپذیر باشد، باید به‌صورت الگوی امن، migration/seed قابل بازبینی یا راهنمای نصب مستند شود.
