@@ -51,7 +51,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 |---|---|---|
 | ۰. مستندسازی و محیط توسعهٔ محلی | Requirements، معماری، updater محلی، راهنمای Laragon/WAMP | مستندات آماده؛ نصب محلی و جداسازی DB Pending |
 | ۱. ممیزی و خط مبنا | بررسی نسخه‌ها، امنیت، داده‌ها و محدودیت‌های میزبانی | ممیزی ایستا اولیه انجام شده؛ اصلاحات Pending |
-| ۲. PoC مدیریت سرور | یک نود آزمایشی، یک سرور CS2، منابع و چرخهٔ عمر | بسته‌های پایهٔ PHP 8.3/Nginx/MariaDB/Redis نصب؛ Composer/Panel Pending |
+| ۲. PoC مدیریت سرور | یک نود آزمایشی، یک سرور CS2، منابع و چرخهٔ عمر | بسته‌های پایه و Composer 2.10.3 نصب؛ دریافت/پیکربندی Panel و Wings/CS2 هنوز Pending |
 | ۳. اتصال فروش | سفارش آزمایشی → Provisioning از طریق API پنل | Pending |
 | ۴. منطق کیف پول و بسته | کسر یک‌باره، ثبت و تمدید `expires_at`، رفتار انقضا | Pending؛ شرط مسدودکنندهٔ تولید |
 | ۵. امنیت و بازیابی | جداسازی مشتریان، Backup/Restore، retry، جلوگیری از تکرار | Pending |
@@ -81,11 +81,31 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | [Local Development](docs/LOCAL-DEVELOPMENT.md) | updater محلی، نصب Laragon/WAMP و موانع امن تست دیتابیس |
 | [Current Status](docs/CHANGELOG-STATUS.md) | وضعیت جاری، انتخاب‌های انجام‌شده و مواردی که هنوز اجرا نشده‌اند |
 
+
+## راهنمای اجرایی مرحله‌به‌مرحلهٔ نصب Pterodactyl
+
+**نقش README:** این فایل نقطهٔ ورود، نقشهٔ راه و خلاصهٔ وضعیت است؛ عمدی است که تمام فرمان‌های نصب در README تکرار نشوند. برای دستورهای کامل copy/paste و توضیح هر فرمان، [Pterodactyl PoC](docs/PTERODACTYL-POC.md) را به‌ترتیب بخش‌ها دنبال کن. [Debian PoC Log](docs/DEBIAN-POC.md) تاریخچهٔ خروجی‌های واقعی و نتیجهٔ اجرای هر مرحله را نگه می‌دارد. گام‌های آینده تا زمانی که اجرا و تأیید نشده‌اند، «Pending» هستند.
+
+| ترتیب | گام | وضعیت فعلی | راهنما |
+|---|---|---|---|
+| ۰ | شناسایی Debian، منابع، شبکه، فضای دیسک و نصب native CS2 | انجام و ثبت شده | [Pterodactyl PoC §۳–۴](docs/PTERODACTYL-POC.md)، [Debian Log](docs/DEBIAN-POC.md) |
+| ۱ | افزودن مخزن SURY و بررسی candidate برای PHP 8.3 | انجام شده | [Pterodactyl PoC §۸](docs/PTERODACTYL-POC.md) |
+| ۲ | نصب PHP 8.3 extensions، Nginx، MariaDB و Redis | انجام و بررسی شده | [Pterodactyl PoC §۹](docs/PTERODACTYL-POC.md) |
+| ۳ | بررسی سرویس‌ها، پورت‌ها و مسیر باینری Nginx | سرویس‌ها/پورت‌ها بررسی شده؛ نسخه Nginx تأیید شده | [Pterodactyl PoC §۹–۱۰](docs/PTERODACTYL-POC.md) |
+| ۴ | نصب Composer 2 و تأیید checksum | انجام شده؛ نسخه 2.10.3 | [Pterodactyl PoC §۱۰](docs/PTERODACTYL-POC.md) |
+| ۵ | دریافت archive رسمی Panel و نصب dependencyهای آن | گام بعدی؛ هنوز اجرا نشده | [Pterodactyl PoC §۱۱](docs/PTERODACTYL-POC.md) |
+| ۶ | ساخت DB/user محلی Panel، تنظیم `.env`، APP_KEY، migrations و حساب مدیر | Pending | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
+| ۷ | Nginx virtual host، queue worker، cron و تست ورود Panel | Pending | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
+| ۸ | نصب Wings/Docker و تعریف Node/Allocation | Pending؛ بعد از قبولی Panel | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
+| ۹ | اولین سرور CS2 و تست چرخهٔ عمر/فضای ذخیره‌سازی | Pending؛ خطر دانلود مجدد Base Game باید حل شود | [CS2 Multi-Instance](docs/CS2-MULTI-INSTANCE.md)، [Testing Bench](docs/TESTING-BENCH.md) |
+
+**نکتهٔ مهم:** فرمان‌های دقیق گام‌های ۰ تا ۴ و خروجی‌هایی که تاکنون واقعاً اجرا شده‌اند در مستند اجرایی/لاگ ثبت شده‌اند. قبل از گام ۵، نسخهٔ پایدار و راهنمای رسمی دوباره بررسی می‌شود و فرمان‌های جدید همان موقع به مستند اجرایی افزوده خواهند شد؛ بنابراین README به‌تنهایی جایگزین راهنمای دستورات نیست.
+
 ## محیط فعلی و محدودیت‌های شناخته‌شده
 
 - میزبان فعلی: Windows، پردازندهٔ Ryzen 5 8400F و ۱۶ گیگابایت RAM.
 - نود آزمایشی: Debian 13 در VMware؛ ۴ vCPU، ۵٫۶ GiB RAM و حدود ۲۸ GiB فضای آزاد در آخرین snapshot؛ IP برابر 192.168.1.5 و listenerهای فعلی بررسی شده‌اند؛ فعلاً محیط تست است، نه نود تولید.
-- روی Debian 13 در VMware، بسته‌های پایهٔ PHP 8.3 و افزونه‌ها، Nginx، MariaDB و Redis نصب شده و سرویس‌ها active گزارش شده‌اند؛ دیتابیس/کاربر اختصاصی Panel و خود Panel هنوز ایجاد نشده‌اند و Composer گام بعدی است. PHP 8.3 از مخزن خارجی SURY تأمین شده است. پیش از نصب CS2 container باید خطر دانلود دوبارهٔ بازی حدود ۷۰ گیگابایتی و فضای آزاد حدود ۲۸ GiB حل شود.
+- روی Debian 13 در VMware، بسته‌های پایهٔ PHP 8.3 و افزونه‌ها، Nginx، MariaDB، Redis و Composer 2.10.3 نصب شده‌اند؛ باینری Nginx هم نسخهٔ 1.26.3 را گزارش کرده است. دیتابیس اختصاصی Panel و خود Panel هنوز ایجاد نشده‌اند. PHP 8.3 از مخزن خارجی SURY تأمین شده است. پیش از نصب CS2 container باید خطر دانلود دوبارهٔ بازی حدود ۷۰ گیگابایتی و فضای آزاد حدود ۲۸ GiB حل شود.
 - هدف شروع: ۵ سرور پایدار؛ ۸ تا ۱۰ سرور تنها هدف کششی است و باید با اندازه‌گیری واقعی تأیید شود.
 - سایت و MariaDB فعلی روی هاست اشتراکی cPanel قرار دارند.
 - اتصال مستقیم خارجی MariaDB روی TCP/3306 برای سرویس فعلی قابل استفاده نیست؛ نود به API سایت از طریق HTTPS وصل می‌شود.
@@ -110,4 +130,4 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 5. هیچ انتخابی صرفاً با تعداد ستارهٔ GitHub انجام نمی‌شود؛ API، بلوغ، امنیت، قابلیت ارتقا، صورتحساب و آزمون عملی معیار تصمیم‌اند.
 6. حذف یا بازنویسی هیچ‌کدام از ریپوهای موجود بخشی از فاز مستندسازی نیست.
 
-**وضعیت نهایی فعلی:** معماری مرجع PoC مشخص است؛ dependencyهای پایهٔ وب/DB روی fc-node-01 نصب شده‌اند، اما Composer و Pterodactyl Panel هنوز نصب نشده‌اند. Wings/ Docker، اجرای CS2 تحت مدیریت Panel و انتقال تولیدی Pending هستند؛ اصلاح کدهای امنیتی نیز به برنامه‌ریزی و تست مجزا نیاز دارد.
+**وضعیت نهایی فعلی:** معماری مرجع PoC مشخص است؛ dependencyهای پایهٔ وب/DB و Composer 2.10.3 روی fc-node-01 نصب و بررسی شده‌اند. دریافت/پیکربندی Pterodactyl Panel، Wings/Docker، اجرای CS2 تحت مدیریت Panel و انتقال تولیدی Pending هستند؛ اصلاح کدهای امنیتی نیز به برنامه‌ریزی و تست مجزا نیاز دارد.
