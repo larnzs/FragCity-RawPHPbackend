@@ -678,8 +678,21 @@ sudo /usr/sbin/nginx -v
 dpkg-query -W -f='nginx package: ${Version}\n' nginx
 ~~~
 
-### گام بعدی مستند
+### نتیجهٔ نصب Composer 2 — انجام‌شده در ۱۷ اکتبر ۲۰۲۶
 
-گام بعد نصب Composer 2 از سایت رسمی است. نصب‌کننده باید پیش از اجرا با SHA-384 رسمی تطبیق داده شود؛ فرمان کامل و checksum تاریخ‌دار در [Pterodactyl PoC](PTERODACTYL-POC.md)، بخش ۱۰ آمده است. بعد از آن، نسخهٔ Composer و Nginx ثبت شده و فقط در مرحلهٔ بعد archive پایدار Panel دریافت می‌شود.
+پس از نصب بسته‌های پایه، کاربر نصب Composer را با تطبیق SHA-384 نصب‌کننده با مقدار رسمی ثبت‌شده در همان روز انجام داد.
 
-**مرز مرحله:** در لاگ ارسالی database/user اختصاصی Panel، secrets، `.env`, APP_KEY، migration، حساب مدیر، queue worker یا cron ایجاد نشده‌اند. هیچ کاری با Docker/Wings یا ساخت CS2 container انجام نشده است.
+| بررسی | خروجی واقعی |
+|---|---|
+| Checksum | `Composer installer checksum verified.` |
+| Composer | `Composer version 2.10.3 2026-08-27 13:34:23` |
+| PHP مرتبط | `PHP version 8.3.35 (/usr/bin/php8.3)` |
+| مسیر Composer | `/usr/local/bin/composer` |
+| Nginx binary | `nginx version: nginx/1.26.3` |
+| Nginx Debian package | `1.26.3-3+deb13u9` |
+
+این خروجی خطای قبلی `nginx -v: command not found` را روشن کرد: وقتی مسیر کامل `/usr/sbin/nginx` استفاده شد، نسخه با موفقیت گزارش شد. این خطا به معنی ازکارافتادن سرویس نبود؛ listener روی TCP/80 و وضعیت `active` پیش‌تر تأیید شده بود.
+
+**گام بعدی:** دریافت و پیکربندی Panel هنوز اجرا نشده است. Release و دستورهای نصب باید در شروع گام بعد از منبع رسمی بررسی شوند. جزئیات روند آموزشی و فرمان قابل تکرار در [Pterodactyl PoC، بخش ۱۰](PTERODACTYL-POC.md) ثبت شده است؛ تاریخ/مقدار checksum تاریخی است و هنگام اجرای مجدد باید مقدار فعلی صفحه رسمی Composer را دید.
+
+**مرز مرحله:** در لاگ فعلی هنوز database/user اختصاصی Panel، secrets، `.env`، APP_KEY، migration، حساب مدیر، queue worker یا cron ایجاد نشده‌اند. Docker، Wings و CS2 container هم هنوز نصب/ساخته نشده‌اند.
