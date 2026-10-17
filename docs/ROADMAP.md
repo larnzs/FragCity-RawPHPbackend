@@ -8,7 +8,7 @@
 |---|---|---|---|
 | P0 — Requirements & Local Development | مستندات آماده؛ اجرا Pending | الزامات، معماری، updater محلی، Laragon/WAMP و مرزبندی Production | clone محلی آماده، DB کاملاً جدا و تست اولیه قابل تکرار باشد |
 | P1 — Security & Baseline | ممیزی ایستا اولیه انجام؛ اصلاح Pending | بازبینی secret، API، ورودی‌ها و مدل مالکیت داده | خطرهای مسدودکننده شناسایی و برنامه اصلاح تصویب شود |
-| P2 — Game Panel PoC | Pending | یک Node، Base Game مشترک، دو Instance با baseline خصوصی کامل و updater انتخابی پلاگین/Runtime | چرخهٔ عمر، جداسازی Instanceها، حفاظت کانفیگ، File Manager و Update هماهنگ‌شده پایدار باشد |
+| P2 — Game Panel PoC | Debian lab آماده‌سازی شد؛ نصب Panel pending | fc-node-01 آزمایشگاهی؛ Panel/DB محلی، سپس Wings/Docker و یک CS2 server | چرخهٔ عمر، جداسازی Instanceها، حفاظت کانفیگ، File Manager و Update هماهنگ‌شده پایدار باشد |
 | P3 — Billing Integration | Pending | سفارش Sandbox/ساختگی تا Provisioning | duplicate و سفارش ناموفق به‌شکل امن مدیریت شود |
 | P4 — Fixed-Duration Product | Pending | بسته‌ها، Wallet، `expires_at` و expiry action | تمام تست‌های مدل مالی قبول شوند |
 | P5 — Isolation & Recovery | Pending | مجوز مشتری، Backup/Restore، retry و rollback | تست‌های امنیتی/بازیابی قبول شوند |
@@ -43,7 +43,7 @@
 ## P2 — PoC پنل بازی
 
 1. Release پایدار و patched دقیق Panel/Wings انتخاب و ثبت شود.
-2. محیط آزمایشی جدا تهیه شود؛ نود تولیدی و هاست اشتراکی cPanel هدف نصب Wings نیستند.
+2. در فاز فعلی، همان fc-node-01 به‌عنوان آزمایشگاه یکپارچهٔ Panel و Node استفاده می‌شود؛ این انتخاب به‌معنی Production بودن نود یا مناسب‌بودن دائمی یک ماشین برای همهٔ سرویس‌ها نیست. Flute CMS و دیتابیس cPanel فعلاً جدا می‌مانند. پیش از نصب Nginx، IP و پورت‌های فعلی ثبت شوند.
 3. یک Node و allocation کوچک ثبت شود.
 4. Egg/template مناسب CS2 انتخاب و مجوز SteamCMD/اجزای لازم تأیید شود.
 5. یک instance آزمایشی نصب/اجرا و stop/restart/delete/backup/restore تست شود.
