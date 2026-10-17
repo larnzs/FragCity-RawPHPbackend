@@ -8,7 +8,7 @@
 
 تنظیمات محیطی در JSON دسته‌بندی می‌شوند: اطلاعات هر ماژول زیر `files`، پروفایل‌های اتصال زیر `databases` و سرویس‌های بیرونی زیر `integrations` قرار می‌گیرند.
 
-## Files
+## ۲. فایل‌ها
 
 - `settings/loader.php`: shared JSON loader, dotted-key lookup, timezone setup, database profile inheritance, and PDO factory.
 - `settings/settings.example.json`: tracked example with blank DB credentials and payment merchant ID.
@@ -16,7 +16,7 @@
 - `settings/.htaccess`: protects settings under Apache.
 - `settings/nginx-protect.conf`: snippet to copy into the Laragon Nginx server block. Nginx ignores .htaccess; block `/settings/` or put runtime JSON outside DocumentRoot and set `FRAGCITY_SETTINGS_FILE`.
 
-## Database profiles
+## ۳. پروفایل‌های دیتابیس
 
 - `main`: site, wallet, server records, Agent and panel pages.
 - `weaponpaints`: WeaponPaints plugin DB.
@@ -26,13 +26,13 @@
 
 پروفایل‌ها می‌توانند با فیلد `extends` اطلاعات اتصال را از پروفایل پایه به ارث ببرند و فقط نام دیتابیس را تغییر دهند. اگر فیلدهای لازم خالی باشند، تابع مرکزی اتصال ایجاد نمی‌کند. این رفتار فقط برای مسیرهایی تضمین شده است که واقعاً از Loader استفاده می‌کنند؛ صفحات قدیمی باید جداگانه ممیزی شوند و نباید فرض کرد همهٔ آن‌ها از credentialهای hard-coded مستقل شده‌اند.
 
-## Module blocks migrated
+## ۴. بخش‌های تنظیم‌شده در نمونه
 
 The settings example defines blocks for the main index, customer/weaponpaint DB wrappers, Agent endpoints, plugin sync, Steam login routes, Zarinpal wallet/server request and callback routes, server purchase/list pages, VIP and password recovery, legacy test index, and CS2 panel configuration/settings/overview/players/servers.
 
 The JSON example also holds the CS2 cfg allowlist, plugin table-to-database map, site URL, timezone and Zarinpal merchant/API/payment-gateway endpoints. Translation dictionaries and business logic remain in PHP; runtime settings and data lists belong in JSON.
 
-## ۴. آماده‌سازی محلی — مرحله‌به‌مرحله
+## ۵. آماده‌سازی محلی — مرحله‌به‌مرحله
 
 این دستورها را از ریشهٔ clone محلی ریپو اجرا کن؛ یعنی همان پوشه‌ای که زیرپوشهٔ `settings` در آن وجود دارد.
 
@@ -85,13 +85,13 @@ php -r "json_decode(file_get_contents('settings/settings.json'), true, 512, JSON
 
 اجرای کامل سایت با دسترسی DB تا تکمیل موارد زیر مسدود است: ساخت دیتابیس و seed آزمایشی مستقل، بررسی صفحات قدیمی و حذف اتکای آن‌ها به credentialهای hard-coded، اثبات اینکه هر endpoint حساس از پروفایل صحیح استفاده می‌کند و غیرفعال بودن پرداخت/APIهای Production.
 
-## ۵. نسخهٔ PHP و timezone
+## ۶. نسخهٔ PHP و منطقهٔ زمانی
 
 این ریپو از قابلیت‌های PHP 8.x مثل `match` و `str_starts_with` استفاده می‌کند؛ برای اجرای سایت محلی در Laragon نسخهٔ PHP باید با کد تطبیق داده شود و در محیط فعلی نسخهٔ 8.4 انتخاب شده است. این موضوع جدا از PHP 8.3 نصب‌شده برای Pterodactyl Panel روی Debian است؛ نیاز این دو برنامه را با هم اشتباه نگیر.
 
 Loader از `app.timezone` استفاده می‌کند و پیش‌فرض UTC است. خطای Parse که به علت نسخهٔ PHP قدیمی رخ دهد، با تغییر timezone برطرف نمی‌شود.
 
-## ۶. انتشار
+## ۷. انتشار
 
 برای هر محیط فایل تنظیمات runtime جدا بساز. URL، DB و تنظیمات سرویس بیرونی باید مخصوص همان محیط باشند. پیش از انتشار backup بگیر، دسترسی HTTP به فایل تنظیمات را مسدود کن، smoke test اجرا کن و راه rollback را نگه دار. credentialهای Production هیچ‌وقت نباید وارد Git شوند.
 
