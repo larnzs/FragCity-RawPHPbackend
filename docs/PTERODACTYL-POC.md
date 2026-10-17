@@ -385,7 +385,20 @@ PANEL_URL="https://github.com/pterodactyl/panel/releases/download/${PANEL_VERSIO
 
 echo "=== PRE-FLIGHT: PHP / COMPOSER ==="
 php --version
-composer --version
+if ! php -r 'exit(PHP_VERSION_ID >= 80200 && PHP_VERSION_ID < 80400 ? 0 : 1);'; then
+    echo 'ERROR: Panel v1.15.1 requires PHP 8.2 or 8.3.' >&2
+    exit 1
+fi
+
+COMPOSER_VERSION="$(composer --version --no-ansi)"
+printf '%s\\n' "$COMPOSER_VERSION"
+case "$COMPOSER_VERSION" in
+    "Composer version 2."*) ;;
+    *)
+        echo 'ERROR: Composer 2 is required.' >&2
+        exit 1
+        ;;
+esac
 
 echo
 echo "=== REQUIRED PHP MODULES ==="
@@ -450,7 +463,8 @@ df -h /
 ### توضیح سادهٔ فرمان
 
 - `set -eu`: در صورت خطای فرمان یا استفاده از متغیر تعریف‌نشده، اجرای بلوک متوقف می‌شود.
-- بررسی PHP/Composer و حلقهٔ moduleها: پیش از دانلود، وجود moduleهای پایهٔ اعلام‌شده در مستندات رسمی را کنترل می‌کند و اگر یکی موجود نباشد، متوقف می‌شود. نام moduleها پیش از مقایسه به حروف کوچک تبدیل می‌شود.
+- بررسی PHP/Composer: Panel v1.15.1 را فقط با PHP 8.2 یا 8.3 و Composer 2 می‌پذیرد؛ در صورت نسخهٔ نامناسب پیش از دانلود متوقف می‌شود.
+- حلقهٔ moduleها: وجود extensionهای پایهٔ اعلام‌شده در مستندات رسمی را کنترل می‌کند و اگر یکی موجود نباشد، متوقف می‌شود. نام moduleها پیش از مقایسه به حروف کوچک تبدیل می‌شود.
 - `PANEL_VERSION`: نسخهٔ دقیق را ثابت می‌کند تا نصب قابل تکرار باشد.
 - بررسی وجود پوشه: مانع بازنویسی ناخواستهٔ نصب قبلی می‌شود.
 - `curl --fail --location`: فایل را از Release رسمی دریافت می‌کند و خطای HTTP را موفق فرض نمی‌کند.
@@ -461,7 +475,7 @@ df -h /
 
 ### خروجی مورد انتظار
 
-- نسخهٔ Composer نمایش داده می‌شود و moduleهای فهرست‌شده هرکدام پیام `OK` می‌گیرند.
+- نسخهٔ PHP در محدودهٔ 8.2/8.3 و نسخهٔ Composer از شاخهٔ 2 خواهد بود؛ moduleهای فهرست‌شده هرکدام پیام `OK` می‌گیرند.
 - `Panel release: v1.15.1`
 - دانلود archive و `tar -tzf` بدون خطا.
 - چهار پیام `OK` برای `artisan`, `.env.example`, `composer.json`, `public/index.php`.
