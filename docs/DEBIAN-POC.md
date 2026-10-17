@@ -560,3 +560,43 @@ sudo -E env RUN_PLUGIN_UPDATER=0 bash ./linux/setup.sh
 - [ ] یک CS2 server از داخل Panel اجرا و lifecycle آن آزمایش شود.
 
 این snapshot از خروجی گزارش‌شدهٔ کاربر تهیه شده است؛ هنوز هیچ package جدیدی نصب نشده است.
+
+
+---
+
+## ۱۵. شبکه، Package Candidates و Storage پیش از Pterodactyl — ۱۷ اکتبر ۲۰۲۶
+
+خروجی تکمیلی کاربر:
+
+- IP ماشین: 192.168.1.5/24 روی ens33.
+- Gateway پیش‌فرض: 192.168.1.1.
+- Listenerهای TCP: SSH روی 0.0.0.0:22 و [::]:22؛ CUPS روی 127.0.0.1:631 و [::1]:631.
+- Listenerهای UDP: Avahi روی 5353 و 43110، و NetworkManager روی IPv6 link-local پورت 546.
+- در خروجی فعلی listener روی پورت‌های 80، 443، 3306، 6379، 8080 و 2022 مشاهده نشد.
+- دستورهای بررسی با sudo این بار کامل شدند.
+
+### Package candidates در مخازن موجود
+
+| بسته | Candidate |
+|---|---|
+| php8.3 | ندارد |
+| php8.4 | 8.4.26-1~deb13u1 |
+| mariadb-server | 1:11.8.6-0+deb13u1 |
+| redis-server | 5:8.0.2-3+deb13u3 |
+| nginx | 1.26.3-3+deb13u9 |
+| docker.io | 26.1.5+dfsg1-9+deb13u1 |
+
+Panel پایدار v1.15.1 محدودهٔ Composer برابر ^8.2 || ^8.3 دارد، در نتیجه PHP 8.4 را در constraint خود نمی‌پذیرد. تصمیم فعلی این است که پیش از نصب پکیج‌ها، مخزن SURY با keyring امضاشده و Signed-By اضافه شود و candidate مربوط به PHP 8.3 دوباره بررسی گردد. SURY مخزن رسمی Debian نیست و این وابستگی خارجی باید در مستندات نصب ثبت بماند.
+
+### Disk / runtime snapshot
+
+- /: 112 GiB کل، 79 GiB مصرف، 28 GiB آزاد، 75% مصرف.
+- /home/steam/cs2: حدود 70 GiB.
+- /home/steam/steamrt: حدود 797 MiB.
+- مسیر /var/lib/docker در خروجی du اندازه‌ای گزارش نکرد؛ Docker در بررسی قبلی نصب نبود.
+
+**نتیجه:** قبل از ساخت کانتینر CS2 بررسی کنیم Egg چه حجمی دانلود می‌کند و چطور می‌تواند Base Game را بدون ایجاد نسخهٔ کامل دوم مصرف کند. تا آن زمان Docker/Wings و server container نصب یا فعال نشده‌اند؛ هیچ فایل بازی حذف نشده است.
+
+مراجع برای تصمیم PHP:
+- Pterodactyl 1.x Getting Started: https://docs.pterodactyl.io/v1/panel/getting-started
+- Debian Wiki — Additional PHP versions/SURY (مخزن شخص ثالث، نه رسمی Debian): https://wiki.debian.org/AdditionalPHPVersions
