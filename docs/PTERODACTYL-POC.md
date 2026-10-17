@@ -1,7 +1,7 @@
 # FragCity — Pterodactyl PoC روی fc-node-01
 
 > آخرین ثبت: ۱۷ اکتبر ۲۰۲۶  
-> وضعیت: **آماده‌سازی محیط انجام شده؛ نصب Panel هنوز شروع نشده است.** این محیط VMware آزمایشی است و Production محسوب نمی‌شود.
+> وضعیت: **بسته‌های پایهٔ Panel نصب و بررسی شده‌اند؛ Composer و خود Panel هنوز نصب نشده‌اند.** این محیط VMware آزمایشی است و Production محسوب نمی‌شود.
 
 ## ۱. تصمیم فعلی پروژه
 
@@ -162,12 +162,19 @@ PoC هنوز موفق محسوب نمی‌شود تا Panel به‌صورت پا
 - نصب خودکار سرور از طریق create-instance.sh یا اجرای مستقیم watchdog.sh جایگزین Pterodactyl/Wings تلقی نمی‌شود.
 - موفقیت native setup، سازگاری خودکار Docker/Shared Base یا ظرفیت ۵ تا ۱۰ سرور را اثبات نمی‌کند.
 
-## ۷. وضعیت همین لحظه
+## ۷. وضعیت همین لحظه — پس از نصب وابستگی‌ها
 
-**انجام‌شده:** Debian، منابع، IP 192.168.1.5، gateway، listenerهای فعلی و candidateهای بسته‌ها ثبت شده‌اند؛ نبود PHP 8.3 در مخازن پیش‌فرض و نیاز به مخزن SURY ثبت شده؛ Flute CMS و دیتابیس cPanel خارج از محدودهٔ نصب فعلی هستند.
+**تأییدشده بر اساس لاگ کاربر در ۱۷ اکتبر ۲۰۲۶:**
+- مخزن SURY و keyring آن نصب شده‌اند؛ APT کاندید PHP 8.3 را از مخزن amd64 دریافت کرده است.
+- بسته‌های PHP 8.3 و extensionهای انتخاب‌شده، Nginx، MariaDB، Redis، Git، curl، tar و unzip نصب شده‌اند.
+- نسخهٔ PHP CLI برابر 8.3.35 است؛ همهٔ extensionهای بررسی‌شده از جمله `bcmath`, `curl`, `gd`, `intl`, `mbstring`, `PDO`, `pdo_mysql`, `xml`, `zip` و Zend OPcache در خروجی ظاهر شده‌اند.
+- سرویس‌های `nginx`, `mariadb`, `redis-server` و `php8.3-fpm` همگی `active` گزارش شده‌اند.
+- Nginx روی TCP/80 گوش می‌دهد. MariaDB روی `127.0.0.1:3306` و Redis روی `127.0.0.1:6379` و `[::1]:6379` گوش می‌دهند؛ در snapshot پورت 3306 و 6379 روی رابط شبکهٔ عمومی باز نیستند.
+- هنوز Composer، فایل‌های Panel، database/user اختصاصی Panel، `.env`، APP_KEY، migrations، حساب مدیر، queue/cron، Docker و Wings نصب/تنظیم نشده‌اند.
+- دستور `nginx -v` در shell کاربر با پیام `command not found` مواجه شده، درحالی‌که سرویس Nginx active و پورت 80 در حال listen است. به‌احتمال زیاد مسیر `/usr/sbin` در PATH این shell نیست؛ نسخهٔ باینری را در ادامه با `sudo /usr/sbin/nginx -v` و نسخهٔ بسته را با `dpkg-query` بررسی می‌کنیم. این پیام را به‌عنوان شکست نصب Nginx ثبت نمی‌کنیم.
+- فضای آزاد همچنان حدود 28 GiB است و نصب فعلی native بازی CS2 در `/home/steam/cs2` حدود 70 GiB است؛ اخطار storage پیش از ساخت container به قوت خود باقی است.
 
-**انجام‌نشده:** هیچ package مربوط به Panel، PHP، Nginx، MariaDB، Redis، Docker یا Wings نصب نشده؛ مخزن PHP 8.3 هنوز اضافه نشده؛ Panel، Node و CS2 container هنوز ساخته نشده‌اند.
-
+**مرحلهٔ باز بعدی:** نصب امن Composer 2 و بررسی خروجی. پس از ثبت خروجی Composer، دانلود archive پایدار Panel انجام می‌شود؛ هنوز Panel را دریافت یا پیکربندی نکنید.
 
 ## ٨. نتیجهٔ افزودن مخزن PHP 8.3 — ۱۷ اکتبر ۲۰۲۶
 
@@ -191,13 +198,11 @@ Candidate: 8.3.35-1+0~20260925.87+debian13~1.gbp19383d
 **وضعیت:** مخزن و keyring نصب شده‌اند؛ خود PHP و اجزای Panel هنوز نصب نشده‌اند. مرحلهٔ بعد نصب PHP 8.3 extensions، Nginx، MariaDB و Redis است. Composer/Panel، Wings و Docker در مرحله‌های بعدی انجام می‌شوند.
 
 
-## ۹. مرحلهٔ بعد: نصب بسته‌های پایهٔ Panel — هنوز اجرا نشده
+## ۹. نتیجهٔ نصب بسته‌های پایهٔ Panel — انجام‌شده
 
-طبق راهنمای رسمی Pterodactyl 1.x، Panel به PHP 8.2/8.3 و extensionهای موردنیاز، MariaDB/MySQL، Redis، وب‌سرور و Composer 2 نیاز دارد. برای Nginx، PHP-FPM نیز لازم است. در مخازن پیش‌فرض این VM، PHP 8.3 candidate نداشت؛ مخزن SURY با Signed-By اضافه شد و candidate معماری amd64 تأیید شد. منبع خارجی SURY باید در نگهداری و به‌روزرسانی آینده در نظر گرفته شود.
+### فرمان اجراشده
 
-### فرمان نصب بسته‌ها
-
-این فرمان، فقط لایهٔ پایهٔ وب و دیتابیس را نصب می‌کند؛ هنوز Panel را دانلود یا راه‌اندازی نمی‌کند و Docker/Wings را هم نصب نمی‌کند.
+کاربر با موفقیت فرمان زیر را اجرا کرد؛ خروجی apt نشان می‌دهد ۵۱ بسته نصب شدند، بدون این‌که هیچ بسته‌ای حذف شود:
 
 ~~~bash
 sudo apt install -y \
@@ -208,41 +213,112 @@ sudo apt install -y \
   git curl tar unzip
 ~~~
 
-این مرحله سرویس‌های Nginx، MariaDB، Redis و PHP-FPM را به‌عنوان dependency نصب می‌کند؛ ممکن است systemd آن‌ها را در پایان نصب اجرا کند. تنظیمات default فعلی باید بعد از نصب دوباره بررسی شوند، به‌خصوص اینکه MariaDB و Redis فقط روی loopback در دسترس باشند و port 80/443 برای Panel استفاده شود. در این مرحله هنوز port forwarding عمومی روتر تغییر نمی‌کند.
+### نسخه‌ها و خروجی‌های واقعی
 
-### بررسی بعد از نصب
+| بخش | نتیجهٔ خروجی |
+|---|---|
+| Debian | Debian GNU/Linux 13 (trixie) |
+| PHP CLI | 8.3.35 |
+| PHP extensions | bcmath, curl, gd, intl, mbstring, PDO, pdo_mysql, xml, zip و Zend OPcache مشاهده شدند |
+| MariaDB client/server package | خروجی `mariadb --version`: MariaDB 11.8.6 |
+| Redis | 8.0.2 |
+| Nginx package | هنگام apt نصب شد؛ نسخهٔ باینری به‌خاطر PATH باید با مسیر کامل تأیید شود |
+| nginx service | active |
+| mariadb service | active |
+| redis-server service | active |
+| php8.3-fpm service | active |
+| Nginx listener | `0.0.0.0:80` و `[::]:80` |
+| MariaDB listener | فقط `127.0.0.1:3306` |
+| Redis listener | `127.0.0.1:6379` و `[::1]:6379` |
+| HTTPS | هنوز listener روی 443 وجود ندارد |
+| Disk | حدود 28 GiB فضای آزاد؛ `/home/steam/cs2` حدود 70 GiB |
+| Composer / Panel / Docker / Wings | هنوز نصب نشده‌اند |
+
+در خروجی فیلتر extension، `Zend OPcache` دو بار دیده شد؛ یک بار برای extension و یک بار در بخش Zend Engine. این duplication خطا نیست. اجرای `nginx -v` در shell کاربر `command not found` داد، اما systemd سرویس را active گزارش کرد و `ss` نیز listener مربوط به Nginx را نشان داد. بنابراین بررسی نسخهٔ باینری با مسیر کامل بخشی از مرحلهٔ بعد است.
+
+### بررسی دوبارهٔ وضعیت
 
 ~~~bash
-echo "=== PHP CLI ==="
-php8.3 -v
-php8.3 -m | grep -Ei '^(bcmath|curl|gd|intl|mbstring|PDO|pdo_mysql|xml|zip|Zend OPcache)$'
+echo "=== PHP ==="
+php --version
+php -m | grep -Ei '^(bcmath|curl|gd|intl|mbstring|PDO|pdo_mysql|xml|zip|Zend OPcache)
+
+echo
+echo "=== NGINX BINARY AND PACKAGE ==="
+sudo /usr/sbin/nginx -v
+dpkg-query -W -f='nginx package: ${Version}\n' nginx
 
 echo
 echo "=== PACKAGE VERSIONS ==="
-nginx -v 2>&1
 mariadb --version
 redis-server --version
 
 echo
-echo "=== SERVICE STATUS ==="
+echo "=== SERVICES ==="
 for svc in nginx mariadb redis-server php8.3-fpm; do
     printf '%-15s' "$svc"
     systemctl is-active "$svc" || true
 done
 
 echo
-echo "=== LISTENING PORTS ==="
-sudo ss -lntup
+echo "=== DATABASE / REDIS / WEB LISTENERS ==="
+sudo ss -lntp | grep -E ':(80|443|3306|6379|8080|2022)\b' || true
+
+echo
+echo "=== DISK ==="
+df -h /
+sudo du -sh /home/steam/cs2 /home/steam/steamrt 2>/dev/null
 ~~~
 
-### مفهوم فرمان‌ها
+این بررسی، به‌ویژه محدود ماندن MariaDB و Redis به loopback را ثبت می‌کند. فعلاً نیازی نیست این پورت‌ها از شبکهٔ LAN یا اینترنت در دسترس باشند.
 
-- apt install بسته‌های باینری، فایل‌های پیکربندی و وابستگی‌های لازم را نصب می‌کند؛ به‌معنای نصب خود Panel نیست.
-- PHP CLI برای اجرای artisan و Composer استفاده می‌شود؛ PHP-FPM درخواست‌های PHP را به Nginx پردازش می‌کند.
-- Nginx درخواست HTTP را دریافت می‌کند و بعداً به پوشهٔ public پنل هدایت می‌شود.
-- MariaDB داده‌های Panel را نگهداری می‌کند؛ Redis برای cache، queue و وضعیت‌های موقت به کار می‌رود.
-- هنوز database، user، رمز، Panel، APP_KEY، queue worker یا cron ساخته نشده‌اند؛ آن‌ها مراحل بعد هستند.
+## ۱۰. مرحلهٔ بعد: نصب Composer 2 — هنوز اجرا نشده
 
-**معیار قبولی این مرحله:** بسته‌ها با PHP 8.3 نصب شوند، extensionهای کلیدی قابل مشاهده باشند، سرویس‌ها active شوند و هیچ listener ناخواسته‌ای روی پورت عمومی دیتابیس/Redis ایجاد نشده باشد. پس از ثبت خروجی، نصب Composer 2 را به‌شکل رسمی و سپس دریافت و پیکربندی خود Panel انجام می‌دهیم.
+Composer مدیریت‌کنندهٔ dependencyهای PHP است؛ Panel برای نصب کتابخانه‌های خود به آن نیاز دارد. در تاریخ بررسی، صفحهٔ رسمی Composer نسخهٔ پایدار 2.10.3 را نشان می‌داد. فرمان زیر checksum رسمی SHA-384 نصب‌کننده را پیش از اجرای آن مقایسه می‌کند و فقط در صورت تطبیق installer را به `/usr/local/bin/composer` نصب می‌کند.
 
-منبع رسمی: https://docs.pterodactyl.io/v1/panel/getting-started
+**منبع نسخه و checksum:** https://getcomposer.org/download/
+
+~~~bash
+set -eu
+cd /tmp
+
+EXPECTED_CHECKSUM='c8b085408188070d5f52bcfe4ecfbee5f727afa458b2573b8eaaf77b3419b0bf2768dc67c86944da1544f06fa544fd47'
+
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+ACTUAL_CHECKSUM="$(php -r "echo hash_file('sha384', 'composer-setup.php');")"
+
+if [ "$EXPECTED_CHECKSUM" != "$ACTUAL_CHECKSUM" ]; then
+    echo 'ERROR: Composer installer checksum mismatch; refusing to execute it.' >&2
+    rm -f composer-setup.php
+    exit 1
+fi
+
+echo 'Composer installer checksum verified.'
+sudo php composer-setup.php --2 --install-dir=/usr/local/bin --filename=composer
+rm -f composer-setup.php
+
+echo
+echo "=== COMPOSER ==="
+composer --version
+command -v composer
+
+echo
+echo "=== NGINX VERSION CHECK ==="
+sudo /usr/sbin/nginx -v
+dpkg-query -W -f='nginx package: ${Version}\n' nginx
+~~~
+
+### چرا checksum مهم است؟
+
+این فرایند ابتدا installer را دریافت می‌کند، سپس SHA-384 فایل را با مقدار منتشرشده در سایت رسمی تطبیق می‌دهد. اگر مقدارها یکسان نباشند، فرمان متوقف می‌شود و installer اجرا نخواهد شد. گزینهٔ `--2` شاخهٔ اصلی Composer 2 را انتخاب می‌کند؛ خروجی دقیق نسخه باید از `composer --version` ثبت شود.
+
+### هنوز اجرا نکنید
+
+در این مرحله فایل Panel را دانلود نکنید، database/user یا رمز Panel نسازید و `.env`/APP_KEY تولید نکنید. پس از تأیید Composer، مرحلهٔ جداگانهٔ دریافت release پایدار Panel و نصب dependencyها مستند و اجرا می‌شود. Wings و Docker هم فعلاً خارج از این گام‌اند.
+
+**معیار قبولی گام Composer:** فرمان با exit code موفق تمام شود، checksum تأیید شود، `composer --version` نسخهٔ 2.x را نمایش دهد و بررسی Nginx با مسیر کامل نسخهٔ باینری/بسته را مشخص کند.
+
+منابع مرجع:
+- https://getcomposer.org/download/
+- https://docs.pterodactyl.io/v1/panel/getting-started
+- https://github.com/pterodactyl/panel/releases
