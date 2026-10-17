@@ -8,7 +8,7 @@
 |---|---|---|---|
 | P0 — Requirements & Local Development | مستندات آماده؛ اجرا Pending | الزامات، معماری، updater محلی، Laragon/WAMP و مرزبندی Production | clone محلی آماده، DB کاملاً جدا و تست اولیه قابل تکرار باشد |
 | P1 — Security & Baseline | ممیزی ایستا اولیه انجام؛ اصلاح Pending | بازبینی secret، API، ورودی‌ها و مدل مالکیت داده | خطرهای مسدودکننده شناسایی و برنامه اصلاح تصویب شود |
-| P2 — Game Panel PoC | بسته‌های پایه نصب و active؛ Composer 2.10.3 نصب و تأیید؛ دریافت/پیکربندی Panel pending | fc-node-01 آزمایشگاهی؛ Panel/DB محلی، سپس Wings/Docker و یک CS2 server | چرخهٔ عمر، جداسازی Instanceها، حفاظت کانفیگ، File Manager و Update هماهنگ‌شده پایدار باشد |
+| P2 — Game Panel PoC | بسته‌های پایه و Composer 2.10.3 تأیید؛ archive Panel v1.15.1 دریافت/استخراج شده؛ مالکیت/DB/config pending | fc-node-01 آزمایشگاهی؛ Panel/DB محلی، سپس Wings/Docker و یک CS2 server | چرخهٔ عمر، جداسازی Instanceها، حفاظت کانفیگ، File Manager و Update هماهنگ‌شده پایدار باشد |
 | P3 — Billing Integration | Pending | سفارش Sandbox/ساختگی تا Provisioning | duplicate و سفارش ناموفق به‌شکل امن مدیریت شود |
 | P4 — Fixed-Duration Product | Pending | بسته‌ها، Wallet، `expires_at` و expiry action | تمام تست‌های مدل مالی قبول شوند |
 | P5 — Isolation & Recovery | Pending | مجوز مشتری، Backup/Restore، retry و rollback | تست‌های امنیتی/بازیابی قبول شوند |
@@ -41,6 +41,18 @@
 - [ ] هیچ عملیات مخرب روی دیتابیس تولیدی انجام نشود.
 
 ## P2 — PoC پنل بازی
+
+### آخرین وضعیت اجرایی — ۱۷ اکتبر ۲۰۲۶
+
+- [x] بسته‌های پایه، Composer 2.10.3، سرویس‌ها و Nginx 1.26.3 بررسی شدند.
+- [x] archive رسمی Panel v1.15.1 دانلود و در `/var/www/pterodactyl` استخراج شد؛ چهار فایل اصلی تأیید شدند.
+- [ ] بررسی افزونه‌های PHP و اصلاح مالکیت/مجوز فایل‌های Panel به `www-data:www-data`.
+- [ ] ایجاد database/user محلی Panel؛ سپس آماده‌سازی `.env`، Composer dependencies و APP_KEY.
+- [ ] اجرای migrations/seed، ساخت مدیر و تنظیم Nginx/queue/cron.
+- [ ] نصب Wings/Docker، تعریف Node و اجرای یک سرور CS2.
+- [ ] پیش از ایجاد CS2 container، حل محدودیت Storage: حدود 27 GiB فضای آزاد در برابر نصب native بازی حدود 70 GiB.
+
+فرمان‌ها و توضیحات مبتدی‌پسند در [Pterodactyl PoC](PTERODACTYL-POC.md) و نتایج واقعی در انتهای [Debian PoC Log](DEBIAN-POC.md) ثبت می‌شوند.
 
 ### وضعیت اجرایی ثبت‌شده در ۱۷ اکتبر ۲۰۲۶
 
