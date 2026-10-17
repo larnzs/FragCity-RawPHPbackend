@@ -145,12 +145,12 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 
 در این راهنما فرض می‌شود Laragon Portable در مسیر زیر است و فایل‌های Flute مستقیماً در `www` قرار دارند:
 
-- ریشهٔ پروژهٔ Flute: `W:\\laragon_portable\\www`
-- ریشهٔ قابل دسترسی از مرورگر: `W:\\laragon_portable\\www\\public`
-- تنظیمات Nginx: `W:\\laragon_portable\\etc\\nginx`
-- پوشهٔ Virtual Hostها: `W:\\laragon_portable\\etc\\nginx\\sites-enabled`
+- ریشهٔ پروژهٔ Flute: `W:\laragon_portable\www`
+- ریشهٔ قابل دسترسی از مرورگر: `W:\laragon_portable\www\public`
+- تنظیمات Nginx: `W:\laragon_portable\etc\nginx`
+- پوشهٔ Virtual Hostها: `W:\laragon_portable\etc\nginx\sites-enabled`
 
-اگر پروژه داخل یک زیرپوشه مانند `www\\FragCity-RawPHPbackend` کلون شده است، مسیرهای این راهنما باید با مسیر واقعی پروژه تطبیق داده شوند؛ `root` همیشه باید به پوشهٔ `public` همان پروژه اشاره کند.
+اگر پروژه داخل یک زیرپوشه مانند `www\FragCity-RawPHPbackend` کلون شده است، مسیرهای این راهنما باید با مسیر واقعی پروژه تطبیق داده شوند؛ `root` همیشه باید به پوشهٔ `public` همان پروژه اشاره کند.
 
 Laragon Portable در محیط ثبت‌شده از **Nginx** استفاده می‌کند؛ مراحل Apache برای این نصب کاربرد ندارند.
 
@@ -182,7 +182,7 @@ vendor/autoload.php
 
 ### مرحلهٔ ۲ — تنظیم Document Root روی `public`
 
-خطای نصب Flute ممکن است اعلام کند که وب‌سرور به ریشهٔ اشتباه اشاره می‌کند و مسیر فعلی `W:\\laragon_portable\\www` است، درحالی‌که مسیر لازم `W:\\laragon_portable\\www\\public` است.
+خطای نصب Flute ممکن است اعلام کند که وب‌سرور به ریشهٔ اشتباه اشاره می‌کند و مسیر فعلی `W:\laragon_portable\www` است، درحالی‌که مسیر لازم `W:\laragon_portable\www\public` است.
 
 در این پروژه باید ریشهٔ وب فقط پوشهٔ `public` باشد. تنظیم در Nginx انجام می‌شود و نباید پوشهٔ اصلی پروژه یا فایل‌های `vendor` و تنظیمات خصوصی مستقیماً در دسترس وب باشند.
 
@@ -191,7 +191,7 @@ vendor/autoload.php
 ۱. این پوشه را با File Explorer باز کنید:
 
 ```text
-W:\\laragon_portable\\etc\\nginx\\sites-enabled
+W:\laragon_portable\etc\nginx\sites-enabled
 ```
 
 ۲. فایل تنظیماتی را باز کنید که داخل آن این مقدار وجود دارد:
