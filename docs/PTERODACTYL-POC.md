@@ -1,7 +1,7 @@
 # FragCity — Pterodactyl PoC روی fc-node-01
 
 > آخرین ثبت: ۱۷ اکتبر ۲۰۲۶  
-> وضعیت: **بسته‌های پایه و Composer 2 نصب و بررسی شده‌اند؛ دریافت و پیکربندی Panel هنوز انجام نشده است.** این محیط VMware آزمایشی است و Production محسوب نمی‌شود.
+> وضعیت: **بسته‌های پایه و Composer 2 بررسی شده‌اند؛ فایل‌های Panel v1.15.1 دانلود و استخراج شده‌اند؛ مالکیت، دیتابیس، `.env`، Composer dependencies و پیکربندی نهایی هنوز Pending هستند.** این محیط VMware آزمایشی است و Production محسوب نمی‌شود.
 
 ## ۱. تصمیم فعلی پروژه
 
@@ -134,12 +134,13 @@ RAM موجود برای Panel آزمایشی کافی به نظر می‌رسد�
 - [x] تأیید اینکه MariaDB و Redis فقط روی loopback گوش می‌دهند.
 - [x] نصب Composer 2.10.3 و تأیید checksum نصب‌کننده در زمان نصب.
 - [x] بررسی Nginx با مسیر کامل؛ نسخهٔ باینری 1.26.3 و بستهٔ Debian برابر 1.26.3-3+deb13u9 است.
-- [ ] دریافت archive نسخهٔ پایدار Panel v1.15.1، بررسی archive و استخراج فایل‌ها در `/var/www/pterodactyl` — **گام بعدی**.
+- [x] دریافت archive رسمی Panel v1.15.1، بررسی archive و استخراج در `/var/www/pterodactyl`؛ خروجی در بخش ۱۱ ثبت شده است.
+- [ ] بررسی افزونه‌های موردنیاز PHP و اصلاح مالکیت/مجوز فایل‌ها به `www-data:www-data` — گام بعدی، بخش ۱۲.
 - [ ] ساخت database و کاربر محدود مخصوص Panel؛ رمز در Git یا مستند عمومی نوشته نشود.
-- [ ] نصب dependencyهای PHP با Composer و بررسی `composer check-platform-reqs --no-dev`.
-- [ ] ساخت `.env`، واردکردن تنظیمات محیط، تولید APP_KEY و پشتیبان امن از آن.
+- [ ] ساخت `.env` اولیه و نصب dependencyهای PHP با Composer؛ سپس بررسی `composer check-platform-reqs --no-dev`.
+- [ ] تنظیم اولیهٔ محیط، تولید APP_KEY و نگهداری امن نسخهٔ پشتیبان از آن.
 - [ ] اجرای migrations/seed و ساخت admin user.
-- [ ] تنظیم مالکیت و permissionهای نهایی فایل‌ها.
+- [ ] تنظیم Nginx، queue worker و cron scheduler؛ قبل از reload اجرای `nginx -t` الزامی است.
 - [ ] ساخت تنظیم Nginx مخصوص Panel؛ قبل از reload اجرای `nginx -t` الزامی است.
 - [ ] تنظیم queue worker و cron scheduler.
 - [ ] آزمایش بازشدن Panel از مرورگر شبکهٔ آزمایش و ورود مدیر.
@@ -184,19 +185,24 @@ PoC هنوز موفق محسوب نمی‌شود تا Panel به‌صورت پا
 - نصب خودکار سرور از طریق create-instance.sh یا اجرای مستقیم watchdog.sh جایگزین Pterodactyl/Wings تلقی نمی‌شود.
 - موفقیت native setup، سازگاری خودکار Docker/Shared Base یا ظرفیت ۵ تا ۱۰ سرور را اثبات نمی‌کند.
 
-## ۷. وضعیت همین لحظه — پس از نصب وابستگی‌ها
+## ۷. وضعیت فعلی — پس از دریافت و استخراج Panel
 
-**تأییدشده بر اساس لاگ کاربر در ۱۷ اکتبر ۲۰۲۶:**
-- مخزن SURY و keyring آن نصب شده‌اند؛ APT کاندید PHP 8.3 را از مخزن amd64 دریافت کرده است.
-- بسته‌های PHP 8.3 و extensionهای انتخاب‌شده، Nginx، MariaDB، Redis، Git، curl، tar و unzip نصب شده‌اند.
-- نسخهٔ PHP CLI برابر 8.3.35 است؛ همهٔ extensionهای بررسی‌شده از جمله `bcmath`, `curl`, `gd`, `intl`, `mbstring`, `PDO`, `pdo_mysql`, `xml`, `zip` و Zend OPcache در خروجی ظاهر شده‌اند.
-- سرویس‌های `nginx`, `mariadb`, `redis-server` و `php8.3-fpm` همگی `active` گزارش شده‌اند.
-- Nginx روی TCP/80 گوش می‌دهد. MariaDB روی `127.0.0.1:3306` و Redis روی `127.0.0.1:6379` و `[::1]:6379` گوش می‌دهند؛ در snapshot پورت 3306 و 6379 روی رابط شبکهٔ عمومی باز نیستند.
-- Composer 2.10.3 نصب و تأیید شده است. فایل‌های Panel، database/user اختصاصی Panel، `.env`، APP_KEY، migrations، حساب مدیر، queue/cron، Docker و Wings هنوز نصب/تنظیم نشده‌اند.
-- دستور `nginx -v` در shell کاربر با پیام `command not found` مواجه شد، اما سرویس active بود و پورت 80 را listen می‌کرد. بررسی بعدی با `sudo /usr/sbin/nginx -v` موفق شد و نسخهٔ `nginx/1.26.3` و بستهٔ `1.26.3-3+deb13u9` را تأیید کرد؛ پس این مورد مشکل PATH کاربر بود، نه شکست نصب Nginx.
-- فضای آزاد همچنان حدود 28 GiB است و نصب فعلی native بازی CS2 در `/home/steam/cs2` حدود 70 GiB است؛ اخطار storage پیش از ساخت container به قوت خود باقی است.
+**بر اساس خروجی کاربر در ۱۷ اکتبر ۲۰۲۶:**
 
-**مرحلهٔ بعد:** دریافت و استخراج archive رسمی Panel v1.15.1 در `/var/www/pterodactyl`. نسخه و URL رسمی بازبینی شده‌اند؛ فرمان کامل و خروجی مورد انتظار در بخش ۱۱ آمده است. هنوز دیتابیس یا `.env` پنل ساخته نشده است.
+- مخزن SURY و keyring آن نصب شده‌اند؛ PHP 8.3 از مخزن amd64 نصب شده است.
+- PHP CLI نسخهٔ 8.3.35 است؛ افزونه‌های `bcmath`, `curl`, `gd`, `intl`, `mbstring`, `PDO`, `pdo_mysql`, `xml`, `zip` و Zend OPcache در خروجی دیده شدند. وجود `posix` و `tokenizer` باید در مرحلهٔ ۱۲ جداگانه تأیید شود.
+- MariaDB 11.8.6، Redis 8.0.2، Nginx 1.26.3 (بستهٔ `1.26.3-3+deb13u9`) و Composer 2.10.3 بررسی شده‌اند.
+- سرویس‌های `nginx`, `mariadb`, `redis-server` و `php8.3-fpm` `active` گزارش شده‌اند؛ Nginx روی TCP/80 گوش می‌دهد، MariaDB فقط روی `127.0.0.1:3306` و Redis روی loopback IPv4/IPv6 است.
+- دستور کوتاه `nginx -v` در shell کاربر پیدا نشد؛ بررسی قبلی با `sudo /usr/sbin/nginx -v` نسخهٔ 1.26.3 را تأیید کرده است. این مشکل PATH بوده است.
+- archive رسمی Panel v1.15.1 با حجم تقریبی 3.0 MiB دانلود شد؛ `tar -tzf` بدون خطا فهرست فایل‌ها را نمایش داد.
+- چهار فایل `artisan`, `.env.example`, `composer.json` و `public/index.php` با پیام `OK` تأیید شدند.
+- حجم پوشهٔ استخراج‌شده `/var/www/pterodactyl` حدود 17 MiB است. فضای آزاد root پس از استخراج حدود 27 GiB و استفادهٔ پارتیشن حدود 75% بود.
+- **نکتهٔ مالکیت:** پس از استخراج، مسیر اصلی مالک `root:root` و `storage`/`bootstrap/cache` مالک `1001:steam` داشتند. این موضوع شکست استخراج نیست؛ مالکیت در بخش ۱۲ اصلاح و بررسی می‌شود.
+- هنوز database/user مختص Panel، `.env`، Composer dependencies، APP_KEY، migrations، حساب مدیر، queue/cron، Docker و Wings ساخته یا نصب نشده‌اند.
+- فضای آزاد برای نصب CS2 داخل container محدود است: حدود 27 GiB آزاد در برابر نصب native بازی حدود 70 GiB. تا حل Storage سرور CS2 داخل container ساخته نمی‌شود.
+
+**گام بعدی:** بررسی افزونه‌های الزامی PHP و اصلاح مالکیت/مجوز فایل‌های Panel طبق بخش ۱۲. این مرحله هنوز اجرا نشده است.
+
 
 ## ٨. نتیجهٔ افزودن مخزن PHP 8.3 — ۱۷ اکتبر ۲۰۲۶
 
@@ -354,7 +360,7 @@ dpkg-query -W -f='nginx package: ${Version}\n' nginx
 - https://getcomposer.org/download/
 - https://docs.pterodactyl.io/v1/panel/getting-started
 
-## ۱۱. گام بعدی: دریافت و استخراج Panel v1.15.1 — هنوز اجرا نشده
+## ۱۱. دریافت و استخراج Panel v1.15.1 — انجام‌شده در ۱۷ اکتبر ۲۰۲۶
 
 ### چرا v1.15.1؟
 
@@ -383,37 +389,9 @@ ARCHIVE="/tmp/pterodactyl-panel-${PANEL_VERSION}.tar.gz"
 FILE_LIST="/tmp/pterodactyl-panel-${PANEL_VERSION}-files.txt"
 PANEL_URL="https://github.com/pterodactyl/panel/releases/download/${PANEL_VERSION}/panel.tar.gz"
 
-echo "=== PRE-FLIGHT: PHP / COMPOSER ==="
-php --version
-if ! php -r 'exit(PHP_VERSION_ID >= 80200 && PHP_VERSION_ID < 80400 ? 0 : 1);'; then
-    echo 'ERROR: Panel v1.15.1 requires PHP 8.2 or 8.3.' >&2
-    exit 1
-fi
+echo "=== PRE-FLIGHT ==="
 
-COMPOSER_VERSION="$(composer --version --no-ansi)"
-printf '%s\\n' "$COMPOSER_VERSION"
-case "$COMPOSER_VERSION" in
-    "Composer version 2."*) ;;
-    *)
-        echo 'ERROR: Composer 2 is required.' >&2
-        exit 1
-        ;;
-esac
-
-echo
-echo "=== REQUIRED PHP MODULES ==="
-PHP_MODULES="$(php -m | tr '[:upper:]' '[:lower:]')"
-for module in bcmath curl dom gd intl json mbstring mysqli openssl pdo pdo_mysql posix tokenizer xml zip; do
-    if printf '%s\n' "$PHP_MODULES" | grep -Fxq "$module"; then
-        printf 'OK: %s\n' "$module"
-    else
-        printf 'ERROR: missing PHP module: %s\n' "$module" >&2
-        exit 1
-    fi
-done
-
-echo
-echo "=== PRE-FLIGHT: PANEL / DISK ==="
+echo "=== PRE-FLIGHT ==="
 echo "Panel release: ${PANEL_VERSION}"
 df -h /
 
@@ -488,4 +466,98 @@ df -h /
 - اگر `curl`، `tar` یا آزمون فایل‌ها خطا داد، ادامه نده.
 - اگر موفق شد، کل خروجی را بفرست. در این گام رمز یا secret ساخته نمی‌شود؛ پیش از ارسال خروجی هر اطلاعات خصوصی را بازبینی کن.
 
-**این گام هنوز اجرا نشده است.** پس از دیدن خروجی، نتیجه را در Runbook، Debian Log، README، Roadmap و Change Log ثبت می‌کنیم؛ سپس سراغ Database و نصب dependencyهای PHP می‌رویم.
+### نتیجهٔ واقعی اجرا
+
+| بررسی | نتیجهٔ لاگ |
+|---|---|
+| Release | `v1.15.1` |
+| دانلود | موفق؛ archive حدود 3.0 MiB |
+| بررسی archive | `tar -tzf` موفق شد و فهرست فایل‌ها نمایش داده شد |
+| فایل‌های اصلی | `artisan`, `.env.example`, `composer.json`, `public/index.php` همگی `OK` |
+| مقصد استخراج | `/var/www/pterodactyl` |
+| حجم استخراج‌شده | حدود `17M` |
+| فضای آزاد پس از استخراج | حدود `27 GiB` |
+
+**نتیجه:** دریافت و استخراج پذیرفته شد؛ این فقط آماده‌شدن فایل‌های برنامه است، نه نصب کامل Panel.
+
+## ۱۲. بررسی افزونه‌های PHP و اصلاح مالکیت فایل‌های Panel — گام بعدی، هنوز اجرا نشده
+
+### هدف
+
+در لاگ، پوشهٔ اصلی مالک `root:root` و مسیرهای `storage` و `bootstrap/cache` مالک `1001:steam` داشتند. مستندات رسمی Pterodactyl برای نصب با Nginx از مالکیت `www-data:www-data` و تنظیم مجوزهای Storage/Cache استفاده می‌کند.
+
+این مرحله فقط افزونه‌های کلیدی PHP و مالکیت فایل‌ها را بررسی/اصلاح می‌کند. دیتابیس یا رمز نمی‌سازد، `.env` ایجاد نمی‌کند و Composer dependencies را هنوز نصب نمی‌کند.
+
+### فرمان کامل
+
+~~~bash
+set -eu
+
+PANEL_DIR='/var/www/pterodactyl'
+
+echo "=== CHECK REQUIRED PHP EXTENSIONS ==="
+for module in bcmath curl gd intl mbstring mysqli openssl PDO pdo_mysql posix tokenizer xml zip; do
+    if php8.3 -m | grep -Eixq "$module"; then
+        printf 'OK: %s\n' "$module"
+    else
+        printf 'MISSING: %s\n' "$module" >&2
+        exit 1
+    fi
+done
+
+echo
+echo "=== CHECK WEB SERVER ACCOUNT ==="
+id www-data
+
+echo
+echo "=== CHECK PANEL FILES ==="
+for required_file in artisan .env.example composer.json public/index.php; do
+    if ! sudo test -f "$PANEL_DIR/$required_file"; then
+        echo "ERROR: missing $PANEL_DIR/$required_file" >&2
+        exit 1
+    fi
+    echo "OK: $required_file"
+done
+
+if sudo test -e "$PANEL_DIR/.env"; then
+    echo "STOP: .env already exists; this command will not overwrite it." >&2
+    exit 1
+fi
+
+echo
+echo "=== SET PANEL OWNERSHIP ==="
+sudo chown -R www-data:www-data "$PANEL_DIR"
+
+echo
+echo "=== SET STORAGE / CACHE PERMISSIONS ==="
+sudo chmod -R 755 "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache"
+
+echo
+echo "=== VERIFY OWNERSHIP AND PERMISSIONS ==="
+sudo stat -c '%U:%G mode=%a %n' "$PANEL_DIR" "$PANEL_DIR/artisan" "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache"
+
+echo
+echo "=== DISK AFTER PERMISSION SETUP ==="
+df -h /
+~~~
+
+### توضیح ساده
+
+- حلقهٔ اول افزونه‌ها را بررسی می‌کند؛ اگر یکی کم باشد، قبل از تغییر مالکیت متوقف می‌شود.
+- `www-data` کاربر رایج وب‌سرور Nginx/PHP-FPM در Debian است؛ `id` وجود حساب را بررسی می‌کند.
+- `chown -R` مالکیت فایل‌ها و پوشه‌های Panel را یکدست می‌کند.
+- `chmod -R 755` مجوزهای اولیهٔ Storage و Cache را تنظیم می‌کند.
+- `stat` نتیجهٔ مالکیت و مجوز را نشان می‌دهد. اگر `.env` از قبل وجود داشته باشد، فرمان عمداً متوقف می‌شود و آن را بازنویسی نمی‌کند.
+
+### خروجی مورد انتظار
+
+- همهٔ افزونه‌ها پیام `OK` بدهند؛ پیام `MISSING` نباید وجود داشته باشد.
+- `id www-data` یک حساب معتبر نشان دهد.
+- چهار فایل اصلی با `OK` تأیید شوند.
+- `stat` مالکیت `www-data:www-data` را برای مسیرهای بررسی‌شده نشان دهد.
+
+اگر افزونه‌ای کم بود یا فرمان خطا داد، ادامه نده و خروجی را بفرست. پس از تأیید این مرحله، سراغ ساخت database/user محلی می‌رویم؛ سپس فایل محیط و Composer dependencies را آماده خواهیم کرد.
+
+منابع رسمی:
+- https://docs.pterodactyl.io/v1/panel/getting-started
+- https://github.com/pterodactyl/panel/releases/tag/v1.15.1
