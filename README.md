@@ -94,19 +94,20 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | ۲ | نصب PHP 8.3 extensions، Nginx، MariaDB و Redis | انجام و بررسی شده | [Pterodactyl PoC §۹](docs/PTERODACTYL-POC.md) |
 | ۳ | بررسی سرویس‌ها، پورت‌ها و مسیر باینری Nginx | سرویس‌ها/پورت‌ها بررسی شده؛ نسخه Nginx تأیید شده | [Pterodactyl PoC §۹–۱۰](docs/PTERODACTYL-POC.md) |
 | ۴ | نصب Composer 2 و تأیید checksum | انجام شده؛ نسخه 2.10.3 | [Pterodactyl PoC §۱۰](docs/PTERODACTYL-POC.md) |
-| ۵ | دریافت و استخراج archive رسمی Panel v1.15.1 | گام بعدی؛ فرمان کامل آماده، هنوز اجرا نشده | [Pterodactyl PoC §۱۱](docs/PTERODACTYL-POC.md) |
-| ۶ | ساخت DB/user محلی Panel، تنظیم `.env`، APP_KEY، migrations و حساب مدیر | Pending | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
-| ۷ | Nginx virtual host، queue worker، cron و تست ورود Panel | Pending | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
-| ۸ | نصب Wings/Docker و تعریف Node/Allocation | Pending؛ بعد از قبولی Panel | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
-| ۹ | اولین سرور CS2 و تست چرخهٔ عمر/فضای ذخیره‌سازی | Pending؛ خطر دانلود مجدد Base Game باید حل شود | [CS2 Multi-Instance](docs/CS2-MULTI-INSTANCE.md)، [Testing Bench](docs/TESTING-BENCH.md) |
+| ۵ | دریافت و استخراج archive رسمی Panel v1.15.1 | انجام شده؛ چهار فایل اصلی تأیید شده‌اند | [Pterodactyl PoC §۱۱](docs/PTERODACTYL-POC.md) |
+| ۶ | بررسی افزونه‌های PHP و اصلاح مالکیت/مجوز فایل‌های Panel | گام بعدی؛ هنوز اجرا نشده | [Pterodactyl PoC §۱۲](docs/PTERODACTYL-POC.md) |
+| ۷ | ساخت DB/user محلی، `.env`، Composer dependencies و APP_KEY | Pending؛ پس از تأیید گام ۶ | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
+| ۸ | migrations/seed، ساخت مدیر و تنظیم Nginx/queue/cron | Pending | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
+| ۹ | نصب Wings/Docker و تعریف Node/Allocation | Pending؛ بعد از قبولی Panel | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
+| ۱۰ | اولین سرور CS2 و تست چرخهٔ عمر/فضای ذخیره‌سازی | Pending؛ خطر دانلود مجدد Base Game باید حل شود | [CS2 Multi-Instance](docs/CS2-MULTI-INSTANCE.md)، [Testing Bench](docs/TESTING-BENCH.md) |
 
-**نکتهٔ مهم:** فرمان‌های گام‌های ۰ تا ۴ و خروجی‌هایی که واقعاً اجرا شده‌اند در Runbook/لاگ ثبت شده‌اند. نسخهٔ پایدار v1.15.1، URL رسمی archive و سازگاری نسخهٔ PHP برای گام ۵ بررسی شده‌اند؛ فرمان کامل همراه توضیح، خروجی مورد انتظار و عیب‌یابی در [Pterodactyl PoC، بخش ۱۱](docs/PTERODACTYL-POC.md) قرار دارد. این گام هنوز روی Debian اجرا نشده است. README نقشهٔ راه است و جایگزین راهنمای دستورات نیست.
+**نکتهٔ مهم:** گام‌های ۰ تا ۵ اجرا و مستند شده‌اند؛ archive رسمی Panel v1.15.1 استخراج و فایل‌های پایه تأیید شده‌اند. گام بعدی بررسی افزونه‌های PHP و اصلاح مالکیت فایل‌ها در [Pterodactyl PoC، بخش ۱۲](docs/PTERODACTYL-POC.md) است. README نقشهٔ راه است و جایگزین راهنمای اجرایی نیست.
 
 ## محیط فعلی و محدودیت‌های شناخته‌شده
 
 - میزبان فعلی: Windows، پردازندهٔ Ryzen 5 8400F و ۱۶ گیگابایت RAM.
 - نود آزمایشی: Debian 13 در VMware؛ ۴ vCPU، ۵٫۶ GiB RAM و حدود ۲۸ GiB فضای آزاد در آخرین snapshot؛ IP برابر 192.168.1.5 و listenerهای فعلی بررسی شده‌اند؛ فعلاً محیط تست است، نه نود تولید.
-- روی Debian 13 در VMware، بسته‌های پایهٔ PHP 8.3 و افزونه‌ها، Nginx، MariaDB، Redis و Composer 2.10.3 نصب شده‌اند؛ باینری Nginx هم نسخهٔ 1.26.3 را گزارش کرده است. دیتابیس اختصاصی Panel و خود Panel هنوز ایجاد نشده‌اند. PHP 8.3 از مخزن خارجی SURY تأمین شده است. پیش از نصب CS2 container باید خطر دانلود دوبارهٔ بازی حدود ۷۰ گیگابایتی و فضای آزاد حدود ۲۸ GiB حل شود.
+- روی Debian 13 در VMware، بسته‌های پایهٔ PHP 8.3 و افزونه‌ها، Nginx، MariaDB، Redis و Composer 2.10.3 نصب شده‌اند؛ باینری Nginx نسخهٔ 1.26.3 را گزارش کرده است. فایل‌های Panel v1.15.1 اکنون در `/var/www/pterodactyl` استخراج شده‌اند (حدود 17 MiB). دیتابیس مخصوص Panel، `.env` و Composer dependencies هنوز آماده نشده‌اند. فضای آزاد حدود 27 GiB است؛ پیش از نصب CS2 داخل container باید ریسک دانلود دوبارهٔ بازی حدود 70 GiB حل شود.
 - هدف شروع: ۵ سرور پایدار؛ ۸ تا ۱۰ سرور تنها هدف کششی است و باید با اندازه‌گیری واقعی تأیید شود.
 - سایت و MariaDB فعلی روی هاست اشتراکی cPanel قرار دارند.
 - اتصال مستقیم خارجی MariaDB روی TCP/3306 برای سرویس فعلی قابل استفاده نیست؛ نود به API سایت از طریق HTTPS وصل می‌شود.
@@ -131,7 +132,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 5. هیچ انتخابی صرفاً با تعداد ستارهٔ GitHub انجام نمی‌شود؛ API، بلوغ، امنیت، قابلیت ارتقا، صورتحساب و آزمون عملی معیار تصمیم‌اند.
 6. حذف یا بازنویسی هیچ‌کدام از ریپوهای موجود بخشی از فاز مستندسازی نیست.
 
-**وضعیت نهایی فعلی:** معماری مرجع PoC مشخص است؛ dependencyهای پایهٔ وب/DB و Composer 2.10.3 روی fc-node-01 نصب و بررسی شده‌اند. دریافت/پیکربندی Pterodactyl Panel، Wings/Docker، اجرای CS2 تحت مدیریت Panel و انتقال تولیدی Pending هستند؛ اصلاح کدهای امنیتی نیز به برنامه‌ریزی و تست مجزا نیاز دارد.
+**وضعیت نهایی فعلی:** dependencyهای پایه و Composer 2.10.3 روی `fc-node-01` نصب و بررسی شده‌اند؛ فایل‌های Panel v1.15.1 دریافت و استخراج شده‌اند. اصلاح مالکیت، database/user، `.env`، Composer dependencies، APP_KEY، migrations، Nginx/queue/cron، Wings/Docker و اجرای CS2 همچنان Pending هستند. اصلاح کدهای امنیتی نیز برنامه و تست مجزا می‌خواهد.
 
 
 ---
