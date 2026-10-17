@@ -2,6 +2,18 @@
 
 ## آخرین وضعیت ثبت‌شده
 
+### نصب dependencyهای پایهٔ Pterodactyl — ۱۷ اکتبر ۲۰۲۶
+
+- کاربر نصب بسته‌های PHP 8.3 و extensionهای موردنیاز، PHP-FPM، Nginx، MariaDB، Redis و ابزارهای پایه را روی `fc-node-01` اجرا کرد؛ لاگ apt پایان عادی نصب ۵۱ بسته را نشان می‌دهد.
+- PHP CLI 8.3.35، MariaDB 11.8.6 و Redis 8.0.2 از خروجی‌ها شناسایی شدند؛ سرویس‌های `nginx`, `mariadb`, `redis-server` و `php8.3-fpm` همگی active بودند.
+- listenerها بررسی شدند: Nginx روی TCP/80؛ MariaDB فقط روی `127.0.0.1:3306`؛ Redis فقط روی loopback IPv4/IPv6. پورت 443 هنوز listener نداشت.
+- `nginx -v` در shell کاربر به علت پیدا نشدن فرمان شکست خورد، اما سرویس و listener فعال بودند؛ تأیید نسخه با `sudo /usr/sbin/nginx -v` و `dpkg-query` در گام Composer ثبت شده است.
+- Composer، خود Panel، دیتابیس و کاربر اختصاصی Panel، `.env`، APP_KEY، queue/cron، Docker و Wings هنوز نصب/ساخته نشده‌اند.
+- فضای آزاد همچنان حدود 28 GiB است، در برابر نصب native بازی CS2 حدود 70 GiB؛ روش امن استفاده از Base Game پیش از ساخت container باید حل شود.
+- آموزش اجرایی و فرمان نصب تأیید checksum برای Composer در [Pterodactyl PoC، بخش ۱۰](PTERODACTYL-POC.md) ثبت شد؛ این گام بعدی است و هنوز اجرا نشده.
+- این تغییر فقط مستندات `FragCity-RawPHPbackend` را به‌روز کرده است؛ در این گام هیچ تغییری در `cs2-kus-addons` انجام نشده است.
+
+
 ### Shared Base، payload اولیهٔ Instance و File Manager — ۱۶ اکتبر ۲۰۲۶
 
 - تصمیم‌های این مرحله در [ADR-011/012](DECISIONS.md) ثبت شد: هر Instance ابتدا payload کامل addons/cfg/GameMode text را در مسیر خصوصی خودش دریافت می‌کند؛ preset مود در Provisioning اولیه اعمال نمی‌شود و کانفیگ Aim/HS، Public Fun یا DM/FFA بعداً جداگانه انجام می‌شود.
