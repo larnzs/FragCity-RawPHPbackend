@@ -693,6 +693,27 @@ dpkg-query -W -f='nginx package: ${Version}\n' nginx
 
 این خروجی خطای قبلی `nginx -v: command not found` را روشن کرد: وقتی مسیر کامل `/usr/sbin/nginx` استفاده شد، نسخه با موفقیت گزارش شد. این خطا به معنی ازکارافتادن سرویس نبود؛ listener روی TCP/80 و وضعیت `active` پیش‌تر تأیید شده بود.
 
-**گام بعدی:** دانلود و استخراج asset رسمی Panel v1.15.1 هنوز اجرا نشده است. فرمان، توضیح مبتدی‌پسند، معیار قبولی و برخورد با خطا در [Pterodactyl PoC، بخش ۱۱](PTERODACTYL-POC.md) ثبت شده است. Composer 2.10.3 و نسخهٔ Nginx در بخش بالاتر همین لاگ تأیید شده‌اند.
+**وضعیت این snapshot تاریخی است:** در آن زمان archive هنوز دانلود نشده بود. نتیجهٔ جدیدتر دریافت و استخراج Panel و گام بعدی در بخش افزوده‌شدهٔ انتهای همین سند ثبت شده است.
 
 **مرز مرحله:** در لاگ فعلی هنوز database/user اختصاصی Panel، secrets، `.env`، APP_KEY، migration، حساب مدیر، queue worker یا cron ایجاد نشده‌اند. Docker، Wings و CS2 container هم هنوز نصب/ساخته نشده‌اند.
+
+
+## دریافت و استخراج Panel v1.15.1 — انجام‌شده در ۱۷ اکتبر ۲۰۲۶
+
+این ثبت براساس خروجی ترمینال ارسالی کاربر است. فایل رسمی release دانلود شد، آرشیو قابل خواندن بود و فایل‌های پایهٔ Panel در مسیر مقصد تأیید شدند.
+
+### نتیجهٔ واقعی
+
+| مورد | نتیجه |
+|---|---|
+| Release | `v1.15.1` |
+| Archive | حدود 3.0 MiB؛ دانلود موفق |
+| بررسی archive | `tar -tzf` موفق شد و فهرست فایل‌ها نمایش داده شد |
+| فایل‌های اصلی | `artisan`, `.env.example`, `composer.json`, `public/index.php` همگی `OK` |
+| مسیر مقصد | `/var/www/pterodactyl` |
+| حجم پوشهٔ استخراج‌شده | حدود `17M` |
+| فضای آزاد پس از استخراج | حدود `27 GiB`، استفادهٔ پارتیشن حدود 75% |
+
+**نکتهٔ مالکیت:** در خروجی اولیه، پوشهٔ اصلی `root:root` و مسیرهای `storage` و `bootstrap/cache` مالک `1001:steam` داشتند. `chmod` فقط permissionها را تغییر می‌دهد و مالکیت را اصلاح نمی‌کند؛ اصلاح مالکیت و بررسی moduleهای PHP در [Pterodactyl PoC، بخش ۱۲](PTERODACTYL-POC.md) مرحلهٔ بعد است.
+
+**مرز فعلی:** هنوز database/user اختصاصی Panel، فایل `.env`، Composer dependencies، APP_KEY، migrations، مدیر Panel، Nginx site config، queue/cron، Docker و Wings ساخته/نصب نشده‌اند. تا وقتی محدودیت Storage حل نشده، CS2 container ساخته نمی‌شود.
