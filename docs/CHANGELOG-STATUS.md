@@ -2,6 +2,16 @@
 
 ## آخرین وضعیت ثبت‌شده
 
+### دریافت و استخراج Panel v1.15.1 — ۱۷ اکتبر ۲۰۲۶
+
+- archive رسمی `panel.tar.gz` از release ثابت `v1.15.1` دانلود شد؛ حجم گزارش‌شده حدود 3.0 MiB است.
+- `tar -tzf` بدون خطا فهرست فایل‌ها را نشان داد؛ فایل‌های `artisan`, `.env.example`, `composer.json`, `public/index.php` همگی `OK` بودند.
+- فایل‌ها در `/var/www/pterodactyl` استخراج شدند؛ حجم پوشه حدود 17 MiB و فضای آزاد پارتیشن root حدود 27 GiB است.
+- خروجی مالکیت اولیه نشان داد پوشهٔ اصلی `root:root` و `storage`/ `bootstrap/cache` مالک `1001:steam` دارند. گام بعد اصلاح مالکیت به `www-data:www-data` و تأیید افزونه‌های لازم PHP است.
+- هنوز database/user، `.env`، Composer dependencies، APP_KEY، migrations، admin user، Nginx site، cron/queue، Docker و Wings نصب یا پیکربندی نشده‌اند.
+- وضعیت و فرمان تکرارپذیر در [Pterodactyl PoC بخش ۱۱](PTERODACTYL-POC.md) و [Debian PoC Log](DEBIAN-POC.md) ثبت شده است. هیچ چیزی در `cs2-kus-addons` تغییر نکرده است.
+
+
 ### ممیزی عمیق Runbook و اصلاح فرمان بررسی PHP — ۱۷ اکتبر ۲۰۲۶
 
 - در بازبینی فرمان‌های نصب مشخص شد pattern دستور `grep -Ei` برای بررسی افزونه‌های PHP، نقل‌قول بسته‌شدن نداشت و قابل کپی/اجرا نبود.
