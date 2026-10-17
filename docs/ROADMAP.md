@@ -42,6 +42,20 @@
 
 ## P2 — PoC پنل بازی
 
+### وضعیت اجرایی ثبت‌شده در ۱۷ اکتبر ۲۰۲۶
+
+- [x] Preflight: Debian 13، منابع، شبکه، فضای دیسک و اندازهٔ native CS2 ثبت شد.
+- [x] PHP 8.3 از مخزن SURY نصب شد؛ extensionهای بررسی‌شده حاضرند.
+- [x] Nginx، MariaDB، Redis و PHP-FPM نصب و فعال شدند؛ MariaDB/Redis در snapshot فقط روی loopback گوش می‌دهند.
+- [x] Composer 2.10.3 نصب و تأیید checksum شد؛ Nginx 1.26.3 بررسی شد.
+- [ ] دریافت و استخراج archive رسمی Panel v1.15.1؛ این گام بعدی است و فرمان کامل در [Pterodactyl PoC §۱۱](PTERODACTYL-POC.md) قرار دارد.
+- [ ] ساخت DB/user، تنظیم محیط، APP_KEY، migrations/seed و اولین مدیر Panel.
+- [ ] Nginx site config، cron، queue worker و تست login.
+- [ ] نصب Wings/Docker؛ پس از قبولی Panel.
+- [ ] اولین CS2 container؛ مسدود تا حل فضای آزاد حدود 28 GiB در برابر نصب native حدود 70 GiB.
+
+این چک‌لیست وضعیت اجرا را نشان می‌دهد؛ شرح معماری و برنامهٔ آزمون‌ها در ادامه آمده است. snapshotهای قبلی در [Debian PoC Log](DEBIAN-POC.md) عمداً به‌صورت تاریخی حفظ می‌شوند.
+
 1. Release پایدار و patched دقیق Panel/Wings انتخاب و ثبت شود.
 2. در فاز فعلی، همان fc-node-01 به‌عنوان آزمایشگاه یکپارچهٔ Panel و Node استفاده می‌شود؛ این انتخاب به‌معنی Production بودن نود یا مناسب‌بودن دائمی یک ماشین برای همهٔ سرویس‌ها نیست. Flute CMS و دیتابیس cPanel فعلاً جدا می‌مانند. پیش از نصب Nginx، IP و پورت‌های فعلی ثبت شوند.
 3. یک Node و allocation کوچک ثبت شود.
