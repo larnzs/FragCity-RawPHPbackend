@@ -184,3 +184,16 @@
 **شرط بازنگری:** اگر منابع، شبکه، ذخیره‌سازی یا محدودیت‌های VMware مانع اجرای پایدار شدند، پیش از Production محل Panel و Nodeها دوباره تفکیک و تصمیم ثبت شود.
 
 **مرجع:** [Pterodactyl PoC](PTERODACTYL-POC.md)، [Debian PoC Log](DEBIAN-POC.md)، [Roadmap](ROADMAP.md).
+
+
+## ADR-017 — PHP 8.3 برای Panel 1.x روی Debian 13
+
+**وضعیت:** تأییدشده برای PoC؛ وابستگی به مخزن خارجی باید نگهداری شود.
+
+**زمینه:** مخازن پیش‌فرض Debian 13 در snapshot این آزمایش `php8.3` candidate نداشتند و `php8.4` ارائه می‌کردند؛ شرط نسخهٔ Panel v1.15.1 بر اساس `composer.json` بازهٔ PHP 8.2/8.3 است و PHP 8.4 را شامل نمی‌کند.
+
+**تصمیم:** برای این PoC، PHP 8.3 از مخزن SURY با keyring و `Signed-By` اختصاصی نصب شود. candidate نسخهٔ 8.3.35 از معماری amd64 گزارش شد و بسته‌های PHP 8.3 و extensionهای منتخب اکنون نصب شده‌اند.
+
+**پیامدها و محدودیت‌ها:** SURY مخزن رسمی Debian نیست؛ کلید، suite و معماری باید حفظ و تغییرات امنیتی/سازگاری آن پایش شود. وجود extensionهای موردنیاز و نسخهٔ واقعی Composer باید قبل از دانلود dependencyهای Panel تأیید شود. این ADR فقط محیط آزمایشگاهی را پوشش می‌دهد و به‌تنهایی سیاست Production یا ارتقای آینده را تعیین نمی‌کند.
+
+**مرجع:** [Pterodactyl PoC](PTERODACTYL-POC.md)، [Debian PoC Log](DEBIAN-POC.md)، https://getcomposer.org/download/.
