@@ -647,7 +647,7 @@ sudo apt install -y \
 | PHP extensionهای فیلترشده | bcmath, curl, gd, intl, mbstring, PDO, pdo_mysql, xml, zip, Zend OPcache مشاهده شدند |
 | MariaDB | 11.8.6 در خروجی client |
 | Redis | 8.0.2 |
-| Nginx | بسته نصب شد؛ بررسی `nginx -v` در PATH کاربر شکست خورد، ولی سرویس active و listener روی 80 است؛ بررسی مسیر کامل pending |
+| Nginx | باینری `nginx/1.26.3` و بستهٔ `1.26.3-3+deb13u9` تأیید شدند؛ سرویس active و listener روی 80 است |
 | nginx | active |
 | mariadb | active |
 | redis-server | active |
@@ -671,7 +671,7 @@ sudo apt install -y \
 
 ### نکته دربارهٔ خطای ظاهری Nginx
 
-فرمان `nginx -v` در shell کاربر پیام `command not found` داد. این نتیجه با active بودن سرویس و listener پورت 80 ناسازگار نیست؛ مسیر باینری Nginx معمولاً زیر `/usr/sbin` قرار دارد و ممکن است در PATH کاربر عادی نباشد. برای نتیجهٔ قطعی اجرا شود:
+فرمان `nginx -v` در shell کاربر پیام `command not found` داد. این با active بودن سرویس ناسازگار نبود؛ علت، پیدا نشدن مسیر باینری در PATH کاربر عادی بود. در بررسی بعدی، فرمان‌های زیر با موفقیت اجرا شدند:
 
 ~~~bash
 sudo /usr/sbin/nginx -v
