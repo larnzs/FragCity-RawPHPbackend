@@ -383,7 +383,24 @@ ARCHIVE="/tmp/pterodactyl-panel-${PANEL_VERSION}.tar.gz"
 FILE_LIST="/tmp/pterodactyl-panel-${PANEL_VERSION}-files.txt"
 PANEL_URL="https://github.com/pterodactyl/panel/releases/download/${PANEL_VERSION}/panel.tar.gz"
 
-echo "=== PRE-FLIGHT ==="
+echo "=== PRE-FLIGHT: PHP / COMPOSER ==="
+php --version
+composer --version
+
+echo
+echo "=== REQUIRED PHP MODULES ==="
+PHP_MODULES="$(php -m | tr '[:upper:]' '[:lower:]')"
+for module in bcmath curl gd intl mbstring mysqli openssl pdo pdo_mysql posix tokenizer xml zip; do
+    if printf '%s\\n' "$PHP_MODULES" | grep -Fxq "$module"; then
+        printf 'OK: %s\\n' "$module"
+    else
+        printf 'ERROR: missing PHP module: %s\\n' "$module" >&2
+        exit 1
+    fi
+done
+
+echo
+echo "=== PRE-FLIGHT: PANEL / DISK ==="
 echo "Panel release: ${PANEL_VERSION}"
 df -h /
 
@@ -432,7 +449,8 @@ df -h /
 
 ### توضیح سادهٔ فرمان
 
-- `set -eu`: در صورت خطای فرمان یا متغیر تعریف‌نشده، اجرای بلوک متوقف می‌شود.
+- `set -eu`: در صورت خطای فرمان یا استفاده از متغیر تعریف‌نشده، اجرای بلوک متوقف می‌شود.
+- بررسی PHP/Composer و حلقهٔ moduleها: پیش از دانلود، وجود moduleهای پایهٔ اعلام‌شده در مستندات رسمی را کنترل می‌کند و اگر یکی موجود نباشد، متوقف می‌شود. نام moduleها پیش از مقایسه به حروف کوچک تبدیل می‌شود.
 - `PANEL_VERSION`: نسخهٔ دقیق را ثابت می‌کند تا نصب قابل تکرار باشد.
 - بررسی وجود پوشه: مانع بازنویسی ناخواستهٔ نصب قبلی می‌شود.
 - `curl --fail --location`: فایل را از Release رسمی دریافت می‌کند و خطای HTTP را موفق فرض نمی‌کند.
@@ -443,6 +461,7 @@ df -h /
 
 ### خروجی مورد انتظار
 
+- نسخهٔ Composer نمایش داده می‌شود و moduleهای فهرست‌شده هرکدام پیام `OK` می‌گیرند.
 - `Panel release: v1.15.1`
 - دانلود archive و `tar -tzf` بدون خطا.
 - چهار پیام `OK` برای `artisan`, `.env.example`, `composer.json`, `public/index.php`.
@@ -451,6 +470,7 @@ df -h /
 ### اگر خطا دیدی
 
 - اگر پیام `already exists` آمد، متوقف شو و پوشه را حذف نکن.
+- اگر preflight PHP/moduleها شکست خورد، archive دانلود نمی‌شود؛ module مفقود یا خطای دقیق را ثبت کن و ادامه نده.
 - اگر `curl`، `tar` یا آزمون فایل‌ها خطا داد، ادامه نده.
 - اگر موفق شد، کل خروجی را بفرست. در این گام رمز یا secret ساخته نمی‌شود؛ پیش از ارسال خروجی هر اطلاعات خصوصی را بازبینی کن.
 
