@@ -1,7 +1,7 @@
 # FragCity — Pterodactyl PoC روی fc-node-01
 
 > آخرین ثبت: ۱۷ اکتبر ۲۰۲۶  
-> وضعیت: **بسته‌های پایهٔ Panel نصب و بررسی شده‌اند؛ Composer و خود Panel هنوز نصب نشده‌اند.** این محیط VMware آزمایشی است و Production محسوب نمی‌شود.
+> وضعیت: **بسته‌های پایه و Composer 2 نصب و بررسی شده‌اند؛ دریافت و پیکربندی Panel هنوز انجام نشده است.** این محیط VMware آزمایشی است و Production محسوب نمی‌شود.
 
 ## ۱. تصمیم فعلی پروژه
 
@@ -170,11 +170,11 @@ PoC هنوز موفق محسوب نمی‌شود تا Panel به‌صورت پا
 - نسخهٔ PHP CLI برابر 8.3.35 است؛ همهٔ extensionهای بررسی‌شده از جمله `bcmath`, `curl`, `gd`, `intl`, `mbstring`, `PDO`, `pdo_mysql`, `xml`, `zip` و Zend OPcache در خروجی ظاهر شده‌اند.
 - سرویس‌های `nginx`, `mariadb`, `redis-server` و `php8.3-fpm` همگی `active` گزارش شده‌اند.
 - Nginx روی TCP/80 گوش می‌دهد. MariaDB روی `127.0.0.1:3306` و Redis روی `127.0.0.1:6379` و `[::1]:6379` گوش می‌دهند؛ در snapshot پورت 3306 و 6379 روی رابط شبکهٔ عمومی باز نیستند.
-- هنوز Composer، فایل‌های Panel، database/user اختصاصی Panel، `.env`، APP_KEY، migrations، حساب مدیر، queue/cron، Docker و Wings نصب/تنظیم نشده‌اند.
+- Composer 2.10.3 نصب و تأیید شده است. فایل‌های Panel، database/user اختصاصی Panel، `.env`، APP_KEY، migrations، حساب مدیر، queue/cron، Docker و Wings هنوز نصب/تنظیم نشده‌اند.
 - دستور `nginx -v` در shell کاربر با پیام `command not found` مواجه شده، درحالی‌که سرویس Nginx active و پورت 80 در حال listen است. به‌احتمال زیاد مسیر `/usr/sbin` در PATH این shell نیست؛ نسخهٔ باینری را در ادامه با `sudo /usr/sbin/nginx -v` و نسخهٔ بسته را با `dpkg-query` بررسی می‌کنیم. این پیام را به‌عنوان شکست نصب Nginx ثبت نمی‌کنیم.
 - فضای آزاد همچنان حدود 28 GiB است و نصب فعلی native بازی CS2 در `/home/steam/cs2` حدود 70 GiB است؛ اخطار storage پیش از ساخت container به قوت خود باقی است.
 
-**مرحلهٔ باز بعدی:** نصب امن Composer 2 و بررسی خروجی. پس از ثبت خروجی Composer، دانلود archive پایدار Panel انجام می‌شود؛ هنوز Panel را دریافت یا پیکربندی نکنید.
+**مرحلهٔ بعد:** بررسی دوبارهٔ release پایدار Panel و سپس نوشتن/اجرای گام دریافت archive و پیکربندی Panel، با ثبت خروجی هر مرحله. هنوز دیتابیس یا `.env` پنل ساخته نشده است.
 
 ## ٨. نتیجهٔ افزودن مخزن PHP 8.3 — ۱۷ اکتبر ۲۰۲۶
 
@@ -232,7 +232,8 @@ sudo apt install -y \
 | Redis listener | `127.0.0.1:6379` و `[::1]:6379` |
 | HTTPS | هنوز listener روی 443 وجود ندارد |
 | Disk | حدود 28 GiB فضای آزاد؛ `/home/steam/cs2` حدود 70 GiB |
-| Composer / Panel / Docker / Wings | هنوز نصب نشده‌اند |
+| Composer | نصب و تأیید شده: 2.10.3 |
+| Panel / Docker / Wings | هنوز نصب نشده‌اند |
 
 در خروجی فیلتر extension، `Zend OPcache` دو بار دیده شد؛ یک بار برای extension و یک بار در بخش Zend Engine. این duplication خطا نیست. اجرای `nginx -v` در shell کاربر `command not found` داد، اما systemd سرویس را active گزارش کرد و `ss` نیز listener مربوط به Nginx را نشان داد. بنابراین بررسی نسخهٔ باینری با مسیر کامل بخشی از مرحلهٔ بعد است.
 
@@ -272,11 +273,11 @@ sudo du -sh /home/steam/cs2 /home/steam/steamrt 2>/dev/null
 
 این بررسی، به‌ویژه محدود ماندن MariaDB و Redis به loopback را ثبت می‌کند. فعلاً نیازی نیست این پورت‌ها از شبکهٔ LAN یا اینترنت در دسترس باشند.
 
-## ۱۰. مرحلهٔ بعد: نصب Composer 2 — هنوز اجرا نشده
+## ۱۰. نصب Composer 2 — انجام‌شده در ۱۷ اکتبر ۲۰۲۶
 
-Composer مدیریت‌کنندهٔ dependencyهای PHP است؛ Panel برای نصب کتابخانه‌های خود به آن نیاز دارد. در تاریخ بررسی، صفحهٔ رسمی Composer نسخهٔ پایدار 2.10.3 را نشان می‌داد. فرمان زیر checksum رسمی SHA-384 نصب‌کننده را پیش از اجرای آن مقایسه می‌کند و فقط در صورت تطبیق installer را به `/usr/local/bin/composer` نصب می‌کند.
+### فرمان اجراشده
 
-**منبع نسخه و checksum:** https://getcomposer.org/download/
+این فرمان در لاگ کاربر با checksum رسمی همان زمان اجرا شد. checksum نصب‌کننده ممکن است با نسخه/تاریخ تغییر کند؛ برای اجرای مجدد، مقدار روز را از صفحهٔ رسمی Composer بررسی کنید و آن را به‌عنوان مقدار ثابت دائمی تلقی نکنید.
 
 ~~~bash
 set -eu
@@ -297,28 +298,49 @@ echo 'Composer installer checksum verified.'
 sudo php composer-setup.php --2 --install-dir=/usr/local/bin --filename=composer
 rm -f composer-setup.php
 
-echo
-echo "=== COMPOSER ==="
 composer --version
 command -v composer
 
-echo
-echo "=== NGINX VERSION CHECK ==="
 sudo /usr/sbin/nginx -v
 dpkg-query -W -f='nginx package: ${Version}\n' nginx
 ~~~
 
-### چرا checksum مهم است؟
+### خروجی واقعی
 
-این فرایند ابتدا installer را دریافت می‌کند، سپس SHA-384 فایل را با مقدار منتشرشده در سایت رسمی تطبیق می‌دهد. اگر مقدارها یکسان نباشند، فرمان متوقف می‌شود و installer اجرا نخواهد شد. گزینهٔ `--2` شاخهٔ اصلی Composer 2 را انتخاب می‌کند؛ خروجی دقیق نسخه باید از `composer --version` ثبت شود.
+| بررسی | نتیجه |
+|---|---|
+| امضای فایل نصب‌کننده | پیام `Composer installer checksum verified.` |
+| Composer | نسخهٔ 2.10.3؛ تاریخ build نمایش‌داده‌شده: 2026-08-27 13:34:23 |
+| مسیر Composer | `/usr/local/bin/composer` |
+| PHP مورد استفاده | 8.3.35 در `/usr/bin/php8.3` |
+| Nginx | `nginx/1.26.3` |
+| بستهٔ Debian Nginx | `1.26.3-3+deb13u9` |
 
-### هنوز اجرا نکنید
+**نتیجه:** گام نصب Composer پذیرفته شد. تأیید checksum نشان می‌دهد installer با مقدار رسمی ثبت‌شده در زمان اجرا تطبیق داشت. نصب Composer فقط ابزار مدیریت dependency را آماده کرده و به معنی نصب‌شدن خود Pterodactyl نیست.
 
-در این مرحله فایل Panel را دانلود نکنید، database/user یا رمز Panel نسازید و `.env`/APP_KEY تولید نکنید. پس از تأیید Composer، مرحلهٔ جداگانهٔ دریافت release پایدار Panel و نصب dependencyها مستند و اجرا می‌شود. Wings و Docker هم فعلاً خارج از این گام‌اند.
+### توضیح آموزشی
 
-**معیار قبولی گام Composer:** فرمان با exit code موفق تمام شود، checksum تأیید شود، `composer --version` نسخهٔ 2.x را نمایش دهد و بررسی Nginx با مسیر کامل نسخهٔ باینری/بسته را مشخص کند.
+- `EXPECTED_CHECKSUM` مقدار قابل‌اعتماد مورد انتظار است؛ `ACTUAL_CHECKSUM` از محتوای واقعی installer محاسبه می‌شود.
+- `set -eu` باعث توقف اسکریپت در خطای فرمان یا استفاده از متغیر تعریف‌نشده می‌شود.
+- گزینهٔ `--2` شاخهٔ اصلی Composer 2 را نصب می‌کند.
+- `/usr/local/bin` محل ابزارهای نصب‌شده به‌صورت سراسری و خارج از مدیریت مستقیم بسته‌های APT است.
+- اجرای `sudo /usr/sbin/nginx -v` مشکل قبلی `nginx: command not found` را برطرف کرد؛ سرویس Nginx از قبل فعال بود و باینری فقط در PATH کاربر عادی پیدا نمی‌شد.
 
-منابع مرجع:
+منابع:
 - https://getcomposer.org/download/
 - https://docs.pterodactyl.io/v1/panel/getting-started
-- https://github.com/pterodactyl/panel/releases
+
+## ۱۱. مرحلهٔ بعد: دریافت و نصب Panel — هنوز اجرا نشده
+
+در ادامه، قبل از اجرای فرمان دانلود، release پایدار و راهنمای رسمی Panel دوباره بررسی می‌شوند. سپس فرمان‌های هر مرحله به همین سند افزوده خواهند شد و نتیجهٔ واقعی اجرای کاربر در [Debian PoC Log](DEBIAN-POC.md) ثبت می‌شود.
+
+ترتیب اجرای مرحلهٔ بعد:
+1. بررسی release فعلی و انتخاب archive همان نسخه.
+2. ایجاد مسیر امن برنامه و دریافت/استخراج archive رسمی.
+3. تنظیم مالکیت و دسترسی فایل‌ها.
+4. نصب dependencyهای PHP با Composer از داخل پوشهٔ Panel.
+5. آماده‌سازی دیتابیس محلی و user محدود Panel؛ رمز فقط در ترمینال/فایل خصوصی، نه Git.
+6. ساخت `.env` و APP_KEY، اجرای migration/seed و ساخت admin طبق مستندات همان release.
+7. تنظیم Nginx، queue worker و cron؛ سپس بررسی ورود به پنل.
+
+این‌ها هنوز برنامهٔ مرحلهٔ بعد هستند و هیچ‌کدام در لاگ فعلی اجرا نشده‌اند. پیش از ساخت DB/secret یا دانلود archive، نسخه و فرمان‌های فعلی دوباره تأیید خواهند شد.
