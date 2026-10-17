@@ -8,7 +8,7 @@
 |---|---|---|---|
 | P0 — Requirements & Local Development | مستندات آماده؛ اجرا Pending | الزامات، معماری، updater محلی، Laragon/WAMP و مرزبندی Production | clone محلی آماده، DB کاملاً جدا و تست اولیه قابل تکرار باشد |
 | P1 — Security & Baseline | ممیزی ایستا اولیه انجام؛ اصلاح Pending | بازبینی secret، API، ورودی‌ها و مدل مالکیت داده | خطرهای مسدودکننده شناسایی و برنامه اصلاح تصویب شود |
-| P2 — Game Panel PoC | Debian lab آماده‌سازی شد؛ نصب Panel pending | fc-node-01 آزمایشگاهی؛ Panel/DB محلی، سپس Wings/Docker و یک CS2 server | چرخهٔ عمر، جداسازی Instanceها، حفاظت کانفیگ، File Manager و Update هماهنگ‌شده پایدار باشد |
+| P2 — Game Panel PoC | بسته‌های پایهٔ PHP 8.3/Nginx/MariaDB/Redis نصب و سرویس‌ها active؛ Composer/Panel pending | fc-node-01 آزمایشگاهی؛ Panel/DB محلی، سپس Wings/Docker و یک CS2 server | چرخهٔ عمر، جداسازی Instanceها، حفاظت کانفیگ، File Manager و Update هماهنگ‌شده پایدار باشد |
 | P3 — Billing Integration | Pending | سفارش Sandbox/ساختگی تا Provisioning | duplicate و سفارش ناموفق به‌شکل امن مدیریت شود |
 | P4 — Fixed-Duration Product | Pending | بسته‌ها، Wallet، `expires_at` و expiry action | تمام تست‌های مدل مالی قبول شوند |
 | P5 — Isolation & Recovery | Pending | مجوز مشتری، Backup/Restore، retry و rollback | تست‌های امنیتی/بازیابی قبول شوند |
