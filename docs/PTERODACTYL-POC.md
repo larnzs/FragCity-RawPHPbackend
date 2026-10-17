@@ -46,9 +46,9 @@ Releaseها قبل از نصب واقعی دوباره بررسی شوند؛ ا�
 | Swap | ۶٫۱ GiB کل؛ حدود ۲۶۸ KiB مصرف‌شده |
 | فایل‌سیستم / | ۱۱۲ GiB کل؛ ۷۹ GiB مصرف؛ ۲۸ GiB آزاد؛ ۷۵٪ مصرف |
 
-### وضعیت نرم‌افزارها
+### وضعیت نرم‌افزارها در snapshot اولیه — پیش از نصب dependencyها
 
-بررسی command -v گزارش کرد که موارد زیر نصب/قابل‌دسترسی نیستند:
+این خروجی مربوط به بررسی پیش از نصب در همین روز است؛ برای وضعیت جدیدتر به بخش‌های ۷، ۹ و ۱۰ مراجعه کن. در snapshot اولیه بررسی command -v گزارش کرد که موارد زیر نصب/قابل‌دسترسی نبودند:
 
 - PHP و Composer
 - Nginx
@@ -224,7 +224,7 @@ Candidate: 8.3.35-1+0~20260925.87+debian13~1.gbp19383d
 
 > **بازبینی نحو فرمان:** در بازبینی تکمیلی ۱۷ اکتبر، نقل‌قول پایانی الگوی `grep` در بلوک بررسی PHP جا افتاده بود و آن بلوک را از نظر shell نامعتبر می‌کرد. نقل‌قول و انتهای الگو اصلاح شد؛ از این نسخهٔ اصلاح‌شده استفاده کن.
 
-### فرمان اجراشده
+### فرمان نصب وابستگی‌های پایه
 
 کاربر با موفقیت فرمان زیر را اجرا کرد؛ خروجی apt نشان می‌دهد ۵۱ بسته نصب شدند، بدون این‌که هیچ بسته‌ای حذف شود:
 
@@ -299,7 +299,7 @@ sudo du -sh /home/steam/cs2 /home/steam/steamrt 2>/dev/null
 
 ## ۱۰. نصب Composer 2 — انجام‌شده در ۱۷ اکتبر ۲۰۲۶
 
-### فرمان اجراشده
+### فرمان نصب Composer با بررسی checksum
 
 این فرمان در لاگ کاربر با checksum رسمی همان زمان اجرا شد. checksum نصب‌کننده ممکن است با نسخه/تاریخ تغییر کند؛ برای اجرای مجدد، مقدار روز را از صفحهٔ رسمی Composer بررسی کنید و آن را به‌عنوان مقدار ثابت دائمی تلقی نکنید.
 
@@ -390,7 +390,7 @@ composer --version
 echo
 echo "=== REQUIRED PHP MODULES ==="
 PHP_MODULES="$(php -m | tr '[:upper:]' '[:lower:]')"
-for module in bcmath curl gd intl mbstring mysqli openssl pdo pdo_mysql posix tokenizer xml zip; do
+for module in bcmath curl dom gd intl json mbstring mysqli openssl pdo pdo_mysql posix tokenizer xml zip; do
     if printf '%s\n' "$PHP_MODULES" | grep -Fxq "$module"; then
         printf 'OK: %s\n' "$module"
     else
