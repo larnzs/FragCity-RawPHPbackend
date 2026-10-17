@@ -1,111 +1,173 @@
-# FragCity
-## نیازمندی‌ها، معماری و نقشهٔ راه
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/f14b1c21-b3b0-470e-b0df-f1cc05b3cab7" alt="Flute CMS" width="100%">
+</p>
 
-> **وضعیت پروژه:** طراحی معماری و گردش‌کار توسعهٔ محلی مستند شده؛ آمادهٔ تولید نیست و اجرای امن DB محلی هنوز مسدود است.  
-> **آخرین به‌روزرسانی مستندات:** ۱۶ اکتبر ۲۰۲۶  
-> **هدف:** ساخت سکوی فروش و مدیریت سرورهای CS2 با تکیه بر پروژه‌های متن‌باز بالغ و کمینه‌کردن کدنویسی اختصاصی.
+<h3 align="center">Open-source CMS for game server communities</h3>
 
-FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux منتقل کند. هدف، ساخت یک محصول میزبانی سرور است که فروش، حساب مشتری، کیف پول، خرید بسته، ساخت خودکار سرور، مدیریت نودها، افزونه‌ها، API، امنیت و بازیابی را به‌شکل منسجم پوشش دهد.
+<p align="center">
+  <a href="https://github.com/flute-cms/cms/releases"><img src="https://img.shields.io/github/v/release/flute-cms/cms?style=flat-square&color=blue" alt="Release"></a>
+  <a href="https://github.com/flute-cms/cms/blob/early/LICENSE"><img src="https://img.shields.io/github/license/flute-cms/cms?style=flat-square" alt="License"></a>
+  <a href="https://github.com/flute-cms/cms/stargazers"><img src="https://img.shields.io/github/stars/flute-cms/cms?style=flat-square" alt="Stars"></a>
+  <a href="https://discord.gg/BcBMeVJJsd"><img src="https://img.shields.io/discord/869991184968323103?style=flat-square&label=discord&color=5865F2" alt="Discord"></a>
+  <img src="https://img.shields.io/badge/php-≥8.2-8892BF?style=flat-square" alt="PHP 8.2+">
+</p>
 
-## الزامات کلیدی محصول
+<p align="center">
+  <a href="https://docs.flute-cms.com">Documentation</a> · <a href="https://flute-cms.com">Website</a> · <a href="https://discord.gg/BcBMeVJJsd">Discord</a> · <a href="https://flute-cms.com/marketplace">Marketplace</a> · <a href="README.ru.md">Русский</a>
+</p>
 
-این خلاصهٔ الزامات، نقطهٔ شروع تصمیم‌های فنی است. تعریف کامل و معیارهای پذیرش در [Requirements](docs/REQUIREMENTS.md) آمده است.
+---
 
-| ID | الزام | وضعیت |
-|---|---|---|
-| REQ-01 | مشتری کیف پولش را شارژ کند و هزینهٔ بسته را هنگام خرید، یک‌بار پرداخت کند | تأییدشده |
-| REQ-02 | بسته‌های مدت‌دار: ۱، ۳، ۷، ۱۵ و ۳۰ روز | تأییدشده |
-| REQ-03 | تایمر از خرید موفق شروع شود و با خاموش‌بودن سرور متوقف نشود | تأییدشده |
-| REQ-04 | هنگام انقضا سرور طبق سیاست مشخص Suspend/Stop شود؛ حذف داده سیاست جدا داشته باشد | اصل مورد توافق؛ جزئیات نیازمند تصمیم |
-| REQ-05 | ساخت و مدیریت instance تا حد ممکن با پنل آماده انجام شود، نه Instance Maker سفارشی | هدف معماری |
-| REQ-06 | مدیریت چند نود با نصب تکرارپذیر و تنظیمات مجزای هر نود | تأییدشده |
-| REQ-07 | ارتباط نود با سایت از HTTPS API باشد؛ Remote MariaDB روی 3306 از هاست فعلی مسیر قابل استفاده‌ای نیست | محدودیت فعلی تأییدشده |
-| REQ-08 | دسترسی سرورها و داده‌های مشتریان از یکدیگر جدا باشد | الزام امنیتی |
-| REQ-09 | Backup/Restore، لاگ، پایش، retry و جلوگیری از عملیات تکراری | الزام عملیاتی |
-| REQ-10 | بهره‌گیری از ریپوهای آماده و نگهداری‌پذیر؛ توسعهٔ اختصاصی فقط برای شکاف واقعی محصول | جهت‌گیری اصلی |
+**Flute** is a free, self-hosted CMS designed for game server communities — CS2, CS:GO, TF2, Minecraft, and others. It ships with a modular plugin system, a built-in marketplace, an admin panel, payment integrations, and social auth out of the box. Install it, extend it, make it yours.
 
-## انتخاب فعلی معماری
+> [!NOTE]
+> Flute is under active development on the `early` branch. The `main` branch contains stable releases.
+> If you'd like to contribute, please see the [Contributing](#contributing) section.
 
-**مسیر مرجع برای PoC:** **Pterodactyl Panel + Wings + Paymenter**
+## Features
 
-این ترکیب هنوز انتخاب قطعی تولید نیست. اول باید ثابت کنیم که ایجاد CS2 instance، تخصیص منابع، اتصال فروش، خرید بسته با کیف پول، ثبت `expires_at` و رفتار زمان انقضا درست کار می‌کند. اگر بخش مدت‌دار در Paymenter به افزونه نیاز داشته باشد، ترجیح این است که شکاف را با extension محدود پر کنیم و هستهٔ محصول را بی‌دلیل fork نکنیم.
+- **Modular architecture** — install modules and themes from the built-in marketplace or develop your own
+- **Game server integration** — native support for Source (CS2, CS:GO, TF2), GoldSrc (CS 1.6), and Minecraft servers via query protocols
+- **Payment system** — built-in shop with 15+ payment gateways through Omnipay (Stripe, PayPal, FreeKassa, and more)
+- **Admin panel** — full management interface with role-based access control, analytics, and one-click updates
+- **Social authentication** — OAuth2 login via Steam, Discord, VK, Google, GitHub, and others through HybridAuth
+- **REST API** — first-class API for external integrations and custom frontends
+- **Theme engine** — Blade templating with SCSS compilation (native dart-sass), theme inheritance, and live preview
+- **Multilingual** — complete i18n system with runtime language switching
+- **Player stats & bans** — integrations with Levels Ranks, IKS Admin, Admin System, and more
+- **Caching** — multi-driver cache layer (Redis, Memcached, APCu, filesystem) with stale-while-revalidate support
 
-**گزینهٔ پشتیبان مقایسه‌ای:** GameAP به‌همراه یک سامانهٔ صورتحساب. تا زمانی که مسیر اصلی مانع واقعی نشان نداده، نباید چند پلتفرم را هم‌زمان نصب و عملیاتی کنیم.
+## Getting Started
 
-## ریپوهای اصلی
+### Requirements
 
-جدول کامل پروژه‌های متعلق به FragCity، گزینه‌های متن‌باز، نقش و وضعیتشان در [Repository Inventory](docs/REPOSITORIES.md) قرار دارد.
+- PHP 8.2+ (with `ext-json`, `ext-mbstring`, `ext-pdo`)
+- MySQL 5.7+ / MariaDB 10.3+ / PostgreSQL 12+
+- Composer 2.x
 
-| ریپو | نقش | وضعیت در FragCity |
-|---|---|---|
-| [FragCity-RawPHPbackend](https://github.com/larnzs/FragCity-RawPHPbackend) | سایت PHP فعلی و مستندات معماری | موجود؛ بازبینی لازم |
-| [FragCity-WebAPIClient](https://github.com/larnzs/FragCity-WebAPIClient) | Agent/Client فعلی C# و منطق آزمایشی | موجود؛ نمونهٔ اولیه، نه هستهٔ نهایی |
-| [cs2-kus-addons](https://github.com/larnzs/cs2-kus-addons) | زیرساخت افزونه‌ها و کانفیگ‌های فعلی CS2 | مستقل و محافظت‌شده؛ در این پروژه تغییر نمی‌کند |
-| [pterodactyl/panel](https://github.com/pterodactyl/panel) + [pterodactyl/wings](https://github.com/pterodactyl/wings) | مدیریت سرورها و نودهای بازی | نامزد اول PoC |
-| [Paymenter/Paymenter](https://github.com/Paymenter/Paymenter) | فروشگاه، حساب مشتری، صورتحساب و اتصال به Pterodactyl | نامزد اول PoC |
-| [gameap/gameap](https://github.com/gameap/gameap) | پنل مدیریت بازی جایگزین | گزینهٔ مقایسه‌ای |
+### Installation
 
-## نقشهٔ راه در یک نگاه
+```bash
+git clone https://github.com/flute-cms/cms.git
+cd cms
+composer install
+```
 
-| فاز | خروجی | وضعیت |
-|---|---|---|
-| ۰. مستندسازی و محیط توسعهٔ محلی | Requirements، معماری، updater محلی، راهنمای Laragon/WAMP | مستندات آماده؛ نصب محلی و جداسازی DB Pending |
-| ۱. ممیزی و خط مبنا | بررسی نسخه‌ها، امنیت، داده‌ها و محدودیت‌های میزبانی | ممیزی ایستا اولیه انجام شده؛ اصلاحات Pending |
-| ۲. PoC مدیریت سرور | یک نود آزمایشی، یک سرور CS2، منابع و چرخهٔ عمر | Pending |
-| ۳. اتصال فروش | سفارش آزمایشی → Provisioning از طریق API پنل | Pending |
-| ۴. منطق کیف پول و بسته | کسر یک‌باره، ثبت و تمدید `expires_at`، رفتار انقضا | Pending؛ شرط مسدودکنندهٔ تولید |
-| ۵. امنیت و بازیابی | جداسازی مشتریان، Backup/Restore، retry، جلوگیری از تکرار | Pending |
-| ۶. داده‌های پلاگین و API | قرارداد HTTPS امن و همگام‌سازی فقط جداول مشخص | Pending |
-| ۷. نود دوم و ظرفیت | نصب تکرارپذیر، اندازه‌گیری ۱/۳/۵ سرور و سپس رشد | Pending |
-| ۸. مهاجرت محدود | انتقال کنترل‌شده و قابل بازگشت پس از قبولی آزمون‌ها | Pending |
+Open your browser and follow the web installer. That's it.
 
-جزئیات فازها و معیار خروج در [Roadmap](docs/ROADMAP.md) است. ماتریس آزمون قابل اجرا در [Platform PoC](docs/PLATFORM-POC.md) قرار دارد.
+> [!TIP]
+> Docker Compose and Nginx presets are included in the repository. See the [deployment guide](https://docs.flute-cms.com/en/guides/install) for details.
 
-## اسناد پروژه
+## Tech Stack
 
-| سند | محتوا |
-|---|---|
-| [Requirements](docs/REQUIREMENTS.md) | نیازهای عملکردی/امنیتی/عملیاتی و معیار پذیرش |
-| [Architecture](docs/ARCHITECTURE.md) | معماری اجزا، مرز مسئولیت‌ها و مدل نودها |
-| [Repository Inventory](docs/REPOSITORIES.md) | جدول ریپوهای داخلی و متن‌باز، نقش، وضعیت و ریسک |
-| [Roadmap](docs/ROADMAP.md) | فازهای اجرا، وابستگی‌ها و نقاط توقف |
-| [Platform PoC](docs/PLATFORM-POC.md) | گزینه‌ها، نسخه‌های کاندید و ماتریس آزمون |
-| [CS2 Multi-Instance](docs/CS2-MULTI-INSTANCE.md) | معماری چند سرور، گزینه‌های اشتراک فایل بازی و بررسی ریپوهای GitHub |
-| [Testing Bench](docs/TESTING-BENCH.md) | برنامهٔ کامل آزمون ابزارهای CS2 بر اساس Linux، Windows و Cross-platform؛ ماتریس و ثبت نتایج |
-| [Probably and Suggestions](docs/PROBABLY-AND-SUGGESTIONS.md) | فرضیه‌ها و پیشنهادهای موقت، اولویت‌های بررسی و معیار تغییر پیشنهاد |
-| [Architecture Decisions](docs/DECISIONS.md) | تصمیم‌های ثبت‌شده، فرضیه‌ها و پرسش‌های باز |
-| [Database & API](docs/DATABASE-API.md) | وضعیت اتصال دیتابیس، API فعلی و مسیر همگام‌سازی |
-| [Security Review](docs/SECURITY-AUDIT.md) | یافته‌های ممیزی ایستا و ترتیب اصلاح |
-| [Debian PoC Log](docs/DEBIAN-POC.md) | مشخصات واقعی VM، فرمان‌های اجراشده، وضعیت و هشدارهای عملیاتی |
-| [Local Development](docs/LOCAL-DEVELOPMENT.md) | updater محلی، نصب Laragon/WAMP و موانع امن تست دیتابیس |
-| [Current Status](docs/CHANGELOG-STATUS.md) | وضعیت جاری، انتخاب‌های انجام‌شده و مواردی که هنوز اجرا نشده‌اند |
+Flute is built on PHP 8.2+ with a component-based architecture:
 
-## محیط فعلی و محدودیت‌های شناخته‌شده
+- **Routing & HTTP** — Symfony Routing, HttpFoundation, HttpKernel
+- **Database** — [Cycle ORM](https://cycle-orm.dev) with Active Record and auto-migrations
+- **Templates** — [Blade](https://github.com/jenssegers/blade) (Illuminate View) with SCSS via dart-sass / scssphp
+- **Authentication** — [HybridAuth](https://hybridauth.github.io/) for OAuth2 providers
+- **Payments** — [Omnipay](https://omnipay.thephpleague.com/) for payment gateway abstraction
+- **Caching** — Symfony Cache (Redis, Memcached, APCu, filesystem adapters)
+- **Logging** — Monolog
+- **DI Container** — PHP-DI
+- **HTTP Client** — Guzzle
 
-- میزبان فعلی: Windows، پردازندهٔ Ryzen 5 8400F و ۱۶ گیگابایت RAM.
-- نود آزمایشی: Debian 13 در VMware؛ فعلاً محیط تست است، نه نود تولید.
-- هدف شروع: ۵ سرور پایدار؛ ۸ تا ۱۰ سرور تنها هدف کششی است و باید با اندازه‌گیری واقعی تأیید شود.
-- سایت و MariaDB فعلی روی هاست اشتراکی cPanel قرار دارند.
-- اتصال مستقیم خارجی MariaDB روی TCP/3306 برای سرویس فعلی قابل استفاده نیست؛ نود به API سایت از طریق HTTPS وصل می‌شود.
-- سرویس‌های Panel/Wings و صف‌های دائمی را روی هاست اشتراکی فرض نمی‌کنیم؛ محل استقرار آن‌ها باید توان اجرای سرویس‌های پس‌زمینه و کنترل امنیت/شبکه را داشته باشد.
+## Project Structure
 
-## پیکربندی مرکزی
+```
+app/
+├── Core/                   # Kernel: DI container, router, services, console
+│   ├── Database/Entities/  # Cycle ORM entities
+│   ├── Modules/            # Built-in modules (Admin, Auth, Payments, …)
+│   ├── Services/           # Core services (Cache, Email, Encrypt, …)
+│   └── ServiceProviders/   # DI service providers
+├── Modules/                # Community / custom modules
+├── Themes/                 # Installable themes
+└── Helpers/                # Global helpers
 
-تنظیمات محیطی و پروفایل‌های دیتابیس از `settings/settings.json` خوانده می‌شوند. نمونهٔ بدون secret در `settings/settings.example.json` است و فایل واقعی در Git نادیده گرفته می‌شود. هنگام استفاده از Nginx، مسیر `/settings/` باید مسدود شود. جزئیات در [Configuration Guide](docs/CONFIGURATION.md) آمده است.
+config/                     # Default configuration
+config-dev/                 # Local overrides (git-ignored)
+public/                     # Web root — the only exposed directory
+storage/                    # Cache, logs, uploads (writable)
+i18n/                       # Localizations
+```
 
-## گردش‌کار توسعهٔ محلی
+## Module Development
 
-**پیش‌فرض کار از اینجا به بعد: کد را ابتدا محلی تست می‌کنیم و انتشار روی cPanel جداگانه و دستی است.** فایل ریشهٔ [update.bat](update.bat) فقط شاخهٔ `main` را انتخاب می‌کند و `git pull --ff-only origin main` اجرا می‌کند؛ اگر working tree محلی تغییر commit‌نشده یا فایل untracked داشته باشد، متوقف می‌شود. این اسکریپت چیزی را روی هاست منتشر نمی‌کند و در Debian VM هم اجرا نمی‌شود.
+Every module lives in `app/Modules/<Name>/` with a consistent structure:
 
-برای محیط وب، **Laragon** انتخاب پیشنهادی است و WAMP جایگزین قابل قبول آن است. راهنمای [Local Development](docs/LOCAL-DEVELOPMENT.md) مسیر clone، VirtualHost و جریان تست را توضیح می‌دهد. با این حال **تست کامل صفحات وابسته به دیتابیس هنوز نباید شروع شود**: secretهای دیتابیس در سورس فعلی وجود دارند و جداسازی تنظیمات محلی از Production، به‌همراه یک seed مستقل، پیش‌نیاز امن اجراست. قوانین جدید `.gitignore` هم فایل‌هایی را که از قبل در Git track شده‌اند خودکار از مخزن خارج نمی‌کند.
+```
+MyModule/
+├── module.json             # Metadata, version, dependencies
+├── Providers/              # Service providers
+├── Controllers/            # Route-attributed controllers
+├── Services/               # Business logic
+├── Resources/
+│   ├── views/              # Blade templates
+│   └── lang/               # Translations
+└── database/migrations/    # Auto-generated migrations
+```
 
-## قواعد محافظتی پروژه
+Routes use PHP attributes — no separate route files:
 
-1. **هیچ تغییری در `cs2-kus-addons` ایجاد نمی‌شود** مگر اینکه کاربر جداگانه درخواست صریح بدهد.
-2. روی دیتابیس تولیدی PoC انجام نمی‌شود؛ از حساب، سفارش، سرور و دادهٔ آزمایشی استفاده خواهد شد.
-3. محصول آماده قبل از تست نسخهٔ دقیق، مجوز، Security Advisory، Backup و Rollback وارد محیط واقعی نمی‌شود.
-4. secretها، رمزها، کلیدهای API و اطلاعات مشتری در Git، README یا لاگ عمومی قرار نمی‌گیرند.
-5. هیچ انتخابی صرفاً با تعداد ستارهٔ GitHub انجام نمی‌شود؛ API، بلوغ، امنیت، قابلیت ارتقا، صورتحساب و آزمون عملی معیار تصمیم‌اند.
-6. حذف یا بازنویسی هیچ‌کدام از ریپوهای موجود بخشی از فاز مستندسازی نیست.
+```php
+#[Route('/my-module/example', name: 'my-module.example')]
+public function example(): Response
+{
+    return view('MyModule::pages.example');
+}
+```
 
-**وضعیت نهایی فعلی:** معماری مرجع برای PoC مشخص است؛ هیچ پلتفرم جدیدی نصب نشده، انتقال تولیدی انجام نشده و اصلاح کدهای امنیتی هنوز در انتظار برنامه‌ریزی و تست مجزاست.
+Full guide → [docs.flute-cms.com/en/modules](https://docs.flute-cms.com/en/modules)
+
+## CLI
+
+```bash
+php flute cache:clear              # Clear application cache
+php flute cache:warmup             # Warm up cache
+php flute template:cache:clear     # Clear compiled templates
+php flute generate:migration       # Generate DB migration from entities
+php flute generate:module          # Scaffold a new module
+php flute routes:list              # Print all registered routes
+php flute cron:run                 # Execute scheduled tasks
+```
+
+## Contributing
+
+We welcome contributions — bug reports, features, code, docs, and translations.
+
+1. Fork the repo and create a branch from `early`
+2. Make your changes and ensure `composer test` passes
+3. Submit a pull request
+
+**Branches:**
+- `main` — stable releases
+- `early` — active development (target your PRs here)
+
+**Commit convention:** imperative, scoped messages:
+```
+feat(auth): add OAuth2 authentication
+fix(database): resolve connection timeout
+core: fix router cache invalidation
+module:Shop: add refund hook
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
+
+## Security
+
+If you discover a security vulnerability, please email [flamesworkk@gmail.com](mailto:flamesworkk@gmail.com) instead of using the issue tracker. All security issues will be addressed promptly.
+
+## Community
+
+- [Discord](https://discord.gg/BcBMeVJJsd) — live chat and support
+- [GitHub Issues](https://github.com/flute-cms/cms/issues) — bug reports and feature requests
+- [Documentation](https://docs.flute-cms.com) — guides and API reference
+
+## License
+
+Flute is open-source software licensed under the [GNU General Public License v3.0 or later](LICENSE).
+
+---
+
+<p align="center">Created by <a href="https://github.com/FlamesONE">Flames</a></p>

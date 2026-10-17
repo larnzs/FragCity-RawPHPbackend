@@ -1,0 +1,243 @@
+﻿
+$button-types: (
+    primary: (
+        color: var(--background),
+        background: var(--primary),
+        hover-background: var(--primary),
+        hover-opacity: 0.9,
+    ),
+    accent: (
+        color: var(--background),
+        background: var(--accent),
+        hover-background: var(--accent),
+        hover-opacity: 0.9,
+    ),
+    secondary: (
+        color: var(--text),
+        background: var(--secondary),
+        hover-background: var(--secondary),
+        hover-opacity: 1,
+    ),
+    error: (
+        color: var(--error),
+        background: var(--error-light),
+        hover-background: var(--error-light),
+        hover-opacity: 1,
+    ),
+    success: (
+        color: var(--success),
+        background: var(--success-light),
+        hover-background: var(--success-light),
+        hover-opacity: 1,
+    ),
+    warning: (
+        color: var(--warning),
+        background: var(--warning-light),
+        hover-background: var(--warning-light),
+        hover-opacity: 1,
+    ),
+    info: (
+        color: var(--info),
+        background: var(--info-light),
+        hover-background: var(--info-light),
+        hover-opacity: 1,
+    ),
+);
+
+$button-outline-types: (
+    primary: (
+        color: var(--text),
+        border-color: var(--transp-2),
+        hover-background: var(--transp-05),
+        hover-color: var(--text),
+    ),
+    accent: (
+        color: var(--accent),
+        border-color: var(--transp-2),
+        hover-background: var(--accent-900),
+        hover-color: var(--accent),
+    ),
+    error: (
+        color: var(--error),
+        border-color: var(--error-light),
+        hover-background: var(--error-light),
+        hover-color: var(--error),
+    ),
+    success: (
+        color: var(--success),
+        border-color: var(--success-light),
+        hover-background: var(--success-light),
+        hover-color: var(--success),
+    ),
+    warning: (
+        color: var(--warning),
+        border-color: var(--warning-light),
+        hover-background: var(--warning-light),
+        hover-color: var(--warning),
+    ),
+);
+
+$sizes: (
+    tiny: (
+        height: 1.75rem,
+        padding: 0 0.5rem,
+        font-size: var(--small),
+        gap: 0.25rem,
+        svg-size: 0.75rem,
+    ),
+    small: (
+        height: 2rem,
+        padding: 0 0.75rem,
+        font-size: var(--p-small),
+        gap: 0.375rem,
+        svg-size: 0.875rem,
+    ),
+    medium: (
+        height: 2.25rem,
+        padding: 0 1rem,
+        font-size: var(--p-small),
+        gap: 0.5rem,
+        svg-size: 1rem,
+    ),
+    large: (
+        height: 2.75rem,
+        padding: 0 1.5rem,
+        font-size: var(--p),
+        gap: 0.5rem,
+        svg-size: 1.125rem,
+    ),
+);
+
+@mixin button-base {
+    @extend .flex-center;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.25rem;
+    padding: 0 1rem;
+    background-color: var(--secondary);
+    color: var(--text);
+    border-radius: var(--border05);
+    font-size: var(--p-small);
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    position: relative;
+    gap: 0.5rem;
+    border: none;
+    outline: none;
+    user-select: none;
+    transition:
+        background-color 0.15s ease,
+        color 0.15s ease,
+        opacity 0.15s ease,
+        border-color 0.15s ease,
+        box-shadow 0.15s ease;
+
+    &:focus-visible {
+        outline: 2px solid var(--primary);
+        outline-offset: 2px;
+    }
+
+    &:hover:not(:disabled):not([aria-busy="true"]) {
+        opacity: 0.85;
+    }
+
+    &:active:not(:disabled):not([aria-busy="true"]) {
+        opacity: 0.7;
+    }
+
+    &[aria-busy="true"] {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    &:disabled {
+        pointer-events: none;
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    svg {
+        flex-shrink: 0;
+        width: 1rem;
+        height: 1rem;
+    }
+}
+
+@mixin button-type($type-name, $type-map) {
+    &-#{$type-name} {
+        color: map-get($type-map, color);
+        background-color: map-get($type-map, background);
+
+        &:hover:not(:disabled):not([aria-busy="true"]) {
+            background-color: map-get($type-map, hover-background);
+            opacity: map-get($type-map, hover-opacity);
+        }
+    }
+}
+
+@mixin button-outline-type($type-name, $outline-map) {
+    &-outline-#{$type-name} {
+        color: map-get($outline-map, color);
+        background-color: transparent;
+        border: 1px solid map-get($outline-map, border-color);
+
+        &:hover:not(:disabled):not([aria-busy="true"]) {
+            background-color: map-get($outline-map, hover-background);
+            color: map-get($outline-map, hover-color);
+            opacity: 1;
+        }
+    }
+}
+
+@mixin button-size($size-name, $size-map) {
+    &-#{$size-name} {
+        height: map-get($size-map, height);
+        padding: map-get($size-map, padding);
+        font-size: map-get($size-map, font-size);
+        gap: map-get($size-map, gap);
+
+        svg {
+            width: map-get($size-map, svg-size);
+            height: map-get($size-map, svg-size);
+        }
+    }
+}
+
+.btn {
+    @include button-base;
+
+    @each $type, $properties in $button-types {
+        @include button-type($type, $properties);
+    }
+
+    @each $outline-type, $properties in $button-outline-types {
+        @include button-outline-type($outline-type, $properties);
+    }
+
+    @each $size, $properties in $sizes {
+        @include button-size($size, $properties);
+    }
+
+&-secondary {
+        border: 1px solid var(--transp-1);
+
+        &:hover:not(:disabled):not([aria-busy="true"]) {
+            border-color: var(--transp-2);
+            background-color: var(--transp-05);
+        }
+    }
+
+&-error,
+    &-success,
+    &-warning,
+    &-info {
+        &:hover:not(:disabled):not([aria-busy="true"]) {
+            opacity: 1;
+            filter: brightness(1.05);
+        }
+    }
+}

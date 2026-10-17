@@ -1,0 +1,36 @@
+.card {
+    @extend .blur-bg;
+
+    background-color: var(--blurred-background);
+    border: 1px solid var(--transp-1);
+    border-radius: var(--border1);
+    box-shadow: var(--shadow-small);
+    contain: layout style;
+    @include transition(box-shadow, transform);
+
+    &-img-top {
+        width: 100%;
+        height: auto;
+        border-radius: var(--border1) var(--border1) 0 0;
+    }
+
+    &-header {
+        padding: var(--space-md) var(--space-lg);
+        border-bottom: 1px solid var(--transp-1);
+
+        .card-title {
+            margin: 0;
+        }
+
+        .card-subtitle {
+            margin-top: var(--space-2xs);
+            color: var(--text-200);
+        }
+    }
+
+    &-body {
+        &:not(.withoutPadding) { padding: var(--space-md) var(--space-lg); }
+    }
+
+    &-footer { padding: var(--space-md) var(--space-lg); border-top: 1px solid var(--transp-1); }
+}

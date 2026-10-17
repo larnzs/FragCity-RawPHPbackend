@@ -1,0 +1,494 @@
+<?php
+
+namespace Flute\Core\Modules\Profile\Components;
+
+use Flute\Core\Database\Entities\User;
+use Flute\Core\Support\FileUploader;
+use Flute\Core\Support\FluteComponent;
+use RuntimeException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Throwable;
+
+class EditMainComponent extends FluteComponent
+{
+    public ?string $name = null;
+
+    public ?string $email = null;
+
+    public ?string $login = null;
+
+    public ?string $uri = null;
+
+    public ?string $theme = null;
+
+    public ?string $privacy = null;
+
+    public ?string $current_password = null;
+
+    public ?string $email_password = null;
+
+    public ?string $new_password = null;
+
+    public ?string $new_password_confirmation = null;
+
+    /**
+     * @var UploadedFile|null
+     */
+    public $avatar = null;
+
+    /**
+     * @var UploadedFile|null
+     */
+    public $banner = null;
+
+    public ?User $user = null;
+
+    /**
+     * Initialize the component.
+     */
+    public function mount()
+    {
+        $this->user = user()->getCurrentUser();
+    }
+
+    /**
+     * Render the component view.
+     *
+     * @return mixed
+     */
+    public function render()
+    {
+        return $this->view('flute::components.profile-tabs.edit.main', [
+            'user' => $this->user,
+        ]);
+    }
+
+    /**
+     * Save the main user information.
+     */
+    public function saveMain()
+    {
+        if ($this->validateSaveMain()) {
+            $newEmail = $this->email;
+            $emailChanged = $newEmail && $newEmail !== $this->user->email;
+
+            if ($emailChanged && !$this->confirmEmailChange()) {
+                return;
+            }
+
+            try {
+                // Don't let updateUserMainInfo touch email — we handle it via pending flow
+                $this->email = $this->user->email;
+                $this->updateUserMainInfo();
+
+                if ($emailChanged) {
+                    if (config('auth.registration.confirm_email')) {
+                        $this->user->pendingEmail = $newEmail;
+                    } else {
+                        $this->user->email = $newEmail;
+                    }
+                }
+
+                user()->updateUser($this->user);
+                $this->email_password = null;
+
+                if ($emailChanged && config('auth.registration.confirm_email')) {
+                    $this->sendPendingEmailConfirmation($newEmail);
+                    $this->flashMessage(__('profile.edit.main.basic_information.email_confirmation_sent'), 'success');
+                } else {
+                    $this->flashMessage(__('profile.edit.main.basic_information.save_changes_success'), 'success');
+                }
+            } catch (Throwable $e) {
+                $this->inputError('name', $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Changing the email hands over the password-reset channel, so re-authenticate first.
+     * Accounts without a local password (social login only) have nothing to verify against.
+     */
+    protected function confirmEmailChange(): bool
+    {
+        if (empty($this->user->password)) {
+            return true;
+        }
+
+        if (empty($this->email_password)) {
+            $this->inputError('email_password', __('profile.edit.main.basic_information.email_password_required'));
+
+            return false;
+        }
+
+        if (!$this->throttlePasswordCheck()) {
+            return false;
+        }
+
+        if (!password_verify($this->email_password, $this->user->password)) {
+            $this->inputError('email_password', __('profile.edit.main.change_password.current_password_incorrect'));
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Both password prompts on this page (email change + password change) are online guessing
+     * oracles against a hijacked session, so they share one budget.
+     */
+    protected function throttlePasswordCheck(): bool
+    {
+        try {
+            throttler()->throttle(['action' => 'profile_password_check', 'user' => $this->user->id], 5, 300, 1);
+        } catch (Throwable $e) {
+            $this->flashMessage(__('def.too_many_requests'), 'error');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Cancel a pending email change.
+     */
+    public function cancelPendingEmail()
+    {
+        $this->user->pendingEmail = null;
+        user()->updateUser($this->user);
+        $this->flashMessage(__('profile.edit.main.basic_information.pending_email_cancelled'), 'success');
+    }
+
+    /**
+     * Resend the pending email confirmation.
+     */
+    public function resendPendingEmail()
+    {
+        if (!$this->user->pendingEmail) {
+            return;
+        }
+
+        try {
+            throttler()->throttle(['action' => 'resend_pending_email', 'user' => $this->user->id], 3, 300, 1);
+        } catch (\Throwable $e) {
+            $this->flashMessage(__('def.too_many_requests'), 'error');
+
+            return;
+        }
+
+        $this->sendPendingEmailConfirmation($this->user->pendingEmail);
+        $this->flashMessage(__('profile.edit.main.basic_information.email_confirmation_sent'), 'success');
+    }
+
+    /**
+     * Send confirmation email to the pending address.
+     */
+    protected function sendPendingEmailConfirmation(string $newEmail): void
+    {
+        try {
+            $verificationToken = auth()->createVerificationToken($this->user)->rawToken;
+            $html = template()->render('flute::emails.confirmation', [
+                'url' => url('confirm-email/' . $verificationToken),
+                'name' => $this->user->name,
+            ]);
+            email()->send($newEmail, __('auth.confirmation.subject'), $html);
+        } catch (\Throwable $e) {
+            logs()->warning('Failed to send pending email confirmation: ' . $e->getMessage());
+        }
+    }
+
+    public function saveTheme()
+    {
+        if ($this->validate([
+            'theme' => 'required|in:dark,light,system',
+        ])) {
+            if ($this->theme === 'system') {
+                cookie()->remove('theme');
+            } else {
+                cookie()->set('theme', $this->theme);
+
+                $this->dispatchBrowserEvent('switch-theme', [
+                    'theme' => $this->theme,
+                ]);
+            }
+
+            $this->flashMessage(__('def.success'));
+        }
+    }
+
+    public function savePrivacy()
+    {
+        if ($this->validate([
+            'privacy' => 'required|in:hidden,visible',
+        ])) {
+            $this->user->hidden = $this->privacy === 'hidden';
+
+            user()->updateUser($this->user);
+
+            $this->flashMessage(__('def.success'));
+        }
+    }
+
+    /**
+     * Save the user's profile images (avatar and banner).
+     */
+    public function saveImages()
+    {
+        if (!$this->validateImages()) {
+            return;
+        }
+
+        /** @var FileUploader $uploader */
+        $uploader = app(FileUploader::class);
+        $uploadsDir = realpath(BASE_PATH . '/public/assets/uploads');
+
+        if ($uploadsDir === false) {
+            $this->addUploadDirectoryError();
+
+            return;
+        }
+
+        $avatarError = $this->processImageUpload(
+            'avatar',
+            $uploader,
+            $uploadsDir,
+            config('profile.max_avatar_size'),
+            'events.profile_avatar_updated',
+        );
+        $bannerError = $this->processImageUpload(
+            'banner',
+            $uploader,
+            $uploadsDir,
+            config('profile.max_banner_size'),
+            'events.profile_banner_updated',
+        );
+
+        if ($avatarError || $bannerError) {
+            $this->handleImageErrors($avatarError, $bannerError);
+
+            return;
+        }
+
+        try {
+            user()->updateUser($this->user);
+            $this->flashMessage(__('profile.edit.main.profile_images.save_changes_success'), 'success');
+        } catch (Throwable $e) {
+            logs()->error($e);
+            $this->addUnknownError();
+        }
+    }
+
+    /**
+     * Save the new user password.
+     */
+    public function savePassword()
+    {
+        if (!$this->validateSavePassword()) {
+            return;
+        }
+
+        if (!empty($this->user->password)) {
+            if (!$this->throttlePasswordCheck()) {
+                return;
+            }
+
+            if (!password_verify($this->current_password, $this->user->password)) {
+                $this->inputError(
+                    'current_password',
+                    __('profile.edit.main.change_password.current_password_incorrect'),
+                );
+
+                return;
+            }
+        }
+
+        try {
+            $this->user->setPassword($this->new_password);
+            user()->updateUser($this->user);
+
+            if (function_exists('notify')) {
+                notify('core.password_changed', $this->user, [
+                    'time' => date('d.m.Y H:i'),
+                ]);
+            }
+
+            $this->flashMessage(__('profile.edit.main.change_password.save_changes_success'), 'success');
+        } catch (Throwable $e) {
+            $this->inputError('new_password', $e->getMessage());
+        }
+    }
+
+    /**
+     * Update the main user information.
+     */
+    protected function updateUserMainInfo()
+    {
+        $this->user->name = $this->name;
+        $this->user->login = $this->login;
+
+        if ($this->uri) {
+            $this->user->uri = $this->uri;
+        }
+    }
+
+    /**
+     * Handle the upload of a single image.
+     */
+    protected function processImageUpload(
+        string $field,
+        FileUploader $uploader,
+        string $uploadsDir,
+        int $maxSize,
+        string $logEvent,
+    ): ?string {
+        $file = $this->$field;
+        if ($file instanceof UploadedFile && $file->isValid()) {
+            try {
+                $newFile = $uploader->uploadImage($file, $maxSize);
+
+                if ($newFile === null) {
+                    throw new RuntimeException(__('profile.edit.main.upload_failed', ['field' => $field]));
+                }
+
+                $this->removeOldFile($field, $uploadsDir);
+                $this->user->$field = $newFile;
+
+                return null;
+            } catch (Throwable $e) {
+                return $e->getMessage();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Remove the old image file.
+     */
+    protected function removeOldFile(string $field, string $uploadsDir): void
+    {
+        $oldFile = $this->user->$field;
+        if ($oldFile && $oldFile !== config("profile.default_{$field}")) {
+            $fullPath = BASE_PATH . '/public/' . $oldFile;
+            if (realpath($fullPath) && strpos(realpath($fullPath), $uploadsDir) === 0 && fs()->exists($fullPath)) {
+                fs()->remove($fullPath);
+            }
+        }
+    }
+
+    /**
+     * Add errors when the upload directory does not exist.
+     */
+    protected function addUploadDirectoryError(): void
+    {
+        $this->inputError('avatar', __('profile.edit.main.upload_directory_error'));
+        $this->inputError('banner', __('profile.edit.main.upload_directory_error'));
+    }
+
+    /**
+     * Handle and display image upload errors.
+     */
+    protected function handleImageErrors(?string $avatarError, ?string $bannerError): void
+    {
+        if ($avatarError) {
+            $this->inputError('avatar', $avatarError);
+        }
+        if ($bannerError) {
+            $this->inputError('banner', $bannerError);
+        }
+    }
+
+    /**
+     * Add a generic unknown error.
+     */
+    protected function addUnknownError(): void
+    {
+        $this->inputError('avatar', __('def.unknown_error'));
+        $this->inputError('banner', __('def.unknown_error'));
+    }
+
+    /**
+     * Validate the main user information.
+     */
+    protected function validateSaveMain(): bool
+    {
+        return $this->validate([
+            'name' => [
+                'required',
+                'regex:/^(?!.*[<>])[\p{L}\p{N}\p{M}\p{Pd}\p{Pc}\p{Sk}\p{So}\s.\-_!"@#$%&*+,.:;?\\/\|()\[\]]+$/u',
+                'min-str-len:' . config('auth.validation.name.min_length'),
+                'max-str-len:' . config('auth.validation.name.max_length'),
+            ],
+            'login' => [
+                'required',
+                'regex:/^[\p{L}\p{N}._-]+$/u',
+                'min-str-len:' . config('auth.validation.login.min_length'),
+                'max-str-len:' . config('auth.validation.login.max_length'),
+                'unique:users,login,' . $this->user->id,
+            ],
+            'email' => [
+                'required',
+                'email',
+                'max-str-len:255',
+                'unique:users,email,' . $this->user->id,
+            ],
+            'uri' => 'nullable|string|max-str-len:60|regex:/^[a-zA-Z0-9._-]+$/|unique:users,uri,' . $this->user->id,
+        ]);
+    }
+
+    /**
+     * Validate the uploaded images.
+     */
+    protected function validateImages(): bool
+    {
+        $this->avatar = request()->files->get('avatar');
+        $this->banner = request()->files->get('banner');
+
+        $rules = [
+            'avatar' => $this->avatar
+                ? 'image|max-file-size:' . ( config('profile.max_avatar_size') * 1024 )
+                : 'nullable|image|max-file-size:' . ( config('profile.max_avatar_size') * 1024 ),
+            'banner' => $this->banner
+                ? 'image|max-file-size:' . ( config('profile.max_banner_size') * 1024 )
+                : 'nullable|image|max-file-size:' . ( config('profile.max_banner_size') * 1024 ),
+        ];
+
+        return $this->validate($rules);
+    }
+
+    /**
+     * Validate the password change data.
+     */
+    protected function validateSavePassword(): bool
+    {
+        if (empty($this->user->login) || empty($this->user->email)) {
+            $this->flashMessage(__('profile.edit.main.password_change.login_and_email_required'), 'error');
+
+            return false;
+        }
+
+        $requiresCurrentPassword = !empty($this->user->password);
+
+        $rules = [
+            'new_password' => [
+                'required',
+                'confirmed',
+                'min-str-len:' . config('auth.validation.password.min_length'),
+                'max-str-len:' . config('auth.validation.password.max_length'),
+            ],
+            'new_password_confirmation' =>
+                'required|string|min-str-len:' . config('auth.validation.password.min_length'),
+        ];
+
+        if ($requiresCurrentPassword) {
+            $rules['current_password'] = 'required|string';
+        }
+
+        $validation = $this->validate($rules, null, [
+            'new_password.confirmed' => __('profile.edit.main.change_password.passwords_do_not_match'),
+        ]);
+
+        return $validation;
+    }
+}

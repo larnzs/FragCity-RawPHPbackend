@@ -1,0 +1,97 @@
+[data-dropdown] {
+    background-color: var(--secondary);
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    transform-origin: top center;
+    transform: scale(0.96);
+    z-index: 1000000;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+    border-radius: var(--border1);
+    border: 1px solid var(--transp-1);
+    box-shadow: var(--shadow-small);
+    padding: 0.375rem;
+    min-width: 180px;
+    overflow: hidden;
+
+    :root[data-theme=light] & {
+        background-color: #ffffff;
+        border-color: rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+
+    > * {
+        display: flex;
+        flex-direction: column;
+        gap: 0.125rem;
+    }
+
+    a,
+    button {
+        display: flex;
+        flex-direction: row;
+        gap: 0.625rem;
+        align-items: center;
+        padding: 0.5rem;
+        border-radius: var(--border05);
+        transition: all 0.1s ease;
+        color: var(--text-200);
+        font-size: var(--p-small);
+        font-weight: 500;
+
+        svg {
+            font-size: var(--p);
+            opacity: 0.7;
+        }
+
+        &:hover {
+            background-color: var(--transp-1);
+            color: var(--text);
+
+            svg {
+                opacity: 1;
+            }
+        }
+    }
+
+    &.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+    }
+
+    .arrow {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: var(--background);
+        border-top: 1px solid var(--transp-1);
+        border-left: 1px solid var(--transp-1);
+        transform: rotate(45deg);
+        z-index: -1;
+    }
+
+    &.admin-dropdown {
+        min-width: 60px;
+    }
+
+    .dropdown-item {
+        border-width: 0;
+        box-shadow: none;
+        justify-content: flex-start;
+
+        &:hover {
+            background-color: var(--transp-1) !important;
+        }
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background-color: var(--transp-1);
+        margin: 0.25rem 0;
+    }
+}

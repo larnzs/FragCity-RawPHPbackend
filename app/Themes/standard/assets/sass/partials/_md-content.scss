@@ -1,0 +1,264 @@
+﻿.md-content {
+	line-height: 1.55;
+	color: var(--text-100);
+	font-size: var(--p-small);
+
+    p {
+        line-height: inherit;
+    }
+
+	> :first-child {
+		margin-top: 0;
+	}
+	> :last-child {
+		margin-bottom: 0;
+	}
+
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6 {
+		color: var(--text-200);
+		margin: var(--space-2xs) 0 var(--space-2xs);
+		font-weight: bold;
+	}
+	h1 {
+		font-size: var(--h6);
+	}
+	h2 {
+		font-size: calc(var(--p) * 1.05);
+	}
+	h3 {
+		font-size: var(--p);
+	}
+	h4 {
+		font-size: var(--p-small);
+	}
+	h5 {
+		font-size: var(--small);
+	}
+	h6 {
+		font-size: calc(var(--small) * 0.95);
+	}
+	p {
+		margin: var(--space-xs) 0;
+	}
+	ul,
+	ol {
+		padding-left: var(--space-md);
+		margin: var(--space-xs) 0;
+		list-style: disc;
+		font-size: var(--p-small);
+	}
+	li {
+		list-style: disc;
+		font-size: var(--p-small);
+		margin: 0;
+	}
+
+ul ul {
+		list-style: circle;
+		margin-top: var(--space-2xs);
+	}
+	ul ul ul {
+		list-style: square;
+	}
+	ol {
+		list-style: decimal;
+	}
+	ol ol {
+		list-style: lower-alpha;
+	}
+	li > ul,
+	li > ol {
+		margin-left: var(--space-md);
+	}
+
+li input[type="checkbox"] {
+		margin-right: var(--space-xs);
+		vertical-align: middle;
+	}
+	li.task-list-item {
+		list-style: none;
+	}
+	:not(pre) > code {
+		background: var(--transp-05);
+		color: var(--text-200);
+		padding: 0.08rem 0.32rem;
+		border: 1px solid var(--transp-1);
+		border-radius: var(--border05);
+		font-family: var(--font-mono);
+	}
+	pre {
+		background: var(--transp-05);
+		border: 1px solid var(--transp-1);
+		padding: var(--space-sm) var(--space-md);
+		border-radius: var(--border05);
+		overflow: auto;
+		font-size: 90%;
+		line-height: 1.6;
+		-webkit-font-smoothing: antialiased;
+		tab-size: 2;
+	}
+	pre code {
+		background: transparent;
+		padding: 0;
+		display: block;
+		font-family: var(--font-mono);
+	}
+	a {
+		color: var(--accent);
+		text-underline-offset: 2px;
+		transition: color var(--transition),
+			text-decoration-color var(--transition);
+	}
+	a:hover {
+		text-decoration: underline;
+	}
+	blockquote {
+		border-left: 1px solid var(--transp-2);
+		margin: var(--space-sm) 0;
+		padding: var(--space-2xs) var(--space-sm);
+		padding-left: var(--space-sm);
+		color: var(--text-300);
+	}
+
+	hr {
+		border: none;
+		height: 1px;
+		background: var(--transp-2);
+		margin: var(--space-md) 0;
+	}
+
+	strong {
+		font-weight: 600;
+		color: var(--text);
+	}
+	em {
+		font-style: italic;
+	}
+	del {
+		color: var(--text-500);
+	}
+	mark {
+		background: var(--warning-light);
+		color: var(--text);
+		border-radius: var(--border05);
+		padding: 0.05rem 0.2rem;
+	}
+	kbd {
+		font-family: var(--font-mono);
+		font-size: 0.9em;
+		background: var(--transp-1);
+		border: 1px solid var(--transp-2);
+		border-bottom-width: 2px;
+		padding: 0.1rem 0.35rem;
+		border-radius: var(--border05);
+	}
+	sub,
+	sup {
+		font-size: 75%;
+		line-height: 0;
+		position: relative;
+		vertical-align: baseline;
+	}
+	sup {
+		top: -0.4em;
+	}
+	sub {
+		bottom: -0.2em;
+	}
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		table-layout: auto;
+		font-size: var(--small);
+		margin: var(--space-xs) 0;
+	}
+	thead th {
+		color: var(--text-300);
+		font-weight: 600;
+		border-bottom: 1px solid var(--transp-2);
+	}
+	th,
+	td {
+		text-align: left;
+	}
+	th,
+	td {
+		padding: var(--space-xs) var(--space-xs);
+		border-bottom: 1px solid var(--transp-1);
+	}
+	caption {
+		caption-side: bottom;
+		font-size: var(--small);
+		color: var(--text-500);
+		padding-top: var(--space-xs);
+	}
+
+	@media (max-width: 768px) {
+		table {
+			display: block;
+			overflow-x: auto;
+		}
+		thead,
+		tbody,
+		th,
+		td,
+		tr {
+			display: revert;
+		}
+	}
+
+img {
+		max-width: 100%;
+		height: auto;
+		border-radius: var(--border05);
+	}
+	figure {
+		margin: var(--space-sm) 0;
+	}
+	figure > img {
+		display: block;
+		margin: var(--space-2xs) auto;
+	}
+	figcaption {
+		text-align: center;
+		color: var(--text-500);
+		font-size: var(--small);
+		margin-top: var(--space-2xs);
+	}
+
+dl {
+		margin: var(--space-xs) 0;
+	}
+	dt {
+		font-weight: 600;
+		color: var(--text-200);
+	}
+	dd {
+		margin: var(--space-2xs) 0 var(--space-xs) var(--space-sm);
+	}
+
+details {
+		background: var(--transp-05);
+		border: 1px solid var(--transp-1);
+		border-radius: var(--border05);
+		padding: var(--space-xs) var(--space-sm);
+		margin: var(--space-xs) 0;
+	}
+	details > summary {
+		cursor: pointer;
+		list-style: none;
+		font-weight: 600;
+		color: var(--text-200);
+	}
+	details > summary::-webkit-details-marker {
+		display: none;
+	}
+	details[open] {
+		background: var(--transp-1);
+	}
+}

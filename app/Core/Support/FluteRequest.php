@@ -1,0 +1,418 @@
+<?php
+
+namespace Flute\Core\Support;
+
+use Exception;
+use Flute\Core\Database\Entities\User;
+use Flute\Core\Exceptions\RequestValidateException;
+use Flute\Core\Support\Htmx\HtmxRequest;
+use Illuminate\Support\Collection;
+use MadeSimple\Arrays\ArrDots;
+use Nette\Utils\AssertionException;
+use Nette\Utils\Validators;
+use Symfony\Component\HttpFoundation\IpUtils;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+
+class FluteRequest extends Request
+{
+    /**
+     * Must match RequestServiceProvider::PRIVATE_SUBNET_CIDRS (private hops for URL / TLS inference).
+     */
+    private const PRIVATE_PEER_CIDRS = [
+        '127.0.0.1',
+        '::1',
+        '10.0.0.0/8',
+        '172.16.0.0/12',
+        '192.168.0.0/16',
+        'fc00::/7',
+    ];
+
+    private ?HtmxRequest $htmxRequest = null;
+
+    private ?array $jsonInputCache = null;
+
+    public function htmx(): HtmxRequest
+    {
+        return $this->htmxRequest ??= new HtmxRequest($this->headers);
+    }
+
+    public function isBoost(): bool
+    {
+        return $this->htmx()->isHtmxRequest() && $this->htmx()->isBoosted();
+    }
+
+    public function isOnlyHtmx(): bool
+    {
+        return $this->htmx()->isHtmxRequest() && !$this->htmx()->isBoosted();
+    }
+
+    public function isPrefetch(): bool
+    {
+        return $this->htmx()->isPrefetch();
+    }
+
+    public function hasSessionCookie(): bool
+    {
+        $sessionConfig = (array) config('app.session', []);
+        $sessionName = (string) ( $sessionConfig['name'] ?? 'flute_session' );
+
+        return $sessionName !== '' && $this->cookies->has($sessionName);
+    }
+
+    public function hasRememberToken(): bool
+    {
+        return $this->cookies->has('remember_token');
+    }
+
+    public function hasAuthenticationCookie(): bool
+    {
+        return $this->hasSessionCookie() || $this->hasRememberToken();
+    }
+
+    /**
+     * Determine if the current request expects a JSON response.
+     */
+    public function expectsJson(): bool
+    {
+        $accept = (string) $this->headers->get('Accept', '');
+
+        return stripos($accept, 'application/json') !== false;
+    }
+
+    /**
+     * Determine if the current request expects a JSON response.
+     */
+    public function isJson(): bool
+    {
+        $contentType = (string) $this->headers->get('Content-Type', '');
+
+        return stripos($contentType, 'application/json') === 0;
+    }
+
+    /**
+     * Determine if the current request is an AJAX request.
+     */
+    public function isAjax(): bool
+    {
+        return $this->headers->get('X-Requested-With') === 'XMLHttpRequest';
+    }
+
+    /**
+     * Retrieve the referer from the current request.
+     */
+    public function getReferer(): string
+    {
+        return $this->headers->get('Referer');
+    }
+
+    /**
+     * Retrieve the files from the current request.
+     */
+    public function files(): Collection
+    {
+        return collect($this->files->all());
+    }
+
+    /**
+     * Retrieve the current authenticated user.
+     */
+    public function user(): ?User
+    {
+        return user()->getCurrentUser();
+    }
+
+    /**
+     * Retrieve the Bearer token from the Authorization header.
+     */
+    public function getAuthorizationBearerToken(): ?string
+    {
+        $authorizationHeader = $this->headers->get('Authorization');
+        if ($authorizationHeader && preg_match('/Bearer\s(\S+)/', $authorizationHeader, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if the current request uses a specific method.
+     */
+    public function isMethod(string $method): bool
+    {
+        return $this->getMethod() === strtoupper($method);
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * After trusted-proxy headers, treat the request as HTTPS when app.url is https, the Host matches
+     * it, and the immediate peer is local/private (typical nginx/php-fpm or Docker bridge) so generated
+     * URLs match TLS terminated upstream even if no X-Forwarded-Proto reaches PHP.
+     */
+    public function isSecure(): bool
+    {
+        if (parent::isSecure()) {
+            return true;
+        }
+
+        $appUrl = (string) config('app.url', '');
+        if ($appUrl === '' || !str_starts_with($appUrl, 'https://')) {
+            return false;
+        }
+
+        if (!$this->_hostMatchesConfiguredAppUrl()) {
+            return false;
+        }
+
+        return $this->_requestArrivedViaPrivateOrLocalInterface();
+    }
+
+    /**
+     * Check if a specific query parameter exists in the request.
+     */
+    public function hasQueryParam(string $key): bool
+    {
+        return $this->query->has($key);
+    }
+
+    /**
+     * Check if a specific header exists in the request.
+     */
+    public function hasHeader(string $key): bool
+    {
+        return $this->headers->has($key);
+    }
+
+    /*
+     * Get the input data from the request, including attributes.
+     *
+     * @param string|null $key
+     * @param mixed $default
+     *
+     * @return mixed
+     */
+    public function input(?string $key = null, $default = null)
+    {
+        $data = array_merge($this->attributes->all(), $this->query->all(), $this->request->all());
+
+        if ($this->isJson()) {
+            $data = array_merge($data, $this->jsonInput());
+        }
+
+        if ($key === null) {
+            return $data;
+        }
+
+        return ArrDots::get($data, $key, $default);
+    }
+
+    private function jsonInput(): array
+    {
+        if ($this->jsonInputCache !== null) {
+            return $this->jsonInputCache;
+        }
+
+        $decoded = json_decode($this->getContent(), true, 32);
+
+        return $this->jsonInputCache = is_array($decoded) ? $decoded : [];
+    }
+
+    /**
+     * Get all input data, including attributes.
+     */
+    public function all(): array
+    {
+        return array_merge($this->attributes->all(), $this->query->all(), $this->request->all());
+    }
+
+    /**
+     * Check if the request contains any of the specified keys, including attributes.
+     *
+     * @param mixed $keys
+     */
+    public function has(...$keys): bool
+    {
+        if (count($keys) === 1 && is_array($keys[0])) {
+            $keys = $keys[0];
+        }
+
+        foreach ($keys as $key) {
+            if ($this->input($key) !== null) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Retrieve only the specified keys from the input data, including attributes.
+     *
+     * @param mixed $keys One or more keys to retrieve, supporting dot notation.
+     */
+    public function only(...$keys): array
+    {
+        if (count($keys) === 1 && is_array($keys[0])) {
+            $keys = $keys[0];
+        }
+
+        $input = $this->input();
+        $filtered = [];
+
+        foreach ($keys as $key) {
+            $value = ArrDots::get($input, $key, null);
+            ArrDots::set($filtered, $key, $value);
+        }
+
+        return $filtered;
+    }
+
+    /**
+     * Проверить, есть ли непустое значение для определенного ключа запроса.
+     */
+    public function filled(string $key): bool
+    {
+        return !empty($this->input($key));
+    }
+
+    /**
+     * Get the session object.
+     *
+     * @return callable|SessionInterface
+     */
+    public function session()
+    {
+        return $this->getSession();
+    }
+
+    /**
+     * Get the client's IP address.
+     */
+    public function ip(): string
+    {
+        return $this->getClientIp();
+    }
+
+    /**
+     * Получить значения для всех ключей запроса, кроме указанных.
+     *
+     * @param  mixed  $keys
+     */
+    public function except($keys): array
+    {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $input = $this->input();
+
+        foreach ($keys as $key) {
+            unset($input[$key]);
+        }
+
+        return $input;
+    }
+
+    /**
+     * Determine if the request URI matches a specific URI or URL.
+     */
+    public function is(?string $uri = null): bool
+    {
+        if (is_null($uri)) {
+            return false;
+        }
+
+        if (is_url($uri)) {
+            return $this->getSchemeAndHttpHost() . $this->getPathInfo() === $uri;
+        }
+
+        return $this->getPathInfo() === $uri;
+    }
+
+    /**
+     * Validate the request input.
+     *
+     * @throws Exception
+     */
+    public function validate(array $rules): array
+    {
+        $validatedData = [];
+        $errors = [];
+
+        foreach ($rules as $field => $ruleSet) {
+            $value = $this->input($field);
+            foreach (explode('|', $ruleSet) as $rule) {
+                try {
+                    $this->validateRule($value, $rule);
+                } catch (AssertionException $e) {
+                    $errors[$field][] = "The {$field} field failed validation for rule {$rule}.";
+                }
+            }
+            if (!isset($errors[$field])) {
+                $validatedData[$field] = $value;
+            }
+        }
+
+        if (count($errors) > 0) {
+            throw new RequestValidateException($errors);
+        }
+
+        return $validatedData;
+    }
+
+    public function isCsrfValid(): bool
+    {
+        return template()->getBlade()->csrfIsValid();
+    }
+
+    public function __get($name)
+    {
+        return $this->input($name);
+    }
+
+    private function _hostMatchesConfiguredAppUrl(): bool
+    {
+        $appUrl = (string) config('app.url', '');
+        $expectedHost = parse_url($appUrl, PHP_URL_HOST);
+        if (!$expectedHost || !is_string($expectedHost)) {
+            return false;
+        }
+
+        $host = $this->_requestHostForUrlMatch();
+
+        return $host !== null && strcasecmp($host, $expectedHost) === 0;
+    }
+
+    private function _requestHostForUrlMatch(): ?string
+    {
+        try {
+            return $this->getHost();
+        } catch (\Throwable) {
+            $raw = (string) $this->headers->get('Host', '');
+            if ($raw === '') {
+                return null;
+            }
+
+            return strtolower((string) preg_replace('/:\d+$/', '', trim($raw)));
+        }
+    }
+
+    private function _requestArrivedViaPrivateOrLocalInterface(): bool
+    {
+        $remote = (string) $this->server->get('REMOTE_ADDR', '');
+        if ($remote === '') {
+            return true;
+        }
+
+        return IpUtils::checkIp($remote, self::PRIVATE_PEER_CIDRS);
+    }
+
+    /**
+     * Validate individual rule.
+     *
+     * @param mixed $value
+     */
+    private function validateRule($value, string $rule): void
+    {
+        Validators::assert($value, $rule);
+    }
+}

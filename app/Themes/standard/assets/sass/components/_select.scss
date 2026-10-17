@@ -1,0 +1,89 @@
+.select {
+    &-wrapper {
+        @extend .flex-column;
+        position: relative;
+        width: 100%;
+    }
+
+    &__prefix {
+        font-size: var(--small);
+        font-weight: 500;
+        color: var(--text-600);
+        margin-bottom: var(--space-xs);
+    }
+
+    &__field-container {
+        position: relative;
+        width: 100%;
+
+        &.has-error .fs__trigger,
+        &.has-error .select__field {
+            border-color: var(--error);
+        }
+
+        &--native {
+            @extend .align-center;
+            gap: 8px;
+            font-size: 14px;
+            border: 1px solid var(--transp-2);
+            border-radius: 12px;
+            color: var(--text);
+            background-color: var(--transp-05);
+            transition: border-color 0.15s, box-shadow 0.15s;
+
+            > select {
+                padding: 6px 12px;
+                padding-right: 2rem;
+            }
+
+            &:focus-within:not(.has-error) {
+                border-color: var(--primary-300);
+            }
+
+            &:hover:not(:focus-within):not(.has-error) {
+                border-color: var(--transp-3);
+            }
+
+            option {
+                background-color: var(--background);
+            }
+        }
+    }
+
+    &__field {
+        font: inherit;
+        outline: 0;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        flex: 1;
+        background-color: transparent;
+        color: inherit;
+        width: 100%;
+        appearance: none;
+    }
+
+    &__toggle-icon {
+        position: absolute;
+        right: 0.875rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        color: var(--text-400);
+    }
+
+    &__error {
+        color: var(--error);
+        font-size: var(--small);
+        margin-top: var(--space-2xs);
+    }
+}
+
+select[data-tom-select] {
+    display: none;
+}
+
+.fs {
+    width: 100%;
+    display: flex;
+}

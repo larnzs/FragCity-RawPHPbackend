@@ -1,0 +1,115 @@
+<?php
+
+namespace Flute\Core\Services;
+
+use Flute\Core\Database\DatabaseConnection;
+use Flute\Core\ModulesManager\ModuleManager;
+use Flute\Core\Router\Router;
+use Flute\Core\Template\Template;
+use GO\Scheduler;
+use Throwable;
+
+final class CacheWarmupService
+{
+    private const NEEDS_WARMUP_FILE = 'storage/app/cache_warmup_needed';
+
+    private const WARMUP_LOCK_FILE = 'storage/app/cache_warmup.lock';
+
+    public function setupCron(Scheduler $scheduler): void
+    {
+        if (!config('app.cron_mode')) {
+            return;
+        }
+
+        $scheduler->call(function (): void {
+            $this->warmupIfNeeded();
+        })->everyMinute();
+
+        // Periodic cleanup of ".!XXXXX" orphans left by interrupted
+        // Symfony Filesystem::remove() calls (FPM kills mid-clear).
+        $scheduler->call(function (): void {
+            try {
+                \Flute\Core\Cache\OrphanSweeper::sweep(storage_path('app'), 3600);
+                \Flute\Core\Cache\OrphanSweeper::sweep(public_path('assets/css'), 3600);
+                \Flute\Core\Cache\OrphanSweeper::sweep(public_path('assets/js'), 3600);
+            } catch (Throwable $e) {
+                logs('cron')->warning($e);
+            }
+        })->everyMinute(15);
+    }
+
+    public function markNeeded(): void
+    {
+        $path = path(self::NEEDS_WARMUP_FILE);
+        @mkdir(dirname($path), 0o755, true);
+        @file_put_contents($path, (string) time(), LOCK_EX);
+    }
+
+    public function clearNeeded(): void
+    {
+        @unlink(path(self::NEEDS_WARMUP_FILE));
+    }
+
+    public function isNeeded(): bool
+    {
+        return is_file(path(self::NEEDS_WARMUP_FILE));
+    }
+
+    public function warmupIfNeeded(): void
+    {
+        if (!$this->isNeeded()) {
+            return;
+        }
+
+        $this->warmup();
+    }
+
+    public function warmup(): void
+    {
+        $lockPath = path(self::WARMUP_LOCK_FILE);
+
+        $handle = FileLockService::acquireLock($lockPath);
+        if ($handle === false) {
+            return;
+        }
+
+        try {
+            try {
+                app(ModuleManager::class)->initialize();
+            } catch (Throwable $e) {
+                logs('cron')->warning($e);
+            }
+
+            try {
+                // Ensure template is initialized (view/component caches).
+                app(Template::class);
+            } catch (Throwable $e) {
+                logs('cron')->warning($e);
+            }
+
+            try {
+                // Ensure compiled routes exist (front/admin).
+                $router = app(Router::class);
+                $router->warmupCompiledRoutes(false);
+                $router->warmupCompiledRoutes(true);
+            } catch (Throwable $e) {
+                logs('cron')->warning($e);
+            }
+
+            try {
+                // Rebuild ORM schema if it was rotated/staled or missing.
+                $schemaFile = storage_path('app/orm_schema.php');
+                $staleSchemaFile = storage_path('app/orm_schema.php.stale');
+                if (!is_file($schemaFile) || is_file($staleSchemaFile)) {
+                    app(DatabaseConnection::class)->forceRefreshSchema();
+                }
+            } catch (Throwable $e) {
+                logs('cron')->warning($e);
+            }
+
+            $this->clearNeeded();
+        } finally {
+            FileLockService::releaseLock($handle);
+        }
+    }
+}

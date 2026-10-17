@@ -1,0 +1,544 @@
+<?php
+
+namespace Flute\Core\Update\Updaters;
+
+use Flute\Core\Composer\ComposerManager;
+use Flute\Core\ModulesManager\ModuleActions;
+use Flute\Core\ModulesManager\ModuleInformation;
+use Flute\Core\ModulesManager\ModuleManager;
+use Flute\Core\Support\FileUploader;
+use RuntimeException;
+use Throwable;
+
+class ModuleUpdater extends AbstractUpdater
+{
+    /**
+     * Information about the module
+     */
+    protected ModuleInformation $module;
+
+    /**
+     * Directories that should not be updated
+     */
+    protected array $excludedPaths = [
+        'Resources/config',
+        'config',
+    ];
+
+    protected ?string $backupDir = null;
+
+    protected bool $preserveBackup = false;
+
+    /**
+     * ModuleUpdater constructor.
+     */
+    public function __construct(ModuleInformation $module)
+    {
+        $this->module = $module;
+    }
+
+    /**
+     * Get the current version
+     */
+    public function getCurrentVersion(): string
+    {
+        return $this->module->version ?? '1.0.0';
+    }
+
+    /**
+     * Get the identifier
+     */
+    public function getIdentifier(): ?string
+    {
+        return $this->module->key;
+    }
+
+    /**
+     * Get the type
+     */
+    public function getType(): string
+    {
+        return 'module';
+    }
+
+    /**
+     * Get the name
+     */
+    public function getName(): string
+    {
+        return $this->module->name;
+    }
+
+    /**
+     * Get the description
+     */
+    public function getDescription(): string
+    {
+        return $this->module->description;
+    }
+
+    /**
+     * Update the module
+     */
+    public function update(array $data): bool
+    {
+        if (empty($data['package_file']) || !file_exists($data['package_file'])) {
+            logs()->error('Module update package file not found: ' . ( $data['package_file'] ?? 'null' ));
+
+            return false;
+        }
+
+        $packageFile = $data['package_file'];
+        $extractDir = storage_path('app/temp/updates/module-' . $this->module->key . '-' . time());
+        $moduleDir = $this->getModuleDirectory();
+        $success = false;
+
+        if (!is_dir($extractDir)) {
+            mkdir($extractDir, 0o755, true);
+        }
+
+        try {
+            $this->createBackup();
+
+            $modulePath = $this->extractModuleArchive($packageFile, $extractDir);
+            if (!$modulePath) {
+                throw new RuntimeException('Invalid module update package.');
+            }
+
+            if (!$this->validateModule($modulePath)) {
+                logs()->error('Module validation failed: incompatible with current CMS version');
+
+                throw new RuntimeException('Module validation failed.');
+            }
+
+            $this->copyModuleFiles($modulePath, $moduleDir);
+
+            // Update composer dependencies
+            /** @var ComposerManager $composerManager */
+            $composerManager = app(ComposerManager::class);
+
+            try {
+                $composerManager->install();
+            } catch (Throwable $e) {
+                throw $e;
+            }
+
+            if (!$this->updateModuleInformation()) {
+                throw new RuntimeException('Module information update failed.');
+            }
+
+            $this->clearCache();
+            /** @var ModuleManager $moduleManager */
+            $moduleManager = app(ModuleManager::class);
+            $moduleManager->clearCache();
+            $moduleManager->refreshModules();
+
+            $success = true;
+
+            return true;
+        } catch (Throwable $e) {
+            logs()->error('Error during module update: ' . $e->getMessage());
+            $this->rollbackFromBackup($moduleDir);
+
+            \Flute\Core\Services\CrashReportService::capture($e, ['source' => 'update.module']);
+
+            return false;
+        } finally {
+            if (is_dir($extractDir)) {
+                $this->removeDirectory($extractDir);
+            }
+
+            if ($success) {
+                $this->cleanupTemporaryBackup();
+            }
+        }
+    }
+
+    /**
+     * Extract the module archive
+     *
+     * @return string|false
+     */
+    protected function extractModuleArchive(string $packageFile, string $extractDir)
+    {
+        try {
+            app(FileUploader::class)->safeExtractZip($packageFile, $extractDir);
+        } catch (Throwable $e) {
+            logs()->error('Failed to extract module update package: ' . $e->getMessage());
+
+            \Flute\Core\Services\CrashReportService::capture($e, ['source' => 'update.module.extract']);
+
+            return false;
+        }
+
+        $rootDir = $extractDir;
+        $items = scandir($extractDir);
+
+        if (count($items) === 3) { // '.', '..' and one directory
+            foreach ($items as $item) {
+                if ($item !== '.' && $item !== '..' && is_dir($extractDir . '/' . $item)) {
+                    $rootDir = $extractDir . '/' . $item;
+
+                    break;
+                }
+            }
+        }
+
+        if (!file_exists($rootDir . '/module.json')) {
+            logs()->error('Invalid module archive: module.json not found');
+
+            return false;
+        }
+
+        return $rootDir;
+    }
+
+    /**
+     * Check compatibility of the module
+     */
+    protected function validateModule(string $modulePath): bool
+    {
+        $moduleJsonPath = $modulePath . '/module.json';
+        if (!file_exists($moduleJsonPath)) {
+            logs()->error('Module validation failed: module.json not found');
+
+            return false;
+        }
+
+        $moduleJson = json_decode(file_get_contents($moduleJsonPath), true);
+        if (empty($moduleJson)) {
+            logs()->error('Module validation failed: invalid module.json format');
+
+            return false;
+        }
+
+        if (!empty($moduleJson['requires']) && !empty($moduleJson['requires']['php'])) {
+            $requiredPhp = $moduleJson['requires']['php'];
+            if (!$this->checkPhpVersion($requiredPhp)) {
+                logs()->error('Module validation failed: PHP version ' . $requiredPhp . ' required');
+
+                return false;
+            }
+        }
+
+        if (!empty($moduleJson['requires']) && !empty($moduleJson['requires']['flute'])) {
+            $requiredFlute = $moduleJson['requires']['flute'];
+            if (!$this->checkFluteVersion($requiredFlute)) {
+                logs()->error('Module validation failed: Flute version ' . $requiredFlute . ' required');
+
+                return false;
+            }
+        }
+
+        if (!empty($moduleJson['requires']) && !empty($moduleJson['requires']['modules'])) {
+            $requiredModules = $moduleJson['requires']['modules'];
+            $missingModules = $this->checkModuleDependencies($requiredModules);
+
+            if (!empty($missingModules)) {
+                logs()->error('Module validation failed: missing required modules: ' . implode(', ', $missingModules));
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Update the module information
+     */
+    protected function updateModuleInformation(): bool
+    {
+        try {
+            /** @var ModuleManager $moduleManager */
+            $moduleManager = app(ModuleManager::class);
+            $moduleManager->refreshModules();
+
+            if ($moduleManager->issetModule($this->module->key)) {
+                $moduleInfo = $moduleManager->getModule($this->module->key);
+                $moduleActions = new ModuleActions();
+                $moduleActions->updateModule($moduleInfo, $moduleManager);
+
+                return true;
+            }
+
+            logs()->error('Failed to update module information: module not found after updating files');
+
+            return false;
+        } catch (Throwable $e) {
+            logs()->error('Failed to update module information: ' . $e->getMessage());
+
+            \Flute\Core\Services\CrashReportService::capture($e, ['source' => 'update.module.info']);
+
+            return false;
+        }
+    }
+
+    /**
+     * Get the path to the module directory
+     */
+    protected function getModuleDirectory(): string
+    {
+        $basePath = BASE_PATH;
+
+        return $basePath . '/app/Modules/' . $this->module->key;
+    }
+
+    /**
+     * Create a backup before updating
+     */
+    protected function createBackup(): bool
+    {
+        $moduleDir = $this->getModuleDirectory();
+        if (!is_dir($moduleDir)) {
+            return false;
+        }
+
+        $this->preserveBackup = (bool) config('app.create_backup');
+        $backupRoot = $this->preserveBackup
+            ? storage_path('backup/modules')
+            : storage_path('app/temp/updates/rollback/modules');
+
+        if (!is_dir($backupRoot) && !@mkdir($backupRoot, 0o755, true) && !is_dir($backupRoot)) {
+            throw new RuntimeException('Unable to create module backup directory.');
+        }
+
+        $this->backupDir = $backupRoot . '/' . $this->module->key . '-' . date('Y-m-d-His') . '-' . getmypid();
+
+        if (!is_dir($this->backupDir)) {
+            mkdir($this->backupDir, 0o755, true);
+        }
+
+        $this->copyDirectory($moduleDir, $this->backupDir);
+
+        logs()->info('Module update rollback backup created: ' . $this->backupDir);
+
+        return true;
+    }
+
+    /**
+     * Copy module files, excluding specified directories
+     */
+    protected function copyModuleFiles(string $source, string $destination, ?string $baseSource = null): bool
+    {
+        if (!is_dir($source)) {
+            return false;
+        }
+
+        $baseSource ??= rtrim(str_replace('\\', '/', $source), '/');
+        $directory = opendir($source);
+        if ($directory === false) {
+            return false;
+        }
+
+        while (( $file = readdir($directory) ) !== false) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $sourcePath = $source . '/' . $file;
+            $destinationPath = $destination . '/' . $file;
+
+            $isExcluded = false;
+            foreach ($this->excludedPaths as $excludedPath) {
+                $normalizedSourcePath = str_replace('\\', '/', $sourcePath);
+                $relativePath = ltrim(substr($normalizedSourcePath, strlen($baseSource)), '/');
+                if ($relativePath === $excludedPath || str_starts_with($relativePath, $excludedPath . '/')) {
+                    $isExcluded = true;
+                    logs()->info('Skipping excluded path: ' . $relativePath);
+
+                    break;
+                }
+            }
+
+            if ($isExcluded) {
+                continue;
+            }
+
+            if (is_dir($sourcePath)) {
+                if (!is_dir($destinationPath)) {
+                    $dirPerms = fileperms($sourcePath) & 0o777;
+                    mkdir($destinationPath, $dirPerms, true);
+                    chmod($destinationPath, $dirPerms);
+                    $this->safeChown($destinationPath, fileowner($sourcePath));
+                    $this->safeChgrp($destinationPath, filegroup($sourcePath));
+                }
+                $this->copyModuleFiles($sourcePath, $destinationPath, $baseSource);
+            } else {
+                $this->atomicCopyFile($sourcePath, $destinationPath);
+            }
+        }
+
+        closedir($directory);
+
+        return true;
+    }
+
+    /**
+     * Copy directory recursively
+     */
+    protected function copyDirectory(string $source, string $destination): bool
+    {
+        if (!is_dir($source)) {
+            return false;
+        }
+
+        if (!is_dir($destination)) {
+            $dirPerms = fileperms($source) & 0o777;
+            mkdir($destination, $dirPerms, true);
+            chmod($destination, $dirPerms);
+            $this->safeChown($destination, fileowner($source));
+            $this->safeChgrp($destination, filegroup($source));
+        }
+
+        $directory = opendir($source);
+        if ($directory === false) {
+            return false;
+        }
+
+        while (( $file = readdir($directory) ) !== false) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            $sourcePath = $source . '/' . $file;
+            $destinationPath = $destination . '/' . $file;
+
+            if (is_dir($sourcePath)) {
+                $this->copyDirectory($sourcePath, $destinationPath);
+            } else {
+                $this->atomicCopyFile($sourcePath, $destinationPath);
+            }
+        }
+
+        closedir($directory);
+
+        return true;
+    }
+
+    /**
+     * Remove directory recursively
+     */
+    protected function removeDirectory(string $directory): bool
+    {
+        if (!is_dir($directory)) {
+            return false;
+        }
+
+        $items = scandir($directory);
+
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            $path = $directory . '/' . $item;
+
+            if (is_dir($path)) {
+                $this->removeDirectory($path);
+            } else {
+                unlink($path);
+            }
+        }
+
+        return rmdir($directory);
+    }
+
+    /**
+     * Clear the cache
+     */
+    protected function clearCache(): void
+    {
+        cache()->clear();
+
+        if (function_exists('cache_warmup_mark')) {
+            cache_warmup_mark();
+        }
+
+        $this->resetOpcache();
+    }
+
+    protected function rollbackFromBackup(string $moduleDir): void
+    {
+        if (!$this->backupDir || !is_dir($this->backupDir)) {
+            return;
+        }
+
+        try {
+            if (is_dir($moduleDir)) {
+                $this->removeDirectory($moduleDir);
+            }
+
+            $this->copyDirectory($this->backupDir, $moduleDir);
+            logs()->warning('Module update rolled back from backup: ' . $this->backupDir, [
+                'module' => $this->module->key,
+            ]);
+        } catch (Throwable $rollbackError) {
+            logs()->critical('Module update rollback failed: ' . $rollbackError->getMessage(), [
+                'module' => $this->module->key,
+                'backup' => $this->backupDir,
+            ]);
+        } finally {
+            if (!$this->preserveBackup && is_dir((string) $this->backupDir)) {
+                $this->removeDirectory((string) $this->backupDir);
+            }
+        }
+    }
+
+    protected function cleanupTemporaryBackup(): void
+    {
+        if (!$this->preserveBackup && $this->backupDir && is_dir($this->backupDir)) {
+            $this->removeDirectory($this->backupDir);
+        }
+    }
+
+    /**
+     * Check the PHP version
+     */
+    protected function checkPhpVersion(string $requiredVersion): bool
+    {
+        return version_compare(PHP_VERSION, $requiredVersion, '>=');
+    }
+
+    /**
+     * Check the Flute version
+     */
+    protected function checkFluteVersion(string $requiredVersion): bool
+    {
+        $fluteVersion = \Flute\Core\App::VERSION;
+
+        return version_compare($fluteVersion, $requiredVersion, '>=');
+    }
+
+    /**
+     * Check the dependencies of other modules
+     */
+    protected function checkModuleDependencies(array $requiredModules): array
+    {
+        /** @var ModuleManager $moduleManager */
+        $moduleManager = app(ModuleManager::class);
+        $missingModules = [];
+
+        foreach ($requiredModules as $moduleKey => $moduleVersion) {
+            if (!$moduleManager->issetModule($moduleKey)) {
+                $missingModules[] = $moduleKey;
+
+                continue;
+            }
+
+            $moduleInfo = $moduleManager->getModule($moduleKey);
+
+            if ($moduleInfo->status !== ModuleManager::ACTIVE) {
+                $missingModules[] = $moduleKey;
+
+                continue;
+            }
+
+            if (!empty($moduleVersion) && version_compare($moduleInfo->version ?? '1.0.0', $moduleVersion, '<')) {
+                $missingModules[] = "{$moduleKey} (требуется версия {$moduleVersion})";
+            }
+        }
+
+        return $missingModules;
+    }
+}

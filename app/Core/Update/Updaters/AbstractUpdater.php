@@ -1,0 +1,220 @@
+<?php
+
+namespace Flute\Core\Update\Updaters;
+
+/**
+ * Base updater with shared filesystem helpers for concrete updaters.
+ *
+ * @method void atomicCopyFile(string $source, string $destination)
+ * @method void resetOpcache()
+ */
+abstract class AbstractUpdater
+{
+    /**
+     * Get current version
+     */
+    abstract public function getCurrentVersion(): string;
+
+    /**
+     * Get component identifier
+     */
+    abstract public function getIdentifier(): ?string;
+
+    /**
+     * Get component type
+     */
+    abstract public function getType(): string;
+
+    /**
+     * Get component name
+     */
+    abstract public function getName(): string;
+
+    /**
+     * Get component description
+     */
+    abstract public function getDescription(): string;
+
+    /**
+     * Process update
+     */
+    abstract public function update(array $data): bool;
+
+    protected function enableUpdateMaintenance(): bool
+    {
+        $basePath = rtrim(str_replace('\\', '/', BASE_PATH), '/') . '/';
+        $storageFlag = $basePath . 'storage/app/.maintenance-composer';
+        $publicFlag = $basePath . 'public/.maintenance-composer';
+
+        if (is_file($storageFlag) || is_file($publicFlag)) {
+            return false;
+        }
+
+        @mkdir(dirname($storageFlag), 0o775, true);
+        @mkdir(dirname($publicFlag), 0o775, true);
+
+        $payload = [
+            'title' => 'Maintenance',
+            'message' => 'Update in progress, please try again shortly.',
+            'started_at' => date(DATE_ATOM),
+            'pid' => getmypid(),
+            'force' => false,
+            'source' => 'flute-admin-update',
+        ];
+
+        @file_put_contents($storageFlag, json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+        @file_put_contents($publicFlag, '1');
+
+        // Safety net: clean up maintenance flags if PHP process dies unexpectedly
+        // (OOM, max_execution_time, segfault). The finally block handles normal flow,
+        // this covers fatal crashes where finally doesn't execute.
+        register_shutdown_function(static function () use ($storageFlag, $publicFlag): void {
+            // Only clean up if there was an error (normal exit is handled by finally/disableUpdateMaintenance)
+            $error = error_get_last();
+            if ($error !== null && in_array($error['type'], [E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_PARSE], true)) {
+                @unlink($storageFlag);
+                @unlink($publicFlag);
+            }
+        });
+
+        return true;
+    }
+
+    protected function disableUpdateMaintenance(bool $enabledByThisCall): void
+    {
+        if (!$enabledByThisCall) {
+            return;
+        }
+
+        $basePath = rtrim(str_replace('\\', '/', BASE_PATH), '/') . '/';
+        $storageFlag = $basePath . 'storage/app/.maintenance-composer';
+        $publicFlag = $basePath . 'public/.maintenance-composer';
+
+        $payload = [];
+        if (is_file($storageFlag)) {
+            $raw = @file_get_contents($storageFlag);
+            if (is_string($raw) && $raw !== '') {
+                $decoded = json_decode($raw, true);
+                if (is_array($decoded)) {
+                    $payload = $decoded;
+                }
+            }
+        }
+
+        if (!empty($payload['force'])) {
+            return;
+        }
+
+        @unlink($storageFlag);
+        @unlink($publicFlag);
+    }
+
+    /**
+     * Atomically copy a single file: write to .tmp, then rename over the target.
+     * This ensures concurrent requests never read a half-written file.
+     * Also invalidates OPcache for the target so new code is picked up immediately.
+     */
+    protected function atomicCopyFile(string $source, string $destination): void
+    {
+        $tmpFile = $destination . '.tmp.' . getmypid();
+
+        copy($source, $tmpFile);
+
+        $this->normalizeLineEndings($tmpFile);
+
+        // Determine permissions to apply
+        if (is_file($destination)) {
+            $perms = fileperms($destination) & 0o755;
+            $owner = fileowner($destination);
+            $group = filegroup($destination);
+        } else {
+            $perms = fileperms($source) & 0o755;
+            $owner = fileowner($source);
+            $group = filegroup($source);
+        }
+
+        chmod($tmpFile, $perms);
+        $this->safeChown($tmpFile, $owner);
+        $this->safeChgrp($tmpFile, $group);
+
+        // Atomic rename — target is either fully old or fully new, never partial
+        rename($tmpFile, $destination);
+
+        // Invalidate OPcache for this file so PHP loads the new version
+        if (function_exists('opcache_invalidate')) {
+            opcache_invalidate($destination, true);
+        }
+    }
+
+    /**
+     * Reset OPcache entirely. Should be called after all files are updated.
+     */
+    protected function resetOpcache(): void
+    {
+        if (function_exists('opcache_reset')) {
+            opcache_reset();
+        }
+    }
+
+    protected function normalizeLineEndings(string $path): void
+    {
+        $textExtensions = [
+            'php',
+            'js',
+            'css',
+            'scss',
+            'json',
+            'xml',
+            'yaml',
+            'yml',
+            'md',
+            'txt',
+            'html',
+            'blade.php',
+            'twig',
+            'env',
+            'htaccess',
+            'ini',
+            'cfg',
+            'conf',
+            'sh',
+            'bat',
+        ];
+
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $basename = basename($path);
+
+        $isText = in_array($ext, $textExtensions, true) || str_ends_with($basename, '.blade.php');
+
+        if (!$isText) {
+            return;
+        }
+
+        $content = file_get_contents($path);
+        if ($content === false || !str_contains($content, "\r\n")) {
+            return;
+        }
+
+        file_put_contents($path, str_replace("\r\n", "\n", $content), LOCK_EX);
+    }
+
+    /**
+     * Safely change file owner if supported by the runtime
+     */
+    protected function safeChown(string $path, $user): void
+    {
+        if (function_exists('chown')) {
+            @chown($path, $user);
+        }
+    }
+
+    /**
+     * Safely change file group if supported by the runtime
+     */
+    protected function safeChgrp(string $path, $group): void
+    {
+        if (function_exists('chgrp')) {
+            @chgrp($path, $group);
+        }
+    }
+}

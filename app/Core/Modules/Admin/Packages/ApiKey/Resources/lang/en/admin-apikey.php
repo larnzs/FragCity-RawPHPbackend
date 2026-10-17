@@ -1,0 +1,67 @@
+<?php
+
+return [
+    'title' => [
+        'list' => 'API Keys',
+        'description' => 'Manage API keys for external access',
+        'create' => 'Create API Key',
+        'edit' => 'Edit API Key',
+    ],
+    'fields' => [
+        'key' => [
+            'label' => 'API Key',
+            'placeholder' => 'Enter API key',
+            'help' => 'This key will be used for API authentication',
+        ],
+        'name' => [
+            'label' => 'Name',
+            'placeholder' => 'Enter key name',
+            'help' => 'You can use this name to identify the key',
+        ],
+        'permissions' => [
+            'label' => 'Permissions',
+        ],
+        'created_at' => 'Created At',
+        'last_used_at' => 'Last Used At',
+        'never' => 'Never',
+    ],
+    'buttons' => [
+        'actions' => 'Actions',
+        'add' => 'Add Key',
+        'save' => 'Save',
+        'edit' => 'Edit',
+        'regenerate' => 'Regenerate',
+        'delete' => 'Delete',
+    ],
+    'confirms' => [
+        'delete_key' => 'Are you sure you want to delete this API key?',
+        'regenerate_key' => 'The old API key will stop working. Regenerate this key?',
+    ],
+    'messages' => [
+        'save_success' => 'API key saved successfully.',
+        'regenerate_success' => 'API key regenerated successfully.',
+        'key_not_found' => 'API key not found.',
+        'no_permissions' => 'Please select at least one permission.',
+        'update_success' => 'API key updated successfully.',
+        'update_error' => 'Error updating API key: :message',
+        'delete_success' => 'API key deleted successfully.',
+        'delete_error' => 'Error deleting API key: :message',
+    ],
+
+    'empty' => [
+        'title' => 'No API keys',
+        'sub' => 'Create an API key to integrate with external services',
+    ],
+
+    'info_alert' => [
+        'title' => 'API module required',
+        'description' => 'API keys allow you to authenticate requests, but the API module must be installed from the marketplace for the API to work.',
+        'install_module' => 'Install module',
+        'documentation' => 'Documentation',
+    ],
+
+    'created_alert' => [
+        'title' => 'Copy the API key now',
+        'description' => 'The ":name" key is shown only once. After leaving this page, it can only be regenerated.',
+    ],
+];

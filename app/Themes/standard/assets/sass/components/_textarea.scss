@@ -1,0 +1,61 @@
+.textarea {
+    &-wrapper {
+        @extend .flex-column;
+
+        position: relative;
+    }
+
+    &__field-container {
+        @extend .align-center;
+
+        gap: 8px;
+        position: relative;
+        width: 100%;
+        padding: 6px 12px;
+        font-size: 14px;
+        border: 1px solid var(--transp-2);
+        border-radius: 12px;
+        color: var(--text);
+        background-color: var(--transp-05);
+        transition: border-color 0.15s, box-shadow 0.15s;
+
+        &:hover:not(:focus-within):not(.has-error):not(.textarea__field-container-readonly) {
+            border-color: var(--transp-3);
+        }
+
+        &:focus-within:not(.textarea__field-container-readonly):not(.has-error) {
+            border-color: var(--primary-300);
+        }
+
+        &.has-error {
+            border-color: var(--error);
+        }
+    }
+
+    &__field {
+        font: inherit;
+        outline: 0;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        flex: 1;
+        background-color: transparent;
+        color: inherit;
+        width: 100%;
+        resize: vertical;
+        min-height: 5em;
+        line-height: 1.5;
+
+        &::placeholder {
+            color: var(--text-500);
+        }
+    }
+
+    &__error {
+        color: var(--error);
+        font-size: var(--small);
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        margin-top: 0.2em;
+    }
+}

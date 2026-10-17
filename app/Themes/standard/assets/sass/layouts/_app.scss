@@ -1,0 +1,161 @@
+﻿
+
+#main {
+    flex: 1;
+    opacity: 1;
+    view-transition-name: main-content;
+}
+
+@keyframes fade-main-in {
+    from {
+        opacity: 0;
+    }
+}
+
+@keyframes fade-main-out {
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes slide-from-right {
+    from {
+        transform: translateX(20px);
+    }
+}
+
+@keyframes slide-to-left {
+    to {
+        transform: translateX(-20px);
+    }
+}
+
+::view-transition-old(flute-header),
+::view-transition-new(flute-header),
+::view-transition-old(sidebar-nav),
+::view-transition-new(sidebar-nav) {
+    animation: none;
+}
+
+:root {
+    --bg-effect-opacity: 0.1;
+}
+
+html[data-bg-effect="dots"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image: radial-gradient(circle, var(--text-600) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: var(--bg-effect-opacity);
+}
+
+html[data-bg-effect="grid"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image:
+        linear-gradient(var(--text-600) 1px, transparent 1px),
+        linear-gradient(90deg, var(--text-600) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: var(--bg-effect-opacity);
+}
+
+html[data-bg-effect="cross"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image:
+        radial-gradient(circle at center, var(--text-500) 2px, transparent 2px),
+        linear-gradient(var(--text-600) 1px, transparent 1px),
+        linear-gradient(90deg, var(--text-600) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-position: 23px 23px, -1px -1px, -1px -1px;
+    opacity: var(--bg-effect-opacity);
+}
+
+html[data-bg-effect="diagonal"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 20px,
+        var(--text-600) 20px,
+        var(--text-600) 21px
+    );
+    opacity: var(--bg-effect-opacity);
+}
+
+html[data-bg-effect="squares"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image:
+        linear-gradient(45deg, var(--text-600) 25%, transparent 25%),
+        linear-gradient(-45deg, var(--text-600) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, var(--text-600) 75%),
+        linear-gradient(-45deg, transparent 75%, var(--text-600) 75%);
+    background-size: 40px 40px;
+    background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+    opacity: var(--bg-effect-opacity);
+}
+
+html[data-bg-effect="mesh"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background:
+        radial-gradient(ellipse 80% 60% at 10% 20%, color-mix(in srgb, var(--accent) 40%, transparent) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 70%, color-mix(in srgb, var(--primary) 35%, transparent) 0%, transparent 50%),
+        radial-gradient(ellipse 70% 50% at 90% 20%, color-mix(in srgb, var(--secondary) 30%, transparent) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 70% at 40% 80%, color-mix(in srgb, var(--accent) 25%, transparent) 0%, transparent 50%);
+    opacity: var(--bg-effect-opacity);
+}
+
+html[data-bg-effect="noise"] body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: -1;
+    background-image: url('data:image/svg+xml,<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');
+    opacity: var(--bg-effect-opacity);
+}
+
+:root {
+    --emoji-pattern: none;
+    --emoji-tile-width: 128px;
+    --emoji-tile-height: 128px;
+    --emoji-angle: 0deg;
+    --emoji-accent-filter: none;
+}
+
+html[data-bg-effect="emoji"] body::before {
+    content: '';
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    pointer-events: none;
+    z-index: -1;
+    background-image: var(--emoji-pattern);
+    background-size: var(--emoji-tile-width) var(--emoji-tile-height);
+    background-repeat: repeat;
+    transform: rotate(var(--emoji-angle));
+    transform-origin: center center;
+    filter: var(--emoji-accent-filter);
+}

@@ -1,0 +1,103 @@
+.input {
+    &-wrapper {
+        @extend .flex-column;
+
+        position: relative;
+    }
+
+    &__prefix {
+        @extend .text-muted, .flex-center;
+
+        font-size: var(--h5);
+        line-height: 1;
+    }
+
+    &__field-container {
+        @extend .align-center;
+
+        gap: 8px;
+        position: relative;
+        width: 100%;
+        min-height: 36px;
+        padding: 6px 12px;
+        font-size: 14px;
+        border: 1px solid var(--transp-2);
+        border-radius: 12px;
+        color: var(--text);
+        background-color: var(--transp-05);
+        transition: border-color 0.15s, box-shadow 0.15s;
+
+        &-withPassword {
+            padding-right: 3em;
+        }
+
+        &:hover:not(:focus-within):not(.has-error):not(.input__field-container-readonly) {
+            border-color: var(--transp-3);
+        }
+
+        &:focus-within:not(.input__field-container-readonly):not(.has-error) {
+            border-color: var(--primary-300);
+        }
+
+        &.has-error {
+            border-color: var(--error);
+        }
+    }
+
+    &__field {
+        font: inherit;
+        outline: 0;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        flex: 1;
+        background-color: transparent;
+        color: inherit;
+    }
+
+    &__toggle-btn {
+        @extend .icon-hover;
+
+        position: absolute;
+        right: var(--space-2xs);
+        width: 36px;
+        height: 36px;
+        font-size: var(--p-small);
+        color: var(--text-500);
+        @include transition(all);
+
+        &:hover {
+            color: var(--text);
+        }
+
+        .icon-eye,
+        .icon-eye-slash {
+            width: 1.5em;
+            height: 1.5em;
+            transition: opacity var(--transition) ease;
+        }
+
+        .icon-eye.visible,
+        .icon-eye-slash.visible {
+            display: inline;
+        }
+    }
+
+    &__error {
+        color: var(--error);
+        font-size: var(--small);
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        margin-top: 0.2em;
+        animation: fadeIn 0.3s ease-out;
+    }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    transition: background-color 600000s 0s, color 600000s 0s;
+}
+
+input[data-autocompleted] {
+    background-color: var(--transp-1) !important;
+}

@@ -1,0 +1,120 @@
+#confirmation-dialog {
+    z-index: 9998;
+
+    .modal__container {
+        max-width: 400px;
+        padding: 0;
+    }
+
+    .modal__header {
+        padding: var(--space-md) var(--space-md) 0;
+        border: none;
+
+        .modal__title {
+            font-size: var(--p);
+            font-weight: 600;
+        }
+    }
+
+    .modal__footer {
+        padding: var(--space-sm) var(--space-md) var(--space-md);
+        border: none;
+
+        .btn {
+            border-radius: var(--border05);
+            font-size: var(--p-small);
+            font-weight: 600;
+            min-height: 42px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .modal__container {
+            max-width: none;
+            min-width: unset;
+        }
+
+        .modal__footer {
+            padding: var(--space-sm) var(--space-md)
+                calc(var(--space-md) + env(safe-area-inset-bottom, 0px));
+        }
+    }
+}
+
+#confirmation-dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-lg) var(--space-lg);
+    text-align: center;
+}
+
+#confirmation-dialog-message {
+    max-width: 340px;
+    line-height: 1.5;
+    font-size: var(--p-small);
+    color: var(--text-300);
+    margin: 0;
+    white-space: pre-line;
+}
+
+.confirmation-dialog {
+    &__icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        > span {
+            display: none;
+
+            &.active {
+                display: flex;
+            }
+
+            > svg {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                width: 52px;
+                height: 52px;
+                padding: var(--space-sm);
+            }
+        }
+
+        > svg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            width: 52px;
+            height: 52px;
+            padding: var(--space-sm);
+        }
+
+        .icon-error svg,
+        svg.icon-error {
+            color: var(--error);
+            background: var(--error-light);
+        }
+
+        .icon-success svg,
+        svg.icon-success {
+            color: var(--success);
+            background: var(--success-light);
+        }
+
+        .icon-warning svg,
+        svg.icon-warning {
+            color: var(--warning);
+            background: var(--warning-light);
+        }
+
+        .icon-info svg,
+        svg.icon-info {
+            color: var(--info);
+            background: var(--info-light);
+        }
+    }
+}

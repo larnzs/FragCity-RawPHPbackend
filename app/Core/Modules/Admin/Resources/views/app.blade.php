@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="{{ app()->getLang() }}" data-theme="{{ cookie()->get('theme', 'dark') }}"
+    data-color-scheme="{{ cookie()->get('color-scheme', 'default') }}">
+
+<head hx-head="append">
+    <title>
+        @yield('title', __(page()->title ?? config('app.name')))
+        @hasSection('title')
+            - {{ config('app.name') }}
+        @endif
+    </title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no">
+    <meta name="view-transition" content="same-origin">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="auth" id="auth" content="{{ user()->isLoggedIn() }}">
+    <meta name="application-name" content="{{ config('app.name') }}">
+    <meta name="apple-mobile-web-app-title" content="{{ config('app.name') }}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="color-scheme" content="dark light">
+    <meta name="supported-color-schemes" content="dark light">
+
+    @stack('head')
+
+    @if (isset($sections['head']))
+        {!! $sections['head'] !!}
+    @endif
+
+    <meta name="description" content="{{ __(page()->description ?? '') }}">
+    <meta name="keywords" content="{{ page()->keywords ?? '' }}">
+    <meta name="robots" content="{{ page()->robots ?? '' }}">
+    <meta property="og:title" content="{{ __(page()->og_title ?? '') }}">
+    <meta property="og:description" content="{{ __(page()->og_description ?? '') }}">
+    <meta property="og:image" content="{{ page()->og_image }}">
+
+    <meta name="htmx-config"
+        content='{
+        "defaultFocusScroll": false,
+        "scrollIntoViewOnBoost": false,
+        "refreshOnHistoryMiss": true,
+        "historyCacheSize": 0
+    }'>
+    <meta name="site_url" content="{{ config('app.url') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="icon" type="image/x-icon" href="@asset('favicon.ico')?v={{ file_exists(public_path('favicon.ico')) ? filemtime(public_path('favicon.ico')) : 1 }}">
+    <link rel="stylesheet" href="@asset('assets/css/libs/flute-select.css')" type='text/css' media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="@asset('assets/css/libs/flute-select.css')" type='text/css'></noscript>
+
+    @stack('styles')
+
+    @if (isset($sections['styles']))
+        {!! $sections['styles'] !!}
+    @endif
+
+    {{-- For support head merge --}}
+    @if (request()->htmx()->isHtmxRequest())
+        @stack('scripts')
+
+        @if (isset($sections['scripts']))
+            {!! $sections['scripts'] !!}
+        @endif
+    @endif
+
+    @if (!request()->htmx()->isHtmxRequest())
+        <link rel="preload" href="@asset('assets/fonts/manrope/Manrope-Regular.woff2')" as="font" type="font/woff2" crossorigin fetchpriority="high">
+        <link rel="preload" href="@asset('assets/fonts/manrope/Manrope-Medium.woff2')" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="@asset('assets/fonts/manrope/manrope.css')" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="@asset('assets/fonts/manrope/manrope.css')"></noscript>
+        <link rel="preload" href="@asset('assets/js/htmx/core.js')" as="script">
+        <link rel="preload" href="@asset('assets/js/app.js')" as="script">
+        <link rel="preload" href="@asset('animate')" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript>
+            <link rel="stylesheet" href="@asset('animate')" type='text/css'>
+        </noscript>
+        <link rel="preload" href="@asset('grid')" as="style" onload="this.onload=null;this.rel='stylesheet'">
+        <noscript><link rel="stylesheet" href="@asset('grid')" type='text/css'></noscript>
+        <link rel="stylesheet" href="@asset('assets/css/libs/cropper.min.css')" media="print" onload="this.media='all'">
+        {{-- SCSS assets --}}
+        @at('Core/Modules/Admin/Resources/assets/sass/admin.scss')
+
+        <script src="@asset('assets/js/htmx/core.js')" defer></script>
+        <script src="{{ Clickfwd\Yoyo\Services\Configuration::yoyoSrc() }}" defer></script>
+
+        <script src="@asset('assets/js/htmx/head.js')" defer fetchpriority="low"></script>
+        <script src="@asset('assets/js/htmx/idiomorph.js')" defer fetchpriority="low"></script>
+
+        <script src="@asset('assets/js/htmx/loadingState.js')" defer fetchpriority="low"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                @php echo Clickfwd\Yoyo\Services\Configuration::javascriptInitCode(false) @endphp
+            });
+        </script>
+    @endif
+
+    <script>
+        window.u = window.u || function(path) {
+            var base = @json((string) url('/'));
+            if (!path) return base;
+            path = String(path);
+            if (/^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(path) || path.charAt(0) === '#') {
+                return path;
+            }
+            return base.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, '');
+        };
+    </script>
+
+    <script>
+        (function() {
+            function updateThemeColor() {
+                var m = document.querySelector('meta[name="theme-color"]#theme-color-meta');
+                if (!m) {
+                    m = document.createElement('meta');
+                    m.setAttribute('name', 'theme-color');
+                    m.id = 'theme-color-meta';
+                    document.head.appendChild(m)
+                }
+                var bg = getComputedStyle(document.documentElement).getPropertyValue('--background').trim() ||
+                    '#1c1c1e';
+                m.setAttribute('content', bg);
+                var ms1 = document.querySelector('meta[name="msapplication-TileColor"]');
+                if (ms1) {
+                    ms1.setAttribute('content', bg)
+                }
+                var ms2 = document.querySelector('meta[name="msapplication-navbutton-color"]');
+                if (ms2) {
+                    ms2.setAttribute('content', bg)
+                }
+            }
+            var cb = typeof requestIdleCallback === 'function'
+                ? function(fn) { requestIdleCallback(fn) }
+                : function(fn) { setTimeout(fn, 1) };
+            cb(updateThemeColor);
+            var o = new MutationObserver(function() { cb(updateThemeColor) });
+            o.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['data-theme']
+            });
+            window.addEventListener('flute:theme-changed', function() { cb(updateThemeColor) });
+        })();
+    </script>
+</head>
+
+<body hx-ext="head-support, loading-states, morph" @class([
+    'sidebar-collapsed' =>
+        cookie()->get('admin-sidebar-collapsed', 'false') === 'true' &&
+        !user()->device()->isMobile(),
+])>
+    @if (!request()->htmx()->isHtmxRequest())
+        <div class="admin-grid-pattern" aria-hidden="true"></div>
+        <div class="admin-particles" aria-hidden="true">
+            <div class="admin-particle admin-particle--1"></div>
+            <div class="admin-particle admin-particle--2"></div>
+            <div class="admin-particle admin-particle--3"></div>
+            <div class="admin-particle admin-particle--4"></div>
+            <div class="admin-particle admin-particle--5"></div>
+        </div>
+    @endif
+
+    @includeWhen(!request()->htmx()->isHtmxRequest(), 'admin::layouts.sidebar')
+
+    @if (!request()->htmx()->isHtmxRequest())
+        <main>
+    @endif
+    @includeWhen(!request()->htmx()->isHtmxRequest(), 'admin::layouts.header')
+
+    @includeWhen(!request()->htmx()->isHtmxRequest(), 'admin::partials.loader')
+
+    @yield('before-content')
+
+    @if (isset($sections['before-content']))
+        {!! $sections['before-content'] !!}
+    @endif
+
+    @include('admin::partials.flash')
+
+    @if (is_development() && !request()->htmx()->isHtmxRequest())
+        <div class="container mt-2">
+            <x-alert type="warning" onlyBorders withClose="false">
+                {{ __('def.debug_message') }} (development mode)
+            </x-alert>
+        </div>
+    @endif
+
+    <div class="main-animation @if (cookie()->get('container-width', 'normal') === 'wide') container-wide @endif container" id="main"
+        hx-history-elt>
+        @stack('content')
+
+        @if (isset($sections['content']))
+            {!! $sections['content'] !!}
+        @endif
+
+        <footer class="d-flex flex-center flex-column text-muted mb-4 mt-4" hx-swap="none">
+            <p>
+                © {{ date('Y') }} Flute. Version: <strong>{{ app()->getVersion() }}</strong>.
+            </p>
+            <p>Developed by <a class="hover-accent" href="https://github.com/FlamesONE" target="_blank" rel="noopener">Flames</a> with
+                <span class="secret-confetti cursor-pointer" id="secret-confetti">❤️</span>.
+            </p>
+            @php
+                $startTime = microtime(true);
+                $executionTime = round($startTime - FLUTE_START, 2);
+                $times = [];
+
+                foreach (app()->getBootTimes() as $key => $value) {
+                    $key = explode('\\', $key);
+                    $key = end($key);
+                    $key = str_replace('ServiceProvider', '', $key);
+                    $times[] = "[{$key}] {$value}ms";
+                }
+            @endphp
+            <small class="text-muted mt-3">Booted in <strong
+                    data-tooltip="{!! implode('&#10;', array_map('e', $times)) !!}">{{ $executionTime }}</strong> seconds
+
+                @if ($executionTime > 1)
+                    <x-popover content="{!! __('admin.performance_info') !!}" />
+                @endif
+            </small>
+        </footer>
+    </div>
+
+    @includeWhen(!request()->htmx()->isHtmxRequest(), 'admin::layouts.footer')
+    @if (!request()->htmx()->isHtmxRequest())
+        </main>
+    @endif
+
+    @stack('content-after')
+
+    @if (isset($sections['content-after']))
+        {!! $sections['content-after'] !!}
+    @endif
+
+    @if (!request()->htmx()->isHtmxRequest())
+        <div id="alerts-container">
+            @stack('toast-container')
+
+            @if (isset($sections['toast-container']))
+                {!! $sections['toast-container'] !!}
+            @endif
+        </div>
+
+        <x-right-sidebar />
+
+        @include('admin::partials.confirmation')
+        @include('admin::partials.search')
+        @include('admin::partials.scrollup')
+        @include('admin::partials.customization')
+        @include('admin::components.richtext-icons')
+    @endif
+
+    @if (!request()->htmx()->isHtmxRequest())
+        <div class="footer-scripts">
+            @php
+                if (is_debug()) {
+                    Tracy\Debugger::renderLoader();
+                }
+            @endphp
+
+            @stack('footer')
+
+            @if (isset($sections['footer']))
+                {!! $sections['footer'] !!}
+            @endif
+
+        </div>
+
+        <script src="@asset('assets/js/libs/a11y-dialog.js')" defer></script>
+        <script src="@asset('assets/js/libs/floating.js')" defer></script>
+        <script src="@asset('jquery')" defer></script>
+        <script src="@asset('assets/js/app.js')" defer></script>
+        {{-- Prefetch is off in the admin panel: it re-fetched whole screens on
+             hover (/admin/shop/products alone is 61 KB), htmx responses are not
+             browser-cacheable, so it only raced with real clicks and aborted them. --}}
+        <script>
+            (function () {
+                var loaded = {};
+                var registry = {};
+
+                function loadScripts(srcs, callback) {
+                    var index = 0;
+
+                    function next() {
+                        if (index >= srcs.length) {
+                            if (callback) callback();
+                            return;
+                        }
+
+                        var src = srcs[index++];
+                        if (loaded[src]) {
+                            next();
+                            return;
+                        }
+
+                        loaded[src] = true;
+                        var script = document.createElement('script');
+                        script.src = src;
+                        script.defer = true;
+                        script.onload = next;
+                        script.onerror = next;
+                        document.head.appendChild(script);
+                    }
+
+                    next();
+                }
+
+                function matches(root, selector) {
+                    if (!root) return !!document.querySelector(selector);
+                    if (root.matches && root.matches(selector)) return true;
+                    return !!(root.querySelector && root.querySelector(selector));
+                }
+
+                registry.tiptap = {
+                    match: '[data-editor="richtext"]',
+                    srcs: ["@asset('assets/js/libs/tiptap-editor.js')"],
+                    init: function (root) {
+                        if (window.fluteRichTextEditor) {
+                            window.fluteRichTextEditor.initialize(root || document);
+                        }
+                    }
+                };
+
+                registry.pickr = {
+                    match: '[data-pickr-never-match]',
+                    srcs: ["@asset('assets/js/libs/pickr.js')"],
+                    init: function () {}
+                };
+
+                function ensure(key, callback, root) {
+                    var lib = registry[key];
+                    if (!lib) {
+                        if (callback) callback();
+                        return;
+                    }
+
+                    if (lib.done) {
+                        if (callback) callback();
+                        if (lib.init) lib.init(root);
+                        return;
+                    }
+
+                    if (lib.loading) {
+                        lib.callbacks.push({ callback: callback, root: root });
+                        return;
+                    }
+
+                    lib.loading = true;
+                    lib.callbacks = [{ callback: callback, root: root }];
+                    loadScripts(lib.srcs, function () {
+                        lib.done = true;
+                        lib.loading = false;
+                        var callbacks = lib.callbacks || [];
+                        lib.callbacks = [];
+                        callbacks.forEach(function (item) {
+                            if (lib.init) lib.init(item.root);
+                            if (item.callback) item.callback();
+                        });
+                    });
+                }
+
+                function scan(root) {
+                    Object.keys(registry).forEach(function (key) {
+                        var lib = registry[key];
+                        if (!lib.done && matches(root, lib.match)) {
+                            ensure(key, null, root);
+                        }
+                    });
+                }
+
+                window.AdminAssetLoader = {
+                    ensure: ensure,
+                    loadScripts: loadScripts,
+                    scan: scan
+                };
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    scan(document);
+                });
+
+                document.body.addEventListener('htmx:afterSettle', function (event) {
+                    scan(event.detail && event.detail.target ? event.detail.target : event.target);
+                });
+            })();
+        </script>
+        <script src="@asset('assets/js/libs/notyf.js')" defer fetchpriority="low"></script>
+        <script src="@asset('assets/js/libs/nprogress.js')" defer></script>
+        <script src="@asset('assets/js/libs/sortable.js')" defer fetchpriority="low"></script>
+        <script src="@asset('assets/js/libs/flute-select.js')" defer fetchpriority="low"></script>
+        <script src="@asset('assets/js/libs/flatpickr.js')" defer fetchpriority="low"></script>
+        <script src="@asset('assets/js/libs/flatpickr-l10n.js')" defer fetchpriority="low"></script>
+        <script src="@asset('assets/js/libs/pickr.js')" defer fetchpriority="low"></script>
+
+        @at('Core/Modules/Admin/Resources/assets/js/helpers.js')
+        <script>
+            window.__imageCropperI18n = {
+                crop_image: @json(__('def.crop_image')),
+                rotate_left: @json(__('def.rotate_left')),
+                rotate_right: @json(__('def.rotate_right')),
+                flip_horizontal: @json(__('def.flip_horizontal')),
+                flip_vertical: @json(__('def.flip_vertical')),
+                zoom_in: @json(__('def.zoom_in')),
+                zoom_out: @json(__('def.zoom_out')),
+                reset: @json(__('def.reset')),
+                cancel: @json(__('def.cancel')),
+                apply: @json(__('def.apply')),
+                free: @json(__('def.free')),
+                square: @json(__('def.square')),
+                landscape: @json(__('def.landscape')),
+                portrait: @json(__('def.portrait'))
+            };
+        </script>
+        @at('Core/Modules/Admin/Resources/assets/js/image-cropper.js')
+        @at('Core/Modules/Admin/Resources/assets/js/modals.js')
+        @at('Core/Modules/Admin/Resources/assets/js/tabs.js')
+        @at('Core/Modules/Admin/Resources/assets/js/popover.js')
+        @at('Core/Modules/Admin/Resources/assets/js/columns.js')
+        @at('Core/Modules/Admin/Resources/assets/js/selection.js')
+        @at('Core/Modules/Admin/Resources/assets/js/script.js')
+        @at('Core/Modules/Admin/Resources/assets/js/sidebar.js')
+        @at('Core/Modules/Admin/Resources/assets/js/sidebar-sort.js')
+        @at('Core/Modules/Admin/Resources/assets/js/sortable.js')
+        @at('Core/Modules/Admin/Resources/assets/js/search.js')
+        @at('Core/Modules/Admin/Resources/assets/js/secret.js')
+        @at('Core/Modules/Admin/Resources/assets/js/scrollup.js')
+        @at('Core/Modules/Admin/Resources/assets/js/select.js')
+        @at('Core/Modules/Admin/Resources/assets/js/file-upload.js')
+        @at('Core/Modules/Admin/Resources/assets/js/table-search.js')
+        {{-- Richtext editor (TipTap) --}}
+        @at('Core/Modules/Admin/Resources/assets/js/richtext/icons.js')
+        @at('Core/Modules/Admin/Resources/assets/js/richtext/extensions.js')
+        @at('Core/Modules/Admin/Resources/assets/js/richtext/upload.js')
+        @at('Core/Modules/Admin/Resources/assets/js/richtext/toolbar.js')
+        @at('Core/Modules/Admin/Resources/assets/js/richtext/modals.js')
+        @at('Core/Modules/Admin/Resources/assets/js/richtext/bubble-menu.js')
+        @at('Core/Modules/Admin/Resources/assets/js/richtext/table-controls.js')
+        @at('Core/Modules/Admin/Resources/assets/js/richtext/main.js')
+        @at('Core/Modules/Admin/Resources/assets/js/customization.js')
+        @at('Core/Modules/Admin/Resources/assets/js/confirm.js')
+        @at('Core/Modules/Admin/Resources/assets/js/datepicker.js')
+        @at('Core/Modules/Admin/Resources/assets/js/input.js')
+        @at('Core/Modules/Admin/Resources/assets/js/buttongroup.js')
+        @at('Core/Modules/Admin/Resources/assets/js/radiocards.js')
+        @at('Core/Modules/Admin/Resources/assets/js/translatable.js')
+        @at('Core/Modules/Admin/Resources/assets/js/filters.js')
+
+        @if (!cookie()->get('admin_onboarding_done'))
+            @include('admin-dashboard::components.onboarding')
+            <script src="@asset('assets/js/libs/shepherd.js')" defer></script>
+            <script src="@at('Core/Modules/Admin/Resources/assets/js/onboarding.js', true)"></script>
+        @endif
+
+        @include('admin::partials.toasts')
+
+        @stack('scripts')
+
+        @if (isset($sections['scripts']))
+            {!! $sections['scripts'] !!}
+        @endif
+
+        <script>
+            (function() {
+                var b = document.body, t = 80, expanded = false;
+                window.addEventListener('scroll', function() {
+                    var top = window.scrollY < t;
+                    if (top !== expanded) {
+                        expanded = top;
+                        b.classList.toggle('glow-expanded', top);
+                    }
+                }, { passive: true });
+                if (window.scrollY < t) b.classList.add('glow-expanded');
+            })();
+        </script>
+    @endif
+</body>
+
+</html>

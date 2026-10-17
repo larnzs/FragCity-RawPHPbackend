@@ -1,0 +1,35 @@
+.database-step {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .db-form {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .db-form__row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+
+        @media (max-width: 640px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .db-form__row-3 {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 14px;
+
+        @media (max-width: 640px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .alert {
+        margin-bottom: 0;
+    }
+}

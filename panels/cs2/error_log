@@ -1,6 +1,0 @@
-[05-Aug-2026 19:37:30 Asia/Tehran] PHP Parse error:  syntax error, unexpected token ":", expecting "]" in /home3/kyonxcbt/public_html/panels/cs2/console.php on line 45
-[05-Aug-2026 19:37:38 Asia/Tehran] PHP Parse error:  syntax error, unexpected token ":", expecting "]" in /home3/kyonxcbt/public_html/panels/cs2/console.php on line 45
-[05-Aug-2026 19:49:17 Asia/Tehran] PHP Parse error:  syntax error, unexpected token ":", expecting "]" in /home3/kyonxcbt/public_html/panels/cs2/console.php on line 45
-[05-Aug-2026 19:49:19 Asia/Tehran] PHP Parse error:  syntax error, unexpected token ":", expecting "]" in /home3/kyonxcbt/public_html/panels/cs2/console.php on line 45
-[05-Aug-2026 22:11:43 Asia/Tehran] PHP Warning:  Undefined array key "console_title" in /home3/kyonxcbt/public_html/panels/cs2/console.php on line 438
-[05-Aug-2026 22:15:36 Asia/Tehran] PHP Parse error:  syntax error, unexpected end of file in /home3/kyonxcbt/public_html/panels/cs2/servers.php on line 363

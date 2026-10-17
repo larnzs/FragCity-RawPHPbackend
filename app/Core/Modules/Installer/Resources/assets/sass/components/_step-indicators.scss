@@ -1,0 +1,77 @@
+.step-nav {
+    display: flex;
+    align-items: center;
+    gap: 0;
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    &__dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--installer-surface3);
+        border: 1.5px solid var(--installer-border);
+        transition: all 0.3s var(--ease-out);
+        flex-shrink: 0;
+    }
+
+    &__label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--installer-muted);
+        white-space: nowrap;
+        transition: color 0.3s;
+
+        @media (max-width: 768px) {
+            display: none;
+        }
+    }
+
+    &__line {
+        width: 20px;
+        height: 1px;
+        background: var(--installer-border);
+        margin: 0 8px;
+        flex-shrink: 0;
+        transition: background 0.3s;
+
+        @media (max-width: 768px) {
+            width: 12px;
+            margin: 0 6px;
+        }
+    }
+
+    // ── Active ──
+    .step-nav__item.is-active {
+        .step-nav__dot {
+            background: var(--accent);
+            border-color: var(--accent);
+            box-shadow: 0 0 8px rgba(165, 255, 117, 0.25);
+        }
+
+        .step-nav__label {
+            color: var(--installer-text);
+        }
+    }
+
+    // ── Done ──
+    .step-nav__item.is-done {
+        .step-nav__dot {
+            background: rgba(165, 255, 117, 0.2);
+            border-color: rgba(165, 255, 117, 0.35);
+        }
+
+        .step-nav__label {
+            color: var(--installer-muted-light);
+        }
+
+        // Line after done item
+        + .step-nav__line {
+            background: rgba(165, 255, 117, 0.15);
+        }
+    }
+}

@@ -1,0 +1,114 @@
+[data-dropdown] {
+    @extend .card;
+    background-color: var(--blurred-background);
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    @include transition(all);
+    transform-origin: top center;
+    transform: scale(0.96);
+    z-index: 10001;
+    display: none;
+    padding: var(--space-xs);
+    min-width: 200px;
+    animation: animDropdownOut 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    display: none;
+    overflow: visible;
+
+    >a {
+        @extend .d-flex, .flex-column;
+        gap: var(--space-2xs);
+    }
+
+    >a,
+    button {
+        display: flex;
+        flex-direction: row;
+        gap: var(--space-sm);
+        align-items: center;
+        padding: var(--space-xs) var(--space-sm);
+        border-radius: var(--border05);
+        @include transition(all);
+        width: 100%;
+
+        &:hover {
+            background-color: var(--transp-1);
+        }
+    }
+
+    &.active {
+        opacity: 1;
+        visibility: visible;
+        animation: animDropdown 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .arrow {
+        position: absolute;
+        width: var(--space-sm);
+        height: var(--space-sm);
+        background: inherit;
+        border-top: 1px solid var(--transp-1);
+        border-left: 1px solid var(--transp-1);
+        transform: rotate(45deg);
+        z-index: -1;
+        animation: animArrow 0.2s ease forwards;
+        opacity: 0;
+    }
+
+    &.admin-dropdown {
+        min-width: 60px;
+    }
+
+    .dropdown-item {
+        border-width: 0px;
+        box-shadow: none;
+        justify-content: flex-start;
+
+        &:hover {
+            background-color: var(--transp-1) !important;
+        }
+    }
+}
+
+@keyframes animDropdown {
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+        filter: blur(2px);
+    }
+
+    30% {
+        opacity: 1;
+        filter: blur(0);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes animDropdownOut {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(0.98);
+        opacity: 0;
+    }
+}
+
+@keyframes animArrow {
+    0% {
+        opacity: 0;
+        transform: rotate(45deg) scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: rotate(45deg) scale(1);
+    }
+}

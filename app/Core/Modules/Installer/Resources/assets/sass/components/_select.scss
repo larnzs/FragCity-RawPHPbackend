@@ -1,0 +1,315 @@
+.select {
+    &-wrapper {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        width: 100%;
+    }
+
+    &__prefix {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--installer-text-secondary);
+        margin-bottom: 6px;
+        text-align: left;
+    }
+
+    &__field-container {
+        position: relative;
+        width: 100%;
+
+        &.has-error .fs__trigger,
+        &.has-error .select__field {
+            border-color: var(--installer-error);
+        }
+    }
+
+    &__field {
+        font: inherit;
+        outline: 0;
+        border: 0;
+        padding: 0;
+        margin: 0;
+        flex: 1;
+        background-color: transparent;
+        color: inherit;
+        width: 100%;
+        appearance: none;
+    }
+
+    &__error {
+        color: var(--installer-error);
+        font-size: 12px;
+        margin-top: 4px;
+    }
+}
+
+select[data-tom-select] {
+    display: none;
+}
+
+.fs {
+    width: 100%;
+    display: flex;
+    min-width: 0;
+
+    --fs-bg: transparent;
+    --fs-bg-popover: rgba(17, 17, 19, 0.98);
+    --fs-bg-hover: rgba(255, 255, 255, 0.06);
+    --fs-bg-highlight: rgba(255, 255, 255, 0.08);
+    --fs-bg-accent: var(--accent);
+    --fs-bg-accent-hover: var(--accent-hover, var(--accent));
+    --fs-border: var(--installer-border2);
+    --fs-border-focus: var(--installer-border-hover);
+    --fs-ring: rgba(165, 255, 117, 0.16);
+    --fs-text: var(--installer-text);
+    --fs-text-muted: var(--installer-muted-light);
+    --fs-text-placeholder: var(--installer-muted);
+    --fs-radius-popover: var(--radius-lg);
+    --fs-radius-option: var(--radius-sm);
+    --fs-radius-input: var(--radius-sm);
+    --fs-shadow: var(--shadow-lg), 0 0 0 1px rgba(255, 255, 255, 0.06);
+    --fs-z-index: 10000;
+}
+
+.fs__trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 45px;
+    padding: 10px 0;
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid var(--installer-border2);
+    border-radius: 0;
+    color: var(--installer-text);
+    font: inherit;
+    cursor: pointer;
+    outline: none;
+    text-align: left;
+    transition:
+        border-color 0.2s var(--ease-out),
+        box-shadow 0.2s var(--ease-out);
+
+    &:hover {
+        border-color: var(--installer-border-hover);
+    }
+
+    &:focus-visible,
+    .fs--open & {
+        border-color: var(--accent);
+        box-shadow: 0 2px 0 0 rgba(165, 255, 117, 0.3);
+    }
+}
+
+.fs__trigger-label {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fs__trigger-label--empty {
+    color: var(--installer-muted);
+}
+
+.fs__trigger-arrow,
+.fs__trigger-clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--installer-muted-light);
+}
+
+.fs__trigger-arrow {
+    opacity: 0.7;
+
+    svg {
+        width: 14px;
+        height: 14px;
+        transition: transform 0.15s var(--ease-out);
+    }
+}
+
+.fs--open .fs__trigger-arrow svg {
+    transform: rotate(180deg);
+}
+
+.fs__trigger-clear {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+
+    &:hover {
+        background: var(--fs-bg-hover);
+        color: var(--installer-text);
+    }
+}
+
+.fs__dropdown {
+    position: absolute;
+    z-index: var(--fs-z-index);
+    min-width: 180px;
+    max-height: min(320px, calc(100vh - 24px));
+    background: var(--fs-bg-popover);
+    border: 1px solid var(--fs-border);
+    border-radius: var(--fs-radius-popover);
+    box-shadow: var(--fs-shadow);
+    color: var(--fs-text);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px) scale(0.98);
+    transform-origin: top center;
+    transition:
+        opacity 0.1s ease,
+        transform 0.1s ease,
+        visibility 0s 0.1s;
+    pointer-events: none;
+    font-size: 13px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+.fs__dropdown--open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    transition:
+        opacity 0.1s ease,
+        transform 0.1s ease,
+        visibility 0s;
+}
+
+.fs__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    flex-shrink: 0;
+}
+
+.fs__search-icon {
+    position: absolute;
+    left: 20px;
+    color: var(--installer-muted);
+    pointer-events: none;
+    opacity: 0.7;
+
+    svg {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+.fs__search-input {
+    width: 100%;
+    padding: 9px 10px 9px 34px;
+    border: 1px solid var(--installer-border2);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--installer-text);
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+    transition:
+        border-color 0.15s var(--ease-out),
+        background-color 0.15s var(--ease-out),
+        box-shadow 0.15s var(--ease-out);
+
+    &::placeholder {
+        color: var(--installer-muted);
+    }
+
+    &:focus {
+        border-color: var(--accent);
+        background: rgba(255, 255, 255, 0.02);
+        box-shadow: 0 0 0 3px rgba(165, 255, 117, 0.08);
+    }
+}
+
+.fs__list {
+    position: relative;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 6px;
+    flex: 1;
+    min-height: 0;
+    scrollbar-width: thin;
+    scrollbar-color: var(--installer-border2) transparent;
+}
+
+.fs__option {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    user-select: none;
+    color: var(--installer-text);
+    transition: background-color 0.08s ease;
+}
+
+.fs__option:hover,
+.fs__option--highlighted {
+    background: var(--fs-bg-highlight);
+}
+
+.fs__option--selected {
+    background: rgba(165, 255, 117, 0.12);
+    color: var(--accent);
+}
+
+.fs__option-content,
+.fs__option-text {
+    min-width: 0;
+    flex: 1;
+}
+
+.fs__option-label {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.fs__option-check {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.fs__status {
+    padding: 16px 10px;
+    color: var(--installer-muted-light);
+    text-align: center;
+}
+
+.fs__wrapper {
+    position: fixed;
+    z-index: var(--fs-z-index);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.fs__wrapper > .fs__dropdown {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    max-height: 100%;
+    transform: none;
+    transition: none;
+}

@@ -1,0 +1,78 @@
+@font-face {
+    font-family: 'Manrope';
+    src: local('Manrope Regular'), local('Manrope-Regular'),
+        url('Manrope-Regular.woff2') format('woff2'),
+        url('Manrope-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: local('Manrope Medium'), local('Manrope-Medium'),
+        url('Manrope-Medium.woff2') format('woff2'),
+        url('Manrope-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: local('Manrope Semibold'), local('Manrope-Semibold'),
+        url('Manrope-Semibold.woff2') format('woff2'),
+        url('Manrope-Semibold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: local('Manrope Bold'), local('Manrope-Bold'),
+        url('Manrope-Bold.woff2') format('woff2'),
+        url('Manrope-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: local('Manrope Light'), local('Manrope-Light'),
+        url('Manrope-Light.woff2') format('woff2'),
+        url('Manrope-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: optional;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: local('Manrope Thin'), local('Manrope-Thin'),
+        url('Manrope-Thin.woff2') format('woff2'),
+        url('Manrope-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: optional;
+}
+
+@font-face {
+    font-family: 'Manrope';
+    src: local('Manrope ExtraBold'), local('Manrope-ExtraBold'),
+        url('Manrope-ExtraBold.woff2') format('woff2'),
+        url('Manrope-ExtraBold.woff') format('woff');
+    font-weight: 800;
+    font-style: normal;
+    font-display: optional;
+}
+
+@font-face {
+    font-family: 'Manrope Fallback';
+    src: local('Arial'), local('Helvetica Neue'), local('sans-serif');
+    size-adjust: 104%;
+    ascent-override: 100%;
+    descent-override: 22%;
+    line-gap-override: 0%;
+}

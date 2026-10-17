@@ -1,0 +1,373 @@
+<?php
+
+namespace Flute\Core\Database\Entities;
+
+use Cycle\ActiveRecord\ActiveRecord;
+use Cycle\Annotated\Annotation\Column;
+use Cycle\Annotated\Annotation\Entity;
+use Cycle\Annotated\Annotation\Relation\HasMany;
+use Cycle\Annotated\Annotation\Relation\ManyToMany;
+use Cycle\Annotated\Annotation\Table;
+use Cycle\Annotated\Annotation\Table\Index;
+use Cycle\ORM\Entity\Behavior;
+
+#[Entity(repository: "Flute\Core\Database\Repositories\UserRepository")]
+#[Table(
+    indexes: [
+        new Index(columns: ["name"]),
+        new Index(columns: ["login"], unique: true),
+        new Index(columns: ["uri"], unique: true),
+        new Index(columns: ["email"], unique: true),
+        new Index(columns: ["last_logged", "hidden"]),
+        new Index(columns: ["hidden"]),
+        new Index(columns: ["created_at"])
+    ]
+)]
+#[Behavior\CreatedAt(
+    field: 'createdAt',
+    column: 'created_at'
+)]
+#[Behavior\UpdatedAt(
+    field: 'updatedAt',
+    column: 'updated_at'
+)]
+class User extends ActiveRecord
+{
+    protected const IS_ONLINE_TIME = 600;
+
+    #[Column(type: "primary")]
+    public int $id;
+
+    #[Column(type: "string", nullable: true)]
+    public ?string $login = null;
+
+    #[Column(type: "string", nullable: true)]
+    public ?string $uri = null;
+
+    #[Column(type: "string")]
+    public string $name;
+
+    #[Column(type: "string", nullable: true)]
+    public ?string $avatar = null;
+
+    #[Column(type: "string", nullable: true)]
+    public ?string $banner = null;
+
+    #[Column(type: "string", nullable: true)]
+    public ?string $email = null;
+
+    #[Column(type: "string", nullable: true)]
+    public ?string $pendingEmail = null;
+
+    #[Column(type: "string", nullable: true)]
+    public ?string $password = null;
+
+    #[Column(type: "boolean", default: false)]
+    public bool $verified = false;
+
+    #[Column(type: "boolean", default: false)]
+    public bool $approved = false;
+
+    #[Column(type: "boolean", default: false)]
+    public bool $hidden = false;
+
+    #[Column(type: "boolean", default: false)]
+    public bool $isTemporary = false;
+
+    #[Column(type: "decimal(10,2)")]
+    public float $balance = 0;
+
+    #[HasMany(target: "UserSocialNetwork", cascade: true)]
+    public array $socialNetworks = [];
+
+    #[ManyToMany(target: "Role", through: "UserRole", cascade: true)]
+    public array $roles = [];
+
+    #[HasMany(target: "RememberToken", cascade: true)]
+    public array $rememberTokens = [];
+
+    #[HasMany(target: "UserDevice", cascade: true)]
+    public array $userDevices = [];
+
+    #[HasMany(target: "UserBlock", innerKey: "id", outerKey: "blockedBy_id", cascade: true)]
+    public array $blocksGiven = [];
+
+    #[HasMany(target: "UserBlock", innerKey: "id", outerKey: "user_id", cascade: true)]
+    public array $blocksReceived = [];
+
+    #[HasMany(target: "UserActionLog", cascade: true)]
+    public array $actionLogs = [];
+
+    #[HasMany(target: "PaymentInvoice", cascade: true)]
+    public array $invoices = [];
+
+    #[Column(type: "datetime")]
+    public \DateTimeImmutable $createdAt;
+
+    #[Column(type: "datetime", nullable: true)]
+    public ?\DateTimeImmutable $updatedAt = null;
+    
+    #[Column(type: "datetime", nullable: true)]
+    public ?\DateTimeImmutable $last_logged = null;
+
+    #[Column(type: "datetime", nullable: true)]
+    public ?\DateTimeImmutable $password_updated_at = null;
+
+    #[Column(type: 'datetime', nullable: true)]
+    public ?\DateTimeImmutable $deletedAt = null;
+
+    #[Column(type: "string", nullable: true)]
+    public ?string $two_factor_secret = null;
+
+    #[Column(type: "text", nullable: true)]
+    public ?string $two_factor_recovery_codes = null;
+
+    #[Column(type: "datetime", nullable: true)]
+    public ?\DateTimeImmutable $two_factor_confirmed_at = null;
+
+    /** @var array<string,true>|null Lazy-built index for O(1) hasRole() lookups */
+    private ?array $rolesIndex = null;
+
+    /** @var array<string,true>|null Lazy-built index for O(1) hasPermission() lookups */
+    private ?array $permissionsIndex = null;
+
+    public function __construct()
+    {
+        $this->last_logged = new \DateTimeImmutable();
+    }
+
+    public function addRole(Role $role) : void
+    {
+        if (! in_array($role, $this->roles, true)) {
+            $this->roles[] = $role;
+            $this->rolesIndex = null;
+            $this->permissionsIndex = null;
+        }
+    }
+
+    public function removeRole(Role $role) : void
+    {
+        $this->roles = array_filter(
+            $this->roles,
+            fn ($r) => $r !== $role
+        );
+        $this->rolesIndex = null;
+        $this->permissionsIndex = null;
+    }
+
+    public function clearRoles() : void
+    {
+        $this->roles = [];
+        $this->rolesIndex = null;
+        $this->permissionsIndex = null;
+    }
+
+    public function hasRole(string $roleName) : bool
+    {
+        if ($this->rolesIndex === null) {
+            $this->rolesIndex = [];
+            foreach ($this->roles as $role) {
+                $this->rolesIndex[$role->name] = true;
+            }
+        }
+        return isset($this->rolesIndex[$roleName]);
+    }
+
+    public function setPassword(string $password) : void
+    {
+        $this->password = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+        $this->password_updated_at = new \DateTimeImmutable();
+    }
+
+    public function jsonSerialize() : array
+    {
+        $user = get_object_vars($this);
+        unset($user['password']);
+        return $user;
+    }
+
+    public function hasPermission(string $permissionName) : bool
+    {
+        if ($this->permissionsIndex === null) {
+            $this->permissionsIndex = [];
+            foreach ($this->roles as $role) {
+                foreach ($role->permissions as $permission) {
+                    $this->permissionsIndex[$permission->name] = true;
+                }
+            }
+        }
+        return isset($this->permissionsIndex[$permissionName]);
+    }
+
+    public function getPermissions()
+    {
+        $permissions = [];
+
+        foreach ($this->roles as $role) {
+            foreach ($role->permissions as $permission) {
+                $permissions[$permission->id] = $permission;
+            }
+        }
+
+        return array_values($permissions);
+    }
+
+    public function getSocialNetwork(string $socialNetworkName) : ?UserSocialNetwork
+    {
+        foreach ($this->socialNetworks as $socialNetwork) {
+            if ($socialNetwork->socialNetwork?->key === $socialNetworkName) {
+                return $socialNetwork;
+            }
+        }
+        return null;
+    }
+
+    public function hasSocialNetwork(string $socialNetworkName) : bool
+    {
+        foreach ($this->socialNetworks as $socialNetwork) {
+            if ($socialNetwork->socialNetwork?->key === $socialNetworkName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function removeSocialNetwork(string $socialNetworkName) : void
+    {
+        $this->socialNetworks = array_filter(
+            $this->socialNetworks,
+            fn ($socialNetwork) => $socialNetwork->socialNetwork?->key !== $socialNetworkName
+        );
+    }
+
+    public function addSocialNetwork(UserSocialNetwork $socialNetwork) : void
+    {
+        $this->socialNetworks[] = $socialNetwork;
+    }
+
+    /**
+     * Get the rendered username HTML with all decorators (badges, icons, tags).
+     *
+     * @param bool $withColor Apply role color styling
+     * @param bool $link      Wrap name in a profile link
+     * @param string $class   Additional CSS class for the wrapper
+     */
+    public function getDisplayName(string $class = '', bool $withColor = true, bool $link = false) : string
+    {
+        try {
+            return app(\Flute\Core\Services\UserNameRenderer::class)->render($this, $class, $withColor, $link);
+        } catch (\Throwable $e) {
+            return e($this->name);
+        }
+    }
+
+    public function getUrl() : string
+    {
+        return ! empty($this->uri) ? $this->uri : (string) $this->id;
+    }
+
+    /**
+     * Roles ordered by display priority, highest first.
+     *
+     * @return Role[]
+     */
+    public function getSortedRoles() : array
+    {
+        $roles = array_values($this->roles ?? []);
+
+        usort($roles, static function (Role $a, Role $b) : int {
+            $priorityCompare = $b->priority <=> $a->priority;
+
+            if ($priorityCompare !== 0) {
+                return $priorityCompare;
+            }
+
+            return ($a->id ?? 0) <=> ($b->id ?? 0);
+        });
+
+        return $roles;
+    }
+
+    public function getPrimaryRole() : ?Role
+    {
+        return $this->getSortedRoles()[0] ?? null;
+    }
+
+    public function isOnline() : bool
+    {
+        $now = new \DateTimeImmutable();
+        $lastLogged = $this->last_logged instanceof \DateTimeImmutable ? $this->last_logged : ($this->last_logged ? new \DateTimeImmutable($this->last_logged) : null);
+        if ($lastLogged === null) {
+            return false;
+        }
+        $interval = $now->getTimestamp() - $lastLogged->getTimestamp();
+        return $interval <= self::IS_ONLINE_TIME;
+    }
+
+    public function isBlocked() : bool
+    {
+        $now = new \DateTimeImmutable();
+        foreach ($this->blocksReceived as $block) {
+            $blockedUntil = $block->blockedUntil;
+
+            if ($blockedUntil === null || $blockedUntil > $now) {
+                if ($block->isActive) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function getBlockInfo() : ?array
+    {
+        $now = new \DateTimeImmutable();
+        foreach ($this->blocksReceived as $block) {
+            if (! $block->isActive) {
+                continue;
+            }
+
+            $blockedUntil = $block->blockedUntil;
+
+            if ($blockedUntil === null || $blockedUntil > $now) {
+                return [
+                    'reason' => $block->reason,
+                    'blockedBy' => $block->blockedBy,
+                    'blockedFrom' => $block->blockedFrom,
+                    'blockedUntil' => $block->blockedUntil,
+                ];
+            }
+        }
+        return null;
+    }
+
+    public function isTemporary() : bool
+    {
+        return $this->isTemporary;
+    }
+
+    public function getMainRole() : ?string
+    {
+        return $this->getPrimaryRole()?->name;
+    }
+
+    public function getLastLoggedPhrase() : string
+    {
+        if(!$this->last_logged) {
+            return __('def.not_online');
+        }
+
+        $lastLogged = carbon($this->last_logged);
+
+        if($lastLogged->diffInMonths() > 3) {
+            return __('def.not_online');
+        }
+
+        return $lastLogged->diffForHumans();
+    }
+
+    public function hasTwoFactorEnabled() : bool
+    {
+        return !empty($this->two_factor_secret) && $this->two_factor_confirmed_at !== null;
+    }
+}

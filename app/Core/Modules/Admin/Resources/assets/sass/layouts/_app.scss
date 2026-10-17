@@ -1,0 +1,195 @@
+body {
+    background: var(--background);
+    margin-left: 260px;
+    min-height: 100vh;
+    transition: margin-left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+
+    &::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background:
+            radial-gradient(circle 500px at 50% -100px, color-mix(in srgb, var(--accent) 10%, transparent), transparent),
+            radial-gradient(circle 350px at 90% 50px, color-mix(in srgb, var(--accent) 5%, transparent), transparent);
+        pointer-events: none;
+    }
+
+    &::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        background: radial-gradient(circle 700px at 50% -50px, color-mix(in srgb, var(--accent) 14%, transparent), transparent);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    &.glow-expanded::after {
+        opacity: 1;
+    }
+
+    @include media(mobile) {
+        margin-left: 0;
+    }
+
+    &.sidebar-collapsed {
+        margin-left: 68px;
+
+        @include media(mobile) {
+            margin-left: 0;
+        }
+    }
+
+    main {
+        width: 100%;
+        transition: .2s cubic-bezier(0.4, 0, 0.2, 1);
+        padding-top: 64px;
+
+        &.container-wide {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+    }
+}
+
+main.content {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 64px);
+    padding-top: 64px;
+    padding-bottom: 2rem;
+}
+
+.content-body {
+    flex: 1;
+}
+
+.admin-header+main.content {
+    min-height: calc(100vh - 64px);
+}
+
+.container-wide {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 2rem;
+    padding-right: 2rem;
+
+    @include media(mobile) {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+.page-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+
+    &__title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text);
+        line-height: 1.2;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+}
+
+.base-legend {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    position: sticky;
+    top: 64px;
+    z-index: 50;
+    padding: 12px 0;
+    margin-top: -12px;
+    transition: all 0.2s ease;
+
+    @media(min-width: 992px) {
+        &.is-stuck {
+            background: var(--blurred-background);
+            backdrop-filter: blur(12px);
+            padding: 12px;
+            border-bottom-left-radius: var(--border1);
+            border-bottom-right-radius: var(--border1);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    }
+
+    @include media(mobile) {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+        top: 0;
+        position: relative;
+
+        >ul {
+            width: 100%;
+
+            a,
+            button {
+                width: 100%;
+            }
+        }
+    }
+}
+
+.icon-container {
+    border-radius: 50%;
+    background-color: var(--transp-1);
+    padding: 10px;
+}
+
+.admin-grid-pattern {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: radial-gradient(circle, var(--text-400) 1px, transparent 1px);
+    background-size: 24px 24px;
+    opacity: 0.15;
+    mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 100%);
+
+    :root[data-theme=light] & {
+        opacity: 0.08;
+    }
+}
+
+.admin-particles {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.admin-particle {
+    position: absolute;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+    will-change: transform, opacity;
+}

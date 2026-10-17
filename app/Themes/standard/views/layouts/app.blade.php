@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+@php
+    $_currentThemeMode = config('app.change_theme', true)
+        ? cookie()->get('theme', config('app.default_theme', 'dark'))
+        : config('app.default_theme', 'dark');
+    $_themeColors = app('flute.view.manager')->getColors($_currentThemeMode);
+    $_navStyle = $_themeColors['--nav-style'] ?? 'default';
+    $_sidebarStyle = $_themeColors['--sidebar-style'] ?? 'default';
+    $_sidebarMode = $_themeColors['--sidebar-mode'] ?? 'full';
+    $_sidebarPosition = $_themeColors['--sidebar-position'] ?? 'top';
+    $_sidebarCollapsed = cookie()->get('sidebar_collapsed', 'false');
+    $_sidebarContained = $_themeColors['--sidebar-contained'] ?? 'false';
+    $_sidebarMiniLabels = $_themeColors['--sidebar-mini-labels'] ?? 'text';
+    $_designPreset = $_themeColors['--design-preset'] ?? 'default';
+    $_tabbarLimit = 4;
+    $_mobileNavMode = navbar()->mobileNavMode($_tabbarLimit);
+@endphp
+<html lang="{{ strtolower(app()->getLang()) }}" data-theme="{{ $_currentThemeMode }}" data-nav-style="{{ $_navStyle }}"
+    data-sidebar-style="{{ $_sidebarStyle }}" data-sidebar-mode="{{ $_sidebarMode }}"
+    data-sidebar-position="{{ $_sidebarPosition }}" data-sidebar-collapsed="{{ $_sidebarCollapsed }}"
+    data-sidebar-contained="{{ $_sidebarContained }}" data-sidebar-mini-labels="{{ $_sidebarMiniLabels }}"
+    data-design-preset="{{ $_designPreset }}"
+    data-mobile-nav-mode="{{ $_mobileNavMode }}">
+
+<head hx-head="append">
+    @php
+        // --- Title ---
+        $_final_title = page()->title;
+        if (empty($_final_title) && \Illuminate\Support\Facades\View::hasSection('title')) {
+            $_final_title = trim(\Illuminate\Support\Facades\View::yieldContent('title'));
+        }
+        if (empty($_final_title)) {
+            $_final_title = config('app.name');
+        }
+        $_final_title = __($_final_title);
+
+        // --- Description ---
+        $_final_description = page()->description;
+        if (empty($_final_description) && \Illuminate\Support\Facades\View::hasSection('description')) {
+            $_final_description = trim(\Illuminate\Support\Facades\View::yieldContent('description'));
+        }
+        if (empty($_final_description)) {
+            $_final_description = config('app.description');
+        }
+        $_final_description = __($_final_description);
+
+        // --- Keywords ---
+        $_final_keywords = page()->keywords;
+        if (empty($_final_keywords) && \Illuminate\Support\Facades\View::hasSection('keywords')) {
+            $_final_keywords = trim(\Illuminate\Support\Facades\View::yieldContent('keywords'));
+        }
+        if (empty($_final_keywords)) {
+            $_final_keywords = config('app.keywords');
+        }
+
+        // --- Robots ---
+        if (config('app.maintenance_mode')) {
+            $_final_robots = 'noindex, nofollow';
+        } else {
+            $_final_robots = page()->robots;
+            if (empty($_final_robots) && \Illuminate\Support\Facades\View::hasSection('robots')) {
+                $_final_robots = trim(\Illuminate\Support\Facades\View::yieldContent('robots'));
+            }
+            if (empty($_final_robots)) {
+                $_final_robots = config('app.robots', 'index, follow');
+            }
+        }
+
+        // --- OG Image ---
+        $_final_og_image = page()->og_image;
+        if (empty($_final_og_image) && \Illuminate\Support\Facades\View::hasSection('og_image')) {
+            $_final_og_image = trim(\Illuminate\Support\Facades\View::yieldContent('og_image'));
+        }
+        if (empty($_final_og_image)) {
+            $_final_og_image = asset('assets/img/social-image.png');
+        }
+
+        // --- Twitter Image ---
+        $_final_twitter_image = page()->og_image;
+        if (empty($_final_twitter_image) && \Illuminate\Support\Facades\View::hasSection('twitter_image')) {
+            $_final_twitter_image = trim(\Illuminate\Support\Facades\View::yieldContent('twitter_image'));
+        }
+        if (empty($_final_twitter_image)) {
+            $_final_twitter_image = asset('assets/img/social-image.png');
+        }
+
+        $isPartialRequest = request()->htmx()->omitsLayoutShell();
+
+        // --- Theme colors ---
+        $__colors = app('flute.view.manager')->getColors();
+        $lightThemeBg = $__colors['light']['--background'] ?? '#ffffff';
+        $darkThemeBg = $__colors['dark']['--background'] ?? '#1c1c1e';
+        $currentTheme = config('app.change_theme', true)
+            ? cookie()->get('theme', config('app.default_theme', 'dark'))
+            : config('app.default_theme', 'dark');
+        $currentThemeBg = $currentTheme === 'light' ? $lightThemeBg : $darkThemeBg;
+    @endphp
+    <title>
+        {{ $_final_title }}
+    </title>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport"
+        content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, user-scalable=no, viewport-fit=cover">
+    <meta name="view-transition" content="same-origin">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="auth" id="auth" content="{{ user()->isLoggedIn() ? 'true' : 'false' }}">
+    <meta name="state-token"
+        content="{{ md5(user()->isLoggedIn() . '_' . (user()->isLoggedIn() ? user()->id : '')) }}">
+    <meta name="google" content="notranslate" />
+    <meta name="default-theme" content="{{ config('app.default_theme', 'dark') }}">
+    <meta name="change-theme" content="{{ config('app.change_theme', true) ? 'true' : 'false' }}">
+    <meta name="description" content="{{ $_final_description }}">
+    <meta name="keywords" content="{{ $_final_keywords }}">
+    <meta name="robots" content="{{ $_final_robots }}">
+    <meta name="author" content="Flames">
+    <meta name="application-name" content="{{ config('app.name') }}">
+    <meta name="apple-mobile-web-app-title" content="{{ config('app.name') }}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="color-scheme" content="dark light">
+    <meta name="supported-color-schemes" content="dark light">
+    <meta name="msapplication-TileColor" content="{{ $currentThemeBg }}">
+    <meta name="msapplication-navbutton-color" content="{{ $currentThemeBg }}">
+    <meta name="theme-color" id="theme-color-meta" content="{{ $currentThemeBg }}">
+    <meta name="theme-color" content="{{ $lightThemeBg }}" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="{{ $darkThemeBg }}" media="(prefers-color-scheme: dark)">
+
+    <meta property="og:title" content="{{ $_final_title }}">
+    <meta property="og:description" content="{{ $_final_description }}">
+    <meta property="og:image" content="{{ $_final_og_image }}">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:site_name" content="{{ config('app.name') }}">
+    <meta property="og:locale" content="{{ strtolower(app()->getLang()) }}">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $_final_title }}">
+    <meta name="twitter:description" content="{{ $_final_description }}">
+    <meta name="twitter:image" content="{{ $_final_twitter_image }}">
+
+    <meta name="htmx-config"
+        content='{
+        "defaultFocusScroll": false,
+        "scrollIntoViewOnBoost": false,
+        "refreshOnHistoryMiss": true,
+        "getCacheBusterParam": false,
+        "historyCacheSize": 0
+    }'>
+    <meta name="site_url" content="{{ config('app.url') }}">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "@yield('schema_type', 'WebPage')",
+        "name": "{{ $_final_title }}",
+        "description": "{{ $_final_description }}",
+        "url": "{{ url()->current() }}",
+        "inLanguage": "{{ strtolower(app()->getLang()) }}",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "{{ config('app.name') }}",
+            "url": "{{ config('app.url') }}"
+        }
+    }
+    </script>
+
+    @yield('meta')
+    @stack('head')
+
+    @if (isset($sections['head']))
+        {!! $sections['head'] !!}
+    @endif
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link rel="icon" href="@asset('favicon.ico')?v={{ file_exists(public_path('favicon.ico')) ? filemtime(public_path('favicon.ico')) : 1 }}">
+    <link rel="shortcut icon" href="@asset('favicon.ico')?v={{ file_exists(public_path('favicon.ico')) ? filemtime(public_path('favicon.ico')) : 1 }}">
+    <link rel="apple-touch-icon" href="@asset('favicon.ico')?v={{ file_exists(public_path('favicon.ico')) ? filemtime(public_path('favicon.ico')) : 1 }}">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <link rel="alternate" href="{{ url()->current() }}" hreflang="x-default">
+
+    @foreach (config('lang.available') as $lang)
+        <link rel="alternate" href="{{ url() }}?lang={{ $lang }}" hreflang="{{ strtolower($lang) }}">
+    @endforeach
+
+    @if (!$isPartialRequest)
+        <link rel="preload" href="@asset('assets/fonts/manrope/Manrope-Regular.woff2')" as="font" type="font/woff2" crossorigin fetchpriority="high">
+        <link rel="preload" href="@asset('assets/fonts/manrope/Manrope-Medium.woff2')" as="font" type="font/woff2" crossorigin>
+        <link rel="preload" href="@asset('assets/js/htmx/core.js')" as="script">
+        <link rel="preload" href="@asset('assets/js/app.js')" as="script">
+        <link rel="preload" href="@at('Core/Template/Resources/js/prefetch.js', true)" as="script">
+
+        @at(tt('assets/sass/app.scss'))
+
+        <link rel="stylesheet" href="@asset('assets/fonts/manrope/manrope.css')">
+    @endif
+
+    @include('flute::partials.background')
+
+    @stack('styles')
+
+    @if (isset($sections['styles']))
+        {!! $sections['styles'] !!}
+    @endif
+
+    @if ($isPartialRequest)
+        @stack('scripts')
+
+        @if (isset($sections['scripts']))
+            {!! $sections['scripts'] !!}
+        @endif
+    @endif
+
+    @if (!$isPartialRequest)
+        <link rel="stylesheet" href="@asset('animate')" media="print" onload="this.media='all'">
+        <link rel="stylesheet" href="@asset('grid')" type="text/css">
+        <link rel="stylesheet" href="@asset('assets/css/libs/flute-select.css')" media="print" onload="this.media='all'">
+        <link rel="stylesheet" href="@asset('assets/css/libs/filepond.min.css')" media="print" onload="this.media='all'">
+        <link rel="stylesheet" href="@asset('assets/css/libs/filepond-plugin-image-preview.min.css')" media="print" onload="this.media='all'">
+        <link rel="stylesheet" href="@asset('assets/css/libs/cropper.min.css')" media="print" onload="this.media='all'">
+
+        <script src="@asset('assets/js/htmx/core.js')" defer></script>
+        <script src="{{ Clickfwd\Yoyo\Services\Configuration::yoyoSrc() }}" defer></script>
+
+        <script src="@asset('assets/js/htmx/head.js')" defer fetchpriority="low"></script>
+        <script src="@asset('assets/js/htmx/response-targets.js')" defer fetchpriority="low"></script>
+        <script src="@asset('assets/js/htmx/idiomorph.js')" defer fetchpriority="low"></script>
+
+        <script src="@asset('assets/js/htmx/loadingState.js')" defer fetchpriority="low"></script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                @php echo Clickfwd\Yoyo\Services\Configuration::javascriptInitCode(false) @endphp
+            });
+        </script>
+    @endif
+
+    @include('flute::partials.colors')
+
+    <script>
+        window.u = window.u || function(path) {
+            var base = @json((string) url('/'));
+            if (!path) return base;
+            path = String(path);
+            if (/^(?:[a-z][a-z0-9+.-]*:)?\/\//i.test(path) || path.charAt(0) === '#') {
+                return path;
+            }
+            return base.replace(/\/+$/, '') + '/' + path.replace(/^\/+/, '');
+        };
+    </script>
+
+    <script>
+        (function() {
+            function updateThemeColor() {
+                var m = document.querySelector('meta[name="theme-color"]#theme-color-meta');
+                if (!m) {
+                    m = document.createElement('meta');
+                    m.setAttribute('name', 'theme-color');
+                    m.id = 'theme-color-meta';
+                    document.head.appendChild(m)
+                }
+                var bg = getComputedStyle(document.documentElement).getPropertyValue('--background').trim() ||
+                    '{{ $currentThemeBg }}';
+                m.setAttribute('content', bg);
+                var ms1 = document.querySelector('meta[name="msapplication-TileColor"]');
+                if (ms1) {
+                    ms1.setAttribute('content', bg)
+                }
+                var ms2 = document.querySelector('meta[name="msapplication-navbutton-color"]');
+                if (ms2) {
+                    ms2.setAttribute('content', bg)
+                }
+            }
+            var cb = typeof requestIdleCallback === 'function'
+                ? function(fn) { requestIdleCallback(fn) }
+                : function(fn) { setTimeout(fn, 1) };
+            cb(updateThemeColor);
+            var o = new MutationObserver(function() { cb(updateThemeColor) });
+            o.observe(document.documentElement, {
+                attributes: true,
+                attributeFilter: ['data-theme']
+            });
+            window.addEventListener('flute:theme-changed', function() { cb(updateThemeColor) });
+        })();
+    </script>
+</head>
+
+<body hx-ext="head-support, loading-states, morph, response-targets" hx-history="false"
+    hx-headers='{"X-CSRF-Token": "{{ csrf_token() }}"}' itemscope itemtype="https://schema.org/WebPage">
+
+    @if (!$isPartialRequest)
+        @can('admin.pages')
+            <x-page-edit-nav />
+            <x-page-edit-controls />
+        @endcan
+    @endif
+
+    @if (!$isPartialRequest)
+        {{-- Always render sidebar-nav, visibility controlled by CSS based on data-nav-style --}}
+        <x-sidebar-nav />
+        <div class="content-frame" id="content-frame"></div>
+        <div class="frame-blur" id="frame-blur"></div>
+        <button type="button" class="sidebar-contained-toggle" id="sidebar-contained-toggle"
+            aria-label="{{ __('def.toggle_sidebar') }}">
+            <x-icon path="ph.regular.sidebar-simple" />
+        </button>
+    @endif
+
+    @includeWhen(!$isPartialRequest, 'flute::layouts.header')
+
+    @if (!$isPartialRequest)
+        @can('admin.pages')
+            <x-page-edit-sidebar />
+            <x-page-visual-editor />
+            @include('flute::partials.page-edit-onboarding')
+        @endcan
+
+        @can('admin.boss')
+            @include('flute::partials.admin-onboarding')
+        @endcan
+    @endif
+
+    <main id="main" class="main-animation" hx-history-elt>
+        @includeWhen(!$isPartialRequest, 'flute::partials.loader')
+
+        @stack('before-content')
+
+        @if (isset($sections['before-content']))
+            {!! $sections['before-content'] !!}
+        @endif
+
+        @if (is_debug() || is_development())
+            @include('flute::components.debug-message')
+        @endif
+
+        @include('flute::partials.breadcrumb')
+        @include('flute::partials.flash')
+        @include('flute::partials.widgets')
+
+        @php
+            $pageBlocks = page()->getBlocks();
+            $hasContentWidget = false;
+            if (!empty($pageBlocks)) {
+                foreach ($pageBlocks as $block) {
+                    if ($block->getWidget() === 'Content') {
+                        $hasContentWidget = true;
+                        break;
+                    }
+                }
+            }
+            // Also check if the global layout already rendered the Content widget
+            if (!$hasContentWidget) {
+                $hasContentWidget = page()->isGlobalContentRendered();
+            }
+        @endphp
+
+        @if (!$hasContentWidget)
+            @stack('content')
+
+            @if (isset($sections['content']))
+                {!! $sections['content'] !!}
+            @endif
+        @endif
+
+        @can('admin.pages')
+            @include('flute::partials.no-widgets')
+        @endcan
+    </main>
+
+    @stack('content-after')
+
+    @if (isset($sections['content-after']))
+        {!! $sections['content-after'] !!}
+    @endif
+
+    {{-- OOB-модалки страницы: при htmx-навигации #modals не перерисовывается, они доезжают сюда --}}
+    @stack('modals-oob')
+
+    @includeIf('flute::partials.confirmation')
+
+    @if (!$isPartialRequest)
+        <div id="alerts-container">
+            @stack('toast-container')
+
+            @if (isset($sections['toast-container']))
+                {!! $sections['toast-container'] !!}
+            @endif
+        </div>
+
+        @includeIf('flute::components.right-sidebar')
+        @includeIf('flute::components.tab-bar')
+
+        @can('admin.pages')
+            @includeIf('flute::components.page-edit')
+            @include('flute::partials.page-edit-dialog')
+            @include('flute::partials.page-seo-dialog')
+        @endcan
+
+        <div id="modals">
+            @include('flute::partials.default-modals')
+
+            @stack('modals')
+
+            @if (isset($sections['modals']))
+                {!! $sections['modals'] !!}
+            @endif
+        </div>
+
+        @includeIf('flute::components.user-card')
+
+        @include('flute::components.richtext-icons')
+    @endif
+
+    @includeWhen(!$isPartialRequest, 'flute::layouts.footer')
+
+    @if (!$isPartialRequest)
+        <div class="footer-scripts">
+            @php
+                if (is_debug()) {
+                    Tracy\Debugger::renderLoader();
+                }
+            @endphp
+
+            @stack('footer')
+
+            @if (isset($sections['footer']))
+                {!! $sections['footer'] !!}
+            @endif
+        </div>
+
+        <script src="@asset('assets/js/libs/a11y-dialog.js')" defer></script>
+        <script src="@asset('assets/js/libs/floating.js')" defer></script>
+        <script src="@asset('jquery')" defer></script>
+        <script src="@asset('assets/js/app.js')" defer></script>
+        <script>
+            window.FlutePrefetchConfig = window.FlutePrefetchConfig || [];
+            window.FlutePrefetchConfig.push({
+                root: 'body',
+                target: 'main',
+                swap: 'outerHTML transition:true',
+                maxEntries: 48,
+                maxConcurrent: 2,
+                hoverDelay: 30,
+                ttl: 180000,
+                visibleLimit: 3,
+                visibleDelay: 350
+            });
+        </script>
+        @at('Core/Template/Resources/js/prefetch.js')
+        <script src="@asset('assets/js/libs/notyf.js')" defer fetchpriority="low"></script>
+        <script src="@asset('assets/js/libs/nprogress.js')" defer></script>
+        <script src="@asset('assets/js/libs/flute-select.js')" defer fetchpriority="low"></script>
+
+        {{-- On-demand heavy libs: loaded when their trigger elements appear in DOM --}}
+        <script>
+        (function(){
+            var loaded = {};
+            function load(srcs, cb) {
+                var i = 0;
+                function next() {
+                    if (i >= srcs.length) { if (cb) cb(); return; }
+                    var src = srcs[i++];
+                    if (loaded[src]) { next(); return; }
+                    loaded[src] = true;
+                    var s = document.createElement('script');
+                    s.src = src;
+                    s.onload = next;
+                    s.onerror = next;
+                    document.head.appendChild(s);
+                }
+                next();
+            }
+
+            function matches(root, sel) {
+                if (!root) return !!document.querySelector(sel);
+                if (root.matches && root.matches(sel)) return true;
+                return root.querySelector && !!root.querySelector(sel);
+            }
+
+            var libs = {
+                filepond: {
+                    match: 'input.filepond',
+                    srcs: [
+                        "@asset('assets/js/libs/filepond-plugin-image-preview.js')",
+                        "@asset('assets/js/libs/filepond-plugin-file-validate-type.js')",
+                        "@asset('assets/js/libs/filepond-plugin-file-validate-size.js')",
+                        "@asset('assets/js/libs/filepond-plugin-image-exif-orientation.js')",
+                        "@asset('assets/js/libs/filepond.js')",
+                        "@asset('assets/js/libs/cropper.js')"
+                    ],
+                    init: function() {
+                        function tryInit() {
+                            if (typeof FilePond !== 'undefined' && typeof _registerFilePondPlugins === 'function') {
+                                _registerFilePondPlugins();
+                            } else {
+                                setTimeout(tryInit, 50);
+                            }
+                        }
+                        tryInit();
+                    }
+                },
+                tiptap: {
+                    match: '[data-editor="richtext"], .richtext-editor-wrapper',
+                    srcs: ["@asset('assets/js/libs/tiptap-editor.js')"],
+                    init: function() {
+                        if (window.fluteRichTextEditor) {
+                            window.fluteRichTextEditor.initialize();
+                        }
+                    }
+                },
+                pickr: {
+                    match: '[data-pickr-never-match]',
+                    srcs: ["@asset('assets/js/libs/pickr.js')"],
+                    init: function () {}
+                }
+            };
+
+            function ensure(key, cb, root) {
+                var lib = libs[key];
+                if (!lib) {
+                    if (cb) cb();
+                    return;
+                }
+
+                if (lib.done) {
+                    if (lib.init) lib.init(root);
+                    if (cb) cb();
+                    return;
+                }
+
+                if (lib.loading) {
+                    lib.callbacks.push({ cb: cb, root: root });
+                    return;
+                }
+
+                lib.loading = true;
+                lib.callbacks = [{ cb: cb, root: root }];
+                load(lib.srcs, function() {
+                    lib.done = true;
+                    lib.loading = false;
+                    var callbacks = lib.callbacks || [];
+                    lib.callbacks = [];
+                    callbacks.forEach(function(item) {
+                        if (lib.init) lib.init(item.root);
+                        if (item.cb) item.cb();
+                    });
+                });
+            }
+
+            function scan(root) {
+                Object.keys(libs).forEach(function(key) {
+                    var lib = libs[key];
+                    if (lib.done) return;
+                    if (matches(root, lib.match)) {
+                        ensure(key, null, root);
+                    }
+                });
+            }
+
+            window.ThemeAssetLoader = {
+                ensure: ensure,
+                loadScripts: load,
+                scan: scan
+            };
+
+            document.addEventListener('DOMContentLoaded', function() { scan(); });
+            document.body.addEventListener('htmx:load', function(e) { scan(e.detail.elt); });
+        })();
+        </script>
+
+        @at(tt('assets/scripts/libs/simplebar.js'))
+        @at(tt('assets/scripts/libs/tinycolor.js'))
+        @at(tt('assets/scripts/helpers.js'))
+        <script>
+            window.__imageCropperI18n = {
+                crop_image: @json(__('def.crop_image')),
+                rotate_left: @json(__('def.rotate_left')),
+                rotate_right: @json(__('def.rotate_right')),
+                flip_horizontal: @json(__('def.flip_horizontal')),
+                flip_vertical: @json(__('def.flip_vertical')),
+                zoom_in: @json(__('def.zoom_in')),
+                zoom_out: @json(__('def.zoom_out')),
+                reset: @json(__('def.reset')),
+                cancel: @json(__('def.cancel')),
+                apply: @json(__('def.apply')),
+                free: @json(__('def.free')),
+                square: @json(__('def.square')),
+                landscape: @json(__('def.landscape')),
+                portrait: @json(__('def.portrait'))
+            };
+        </script>
+        @at(tt('assets/scripts/image-cropper.js'))
+        @at(tt('assets/scripts/bottom-sheet.js'))
+        @at(tt('assets/scripts/user-card.js'))
+        @at(tt('assets/scripts/tabs.js'))
+        @at(tt('assets/scripts/steps.js'))
+        @at(tt('assets/scripts/richtext/icons.js'))
+        @at(tt('assets/scripts/richtext/extensions.js'))
+        @at(tt('assets/scripts/richtext/upload.js'))
+        @at(tt('assets/scripts/richtext/toolbar.js'))
+        @at(tt('assets/scripts/richtext/modals.js'))
+        @at(tt('assets/scripts/richtext/bubble-menu.js'))
+        @at(tt('assets/scripts/richtext/table-controls.js'))
+        @at(tt('assets/scripts/richtext/main.js'))
+        @at(tt('assets/scripts/translatable.js'))
+        @at(tt('assets/scripts/otp-input.js'))
+        @at(tt('assets/scripts/tom-select.js'))
+
+        @can('admin.pages')
+            <link rel="stylesheet" href="@asset('assets/css/libs/gridstack.min.css')" media="print" onload="this.media='all'">
+            <script src="@asset('assets/js/libs/gridstack-all.js')" defer></script>
+
+            {{-- Page Edit modular scripts --}}
+            @at(tt('assets/scripts/page-edit/core/namespace.js'))
+            @at(tt('assets/scripts/page-edit/core/event-bus.js'))
+            @at(tt('assets/scripts/page-edit/core/config.js'))
+            @at(tt('assets/scripts/page-edit/managers/history-manager.js'))
+            @at(tt('assets/scripts/page-edit/managers/onboarding-manager.js'))
+            @at(tt('assets/scripts/page-edit/managers/sidebar-manager.js'))
+            @at(tt('assets/scripts/page-edit/grid/grid-controller.js'))
+            @at(tt('assets/scripts/page-edit/grid/widget-loader.js'))
+            @at(tt('assets/scripts/page-edit/grid/widget-toolbar.js'))
+            @at(tt('assets/scripts/page-edit/ui/search-handler.js'))
+            @at(tt('assets/scripts/page-edit/ui/category-accordion.js'))
+            @at(tt('assets/scripts/page-edit/ui/keyboard-handler.js'))
+            @at(tt('assets/scripts/page-edit/ui/visibility-conditions.js'))
+            @at(tt('assets/scripts/page-edit/storage/local-storage.js'))
+            @at(tt('assets/scripts/page-edit/storage/layout-api.js'))
+            @at(tt('assets/scripts/page-edit/main.js'))
+            @at(tt('assets/scripts/page-visual-editor.js'))
+        @endcan
+
+        @can('admin.boss')
+            @if (!config('tips_complete.admin_onboarding.completed'))
+                @at(tt('assets/scripts/admin-onboarding.js'))
+            @endif
+        @endcan
+
+        {{-- Always load sidebar-nav script, it handles visibility check internally --}}
+        @at(tt(path: 'assets/scripts/sidebar-nav.js'))
+
+        @at(tt('assets/scripts/tabbar.js'))
+
+        @at(tt('assets/scripts/app.js'))
+
+        @include('flute::partials.toasts')
+
+        @stack('scripts')
+
+        @if (isset($sections['scripts']))
+            {!! $sections['scripts'] !!}
+        @endif
+
+    @endif
+</body>
+
+</html>

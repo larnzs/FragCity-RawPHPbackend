@@ -1,0 +1,367 @@
+<?php
+
+namespace Flute\Admin\Packages\ApiKey\Screens;
+
+use Cycle\Database\Injection\Parameter;
+use Flute\Admin\Platform\Actions\Button;
+use Flute\Admin\Platform\Actions\DropDown;
+use Flute\Admin\Platform\Actions\DropDownItem;
+use Flute\Admin\Platform\Fields\Input;
+use Flute\Admin\Platform\Fields\Select;
+use Flute\Admin\Platform\Fields\TD;
+use Flute\Admin\Platform\Layouts\LayoutFactory;
+use Flute\Admin\Platform\Repository;
+use Flute\Admin\Platform\Screen;
+use Flute\Admin\Platform\Support\Color;
+use Flute\Core\Database\Entities\ApiKey;
+use Flute\Core\Database\Entities\Permission;
+
+class ApiKeyScreen extends Screen
+{
+    public ?string $name = null;
+
+    public ?string $description = null;
+
+    public ?string $permission = 'admin.boss';
+
+    public $apiKeys;
+
+    public function mount(): void
+    {
+        $this->name = __('admin-apikey.title.list');
+        $this->description = __('admin-apikey.title.description');
+
+        breadcrumb()->add(__('def.admin_panel'), url('/admin'))->add(__('admin-apikey.title.list'));
+
+        $this->apiKeys = rep(ApiKey::class)->select();
+    }
+
+    public function layout(): array
+    {
+        return [
+            LayoutFactory::view('admin-api::components.api-info-alert'),
+            LayoutFactory::view('admin-api::components.api-key-created-alert'),
+
+            LayoutFactory::table('apiKeys', [
+                TD::selection('id'),
+                TD::make('id', 'ID')->minWidth('50px'),
+
+                TD::make('name', __('admin-apikey.fields.name.label'))
+                    ->render(static fn(ApiKey $apiKey) => $apiKey->name)
+                    ->minWidth('250px')
+                    ->cantHide(),
+
+                TD::make('key', __('admin-apikey.fields.key.label'))
+                    ->render(static fn(ApiKey $apiKey) => view('admin-api::cells.key', compact('apiKey')))
+                    ->minWidth('250px'),
+
+                TD::make('permissions', __('admin-apikey.fields.permissions.label'))
+                    ->alignCenter()
+                    ->render(static fn(ApiKey $apiKey) => sizeof($apiKey->permissions))
+                    ->minWidth('100px'),
+
+                TD::make('lastUsedAt', __('admin-apikey.fields.last_used_at'))
+                    ->render(static fn(ApiKey $apiKey) => $apiKey->lastUsedAt
+                        ? $apiKey->lastUsedAt->format(default_date_format())
+                        : __('admin-apikey.fields.never'))
+                    ->minWidth('150px'),
+
+                TD::make('createdAt', __('admin-apikey.fields.created_at'))
+                    ->render(static fn(ApiKey $apiKey) => $apiKey->createdAt->format(default_date_format()))
+                    ->minWidth('150px'),
+
+                TD::make('actions', __('admin-apikey.buttons.actions'))
+                    ->width('200px')
+                    ->alignCenter()
+                    ->render(static fn(ApiKey $apiKey) => DropDown::make()
+                        ->icon('ph.regular.dots-three-outline-vertical')
+                        ->list([
+                            DropDownItem::make(__('admin-apikey.buttons.edit'))
+                                ->modal('editApiKeyModal', ['id' => $apiKey->id])
+                                ->icon('ph.bold.pencil-bold')
+                                ->type(Color::OUTLINE_PRIMARY)
+                                ->size('small')
+                                ->fullWidth(),
+
+                            DropDownItem::make(__('admin-apikey.buttons.regenerate'))
+                                ->confirm(__('admin-apikey.confirms.regenerate_key'))
+                                ->method('regenerateApiKey', ['id' => $apiKey->id])
+                                ->icon('ph.bold.arrows-clockwise-bold')
+                                ->type(Color::OUTLINE_WARNING)
+                                ->size('small')
+                                ->fullWidth(),
+
+                            DropDownItem::make(__('admin-apikey.buttons.delete'))
+                                ->confirm(__('admin-apikey.confirms.delete_key'))
+                                ->method('deleteApiKey', ['id' => $apiKey->id])
+                                ->icon('ph.bold.trash-bold')
+                                ->type(Color::OUTLINE_DANGER)
+                                ->size('small')
+                                ->fullWidth(),
+                        ])),
+            ])
+                ->empty('ph.regular.key', __('admin-apikey.empty.title'), __('admin-apikey.empty.sub'))
+                ->emptyButton(
+                    Button::make(__('admin-apikey.buttons.add'))
+                        ->icon('ph.regular.plus')
+                        ->type(Color::PRIMARY)
+                        ->modal('addApiKeyModal'),
+                )
+                ->searchable(['key', 'id'])
+                ->bulkActions([
+                    Button::make(__('admin.bulk.delete_selected'))
+                        ->icon('ph.bold.trash-bold')
+                        ->type(Color::OUTLINE_DANGER)
+                        ->confirm(__('admin.confirms.delete_selected'))
+                        ->method('bulkDeleteApiKeys'),
+                ])
+                ->commands([
+                    Button::make(__('admin-apikey.buttons.add'))
+                        ->icon('ph.regular.plus')
+                        ->type(Color::PRIMARY)
+                        ->modal('addApiKeyModal'),
+                ]),
+        ];
+    }
+
+    /**
+     * Модальное окно для добавления нового API ключа
+     */
+    public function addApiKeyModal(Repository $parameters)
+    {
+        return LayoutFactory::modal($parameters, [
+            LayoutFactory::field(
+                Input::make('name')->type('text')->placeholder(__('admin-apikey.fields.name.placeholder')),
+            )
+                ->label(__('admin-apikey.fields.name.label'))
+                ->required()
+                ->small(__('admin-apikey.fields.name.help')),
+
+            LayoutFactory::field(
+                Select::make('permissions')
+                    ->fromDatabase('permissions', 'name', 'name')
+                    ->filter(static fn($permission) => user()->can($permission->name))
+                    ->multiple(),
+            )->label(__('def.permissions')),
+        ])
+            ->title(__('admin-apikey.title.create'))
+            ->applyButton(__('admin-apikey.buttons.add'))
+            ->method('saveApiKey');
+    }
+
+    /**
+     * Сохранение нового API ключа
+     */
+    public function saveApiKey()
+    {
+        $data = request()->input();
+
+        if (!isset($data['permissions']) || !is_array($data['permissions'])) {
+            $data['permissions'] = [];
+        }
+
+        $data['permissions'] = array_values(array_unique(array_filter(
+            $data['permissions'],
+            static fn($v) => $v !== '' && $v !== null,
+        )));
+
+        $validation = $this->validate(
+            [
+                'name' => ['required', 'string', 'unique:api_keys,name'],
+                'permissions' => ['required', 'array'],
+                // 'permissions.*' => ['exists:permissions,name'],
+            ],
+            $data,
+        );
+
+        if (!$validation) {
+            return;
+        }
+
+        $plainKey = $this->generateUniqueApiKey();
+
+        $apiKey = new ApiKey();
+        $apiKey->name = $data['name'];
+        $apiKey->key = ApiKey::hashPlainKey($plainKey);
+        $apiKey->saveOrFail();
+
+        $this->syncPermissions($apiKey, $data['permissions']);
+        $apiKey->saveOrFail();
+
+        session()->set('admin.api_keys.created_key', [
+            'name' => $apiKey->name,
+            'key' => $plainKey,
+        ]);
+
+        $this->flashMessage(__('admin-apikey.messages.save_success'), 'success');
+        $this->apiKeys = rep(ApiKey::class)->select();
+        $this->closeModal();
+    }
+
+    /**
+     * Модальное окно для редактирования API ключа
+     */
+    public function editApiKeyModal(Repository $parameters)
+    {
+        $apiKey = ApiKey::findByPK($parameters->get('id'));
+        if (!$apiKey) {
+            $this->flashMessage(__('admin-apikey.messages.key_not_found'), 'error');
+
+            return;
+        }
+
+        $selectedPermissions = array_map(static fn($permission) => $permission->name, $apiKey->permissions);
+
+        return LayoutFactory::modal($parameters, [
+            LayoutFactory::field(
+                Input::make('name')
+                    ->type('text')
+                    ->placeholder(__('admin-apikey.fields.name.placeholder'))
+                    ->value($apiKey->name),
+            )
+                ->label(__('admin-apikey.fields.name.label'))
+                ->required()
+                ->small(__('admin-apikey.fields.name.help')),
+
+            LayoutFactory::field(
+                Select::make('permissions')
+                    ->fromDatabase('permissions', 'name', 'name')
+                    ->filter(static fn($permission) => user()->can($permission->name))
+                    ->multiple()
+                    ->value($selectedPermissions),
+            )->label(__('def.permissions')),
+        ])
+            ->title(__('admin-apikey.title.edit'))
+            ->applyButton(__('admin-apikey.buttons.save'))
+            ->method('updateApiKey');
+    }
+
+    /**
+     * Обновление существующего API ключа
+     */
+    public function updateApiKey()
+    {
+        $data = request()->input();
+        $id = $this->modalParams->get('id');
+
+        if (!isset($data['permissions']) || !is_array($data['permissions'])) {
+            $data['permissions'] = [];
+        }
+
+        $data['permissions'] = array_values(array_unique(array_filter(
+            $data['permissions'],
+            static fn($v) => $v !== '' && $v !== null,
+        )));
+
+        $apiKey = ApiKey::findByPK($id);
+        if (!$apiKey) {
+            $this->flashMessage(__('admin-apikey.messages.key_not_found'), 'error');
+
+            return;
+        }
+
+        $validation = $this->validate(
+            [
+                'name' => ['required', 'string'],
+                'permissions' => ['required', 'array'],
+                // 'permissions.*' => ['exists:permissions,name'],
+            ],
+            $data,
+        );
+
+        if (!$validation) {
+            return;
+        }
+
+        $apiKey->name = $data['name'];
+        $this->syncPermissions($apiKey, $data['permissions']);
+
+        $apiKey->save();
+
+        $this->flashMessage(__('admin-apikey.messages.save_success'), 'success');
+        $this->apiKeys = rep(ApiKey::class)->select();
+        $this->closeModal();
+    }
+
+    /**
+     * Удаление API ключа
+     */
+    public function deleteApiKey()
+    {
+        $id = request()->input('id');
+
+        $apiKey = ApiKey::findByPK($id);
+        if (!$apiKey) {
+            $this->flashMessage(__('admin-apikey.messages.key_not_found'), 'error');
+
+            return;
+        }
+
+        $apiKey->delete();
+        $this->flashMessage(__('admin-apikey.messages.delete_success'), 'success');
+        $this->apiKeys = rep(ApiKey::class)->select();
+    }
+
+    public function regenerateApiKey(): void
+    {
+        $id = request()->input('id');
+
+        $apiKey = ApiKey::findByPK($id);
+        if (!$apiKey) {
+            $this->flashMessage(__('admin-apikey.messages.key_not_found'), 'error');
+
+            return;
+        }
+
+        $plainKey = $this->generateUniqueApiKey();
+        $apiKey->key = ApiKey::hashPlainKey($plainKey);
+        $apiKey->saveOrFail();
+
+        session()->set('admin.api_keys.created_key', [
+            'name' => $apiKey->name,
+            'key' => $plainKey,
+        ]);
+
+        $this->flashMessage(__('admin-apikey.messages.regenerate_success'), 'success');
+        $this->apiKeys = rep(ApiKey::class)->select();
+    }
+
+    public function bulkDeleteApiKeys(): void
+    {
+        $ids = request()->input('selected', []);
+        if (!$ids) {
+            return;
+        }
+        foreach ($ids as $id) {
+            $apiKey = ApiKey::findByPK($id);
+            if (!$apiKey) {
+                continue;
+            }
+            $apiKey->delete();
+        }
+        $this->apiKeys = rep(ApiKey::class)->select();
+        $this->flashMessage(__('admin-apikey.messages.delete_success'), 'success');
+    }
+
+    private function generateUniqueApiKey(): string
+    {
+        do {
+            $plainKey = bin2hex(random_bytes(16));
+        } while (ApiKey::findByPlainKey($plainKey) !== null);
+
+        return $plainKey;
+    }
+
+    private function syncPermissions(ApiKey $apiKey, array $permissionNames): void
+    {
+        $apiKey->permissions = [];
+
+        $permissions = Permission::query()->where('name', 'in', new Parameter($permissionNames))->fetchAll();
+
+        foreach ($permissions as $permission) {
+            if (user()->can($permission->name)) {
+                $apiKey->addPermission($permission);
+            }
+        }
+    }
+}

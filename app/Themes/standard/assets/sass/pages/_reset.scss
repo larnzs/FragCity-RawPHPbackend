@@ -1,0 +1,15 @@
+.reset {
+    &-container {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: center;
+        gap: var(--space-sm);
+        font-size: var(--h1);
+        margin-top: var(--space-lg);
+    }
+
+    &-success-icon {
+        color: var(--success);
+    }
+}
