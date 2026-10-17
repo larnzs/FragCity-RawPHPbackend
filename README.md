@@ -80,11 +80,12 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) | snapshot محیط، نسخه‌های کاندید، ترتیب نصب Panel/DB/Wings و موانع Storage/شبکه |
 | [Local Development](docs/LOCAL-DEVELOPMENT.md) | updater محلی، نصب Laragon/WAMP و موانع امن تست دیتابیس |
 | [Current Status](docs/CHANGELOG-STATUS.md) | وضعیت جاری، انتخاب‌های انجام‌شده و مواردی که هنوز اجرا نشده‌اند |
+| [Documentation Audit](docs/DOCUMENTATION-AUDIT.md) | محدودهٔ بازبینی مستندات، اصلاحات، پیوندهای بررسی‌شده و استاندارد آموزش مبتدی‌پسند |
 
 
 ## راهنمای اجرایی مرحله‌به‌مرحلهٔ نصب Pterodactyl
 
-**نقش README:** این فایل نقطهٔ ورود، نقشهٔ راه و خلاصهٔ وضعیت است؛ عمدی است که تمام فرمان‌های نصب در README تکرار نشوند. برای دستورهای کامل copy/paste و توضیح هر فرمان، [Pterodactyl PoC](docs/PTERODACTYL-POC.md) را به‌ترتیب بخش‌ها دنبال کن. [Debian PoC Log](docs/DEBIAN-POC.md) تاریخچهٔ خروجی‌های واقعی و نتیجهٔ اجرای هر مرحله را نگه می‌دارد. گام‌های آینده تا زمانی که اجرا و تأیید نشده‌اند، «Pending» هستند.
+**نقش README:** این فایل نقطهٔ شروع و نقشهٔ راه است؛ برای جلوگیری از کپی‌شدن و قدیمی‌شدن فرمان‌ها، دستورات کامل فقط در [Pterodactyl PoC](docs/PTERODACTYL-POC.md) نگهداری می‌شوند و [Debian PoC Log](docs/DEBIAN-POC.md) خروجی‌های واقعی را ثبت می‌کند. نماد `[x]` یعنی با شواهد اجرا تأیید شده و `[ ]` یعنی هنوز انجام نشده یا تأیید نشده است. هر بار فقط گام بعدیِ بدون تیک را اجرا کن. فرمان‌های مرحلهٔ بعد را در ترمینال Debian اجرا کن؛ نه در PowerShell/Windows. اگر خطا دیدی، همان‌جا توقف کن، چیزی را حذف نکن و خروجی را قبل از ارسال از نظر secret بازبینی کن.
 
 | ترتیب | گام | وضعیت فعلی | راهنما |
 |---|---|---|---|
@@ -93,7 +94,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | ۲ | نصب PHP 8.3 extensions، Nginx، MariaDB و Redis | انجام و بررسی شده | [Pterodactyl PoC §۹](docs/PTERODACTYL-POC.md) |
 | ۳ | بررسی سرویس‌ها، پورت‌ها و مسیر باینری Nginx | سرویس‌ها/پورت‌ها بررسی شده؛ نسخه Nginx تأیید شده | [Pterodactyl PoC §۹–۱۰](docs/PTERODACTYL-POC.md) |
 | ۴ | نصب Composer 2 و تأیید checksum | انجام شده؛ نسخه 2.10.3 | [Pterodactyl PoC §۱۰](docs/PTERODACTYL-POC.md) |
-| ۵ | دریافت archive رسمی Panel و نصب dependencyهای آن | گام بعدی؛ هنوز اجرا نشده | [Pterodactyl PoC §۱۱](docs/PTERODACTYL-POC.md) |
+| ۵ | دریافت و استخراج archive رسمی Panel v1.15.1 | گام بعدی؛ فرمان کامل آماده، هنوز اجرا نشده | [Pterodactyl PoC §۱۱](docs/PTERODACTYL-POC.md) |
 | ۶ | ساخت DB/user محلی Panel، تنظیم `.env`، APP_KEY، migrations و حساب مدیر | Pending | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
 | ۷ | Nginx virtual host، queue worker، cron و تست ورود Panel | Pending | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
 | ۸ | نصب Wings/Docker و تعریف Node/Allocation | Pending؛ بعد از قبولی Panel | [Pterodactyl PoC](docs/PTERODACTYL-POC.md) |
