@@ -600,3 +600,25 @@ Panel پایدار v1.15.1 محدودهٔ Composer برابر ^8.2 || ^8.3 دا�
 مراجع برای تصمیم PHP:
 - Pterodactyl 1.x Getting Started: https://docs.pterodactyl.io/v1/panel/getting-started
 - Debian Wiki — Additional PHP versions/SURY (مخزن شخص ثالث، نه رسمی Debian): https://wiki.debian.org/AdditionalPHPVersions
+
+
+---
+
+## ۱۶. افزودن مخزن PHP 8.3 با keyring — ۱۷ اکتبر ۲۰۲۶
+
+کاربر فرمان‌های مربوط به دریافت و نصب debsuryorg-archive-keyring، ساخت فایل مخزن APT با گزینهٔ Signed-By و اجرای sudo apt update را با موفقیت انجام داد.
+
+Candidate واقعی:
+
+~~~text
+php8.3:
+  Installed: (none)
+  Candidate: 8.3.35-1+0~20260925.87+debian13~1.gbp19383d
+  Version table:
+     8.3.35-1+0~20260925.87+debian13~1.gbp19383d 500
+        500 https://packages.sury.org/php trixie/main amd64 Packages
+~~~
+
+SURY پیام داد که مخزن آن برای i386 فایل Packages ارائه نمی‌کند. این پیام به‌تنهایی نصب amd64 را مسدود نکرد و candidate مناسب معماری amd64 نمایش داده شد.
+
+**نکتهٔ آموزشی:** فایل .sources تعریف می‌کند APT از کدام URI، suite و component بسته‌ها را دریافت کند و کلید Signed-By مشخص می‌کند امضای metadata این مخزن با کدام keyring بررسی شود. افزودن این مخزن منبع نرم‌افزار سیستم را تغییر می‌دهد، اما در این مرحله هنوز PHP، Nginx، MariaDB، Redis، Composer، Panel، Docker یا Wings نصب نشده‌اند.
