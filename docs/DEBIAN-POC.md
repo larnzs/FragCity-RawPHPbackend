@@ -1,6 +1,6 @@
 # FragCity — Debian/VMware PoC Log
 
-> این سند جزئیات تاریخی پارت ۲، فرمان‌های بررسی‌شده و وضعیت واقعی VM را برای ادامهٔ آزمایش حفظ می‌کند. این محیط Production نیست.
+> این سند جزئیات تاریخی پارت ۲، فرمان‌های بررسی‌شده و وضعیت واقعی VM را برای ادامهٔ آزمایش حفظ می‌کند. این محیط Production نیست. وضعیت مراحل به‌ترتیب زمانی ثبت می‌شود؛ بخش‌های تازه‌تر در انتهای سند، snapshotهای قدیمی‌تر را به‌روزرسانی می‌کنند.
 
 ## پارت ۲ — آماده‌سازی Debian و VMware و آزمایش نخستین سرور CS2
 
@@ -622,3 +622,64 @@ php8.3:
 SURY پیام داد که مخزن آن برای i386 فایل Packages ارائه نمی‌کند. این پیام به‌تنهایی نصب amd64 را مسدود نکرد و candidate مناسب معماری amd64 نمایش داده شد.
 
 **نکتهٔ آموزشی:** فایل .sources تعریف می‌کند APT از کدام URI، suite و component بسته‌ها را دریافت کند و کلید Signed-By مشخص می‌کند امضای metadata این مخزن با کدام keyring بررسی شود. افزودن این مخزن منبع نرم‌افزار سیستم را تغییر می‌دهد، اما در این مرحله هنوز PHP، Nginx، MariaDB، Redis، Composer، Panel، Docker یا Wings نصب نشده‌اند.
+
+
+## وضعیت اجرایی جدید — بسته‌های پایهٔ Pterodactyl — ۱۷ اکتبر ۲۰۲۶
+
+این بخش براساس لاگ ترمینال ارسال‌شده اضافه شده و وضعیت فعلی را جایگزین snapshot قدیمی «PHP/Nginx/MariaDB/Redis نصب نیستند» می‌کند. آن snapshot صحیح بود، اما مربوط به قبل از نصب است.
+
+### آنچه واقعاً نصب و تأیید شد
+
+فرمان `sudo apt install -y` با بسته‌های زیر بدون خطای نصب در لاگ پایان یافته است:
+
+~~~bash
+sudo apt install -y \
+  php8.3 php8.3-cli php8.3-common php8.3-gd php8.3-mysql \
+  php8.3-mbstring php8.3-bcmath php8.3-xml php8.3-curl \
+  php8.3-zip php8.3-fpm php8.3-intl php8.3-opcache \
+  mariadb-server redis-server nginx \
+  git curl tar unzip
+~~~
+
+| مورد | نسخه/وضعیت واقعی |
+|---|---|
+| PHP CLI | 8.3.35 |
+| PHP extensionهای فیلترشده | bcmath, curl, gd, intl, mbstring, PDO, pdo_mysql, xml, zip, Zend OPcache مشاهده شدند |
+| MariaDB | 11.8.6 در خروجی client |
+| Redis | 8.0.2 |
+| Nginx | بسته نصب شد؛ بررسی `nginx -v` در PATH کاربر شکست خورد، ولی سرویس active و listener روی 80 است؛ بررسی مسیر کامل pending |
+| nginx | active |
+| mariadb | active |
+| redis-server | active |
+| php8.3-fpm | active |
+| Composer | هنوز نصب نشده |
+| Pterodactyl Panel | هنوز دانلود/نصب نشده |
+| Docker / Wings | هنوز نصب نشده |
+
+### پورت‌ها بعد از نصب
+
+خروجی `sudo ss -lntup` این موارد مهم را نشان داد:
+
+- Nginx: `0.0.0.0:80` و `[::]:80`.
+- MariaDB: `127.0.0.1:3306`، فقط loopback.
+- Redis: `127.0.0.1:6379` و `[::1]:6379`، فقط loopback.
+- در آن snapshot برای 443 listener دیده نشد؛ HTTPS هنوز تنظیم نشده است.
+- SSH روی TCP/22 باقی است.
+- فضای آزاد پارتیشن root حدود 28 GiB و مصرف حدود 75% است؛ فایل نصب native بازی در `/home/steam/cs2` حدود 70 GiB و Steam Runtime حدود 797 MiB گزارش شده‌اند.
+
+این وضعیت نشان می‌دهد سطح دسترسی DB و Redis فعلاً به شبکهٔ عمومی باز نشده است. این تنظیم را برای PoC حفظ می‌کنیم؛ قبل از ساخت CS2 container همچنان باید ریسک دانلود مجدد فایل بازی حل شود.
+
+### نکته دربارهٔ خطای ظاهری Nginx
+
+فرمان `nginx -v` در shell کاربر پیام `command not found` داد. این نتیجه با active بودن سرویس و listener پورت 80 ناسازگار نیست؛ مسیر باینری Nginx معمولاً زیر `/usr/sbin` قرار دارد و ممکن است در PATH کاربر عادی نباشد. برای نتیجهٔ قطعی اجرا شود:
+
+~~~bash
+sudo /usr/sbin/nginx -v
+dpkg-query -W -f='nginx package: ${Version}\n' nginx
+~~~
+
+### گام بعدی مستند
+
+گام بعد نصب Composer 2 از سایت رسمی است. نصب‌کننده باید پیش از اجرا با SHA-384 رسمی تطبیق داده شود؛ فرمان کامل و checksum تاریخ‌دار در [Pterodactyl PoC](PTERODACTYL-POC.md)، بخش ۱۰ آمده است. بعد از آن، نسخهٔ Composer و Nginx ثبت شده و فقط در مرحلهٔ بعد archive پایدار Panel دریافت می‌شود.
+
+**مرز مرحله:** در لاگ ارسالی database/user اختصاصی Panel، secrets، `.env`, APP_KEY، migration، حساب مدیر، queue worker یا cron ایجاد نشده‌اند. هیچ کاری با Docker/Wings یا ساخت CS2 container انجام نشده است.
