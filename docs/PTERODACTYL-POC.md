@@ -491,7 +491,7 @@ set -eu
 PANEL_DIR='/var/www/pterodactyl'
 
 echo "=== CHECK REQUIRED PHP EXTENSIONS ==="
-for module in bcmath curl gd intl mbstring mysqli openssl PDO pdo_mysql posix tokenizer xml zip; do
+for module in bcmath curl dom gd intl json mbstring mysqli openssl PDO pdo_mysql posix tokenizer xml zip; do
     if php8.3 -m | grep -Eixq "$module"; then
         printf 'OK: %s\n' "$module"
     else
