@@ -391,10 +391,10 @@ echo
 echo "=== REQUIRED PHP MODULES ==="
 PHP_MODULES="$(php -m | tr '[:upper:]' '[:lower:]')"
 for module in bcmath curl gd intl mbstring mysqli openssl pdo pdo_mysql posix tokenizer xml zip; do
-    if printf '%s\\n' "$PHP_MODULES" | grep -Fxq "$module"; then
-        printf 'OK: %s\\n' "$module"
+    if printf '%s\n' "$PHP_MODULES" | grep -Fxq "$module"; then
+        printf 'OK: %s\n' "$module"
     else
-        printf 'ERROR: missing PHP module: %s\\n' "$module" >&2
+        printf 'ERROR: missing PHP module: %s\n' "$module" >&2
         exit 1
     fi
 done
