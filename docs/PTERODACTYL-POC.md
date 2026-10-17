@@ -17,7 +17,7 @@
 
 - **Pterodactyl Panel:** نسخهٔ پایدار کاندید v1.15.1. شاخهٔ 2.0 در وب‌سایت پروژه Open Beta معرفی شده است؛ فعلاً از Beta برای این PoC استفاده نمی‌کنیم.
 - **Wings:** نسخهٔ پایدار کاندید v1.13.4.
-- **PHP:** Panel v1.15.1 به PHP در بازهٔ ^8.2 یا ^8.3 نیاز دارد و شرط آن PHP 8.4 را شامل نمی‌کند. روی مخازن پیش‌فرض این Debian، php8.3 candidate ندارد و php8.4 موجود است؛ بنابراین برای حفظ شاخهٔ پایدار 1.x، برنامه این است که PHP 8.3 را از مخزن شخص ثالث SURY نصب کنیم. SURY مخزن رسمی Debian نیست؛ کلید آن باید با keyring و گزینهٔ Signed-By مدیریت شود و حذف مخزن پس از نصب بسته‌هایش ممکن است به نگهداری/به‌روزرسانی PHP آسیب بزند. قبل از نصب بسته‌ها، ابتدا فقط مخزن را اضافه می‌کنیم و candidate را تأیید می‌کنیم.
+- **PHP:** Panel v1.15.1 به PHP در بازهٔ ^8.2 یا ^8.3 نیاز دارد و شرط آن PHP 8.4 را شامل نمی‌کند. مخزن شخص ثالث SURY با keyring اختصاصی و گزینهٔ Signed-By اضافه شد؛ پس از apt update، candidate برابر 8.3.35-1+0~20260925.87+debian13~1.gbp19383d گزارش شد. SURY مخزن رسمی Debian نیست و این وابستگی خارجی باید برای به‌روزرسانی‌های آینده حفظ و پایش شود. APT پیام داد که SURY مخزن i386 ارائه نمی‌کند؛ چون candidate معماری amd64 موجود است، این پیام مانع نصب نسخهٔ موردنیاز amd64 نیست.
 - **وب‌سرور:** Nginx.
 - **دیتابیس Panel:** MariaDB محلی، با database و user جداگانه برای Panel.
 - **Queue/cache:** Redis محلی.
@@ -167,3 +167,25 @@ PoC هنوز موفق محسوب نمی‌شود تا Panel به‌صورت پا
 **انجام‌شده:** Debian، منابع، IP 192.168.1.5، gateway، listenerهای فعلی و candidateهای بسته‌ها ثبت شده‌اند؛ نبود PHP 8.3 در مخازن پیش‌فرض و نیاز به مخزن SURY ثبت شده؛ Flute CMS و دیتابیس cPanel خارج از محدودهٔ نصب فعلی هستند.
 
 **انجام‌نشده:** هیچ package مربوط به Panel، PHP، Nginx، MariaDB، Redis، Docker یا Wings نصب نشده؛ مخزن PHP 8.3 هنوز اضافه نشده؛ Panel، Node و CS2 container هنوز ساخته نشده‌اند.
+
+
+## ٨. نتیجهٔ افزودن مخزن PHP 8.3 — ۱۷ اکتبر ۲۰۲۶
+
+کاربر این مراحل را انجام داد:
+
+1. نصب/تأیید ca-certificates و curl.
+2. دریافت و نصب بستهٔ debsuryorg-archive-keyring نسخهٔ 2025.11.18.
+3. ساخت فایل /etc/apt/sources.list.d/sury-php.sources با Signed-By: /usr/share/keyrings/debsuryorg-archive-keyring.gpg.
+4. اجرای موفق sudo apt update.
+
+خروجی واقعی apt-cache policy php8.3:
+
+~~~text
+Installed: (none)
+Candidate: 8.3.35-1+0~20260925.87+debian13~1.gbp19383d
+500 https://packages.sury.org/php trixie/main amd64 Packages
+~~~
+
+پیام Skipping ... binary-i386/Packages از SURY به‌دلیل پشتیبانی‌نشدن معماری i386 در این مخزن بود؛ APT هم‌زمان index معماری amd64 را دریافت کرد و candidate را نشان داد.
+
+**وضعیت:** مخزن و keyring نصب شده‌اند؛ خود PHP و اجزای Panel هنوز نصب نشده‌اند. مرحلهٔ بعد نصب PHP 8.3 extensions، Nginx، MariaDB و Redis است. Composer/Panel، Wings و Docker در مرحله‌های بعدی انجام می‌شوند.
