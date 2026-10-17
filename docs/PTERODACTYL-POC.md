@@ -189,3 +189,60 @@ Candidate: 8.3.35-1+0~20260925.87+debian13~1.gbp19383d
 پیام Skipping ... binary-i386/Packages از SURY به‌دلیل پشتیبانی‌نشدن معماری i386 در این مخزن بود؛ APT هم‌زمان index معماری amd64 را دریافت کرد و candidate را نشان داد.
 
 **وضعیت:** مخزن و keyring نصب شده‌اند؛ خود PHP و اجزای Panel هنوز نصب نشده‌اند. مرحلهٔ بعد نصب PHP 8.3 extensions، Nginx، MariaDB و Redis است. Composer/Panel، Wings و Docker در مرحله‌های بعدی انجام می‌شوند.
+
+
+## ۹. مرحلهٔ بعد: نصب بسته‌های پایهٔ Panel — هنوز اجرا نشده
+
+طبق راهنمای رسمی Pterodactyl 1.x، Panel به PHP 8.2/8.3 و extensionهای موردنیاز، MariaDB/MySQL، Redis، وب‌سرور و Composer 2 نیاز دارد. برای Nginx، PHP-FPM نیز لازم است. در مخازن پیش‌فرض این VM، PHP 8.3 candidate نداشت؛ مخزن SURY با Signed-By اضافه شد و candidate معماری amd64 تأیید شد. منبع خارجی SURY باید در نگهداری و به‌روزرسانی آینده در نظر گرفته شود.
+
+### فرمان نصب بسته‌ها
+
+این فرمان، فقط لایهٔ پایهٔ وب و دیتابیس را نصب می‌کند؛ هنوز Panel را دانلود یا راه‌اندازی نمی‌کند و Docker/Wings را هم نصب نمی‌کند.
+
+~~~bash
+sudo apt install -y \
+  php8.3 php8.3-cli php8.3-common php8.3-gd php8.3-mysql \
+  php8.3-mbstring php8.3-bcmath php8.3-xml php8.3-curl \
+  php8.3-zip php8.3-fpm php8.3-intl php8.3-opcache \
+  mariadb-server redis-server nginx \
+  git curl tar unzip
+~~~
+
+این مرحله سرویس‌های Nginx، MariaDB، Redis و PHP-FPM را به‌عنوان dependency نصب می‌کند؛ ممکن است systemd آن‌ها را در پایان نصب اجرا کند. تنظیمات default فعلی باید بعد از نصب دوباره بررسی شوند، به‌خصوص اینکه MariaDB و Redis فقط روی loopback در دسترس باشند و port 80/443 برای Panel استفاده شود. در این مرحله هنوز port forwarding عمومی روتر تغییر نمی‌کند.
+
+### بررسی بعد از نصب
+
+~~~bash
+echo "=== PHP CLI ==="
+php8.3 -v
+php8.3 -m | grep -Ei '^(bcmath|curl|gd|intl|mbstring|PDO|pdo_mysql|xml|zip|Zend OPcache)$'
+
+echo
+echo "=== PACKAGE VERSIONS ==="
+nginx -v 2>&1
+mariadb --version
+redis-server --version
+
+echo
+echo "=== SERVICE STATUS ==="
+for svc in nginx mariadb redis-server php8.3-fpm; do
+    printf '%-15s' "$svc"
+    systemctl is-active "$svc" || true
+done
+
+echo
+echo "=== LISTENING PORTS ==="
+sudo ss -lntup
+~~~
+
+### مفهوم فرمان‌ها
+
+- apt install بسته‌های باینری، فایل‌های پیکربندی و وابستگی‌های لازم را نصب می‌کند؛ به‌معنای نصب خود Panel نیست.
+- PHP CLI برای اجرای artisan و Composer استفاده می‌شود؛ PHP-FPM درخواست‌های PHP را به Nginx پردازش می‌کند.
+- Nginx درخواست HTTP را دریافت می‌کند و بعداً به پوشهٔ public پنل هدایت می‌شود.
+- MariaDB داده‌های Panel را نگهداری می‌کند؛ Redis برای cache، queue و وضعیت‌های موقت به کار می‌رود.
+- هنوز database، user، رمز، Panel، APP_KEY، queue worker یا cron ساخته نشده‌اند؛ آن‌ها مراحل بعد هستند.
+
+**معیار قبولی این مرحله:** بسته‌ها با PHP 8.3 نصب شوند، extensionهای کلیدی قابل مشاهده باشند، سرویس‌ها active شوند و هیچ listener ناخواسته‌ای روی پورت عمومی دیتابیس/Redis ایجاد نشده باشد. پس از ثبت خروجی، نصب Composer 2 را به‌شکل رسمی و سپس دریافت و پیکربندی خود Panel انجام می‌دهیم.
+
+منبع رسمی: https://docs.pterodactyl.io/v1/panel/getting-started
