@@ -2,15 +2,25 @@
 
 ## آخرین وضعیت ثبت‌شده
 
+### نصب Composer 2 و تأیید نسخهٔ Nginx — ۱۷ اکتبر ۲۰۲۶
+
+- نصب‌کنندهٔ Composer با SHA-384 مورد انتظار تطبیق کرد؛ پیام `Composer installer checksum verified.` در لاگ دیده شد.
+- Composer نسخهٔ 2.10.3 با PHP 8.3.35 در مسیر `/usr/local/bin/composer` نصب شد.
+- بررسی Nginx با مسیر کامل موفق بود: `nginx/1.26.3`؛ نسخهٔ Debian package برابر `1.26.3-3+deb13u9` گزارش شد.
+- وضعیت کنونی گام بعدی: دریافت و پیکربندی Panel هنوز انجام نشده است؛ دیتابیس اختصاصی، `.env`, APP_KEY، migrations، admin user، queue/cron، Docker/Wings و CS2 container هنوز pending هستند.
+- راهنمای اجرایی و توضیح آموزشی در [Pterodactyl PoC، بخش ۱۰](PTERODACTYL-POC.md) و خروجی ثبت‌شده در انتهای [Debian PoC Log](DEBIAN-POC.md) آمده‌اند.
+- مقدار checksum ثبت‌شده، شاهد اجرای موفق همین نصب است و نباید در آینده بدون بررسی صفحهٔ رسمی Composer به‌عنوان مقدار همیشگی استفاده شود.
+
+
 ### نصب dependencyهای پایهٔ Pterodactyl — ۱۷ اکتبر ۲۰۲۶
 
 - کاربر نصب بسته‌های PHP 8.3 و extensionهای موردنیاز، PHP-FPM، Nginx، MariaDB، Redis و ابزارهای پایه را روی `fc-node-01` اجرا کرد؛ لاگ apt پایان عادی نصب ۵۱ بسته را نشان می‌دهد.
 - PHP CLI 8.3.35، MariaDB 11.8.6 و Redis 8.0.2 از خروجی‌ها شناسایی شدند؛ سرویس‌های `nginx`, `mariadb`, `redis-server` و `php8.3-fpm` همگی active بودند.
 - listenerها بررسی شدند: Nginx روی TCP/80؛ MariaDB فقط روی `127.0.0.1:3306`؛ Redis فقط روی loopback IPv4/IPv6. پورت 443 هنوز listener نداشت.
 - `nginx -v` در shell کاربر به علت پیدا نشدن فرمان شکست خورد، اما سرویس و listener فعال بودند؛ تأیید نسخه با `sudo /usr/sbin/nginx -v` و `dpkg-query` در گام Composer ثبت شده است.
-- Composer، خود Panel، دیتابیس و کاربر اختصاصی Panel، `.env`، APP_KEY، queue/cron، Docker و Wings هنوز نصب/ساخته نشده‌اند.
+- در زمان ثبت این snapshot وابستگی‌ها، Composer هنوز نصب نشده بود؛ نصب Composer 2.10.3 در بخش جدیدتر بالای این فایل ثبت شده است. خود Panel، دیتابیس و کاربر اختصاصی Panel، `.env`، APP_KEY، queue/cron، Docker و Wings هنوز نصب/ساخته نشده‌اند.
 - فضای آزاد همچنان حدود 28 GiB است، در برابر نصب native بازی CS2 حدود 70 GiB؛ روش امن استفاده از Base Game پیش از ساخت container باید حل شود.
-- آموزش اجرایی و فرمان نصب تأیید checksum برای Composer در [Pterodactyl PoC، بخش ۱۰](PTERODACTYL-POC.md) ثبت شد؛ این گام بعدی است و هنوز اجرا نشده.
+- فرمان و آموزش Composer پیش از اجرا در [Pterodactyl PoC، بخش ۱۰](PTERODACTYL-POC.md) آمده بود؛ نصب اکنون با موفقیت انجام شده و نتیجه در ابتدای این Change Log ثبت شده است.
 - این تغییر فقط مستندات `FragCity-RawPHPbackend` را به‌روز کرده است؛ در این گام هیچ تغییری در `cs2-kus-addons` انجام نشده است.
 
 
