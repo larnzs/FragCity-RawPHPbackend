@@ -1,7 +1,9 @@
 # FragCity — Initial Security Review
 
 
-**دامنه ممیزی:** بازبینی ایستای فایل‌های مرتبط با authentication، heartbeat، bulk sync و DatabaseSyncService در شاخه `main` مخازن `FragCity-WebAPIClient` و `FragCity-RawPHPbackend`. این بازبینی تست نفوذ، اجرای کد، تست روی سرور زنده یا ممیزی کامل کل برنامه نیست. هیچ باگی در این مرحله اصلاح نشده است.
+**دامنهٔ ممیزی:** بازبینی ایستای فایل‌های مرتبط با authentication، heartbeat، bulk sync و DatabaseSyncService در شاخهٔ `main` مخازن `FragCity-WebAPIClient` و `FragCity-RawPHPbackend`. این گزارش خط مبنای امنیتی است؛ تست نفوذ یا ممیزی پویا/کامل کل برنامه نیست.
+
+> **وضعیت جاری — ۱۷ اکتبر ۲۰۲۶:** فایل‌های `settings/loader.php` و `settings/settings.example.json` در ریپو وجود دارند، اما حضور Loader به معنی مهاجرت کامل تمام صفحات قدیمی نیست. یافته‌های credential hard-coded، صدور/ثبت token، ستون‌های SQL برگرفته از payload و خطای heartbeat همچنان باز هستند؛ بدون تغییر/test مشخص، رفع آن‌ها یا Rotation credentialها را انجام‌شده فرض نکن.
 
 ### ۱۶.۱. موارد با اولویت فوری
 
@@ -29,7 +31,7 @@
 
 #### E. خطای نحوی در heartbeat
 
-در `agent/heartbeat.php` دستور fetch رکورد موجود به صورت `$checkStmt$checkStmt->fetch(...)` دیده می‌شود. این عبارت از نظر نحوی نامعتبر به نظر می‌رسد و باید با lint واقعی PHP تأیید و اصلاح شود؛ تا پیش از آن heartbeat را سالم فرض نکنیم.
+در نسخهٔ فعلی `agent/heartbeat.php` عبارت `$existingNode = $checkStmt$checkStmt->fetch(PDO::FETCH_ASSOC);` همچنان وجود دارد. این عبارت از نظر PHP syntax نامعتبر است. قبل از استفاده باید `php -l agent/heartbeat.php` اجرا و مشکل اصلاح شود؛ تا آن زمان endpoint را سالم یا آمادهٔ Production فرض نکن. این بازبینی مستندات، کد اجرایی را اصلاح نکرده است.
 
 #### F. مسیر سینک مستقیم دیتابیس خطر از دست‌رفتن داده دارد
 
