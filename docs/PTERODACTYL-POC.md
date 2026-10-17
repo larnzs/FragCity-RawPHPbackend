@@ -109,45 +109,67 @@ pgrep -a -x cs2 خروجی No active CS2 process داد. این یعنی هنگ�
 
 RAM موجود برای Panel آزمایشی کافی به نظر می‌رسد، اما ظرفیت اجرای بازی، تعداد Instanceها و محدودیت منابع باید جداگانه اندازه‌گیری شوند.
 
-## ۵. ترتیب اجرایی این PoC
+## ۵. راهنمای اجرایی و چک‌لیست مرحله‌به‌مرحله
 
-### P2.1 — Preflight شبکه و مسیر دیسک
+این بخش نقشهٔ عملیاتی کل PoC است. علامت‌ها معنی مشخص دارند:
 
-- [ ] تأیید کارکرد sudo.
-- [ ] ثبت IP با ip -br address و مسیر پیش‌فرض.
-- [ ] ثبت پورت‌های listening قبل از نصب Nginx.
-- [ ] ثبت اندازهٔ native CS2/Steam Runtime و فضای آزاد.
-- [ ] اطمینان از نبود CS2 process پیش از maintenance.
+- `[x]` یعنی اجرای آن مرحله از روی لاگ یا خروجی قابل مشاهده تأیید شده است.
+- `[ ]` یعنی هنوز انجام نشده یا شواهد کافی برای تأیید آن نداریم.
+- در هر جلسه فقط مرحلهٔ بعدیِ بدون تیک را اجرا کن. مراحل انجام‌نشده را جلوتر از ترتیب اجرا نکن.
 
-### P2.2 — نصب Panel و database stack
+### P2.1 — بررسی اولیهٔ Debian، شبکه و Storage
 
-- [ ] نصب وابستگی‌های نسخهٔ منتخب بر اساس راهنمای جاری Pterodactyl.
-- [ ] نصب/فعال‌سازی Nginx و PHP-FPM.
-- [ ] نصب MariaDB و Redis.
-- [ ] ساخت database به نام panel و user محلی محدود به loopback؛ رمز فقط در terminal/config خصوصی و نه در Git.
-- [ ] دریافت archive رسمی Panel، تنظیم .env، Composer dependencies، key، migrations/seed و کاربر admin.
+- [x] تأیید کارکرد `sudo`.
+- [x] ثبت نسخهٔ Debian و kernel.
+- [x] ثبت CPU، RAM، swap و فضای دیسک.
+- [x] ثبت IP، gateway و پورت‌های listening پیش از نصب وب‌سرور.
+- [x] ثبت اندازهٔ native CS2 و Steam Runtime و نبود process فعال CS2 در زمان snapshot.
+- [x] ثبت محدودیت Storage: فضای آزاد root حدود 28 GiB است، اما نصب native CS2 حدود 70 GiB فضا دارد.
+
+### P2.2 — آماده‌سازی و نصب Panel
+
+- [x] افزودن مخزن PHP 8.3 از SURY با keyring اختصاصی و `Signed-By`.
+- [x] نصب PHP 8.3، extensionهای منتخب، Nginx، MariaDB، Redis و ابزارهای لازم.
+- [x] تأیید extensionهای PHP بررسی‌شده و active بودن Nginx، MariaDB، Redis و PHP-FPM.
+- [x] تأیید اینکه MariaDB و Redis فقط روی loopback گوش می‌دهند.
+- [x] نصب Composer 2.10.3 و تأیید checksum نصب‌کننده در زمان نصب.
+- [x] بررسی Nginx با مسیر کامل؛ نسخهٔ باینری 1.26.3 و بستهٔ Debian برابر 1.26.3-3+deb13u9 است.
+- [ ] دریافت archive نسخهٔ پایدار Panel v1.15.1، بررسی archive و استخراج فایل‌ها در `/var/www/pterodactyl` — **گام بعدی**.
+- [ ] ساخت database و کاربر محدود مخصوص Panel؛ رمز در Git یا مستند عمومی نوشته نشود.
+- [ ] نصب dependencyهای PHP با Composer و بررسی `composer check-platform-reqs --no-dev`.
+- [ ] ساخت `.env`، واردکردن تنظیمات محیط، تولید APP_KEY و پشتیبان امن از آن.
+- [ ] اجرای migrations/seed و ساخت admin user.
+- [ ] تنظیم مالکیت و permissionهای نهایی فایل‌ها.
+- [ ] ساخت تنظیم Nginx مخصوص Panel؛ قبل از reload اجرای `nginx -t` الزامی است.
 - [ ] تنظیم queue worker و cron scheduler.
-- [ ] بالا آوردن Panel در شبکهٔ آزمایش و تست ورود مدیر.
+- [ ] آزمایش بازشدن Panel از مرورگر شبکهٔ آزمایش و ورود مدیر.
 
-ابتدا فقط دسترسی شبکهٔ محلی آزمایش می‌شود. دامنه عمومی، port forwarding اینترنتی و production TLS در این مرحله هدف نیستند.
+**قانون شبکه در این PoC:** هنوز port forwarding اینترنتی یا دامنهٔ عمومی تنظیم نمی‌کنیم. HTTP بدون TLS فقط برای شبکهٔ آزمایشگاهیِ محدود است و نباید با رمز واقعی از اینترنت در دسترس قرار گیرد.
 
-### P2.3 — نصب Wings و Docker
+### P2.3 — نصب Wings و Docker (بعد از قبولی Panel)
 
-- [ ] نصب Docker طبق مستندات رسمی Debian 13/Wings.
-- [ ] بررسی docker info و سازگاری kernel.
-- [ ] ساخت Node آزمایشی در Panel و ثبت allocations مناسب IP داخلی.
-- [ ] تولید config برای Wings از خود Panel و راه‌اندازی کنترل‌شده.
-- [ ] بررسی firewall/NAT، storage root و مسیرهای کانتینر پیش از اولین server creation.
+- [ ] بازبینی راهنمای رسمی Docker و نصب نسخهٔ سازگار.
+- [ ] اجرای `docker info` و بررسی سازگاری kernel.
+- [ ] ایجاد Node آزمایشی در Panel و تعریف allocations بر اساس IP واقعی Node.
+- [ ] گرفتن تنظیم Wings از خود Panel؛ token/secret وارد Git نشود.
+- [ ] راه‌اندازی Wings با systemd و بررسی log/service status.
+- [ ] بررسی storage root و پورت‌های کانتینر پیش از ایجاد اولین سرور.
 
-نصب Docker می‌تواند قواعد firewall/NAT و مصرف دیسک را تغییر دهد؛ بنابراین بعد از ثبت وضعیت پورت‌ها انجام می‌شود، نه قبل از آن.
+نصب Docker می‌تواند قواعد firewall/NAT و مصرف دیسک را تغییر دهد؛ به همین دلیل بعد از ثبت وضعیت شبکه انجام می‌شود.
 
 ### P2.4 — اولین CS2 تحت مدیریت Pterodactyl
 
-- [ ] انتخاب Egg/Startup سازگار و بازبینی اسکریپت نصب آن.
-- [ ] حل اختلاف میان نصب native فعلی و filesystem داخل Docker.
-- [ ] ابتدا یک server آزمایشی؛ تأیید install/start/console/stop/restart.
-- [ ] بررسی RAM/CPU/disk/port و لاگ‌ها.
-- [ ] بعد از قبولی فقط، بررسی model مربوط به Base Game مشترک و Instanceهای جدا.
+- [ ] بررسی Egg و Startup، به‌ویژه اسکریپت نصب و حجم دانلود.
+- [ ] حل محدودیت Storage پیش از ساخت container؛ ایجاد سرور CS2 تا آن زمان **مسدود است**.
+- [ ] ساخت فقط یک سرور آزمایشی پس از تأیید فضای کافی یا روش Storage قابل اعتماد.
+- [ ] تست install/start/console/stop/restart و ثبت خروجی واقعی.
+- [ ] بررسی RAM/CPU/disk/network و لاگ‌ها.
+- [ ] پس از قبولی، بررسی Shared Base و جداسازی payload هر Instance.
+
+### معیار موفقیت PoC
+
+PoC فقط زمانی موفق است که Panel پایدار باز شود، Wings به Panel متصل بماند و حداقل یک سرور CS2 از داخل Panel چرخهٔ Start/Stop/Restart موفق و تکرارپذیر داشته باشد. نصب بسته‌ها یا بازشدن صفحهٔ login به‌تنهایی موفقیت نهایی نیست.
+
 
 ## ۶. معیار پذیرش و منع‌های عملیاتی
 
@@ -174,7 +196,7 @@ PoC هنوز موفق محسوب نمی‌شود تا Panel به‌صورت پا
 - دستور `nginx -v` در shell کاربر با پیام `command not found` مواجه شد، اما سرویس active بود و پورت 80 را listen می‌کرد. بررسی بعدی با `sudo /usr/sbin/nginx -v` موفق شد و نسخهٔ `nginx/1.26.3` و بستهٔ `1.26.3-3+deb13u9` را تأیید کرد؛ پس این مورد مشکل PATH کاربر بود، نه شکست نصب Nginx.
 - فضای آزاد همچنان حدود 28 GiB است و نصب فعلی native بازی CS2 در `/home/steam/cs2` حدود 70 GiB است؛ اخطار storage پیش از ساخت container به قوت خود باقی است.
 
-**مرحلهٔ بعد:** بررسی دوبارهٔ release پایدار Panel و سپس نوشتن/اجرای گام دریافت archive و پیکربندی Panel، با ثبت خروجی هر مرحله. هنوز دیتابیس یا `.env` پنل ساخته نشده است.
+**مرحلهٔ بعد:** دریافت و استخراج archive رسمی Panel v1.15.1 در `/var/www/pterodactyl`. نسخه و URL رسمی بازبینی شده‌اند؛ فرمان کامل و خروجی مورد انتظار در بخش ۱۱ آمده است. هنوز دیتابیس یا `.env` پنل ساخته نشده است.
 
 ## ٨. نتیجهٔ افزودن مخزن PHP 8.3 — ۱۷ اکتبر ۲۰۲۶
 
@@ -330,17 +352,104 @@ dpkg-query -W -f='nginx package: ${Version}\n' nginx
 - https://getcomposer.org/download/
 - https://docs.pterodactyl.io/v1/panel/getting-started
 
-## ۱۱. مرحلهٔ بعد: دریافت و نصب Panel — هنوز اجرا نشده
+## ۱۱. گام بعدی: دریافت و استخراج Panel v1.15.1 — هنوز اجرا نشده
 
-در ادامه، قبل از اجرای فرمان دانلود، release پایدار و راهنمای رسمی Panel دوباره بررسی می‌شوند. سپس فرمان‌های هر مرحله به همین سند افزوده خواهند شد و نتیجهٔ واقعی اجرای کاربر در [Debian PoC Log](DEBIAN-POC.md) ثبت می‌شود.
+### چرا v1.15.1؟
 
-ترتیب اجرای مرحلهٔ بعد:
-1. بررسی release فعلی و انتخاب archive همان نسخه.
-2. ایجاد مسیر امن برنامه و دریافت/استخراج archive رسمی.
-3. تنظیم مالکیت و دسترسی فایل‌ها.
-4. نصب dependencyهای PHP با Composer از داخل پوشهٔ Panel.
-5. آماده‌سازی دیتابیس محلی و user محدود Panel؛ رمز فقط در ترمینال/فایل خصوصی، نه Git.
-6. ساخت `.env` و APP_KEY، اجرای migration/seed و ساخت admin طبق مستندات همان release.
-7. تنظیم Nginx، queue worker و cron؛ سپس بررسی ورود به پنل.
+در بازبینی ۱۷ اکتبر ۲۰۲۶، GitHub صفحهٔ release رسمی را با v1.15.1 به‌عنوان آخرین release پایدار 1.x نشان می‌دهد؛ مستندات رسمی، خط 1.x را Stable و 2.0 را Open Beta معرفی می‌کنند. asset رسمی همین tag برابر `panel.tar.gz` است. فایل `composer.json` این tag محدودهٔ PHP را `^8.2 || ^8.3` اعلام می‌کند و با PHP 8.3.35 نصب‌شده سازگار است. برای نصب تکرارپذیر از tag ثابت استفاده می‌کنیم، نه URL متغیر `latest/download`.
 
-این‌ها هنوز برنامهٔ مرحلهٔ بعد هستند و هیچ‌کدام در لاگ فعلی اجرا نشده‌اند. پیش از ساخت DB/secret یا دانلود archive، نسخه و فرمان‌های فعلی دوباره تأیید خواهند شد.
+منابع رسمی:
+- Release: https://github.com/pterodactyl/panel/releases/tag/v1.15.1
+- فایل رسمی: https://github.com/pterodactyl/panel/releases/download/v1.15.1/panel.tar.gz
+- Getting Started نسخهٔ 1.x: https://docs.pterodactyl.io/v1/panel/getting-started
+- `composer.json` همان tag: https://raw.githubusercontent.com/pterodactyl/panel/v1.15.1/composer.json
+
+### پیش از اجرا
+
+این گام را در **ترمینال Debian ماشین `fc-node-01`** اجرا کن، نه در Windows. این مرحله فقط archive را دانلود، بررسی و استخراج می‌کند؛ database، رمز، `.env`، APP_KEY، Composer dependencies، Nginx virtual host، Docker یا Wings را نمی‌سازد.
+
+اگر مسیر `/var/www/pterodactyl` از قبل وجود داشته باشد، اسکریپت عمداً متوقف می‌شود تا فایل‌های احتمالی قبلی بازنویسی نشوند. در آن صورت پوشه را حذف نکن؛ خروجی را بفرست تا اول بررسی شود.
+
+### فرمان کامل مرحله
+
+~~~bash
+set -eu
+
+PANEL_VERSION='v1.15.1'
+PANEL_DIR='/var/www/pterodactyl'
+ARCHIVE="/tmp/pterodactyl-panel-${PANEL_VERSION}.tar.gz"
+FILE_LIST="/tmp/pterodactyl-panel-${PANEL_VERSION}-files.txt"
+PANEL_URL="https://github.com/pterodactyl/panel/releases/download/${PANEL_VERSION}/panel.tar.gz"
+
+echo "=== PRE-FLIGHT ==="
+echo "Panel release: ${PANEL_VERSION}"
+df -h /
+
+if sudo test -e "$PANEL_DIR"; then
+    echo "STOP: $PANEL_DIR already exists. No files were changed."
+    sudo ls -la "$PANEL_DIR"
+    exit 1
+fi
+
+echo
+echo "=== DOWNLOAD OFFICIAL RELEASE ASSET ==="
+curl --fail --location --show-error --output "$ARCHIVE" "$PANEL_URL"
+test -s "$ARCHIVE"
+ls -lh "$ARCHIVE"
+
+echo
+echo "=== VERIFY ARCHIVE CAN BE READ ==="
+tar -tzf "$ARCHIVE" > "$FILE_LIST"
+sed -n '1,15p' "$FILE_LIST"
+
+echo
+echo "=== CREATE TARGET DIRECTORY AND EXTRACT ==="
+sudo install -d -m 0755 "$PANEL_DIR"
+sudo tar -xzf "$ARCHIVE" -C "$PANEL_DIR"
+
+echo
+echo "=== CHECK REQUIRED PANEL FILES ==="
+for required_file in artisan .env.example composer.json public/index.php; do
+    if ! sudo test -f "$PANEL_DIR/$required_file"; then
+        echo "ERROR: expected file is missing: $PANEL_DIR/$required_file" >&2
+        exit 1
+    fi
+    echo "OK: $required_file"
+done
+
+echo
+echo "=== SET INITIAL STORAGE / CACHE PERMISSIONS ==="
+sudo chmod -R 755 "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache"
+
+echo
+echo "=== PANEL DIRECTORY SUMMARY ==="
+sudo ls -ld "$PANEL_DIR" "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache"
+sudo du -sh "$PANEL_DIR"
+df -h /
+~~~
+
+### توضیح سادهٔ فرمان
+
+- `set -eu`: در صورت خطای فرمان یا متغیر تعریف‌نشده، اجرای بلوک متوقف می‌شود.
+- `PANEL_VERSION`: نسخهٔ دقیق را ثابت می‌کند تا نصب قابل تکرار باشد.
+- بررسی وجود پوشه: مانع بازنویسی ناخواستهٔ نصب قبلی می‌شود.
+- `curl --fail --location`: فایل را از Release رسمی دریافت می‌کند و خطای HTTP را موفق فرض نمی‌کند.
+- `tar -tzf`: قبل از استخراج، بررسی می‌کند archive قابل خواندن است و فهرست فایل‌ها را نگه می‌دارد.
+- `install -d`: پوشهٔ مقصد را می‌سازد؛ `tar` فایل‌ها را در آن استخراج می‌کند.
+- آزمون چهار فایل: وجود فایل‌های اصلی برنامه، فایل نمونهٔ محیط، فهرست dependencyها و front controller را بررسی می‌کند.
+- `chmod`: مجوز اولیهٔ Storage و Cache را تنظیم می‌کند؛ مالکیت نهایی در مرحلهٔ بعد اعمال می‌شود.
+
+### خروجی مورد انتظار
+
+- `Panel release: v1.15.1`
+- دانلود archive و `tar -tzf` بدون خطا.
+- چهار پیام `OK` برای `artisan`, `.env.example`, `composer.json`, `public/index.php`.
+- نمایش مسیرهای Panel/Storage/Cache و اندازهٔ پوشه.
+
+### اگر خطا دیدی
+
+- اگر پیام `already exists` آمد، متوقف شو و پوشه را حذف نکن.
+- اگر `curl`، `tar` یا آزمون فایل‌ها خطا داد، ادامه نده.
+- اگر موفق شد، کل خروجی را بفرست. در این گام رمز یا secret ساخته نمی‌شود؛ پیش از ارسال خروجی هر اطلاعات خصوصی را بازبینی کن.
+
+**این گام هنوز اجرا نشده است.** پس از دیدن خروجی، نتیجه را در Runbook، Debian Log، README، Roadmap و Change Log ثبت می‌کنیم؛ سپس سراغ Database و نصب dependencyهای PHP می‌رویم.
