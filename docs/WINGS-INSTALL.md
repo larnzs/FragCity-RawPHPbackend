@@ -11,7 +11,7 @@
 
 این VM فعلی را برای PoC ادامه بده، اما آن را مستقیماً به چند Node کلون نکن. این VM Panel و دیتابیس/تنظیمات آن را دارد. الگوی Node قابل‌تکرار باید نقش‌محور باشد (Debian + Docker + Wings binary/service)، بدون Panel مرکزی و بدون فایل config واقعی Wings یا tokenهای هر Node. برای هر clone، machine identity، SSH host keys، hostname/IP و config مخصوص node باید یکتا شوند.
 
-راهنمای کامل backup در برابر clone، OVF/OVA، Node Golden Template، bootstrap scripts و تفکیک فایل‌های CS2/KUS در [Reusable Linux Image Strategy](REUSABLE-LINUX-IMAGE-STRATEGY.md) است.
+راهنمای کامل backup در برابر clone، OVF/OVA، Node Golden Template، bootstrap scripts و تفکیک فایل‌های CS2/KUS در [Reusable Linux Image Strategy](REUSABLE-LINUX-IMAGE-STRATEGY.md) است. دستور گام‌به‌گام برای ساخت Template واقعی و نقطهٔ توقف کپی در [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) قرار دارد.
 
 ## 1. اجزای معماری
 
@@ -58,8 +58,8 @@
 | RAM | 5.6 GiB؛ حدود 3 GiB available در نمونه‌برداری |
 | Root filesystem | 112 GiB کل، 80 GiB مصرف‌شده، 27 GiB آزاد |
 | `/home/steam` | حدود 71 GiB؛ فایل‌های موجود CS2/KUS |
-| Docker CLI/daemon | پیدا نشد / فعال نبود |
-| Docker repository | `/etc/apt/sources.list.d/docker.sources` هنوز وجود نداشت |
+| Docker CLI/daemon | در preflight اولیه پیدا نشد؛ در تست بعدی Docker 29.9.1 فعال و hello-world موفق شد |
+| Docker repository | در preflight اولیه وجود نداشت؛ بعداً پیکربندی شد و بسته‌ها نصب شدند |
 | بسته‌های متعارض بررسی‌شده | هیچ‌کدام installed گزارش نشدند |
 | listenerهای موجود | SSH TCP/22، NGINX TCP/80؛ MariaDB روی loopback:3306، Redis روی loopback:6379 |
 | Wings ports | 8080 و 2022 هنوز listener نیستند؛ Wings نصب نشده است |
