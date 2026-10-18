@@ -156,3 +156,13 @@
 - راهنما شامل مراحل تکمیل‌شده و Pending است و مهم‌ترین کدها/خطاهای این گفتگو را ثبت می‌کند. خروجی‌های تکراری صرفاً تزئینی به‌جای کپی‌کردن پشت‌سرهم، در حد لازم به‌صورت نتیجه خلاصه شده‌اند؛ رمزها و APP_KEY عمداً حذف شده‌اند.
 - لینک‌های اصلی runbook، Panel setup، Wings، Session Command Log و Current Status در GitHub دوباره خوانده شدند.
 - مورد باز مانده: نسخهٔ دقیق Panel. پیش از نصب Wings، دستور p:info اجرا و نسخه با Release رسمی تطبیق داده شود. Docker preflight تکمیل است ولی نصب Docker هنوز اجرا نشده.
+
+
+## ممیزی Golden Image و اسکریپت‌های Node — ۱۸ اکتبر ۲۰۲۶
+
+- راهنمای مستقل [DEBIAN-NODE-GOLDEN-IMAGE](DEBIAN-NODE-GOLDEN-IMAGE.md) اضافه شد تا ساخت VM تازهٔ Debian 13 با ظرفیت مجازی Growable برابر 300 GB را مرحله‌به‌مرحله توضیح دهد.
+- اسکریپت‌های [install-docker.sh](../infra/node-template/install-docker.sh)، [prepare-golden-image.sh](../infra/node-template/prepare-golden-image.sh) و [set-node-identity.sh](../infra/node-template/set-node-identity.sh) نسخه‌بندی شده‌اند.
+- اسکریپت Docker روی Debian 13/amd64 guard دارد، package conflict را خودکار حذف نمی‌کند و فایل repository/key موجود و متفاوت را overwrite نمی‌کند.
+- اسکریپت finalization عمداً destructive نسبت به machine-id و SSH host keys است؛ فقط در VM تمیز با hostname دقیق `fc-node-template`، بدون Panel، game payload، server volumes و Wings config اجرا می‌شود. پس از پیام READY، VM مادر باید خاموش بماند.
+- **هیچ‌یک از این اسکریپت‌های Template هنوز روی VM تازه‌ای اجرا نشده‌اند.** Docker روی VM فعلی Panel نصب و آزمایش شده؛ Template تازه فقط پس از اجرای واقعی مراحل سند و ثبت خروجی‌ها Complete اعلام می‌شود.
+- تصمیم معماری: VM فعلی Panel را برای Node Golden Image clone نمی‌کنیم؛ Panel، Node، بازی و token/config اختصاصی هر Node نقش‌های جدا دارند.
