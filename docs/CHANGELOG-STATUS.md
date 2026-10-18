@@ -8,9 +8,9 @@
 - Docker Engine روی VM فعلی Panel نصب و تأیید شده: Docker 29.9.1، سرویس systemd برابر ACTIVE، `docker info` موفق و `docker run --rm hello-world` موفق.
 - خطای 403 در آخرین تست تکرار نشد؛ دو endpoint رسمی Docker پاسخ HTTP 200 دادند.
 - Wings هنوز نصب نشده؛ نسخهٔ دقیق Panel باید با `sudo -u www-data php8.3 artisan p:info` تأیید شود.
-- **تصمیم معماری جدید:** VM فعلی Panel به Golden Image تبدیل یا clone نمی‌شود. Template واقعی با VM تازهٔ Debian 13 و ظرفیت مجازی Growable برابر 300 GB ساخته می‌شود؛ CS2 و فایل‌های `cs2-kus-addons` در آن نصب نمی‌شوند.
-- راهنمای ساخت Template: [DEBIAN-NODE-GOLDEN-IMAGE.md](DEBIAN-NODE-GOLDEN-IMAGE.md). اسکریپت‌های GitHub: [infra/node-template](https://github.com/larnzs/FragCity-RawPHPbackend/tree/main/infra/node-template).
-- گام بعدی فعلی: اجرای فقط‌خواندنی `p:info` روی VM فعلی Panel؛ پس از انتخاب Wings سازگار، ساخت VM تمیز `fc-node-template` را شروع می‌کنیم.
+- **تصمیم فعلی برای ادامهٔ PoC:** فعلاً Wings را روی همین VM `fc-node-01` نصب می‌کنیم تا مسیر end-to-end اثبات شود؛ Golden Image و VM جدید به بعد موکول شده‌اند. VM فعلی را با اسکریپت‌های finalization/clone identity تغییر نده و آن را در این مرحله clone نکن. بعد از تکمیل PoC، Template تمیز و Cheatsheet قابل‌تکرار ساخته می‌شود.
+- راهنمای Golden Image فعلاً برای آینده نگه داشته شده: [DEBIAN-NODE-GOLDEN-IMAGE.md](DEBIAN-NODE-GOLDEN-IMAGE.md). اکنون قدم بعد `p:info` و سپس نصب Wings روی همین VM است.
+- گام بعدی فعلی: اجرای فقط‌خواندنی `p:info` روی همین VM؛ پس از انتخاب Wings سازگار، Node `fc-node-01` را در Panel ثبت کرده و Wings را همین‌جا نصب می‌کنیم.
 - فایل‌های حدود 71 GiB در `/home/steam` روی VM فعلی حفظ می‌شوند؛ هنوز هیچ CS2 instance در Pterodactyl ایجاد نشده و دسترسی عمومی/HTTPS هم تنظیم نشده است.
 
 
