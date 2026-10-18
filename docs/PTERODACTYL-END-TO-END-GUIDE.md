@@ -577,7 +577,9 @@ df -h /
 
 **وضعیت: این مرحله هنوز اجرا نشده و قدم بعدی واقعی است.**
 
-Docker در این معماری محیط‌های container را اجرا می‌کند. طبق راهنمای رسمی از مخزن APT خود Docker استفاده می‌کنیم: https://docs.docker.com/engine/install/debian/
+Docker در این معماری محیط‌های container را اجرا می‌کند. این مرحله در ۱۸ اکتبر ۲۰۲۶ با [راهنمای رسمی Docker برای Debian](https://docs.docker.com/engine/install/debian/) تطبیق داده شد: Debian 13/Trixie و معماری amd64 پشتیبانی می‌شوند و روش مخزن APT رسمی انتخاب شده است.
+
+**هشدار شبکه:** Docker هنگام انتشار پورت containerها می‌تواند با قواعد firewall/NAT کار کند و در برخی پیکربندی‌ها پورت‌های published از قواعد UFW/firewalld عبور کنند. در این مرحله هیچ پورت بازی یا Port Forwarding عمومی باز نمی‌کنیم؛ رفتار firewall و زنجیرهٔ `DOCKER-USER` در فصل شبکه بررسی می‌شود.
 
 ~~~bash
 set -eu
