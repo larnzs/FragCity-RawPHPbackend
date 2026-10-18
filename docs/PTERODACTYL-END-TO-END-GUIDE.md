@@ -686,47 +686,44 @@ done
 
 ### مرحله ۱۸ — تأیید Docker پس از نصب
 
-**قدم بعدی فعلی است:** خروجی ۱۸ اکتبر نشان داد پنج بستهٔ Docker نصب شده‌اند و endpointهای رسمی HTTP=200 می‌دهند؛ حالا باید سرویس/daemon و اجرای container آزمایش شوند.
+**وضعیت: انجام شد؛ نصب و اجرای container آزمایشی موفق بود.**
 
-این بلوک برای تشخیص مناسب است: حتی اگر سرویس پایین باشد، تلاش می‌کند لاگ را نشان دهد و به‌خاطر یک کد خروجی قبل از رسیدن به اطلاعات تشخیصی متوقف نمی‌شود.
+خروجی واقعی کاربر:
+- `Docker version 29.9.1, build dfc520d`
+- `systemctl is-active docker`: `ACTIVE`
+- `docker info`: `Server=29.9.1 Containers=0 Images=0` (این نمونه‌برداری قبل از pull شدن `hello-world` بود)
+- `docker run --rm hello-world`: image برای معماری amd64 دریافت شد و پیام `Hello from Docker!` نمایش داده شد.
+- فضای root پس از تست: 112 GiB کل، 80 GiB مصرف‌شده، 27 GiB آزاد.
+- `/var/lib/docker` در خروجی `du` برابر 232 KiB گزارش شد؛ این فقط اندازهٔ مسیر گزارش‌شده در همان لحظه است و دلیل پاک‌کردن یا دستکاری storage نیست.
+- خطای 403 قبلی در تست endpointها تکرار نشد؛ هر دو URL رسمی HTTP=200 داده بودند.
+
+Docker Engine اکنون آماده است و مرحلهٔ نصب را تکرار نکن. تست `hello-world` ثابت می‌کند CLI، daemon، دریافت image و اجرای یک container ساده کار کرده‌اند؛ هنوز ثابت نمی‌کند Wings وصل شده یا CS2 قابل اجراست.
+
+### مرحلهٔ ۱۹ — شناسایی نسخهٔ دقیق Panel پیش از نصب Wings
+
+**وضعیت: قدم بعدی فعلی؛ Wings را هنوز نصب نکن.** نسخهٔ دقیق Panel باید از خود برنامه خوانده شود؛ نسخهٔ Laravel به‌تنهایی نسخهٔ Pterodactyl را مشخص نمی‌کند. دستور رسمی `p:info` نسخهٔ Panel و جزئیات تنظیمات را نشان می‌دهد. [مستندات رسمی Artisan](https://docs.pterodactyl.io/v2/guides/tutorials/artisan).
+
+در Debian اجرا کن:
 
 ~~~bash
-set -u
-
-echo "=== DOCKER CLIENT ==="
-sudo docker --version || true
-
-echo
-echo "=== DOCKER SERVICE ==="
-if sudo systemctl is-active --quiet docker; then
-    echo "Docker service: ACTIVE"
-else
-    echo "Docker service: NOT ACTIVE"
-    sudo systemctl status docker --no-pager -l || true
-    echo
-    echo "=== RECENT DOCKER SERVICE LOG ==="
-    sudo journalctl -u docker -n 80 --no-pager || true
-fi
-
-echo
-echo "=== DOCKER ENGINE INFO ==="
-sudo docker info --format 'Server={{.ServerVersion}} Containers={{.Containers}} Images={{.Images}} CgroupDriver={{.CgroupDriver}} CgroupVersion={{.CgroupVersion}}' || {
-    echo "docker info failed; inspect the service status/log above."
-}
-
-echo
-echo "=== TEST CONTAINER ==="
-sudo docker run --rm hello-world || {
-    echo "hello-world failed. Keep the full error; do not run prune or delete Docker data."
-}
-
-echo
-echo "=== DISK AFTER TEST ==="
-df -h /
-sudo du -sh /var/lib/docker 2>/dev/null || true
+cd /var/www/pterodactyl
+sudo -u www-data php8.3 artisan p:info
 ~~~
 
-**نتیجهٔ موفق مورد انتظار:** Docker service فعال است؛ docker info چاپ می‌کند که با Engine ارتباط برقرار شده؛ hello-world پیام موفقیت نمایش می‌دهد. اگر hello-world به‌علت دریافت image خطا بدهد، خروجی کامل آن را نگه دار؛ موفق‌نبودن pull با خرابی Panel یکی نیست و CS2 را دانلود نمی‌کند مگر اینکه فرمان صریحاً برای همان بازی اجرا شود.
+این فرمان فقط اطلاعات می‌خواند. خروجی کامل را قبل از ارسال مرور کن و هر مقدار حساس احتمالی را حذف کن؛ هیچ رمز، token، APP_KEY یا محتوای کامل `.env` را نفرست.
+
+بعد از مشاهدهٔ نسخه:
+1. شاخهٔ رسمی Panel (پایدار 1.x یا پیش‌انتشار 2.0) را مشخص می‌کنیم.
+2. نسخهٔ Wings سازگار را از مستندات همان شاخه انتخاب می‌کنیم؛ به `latest` کورکورانه تکیه نمی‌کنیم.
+3. سپس در Admin UI، Location و Node مخصوص `fc-node-01` را ایجاد می‌کنیم و config محرمانه را از تب Configuration دریافت می‌کنیم.
+4. Wings را foreground/debug آزمایش می‌کنیم و تنها پس از موفقیت، systemd service می‌سازیم.
+
+مرجع نسخه‌ها:
+- [Pterodactyl 2.0 docs — هنوز Pre-release](https://docs.pterodactyl.io/v2)
+- [Installing Wings — نسخهٔ 2.0](https://docs.pterodactyl.io/v2/wings/installing)
+- [Installing Wings — شاخهٔ پایدار 1.x](https://docs.pterodactyl.io/v1/wings/installing)
+- [Panel releases](https://github.com/pterodactyl/panel/releases)
+- [Wings releases](https://github.com/pterodactyl/wings/releases)
 
 ### مرحله ۱۹ — قبل از نصب Wings
 
@@ -766,8 +763,8 @@ sudo -u www-data php8.3 artisan p:info
 - [x] Egg query اجرا شد؛ فقط CS:GO پیدا شد
 - [x] فضای دیسک بررسی و /home/steam مشخصاً برای حفظ علامت‌گذاری شد
 - [x] Docker preflight انجام شد
-- [ ] Docker Engine نصب شود
-- [ ] docker info و hello-world موفق شوند
+- [x] Docker Engine نصب و سرویس فعال شد
+- [x] docker info و hello-world موفق شدند
 - [ ] نسخهٔ دقیق Panel تأیید و Wings سازگار انتخاب شود
 - [ ] Node ساخته، Wings نصب و سرویس فعال شود
 - [ ] Wings در Panel Online شود
