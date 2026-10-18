@@ -2,16 +2,15 @@
 
 ## آخرین وضعیت ثبت‌شده
 
-## وضعیت جاری تأییدشده — ۱۸ اکتبر ۲۰۲۶، پس از اجرای Docker
+## وضعیت جاری تأییدشده — ۱۸ اکتبر ۲۰۲۶، پس از اجرای p:info
 
 - Panel روی LAN فعال است و ورود مدیر از Windows تأیید شده؛ URL فعلی `http://192.168.1.5` است.
-- Docker Engine روی VM فعلی Panel نصب و تأیید شده: Docker 29.9.1، سرویس systemd برابر ACTIVE، `docker info` موفق و `docker run --rm hello-world` موفق.
-- خطای 403 در آخرین تست تکرار نشد؛ دو endpoint رسمی Docker پاسخ HTTP 200 دادند.
-- Wings هنوز نصب نشده؛ نسخهٔ دقیق Panel باید با `sudo -u www-data php8.3 artisan p:info` تأیید شود.
-- **تصمیم فعلی برای ادامهٔ PoC:** فعلاً Wings را روی همین VM `fc-node-01` نصب می‌کنیم تا مسیر end-to-end اثبات شود؛ Golden Image و VM جدید به بعد موکول شده‌اند. VM فعلی را با اسکریپت‌های finalization/clone identity تغییر نده و آن را در این مرحله clone نکن. بعد از تکمیل PoC، Template تمیز و Cheatsheet قابل‌تکرار ساخته می‌شود.
-- راهنمای Golden Image فعلاً برای آینده نگه داشته شده: [DEBIAN-NODE-GOLDEN-IMAGE.md](DEBIAN-NODE-GOLDEN-IMAGE.md). اکنون قدم بعد `p:info` و سپس نصب Wings روی همین VM است.
-- گام بعدی فعلی: اجرای فقط‌خواندنی `p:info` روی همین VM؛ پس از انتخاب Wings سازگار، Node `fc-node-01` را در Panel ثبت کرده و Wings را همین‌جا نصب می‌کنیم.
-- فایل‌های حدود 71 GiB در `/home/steam` روی VM فعلی حفظ می‌شوند؛ هنوز هیچ CS2 instance در Pterodactyl ایجاد نشده و دسترسی عمومی/HTTPS هم تنظیم نشده است.
+- خروجی واقعی `p:info`: **Panel Version 1.15.1**، Latest Version برابر `error` و Up-to-Date برابر `Yes`.
+- Docker Engine نسخهٔ 29.9.1 نصب شده، سرویس ACTIVE است، `docker info` موفق و `docker run --rm hello-world` موفق.
+- Wings هنوز نصب/متصل نشده؛ نسخهٔ منتخب فعلی **v1.13.4** و راهنمای اجرایی واحد در [FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md](FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md) است.
+- **تصمیم فعلی:** همین VM `fc-node-01` را ادامه می‌دهیم. نصب مجدد Debian، ساخت VM جدید یا آماده‌سازی template در این مرحله جزو کار نیست.
+- گام بعدی: دریافت باینری Wings، ساخت Node در Panel از مرورگر Windows، دریافت config محرمانه به‌صورت محلی، سپس debug و systemd.
+- فایل‌های حدود 71 GiB در `/home/steam` حفظ می‌شوند؛ هنوز هیچ CS2 instance در Pterodactyl ایجاد نشده و دامنه/HTTPS عمومی تنظیم نشده است.
 
 
 ## Snapshot تأییدشدهٔ جدید — ۱۸ اکتبر ۲۰۲۶
@@ -31,7 +30,7 @@
 - حساب Administrator ساخته شد.
 - NGINX برای `/var/www/pterodactyl/public` و PHP-FPM 8.3 تنظیم شد. ورود از Windows به `http://192.168.1.5` موفق بود.
 - این محیط هنوز فقط LAN/HTTP است؛ دامنه، HTTPS، فایروال WAN و Port Forwarding عمومی انجام نشده‌اند.
-- نسخهٔ دقیق Panel هنوز باید تطبیق داده شود: تاریخچهٔ قدیمی از `v1.15.1` نام می‌برد، اما شواهد فعلی `Laravel 12.64.0` و نداشتن Git metadata است. از Laravel version برای حدس‌زدن نسخهٔ Panel استفاده نکنید.
+- خروجی `sudo -u www-data php8.3 artisan p:info` نسخهٔ واقعی Panel را `1.15.1` تأیید کرد؛ Laravel Framework version با Panel version یکی نیست.
 
 جزئیات گام‌به‌گام: [Pterodactyl LAN Setup](PTERODACTYL-LAN-SETUP.md). تاریخچه و جزئیات قدیمی: [Pterodactyl PoC](PTERODACTYL-POC.md).
 
@@ -40,7 +39,7 @@
 - تصمیم فعلی: **VM موجود را ادامه بده؛ از صفر نصب مجدد نکن.** Panel روی `192.168.1.5` باز می‌شود، ورود مدیر موفق بوده، MariaDB و migrationها آماده‌اند و NGINX سرویس می‌دهد. بازسازی VM این دستاوردها را دور می‌ریزد و به‌خودی‌خود یک خطای HTTP 403 در دانلود مخزن را حل نمی‌کند.
 - پیش از تغییرات زیرساختی مهم، یک snapshot در VMware بگیر. برای backup مستقل و مطمئن‌تر، مهمان Debian را clean shutdown کن و سپس کل پوشهٔ VM را به یک محل دیگر کپی کن. Snapshot به‌تنهایی backup مستقل نیست.
 - در تلاش اول نصب Docker، HTTP 403 گزارش شد. تست بعدی در 04:29 UTC، هر دو endpoint رسمی را HTTP=200 نشان داد و بسته‌ها نصب شدند؛ سپس در تست نهایی Docker 29.9.1، سرویس ACTIVE و hello-world موفق بود. 403 فعلاً رفع‌شده/تکرارنشده است؛ اگر بازگردد، از مرحلهٔ عیب‌یابی راهنمای یکپارچه استفاده کن.
-- گام بعد: اجرای `sudo -u www-data php8.3 artisan p:info` در `/var/www/pterodactyl` برای تأیید نسخهٔ Panel؛ سپس Wings سازگار انتخاب می‌شود. بلوک 403 در راهنما برای عیب‌یابی مجدد نگه داشته شده است.
+- نسخهٔ Panel حالا تأیید شده است؛ گام بعد دریافت Wings `v1.13.4` و ساخت Node طبق [راهنمای مادر Copy/Paste](FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md) است.
 - تا زمان تشخیص، از `trusted=yes`، خاموش‌کردن TLS، mirror ناشناس، پاک‌کردن فایل‌ها یا نصب دوبارهٔ Debian استفاده نکن. فایل‌های حدود 71 GiB در `/home/steam` مربوط به CS2/KUS حفظ می‌شوند.
 - Docker رسمی، Debian 13/Trixie و معماری amd64 را پشتیبانی می‌کند؛ وجود خطای 403 را به‌تنهایی نمی‌توان به ناسازگاری سیستم‌عامل نسبت داد.
 - راهنمای Wings به [Wings Install](WINGS-INSTALL.md) و Runbook به [Pterodactyl End-to-End Guide](PTERODACTYL-END-TO-END-GUIDE.md) اشاره می‌کنند. هیچ سرور CS2 یا Port Forwarding عمومی در این مرحله ایجاد نشده است.
