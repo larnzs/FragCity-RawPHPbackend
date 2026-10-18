@@ -94,7 +94,7 @@
 - Panel در LAN فعال و ورود مدیر موفق است.
 - آخرین تست endpointها: Docker GPG URL و آدرس dists/trixie/InRelease هر دو HTTP=200.
 - خروجی dpkg-query نشان داد docker-ce، docker-ce-cli، containerd.io، docker-buildx-plugin و docker-compose-plugin نصب هستند.
-- **Docker daemon هنوز با systemctl، docker info و hello-world تأیید نشده است.** بنابراین Wings و Node همچنان Pending هستند.
+- **Docker نصب و تأیید شد:** Docker 29.9.1/build dfc520d، سرویس ACTIVE، docker info موفق و hello-world پیام موفقیت داد. Wings و Node همچنان Pending هستند.
 - /home/steam حدود 71 GiB فایل CS2/KUS دارد؛ حفظ شود.
 - تمام زیرساخت فعلاً LAN-only است؛ دامنه، HTTPS و دسترسی عمومی به فصل شبکه موکول‌اند.
 
