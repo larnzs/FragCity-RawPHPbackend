@@ -618,6 +618,72 @@ sudo systemctl enable --now docker
 
 اگر docker.sources از قبل وجود داشت، به‌جای overwrite کردن بررسی‌اش کن. فعلاً پورت عمومی یا Port Forwarding جدید باز نکن و کاربر fragcityadmin را به گروه docker اضافه نکن؛ از sudo docker استفاده کن.
 
+### عیب‌یابی مرحله ۱۷ — خطای HTTP 403 هنگام دریافت Docker
+
+**وضعیت فعلی:** نصب مرحلهٔ ۱۷ با HTTP 403 متوقف شده است؛ Docker هنوز نصب‌شده فرض نمی‌شود. خطای 403 به‌تنهایی دلیل خرابی Debian یا نیاز به نصب مجدد VMDK نیست. ابتدا باید URL دقیقِ ردشده را پیدا کنیم. روش رسمی Docker برای Debian 13 از `https://download.docker.com/linux/debian/gpg` و repository مربوط به `trixie` استفاده می‌کند.
+
+**پیش از عیب‌یابی:** در VMware از VM یک snapshot/backup امن بگیر؛ برای backup مستقل و سازگارتر، Debian را به‌صورت عادی خاموش کن و سپس پوشهٔ VM را کپی کن. Snapshot جای backup مستقل را نمی‌گیرد. هیچ فایلی را از `/home/steam` پاک یا جابه‌جا نکن و کلید TLS را غیرفعال نکن.
+
+این بلوک فقط اتصال و وضعیت فایل‌های تنظیمات را بررسی می‌کند؛ چیزی نصب، حذف یا تغییر نمی‌دهد:
+
+~~~bash
+set -u
+
+echo "=== TIME ==="
+date -u
+
+echo
+echo "=== DOCKER OFFICIAL ENDPOINTS (GET, NOT HEAD) ==="
+for url in \
+    "https://download.docker.com/linux/debian/gpg" \
+    "https://download.docker.com/linux/debian/dists/trixie/InRelease"
+do
+    echo
+    printf 'URL: %s\n' "$url"
+    curl -sS -L --connect-timeout 10 --max-time 30 \
+        -o /dev/null \
+        -w 'HTTP=%{http_code} remote_ip=%{remote_ip} total_seconds=%{time_total}\n' \
+        "$url"
+    result=$?
+    if [ "$result" -ne 0 ]; then
+        printf 'curl_exit_code=%s\n' "$result"
+    fi
+done
+
+echo
+echo "=== DOCKER KEY FILE ==="
+if sudo test -e /etc/apt/keyrings/docker.asc; then
+    sudo stat -c 'size=%s bytes owner=%U:%G mode=%a path=%n' \
+        /etc/apt/keyrings/docker.asc
+else
+    echo "No docker.asc file exists."
+fi
+
+echo
+echo "=== DOCKER APT SOURCE ==="
+if sudo test -f /etc/apt/sources.list.d/docker.sources; then
+    sudo cat /etc/apt/sources.list.d/docker.sources
+else
+    echo "No docker.sources file exists."
+fi
+
+echo
+echo "=== DOCKER PACKAGE STATUS ==="
+for package in docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin; do
+    dpkg-query -W -f='${db:Status-Status} ${Version}\n' "$package" 2>/dev/null \
+        || echo "not installed: $package"
+done
+~~~
+
+**نحوهٔ تفسیر نتیجه:**
+
+- اگر endpoint کلید یا `InRelease` مقدار `HTTP=403` بدهد، همان URL توسط سرور مقصد یا یک واسطهٔ شبکه رد شده است. متن خطای اصلی، زمان اجرا، DNS/مسیر شبکه و هر proxy تنظیم‌شده را بررسی می‌کنیم؛ از mirror ناشناس یا خاموش‌کردن اعتبارسنجی TLS استفاده نکن.
+- اگر هر دو `HTTP=200` بدهند، دسترسی فعلی به endpointها برقرار است؛ خطای قبلی ممکن است موقتی باشد یا در مرحلهٔ دیگری مثل `apt update` رخ داده باشد. خروجی اصلی خطا برای تعیین دقیق لازم است.
+- اگر خطا timeout/TLS/DNS باشد و HTTP code نداشته باشد، این خطای 403 نیست و باید همان خطای شبکه بررسی شود.
+- پس از بررسی، فقط اگر فایل repository و کلید درست باشند، مرحلهٔ نصب را ادامه بده. اگر `docker.sources` وجود دارد، آن را کورکورانه بازنویسی نکن.
+
+~~~
+
 ### مرحله ۱۸ — تأیید Docker پس از نصب
 
 **این بلوک فقط بعد از موفقیت مرحله ۱۷ اجرا شود.**
