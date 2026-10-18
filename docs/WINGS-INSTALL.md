@@ -1,17 +1,19 @@
 # FragCity — فصل Wings و Docker (LAN-only)
 
-**وضعیت:** Docker Engine نصب و با `docker info` و `hello-world` آزمایش شده؛ Wings هنوز نصب نشده است.  
+**وضعیت:** Docker Engine روی همین VM نصب و با `docker info` و `hello-world` آزمایش شده؛ قدم بعد نصب Wings روی همین `fc-node-01` است. Golden Image فعلاً به آینده موکول شده.  
 **Node:** `fc-node-01` · **OS:** Debian 13/Trixie · **Architecture:** amd64/x86_64 · **LAN IP:** `192.168.1.5`  
 **Panel:** `http://192.168.1.5` · ورود مدیر از Windows تأیید شده است.  
 **محدوده:** شبکهٔ داخلی فقط؛ هنوز دامنهٔ عمومی، HTTPS عمومی، Port Forwarding، فایروال WAN یا سرور بازی Pterodactyl نداریم.
 
 > **اصل ایمنی:** مسیر `/home/steam` حدود 71 GiB از فایل‌های موجود CS2/KUS را نگه می‌دارد. آن را حذف، جابه‌جا، کپی یا mount نکن. ادغام فایل‌های موجود با Egg/volumeهای Pterodactyl در فصل ۴ جداگانه طراحی می‌شود.
 
-## تصمیم دربارهٔ قابلیت انتقال VM
+## تصمیم اجرایی فعلی: ادامه روی همین VM
 
-این VM فعلی را برای PoC ادامه بده، اما آن را مستقیماً به چند Node کلون نکن. این VM Panel و دیتابیس/تنظیمات آن را دارد. الگوی Node قابل‌تکرار باید نقش‌محور باشد (Debian + Docker + Wings binary/service)، بدون Panel مرکزی و بدون فایل config واقعی Wings یا tokenهای هر Node. برای هر clone، machine identity، SSH host keys، hostname/IP و config مخصوص node باید یکتا شوند.
+برای این PoC، Panel و Wings موقتاً روی همین Debian `fc-node-01` اجرا می‌شوند. این روش برای آزمایش LAN و یادگیری مناسب است؛ **به‌عنوان معماری Production نهایی تلقی نمی‌شود**. Docker روی همین VM تأیید شده است و نصب آن تکرار نمی‌شود.
 
-راهنمای کامل backup در برابر clone، OVF/OVA، Node Golden Template، bootstrap scripts و تفکیک فایل‌های CS2/KUS در [Reusable Linux Image Strategy](REUSABLE-LINUX-IMAGE-STRATEGY.md) است. دستور گام‌به‌گام برای ساخت Template واقعی و نقطهٔ توقف کپی در [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) قرار دارد.
+پیش از نصب Wings، نسخهٔ دقیق Panel را با `sudo -u www-data php8.3 artisan p:info` بخوان. سپس Node همین ماشین را در Admin UI بساز و پیکربندی اختصاصی‌اش را از Panel دریافت کن. `/etc/pterodactyl/config.yml` حاوی token/secret است و نباید در Git یا چت ذخیره شود.
+
+Golden Image فعلاً deferred است؛ بعد از تکمیل PoC به [Reusable Linux Image Strategy](REUSABLE-LINUX-IMAGE-STRATEGY.md) و [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) برمی‌گردیم. هیچ اسکریپت finalization/clone identity را روی VM فعلی اجرا نکن.
 
 ## 1. اجزای معماری
 
