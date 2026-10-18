@@ -252,17 +252,52 @@ sudo systemctl is-active nginx
 
 ابتدا preflight بررسی شد: Debian 13 amd64، VMware، چهار vCPU، RAM حدود 5.6 GiB؛ Docker و repository آن هنوز نصب نشده‌اند، و بسته‌های متعارض بررسی‌شده پیدا نشدند.
 
-برای نصب تازه از مخزن رسمی، طبق <https://docs.docker.com/engine/install/debian/> عمل کنید. در این نصب، repository Docker هنوز اضافه نشده. بعد از نصب، این تست‌ها باید موفق شوند:
+در آخرین preflight، فایل repository `/etc/apt/sources.list.d/docker.sources` وجود نداشت. **این بلوک مرحلهٔ نصب بعدی است؛ هنوز روی VM اجرا نشده.** منبع و روش نصب رسمی: <https://docs.docker.com/engine/install/debian/>.
 
 ```bash
+set -eu
+
+sudo apt update
+sudo apt install -y ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+
+if ! sudo test -s /etc/apt/keyrings/docker.asc; then
+    sudo curl -fsSL https://download.docker.com/linux/debian/gpg \
+        -o /etc/apt/keyrings/docker.asc
+fi
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+if sudo test -e /etc/apt/sources.list.d/docker.sources; then
+    echo "STOP: docker.sources already exists; inspect it before editing."
+    exit 1
+fi
+
+. /etc/os-release
+sudo tee /etc/apt/sources.list.d/docker.sources >/dev/null <<EOF
+Types: deb
+URIs: https://download.docker.com/linux/debian
+Suites: $VERSION_CODENAME
+Components: stable
+Architectures: $(dpkg --print-architecture)
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF
+
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 sudo systemctl enable --now docker
+
+echo "=== VERIFY ENGINE ==="
 sudo systemctl is-active docker
 sudo docker info
 sudo docker run --rm hello-world
 df -h /
 ```
 
-**وضعیت:** [ ] Pending. برای گام‌به‌گام کامل و تفسیر هر فرمان به [Wings & Docker Install](docs/WINGS-INSTALL.md) بروید. فعلاً کاربر `fragcityadmin` را به گروه `docker` اضافه نکن؛ از `sudo docker` استفاده کن.
+**این فرمان‌ها چه می‌کنند؟** `apt update` فهرست بسته‌ها را تازه می‌کند؛ ابزارهای `ca-certificates` و `curl` برای دانلود HTTPS لازم‌اند؛ فایل `docker.asc` کلید عمومی امضای مخزن است؛ `docker.sources` آدرس، suite و کلید امضای مخزن را برای APT مشخص می‌کند؛ سپس Engine/CLI/container runtime نصب می‌شود. `systemctl enable --now docker` سرویس را اکنون فعال و برای بوت‌های بعدی هم روشن می‌کند. `docker info` ارتباط CLI با daemon را بررسی می‌کند و `hello-world` یک container آزمایشی اجرا می‌کند؛ این تست CS2 را دانلود نمی‌کند.
+
+اگر مخزن `docker.sources` پیش از اجرا وجود داشت، به‌جای اجرای دوباره یا overwrite کردن، فایل را بررسی و با دستورهای راهنمای فصل Wings هماهنگ کن. این نصب ممکن است روی قوانین شبکهٔ میزبان اثر بگذارد؛ فعلاً port forwarding عمومی تعریف نکن.
+
+**وضعیت:** [ ] Pending. برای توضیح مفصل‌تر مفاهیم Docker و تفسیر هر فرمان به [Wings & Docker Install](docs/WINGS-INSTALL.md) بروید. فعلاً کاربر `fragcityadmin` را به گروه `docker` اضافه نکن؛ از `sudo docker` استفاده کن.
 
 ### مرحله 8 — ساخت Node و نصب Wings
 
