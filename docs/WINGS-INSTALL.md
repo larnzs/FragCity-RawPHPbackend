@@ -189,39 +189,52 @@ df -h /
 
 طبق خروجی بررسی دیسک، `/home/steam` حاوی حدود 71 GiB فایل‌های CS2/KUS است؛ این مسیر را پاک یا جابه‌جا نکن. قبل از تغییرات بیشتر، snapshot بگیر و اگر backup مستقل می‌خواهی، VM را عادی خاموش و کل پوشهٔ VM را کپی کن.
 
-## 5. قبل از نصب Wings: نسخهٔ دقیق Panel و Node
+## 5. مرحلهٔ جاری — نصب Wings روی همین VM
 
-**قدم بعدی فعلی:** در Debian نسخهٔ Panel را از Artisan بخوان، سپس نسخهٔ Wings را طبق همان شاخه انتخاب کن. Pterodactyl 2.0 هنوز در مستندات رسمی Pre-release است؛ مستندات فعلی می‌گویند Wings 1.13.2 و 1.13.3 با 2.0 آزمایش شده‌اند. اگر Panel واقعاً 1.x باشد، باید جدول نسخه‌های 1.x را دنبال کنیم؛ این دو حالت را با حدس از روی Laravel version تعیین نکن.
+**تصمیم اجرایی فعلی:** فعلاً Golden Image و VM تمیز را عقب می‌اندازیم. Panel و Wings را برای PoC روی همین `fc-node-01` اجرا می‌کنیم؛ برای Production بعداً معماری را جداگانه ارزیابی می‌کنیم. Docker روی همین VM تأیید شده و نباید دوباره نصب شود.
+
+### 5.1 شناسایی نسخهٔ Panel
+
+روی همین VM اجرا کن:
 
 ~~~bash
 cd /var/www/pterodactyl
 sudo -u www-data php8.3 artisan p:info
 ~~~
 
-این فرمان فقط اطلاعات تنظیمات و نسخه را نشان می‌دهد. قبل از ارسال، هرگونه رمز، token یا secret را حذف کن؛ اگر خروجی حاوی credential بود آن قسمت را نفرست.
+خروجی نسخه و تنظیمات Panel را نشان می‌دهد. قبل از ارسال، رمزها، tokenها، APP_KEY یا secret را حذف کن؛ محتوای کامل `.env` را نفرست. مستند رسمی: <https://docs.pterodactyl.io/v2/guides/tutorials/artisan>.
 
-منابع رسمی:
+### 5.2 انتخاب نسخهٔ سازگار
+
+- اگر Panel روی شاخهٔ 1.x باشد، راهنمای Wings 1.x و جدول سازگاری همان شاخه را استفاده کن.
+- اگر Panel روی 2.0 pre-release باشد، مستندات رسمی فعلی می‌گویند Wings 1.13.2 تا 1.13.4 با آن تست شده‌اند. نسخهٔ دقیق را پس از دیدن `p:info` انتخاب و pin می‌کنیم.
+- تا پیش از این تأیید، Wings را دانلود یا اجرا نکن.
+
+منابع:
 - <https://docs.pterodactyl.io/v2>
 - <https://docs.pterodactyl.io/v2/wings/installing>
 - <https://docs.pterodactyl.io/v1/wings/installing>
-- <https://github.com/pterodactyl/panel/releases>
 - <https://github.com/pterodactyl/wings/releases>
 
-پس از تطبیق نسخه:
+### 5.3 ساخت Node در Panel
 
+پس از تعیین نسخه:
+1. در Admin → Locations یک Location بساز/انتخاب کن.
+2. در Admin → Nodes یک Node به نام `fc-node-01` تعریف کن.
+3. آدرس آزمایشی LAN برابر `192.168.1.5` است؛ فعلاً HTTP و SSL خاموش، فقط برای شبکهٔ مورداعتماد محلی.
+4. Daemon port معمولاً TCP/8080 و SFTP port TCP/2022 است؛ با UI/config همان نسخه مطابقت بده.
+5. از تب Configuration، config اختصاصی Node را دریافت کن. فایل `/etc/pterodactyl/config.yml` حاوی secret است؛ در GitHub/چت ثبتش نکن.
 
-قبل از دانلود Wings، نسخهٔ دقیق Panel را تأیید کن. لاگ Panel فعلی Laravel `12.64.0` را نشان می‌داد، اما metadata مربوط به Git وجود نداشت؛ یک مستند قدیمی‌تر به archive `v1.15.1` اشاره می‌کند. عدد Laravel به‌تنهایی نسخهٔ Panel را تعیین نمی‌کند. از <https://github.com/pterodactyl/wings/releases> و مستندات همان شاخه برای انتخاب سازگار استفاده کن؛ `latest` را کورکورانه دانلود نکن.
+### 5.4 نصب و آزمایش Wings
 
-وقتی نسخه تطبیق شد:
+پس از ساخت Node و دریافت config:
+- باینری Linux/amd64 نسخهٔ pin‌شده را از Release رسمی دریافت کن؛ hash/نسخه را ثبت کن.
+- ابتدا `sudo wings --debug` را در foreground اجرا کن.
+- اگر بدون خطا راه افتاد، با `Ctrl+C` متوقفش کن، سپس systemd service بساز/فعال کن.
+- تأیید نهایی: `systemctl is-active wings` و وضعیت Node در Panel برابر Online.
 
-1. در Panel به **Admin → Locations** برو و یک Location بساز (اگر هنوز وجود ندارد).
-2. به **Admin → Nodes → Create New** برو.
-3. نام Node پیشنهادی: `fc-node-01`.
-4. برای آزمایش LAN، FQDN/Address را با IP رزروشدهٔ `192.168.1.5` هماهنگ کن و فعلاً SSL را غیرفعال نگه دار؛ این انتخاب فقط برای شبکهٔ قابل‌اعتماد تست است.
-5. Daemon port پیشنهادی پیش‌فرض `8080` و SFTP port `2022` است، مگر اینکه نسخه/UI فعلی مقدار دیگری بخواهد.
-6. ظرفیت RAM/disk را صادقانه تنظیم کن؛ 27 GiB آزاد به معنی وجود ظرفیت امن برای دانلود CS2 نیست.
-7. از تب Configuration کد YAML را تولید/کپی کن. آن فایل حاوی tokenها و secretهای Wings است؛ آن را در Git، README یا چت نگذار.
-
+**محدودیت مهم:** این PoC در LAN است. هنوز هیچ Port Forwarding عمومی، HTTPS عمومی یا CS2 server instance ایجاد نمی‌کنیم. حدود 71 GiB فایل‌های موجود CS2/KUS در `/home/steam` باید حفظ شوند. Golden Image و اسکریپت‌های clone فقط پس از تکمیل PoC و در فصل آینده بررسی خواهند شد؛ روی VM فعلی اسکریپت finalization/clone identity اجرا نکن.
+ 
 ## 6. نصب باینری Wings و config
 
 این گام **بعد از ثبت نسخهٔ سازگار و ساخت Node در Panel** انجام می‌شود؛ در این مرحله هنوز اجرا نشده است.
