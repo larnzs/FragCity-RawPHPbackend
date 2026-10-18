@@ -2,7 +2,7 @@
 
 **هدف:** یک بار یک Debian تمیز با Docker و Wings آماده کنیم؛ سپس از VM خاموش‌شده یک کپی کامل بگیریم تا برای Node جدید، نصب Linux و تمام dependencyها را از اول تکرار نکنیم.
 
-**وضعیت فعلی:** Docker روی VM فعلی Panel نصب و با `docker info` و `hello-world` آزمایش شده است. این VM فعلی Golden Image نیست؛ چون Panel، دیتابیس Panel، تنظیمات NGINX و حدود 71 GiB فایل‌های بازی در `/home/steam` دارد.
+**وضعیت فعلی:** Docker روی VM فعلی Panel نصب و با `docker info` و `hello-world` آزمایش شده است. این VM فعلی Golden Image نیست؛ چون Panel، دیتابیس Panel، تنظیمات NGINX و حدود 71 GiB فایل‌های بازی در `/home/steam` دارد. راهنما و اسکریپت‌ها در GitHub آماده‌اند؛ VM تازه هنوز ساخته یا روی آن اجرا نشده‌اند.
 
 ## تصمیم معماری — خیلی مهم
 
