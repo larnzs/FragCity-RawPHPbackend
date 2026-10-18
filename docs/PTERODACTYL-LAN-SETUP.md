@@ -1,5 +1,8 @@
 # FragCity — نصب واقعی Pterodactyl Panel در LAN
 
+برای دیدن تاریخچهٔ کامل فرمان‌های این گفتگو (checkها، دستورات، خطاها و اصلاح‌ها)، [Pterodactyl Session Command Log](PTERODACTYL-SESSION-COMMAND-LOG.md) را هم بخوانید.
+
+
 **وضعیت:** نصب پنل و ورود از مرورگر Windows موفق شده است. این سند هم مسیر تکرارپذیر را توضیح می‌دهد و هم وضعیت واقعی نصب فعلی را ثبت می‌کند.  
 **محدوده:** آزمایش LAN روی Debian 13 در VMware؛ هنوز Production نیست.  
 **آدرس پنل فعلی:** `http://192.168.1.5`  
