@@ -1,7 +1,7 @@
 # FragCity — Documentation Audit & Beginner-Friendly Guide
 
 > بازبینی مستندات: ۱۷ اکتبر ۲۰۲۶  
-> محدوده: README و ۱۸ سند Markdown در `docs/` (در مجموع ۱۹ فایل)  
+> محدودهٔ اولیهٔ این گزارش: README و ۱۸ سند. پس از افزودن راهنماهای Panel/Wings، دفتر فرمان‌ها و راهنمای یکپارچه، شمار فایل‌ها تغییر کرده است؛ آخرین شمارش با فهرست GitHub انجام شود.  
 > وضعیت: لینک‌ها، code fenceها و فرمان‌های کلیدی Bash بررسی شده‌اند؛ archive Panel v1.15.1 دانلود و استخراج شده است و گام بعدی اصلاح مالکیت/بررسی افزونه‌های PHP است.
 
 ## ۱. هدف این سند
@@ -136,3 +136,13 @@
 - پس از commit، فایل‌های GitHub دوباره خوانده شدند و حضور لینک‌های اصلی، سرعنوان‌ها و متوازن‌بودن code fenceها بررسی شد. این بررسی ساختاری، اجرای فرمان‌ها روی VM را اثبات نمی‌کند.
 - فقط مستندات `FragCity-RawPHPbackend` تغییر کردند. مخزن `cs2-kus-addons` و ماشین Debian تغییر نکردند.
 
+
+
+## چکاپ نهایی فرمان‌به‌فرمان — ۱۸ اکتبر ۲۰۲۶
+
+- برای پاسخ به درخواست تجمیع همهٔ مراحل، سند [Pterodactyl End-to-End Guide](PTERODACTYL-END-TO-END-GUIDE.md) ایجاد و از README لینک شد.
+- ساختار آن شامل توضیحات معماری در ابتدای سند و سپس مرحله‌های شماره‌گذاری‌شده تا preflight فعلی Docker است. مرحله‌های تکمیل‌شده صریحاً از مرحله‌های Pending جدا شده‌اند.
+- راهنما کدهای مهم این گفتگو را ثبت می‌کند: بررسی PHP modules و فایل‌های Panel؛ Composer/APP_KEY؛ سرویس‌ها؛ check/creation/update دیتابیس و تفاوت root؛ Cache permission fix؛ wizardهای Panel؛ migration/seed/admin؛ NGINX site config و enable/reload؛ SSH/SFTP/HeidiSQL tunnel؛ Egg query؛ disk forensics؛ Docker conflict preflight و بلوک نصب Docker.
+- برخی outputهای کوتاه و تکراری عمداً فقط به‌عنوان نتیجه ثبت شده‌اند، نه با تکرار تک‌تک echoهای تزئینی. رمز، APP_KEY و tokenها عمداً حذف شده‌اند.
+- یک عدم‌قطعیت مهم جدا شده است: نسخهٔ دقیق Panel باید با `p:info` تعیین شود، قبل از آنکه نسخهٔ Wings انتخاب شود.
+- کنترل ساختاری پس از commit شامل بازخوانی فایل‌ها و بررسی code fenceهای کلیدی است؛ فرمان‌های نصب در این مرحله دوباره روی VM اجرا نشده‌اند.
