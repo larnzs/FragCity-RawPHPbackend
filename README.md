@@ -1,7 +1,7 @@
 # FragCity
 ## نیازمندی‌ها، معماری و نقشهٔ راه
 
-> **وضعیت پروژه:** Panel آزمایشی Pterodactyl در LAN نصب شده و ورود مدیر تأیید شده است؛ Docker Engine روی VM فعلی نصب و با `docker info` و `hello-world` تأیید شده؛ Wings و اجرای واقعی CS2 هنوز Pending هستند. اکنون یک VM تمیز 300 GB برای Node Golden Image می‌سازیم؛ VM فعلی Panel را clone نکن. سایت Raw PHP همچنان برای تست دیتابیس محلی به جداسازی امن credentialها و seed مستقل نیاز دارد؛ پروژه Production نیست.  
+> **وضعیت پروژه:** Panel آزمایشی Pterodactyl نسخهٔ 1.15.1 در LAN نصب شده و ورود مدیر تأیید شده است؛ Docker Engine نسخهٔ 29.9.1 نصب و با `docker run --rm hello-world` تأیید شده؛ گام جاری نصب Wings و ساخت Node روی همان VM یعنی `fc-node-01` است. برای اجرای فرمان‌ها از نصب Debian بدون Desktop Environment تا مراحل بعدی، سند مادر [FRAGCITY-MASTER-COPY-PASTE-RUNBOOK](docs/FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md) مرجع اجرایی واحد است. پروژه هنوز Production نیست؛ فایل‌های `/home/steam` باید حفظ شوند.
 > **آخرین به‌روزرسانی مستندات:** ۱۸ اکتبر ۲۰۲۶  
 > **هدف:** ساخت سکوی فروش و مدیریت سرورهای CS2 با تکیه بر پروژه‌های متن‌باز بالغ و کمینه‌کردن کدنویسی اختصاصی.
 
@@ -31,12 +31,6 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 این ترکیب هنوز انتخاب قطعی تولید نیست. اول باید ثابت کنیم که ایجاد CS2 instance، تخصیص منابع، اتصال فروش، خرید بسته با کیف پول، ثبت `expires_at` و رفتار زمان انقضا درست کار می‌کند. اگر بخش مدت‌دار در Paymenter به افزونه نیاز داشته باشد، ترجیح این است که شکاف را با extension محدود پر کنیم و هستهٔ محصول را بی‌دلیل fork نکنیم.
 
 **گزینهٔ پشتیبان مقایسه‌ای:** GameAP به‌همراه یک سامانهٔ صورتحساب. تا زمانی که مسیر اصلی مانع واقعی نشان نداده، نباید چند پلتفرم را هم‌زمان نصب و عملیاتی کنیم.
-
-### استراتژی Image قابل‌انتقال و نصب تکرارپذیر
-
-هدف این نیست که هر بار Linux و تمام کدهای نصب را دستی از صفر اجرا کنیم. برای Nodeهای جدید، یک **Node Golden Template** شامل Debian پایه، Docker و Wings با نسخهٔ مشخص می‌سازیم و نصب/پیکربندی اختصاصی هر ماشین را با اسکریپت‌های version-controlled انجام می‌دهیم. اما VMDK فعلی شامل Panel و دیتابیس آن است و نباید همان‌طور روی چند Node کپی شود. Panel مرکزی، Nodeهای بازی و فایل‌های بازی باید لایه‌های جدا داشته باشند؛ IP/hostname، machine identity، SSH host keys و tokenهای Wings باید برای هر clone یکتا باشند. فایل‌های CS2/KUS هم جدا از image سیستم‌عامل مدیریت می‌شوند.
-
-تصمیم و مراحل تفصیلی: [Reusable Debian Image Strategy](docs/REUSABLE-LINUX-IMAGE-STRATEGY.md).
 
 ## ریپوهای اصلی
 
@@ -71,6 +65,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 
 | سند | محتوا |
 |---|---|
+| [راهنمای مادر Copy/Paste](docs/FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md) | **مرجع اجرایی واحد:** از نصب Debian بدون GUI تا نصب Panel/Docker و ادامهٔ Wings؛ فرمان‌ها، خروجی‌های واقعی و مراحل بعدی |
 | [Requirements](docs/REQUIREMENTS.md) | نیازهای عملکردی/امنیتی/عملیاتی و معیار پذیرش |
 | [Architecture](docs/ARCHITECTURE.md) | معماری اجزا، مرز مسئولیت‌ها و مدل نودها |
 | [Repository Inventory](docs/REPOSITORIES.md) | جدول ریپوهای داخلی و متن‌باز، نقش، وضعیت و ریسک |
@@ -88,234 +83,29 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | [Pterodactyl End-to-End Guide](docs/PTERODACTYL-END-TO-END-GUIDE.md) | یک راهنمای پیوسته و شماره‌گذاری‌شده از بررسی Debian و نصب Panel تا خطاهای واقعی، SSH/HeidiSQL، دیسک و گام نصب Docker |
 | [Pterodactyl Session Command Log](docs/PTERODACTYL-SESSION-COMMAND-LOG.md) | دفتر زمانی فرمان‌های واقعی/تشخیصی، نتایج ثبت‌شده، خطاها و اصلاح‌ها، تنظیمات LAN و تفکیک موارد اجراشده از Pending |
 | [Wings & Docker Install](docs/WINGS-INSTALL.md) | فصل مستقل Docker/Wings: مفاهیم، نصب Engine، Node، config، systemd، Allocation، محدودیت دیسک و مراحل LAN |
-| [Reusable Debian Image Strategy](docs/REUSABLE-LINUX-IMAGE-STRATEGY.md) | تصمیم ثبت‌شده برای VMDK/OVF/OVA، Node Golden Template، bootstrap scripts و جلوگیری از کپی secret/identity |
-| [Debian Node Golden Image](docs/DEBIAN-NODE-GOLDEN-IMAGE.md) | راهنمای عملی ساخت VM تمیز 300 GB برای Node، نصب Docker/Wings، پاک‌سازی هویت و نقطهٔ توقف برای کپی گرفتن |
 | [Local Development](docs/LOCAL-DEVELOPMENT.md) | updater محلی، نصب Laragon/WAMP و موانع امن تست دیتابیس |
 | [Current Status](docs/CHANGELOG-STATUS.md) | وضعیت جاری، انتخاب‌های انجام‌شده و مواردی که هنوز اجرا نشده‌اند |
 | [Documentation Audit](docs/DOCUMENTATION-AUDIT.md) | محدودهٔ بازبینی مستندات، اصلاحات، پیوندهای بررسی‌شده و استاندارد آموزش مبتدی‌پسند |
 
 
-## Quick Setup — راه‌اندازی زیرساخت FragCity از صفر تا اولین سرور
+## شروع اجرایی — راهنمای مادر
 
-این بخش **نقطهٔ شروع اجرایی** مخزن است. برای مسیر کامل فرمان‌به‌فرمان از ابتدا تا مرحلهٔ فعلی، [راهنمای یکپارچهٔ End-to-End](docs/PTERODACTYL-END-TO-END-GUIDE.md) را باز کن؛ جدول زیر نقشهٔ فصل‌ها و وضعیت آنهاست. جزئیات کامل هر خطا و سابقهٔ گفتگو در [دفتر فرمان‌ها](docs/PTERODACTYL-SESSION-COMMAND-LOG.md) است.
+**برای کار عملی فقط از این فایل شروع کن:** [راهنمای مادر Copy/Paste](docs/FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md).
 
-> **محیط فعلی فقط LAN است.** Panel از Windows با `http://192.168.1.5` باز می‌شود؛ دامنهٔ واقعی، HTTPS، port forwarding عمومی و فایروال WAN هنوز تنظیم نشده‌اند. هیچ secret، رمز، APP_KEY یا token در README یا Git قرار ندهید.
+این فایل به‌عنوان دفترچهٔ اجرایی واحد طراحی شده است: نصب Debian بدون محیط گرافیکی، آماده‌سازی SSH و شبکه، PHP و سرویس‌های موردنیاز، نصب Panel، دیتابیس، تنظیم NGINX، رفع خطای Cache، Docker، تأیید نسخهٔ Panel و نصب Wings را به‌ترتیب پوشش می‌دهد. نتیجه‌های واقعی، خطاهای قبلی و بلوک‌های بعدی پس از اجرا در همان فایل ثبت می‌شوند.
 
-### نقشهٔ فصل‌ها
+### وضعیت فعلی
 
-| فصل | موضوع | وضعیت فعلی |
-|---|---|---|
-| ۰ | دانلود Debian ISO، ساخت VM در VMware و نصب سیستم‌عامل | نیازمند تدوین مستقل در آینده |
-| ۱ | راه‌اندازی اولیهٔ Debian، شبکه، SSH، به‌روزرسانی و آماده‌سازی فایل‌های موجود | نیازمند تدوین مستقل در آینده؛ وضعیت واقعی VM در [Debian PoC Log](docs/DEBIAN-POC.md) ثبت شده |
-| ۲ | نصب Pterodactyl Panel در LAN | **تکمیل شد؛ ورود مدیر از Windows تأیید شده** — [راهنمای فصل Panel](docs/PTERODACTYL-LAN-SETUP.md) |
-| ۳ | Docker Engine و Wings، اتصال Node به Panel | **Docker نصب و آزمایش شده؛ نصب Wings و اتصال Node در انتظار** — [راهنمای فصل Wings](docs/WINGS-INSTALL.md) |
-| ۴ | ادغام `cs2-kus-addons` و فایل‌های موجود CS2 با مدل Egg/Container/Volume در Pterodactyl | Pending؛ فصل پیچیدهٔ بعد از Wings |
-| ۵ | دامنه، DNS، HTTPS، NGINX، firewall، VMware/Router port-forwarding و دسترسی عمومی بازی‌ها | Pending؛ جدا از مراحل LAN |
+- Panel **1.15.1** نصب است و ورود از Windows به `http://192.168.1.5` تأیید شده است.
+- Docker **29.9.1** فعال است و آزمون `hello-world` موفق بوده است.
+- Wings هنوز نصب/پیکربندی نشده؛ مرحلهٔ جاری دانلود باینری و ساخت Node `fc-node-01` است.
+- سرور CS2 تحت مدیریت Pterodactyl هنوز ساخته نشده است؛ فضای آزاد و استفاده از فایل‌های موجود زیر `/home/steam` باید قبل از آن طراحی شود.
+- این PoC فقط LAN/HTTP است؛ دامنه، TLS عمومی و Port Forwarding عمومی هنوز تنظیم نشده‌اند.
+- هیچ‌یک از فایل‌های پروژهٔ `cs2-kus-addons` بدون درخواست صریح تغییر نمی‌کنند.
 
-### معماری موردنظر
+### قاعدهٔ به‌روزرسانی مستندات
 
-- **Panel** رابط وب مدیریتی است.
-- **Wings** سرویس روی Node است که با Panel ارتباط می‌گیرد.
-- **Docker Engine** محیط‌های container را برای اجرای نمونه‌های سرور بازی ایجاد و کنترل می‌کند.
-- **Egg** الگوی نصب و اجرای یک نوع بازی است.
-- یک **Node** می‌تواند چند server instance را میزبانی کند؛ برای هر سرور بازی روی همان VM الزاماً Node جدا لازم نیست.
-- **سرور بازی** به IP و Allocation/port خود متصل می‌شود. DNS مثل `server1.example` به‌تنهایی port متفاوتی انتخاب نمی‌کند. برای چند instance روی یک IP، Allocationهای port مهم‌اند؛ اگر هر server1/server2 ماشین جدا باشد، هرکدام Node خود را دارند.
-
-### وضعیت فعلی تأییدشده: `fc-node-01`
-
-| مورد | نتیجه |
-|---|---|
-| OS / kernel | Debian 13 (Trixie), `6.12.113+deb13-amd64` |
-| VM/CPU | VMware، معماری `x86_64/amd64`، چهار vCPU |
-| RAM | حدود 5.6 GiB؛ در snapshot حدود 3 GiB available |
-| Disk root | 112 GiB کل، حدود 80 GiB مصرف‌شده، 27 GiB آزاد |
-| Panel URL | `http://192.168.1.5`؛ LAN-only، HTTP |
-| Panel path | `/var/www/pterodactyl`; web root: `/var/www/pterodactyl/public` |
-| PHP/Composer | PHP 8.3.35؛ Composer 2.10.3 |
-| Database/cache | MariaDB 11.8.6 و Redis فعال؛ DB مخصوص Panel با نام `panel` و user `pterodactyl` |
-| NGINX/PHP-FPM | فعال؛ listener وب روی TCP/80؛ PHP-FPM 8.3 فعال |
-| Panel schema/admin | migration/seed موفق، حساب Administrator ساخته شده و ورود از Windows تأیید شده |
-| Egg CS2 | SQL فعلاً فقط `Counter-Strike: Global Offensive` را نشان داده؛ Egg اختصاصی CS2 هنوز اضافه/تأیید نشده |
-| Docker/Wings | Docker نصب و تأیید شده؛ Wings هنوز نصب نشده |
-| Storage بازی | حدود 71 GiB در `/home/steam` شامل فایل‌های موجود CS2/KUS؛ باید حفظ شود |
-| دسترسی عمومی | هیچ تنظیم دامنه/TLS/Port Forwarding جدیدی انجام نشده |
-
-**هشدار نسخه:** یک سند تاریخی از Panel `v1.15.1` نام می‌برد، اما لاگ نصب فعلی Laravel `12.64.0` را گزارش کرده و Git metadata در پوشهٔ نصب وجود نداشت. نسخهٔ دقیق Panel هنوز باید از نصب واقعی تأیید شود. پیش از انتخاب باینری Wings نسخه‌ها را تطبیق دهید؛ Laravel version به‌تنهایی نسخهٔ Panel را ثابت نمی‌کند.
-
-## Quick Setup: اجرای مرحله‌به‌مرحله
-
-مراحل زیر خلاصهٔ مسیر نصب‌اند. **روی همین VM، مراحل دارای `[x]` را بی‌دلیل دوباره اجرا نکن.** برای نصب تازه باید نسخهٔ رسمی و ثابت Panel را ابتدا انتخاب و pin کرد و سپس کل runbook را از ابتدا دنبال کرد.
-
-### مرحله 1 — سیستم‌عامل، منابع و شبکه
-
-**هدف:** بدانیم روی کدام سیستم کار می‌کنیم و کدام IP/منابع برای Node در دسترس‌اند.
-
-```bash
-cat /etc/os-release
-hostname
-hostname -I
-systemd-detect-virt || true
-uname -m
-free -h
-df -h /
-```
-
-**وضعیت:** [x] انجام و ثبت شده. IP LAN رزروشدهٔ Debian برابر `192.168.1.5` است. از Windows برای ورود SSH می‌توان از `ssh fragcityadmin@192.168.1.5` استفاده کرد.
-
-### مرحله 2 — PHP، NGINX، MariaDB، Redis و Composer
-
-**هدف:** فراهم‌کردن runtime وب و ابزارهای لازم Panel.
-
-- PHP 8.3.35 و extensionهای بررسی‌شده نصب شده‌اند.
-- MariaDB و Redis فعال‌اند؛ MariaDB روی `127.0.0.1:3306` و Redis روی loopback باقی می‌مانند.
-- Composer 2.10.3 نصب و بررسی شده است.
-- سرویس PHP-FPM 8.3 و NGINX فعال‌اند.
-
-**وضعیت:** [x] انجام شده. فهرست بسته‌ها و فرمان‌های تاریخی را در [Debian PoC Log](docs/DEBIAN-POC.md) ببینید.
-
-### مرحله 3 — فایل‌های Panel، ownership و Composer
-
-**هدف:** قرار دادن کد Panel در مسیر وب، نصب dependencyها و جلوگیری از خطای write permission.
-
-مسیر کد: `/var/www/pterodactyl`. پنل از پوشهٔ `public` سرو می‌شود؛ فایل `.env` نباید مستقیماً از وب در دسترس باشد.
-
-پس از استخراج archive رسمی:
-
-```bash
-cd /var/www/pterodactyl
-sudo chown -R www-data:www-data .
-sudo find storage bootstrap/cache -type d -exec chmod 750 {} +
-sudo find storage bootstrap/cache -type f -exec chmod 640 {} +
-```
-
-**معنی:** `chown` مالک/گروه را تنظیم می‌کند؛ `chmod` مجوز خواندن/نوشتن/ورود را کنترل می‌کند. `750` برای پوشه و `640` برای فایل، دسترسی نوشتن را برای owner محدود می‌کند. از `777` استفاده نکن.
-
-روی نصب تازه، فقط اگر `.env` وجود ندارد:
-
-```bash
-sudo cp .env.example .env
-sudo chown www-data:www-data .env
-sudo chmod 640 .env
-sudo -u www-data /usr/local/bin/composer install --no-dev --optimize-autoloader
-sudo -u www-data php8.3 artisan key:generate
-```
-
-**وضعیت:** [x] انجام شده و dependencyهای Composer نصب شده‌اند. `APP_KEY` را دوباره generate نکن و `.env` را overwrite نکن. توضیح کامل: [Pterodactyl LAN Setup](docs/PTERODACTYL-LAN-SETUP.md).
-
-### مرحله 4 — دیتابیس و تنظیم محیط Panel
-
-**هدف:** جداسازی داده‌های Panel از دیتابیس سایت FragCity و تنظیم آدرس، cache، session و queue.
-
-در نصب تازه، پس از بررسی اینکه دیتابیس/user از قبل وجود ندارند، ورود محلی به MariaDB:
-
-```bash
-sudo env MYSQL_HISTFILE=/dev/null mariadb
-```
-
-داخل MariaDB، `panel` بساز و برای `pterodactyl`@ `127.0.0.1` رمز منحصربه‌فرد تعیین کن؛ نمونهٔ کامل SQL در [Pterodactyl LAN Setup](docs/PTERODACTYL-LAN-SETUP.md) است. هیچ رمز واقعی را در Git/چت قرار نده.
-
-سپس:
-
-```bash
-cd /var/www/pterodactyl
-sudo -u www-data php8.3 artisan p:environment:setup
-sudo -u www-data php8.3 artisan p:environment:database
-```
-
-مقادیر فعلی ثبت‌شده: URL `http://192.168.1.5`، timezone `Asia/Tehran`، Cache/Session/Queue روی Redis، Redis host `127.0.0.1:6379` و DB host `127.0.0.1:3306` با DB `panel` و user `pterodactyl`. Redis Password در خروجی wizard خالی ثبت شد؛ اگر خود سرویس Redis را با رمز پیکربندی می‌کنی، باید هر دو سمت هماهنگ شوند.
-
-**وضعیت:** [x] wizardها تکمیل شدند.
-
-### مرحله 5 — Migration، seed و مدیر Panel
-
-```bash
-cd /var/www/pterodactyl
-sudo -u www-data php8.3 artisan migrate --seed --force
-sudo -u www-data php8.3 artisan p:user:make
-```
-
-- Migration/seed، جدول‌ها و داده‌های اولیهٔ Nest/Egg را ساخته است.
-- حساب Administrator ساخته شده است.
-- این دو فرمان روی نصب فعلی دوباره اجرا نشوند مگر اینکه دلیل مشخصی وجود داشته باشد.
-
-**وضعیت:** [x] موفق.
-
-### مرحله 6 — NGINX و ورود از Windows
-
-NGINX باید root را روی `/var/www/pterodactyl/public` بگذارد و PHP را به socket `/run/php/php8.3-fpm.sock` بفرستد. فایل فعال فعلی `/etc/nginx/sites-available/pterodactyl.conf` است.
-
-پس از هر تغییر:
-
-```bash
-sudo /usr/sbin/nginx -t
-sudo systemctl reload nginx
-sudo systemctl is-active nginx
-```
-
-در Windows باز کنید: <http://192.168.1.5>
-
-**وضعیت:** [x] Panel باز شده و login موفق بوده است. این مرحله فقط LAN و HTTP است؛ هنوز HTTPS یا دسترسی WAN نداریم. Queue Worker و Scheduler/Cron باید پیش از PoC پایدار و قطعاً پیش از Production جداگانه بررسی/تکمیل شوند.
-
-### مرحله 7 — نصب و تأیید Docker (تکمیل‌شده)
-
-**نتیجهٔ واقعی ترمینال در ۱۸ اکتبر ۲۰۲۶:**
-
-- هر دو endpoint مخزن رسمی Docker قبلاً `HTTP=200` پاسخ دادند؛ خطای 403 در بررسی مجدد تکرار نشد.
-- بسته‌های Docker نصب شدند: Docker CE/CLI نسخهٔ `29.9.1`، containerd و افزونه‌های Buildx/Compose.
-- `systemctl`: سرویس Docker فعال.
-- `docker info`: ارتباط CLI با Engine موفق و Server version برابر `29.9.1`.
-- `docker run --rm hello-world`: image آزمایشی دریافت شد و پیام `Hello from Docker!` نمایش داده شد.
-- فضای root در پایان همچنان حدود 27 GiB آزاد گزارش شد؛ در این مرحله هیچ سرور CS2 دانلود/ساخته نشد.
-
-**این مرحله را دوباره اجرا نکن.** Docker نصب و آزمایش شده است. حالا باید نسخهٔ دقیق Panel را بگیریم، چون نسخهٔ Wings باید با شاخهٔ Panel سازگار باشد. از فرمان `p:info` در [مرحلهٔ ۱۹ راهنمای یکپارچه](docs/PTERODACTYL-END-TO-END-GUIDE.md) استفاده کن و قبل از دریافت Wings، نتیجه را بررسی کن.
-
-فایل‌های موجود حدود 71 GiB در `/home/steam` حفظ می‌شوند. هنوز CS2 instance نساخته‌ایم؛ ادغام فایل‌های فعلی با Pterodactyl موضوع فصل ۴ است.
-
-### مرحله 8 — نصب Wings روی همین VM و اتصال Node
-
-**تصمیم فعلی:** فعلاً Golden Image و VM جدید را کنار می‌گذاریم. برای PoC، Panel و Wings روی همین Debian یعنی `fc-node-01` آزمایش می‌شوند. ساخت Template تمیز و Cheatsheet کامل بعد از اثبات مسیر عملیاتی انجام می‌شود.
-
-**وضعیت تأییدشده:** Docker Engine نسخهٔ 29.9.1 نصب است، سرویس active است، `docker info` موفق و `docker run --rm hello-world` موفق بوده است. Docker را دوباره نصب نکن.
-
-قدم بعد فقط شناسایی نسخهٔ Panel است تا Wings سازگار انتخاب شود:
-
-~~~bash
-cd /var/www/pterodactyl
-sudo -u www-data php8.3 artisan p:info
-~~~
-
-خروجی را از نظر password/token/secret بازبینی کن و مقدارهای محرمانه را نفرست. سپس در Admin UI یک Location (در صورت نبود) و Node به نام `fc-node-01` بساز. برای PoC LAN از آدرس `192.168.1.5` و HTTP بدون SSL استفاده می‌کنیم؛ Daemon port معمولاً TCP/8080 و SFTP port TCP/2022 هستند، اما مقدارهای نهایی را از UI/config همان نسخه بگیر. Config واقعی Wings حاوی secret است و نباید در GitHub یا چت ثبت شود.
-
-در ادامه Wings را طبق release سازگار نصب می‌کنیم، ابتدا با `sudo wings --debug` آزمایش می‌کنیم و پس از موفقیت systemd را فعال می‌کنیم. این مرحله فقط LAN است؛ هنوز Port Forwarding عمومی، HTTPS یا CS2 instance نداریم.
-
-**Golden Image در آینده:** پس از تکمیل PoC، [راهنمای ساخت Debian Node Golden Image](docs/DEBIAN-NODE-GOLDEN-IMAGE.md) و اسکریپت‌های [infra/node-template](https://github.com/larnzs/FragCity-RawPHPbackend/tree/main/infra/node-template) را برای ساخت محیط تمیز و قابل‌تکرار بازبینی می‌کنیم. آن template را روی همین VM فعلی اعمال نکن.
-
-**وضعیت:** Docker تکمیل؛ `p:info`، نصب Wings و Online شدن Node در انتظار.
-
-### مرحله 9 — Egg/Allocation و اولین سرور بازی
-
-بررسی DB نشان داد تنها Egg نام‌برده‌شدهٔ CS فعلاً `Counter-Strike: Global Offensive` است؛ Egg مخصوص CS2 هنوز وارد/تأیید نشده است. پس از Wings، Egg مخصوص CS2 باید از منبع معتبر اضافه و سپس Allocationهای واقعی تنظیم شوند.
-
-**وضعیت:** [ ] Pending.
-
-### مرحله 10 — ادغام فایل‌های موجود CS2/KUS (فصل ۴)
-
-آخرین اندازه‌گیری دیسک: 112 GiB کل، حدود 80 GiB مصرف‌شده، 27 GiB آزاد؛ `/home/steam` حدود 71 GiB دارد و شامل فایل‌های موجود CS2/KUS است.
-
-**حذف، جابه‌جایی یا پاک‌سازی `/home/steam` ممنوع است.** Docker به‌طور خودکار این فایل‌ها را به containerهای Pterodactyl متصل نمی‌کند. Egg استاندارد CS2 فضای بیشتری از فضای آزاد فعلی می‌خواهد؛ قبل از ساخت server instance، راه استفادهٔ مجدد از Base Game/فایل‌های موجود باید طراحی و آزمایش شود. این همان کار فصل ۴ است؛ هیچ تغییری در ریپوی `cs2-kus-addons` بدون درخواست صریح انجام نمی‌شود.
-
-**وضعیت:** [ ] Pending.
-
-### مرحله 11 — دامنه و دسترسی عمومی (فصل شبکهٔ آینده)
-
-این بخش فعلاً انجام نشده:
-
-- تعریف دامنهٔ Panel (مثلاً `panel.fragcity.ir`) و TLS/HTTPS.
-- تعریف نام‌های DNS برای Nodeها و در صورت نیاز نام‌های قابل‌حفظ برای سرورهای بازی.
-- NGINX، گواهی، Firewall، قواعد Docker/iptables، VMware bridged networking، روتر و Port Forwarding.
-- انتخاب پورت و protocol هر Egg براساس پیکربندی واقعی بازی.
-
-**هشدار:** DNS hostname به‌تنهایی port را انتخاب نمی‌کند. چند سرور روی یک Node می‌توانند از یک IP و portهای مجزا استفاده کنند؛ Node جدا فقط برای ماشین جدا لازم است. MariaDB/Redis را برای بازیکن یا اینترنت عمومی باز نکنید.
+پس از هر مرحله، فرمان‌هایی که واقعاً اجرا شده‌اند، خروجی قابل‌تأیید، خطاهای رخ‌داده و دستور مرحلهٔ بعد به **همان فایل مادر** افزوده می‌شود. فرمان‌های مربوط به فازهای پیاده‌سازی‌نشده به‌عنوان دستور Production فرضی ثبت نمی‌شوند.
 
 ## راهنمای تفصیلی
 
