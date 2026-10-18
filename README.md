@@ -255,13 +255,20 @@ sudo systemctl is-active nginx
 
 **وضعیت:** [x] Panel باز شده و login موفق بوده است. این مرحله فقط LAN و HTTP است؛ هنوز HTTPS یا دسترسی WAN نداریم. Queue Worker و Scheduler/Cron باید پیش از PoC پایدار و قطعاً پیش از Production جداگانه بررسی/تکمیل شوند.
 
-### مرحله 7 — تأیید Docker و آماده‌سازی Wings
+### مرحله 7 — نصب و تأیید Docker (تکمیل‌شده)
 
-**وضعیت به‌روزشده بر اساس خروجی ۱۸ اکتبر ۲۰۲۶:** endpointهای رسمی Docker برای GPG و فایل Trixie/InRelease هر دو HTTP=200 برگرداندند. dpkg-query نیز این بسته‌ها را installed گزارش کرده است: docker-ce، docker-ce-cli، containerd.io، docker-buildx-plugin و docker-compose-plugin. بنابراین خطای 403 فعلاً تکرار نشده و بسته‌ها نصب‌اند؛ اما اجرای سرویس Docker و کارکرد واقعی Engine هنوز تأیید نشده است.
+**نتیجهٔ واقعی ترمینال در ۱۸ اکتبر ۲۰۲۶:**
 
-**روی همین VM بلوک نصب اولیهٔ Docker را دوباره اجرا نکن.** به [راهنمای یکپارچه، مرحله ۱۸](docs/PTERODACTYL-END-TO-END-GUIDE.md) برو و فقط بررسی‌های systemctl، docker info و hello-world را اجرا کن. اگر daemon سالم باشد، نسخه و نتیجهٔ آزمون را ثبت کن. Wings هنوز نصب نشده است.
+- هر دو endpoint مخزن رسمی Docker قبلاً `HTTP=200` پاسخ دادند؛ خطای 403 در بررسی مجدد تکرار نشد.
+- بسته‌های Docker نصب شدند: Docker CE/CLI نسخهٔ `29.9.1`، containerd و افزونه‌های Buildx/Compose.
+- `systemctl`: سرویس Docker فعال.
+- `docker info`: ارتباط CLI با Engine موفق و Server version برابر `29.9.1`.
+- `docker run --rm hello-world`: image آزمایشی دریافت شد و پیام `Hello from Docker!` نمایش داده شد.
+- فضای root در پایان همچنان حدود 27 GiB آزاد گزارش شد؛ در این مرحله هیچ سرور CS2 دانلود/ساخته نشد.
 
-همچنین از اجرای سرور CS2 جدید فعلاً خودداری کن؛ حدود 71 GiB فایل موجود در /home/steam باید حفظ شود و روش ادغامش با Pterodactyl در فصل ۴ طراحی می‌شود.
+**این مرحله را دوباره اجرا نکن.** Docker نصب و آزمایش شده است. حالا باید نسخهٔ دقیق Panel را بگیریم، چون نسخهٔ Wings باید با شاخهٔ Panel سازگار باشد. از فرمان `p:info` در [مرحلهٔ ۱۹ راهنمای یکپارچه](docs/PTERODACTYL-END-TO-END-GUIDE.md) استفاده کن و قبل از دریافت Wings، نتیجه را بررسی کن.
+
+فایل‌های موجود حدود 71 GiB در `/home/steam` حفظ می‌شوند. هنوز CS2 instance نساخته‌ایم؛ ادغام فایل‌های فعلی با Pterodactyl موضوع فصل ۴ است.
 
 ### مرحله 8 — ساخت Node و نصب Wings
 
