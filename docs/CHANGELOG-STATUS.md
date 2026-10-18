@@ -47,7 +47,7 @@
 - RAM حدود 5.6 GiB؛ root filesystem برابر 112 GiB؛ آخرین snapshot: حدود 80 GiB مصرف و 27 GiB آزاد.
 - Preflight نشان داد Docker CLI/daemon نصب/فعال نیستند؛ `docker.sources` هم هنوز وجود نداشت و بسته‌های متعارض بررسی‌شده نصب نبودند.
 - حدود 71 GiB در `/home/steam` مربوط به فایل‌های موجود CS2 و `cs2-kus-addons` است؛ **پاک، جابه‌جا یا overwrite نشود**.
-- در retest ساعت 04:29 UTC، Docker GPG endpoint و Trixie/InRelease هر دو HTTP=200 دادند. dpkg-query نشان داد docker-ce و docker-ce-cli نسخهٔ 5:29.9.1-1~debian.13~trixie، containerd.io نسخهٔ 2.4.2-2~debian.13~trixie، docker-buildx-plugin نسخهٔ 0.38.0-1~debian.13~trixie و docker-compose-plugin نسخهٔ 5.6.0-1~debian.13~trixie installed هستند. خطای 403 فعلاً تکرار نشده؛ Docker daemon، docker info و hello-world هنوز باید تأیید شوند.
+- در retest ساعت 04:29 UTC، Docker GPG endpoint و Trixie/InRelease هر دو HTTP=200 دادند. dpkg-query پنج بستهٔ Docker را installed گزارش کرد. سپس Docker version 29.9.1/build dfc520d تأیید شد، systemd سرویس را ACTIVE گزارش کرد، docker info به Engine متصل شد و docker run --rm hello-world پیام موفقیت داد. خطای 403 در endpointهای رسمی تکرار نشد. **Docker نصب و تأیید شده؛ Wings هنوز Pending است.**
 - Egg Query در دیتابیس فقط `Counter-Strike: Global Offensive` را نشان داد؛ Egg اختصاصی CS2 هنوز import/تأیید نشده است.
 
 راهنمای جاری و گام بعدی: [Wings Install](WINGS-INSTALL.md).
