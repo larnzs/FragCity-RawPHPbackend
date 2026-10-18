@@ -275,7 +275,7 @@ sudo systemctl is-active nginx
 
 **تصمیم معماری:** VM فعلی Panel را clone یا تبدیل به template نکن؛ این VM دیتابیس Panel و تنظیمات وب دارد و حدود 71 GiB فایل CS2/KUS نیز در `/home/steam` روی آن است. یک VM تازه به نام `fc-node-template` با Debian 13 و ظرفیت مجازی Growable برابر 300 GB بساز. CS2 روی template نصب نمی‌شود.
 
-راهنمای اجرایی کامل، تنظیمات VMware، نصب Debian، اسکریپت Docker، دروازهٔ نسخهٔ Wings، پاک‌سازی machine-id/SSH host keys و نقطهٔ دقیق خاموش‌کردن/کپی‌گرفتن در [Debian Node Golden Image](docs/DEBIAN-NODE-GOLDEN-IMAGE.md) آمده است. اسکریپت‌های نسخه‌بندی‌شده در [infra/node-template](../tree/main/infra/node-template) قرار دارند.
+راهنمای اجرایی کامل، تنظیمات VMware، نصب Debian، اسکریپت Docker، دروازهٔ نسخهٔ Wings، پاک‌سازی machine-id/SSH host keys و نقطهٔ دقیق خاموش‌کردن/کپی‌گرفتن در [Debian Node Golden Image](docs/DEBIAN-NODE-GOLDEN-IMAGE.md) آمده است. اسکریپت‌های نسخه‌بندی‌شده در [infra/node-template](https://github.com/larnzs/FragCity-RawPHPbackend/tree/main/infra/node-template) قرار دارند.
 
 Docker روی VM فعلی Panel نصب شده و با `docker info` و `hello-world` تأیید شده است؛ بنابراین نصب Docker را روی آن تکرار نکن. ابتدا از خود Panel نسخه را بخوان:
 
