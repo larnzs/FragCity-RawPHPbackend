@@ -1,11 +1,17 @@
 # FragCity — فصل Wings و Docker (LAN-only)
 
-**وضعیت:** preflight تکمیل شده؛ Docker و Wings هنوز نصب نشده‌اند.  
+**وضعیت:** preflight تکمیل شده؛ بسته‌های Docker نصب شده‌اند، اما سلامت daemon هنوز تأیید نشده؛ Wings نصب نشده است.  
 **Node:** `fc-node-01` · **OS:** Debian 13/Trixie · **Architecture:** amd64/x86_64 · **LAN IP:** `192.168.1.5`  
 **Panel:** `http://192.168.1.5` · ورود مدیر از Windows تأیید شده است.  
 **محدوده:** شبکهٔ داخلی فقط؛ هنوز دامنهٔ عمومی، HTTPS عمومی، Port Forwarding، فایروال WAN یا سرور بازی Pterodactyl نداریم.
 
 > **اصل ایمنی:** مسیر `/home/steam` حدود 71 GiB از فایل‌های موجود CS2/KUS را نگه می‌دارد. آن را حذف، جابه‌جا، کپی یا mount نکن. ادغام فایل‌های موجود با Egg/volumeهای Pterodactyl در فصل ۴ جداگانه طراحی می‌شود.
+
+## تصمیم دربارهٔ قابلیت انتقال VM
+
+این VM فعلی را برای PoC ادامه بده، اما آن را مستقیماً به چند Node کلون نکن. این VM Panel و دیتابیس/تنظیمات آن را دارد. الگوی Node قابل‌تکرار باید نقش‌محور باشد (Debian + Docker + Wings binary/service)، بدون Panel مرکزی و بدون فایل config واقعی Wings یا tokenهای هر Node. برای هر clone، machine identity، SSH host keys، hostname/IP و config مخصوص node باید یکتا شوند.
+
+راهنمای کامل backup در برابر clone، OVF/OVA، Node Golden Template، bootstrap scripts و تفکیک فایل‌های CS2/KUS در [Reusable Linux Image Strategy](REUSABLE-LINUX-IMAGE-STRATEGY.md) است.
 
 ## 1. اجزای معماری
 
