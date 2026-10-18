@@ -271,22 +271,26 @@ sudo systemctl is-active nginx
 
 فایل‌های موجود حدود 71 GiB در `/home/steam` حفظ می‌شوند. هنوز CS2 instance نساخته‌ایم؛ ادغام فایل‌های فعلی با Pterodactyl موضوع فصل ۴ است.
 
-### مرحله 8 — ساخت Golden Image تمیز برای Nodeها (قدم بعدی)
+### مرحله 8 — نصب Wings روی همین VM و اتصال Node
 
-**تصمیم معماری:** VM فعلی Panel را clone یا تبدیل به template نکن؛ این VM دیتابیس Panel و تنظیمات وب دارد و حدود 71 GiB فایل CS2/KUS نیز در `/home/steam` روی آن است. یک VM تازه به نام `fc-node-template` با Debian 13 و ظرفیت مجازی Growable برابر 300 GB بساز. CS2 روی template نصب نمی‌شود.
+**تصمیم فعلی:** فعلاً Golden Image و VM جدید را کنار می‌گذاریم. برای PoC، Panel و Wings روی همین Debian یعنی `fc-node-01` آزمایش می‌شوند. ساخت Template تمیز و Cheatsheet کامل بعد از اثبات مسیر عملیاتی انجام می‌شود.
 
-راهنمای اجرایی کامل، تنظیمات VMware، نصب Debian، اسکریپت Docker، دروازهٔ نسخهٔ Wings، پاک‌سازی machine-id/SSH host keys و نقطهٔ دقیق خاموش‌کردن/کپی‌گرفتن در [Debian Node Golden Image](docs/DEBIAN-NODE-GOLDEN-IMAGE.md) آمده است. اسکریپت‌های نسخه‌بندی‌شده در [infra/node-template](https://github.com/larnzs/FragCity-RawPHPbackend/tree/main/infra/node-template) قرار دارند.
+**وضعیت تأییدشده:** Docker Engine نسخهٔ 29.9.1 نصب است، سرویس active است، `docker info` موفق و `docker run --rm hello-world` موفق بوده است. Docker را دوباره نصب نکن.
 
-Docker روی VM فعلی Panel نصب شده و با `docker info` و `hello-world` تأیید شده است؛ بنابراین نصب Docker را روی آن تکرار نکن. ابتدا از خود Panel نسخه را بخوان:
+قدم بعد فقط شناسایی نسخهٔ Panel است تا Wings سازگار انتخاب شود:
 
 ~~~bash
 cd /var/www/pterodactyl
 sudo -u www-data php8.3 artisan p:info
 ~~~
 
-خروجی را بدون password، token، APP_KEY یا secret ارسال کن. پس از تطبیق نسخه، اسکریپت نصب Wings را با نسخهٔ سازگار pin می‌کنیم و آن را روی VM تازه نصب می‌کنیم. template فقط با Debian + Docker + Wings binary/unit آماده می‌شود و **هیچ** `/etc/pterodactyl/config.yml` یا token اختصاصی Node در آن باقی نمی‌ماند.
+خروجی را از نظر password/token/secret بازبینی کن و مقدارهای محرمانه را نفرست. سپس در Admin UI یک Location (در صورت نبود) و Node به نام `fc-node-01` بساز. برای PoC LAN از آدرس `192.168.1.5` و HTTP بدون SSL استفاده می‌کنیم؛ Daemon port معمولاً TCP/8080 و SFTP port TCP/2022 هستند، اما مقدارهای نهایی را از UI/config همان نسخه بگیر. Config واقعی Wings حاوی secret است و نباید در GitHub یا چت ثبت شود.
 
-**نقطهٔ توقف برای کپی:** تنها وقتی اسکریپت `prepare-golden-image.sh` پیام `READY` بدهد و VM مادر خاموش شود، کل پوشهٔ VM را کپی کن. متن راهنما مشخص می‌کند کپی چگونه identity یکتا بگیرد.
+در ادامه Wings را طبق release سازگار نصب می‌کنیم، ابتدا با `sudo wings --debug` آزمایش می‌کنیم و پس از موفقیت systemd را فعال می‌کنیم. این مرحله فقط LAN است؛ هنوز Port Forwarding عمومی، HTTPS یا CS2 instance نداریم.
+
+**Golden Image در آینده:** پس از تکمیل PoC، [راهنمای ساخت Debian Node Golden Image](docs/DEBIAN-NODE-GOLDEN-IMAGE.md) و اسکریپت‌های [infra/node-template](https://github.com/larnzs/FragCity-RawPHPbackend/tree/main/infra/node-template) را برای ساخت محیط تمیز و قابل‌تکرار بازبینی می‌کنیم. آن template را روی همین VM فعلی اعمال نکن.
+
+**وضعیت:** Docker تکمیل؛ `p:info`، نصب Wings و Online شدن Node در انتظار.
 
 ### مرحله 9 — Egg/Allocation و اولین سرور بازی
 
