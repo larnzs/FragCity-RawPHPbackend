@@ -125,3 +125,14 @@
 - کنترل هدفمند پس از Commit انجام شد: README به Quick Setup و دو سند جدید لینک می‌دهد؛ سندهای جدید از GitHub قابل خواندن هستند؛ code fenceهای بررسی‌شده متوازن‌اند (README: 34 نشانگر، Panel guide: 18، Wings guide: 16). این کنترل محدود است و جایگزین ممیزی کامل همهٔ لینک‌ها و فرمان‌ها یا آزمون اجرایی روی VM نیست.
 - فقط اسناد این مخزن تغییر کردند. نه `cs2-kus-addons` و نه فایل‌ها/تنظیمات VM تغییر داده نشدند.
 
+
+
+## Vollständigkeitsprüfung der Setup-Befehle — 18. Oktober 2026
+
+- Beim Abgleich des README und der vorhandenen Setup-Kapitel mit dem gesamten Gespräch wurde festgestellt, dass die bisherige Dokumentation zwar die Hauptschritte beschrieb, aber nicht jede wichtige Kommando-/Troubleshooting-Sequenz und jede beobachtete Abweichung an einer Stelle enthielt.
+- Neu erstellt: [Pterodactyl Session Command Log](PTERODACTYL-SESSION-COMMAND-LOG.md). Es enthält die wesentlichen tatsächlichen Befehlsblöcke, Erklärungen, beobachtete Resultate, den MariaDB-Namensfehler und seine Korrektur, Cache-Permission-Diagnose, NGINX-Konfiguration, SSH/HeidiSQL/SFTP-Hinweise, Disk-Analyse und den Docker-Preflight.
+- README und Panel Runbook verweisen nun direkt auf dieses Log. Befehle, die bislang nur vorgeschlagen wurden (insbesondere Docker-Installation und Wings), sind ausdrücklich als Pending markiert.
+- Secrets, echte Passwörter, APP_KEY und private Anmeldedaten werden nicht erneut in der Dokumentation ausgeschrieben.
+- GitHub-Dateien nach dem Commit erneut gelesen und auf Vorhandensein der Links/zentralen Abschnitte sowie auf ausgeglichene Code-Fences geprüft. Diese strukturelle Prüfung ist keine Ausführung der Bash-Befehle auf dem Debian-VM.
+- Es wurde nur `FragCity-RawPHPbackend` dokumentationsseitig geändert. `cs2-kus-addons`, die Debian-VM und der laufende Panel wurden nicht verändert.
+
