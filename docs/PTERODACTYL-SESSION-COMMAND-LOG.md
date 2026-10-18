@@ -395,6 +395,41 @@ sudo grep -E \
 
 The summary check earlier showed `APP_URL=http://panel.example.com` before the successful wizard run. The later successful wizard selected `http://192.168.1.5`. Do not treat the old output as the current URL. Never print all of `.env` because it contains secrets.
 
+
+
+### Troubleshooting: compare Artisan as the admin and service account
+
+After the setup wizard returned unexpectedly, these read-only checks were run:
+
+~~~bash
+set -eu
+cd /var/www/pterodactyl
+
+sudo php8.3 artisan --version
+sudo php8.3 artisan list | grep -E 'p:environment:(setup|database|mail)' || true
+
+sudo -u www-data php8.3 artisan --version
+sudo -u www-data php8.3 artisan list | grep -E 'p:environment:(setup|database|mail)' || true
+
+sudo stat -c '%U:%G mode=%a %n' .env
+
+if sudo -u www-data test -r .env; then
+    echo "OK: www-data can read .env"
+else
+    echo "ERROR: www-data cannot read .env"
+fi
+
+if sudo -u www-data test -w .env; then
+    echo "OK: www-data can write .env"
+else
+    echo "ERROR: www-data cannot write .env"
+fi
+~~~
+
+**Observed outcome:** both identities reported Laravel Framework 12.64.0 and the expected `p:environment:setup`, `p:environment:database`, and `p:environment:mail` commands. The `.env` file was `www-data:www-data mode=640`; `www-data` could read and write it. The earlier wizard failure was a cache path permission failure, not a missing Artisan command.
+
+The safe configuration-summary command is in the previous section. Never use `cat .env` in output that will be copied into chat or documentation.
+
 ## 8. Run migrations and seed, then create the administrator
 
 ### Commands actually executed
@@ -527,6 +562,25 @@ server {
 ~~~
 
 The config path is `/etc/nginx/sites-available/pterodactyl.conf`; the enabled link points to it from `/etc/nginx/sites-enabled/pterodactyl.conf`. The default site symlink was disabled so the Panel site could serve the LAN address.
+
+### How the site was enabled
+
+The config file was written only after checking that a file with that name did not already exist. These commands enabled the site and disabled the default site symlink while preserving the original file in `sites-available`:
+
+~~~bash
+sudo ln -s \
+    /etc/nginx/sites-available/pterodactyl.conf \
+    /etc/nginx/sites-enabled/pterodactyl.conf
+
+if sudo test -L /etc/nginx/sites-enabled/default; then
+    sudo rm /etc/nginx/sites-enabled/default
+    echo "Default site symlink disabled; source file is preserved."
+else
+    echo "No default-site symlink found."
+fi
+~~~
+
+Removing this symlink only disables the default site's enabled link; it does not delete `/etc/nginx/sites-available/default`. Do not remove an existing custom config without inspecting it.
 
 ### Syntax check, reload and local HTTP test
 
