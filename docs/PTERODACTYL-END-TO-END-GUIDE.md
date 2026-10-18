@@ -688,70 +688,65 @@ done
 
 **وضعیت: انجام شد؛ نصب و اجرای container آزمایشی موفق بود.**
 
-خروجی واقعی کاربر:
+خروجی واقعی:
 - `Docker version 29.9.1, build dfc520d`
 - `systemctl is-active docker`: `ACTIVE`
-- `docker info`: `Server=29.9.1 Containers=0 Images=0` (این نمونه‌برداری قبل از pull شدن `hello-world` بود)
-- `docker run --rm hello-world`: image برای معماری amd64 دریافت شد و پیام `Hello from Docker!` نمایش داده شد.
-- فضای root پس از تست: 112 GiB کل، 80 GiB مصرف‌شده، 27 GiB آزاد.
-- `/var/lib/docker` در خروجی `du` برابر 232 KiB گزارش شد؛ این فقط اندازهٔ مسیر گزارش‌شده در همان لحظه است و دلیل پاک‌کردن یا دستکاری storage نیست.
-- خطای 403 قبلی در تست endpointها تکرار نشد؛ هر دو URL رسمی HTTP=200 داده بودند.
+- `docker info`: Server version برابر `29.9.1`
+- `docker run --rm hello-world`: image برای amd64 دریافت شد و پیام `Hello from Docker!` نمایش داده شد.
+- فضای root: 112 GiB کل، 80 GiB مصرف‌شده و حدود 27 GiB آزاد.
+- تست endpoint رسمی پس از خطای قبلی 403، هر دو URL را HTTP=200 نشان داد.
 
-Docker Engine اکنون آماده است و مرحلهٔ نصب را تکرار نکن. تست `hello-world` ثابت می‌کند CLI، daemon، دریافت image و اجرای یک container ساده کار کرده‌اند؛ هنوز ثابت نمی‌کند Wings وصل شده یا CS2 قابل اجراست.
+Docker را دوباره نصب نکن. این تست فقط Docker Engine و اجرای یک container ساده را تأیید می‌کند؛ نه نصب Wings و نه اجرای CS2.
 
-**تصمیم اجرایی جاری:** فعلاً Golden Image را کنار می‌گذاریم و PoC را روی همین `fc-node-01` ادامه می‌دهیم؛ Panel و Wings موقتاً روی همین Debian خواهند بود. Docker روی همین VM نصب و آزمایش شده است. **یک VM تازه نساز و اسکریپت‌های finalization یا تنظیم هویت clone را روی این ماشین اجرا نکن.** پس از تکمیل و تأیید مسیر Wings، راهنمای [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) را برای مرحلهٔ آینده نگه می‌داریم.
+### مرحلهٔ ۱۹ — نصب Wings روی همین VM آزمایشی
 
-قدم بعد نسخهٔ دقیق Panel را از خود برنامه می‌خواند:
+**تصمیم اجرایی فعلی:** Golden Image و VM جدید را فعلاً کنار می‌گذاریم؛ PoC را روی همین `fc-node-01` ادامه می‌دهیم. Panel و Wings موقتاً روی همین Debian خواهند بود. **اسکریپت‌های finalization/clone identity مربوط به Golden Image را روی این VM اجرا نکن.** بعد از اثبات end-to-end، سراغ Cheatsheet و Template تمیز می‌رویم: [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md).
 
-~~~bash
-cd /var/www/pterodactyl
-sudo -u www-data php8.3 artisan p:info
-~~~
+#### ۱۹.۱ — خواندن نسخهٔ دقیق Panel
 
-خروجی را بازبینی کن و password، token، APP_KEY یا secret را ارسال نکن. پس از تطبیق نسخه، همین VM را به‌عنوان Node آزمایشی `fc-node-01` در Admin UI ثبت می‌کنیم. آدرس LAN برابر `192.168.1.5` است؛ فعلاً HTTP بدون SSL، daemon port پیشنهادی TCP/8080 و SFTP TCP/2022 هستند، ولی مقدار نهایی را از UI/config همان نسخه بگیر. فایل `/etc/pterodactyl/config.yml` محرمانه است و نباید وارد GitHub یا چت شود.
+نسخهٔ Laravel به‌تنهایی نسخهٔ Pterodactyl را ثابت نمی‌کند. مستندات رسمی `p:info` را برای نمایش نسخه و تنظیمات Panel معرفی می‌کنند. <https://docs.pterodactyl.io/v2/guides/tutorials/artisan>
 
-### مرحلهٔ ۱۹ — شناسایی نسخهٔ دقیق Panel پیش از نصب Wings
-
-**وضعیت: قدم بعدی فعلی؛ Wings را هنوز نصب نکن.** نسخهٔ دقیق Panel باید از خود برنامه خوانده شود؛ نسخهٔ Laravel به‌تنهایی نسخهٔ Pterodactyl را مشخص نمی‌کند. دستور رسمی `p:info` نسخهٔ Panel و جزئیات تنظیمات را نشان می‌دهد. [مستندات رسمی Artisan](https://docs.pterodactyl.io/v2/guides/tutorials/artisan).
-
-در Debian اجرا کن:
+روی همین VM اجرا کن:
 
 ~~~bash
 cd /var/www/pterodactyl
 sudo -u www-data php8.3 artisan p:info
 ~~~
 
-این فرمان فقط اطلاعات می‌خواند. خروجی کامل را قبل از ارسال مرور کن و هر مقدار حساس احتمالی را حذف کن؛ هیچ رمز، token، APP_KEY یا محتوای کامل `.env` را نفرست.
+این فرمان فقط اطلاعات می‌خواند. خروجی را بازبینی کن و password، token، APP_KEY یا هر secret را قبل از ارسال حذف کن؛ محتوای کامل `.env` را نفرست.
 
-بعد از مشاهدهٔ نسخه:
-1. شاخهٔ رسمی Panel (پایدار 1.x یا پیش‌انتشار 2.0) را مشخص می‌کنیم.
-2. نسخهٔ Wings سازگار را از مستندات همان شاخه انتخاب می‌کنیم؛ به `latest` کورکورانه تکیه نمی‌کنیم.
-3. سپس در Admin UI، Location و Node مخصوص `fc-node-01` را ایجاد می‌کنیم و config محرمانه را از تب Configuration دریافت می‌کنیم.
-4. Wings را foreground/debug آزمایش می‌کنیم و تنها پس از موفقیت، systemd service می‌سازیم.
+#### ۱۹.۲ — انتخاب Wings سازگار
 
-مرجع نسخه‌ها:
-- [Pterodactyl 2.0 docs — هنوز Pre-release](https://docs.pterodactyl.io/v2)
-- [Installing Wings — نسخهٔ 2.0](https://docs.pterodactyl.io/v2/wings/installing)
-- [Installing Wings — شاخهٔ پایدار 1.x](https://docs.pterodactyl.io/v1/wings/installing)
+پس از دیدن نسخه:
+1. اگر Panel از شاخهٔ پایدار 1.x باشد، جدول سازگاری Wings 1.x را دنبال می‌کنیم.
+2. اگر Panel از شاخهٔ 2.0 pre-release باشد، مستندات رسمی فعلی می‌گویند Wings 1.13.2 تا 1.13.4 با آن تست شده‌اند؛ انتخاب نهایی را با دقیق‌ترین release و مستندات همان لحظه pin می‌کنیم.
+3. نسخهٔ Wings را کورکورانه از `latest` انتخاب نکن و تا پیش از این تأیید، باینری نصب نکن.
+
+منابع رسمی:
+- [Pterodactyl 2.0 docs — Pre-release](https://docs.pterodactyl.io/v2)
+- [Installing Wings — 2.0](https://docs.pterodactyl.io/v2/wings/installing)
+- [Installing Wings — 1.x](https://docs.pterodactyl.io/v1/wings/installing)
 - [Panel releases](https://github.com/pterodactyl/panel/releases)
 - [Wings releases](https://github.com/pterodactyl/wings/releases)
 
-### مرحله ۱۹ — قبل از نصب Wings
+#### ۱۹.۳ — ساخت Node روی همین Debian
 
-**وضعیت: Pending.** اول نسخهٔ دقیق Panel را تأیید کن:
+پس از انتخاب نسخهٔ سازگار:
+1. در Admin UI یک Location ایجاد/انتخاب کن.
+2. در Admin → Nodes یک Node به نام `fc-node-01` بساز؛ آدرس LAN آن `192.168.1.5` است.
+3. برای این آزمایش LAN، HTTP بدون SSL به‌کار ببر. Daemon port معمولاً TCP/8080 و SFTP port TCP/2022 هستند؛ مقدار نهایی را با تنظیمات UI همان نسخه مطابقت بده.
+4. ظرفیت RAM/disk را محافظه‌کارانه تنظیم کن. حدود 27 GiB فضای آزاد برای دانلود مجدد CS2 کافی فرض نمی‌شود.
+5. از تب Configuration تنظیمات مختص همین Node را دریافت کن. فایل `/etc/pterodactyl/config.yml` و token آن محرمانه‌اند؛ در GitHub یا چت قرار نده.
 
-~~~bash
-cd /var/www/pterodactyl
-sudo -u www-data php8.3 artisan p:info
-~~~
+#### ۱۹.۴ — نصب و آزمایش Wings
 
-پیش از ارسال خروجی، password یا secret را حذف کن. نسخهٔ Laravel 12.64.0 که قبلاً دیدیم به‌تنهایی نسخهٔ دقیق Panel را ثابت نمی‌کند. آن را با release رسمی تطبیق بده و سپس Wings سازگار انتخاب کن:
+پس از Node و config اختصاصی:
+1. باینری Linux/amd64 نسخهٔ pin‌شده را از Release رسمی Wings نصب کن.
+2. ابتدا `sudo wings --debug` را در foreground اجرا کن و خطاها را بررسی کن.
+3. فقط پس از شروع موفق، با `Ctrl+C` آن را متوقف و systemd service را طبق راهنمای همان release بساز/فعال کن.
+4. از Panel تأیید کن Node به حالت Online رسیده است.
 
-- Panel releases: https://github.com/pterodactyl/panel/releases
-- Wings releases: https://github.com/pterodactyl/wings/releases
-- Wings install docs: https://docs.pterodactyl.io/v1/wings/installing
-
-پس از آن، از Admin UI یک Location و Node بساز، config همان Node را از Panel دریافت کن و token/secret آن را در Git یا چت قرار نده. بعد باینری Linux/amd64 نسخهٔ سازگار را نصب و طبق راهنمای همان Release ابتدا foreground/debug و سپس systemd را پیکربندی کن. Wings هنوز روی این VM نصب نشده است.
+همهٔ این مراحل LAN-only هستند. هیچ دامنه، HTTPS عمومی یا Port Forwarding جدیدی در این مرحله تنظیم نمی‌کنیم.
 
 ### مرحله ۲۰ — مراحل بعد از Wings
 
