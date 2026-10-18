@@ -127,12 +127,12 @@
 
 
 
-## Vollständigkeitsprüfung der Setup-Befehle — 18. Oktober 2026
+## ممیزی پوشش فرمان‌های راه‌اندازی — ۱۸ اکتبر ۲۰۲۶
 
-- Beim Abgleich des README und der vorhandenen Setup-Kapitel mit dem gesamten Gespräch wurde festgestellt, dass die bisherige Dokumentation zwar die Hauptschritte beschrieb, aber nicht jede wichtige Kommando-/Troubleshooting-Sequenz und jede beobachtete Abweichung an einer Stelle enthielt.
-- Neu erstellt: [Pterodactyl Session Command Log](PTERODACTYL-SESSION-COMMAND-LOG.md). Es enthält die wesentlichen tatsächlichen Befehlsblöcke, Erklärungen, beobachtete Resultate, den MariaDB-Namensfehler und seine Korrektur, Cache-Permission-Diagnose, NGINX-Konfiguration, SSH/HeidiSQL/SFTP-Hinweise, Disk-Analyse und den Docker-Preflight.
-- README und Panel Runbook verweisen nun direkt auf dieses Log. Befehle, die bislang nur vorgeschlagen wurden (insbesondere Docker-Installation und Wings), sind ausdrücklich als Pending markiert.
-- Secrets, echte Passwörter, APP_KEY und private Anmeldedaten werden nicht erneut in der Dokumentation ausgeschrieben.
-- GitHub-Dateien nach dem Commit erneut gelesen und auf Vorhandensein der Links/zentralen Abschnitte sowie auf ausgeglichene Code-Fences geprüft. Diese strukturelle Prüfung ist keine Ausführung der Bash-Befehle auf dem Debian-VM.
-- Es wurde nur `FragCity-RawPHPbackend` dokumentationsseitig geändert. `cs2-kus-addons`, die Debian-VM und der laufende Panel wurden nicht verändert.
+- در مقایسهٔ README و فصل‌های موجود با گفتگو مشخص شد که راهنماهای قبلی مراحل اصلی را پوشش می‌دادند، اما همهٔ فرمان‌های مهم تشخیصی، خروجی‌ها و مسیر عیب‌یابی را یکجا ثبت نکرده بودند.
+- سند [Pterodactyl Session Command Log](PTERODACTYL-SESSION-COMMAND-LOG.md) ساخته شد. این سند فرمان‌های اصلی بررسی PHP/Composer، دیتابیس، تغییر رمز نمونه، بررسی احراز هویت root، cache permission، Artisan، migration/seed، ایجاد مدیر، بررسی Egg، NGINX، SSH/HeidiSQL/SFTP، تحلیل فضای دیسک و preflight Docker را به ترتیب توضیح می‌دهد.
+- README و راهنمای Panel مستقیماً به این دفتر فرمان پیوند می‌دهند. فرمان‌های Docker/Wings که فقط پیشنهاد شده‌اند، به‌عنوان Pending برچسب دارند و به‌عنوان عملیات اجراشده ثبت نشده‌اند.
+- رمزهای واقعی، APP_KEY، توکن‌ها و جزئیات حساس ورود عمداً در داک تکرار نشده‌اند.
+- پس از commit، فایل‌های GitHub دوباره خوانده شدند و حضور لینک‌های اصلی، سرعنوان‌ها و متوازن‌بودن code fenceها بررسی شد. این بررسی ساختاری، اجرای فرمان‌ها روی VM را اثبات نمی‌کند.
+- فقط مستندات `FragCity-RawPHPbackend` تغییر کردند. مخزن `cs2-kus-addons` و ماشین Debian تغییر نکردند.
 
