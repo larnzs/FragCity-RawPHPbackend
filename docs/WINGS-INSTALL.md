@@ -34,6 +34,10 @@
 
 بازیکن‌ها مستقیماً به IP و port بازی متصل می‌شوند؛ معمولاً ترافیک بازی از Panel عبور نمی‌کند. Docker اجرای container را فراهم می‌کند، اما فایل‌های native در `/home/steam` را خودکار داخل container قرار نمی‌دهد.
 
+این روش در ۱۸ اکتبر ۲۰۲۶ با [مستند رسمی Docker برای Debian](https://docs.docker.com/engine/install/debian/) بررسی شده است. مستند رسمی Debian 13/Trixie و معماری amd64 را پشتیبانی‌شده معرفی می‌کند.
+
+**هشدار firewall:** مستند رسمی Docker هشدار می‌دهد که پورت‌های منتشرشدهٔ container ممکن است از قواعد UFW/firewalld عبور کنند و Docker از iptables/ip6tables استفاده می‌کند. بنابراین فعلاً سرور بازی نساز و پورت عمومی باز نکن؛ در فصل شبکه قواعد Docker، `DOCKER-USER` و port forwarding را با هم بررسی می‌کنیم.
+
 ## 3. Preflight واقعی
 
 آخرین خروجی بررسی‌شده:
