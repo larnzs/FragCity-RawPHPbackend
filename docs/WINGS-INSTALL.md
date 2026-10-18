@@ -1,19 +1,12 @@
-# FragCity — فصل Wings و Docker (LAN-only)
+# FragCity — Wings و Docker (راهنمای تکمیلی)
 
-**وضعیت:** Docker Engine روی همین VM نصب و با `docker info` و `hello-world` آزمایش شده؛ قدم بعد نصب Wings روی همین `fc-node-01` است. Golden Image فعلاً به آینده موکول شده.  
-**Node:** `fc-node-01` · **OS:** Debian 13/Trixie · **Architecture:** amd64/x86_64 · **LAN IP:** `192.168.1.5`  
-**Panel:** `http://192.168.1.5` · ورود مدیر از Windows تأیید شده است.  
-**محدوده:** شبکهٔ داخلی فقط؛ هنوز دامنهٔ عمومی، HTTPS عمومی، Port Forwarding، فایروال WAN یا سرور بازی Pterodactyl نداریم.
+**مرجع اجرای فرمان‌ها:** [راهنمای مادر Copy/Paste](FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md). همین VM یعنی fc-node-01 را ادامه می‌دهیم؛ Panel نسخهٔ 1.15.1 و Docker Engine نسخهٔ 29.9.1 تأیید شده‌اند. گام فعلی دریافت Wings v1.13.4، ساخت Node از مرورگر Windows، گرفتن config محرمانه از Panel و اجرای debug است.
 
-> **اصل ایمنی:** مسیر `/home/steam` حدود 71 GiB از فایل‌های موجود CS2/KUS را نگه می‌دارد. آن را حذف، جابه‌جا، کپی یا mount نکن. ادغام فایل‌های موجود با Egg/volumeهای Pterodactyl در فصل ۴ جداگانه طراحی می‌شود.
+**محیط:** Debian 13/Trixie · amd64/x86_64 · LAN IP برابر 192.168.1.5 · Panel برابر http://192.168.1.5. این PoC هنوز Production نیست.
 
-## تصمیم اجرایی فعلی: ادامه روی همین VM
-
-برای این PoC، Panel و Wings موقتاً روی همین Debian `fc-node-01` اجرا می‌شوند. این روش برای آزمایش LAN و یادگیری مناسب است؛ **به‌عنوان معماری Production نهایی تلقی نمی‌شود**. Docker روی همین VM تأیید شده است و نصب آن تکرار نمی‌شود.
-
-پیش از نصب Wings، نسخهٔ دقیق Panel را با `sudo -u www-data php8.3 artisan p:info` بخوان. سپس Node همین ماشین را در Admin UI بساز و پیکربندی اختصاصی‌اش را از Panel دریافت کن. `/etc/pterodactyl/config.yml` حاوی token/secret است و نباید در Git یا چت ذخیره شود.
-
-Golden Image فعلاً deferred است؛ بعد از تکمیل PoC به [Reusable Linux Image Strategy](REUSABLE-LINUX-IMAGE-STRATEGY.md) و [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) برمی‌گردیم. هیچ اسکریپت finalization/clone identity را روی VM فعلی اجرا نکن.
+> **حفاظت فایل‌ها:** حدود 71 GiB فایل CS2/KUS زیر /home/steam باید حفظ شود. فعلاً CS2 instance جدید از Egg نساز و مسیر موجود را حذف/جابه‌جا/overwrite نکن.
+>
+> **Secretها:** /etc/pterodactyl/config.yml و Auto-Deploy token محرمانه‌اند؛ در GitHub یا چت نگذار.
 
 ## 1. اجزای معماری
 
@@ -191,7 +184,7 @@ df -h /
 
 ## 5. مرحلهٔ جاری — نصب Wings روی همین VM
 
-**تصمیم اجرایی فعلی:** فعلاً Golden Image و VM تمیز را عقب می‌اندازیم. Panel و Wings را برای PoC روی همین `fc-node-01` اجرا می‌کنیم؛ برای Production بعداً معماری را جداگانه ارزیابی می‌کنیم. Docker روی همین VM تأیید شده و نباید دوباره نصب شود.
+**تصمیم اجرایی فعلی:** Panel و Wings را برای PoC روی همین `fc-node-01` اجرا می‌کنیم. Docker روی همین VM تأیید شده و نباید دوباره نصب شود؛ ترتیب اجرای مراحل در [راهنمای مادر](FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md) است.
 
 ### 5.1 شناسایی نسخهٔ Panel
 
@@ -207,7 +200,7 @@ sudo -u www-data php8.3 artisan p:info
 ### 5.2 انتخاب نسخهٔ سازگار
 
 - اگر Panel روی شاخهٔ 1.x باشد، راهنمای Wings 1.x و جدول سازگاری همان شاخه را استفاده کن.
-- اگر Panel روی 2.0 pre-release باشد، مستندات رسمی فعلی می‌گویند Wings 1.13.2 تا 1.13.4 با آن تست شده‌اند. نسخهٔ دقیق را پس از دیدن `p:info` انتخاب و pin می‌کنیم.
+- خروجی واقعی `p:info` نسخهٔ Panel را **1.15.1** گزارش کرده است؛ راهنمای رسمی Wings شاخهٔ 1.x را به‌کار می‌بریم و نسخهٔ Wings در فایل مادر pin شده است.
 - تا پیش از این تأیید، Wings را دانلود یا اجرا نکن.
 
 منابع:
@@ -233,7 +226,7 @@ sudo -u www-data php8.3 artisan p:info
 - اگر بدون خطا راه افتاد، با `Ctrl+C` متوقفش کن، سپس systemd service بساز/فعال کن.
 - تأیید نهایی: `systemctl is-active wings` و وضعیت Node در Panel برابر Online.
 
-**محدودیت مهم:** این PoC در LAN است. هنوز هیچ Port Forwarding عمومی، HTTPS عمومی یا CS2 server instance ایجاد نمی‌کنیم. حدود 71 GiB فایل‌های موجود CS2/KUS در `/home/steam` باید حفظ شوند. Golden Image و اسکریپت‌های clone فقط پس از تکمیل PoC و در فصل آینده بررسی خواهند شد؛ روی VM فعلی اسکریپت finalization/clone identity اجرا نکن.
+**محدودیت مهم:** این PoC در LAN است. هنوز هیچ Port Forwarding عمومی، HTTPS عمومی یا CS2 server instance ایجاد نمی‌کنیم. حدود 71 GiB فایل‌های موجود CS2/KUS در `/home/steam` باید حفظ شوند. فرمان‌های مرحلهٔ بعد و ترتیب اتصال Node در [راهنمای مادر](FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md) ثبت شده‌اند.
  
 ## 6. نصب باینری Wings و config
 
