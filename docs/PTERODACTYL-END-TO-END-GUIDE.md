@@ -4,7 +4,7 @@
 >
 > **وضعیت واقعی:** Pterodactyl Panel در LAN نصب شده و ورود Windows موفق بوده است. Docker Engine نسخهٔ 29.9.1 نصب شده، سرویس فعال است و آزمون `hello-world` موفق بوده است. Wings هنوز نصب نشده؛ قدم بعدی تأیید نسخهٔ دقیق Panel و انتخاب نسخهٔ سازگار Wings است.
 >
-> راهنمای سریع مخزن در [README](../README.md)، این راهنمای یکپارچه در ادامه، ثبت فرمان‌ها و خطاهای گفتگو در [Session Command Log](PTERODACTYL-SESSION-COMMAND-LOG.md)، راهنمای تفصیلی Panel در [PTERODACTYL-LAN-SETUP](PTERODACTYL-LAN-SETUP.md)، و فصل Wings در [WINGS-INSTALL](WINGS-INSTALL.md) قرار دارند. برای ساخت VM مستقل و قابل‌کپی Node، از [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) استفاده کن.
+> **مرجع اجرایی واحد:** [راهنمای مادر Copy/Paste](FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md) شامل مراحل نصب Debian بدون محیط گرافیکی تا Docker و Wings است. این سند قدیمی را به‌عنوان سابقه و توضیحات تکمیلی بخوان؛ هنگام اجرا، وضعیت و فرمان‌های فایل مادر ملاک‌اند.
 
 ## توضیحات کامل قبل از اجرا
 
@@ -42,7 +42,7 @@
 - حدود 71 GiB در /home/steam شامل فایل‌های موجود CS2 و cs2-kus-addons است. **این مسیر را حذف، جابه‌جا، overwrite یا بدون طراحی mount نکن.** تا پایان فصل ۴، سرور CS2 جدید از Egg نساز؛ ممکن است دانلود بازی را تکرار کند و فضای دیسک را پر کند.
 - هرگز رمز، APP_KEY، token یا محتوای کامل .env را در GitHub یا چت قرار نده.
 - روی نصب فعلی فرمان‌های دارای برچسب «انجام‌شده» را بی‌دلیل تکرار نکن؛ مخصوصاً ساخت دیتابیس، تولید APP_KEY، migration و ساخت مدیر.
-- یک ناسازگاری مستنداتی دربارهٔ نسخهٔ دقیق Panel باقی است: خروجی واقعی Artisan، Laravel Framework 12.64.0 را نشان داد و دستور p:environment:addons:run-hooks هم موجود بود؛ در سند تاریخی به archive v1.15.1 اشاره شده، اما این شواهد به‌طور قطعی یک نسخه را ثابت نمی‌کنند. پیش از انتخاب Wings باید نسخهٔ واقعی Panel با p:info و اسناد رسمی تطبیق داده شود.
+- نسخهٔ دقیق Panel اکنون با خروجی واقعی `p:info` تأیید شده است: **1.15.1**. برای ادامه از راهنمای رسمی Wings شاخهٔ 1.x استفاده می‌کنیم و نسخهٔ دانلود انتخاب‌شده در فایل مادر ثبت شده است.
 
 ## مراحل اجرا
 
@@ -700,7 +700,7 @@ Docker را دوباره نصب نکن. این تست فقط Docker Engine و ا
 
 ### مرحلهٔ ۱۹ — نصب Wings روی همین VM آزمایشی
 
-**تصمیم اجرایی فعلی:** Golden Image و VM جدید را فعلاً کنار می‌گذاریم؛ PoC را روی همین `fc-node-01` ادامه می‌دهیم. Panel و Wings موقتاً روی همین Debian خواهند بود. **اسکریپت‌های finalization/clone identity مربوط به Golden Image را روی این VM اجرا نکن.** بعد از اثبات end-to-end، سراغ Cheatsheet و Template تمیز می‌رویم: [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md).
+**تصمیم اجرایی فعلی:** همین VM `fc-node-01` را ادامه می‌دهیم. برای نصب و ترتیب فرمان‌ها، فقط [راهنمای مادر Copy/Paste](FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md) را مبنا قرار بده.
 
 #### ۱۹.۱ — خواندن نسخهٔ دقیق Panel
 
