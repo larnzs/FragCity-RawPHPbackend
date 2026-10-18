@@ -1,6 +1,6 @@
 # FragCity — فصل Wings و Docker (LAN-only)
 
-**وضعیت:** preflight تکمیل شده؛ بسته‌های Docker نصب شده‌اند، اما سلامت daemon هنوز تأیید نشده؛ Wings نصب نشده است.  
+**وضعیت:** Docker Engine نصب و با `docker info` و `hello-world` آزمایش شده؛ Wings هنوز نصب نشده است.  
 **Node:** `fc-node-01` · **OS:** Debian 13/Trixie · **Architecture:** amd64/x86_64 · **LAN IP:** `192.168.1.5`  
 **Panel:** `http://192.168.1.5` · ورود مدیر از Windows تأیید شده است.  
 **محدوده:** شبکهٔ داخلی فقط؛ هنوز دامنهٔ عمومی، HTTPS عمومی، Port Forwarding، فایروال WAN یا سرور بازی Pterodactyl نداریم.
@@ -103,7 +103,7 @@ done
 
 ### 4.2 افزودن repository و نصب
 
-**وضعیت فعلی: این گام هنوز اجرا نشده است.** این بلوک مخزن رسمی Docker را برای Debian codename فعلی اضافه می‌کند؛ قبل از اجرا، مخزن موجود را بازبینی کن. اگر فایل `docker.sources` با محتوای متفاوت وجود دارد، overwrite نکن.
+**وضعیت تاریخی: این گام انجام شده است.** Docker repository/package setup روی همین VM اجرا شد. تکرار نصب لازم نیست؛ نتیجهٔ واقعی و مرحلهٔ تأیید در بخش بعد ثبت شده است.
 
 ```bash
 set -eu
@@ -159,34 +159,27 @@ sudo systemctl enable --now docker
 
 ### 4.3 تأیید نصب Docker
 
-بعد از نصب، این تست‌ها را اجرا کن و خروجی را قبل از ادامه ثبت کن:
+**وضعیت: انجام شده — ۱۸ اکتبر ۲۰۲۶.**
 
-```bash
-echo "=== VERSION ==="
+خروجی واقعی:
+- `docker --version`: Docker version 29.9.1, build dfc520d.
+- سرویس systemd: ACTIVE.
+- `docker info`: Server 29.9.1؛ ارتباط CLI و daemon موفق.
+- `docker run --rm hello-world`: pull موفق image amd64 و چاپ `Hello from Docker!`.
+- فضای root پس از تست: 27 GiB آزاد.
+- /home/steam دست‌نخورده مانده است؛ هنوز container مربوط به CS2 ساخته نشده.
+
+برای مرجع، بلوک آزمون قابل تکرار (لازم نیست الان دوباره اجرا شود):
+
+~~~bash
 sudo docker --version
-
-echo
-echo "=== SERVICE ==="
 sudo systemctl is-active docker
-sudo systemctl status docker --no-pager -l
-
-echo
-echo "=== ENGINE INFO ==="
-sudo docker info --format 'Server={{.ServerVersion}} Containers={{.Containers}} Images={{.Images}} Cgroup={{.CgroupVersion}} Driver={{.Driver}}'
-
-echo
-echo "=== TEST CONTAINER ==="
+sudo docker info --format 'Server={{.ServerVersion}} Containers={{.Containers}} Images={{.Images}}'
 sudo docker run --rm hello-world
-
-echo
-echo "=== DISK AFTER TEST ==="
 df -h /
-sudo du -sh /var/lib/docker 2>/dev/null || true
-```
+~~~
 
-`hello-world` یک image کوچک آزمایشی را می‌گیرد (اگر محلی نباشد)، container می‌سازد و پیام موفقیت می‌دهد. گزینهٔ `--rm` container آزمایشی را پس از پایان حذف می‌کند، اما لزوماً image دانلودشده را حذف نمی‌کند. این تست CS2 را دانلود یا اجرا نمی‌کند و به‌تنهایی آماده‌بودن Wings را اثبات نمی‌کند.
-
-فعلاً کاربر را به گروه `docker` اضافه نکن؛ این گروه عملاً دسترسی نزدیک به root می‌دهد. فرمان‌های Docker را با `sudo` اجرا کن. از `docker system prune -a` یا حذف دستی `/var/lib/docker` استفاده نکن.
+این تست سلامت اولیهٔ Engine را تأیید می‌کند، نه اتصال Wings یا اجرای CS2.
 
 ## 4.4 اگر مرحلهٔ نصب Docker با HTTP 403 متوقف شد
 
@@ -194,7 +187,26 @@ sudo du -sh /var/lib/docker 2>/dev/null || true
 
 طبق خروجی بررسی دیسک، `/home/steam` حاوی حدود 71 GiB فایل‌های CS2/KUS است؛ این مسیر را پاک یا جابه‌جا نکن. قبل از تغییرات بیشتر، snapshot بگیر و اگر backup مستقل می‌خواهی، VM را عادی خاموش و کل پوشهٔ VM را کپی کن.
 
-## 5. قبل از نصب Wings: نسخه و Node
+## 5. قبل از نصب Wings: نسخهٔ دقیق Panel و Node
+
+**قدم بعدی فعلی:** در Debian نسخهٔ Panel را از Artisan بخوان، سپس نسخهٔ Wings را طبق همان شاخه انتخاب کن. Pterodactyl 2.0 هنوز در مستندات رسمی Pre-release است؛ مستندات فعلی می‌گویند Wings 1.13.2 و 1.13.3 با 2.0 آزمایش شده‌اند. اگر Panel واقعاً 1.x باشد، باید جدول نسخه‌های 1.x را دنبال کنیم؛ این دو حالت را با حدس از روی Laravel version تعیین نکن.
+
+~~~bash
+cd /var/www/pterodactyl
+sudo -u www-data php8.3 artisan p:info
+~~~
+
+این فرمان فقط اطلاعات تنظیمات و نسخه را نشان می‌دهد. قبل از ارسال، هرگونه رمز، token یا secret را حذف کن؛ اگر خروجی حاوی credential بود آن قسمت را نفرست.
+
+منابع رسمی:
+- <https://docs.pterodactyl.io/v2>
+- <https://docs.pterodactyl.io/v2/wings/installing>
+- <https://docs.pterodactyl.io/v1/wings/installing>
+- <https://github.com/pterodactyl/panel/releases>
+- <https://github.com/pterodactyl/wings/releases>
+
+پس از تطبیق نسخه:
+
 
 قبل از دانلود Wings، نسخهٔ دقیق Panel را تأیید کن. لاگ Panel فعلی Laravel `12.64.0` را نشان می‌داد، اما metadata مربوط به Git وجود نداشت؛ یک مستند قدیمی‌تر به archive `v1.15.1` اشاره می‌کند. عدد Laravel به‌تنهایی نسخهٔ Panel را تعیین نمی‌کند. از <https://github.com/pterodactyl/wings/releases> و مستندات همان شاخه برای انتخاب سازگار استفاده کن؛ `latest` را کورکورانه دانلود نکن.
 
