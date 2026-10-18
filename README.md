@@ -32,6 +32,12 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 
 **گزینهٔ پشتیبان مقایسه‌ای:** GameAP به‌همراه یک سامانهٔ صورتحساب. تا زمانی که مسیر اصلی مانع واقعی نشان نداده، نباید چند پلتفرم را هم‌زمان نصب و عملیاتی کنیم.
 
+### استراتژی Image قابل‌انتقال و نصب تکرارپذیر
+
+هدف این نیست که هر بار Linux و تمام کدهای نصب را دستی از صفر اجرا کنیم. برای Nodeهای جدید، یک **Node Golden Template** شامل Debian پایه، Docker و Wings با نسخهٔ مشخص می‌سازیم و نصب/پیکربندی اختصاصی هر ماشین را با اسکریپت‌های version-controlled انجام می‌دهیم. اما VMDK فعلی شامل Panel و دیتابیس آن است و نباید همان‌طور روی چند Node کپی شود. Panel مرکزی، Nodeهای بازی و فایل‌های بازی باید لایه‌های جدا داشته باشند؛ IP/hostname، machine identity، SSH host keys و tokenهای Wings باید برای هر clone یکتا باشند. فایل‌های CS2/KUS هم جدا از image سیستم‌عامل مدیریت می‌شوند.
+
+تصمیم و مراحل تفصیلی: [Reusable Debian Image Strategy](docs/REUSABLE-LINUX-IMAGE-STRATEGY.md).
+
 ## ریپوهای اصلی
 
 جدول کامل پروژه‌های متعلق به FragCity، گزینه‌های متن‌باز، نقش و وضعیتشان در [Repository Inventory](docs/REPOSITORIES.md) قرار دارد.
@@ -82,6 +88,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | [Pterodactyl End-to-End Guide](docs/PTERODACTYL-END-TO-END-GUIDE.md) | یک راهنمای پیوسته و شماره‌گذاری‌شده از بررسی Debian و نصب Panel تا خطاهای واقعی، SSH/HeidiSQL، دیسک و گام نصب Docker |
 | [Pterodactyl Session Command Log](docs/PTERODACTYL-SESSION-COMMAND-LOG.md) | دفتر زمانی فرمان‌های واقعی/تشخیصی، نتایج ثبت‌شده، خطاها و اصلاح‌ها، تنظیمات LAN و تفکیک موارد اجراشده از Pending |
 | [Wings & Docker Install](docs/WINGS-INSTALL.md) | فصل مستقل Docker/Wings: مفاهیم، نصب Engine، Node، config، systemd، Allocation، محدودیت دیسک و مراحل LAN |
+| [Reusable Debian Image Strategy](docs/REUSABLE-LINUX-IMAGE-STRATEGY.md) | تصمیم ثبت‌شده برای VMDK/OVF/OVA، Node Golden Template، bootstrap scripts و جلوگیری از کپی secret/identity |
 | [Local Development](docs/LOCAL-DEVELOPMENT.md) | updater محلی، نصب Laragon/WAMP و موانع امن تست دیتابیس |
 | [Current Status](docs/CHANGELOG-STATUS.md) | وضعیت جاری، انتخاب‌های انجام‌شده و مواردی که هنوز اجرا نشده‌اند |
 | [Documentation Audit](docs/DOCUMENTATION-AUDIT.md) | محدودهٔ بازبینی مستندات، اصلاحات، پیوندهای بررسی‌شده و استاندارد آموزش مبتدی‌پسند |
@@ -248,58 +255,13 @@ sudo systemctl is-active nginx
 
 **وضعیت:** [x] Panel باز شده و login موفق بوده است. این مرحله فقط LAN و HTTP است؛ هنوز HTTPS یا دسترسی WAN نداریم. Queue Worker و Scheduler/Cron باید پیش از PoC پایدار و قطعاً پیش از Production جداگانه بررسی/تکمیل شوند.
 
-### مرحله 7 — نصب Docker و آماده‌سازی Wings (گام بعدی)
+### مرحله 7 — تأیید Docker و آماده‌سازی Wings
 
-**Docker چیست؟** Engine اجرای containerهاست. Wings از آن درخواست ساخت/اجرای/توقف containerهای بازی را می‌کند. Docker خود Panel، Wings یا سرور CS2 نیست؛ لایهٔ runtime است.
+**وضعیت به‌روزشده بر اساس خروجی ۱۸ اکتبر ۲۰۲۶:** endpointهای رسمی Docker برای GPG و فایل Trixie/InRelease هر دو HTTP=200 برگرداندند. dpkg-query نیز این بسته‌ها را installed گزارش کرده است: docker-ce، docker-ce-cli، containerd.io، docker-buildx-plugin و docker-compose-plugin. بنابراین خطای 403 فعلاً تکرار نشده و بسته‌ها نصب‌اند؛ اما اجرای سرویس Docker و کارکرد واقعی Engine هنوز تأیید نشده است.
 
-ابتدا preflight بررسی شد: Debian 13 amd64، VMware، چهار vCPU، RAM حدود 5.6 GiB؛ Docker و repository آن هنوز نصب نشده‌اند، و بسته‌های متعارض بررسی‌شده پیدا نشدند.
+**روی همین VM بلوک نصب اولیهٔ Docker را دوباره اجرا نکن.** به [راهنمای یکپارچه، مرحله ۱۸](docs/PTERODACTYL-END-TO-END-GUIDE.md) برو و فقط بررسی‌های systemctl، docker info و hello-world را اجرا کن. اگر daemon سالم باشد، نسخه و نتیجهٔ آزمون را ثبت کن. Wings هنوز نصب نشده است.
 
-در آخرین preflight، فایل repository `/etc/apt/sources.list.d/docker.sources` وجود نداشت. **این بلوک مرحلهٔ نصب بعدی است؛ هنوز روی VM اجرا نشده.** منبع و روش نصب رسمی: <https://docs.docker.com/engine/install/debian/>.
-
-```bash
-set -eu
-
-sudo apt update
-sudo apt install -y ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-
-if ! sudo test -s /etc/apt/keyrings/docker.asc; then
-    sudo curl -fsSL https://download.docker.com/linux/debian/gpg \
-        -o /etc/apt/keyrings/docker.asc
-fi
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-if sudo test -e /etc/apt/sources.list.d/docker.sources; then
-    echo "STOP: docker.sources already exists; inspect it before editing."
-    exit 1
-fi
-
-. /etc/os-release
-sudo tee /etc/apt/sources.list.d/docker.sources >/dev/null <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/debian
-Suites: $VERSION_CODENAME
-Components: stable
-Architectures: $(dpkg --print-architecture)
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF
-
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo systemctl enable --now docker
-
-echo "=== VERIFY ENGINE ==="
-sudo systemctl is-active docker
-sudo docker info
-sudo docker run --rm hello-world
-df -h /
-```
-
-**این فرمان‌ها چه می‌کنند؟** `apt update` فهرست بسته‌ها را تازه می‌کند؛ ابزارهای `ca-certificates` و `curl` برای دانلود HTTPS لازم‌اند؛ فایل `docker.asc` کلید عمومی امضای مخزن است؛ `docker.sources` آدرس، suite و کلید امضای مخزن را برای APT مشخص می‌کند؛ سپس Engine/CLI/container runtime نصب می‌شود. `systemctl enable --now docker` سرویس را اکنون فعال و برای بوت‌های بعدی هم روشن می‌کند. `docker info` ارتباط CLI با daemon را بررسی می‌کند و `hello-world` یک container آزمایشی اجرا می‌کند؛ این تست CS2 را دانلود نمی‌کند.
-
-اگر مخزن `docker.sources` پیش از اجرا وجود داشت، به‌جای اجرای دوباره یا overwrite کردن، فایل را بررسی و با دستورهای راهنمای فصل Wings هماهنگ کن. این نصب ممکن است روی قوانین شبکهٔ میزبان اثر بگذارد؛ فعلاً port forwarding عمومی تعریف نکن.
-
-**وضعیت:** [ ] Pending. برای توضیح مفصل‌تر مفاهیم Docker و تفسیر هر فرمان به [Wings & Docker Install](docs/WINGS-INSTALL.md) بروید. فعلاً کاربر `fragcityadmin` را به گروه `docker` اضافه نکن؛ از `sudo docker` استفاده کن.
+همچنین از اجرای سرور CS2 جدید فعلاً خودداری کن؛ حدود 71 GiB فایل موجود در /home/steam باید حفظ شود و روش ادغامش با Pterodactyl در فصل ۴ طراحی می‌شود.
 
 ### مرحله 8 — ساخت Node و نصب Wings
 
