@@ -686,21 +686,47 @@ done
 
 ### مرحله ۱۸ — تأیید Docker پس از نصب
 
-**قدم بعدی فعلی است: بسته‌ها روی VM نصب‌اند، اما سلامت daemon و اجرای container هنوز تأیید نشده‌اند.**
+**قدم بعدی فعلی است:** خروجی ۱۸ اکتبر نشان داد پنج بستهٔ Docker نصب شده‌اند و endpointهای رسمی HTTP=200 می‌دهند؛ حالا باید سرویس/daemon و اجرای container آزمایش شوند.
+
+این بلوک برای تشخیص مناسب است: حتی اگر سرویس پایین باشد، تلاش می‌کند لاگ را نشان دهد و به‌خاطر یک کد خروجی قبل از رسیدن به اطلاعات تشخیصی متوقف نمی‌شود.
 
 ~~~bash
-set -eu
+set -u
 
-sudo docker --version
-sudo systemctl is-active docker
-sudo systemctl status docker --no-pager -l
-sudo docker info
-sudo docker run --rm hello-world
+echo "=== DOCKER CLIENT ==="
+sudo docker --version || true
+
+echo
+echo "=== DOCKER SERVICE ==="
+if sudo systemctl is-active --quiet docker; then
+    echo "Docker service: ACTIVE"
+else
+    echo "Docker service: NOT ACTIVE"
+    sudo systemctl status docker --no-pager -l || true
+    echo
+    echo "=== RECENT DOCKER SERVICE LOG ==="
+    sudo journalctl -u docker -n 80 --no-pager || true
+fi
+
+echo
+echo "=== DOCKER ENGINE INFO ==="
+sudo docker info --format 'Server={{.ServerVersion}} Containers={{.Containers}} Images={{.Images}} CgroupDriver={{.CgroupDriver}} CgroupVersion={{.CgroupVersion}}' || {
+    echo "docker info failed; inspect the service status/log above."
+}
+
+echo
+echo "=== TEST CONTAINER ==="
+sudo docker run --rm hello-world || {
+    echo "hello-world failed. Keep the full error; do not run prune or delete Docker data."
+}
+
+echo
+echo "=== DISK AFTER TEST ==="
 df -h /
 sudo du -sh /var/lib/docker 2>/dev/null || true
 ~~~
 
-hello-world یک container آزمایشی کوتاه اجرا می‌کند؛ سرور CS2 را دانلود نمی‌کند. --rm container را بعد از اتمام حذف می‌کند، نه لزوماً image را. از docker system prune -a یا حذف دستی /var/lib/docker استفاده نکن.
+**نتیجهٔ موفق مورد انتظار:** Docker service فعال است؛ docker info چاپ می‌کند که با Engine ارتباط برقرار شده؛ hello-world پیام موفقیت نمایش می‌دهد. اگر hello-world به‌علت دریافت image خطا بدهد، خروجی کامل آن را نگه دار؛ موفق‌نبودن pull با خرابی Panel یکی نیست و CS2 را دانلود نمی‌کند مگر اینکه فرمان صریحاً برای همان بازی اجرا شود.
 
 ### مرحله ۱۹ — قبل از نصب Wings
 
