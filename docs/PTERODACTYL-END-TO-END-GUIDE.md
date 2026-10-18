@@ -2,7 +2,7 @@
 
 > **هدف این فایل:** همهٔ مراحل معنادار این گفتگو را به ترتیب اجرا، با بلوک‌های کد قابل پیدا کردن و وضعیت واقعی هر مرحله نگه دارد. اول توضیحات معماری را بخوان؛ سپس مرحله‌ها را به ترتیب دنبال کن.
 >
-> **وضعیت واقعی:** Pterodactyl Panel روی Debian در LAN نصب شده و ورود از Windows موفق بوده است. Docker و Wings هنوز نصب نشده‌اند. گام بعدی واقعی، نصب Docker و تأیید Engine است.
+> **وضعیت واقعی:** Pterodactyl Panel در LAN نصب شده و ورود Windows موفق بوده است. Docker Engine نسخهٔ 29.9.1 نصب شده، سرویس فعال است و آزمون `hello-world` موفق بوده است. Wings هنوز نصب نشده؛ قدم بعدی تأیید نسخهٔ دقیق Panel و انتخاب نسخهٔ سازگار Wings است.
 >
 > راهنمای سریع مخزن در [README](../README.md)، این راهنمای یکپارچه در ادامه، ثبت فرمان‌ها و خطاهای گفتگو در [Session Command Log](PTERODACTYL-SESSION-COMMAND-LOG.md)، راهنمای تفصیلی Panel در [PTERODACTYL-LAN-SETUP](PTERODACTYL-LAN-SETUP.md)، و فصل Wings در [WINGS-INSTALL](WINGS-INSTALL.md) قرار دارند.
 
