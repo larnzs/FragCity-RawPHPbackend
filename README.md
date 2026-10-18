@@ -1,7 +1,7 @@
 # FragCity
 ## نیازمندی‌ها، معماری و نقشهٔ راه
 
-> **وضعیت پروژه:** Panel آزمایشی Pterodactyl در LAN نصب شده و ورود مدیر تأیید شده است؛ Docker/Wings و اجرای واقعی CS2 تحت Panel هنوز Pending هستند. سایت Raw PHP همچنان برای تست دیتابیس محلی به جداسازی امن credentialها و seed مستقل نیاز دارد؛ پروژه Production نیست.  
+> **وضعیت پروژه:** Panel آزمایشی Pterodactyl در LAN نصب شده و ورود مدیر تأیید شده است؛ Docker Engine نصب و با `docker info` و `hello-world` تأیید شده؛ Wings و اجرای واقعی CS2 تحت Panel هنوز Pending هستند. سایت Raw PHP همچنان برای تست دیتابیس محلی به جداسازی امن credentialها و seed مستقل نیاز دارد؛ پروژه Production نیست.  
 > **آخرین به‌روزرسانی مستندات:** ۱۸ اکتبر ۲۰۲۶  
 > **هدف:** ساخت سکوی فروش و مدیریت سرورهای CS2 با تکیه بر پروژه‌های متن‌باز بالغ و کمینه‌کردن کدنویسی اختصاصی.
 
@@ -57,7 +57,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 |---|---|---|
 | ۰. مستندسازی و محیط توسعهٔ محلی | Requirements، معماری، updater محلی، راهنمای Laragon/WAMP | مستندات آماده؛ نصب محلی و جداسازی DB Pending |
 | ۱. ممیزی و خط مبنا | بررسی نسخه‌ها، امنیت، داده‌ها و محدودیت‌های میزبانی | ممیزی ایستا اولیه انجام شده؛ اصلاحات Pending |
-| ۲. PoC مدیریت سرور | یک نود آزمایشی، یک سرور CS2، منابع و چرخهٔ عمر | Panel در LAN نصب و ورود مدیر تأیید شده؛ Docker/Wings و سرور CS2 تحت مدیریت Panel هنوز Pending |
+| ۲. PoC مدیریت سرور | یک نود آزمایشی، یک سرور CS2، منابع و چرخهٔ عمر | Panel در LAN و Docker Engine تأیید شده؛ Wings و سرور CS2 تحت مدیریت Panel هنوز Pending |
 | ۳. اتصال فروش | سفارش آزمایشی → Provisioning از طریق API پنل | Pending |
 | ۴. منطق کیف پول و بسته | کسر یک‌باره، ثبت و تمدید `expires_at`، رفتار انقضا | Pending؛ شرط مسدودکنندهٔ تولید |
 | ۵. امنیت و بازیابی | جداسازی مشتریان، Backup/Restore، retry، جلوگیری از تکرار | Pending |
@@ -107,7 +107,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | ۰ | دانلود Debian ISO، ساخت VM در VMware و نصب سیستم‌عامل | نیازمند تدوین مستقل در آینده |
 | ۱ | راه‌اندازی اولیهٔ Debian، شبکه، SSH، به‌روزرسانی و آماده‌سازی فایل‌های موجود | نیازمند تدوین مستقل در آینده؛ وضعیت واقعی VM در [Debian PoC Log](docs/DEBIAN-POC.md) ثبت شده |
 | ۲ | نصب Pterodactyl Panel در LAN | **تکمیل شد؛ ورود مدیر از Windows تأیید شده** — [راهنمای فصل Panel](docs/PTERODACTYL-LAN-SETUP.md) |
-| ۳ | Docker Engine و Wings، اتصال Node به Panel | **در حال انجام؛ Docker هنوز نصب نشده** — [راهنمای فصل Wings](docs/WINGS-INSTALL.md) |
+| ۳ | Docker Engine و Wings، اتصال Node به Panel | **Docker نصب و آزمایش شده؛ نصب Wings و اتصال Node در انتظار** — [راهنمای فصل Wings](docs/WINGS-INSTALL.md) |
 | ۴ | ادغام `cs2-kus-addons` و فایل‌های موجود CS2 با مدل Egg/Container/Volume در Pterodactyl | Pending؛ فصل پیچیدهٔ بعد از Wings |
 | ۵ | دامنه، DNS، HTTPS، NGINX، firewall، VMware/Router port-forwarding و دسترسی عمومی بازی‌ها | Pending؛ جدا از مراحل LAN |
 
@@ -135,7 +135,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | NGINX/PHP-FPM | فعال؛ listener وب روی TCP/80؛ PHP-FPM 8.3 فعال |
 | Panel schema/admin | migration/seed موفق، حساب Administrator ساخته شده و ورود از Windows تأیید شده |
 | Egg CS2 | SQL فعلاً فقط `Counter-Strike: Global Offensive` را نشان داده؛ Egg اختصاصی CS2 هنوز اضافه/تأیید نشده |
-| Docker/Wings | هنوز نصب نشده‌اند |
+| Docker/Wings | Docker نصب و تأیید شده؛ Wings هنوز نصب نشده |
 | Storage بازی | حدود 71 GiB در `/home/steam` شامل فایل‌های موجود CS2/KUS؛ باید حفظ شود |
 | دسترسی عمومی | هیچ تنظیم دامنه/TLS/Port Forwarding جدیدی انجام نشده |
 
@@ -334,7 +334,7 @@ sudo systemctl is-active nginx
 5. هیچ انتخابی صرفاً با تعداد ستارهٔ GitHub انجام نمی‌شود؛ API، بلوغ، امنیت، قابلیت ارتقا، صورتحساب و آزمون عملی معیار تصمیم‌اند.
 6. حذف یا بازنویسی هیچ‌کدام از ریپوهای موجود بخشی از فاز مستندسازی نیست.
 
-**وضعیت نهایی فعلی:** dependencyهای پایه و Composer 2.10.3 روی `fc-node-01` نصب و بررسی شده‌اند؛ فایل‌های Panel v1.15.1 دریافت و استخراج شده‌اند. اصلاح مالکیت، database/user، `.env`، Composer dependencies، APP_KEY، migrations، Nginx/queue/cron، Wings/Docker و اجرای CS2 همچنان Pending هستند. اصلاح کدهای امنیتی نیز برنامه و تست مجزا می‌خواهد.
+**وضعیت فعلی:** Panel در LAN نصب شده، ورود مدیر موفق بوده و Docker Engine روی `fc-node-01` نصب و با اجرای موفق `hello-world` تأیید شده است. Wings هنوز نصب نشده؛ نسخهٔ دقیق Panel باید با `p:info` تأیید شود، سپس نسخهٔ سازگار Wings و Node تنظیم شوند. اجرای CS2 تحت Pterodactyl، ادغام فایل‌های موجود CS2/KUS، queue/cron، hardening، backup و دسترسی عمومی هنوز مراحل جداگانه‌اند.
 
 
 ---
