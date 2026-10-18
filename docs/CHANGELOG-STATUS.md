@@ -2,6 +2,48 @@
 
 ## آخرین وضعیت ثبت‌شده
 
+## Snapshot تأییدشدهٔ جدید — ۱۸ اکتبر ۲۰۲۶
+
+این snapshot جدید، وضعیت‌های قدیمی‌تر که در ادامهٔ فایل به‌صورت تاریخچه حفظ شده‌اند را به‌روزرسانی می‌کند.
+
+### Panel LAN: تکمیل شد
+
+- Panel در `/var/www/pterodactyl` نصب و پیکربندی شد.
+- PHP CLI: `8.3.35`؛ Composer: `2.10.3`؛ Laravel Framework خروجی Artisan: `12.64.0`.
+- MariaDB: `11.8.6`، دیتابیس محلی `panel` و حساب اختصاصی `pterodactyl`@ `127.0.0.1`.
+- Redis و PHP-FPM فعال بودند؛ Redis Host/Port در Panel برابر `127.0.0.1:6379` تنظیم شد و فیلد Redis Password در wizard خالی ماند.
+- Composer dependencyها نصب شدند؛ `APP_KEY` ساخته شد.
+- خطای cache write دسترسی با مالکیت `www-data:www-data`، پوشه‌های `750` و فایل‌های `640` در `storage` و `bootstrap/cache` رفع شد؛ آزمون نوشتن `www-data` موفق بود.
+- `p:environment:setup` و `p:environment:database` تکمیل شدند.
+- `migrate --seed --force` موفق بود و داده‌های اولیهٔ Nest/Egg ایجاد شدند.
+- حساب Administrator ساخته شد.
+- NGINX برای `/var/www/pterodactyl/public` و PHP-FPM 8.3 تنظیم شد. ورود از Windows به `http://192.168.1.5` موفق بود.
+- این محیط هنوز فقط LAN/HTTP است؛ دامنه، HTTPS، فایروال WAN و Port Forwarding عمومی انجام نشده‌اند.
+- نسخهٔ دقیق Panel هنوز باید تطبیق داده شود: تاریخچهٔ قدیمی از `v1.15.1` نام می‌برد، اما شواهد فعلی `Laravel 12.64.0` و نداشتن Git metadata است. از Laravel version برای حدس‌زدن نسخهٔ Panel استفاده نکنید.
+
+جزئیات گام‌به‌گام: [Pterodactyl LAN Setup](PTERODACTYL-LAN-SETUP.md). تاریخچه و جزئیات قدیمی: [Pterodactyl PoC](PTERODACTYL-POC.md).
+
+### Wings/Docker: در جریان است
+
+- Debian 13 (Trixie)، VMware، معماری `x86_64/amd64`، kernel `6.12.113+deb13-amd64` و ۴ vCPU بررسی شدند.
+- RAM حدود 5.6 GiB؛ root filesystem برابر 112 GiB؛ آخرین snapshot: حدود 80 GiB مصرف و 27 GiB آزاد.
+- Preflight نشان داد Docker CLI/daemon نصب/فعال نیستند؛ `docker.sources` هم هنوز وجود نداشت و بسته‌های متعارض بررسی‌شده نصب نبودند.
+- حدود 71 GiB در `/home/steam` مربوط به فایل‌های موجود CS2 و `cs2-kus-addons` است؛ **پاک، جابه‌جا یا overwrite نشود**.
+- Docker/Wings هنوز نصب/اجرا نشده؛ فعلاً CS2 container نساز چون فضای آزاد کافی برای نصب تازهٔ بازی تأیید نشده.
+- Egg Query در دیتابیس فقط `Counter-Strike: Global Offensive` را نشان داد؛ Egg اختصاصی CS2 هنوز import/تأیید نشده است.
+
+راهنمای جاری و گام بعدی: [Wings Install](WINGS-INSTALL.md).
+
+### فصل‌های پروژه
+
+- فصل ۰: دانلود Debian، ساخت VMware VM و نصب OS — بعداً با مراحل واقعی تکمیل شود.
+- فصل ۱: راه‌اندازی اولیه Debian، شبکه، SSH و آماده‌سازی سیستم — بعداً به فصل مستقل تبدیل شود.
+- فصل ۲: Pterodactyl Panel در LAN — تکمیل شده.
+- فصل ۳: Docker و Wings — در حال انجام.
+- فصل ۴: ادغام `cs2-kus-addons` و بازی موجود با Egg/Container/Volume — هنوز شروع نشده و نیازمند طراحی/آزمون دقیق است.
+- فصل ۵: دامنه، HTTPS، NGINX، firewall، VMware/router port-forwarding و دسترسی عمومی — به آینده موکول شده.
+
+
 ### دریافت و استخراج Panel v1.15.1 — ۱۷ اکتبر ۲۰۲۶
 
 - archive رسمی `panel.tar.gz` از release ثابت `v1.15.1` دانلود شد؛ حجم گزارش‌شده حدود 3.0 MiB است.
