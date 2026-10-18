@@ -1,7 +1,7 @@
 # FragCity
 ## نیازمندی‌ها، معماری و نقشهٔ راه
 
-> **وضعیت پروژه:** طراحی معماری و گردش‌کار توسعهٔ محلی مستند شده؛ آمادهٔ تولید نیست و اجرای امن DB محلی هنوز مسدود است.  
+> **وضعیت پروژه:** Panel آزمایشی Pterodactyl در LAN نصب شده و ورود مدیر تأیید شده است؛ Docker/Wings و اجرای واقعی CS2 تحت Panel هنوز Pending هستند. سایت Raw PHP همچنان برای تست دیتابیس محلی به جداسازی امن credentialها و seed مستقل نیاز دارد؛ پروژه Production نیست.  
 > **آخرین به‌روزرسانی مستندات:** ۱۸ اکتبر ۲۰۲۶  
 > **هدف:** ساخت سکوی فروش و مدیریت سرورهای CS2 با تکیه بر پروژه‌های متن‌باز بالغ و کمینه‌کردن کدنویسی اختصاصی.
 
@@ -79,6 +79,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | [Debian PoC Log](docs/DEBIAN-POC.md) | مشخصات واقعی VM، فرمان‌های اجراشده، وضعیت و هشدارهای عملیاتی |
 | [Pterodactyl PoC (تاریخی/تحلیلی)](docs/PTERODACTYL-POC.md) | بررسی‌های اولیه، فرضیه‌ها و سابقهٔ تصمیم‌ها؛ برای وضعیت اجرا به Runbook LAN مراجعه کنید |
 | [Pterodactyl LAN Setup](docs/PTERODACTYL-LAN-SETUP.md) | راهنمای مبتدی‌پسند نصب واقعی Panel در LAN، دیتابیس، APP_KEY، migration، NGINX، خطاها و وضعیت تأییدشده |
+| [Pterodactyl End-to-End Guide](docs/PTERODACTYL-END-TO-END-GUIDE.md) | یک راهنمای پیوسته و شماره‌گذاری‌شده از بررسی Debian و نصب Panel تا خطاهای واقعی، SSH/HeidiSQL، دیسک و گام نصب Docker |
 | [Pterodactyl Session Command Log](docs/PTERODACTYL-SESSION-COMMAND-LOG.md) | دفتر زمانی فرمان‌های واقعی/تشخیصی، نتایج ثبت‌شده، خطاها و اصلاح‌ها، تنظیمات LAN و تفکیک موارد اجراشده از Pending |
 | [Wings & Docker Install](docs/WINGS-INSTALL.md) | فصل مستقل Docker/Wings: مفاهیم، نصب Engine، Node، config، systemd، Allocation، محدودیت دیسک و مراحل LAN |
 | [Local Development](docs/LOCAL-DEVELOPMENT.md) | updater محلی، نصب Laragon/WAMP و موانع امن تست دیتابیس |
@@ -88,7 +89,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 
 ## Quick Setup — راه‌اندازی زیرساخت FragCity از صفر تا اولین سرور
 
-این بخش **نقطهٔ شروع اجرایی** مخزن است. هر گام مشخص می‌کند چه کاری می‌کند، با چه فرمانی انجام می‌شود، و در محیط فعلی انجام شده یا هنوز باقی مانده است. برای توضیح کامل‌تر و علت هر فرمان، به فصل مستقل هر مرحله مراجعه کنید.
+این بخش **نقطهٔ شروع اجرایی** مخزن است. برای مسیر کامل فرمان‌به‌فرمان از ابتدا تا مرحلهٔ فعلی، [راهنمای یکپارچهٔ End-to-End](docs/PTERODACTYL-END-TO-END-GUIDE.md) را باز کن؛ جدول زیر نقشهٔ فصل‌ها و وضعیت آنهاست. جزئیات کامل هر خطا و سابقهٔ گفتگو در [دفتر فرمان‌ها](docs/PTERODACTYL-SESSION-COMMAND-LOG.md) است.
 
 > **محیط فعلی فقط LAN است.** Panel از Windows با `http://192.168.1.5` باز می‌شود؛ دامنهٔ واقعی، HTTPS، port forwarding عمومی و فایروال WAN هنوز تنظیم نشده‌اند. هیچ secret، رمز، APP_KEY یا token در README یا Git قرار ندهید.
 
