@@ -4,7 +4,7 @@
 >
 > **وضعیت واقعی:** Pterodactyl Panel در LAN نصب شده و ورود Windows موفق بوده است. Docker Engine نسخهٔ 29.9.1 نصب شده، سرویس فعال است و آزمون `hello-world` موفق بوده است. Wings هنوز نصب نشده؛ قدم بعدی تأیید نسخهٔ دقیق Panel و انتخاب نسخهٔ سازگار Wings است.
 >
-> راهنمای سریع مخزن در [README](../README.md)، این راهنمای یکپارچه در ادامه، ثبت فرمان‌ها و خطاهای گفتگو در [Session Command Log](PTERODACTYL-SESSION-COMMAND-LOG.md)، راهنمای تفصیلی Panel در [PTERODACTYL-LAN-SETUP](PTERODACTYL-LAN-SETUP.md)، و فصل Wings در [WINGS-INSTALL](WINGS-INSTALL.md) قرار دارند.
+> راهنمای سریع مخزن در [README](../README.md)، این راهنمای یکپارچه در ادامه، ثبت فرمان‌ها و خطاهای گفتگو در [Session Command Log](PTERODACTYL-SESSION-COMMAND-LOG.md)، راهنمای تفصیلی Panel در [PTERODACTYL-LAN-SETUP](PTERODACTYL-LAN-SETUP.md)، و فصل Wings در [WINGS-INSTALL](WINGS-INSTALL.md) قرار دارند. برای ساخت VM مستقل و قابل‌کپی Node، از [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) استفاده کن.
 
 ## توضیحات کامل قبل از اجرا
 
@@ -698,6 +698,15 @@ done
 - خطای 403 قبلی در تست endpointها تکرار نشد؛ هر دو URL رسمی HTTP=200 داده بودند.
 
 Docker Engine اکنون آماده است و مرحلهٔ نصب را تکرار نکن. تست `hello-world` ثابت می‌کند CLI، daemon، دریافت image و اجرای یک container ساده کار کرده‌اند؛ هنوز ثابت نمی‌کند Wings وصل شده یا CS2 قابل اجراست.
+
+**تصمیم جدید دربارهٔ Template:** Docker روی VM فعلی Panel تأیید شده است، اما این VM **منبع Golden Image نیست**. آن را clone نکن؛ یک VM تازهٔ `fc-node-template` با 300 GB Growable disk بساز و فصل [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) را دنبال کن. قبل از نصب Wings روی template، نسخهٔ دقیق Panel را با فرمان زیر بخوان:
+
+~~~bash
+cd /var/www/pterodactyl
+sudo -u www-data php8.3 artisan p:info
+~~~
+
+سپس نسخهٔ سازگار Wings را pin کن. نقطهٔ کپی فقط وقتی است که Wings binary/unit آماده باشد ولی config/token اختصاصی وجود نداشته باشد، اسکریپت نهایی پیام `READY` بدهد و VM مادر خاموش شده باشد.
 
 ### مرحلهٔ ۱۹ — شناسایی نسخهٔ دقیق Panel پیش از نصب Wings
 
