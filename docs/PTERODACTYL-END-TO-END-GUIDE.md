@@ -122,6 +122,15 @@ for required_file in artisan .env.example composer.json public/index.php; do
     echo "OK: $required_file"
 done
 
+echo
+echo "=== SET PANEL OWNERSHIP ==="
+sudo chown -R www-data:www-data "$PANEL_DIR"
+
+echo
+echo "=== SET RUNTIME DIRECTORY / FILE MODES ==="
+sudo find "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache" -type d -exec chmod 750 {} +
+sudo find "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache" -type f -exec chmod 640 {} +
+
 sudo stat -c '%U:%G mode=%a %n' \
     "$PANEL_DIR" "$PANEL_DIR/artisan" \
     "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache"
@@ -150,6 +159,8 @@ if sudo test -e /var/www/pterodactyl/.env; then
 fi
 
 sudo cp .env.example .env
+sudo chown www-data:www-data .env
+sudo chmod 640 .env
 
 COMPOSER_BIN="$(command -v composer)"
 sudo env COMPOSER_ALLOW_SUPERUSER=1 \
