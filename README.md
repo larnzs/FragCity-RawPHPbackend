@@ -1,7 +1,7 @@
 # FragCity
 ## نیازمندی‌ها، معماری و نقشهٔ راه
 
-> **وضعیت پروژه:** Panel آزمایشی Pterodactyl در LAN نصب شده و ورود مدیر تأیید شده است؛ Docker Engine نصب و با `docker info` و `hello-world` تأیید شده؛ Wings و اجرای واقعی CS2 تحت Panel هنوز Pending هستند. سایت Raw PHP همچنان برای تست دیتابیس محلی به جداسازی امن credentialها و seed مستقل نیاز دارد؛ پروژه Production نیست.  
+> **وضعیت پروژه:** Panel آزمایشی Pterodactyl در LAN نصب شده و ورود مدیر تأیید شده است؛ Docker Engine روی VM فعلی نصب و با `docker info` و `hello-world` تأیید شده؛ Wings و اجرای واقعی CS2 هنوز Pending هستند. اکنون یک VM تمیز 300 GB برای Node Golden Image می‌سازیم؛ VM فعلی Panel را clone نکن. سایت Raw PHP همچنان برای تست دیتابیس محلی به جداسازی امن credentialها و seed مستقل نیاز دارد؛ پروژه Production نیست.  
 > **آخرین به‌روزرسانی مستندات:** ۱۸ اکتبر ۲۰۲۶  
 > **هدف:** ساخت سکوی فروش و مدیریت سرورهای CS2 با تکیه بر پروژه‌های متن‌باز بالغ و کمینه‌کردن کدنویسی اختصاصی.
 
@@ -89,6 +89,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | [Pterodactyl Session Command Log](docs/PTERODACTYL-SESSION-COMMAND-LOG.md) | دفتر زمانی فرمان‌های واقعی/تشخیصی، نتایج ثبت‌شده، خطاها و اصلاح‌ها، تنظیمات LAN و تفکیک موارد اجراشده از Pending |
 | [Wings & Docker Install](docs/WINGS-INSTALL.md) | فصل مستقل Docker/Wings: مفاهیم، نصب Engine، Node، config، systemd، Allocation، محدودیت دیسک و مراحل LAN |
 | [Reusable Debian Image Strategy](docs/REUSABLE-LINUX-IMAGE-STRATEGY.md) | تصمیم ثبت‌شده برای VMDK/OVF/OVA، Node Golden Template، bootstrap scripts و جلوگیری از کپی secret/identity |
+| [Debian Node Golden Image](docs/DEBIAN-NODE-GOLDEN-IMAGE.md) | راهنمای عملی ساخت VM تمیز 300 GB برای Node، نصب Docker/Wings، پاک‌سازی هویت و نقطهٔ توقف برای کپی گرفتن |
 | [Local Development](docs/LOCAL-DEVELOPMENT.md) | updater محلی، نصب Laragon/WAMP و موانع امن تست دیتابیس |
 | [Current Status](docs/CHANGELOG-STATUS.md) | وضعیت جاری، انتخاب‌های انجام‌شده و مواردی که هنوز اجرا نشده‌اند |
 | [Documentation Audit](docs/DOCUMENTATION-AUDIT.md) | محدودهٔ بازبینی مستندات، اصلاحات، پیوندهای بررسی‌شده و استاندارد آموزش مبتدی‌پسند |
@@ -270,13 +271,22 @@ sudo systemctl is-active nginx
 
 فایل‌های موجود حدود 71 GiB در `/home/steam` حفظ می‌شوند. هنوز CS2 instance نساخته‌ایم؛ ادغام فایل‌های فعلی با Pterodactyl موضوع فصل ۴ است.
 
-### مرحله 8 — ساخت Node و نصب Wings
+### مرحله 8 — ساخت Golden Image تمیز برای Nodeها (قدم بعدی)
 
-پس از موفقیت Docker، نسخهٔ دقیق Panel را تأیید کن، سپس از release سازگار Wings انتخاب کن. Node باید از Admin UI پنل ساخته شود؛ آدرس تست LAN فعلی `192.168.1.5` است. پورت‌های پیش‌فرض مورد انتظار Wings معمولاً TCP/8080 و SFTP/2022 هستند، اما باید با UI/config همان نسخه تأیید شوند.
+**تصمیم معماری:** VM فعلی Panel را clone یا تبدیل به template نکن؛ این VM دیتابیس Panel و تنظیمات وب دارد و حدود 71 GiB فایل CS2/KUS نیز در `/home/steam` روی آن است. یک VM تازه به نام `fc-node-template` با Debian 13 و ظرفیت مجازی Growable برابر 300 GB بساز. CS2 روی template نصب نمی‌شود.
 
-`config.yml` را از صفحهٔ Configuration همان Node تولید کن. این فایل token/secret دارد: در Git، README یا چت قرار نده. Wings را ابتدا foreground/debug آزمایش کن، سپس طبق مستندات همان نسخه systemd service بساز.
+راهنمای اجرایی کامل، تنظیمات VMware، نصب Debian، اسکریپت Docker، دروازهٔ نسخهٔ Wings، پاک‌سازی machine-id/SSH host keys و نقطهٔ دقیق خاموش‌کردن/کپی‌گرفتن در [Debian Node Golden Image](docs/DEBIAN-NODE-GOLDEN-IMAGE.md) آمده است. اسکریپت‌های نسخه‌بندی‌شده در [infra/node-template](../tree/main/infra/node-template) قرار دارند.
 
-**وضعیت:** [ ] Pending.
+Docker روی VM فعلی Panel نصب شده و با `docker info` و `hello-world` تأیید شده است؛ بنابراین نصب Docker را روی آن تکرار نکن. ابتدا از خود Panel نسخه را بخوان:
+
+~~~bash
+cd /var/www/pterodactyl
+sudo -u www-data php8.3 artisan p:info
+~~~
+
+خروجی را بدون password، token، APP_KEY یا secret ارسال کن. پس از تطبیق نسخه، اسکریپت نصب Wings را با نسخهٔ سازگار pin می‌کنیم و آن را روی VM تازه نصب می‌کنیم. template فقط با Debian + Docker + Wings binary/unit آماده می‌شود و **هیچ** `/etc/pterodactyl/config.yml` یا token اختصاصی Node در آن باقی نمی‌ماند.
+
+**نقطهٔ توقف برای کپی:** تنها وقتی اسکریپت `prepare-golden-image.sh` پیام `READY` بدهد و VM مادر خاموش شود، کل پوشهٔ VM را کپی کن. متن راهنما مشخص می‌کند کپی چگونه identity یکتا بگیرد.
 
 ### مرحله 9 — Egg/Allocation و اولین سرور بازی
 
