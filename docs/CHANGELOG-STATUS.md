@@ -9,7 +9,7 @@
 - خطای 403 در آخرین تست تکرار نشد؛ دو endpoint رسمی Docker پاسخ HTTP 200 دادند.
 - Wings هنوز نصب نشده؛ نسخهٔ دقیق Panel باید با `sudo -u www-data php8.3 artisan p:info` تأیید شود.
 - **تصمیم معماری جدید:** VM فعلی Panel به Golden Image تبدیل یا clone نمی‌شود. Template واقعی با VM تازهٔ Debian 13 و ظرفیت مجازی Growable برابر 300 GB ساخته می‌شود؛ CS2 و فایل‌های `cs2-kus-addons` در آن نصب نمی‌شوند.
-- راهنمای ساخت Template: [DEBIAN-NODE-GOLDEN-IMAGE.md](DEBIAN-NODE-GOLDEN-IMAGE.md). اسکریپت‌های GitHub: [infra/node-template](../tree/main/infra/node-template).
+- راهنمای ساخت Template: [DEBIAN-NODE-GOLDEN-IMAGE.md](DEBIAN-NODE-GOLDEN-IMAGE.md). اسکریپت‌های GitHub: [infra/node-template](https://github.com/larnzs/FragCity-RawPHPbackend/tree/main/infra/node-template).
 - گام بعدی فعلی: اجرای فقط‌خواندنی `p:info` روی VM فعلی Panel؛ پس از انتخاب Wings سازگار، ساخت VM تمیز `fc-node-template` را شروع می‌کنیم.
 - فایل‌های حدود 71 GiB در `/home/steam` روی VM فعلی حفظ می‌شوند؛ هنوز هیچ CS2 instance در Pterodactyl ایجاد نشده و دسترسی عمومی/HTTPS هم تنظیم نشده است.
 
