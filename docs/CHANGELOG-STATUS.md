@@ -23,6 +23,16 @@
 
 جزئیات گام‌به‌گام: [Pterodactyl LAN Setup](PTERODACTYL-LAN-SETUP.md). تاریخچه و جزئیات قدیمی: [Pterodactyl PoC](PTERODACTYL-POC.md).
 
+### تصمیم اجرایی دربارهٔ VMDK و خطای 403 — ۱۸ اکتبر ۲۰۲۶
+
+- تصمیم فعلی: **VM موجود را ادامه بده؛ از صفر نصب مجدد نکن.** Panel روی `192.168.1.5` باز می‌شود، ورود مدیر موفق بوده، MariaDB و migrationها آماده‌اند و NGINX سرویس می‌دهد. بازسازی VM این دستاوردها را دور می‌ریزد و به‌خودی‌خود یک خطای HTTP 403 در دانلود مخزن را حل نمی‌کند.
+- پیش از تغییرات زیرساختی مهم، یک snapshot در VMware بگیر. برای backup مستقل و مطمئن‌تر، مهمان Debian را clean shutdown کن و سپس کل پوشهٔ VM را به یک محل دیگر کپی کن. Snapshot به‌تنهایی backup مستقل نیست.
+- اجرای نصب Docker در مرحلهٔ ۱۷ با HTTP 403 گزارش شده؛ **Docker نصب‌شده فرض نمی‌شود**. هنوز مشخص نشده 403 روی URL دریافت کلید `/linux/debian/gpg`، روی `apt update` یا endpoint دیگری رخ داده است.
+- گام بعد: اجرای بلوک فقط‌خواندنی در [Runbook یکپارچه، عیب‌یابی مرحلهٔ ۱۷](PTERODACTYL-END-TO-END-GUIDE.md#عیب‌یابی-مرحله-۱۷--خطای-http-403-هنگام-دریافت-docker). نتایج HTTP endpoint کلید و `dists/trixie/InRelease`، اندازهٔ کلید موجود، فایل `docker.sources` و وضعیت پکیج‌ها را مشخص می‌کند.
+- تا زمان تشخیص، از `trusted=yes`، خاموش‌کردن TLS، mirror ناشناس، پاک‌کردن فایل‌ها یا نصب دوبارهٔ Debian استفاده نکن. فایل‌های حدود 71 GiB در `/home/steam` مربوط به CS2/KUS حفظ می‌شوند.
+- Docker رسمی، Debian 13/Trixie و معماری amd64 را پشتیبانی می‌کند؛ وجود خطای 403 را به‌تنهایی نمی‌توان به ناسازگاری سیستم‌عامل نسبت داد.
+- راهنمای Wings به [Wings Install](WINGS-INSTALL.md) و Runbook به [Pterodactyl End-to-End Guide](PTERODACTYL-END-TO-END-GUIDE.md) اشاره می‌کنند. هیچ سرور CS2 یا Port Forwarding عمومی در این مرحله ایجاد نشده است.
+
 ### Wings/Docker: در جریان است
 
 - Debian 13 (Trixie)، VMware، معماری `x86_64/amd64`، kernel `6.12.113+deb13-amd64` و ۴ vCPU بررسی شدند.
