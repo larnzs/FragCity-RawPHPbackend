@@ -710,7 +710,7 @@ fi
 - Docker CLI and Docker service were not installed/active.
 - Most recent resources: four vCPU, around 5.6 GiB RAM, 27 GiB root space free.
 
-**Not yet executed:** adding Docker's repository, installing Engine, running `docker info`, and running `hello-world`. These steps are in [Wings & Docker Install](WINGS-INSTALL.md). Do not claim Docker/Wings is installed until those command outputs prove it.
+**Status at the time this earlier entry was written (historical):** Docker repository setup and Engine verification had not yet been run. The later section [Docker verification — 18 October 2026](#docker-verification--18-october-2026-executed--observed) supersedes that state: Docker 29.9.1 is now installed and `hello-world` succeeded. Wings remains pending.
 
 ## 14. Current status and next action
 
