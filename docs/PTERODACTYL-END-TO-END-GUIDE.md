@@ -699,14 +699,16 @@ done
 
 Docker Engine اکنون آماده است و مرحلهٔ نصب را تکرار نکن. تست `hello-world` ثابت می‌کند CLI، daemon، دریافت image و اجرای یک container ساده کار کرده‌اند؛ هنوز ثابت نمی‌کند Wings وصل شده یا CS2 قابل اجراست.
 
-**تصمیم جدید دربارهٔ Template:** Docker روی VM فعلی Panel تأیید شده است، اما این VM **منبع Golden Image نیست**. آن را clone نکن؛ یک VM تازهٔ `fc-node-template` با 300 GB Growable disk بساز و فصل [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) را دنبال کن. قبل از نصب Wings روی template، نسخهٔ دقیق Panel را با فرمان زیر بخوان:
+**تصمیم اجرایی جاری:** فعلاً Golden Image را کنار می‌گذاریم و PoC را روی همین `fc-node-01` ادامه می‌دهیم؛ Panel و Wings موقتاً روی همین Debian خواهند بود. Docker روی همین VM نصب و آزمایش شده است. **یک VM تازه نساز و اسکریپت‌های finalization یا تنظیم هویت clone را روی این ماشین اجرا نکن.** پس از تکمیل و تأیید مسیر Wings، راهنمای [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) را برای مرحلهٔ آینده نگه می‌داریم.
+
+قدم بعد نسخهٔ دقیق Panel را از خود برنامه می‌خواند:
 
 ~~~bash
 cd /var/www/pterodactyl
 sudo -u www-data php8.3 artisan p:info
 ~~~
 
-سپس نسخهٔ سازگار Wings را pin کن. نقطهٔ کپی فقط وقتی است که Wings binary/unit آماده باشد ولی config/token اختصاصی وجود نداشته باشد، اسکریپت نهایی پیام `READY` بدهد و VM مادر خاموش شده باشد.
+خروجی را بازبینی کن و password، token، APP_KEY یا secret را ارسال نکن. پس از تطبیق نسخه، همین VM را به‌عنوان Node آزمایشی `fc-node-01` در Admin UI ثبت می‌کنیم. آدرس LAN برابر `192.168.1.5` است؛ فعلاً HTTP بدون SSL، daemon port پیشنهادی TCP/8080 و SFTP TCP/2022 هستند، ولی مقدار نهایی را از UI/config همان نسخه بگیر. فایل `/etc/pterodactyl/config.yml` محرمانه است و نباید وارد GitHub یا چت شود.
 
 ### مرحلهٔ ۱۹ — شناسایی نسخهٔ دقیق Panel پیش از نصب Wings
 
