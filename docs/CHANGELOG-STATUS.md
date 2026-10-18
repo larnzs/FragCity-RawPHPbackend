@@ -205,3 +205,12 @@
 - برچسب‌های اجراشده از فرمان‌های پیشنهادی جدا شده‌اند؛ secretها و رمزهای واقعی ثبت نشده‌اند.
 - نسخهٔ دقیق Panel هنوز لازم است با فرمان p:info بررسی شود، چون خروجی Laravel 12.64.0 به‌تنهایی نسخهٔ Panel را مشخص نمی‌کند. تا تطبیق نسخه، Wings نصب نمی‌شود.
 - فایل‌های /home/steam با حدود 71 GiB دادهٔ موجود CS2/KUS باید حفظ شوند؛ ادغام آن‌ها فصل ۴ است. دامنه/HTTPS/Port Forwarding عمومی هنوز نصب نشده‌اند و در فصل ۵ خواهند بود.
+
+
+### مرحله ۱۷ آمادهٔ اجرا — نصب Docker از مخزن رسمی — ۱۸ اکتبر ۲۰۲۶
+
+- فرمان نصب کامل از مخزن APT رسمی Docker در [Pterodactyl End-to-End Guide، مرحلهٔ ۱۷](PTERODACTYL-END-TO-END-GUIDE.md) ثبت شد.
+- روش با سند رسمی Docker برای Debian بررسی شد؛ Debian 13/Trixie و amd64 پشتیبانی می‌شوند.
+- Docker هنوز نصب نشده است؛ تنها preflight انجام شده. پس از اجرای کاربر، نتیجهٔ `docker --version`، `systemctl is-active docker`, `docker info` و `docker run --rm hello-world` ثبت خواهد شد.
+- هشدار رسمی دربارهٔ portهای Docker و عبور احتمالی published ports از UFW/firewalld اضافه شد. فعلاً هیچ Port Forwarding عمومی باز نمی‌شود؛ قوانین Docker/firewall در فصل شبکه بررسی خواهند شد.
+
