@@ -79,6 +79,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 | [Debian PoC Log](docs/DEBIAN-POC.md) | مشخصات واقعی VM، فرمان‌های اجراشده، وضعیت و هشدارهای عملیاتی |
 | [Pterodactyl PoC (تاریخی/تحلیلی)](docs/PTERODACTYL-POC.md) | بررسی‌های اولیه، فرضیه‌ها و سابقهٔ تصمیم‌ها؛ برای وضعیت اجرا به Runbook LAN مراجعه کنید |
 | [Pterodactyl LAN Setup](docs/PTERODACTYL-LAN-SETUP.md) | راهنمای مبتدی‌پسند نصب واقعی Panel در LAN، دیتابیس، APP_KEY، migration، NGINX، خطاها و وضعیت تأییدشده |
+| [Pterodactyl Session Command Log](docs/PTERODACTYL-SESSION-COMMAND-LOG.md) | دفتر زمانی فرمان‌های واقعی/تشخیصی، نتایج ثبت‌شده، خطاها و اصلاح‌ها، تنظیمات LAN و تفکیک موارد اجراشده از Pending |
 | [Wings & Docker Install](docs/WINGS-INSTALL.md) | فصل مستقل Docker/Wings: مفاهیم، نصب Engine، Node، config، systemd، Allocation، محدودیت دیسک و مراحل LAN |
 | [Local Development](docs/LOCAL-DEVELOPMENT.md) | updater محلی، نصب Laragon/WAMP و موانع امن تست دیتابیس |
 | [Current Status](docs/CHANGELOG-STATUS.md) | وضعیت جاری، انتخاب‌های انجام‌شده و مواردی که هنوز اجرا نشده‌اند |
