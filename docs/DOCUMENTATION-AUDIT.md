@@ -1,8 +1,8 @@
 # FragCity — Documentation Audit & Beginner-Friendly Guide
 
 > آخرین چکاپ مستندات: ۱۸ اکتبر ۲۰۲۶  
-> محدودهٔ فعلی: README و ۲۲ سند Markdown داخل docs/ (در مجموع ۲۳ فایل Markdown در ریشه و docs)؛ راهنماهای قدیمی‌تر در بخش‌های تاریخی نگه داشته شده‌اند.  
-> وضعیت واقعی: Panel روی LAN نصب شده و ورود مدیر تأیید شده است؛ Docker/Wings و اجرای سرور CS2 هنوز Pending هستند. نسخهٔ دقیق Panel باید پیش از نصب Wings با p:info و Release رسمی تطبیق داده شود.
+> محدودهٔ فعلی: README و ۲۳ سند Markdown داخل docs/ (در مجموع ۲۴ فایل Markdown در ریشه و docs)؛ راهنماهای قدیمی‌تر در بخش‌های تاریخی نگه داشته شده‌اند.  
+> وضعیت واقعی در ۱۸ اکتبر ۲۰۲۶: Panel روی LAN نصب و login تأیید شده؛ Docker Engine 29.9.1، systemd service، docker info و hello-world موفق‌اند؛ Wings و CS2 instance هنوز Pending هستند. نسخهٔ دقیق Panel باید با p:info پیش از نصب Wings تأیید شود. یک راهنمای مستقل ساخت Node Golden Image نیز افزوده شده است.
 
 ## ۱. هدف این سند
 
@@ -119,7 +119,7 @@
 ## به‌روزرسانی Runbook زیرساخت — ۱۸ اکتبر ۲۰۲۶
 
 - بخش Quick Setup در README بازنویسی شد تا وضعیت واقعی LAN را از برنامهٔ قدیمی نصب جدا کند و فصل‌های ۰ تا ۵ را مشخص سازد: نصب Debian، آماده‌سازی Debian، Panel، Wings، ادغام `cs2-kus-addons` و شبکه/دسترسی عمومی.
-- فرمان‌های نصب Docker از مخزن رسمی در Quick Setup آمده‌اند؛ نصب Docker/Wings هنوز Pending است و دستورها به‌عنوان مرحلهٔ بعد برچسب خورده‌اند.
+- Docker روی VM فعلی Panel نصب و با hello-world تأیید شده است. نصب Wings و ساخت VM مستقل Golden Image هنوز Pending هستند؛ راهنمای عملی در [Debian Node Golden Image](DEBIAN-NODE-GOLDEN-IMAGE.md) است.
 - دو سند اجرایی ایجاد شدند: [Pterodactyl LAN Setup](PTERODACTYL-LAN-SETUP.md) و [Wings & Docker Install](WINGS-INSTALL.md).
 - گزارش جاری در [CHANGELOG-STATUS](CHANGELOG-STATUS.md) با شواهد نصب Panel و preflight نود به‌روز شد. [PTERODACTYL-POC](PTERODACTYL-POC.md) اکنون صریحاً مشخص می‌کند که بخش نسخهٔ اولیه تاریخی است و نسخهٔ دقیق Panel باید پیش از انتخاب Wings تطبیق داده شود.
 - کنترل هدفمند پس از Commit انجام شد: README به Quick Setup و دو سند جدید لینک می‌دهد؛ سندهای جدید از GitHub قابل خواندن هستند؛ code fenceهای بررسی‌شده متوازن‌اند (README: 34 نشانگر، Panel guide: 18، Wings guide: 16). این کنترل محدود است و جایگزین ممیزی کامل همهٔ لینک‌ها و فرمان‌ها یا آزمون اجرایی روی VM نیست.
@@ -131,7 +131,7 @@
 
 - در مقایسهٔ README و فصل‌های موجود با گفتگو مشخص شد که راهنماهای قبلی مراحل اصلی را پوشش می‌دادند، اما همهٔ فرمان‌های مهم تشخیصی، خروجی‌ها و مسیر عیب‌یابی را یکجا ثبت نکرده بودند.
 - سند [Pterodactyl Session Command Log](PTERODACTYL-SESSION-COMMAND-LOG.md) ساخته شد. این سند فرمان‌های اصلی بررسی PHP/Composer، دیتابیس، تغییر رمز نمونه، بررسی احراز هویت root، cache permission، Artisan، migration/seed، ایجاد مدیر، بررسی Egg، NGINX، SSH/HeidiSQL/SFTP، تحلیل فضای دیسک و preflight Docker را به ترتیب توضیح می‌دهد.
-- README و راهنمای Panel مستقیماً به این دفتر فرمان پیوند می‌دهند. فرمان‌های Docker/Wings که فقط پیشنهاد شده‌اند، به‌عنوان Pending برچسب دارند و به‌عنوان عملیات اجراشده ثبت نشده‌اند.
+- README و راهنمای Panel به دفتر فرمان‌ها پیوند می‌دهند. نتیجهٔ Docker در Session Command Log ثبت شده؛ Wings و ساخت Template هنوز اجرا نشده‌اند.
 - رمزهای واقعی، APP_KEY، توکن‌ها و جزئیات حساس ورود عمداً در داک تکرار نشده‌اند.
 - پس از commit، فایل‌های GitHub دوباره خوانده شدند و حضور لینک‌های اصلی، سرعنوان‌ها و متوازن‌بودن code fenceها بررسی شد. این بررسی ساختاری، اجرای فرمان‌ها روی VM را اثبات نمی‌کند.
 - فقط مستندات `FragCity-RawPHPbackend` تغییر کردند. مخزن `cs2-kus-addons` و ماشین Debian تغییر نکردند.
@@ -141,7 +141,7 @@
 ## چکاپ نهایی فرمان‌به‌فرمان — ۱۸ اکتبر ۲۰۲۶
 
 - برای پاسخ به درخواست تجمیع همهٔ مراحل، سند [Pterodactyl End-to-End Guide](PTERODACTYL-END-TO-END-GUIDE.md) ایجاد و از README لینک شد.
-- ساختار آن شامل توضیحات معماری در ابتدای سند و سپس مرحله‌های شماره‌گذاری‌شده تا preflight فعلی Docker است. مرحله‌های تکمیل‌شده صریحاً از مرحله‌های Pending جدا شده‌اند.
+- راهنمای یکپارچه شامل توضیحات معماری در ابتدای سند و مراحل شماره‌گذاری‌شده Panel/Docker است؛ راهنمای مستقل Golden Image مسیر ساخت VM تمیز 300 GB، نصب Docker/Wings و نقطهٔ توقف کپی را تعریف می‌کند. وضعیت واقعی اجرا از دستورهای پیشنهادی جدا نگه داشته می‌شود.
 - راهنما کدهای مهم این گفتگو را ثبت می‌کند: بررسی PHP modules و فایل‌های Panel؛ Composer/APP_KEY؛ سرویس‌ها؛ check/creation/update دیتابیس و تفاوت root؛ Cache permission fix؛ wizardهای Panel؛ migration/seed/admin؛ NGINX site config و enable/reload؛ SSH/SFTP/HeidiSQL tunnel؛ Egg query؛ disk forensics؛ Docker conflict preflight و بلوک نصب Docker.
 - برخی outputهای کوتاه و تکراری عمداً فقط به‌عنوان نتیجه ثبت شده‌اند، نه با تکرار تک‌تک echoهای تزئینی. رمز، APP_KEY و tokenها عمداً حذف شده‌اند.
 - یک عدم‌قطعیت مهم جدا شده است: نسخهٔ دقیق Panel باید با `p:info` تعیین شود، قبل از آنکه نسخهٔ Wings انتخاب شود.
