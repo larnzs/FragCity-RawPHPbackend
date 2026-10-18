@@ -736,3 +736,47 @@ fi
 - [ ] Separately document public DNS/TLS/firewall/router/VMware port forwarding; none of these is part of the current LAN setup.
 
 **Never confuse these outcomes:** opening Panel means the web application works; a green/online Wings means the node agent is connected; a successful CS2 server lifecycle means the game server actually starts/stops/restarts from Panel. The overall PoC is not complete until all required stages are tested.
+
+
+## Docker verification — 18 October 2026 (executed / observed)
+
+### Command/result
+
+The user ran a read/verify block in Debian `fc-node-01`:
+
+~~~bash
+sudo docker --version
+sudo systemctl is-active docker
+sudo docker info --format 'Server={{.ServerVersion}} Containers={{.Containers}} Images={{.Images}}'
+sudo docker run --rm hello-world
+df -h /
+sudo du -sh /var/lib/docker 2>/dev/null || true
+~~~
+
+Observed output:
+- Docker version 29.9.1, build `dfc520d`.
+- systemd service state: `ACTIVE`.
+- Engine information: Server `29.9.1`, Containers `0`, Images `0` at the time of the info query (before the test image was pulled).
+- Docker Hub pull for `hello-world:latest` completed successfully; the amd64 test container ran and printed `Hello from Docker!`.
+- Root filesystem after the test: 112 GiB total, 80 GiB used, 27 GiB available; `du -sh /var/lib/docker` printed 232 KiB in that sampling.
+- In the immediately preceding diagnostic, official Docker GPG and Debian Trixie/InRelease endpoints each returned HTTP 200, and dpkg-query reported the five Docker packages installed.
+
+### Interpretation
+
+- **Docker Engine is installed and its basic container workflow was verified.** The old HTTP 403 was not reproduced by the endpoint test.
+- This does not prove Wings is installed, connected to Panel, or able to run CS2.
+- Do not rerun the Docker installation block. Next action is to read the exact Panel version before choosing a compatible Wings release.
+
+### Next read-only command
+
+~~~bash
+cd /var/www/pterodactyl
+sudo -u www-data php8.3 artisan p:info
+~~~
+
+This Artisan command displays Panel version and configuration details. Review the output and redact any sensitive value before sharing; never record database credentials, APP_KEY, tokens, or the complete `.env` contents.
+
+Official version references:
+- https://docs.pterodactyl.io/v2 (2.0 documentation is marked pre-release)
+- https://docs.pterodactyl.io/v2/wings/installing (states Wings 1.13.2/1.13.3 were tested with Panel 2.0)
+- https://docs.pterodactyl.io/v1/wings/installing (separate 1.x instructions)
