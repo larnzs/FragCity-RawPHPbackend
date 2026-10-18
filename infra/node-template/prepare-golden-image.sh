@@ -70,22 +70,26 @@ systemctl enable fc-node-template-ssh-hostkeys.service
 docker image rm hello-world:latest >/dev/null 2>&1 || true
 apt-get clean
 
-# Reset Linux identity for cloning. Do not boot the source template after this step.
+# Reset SSH identity before checking the final state.
 find /etc/ssh -maxdepth 1 -type f -name 'ssh_host_*' -delete
-truncate -s 0 /etc/machine-id
-rm -f /var/lib/dbus/machine-id
-ln -s /etc/machine-id /var/lib/dbus/machine-id
 
 echo
 echo "=== FINAL TEMPLATE CHECKS ==="
 printf 'Hostname: %s\n' "$(hostnamectl --static)"
-printf 'machine-id bytes: '
-wc -c </etc/machine-id
 if find /etc/ssh -maxdepth 1 -type f -name 'ssh_host_*' -print -quit | grep -q .; then
   fail "SSH host keys still exist; template is NOT ready."
 fi
 systemctl is-enabled fc-node-template-ssh-hostkeys.service
 systemctl is-active docker
 [[ ! -e /etc/pterodactyl/config.yml ]] || fail "Node config unexpectedly exists."
+
+# Empty machine-id LAST. Do not run commands that may initialize system identity afterward.
+install -d -o root -g root -m 0755 /var/lib/dbus
+rm -f /var/lib/dbus/machine-id
+ln -s /etc/machine-id /var/lib/dbus/machine-id
+truncate -s 0 /etc/machine-id
+printf 'machine-id bytes after finalization: '
+wc -c </etc/machine-id
+
 echo "READY: shut down now, then copy the entire powered-off VM folder."
 echo "IMPORTANT: do not reboot or use the template source after finalization."
