@@ -415,9 +415,17 @@ Latest Version: error یعنی این فرمان نتوانست مقدار Lates
 
 ~~~bash
 set -eu
+
+if sudo test -e /usr/local/bin/wings; then
+  echo "STOP: /usr/local/bin/wings already exists; inspect it instead of overwriting."
+  sudo stat -c 'owner=%U:%G mode=%a size=%s path=%n' /usr/local/bin/wings
+  exit 1
+fi
+
 sudo install -d -o root -g root -m 0755 /etc/pterodactyl
 curl -fL "https://github.com/pterodactyl/wings/releases/download/v1.13.4/wings_linux_amd64" -o /tmp/wings_linux_amd64
 file /tmp/wings_linux_amd64
+sha256sum /tmp/wings_linux_amd64
 sudo install -o root -g root -m 0755 /tmp/wings_linux_amd64 /usr/local/bin/wings
 /usr/local/bin/wings --help
 ~~~
