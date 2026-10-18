@@ -33,13 +33,21 @@
 - Docker رسمی، Debian 13/Trixie و معماری amd64 را پشتیبانی می‌کند؛ وجود خطای 403 را به‌تنهایی نمی‌توان به ناسازگاری سیستم‌عامل نسبت داد.
 - راهنمای Wings به [Wings Install](WINGS-INSTALL.md) و Runbook به [Pterodactyl End-to-End Guide](PTERODACTYL-END-TO-END-GUIDE.md) اشاره می‌کنند. هیچ سرور CS2 یا Port Forwarding عمومی در این مرحله ایجاد نشده است.
 
+### تصمیم دربارهٔ VMDK و Node Golden Template — ۱۸ اکتبر ۲۰۲۶
+
+- VMDK فعلی یک VM آزمایشی stateful است، نه یک Node Golden Image قابل‌کلون مستقیم؛ چون Panel، دیتابیس Panel، تنظیمات وب، هویت ماشین و در آینده Wings را کنار هم دارد.
+- بعد از اثبات عملکرد Wings، قالب Node جداگانه طراحی می‌شود: Debian پایه + Docker + باینری Wings/سرویس + اسکریپت‌های bootstrap، بدون Panel مرکزی، دیتابیس Panel یا token/config واقعی Wings.
+- برای هر clone، hostname، machine-id، SSH host keys، IP و config/token اختصاصی Wings باید یکتا باشند. Panel مرکزی یک نمونه می‌ماند؛ Nodeهای بازی از طریق Wings به آن متصل می‌شوند.
+- فایل‌های حدود 71 GiB در /home/steam جداگانه نگهداری و در فصل ۴ ادغام/انتقال می‌شوند؛ در golden image عمومی قرار نمی‌گیرند.
+- فرمان نصب دستی دوباره اجرا نشود؛ قدم بعدی تأیید daemon با systemctl، docker info و hello-world است. راهنمای تصمیم: [Reusable Linux Image Strategy](REUSABLE-LINUX-IMAGE-STRATEGY.md).
+
 ### Wings/Docker: در جریان است
 
 - Debian 13 (Trixie)، VMware، معماری `x86_64/amd64`، kernel `6.12.113+deb13-amd64` و ۴ vCPU بررسی شدند.
 - RAM حدود 5.6 GiB؛ root filesystem برابر 112 GiB؛ آخرین snapshot: حدود 80 GiB مصرف و 27 GiB آزاد.
 - Preflight نشان داد Docker CLI/daemon نصب/فعال نیستند؛ `docker.sources` هم هنوز وجود نداشت و بسته‌های متعارض بررسی‌شده نصب نبودند.
 - حدود 71 GiB در `/home/steam` مربوط به فایل‌های موجود CS2 و `cs2-kus-addons` است؛ **پاک، جابه‌جا یا overwrite نشود**.
-- Docker/Wings هنوز نصب/اجرا نشده؛ فعلاً CS2 container نساز چون فضای آزاد کافی برای نصب تازهٔ بازی تأیید نشده.
+- در retest ساعت 04:29 UTC، Docker GPG endpoint و Trixie/InRelease هر دو HTTP=200 دادند. dpkg-query نشان داد docker-ce و docker-ce-cli نسخهٔ 5:29.9.1-1~debian.13~trixie، containerd.io نسخهٔ 2.4.2-2~debian.13~trixie، docker-buildx-plugin نسخهٔ 0.38.0-1~debian.13~trixie و docker-compose-plugin نسخهٔ 5.6.0-1~debian.13~trixie installed هستند. خطای 403 فعلاً تکرار نشده؛ Docker daemon، docker info و hello-world هنوز باید تأیید شوند.
 - Egg Query در دیتابیس فقط `Counter-Strike: Global Offensive` را نشان داد؛ Egg اختصاصی CS2 هنوز import/تأیید نشده است.
 
 راهنمای جاری و گام بعدی: [Wings Install](WINGS-INSTALL.md).
