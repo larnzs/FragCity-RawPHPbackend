@@ -5,6 +5,15 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
+if (
+    !isset($_SESSION['auth_csrf_token']) ||
+    !is_string($_SESSION['auth_csrf_token']) ||
+    !preg_match('/^[a-f0-9]{64}$/D', $_SESSION['auth_csrf_token'])
+) {
+    $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
+}
+$authCsrfToken = $_SESSION['auth_csrf_token'];
+
 /* =========================================================
  | Database
  ========================================================== */
@@ -85,6 +94,12 @@ if (!function_exists('redirect_back')) {
  | Authentication: Login / Register
  ========================================================== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
+    $submittedCsrfToken = $_POST['csrf_token'] ?? '';
+    if (!is_string($submittedCsrfToken) || !hash_equals($authCsrfToken, $submittedCsrfToken)) {
+        $_SESSION['auth_error'] = 'درخواست معتبر نیست؛ صفحه را تازه‌سازی کنید و دوباره تلاش کنید.';
+        redirect_back();
+    }
+
     $authAction = (string) $_POST['auth_action'];
 
     /* ------------------------- Login ------------------------- */
@@ -105,11 +120,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
             $field = 'username';
         }
 
-        $stmt = $pdo->prepare(
-            "SELECT * FROM users WHERE {$field} = ? LIMIT 1"
-        );
-        $stmt->execute([$loginId]);
-        $user = $stmt->fetch();
+        try {
+            $stmt = $pdo->prepare(
+                "SELECT * FROM users WHERE {$field} = ? LIMIT 1"
+            );
+            $stmt->execute([$loginId]);
+            $user = $stmt->fetch();
+        } catch (PDOException $e) {
+            error_log('[FragCity] Login query failed (SQLSTATE ' . $e->getCode() . ').');
+            $_SESSION['auth_error'] = 'در حال حاضر امکان ورود وجود ندارد؛ اتصال دیتابیس را بررسی کنید.';
+            redirect_back();
+        }
 
         if (
             $user &&
@@ -119,6 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
             )
         ) {
             session_regenerate_id(true);
+            $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 
             $_SESSION['user_logged_in'] = true;
             $_SESSION['steamid'] = (string) ($user['steamid64'] ?? '');
@@ -184,12 +206,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
         }
 
         if (!$hasError) {
-            $stmt = $pdo->prepare(
-                'SELECT id FROM users WHERE steamid64 = ? LIMIT 1'
-            );
-            $stmt->execute([$steamid]);
+            try {
+                $stmt = $pdo->prepare(
+                    'SELECT id FROM users WHERE steamid64 = ? LIMIT 1'
+                );
+                $stmt->execute([$steamid]);
+                $existingUser = $stmt->fetch();
+            } catch (PDOException $e) {
+                error_log('[FragCity] Registration lookup failed (SQLSTATE ' . $e->getCode() . ').');
+                $_SESSION['auth_error'] = 'در حال حاضر امکان ثبت‌نام وجود ندارد؛ اتصال دیتابیس را بررسی کنید.';
+                redirect_back();
+            }
 
-            if ($stmt->fetch()) {
+            if ($existingUser) {
                 $_SESSION['auth_error'] = 'این SteamID قبلاً ثبت‌نام کرده است.';
                 $hasError = true;
             }
@@ -208,22 +237,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
 
             $steam = steamid64_to_steam($steamid);
 
-            $stmt = $pdo->prepare(
-                'INSERT INTO users
-                    (steamid64, steam, username, email, phone, password_hash)
-                 VALUES (?, ?, ?, ?, ?, ?)'
-            );
+            try {
+                $stmt = $pdo->prepare(
+                    'INSERT INTO users
+                        (steamid64, steam, username, email, phone, password_hash)
+                     VALUES (?, ?, ?, ?, ?, ?)'
+                );
 
-            $stmt->execute([
-                $steamid,
-                $steam,
-                $username !== '' ? $username : null,
-                $email !== '' ? $email : null,
-                $phone,
-                $hash,
-            ]);
+                $stmt->execute([
+                    $steamid,
+                    $steam,
+                    $username !== '' ? $username : null,
+                    $email !== '' ? $email : null,
+                    $phone,
+                    $hash,
+                ]);
+            } catch (PDOException $e) {
+                error_log('[FragCity] Registration insert failed (SQLSTATE ' . $e->getCode() . ').');
+                $_SESSION['auth_error'] = 'ثبت‌نام انجام نشد؛ اتصال دیتابیس یا تکراری بودن اطلاعات را بررسی کنید.';
+                redirect_back();
+            }
 
             session_regenerate_id(true);
+            $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 
             $_SESSION['user_logged_in'] = true;
             $_SESSION['steamid'] = $steamid;
