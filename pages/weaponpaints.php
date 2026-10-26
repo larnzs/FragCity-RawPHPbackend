@@ -54,8 +54,17 @@ $steamid = (string)($_SESSION['steamid'] ?? '');
 
 if ($steamid === '') {
     echo '<div class="wp-auth-state">اطلاعات کاربر نامعتبر.</div>';
-    exit;
+    return;
 }
+
+if (
+    !isset($_SESSION['wp_csrf_token']) ||
+    !is_string($_SESSION['wp_csrf_token']) ||
+    !preg_match('/^[a-f0-9]{64}$/D', $_SESSION['wp_csrf_token'])
+) {
+    $_SESSION['wp_csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrfToken = $_SESSION['wp_csrf_token'];
 
 session_write_close();
 
@@ -76,7 +85,14 @@ if (!defined('IMAGE_DEFAULT_GLOVE_CT')) {
     define('IMAGE_DEFAULT_GLOVE_CT', '');
 }
 
-$db = new RemoteDataBase();
+try {
+    $db = new RemoteDataBase();
+} catch (Throwable $e) {
+    error_log('[FragCity] Weapon-paints DB initialization failed: ' . $e->getMessage());
+    http_response_code(503);
+    echo '<div class="wp-auth-state" role="alert">اتصال به دیتابیس اسکین‌ها برقرار نشد. تنظیمات محلی دیتابیس را بررسی کنید.</div>';
+    return;
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -508,6 +524,7 @@ $agentsData = normalizeAgentsDataset($agentsData);
 |--------------------------------------------------------------------------
 */
 
+try {
 $skinRows = $db->select(
     "SELECT
         weapon_defindex,
@@ -607,6 +624,13 @@ foreach ($selectedPins as $row) {
     }
 }
 
+} catch (Throwable $e) {
+    error_log('[FragCity] Weapon-paints data load failed: ' . $e->getMessage());
+    http_response_code(503);
+    echo '<div class="wp-auth-state" role="alert">اطلاعات اسکین‌های کاربر قابل دریافت نیست. ساختار دیتابیس و جدول‌های پلاگین را بررسی کنید.</div>';
+    return;
+}
+
 /*
 |--------------------------------------------------------------------------
 | Request state
@@ -684,7 +708,14 @@ $pinEndIndex = min(
 */
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $submittedCsrfToken = $_POST['wp_csrf_token'] ?? '';
+    if (!is_string($submittedCsrfToken) || !hash_equals($csrfToken, $submittedCsrfToken)) {
+        http_response_code(400);
+        echo '<div class="wp-auth-state" role="alert">درخواست معتبر نیست؛ صفحه را تازه‌سازی کنید و دوباره تلاش کنید.</div>';
+        return;
+    }
 
+    try {
     $activeTab = (string)(
         $_POST['active_tab']
         ?? 'tab-knives'
@@ -1282,6 +1313,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pinPage
         );
     }
+    } catch (Throwable $e) {
+        error_log('[FragCity] Weapon-paints save failed: ' . $e->getMessage());
+        http_response_code(500);
+        echo '<div class="wp-auth-state" role="alert">ذخیره‌سازی تنظیمات اسکین انجام نشد. خطای دیتابیس را در لاگ PHP بررسی کنید.</div>';
+        return;
+    }
 }
 
 /*
@@ -1640,6 +1677,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                     method="post"
                                     class="wp-auto-submit wp-card-action" data-wp-native-submit="true"
                                 >
+<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
                                     <input
                                         type="hidden"
@@ -2070,6 +2108,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                         method="post"
                                         class="wp-auto-submit wp-card-action" data-wp-native-submit="true"
                                     >
+<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
                                         <input
                                             type="hidden"
@@ -2197,6 +2236,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                         method="post"
                                         class="wp-auto-submit wp-card-action" data-wp-native-submit="true"
                                     >
+<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
                                         <input
                                             type="hidden"
@@ -2355,6 +2395,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                             method="post"
                                             class="wp-auto-submit wp-card-action" data-wp-native-submit="true"
                                         >
+<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
                                             <input
                                                 type="hidden"
@@ -2490,6 +2531,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                 </h3>
 
                                 <form method="post" class="wp-auto-submit" data-wp-native-submit="true">
+<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
                                     <input
                                         type="hidden"
@@ -2731,6 +2773,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                 </h3>
 
                                 <form method="post" class="wp-auto-submit" data-wp-native-submit="true">
+<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
                                     <input
                                         type="hidden"
@@ -2813,6 +2856,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                 </h3>
 
                                 <form method="post" class="wp-auto-submit" data-wp-native-submit="true">
+<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
                                     <input
                                         type="hidden"
@@ -2918,6 +2962,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                 </h3>
 
                                 <form method="post" class="wp-auto-submit" data-wp-native-submit="true">
+<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
                                     <input
                                         type="hidden"
@@ -3022,6 +3067,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                 </h3>
 
                                 <form method="post" class="wp-auto-submit" data-wp-native-submit="true">
+<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
                                     <input
                                         type="hidden"
@@ -3294,6 +3340,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 <div class="modal-body wp-modal-body">
 
                     <form method="post" class="wp-auto-submit" data-wp-native-submit="true">
+<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
                         <input
                             type="hidden"
