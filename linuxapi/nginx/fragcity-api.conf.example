@@ -1,0 +1,44 @@
+# Independent Nginx vhost for api.fragcity.ir.
+# This does NOT replace or modify the Pterodactyl Panel vhost.
+# Phase 1 HTTP bootstrap (used only until Certbot provisions a certificate).
+# Debian PHP 8.3 socket shown below: verify against /run/php/ first.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name api.fragcity.ir;
+
+    root /var/www/fragcity-api/public;
+    client_max_body_size 32k;
+    server_tokens off;
+
+    # Health endpoint. Force a known script; do not pass arbitrary PHP files.
+    location = /health {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+    }
+
+    location = /v1/weaponpaints {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+    }
+
+    location / {
+        return 404;
+    }
+
+    location ~ \.php$ {
+        return 404;
+    }
+}
+
+# After Certbot has created the certificate, add a TLS server block for 443
+# that uses the same exact locations and:
+#   ssl_certificate     /etc/letsencrypt/live/api.fragcity.ir/fullchain.pem;
+#   ssl_certificate_key /etc/letsencrypt/live/api.fragcity.ir/privkey.pem;
+# Then change the port-80 server to serve ACME challenges and redirect all
+# other requests to HTTPS. The website client requires HTTPS and verifies TLS.
