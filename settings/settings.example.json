@@ -48,10 +48,6 @@
       "request_url": "https://payment.zarinpal.com/pg/v4/payment/request.json",
       "verify_url": "https://payment.zarinpal.com/pg/v4/payment/verify.json",
       "startpay_base_url": "https://payment.zarinpal.com/pg/StartPay/"
-    },
-    "weaponpaints_api": {
-      "base_url": "",
-      "shared_secret": ""
     }
   },
   "files": {
@@ -249,8 +245,7 @@
       "database_profile": "simpleadmin_plugin"
     },
     "database.weaponpaints_plugin": {
-      "database_profile": "weaponpaints",
-      "transport": "local"
+      "database_profile": "weaponpaints"
     },
     "panels.cs2.overview": {
       "database_profile": "main"
