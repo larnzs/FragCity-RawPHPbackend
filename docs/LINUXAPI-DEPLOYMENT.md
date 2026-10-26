@@ -84,7 +84,7 @@ the webroot and are not in Git.
 
 11. Smoke test `GET https://api.fragcity.ir/health`, then run the signed CLI
     check from the repository root on Linux:
-    `php linuxapi/tools/smoke-test.php https://api.fragcity.ir`
+    `php /var/www/fragcity-api/tools/smoke-test.php https://api.fragcity.ir`
     Add a test account's SteamID as a second argument for a read-only selection
     test. This checks signature/header forwarding, nonce persistence, DB access,
     and (when supplied) the table SELECT grants.
