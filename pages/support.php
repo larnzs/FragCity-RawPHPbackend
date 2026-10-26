@@ -2,19 +2,19 @@
 // pages/support.php
 // Public page – contact tab always visible; tickets require login to view/submit
 
-$isLoggedIn = isset($_SESSION['user_logged_in']);
+require_once __DIR__ . '/../settings/loader.php';
+
+$isLoggedIn = (($_SESSION['user_logged_in'] ?? false) === true);
 $steamid    = $_SESSION['steamid'] ?? '';
 $isAdmin    = ($_SESSION['role'] ?? '') === 'admin';
 $message    = '';
 $error      = '';
 
-$pdo = null;
-try {
-    $pdo = new PDO("mysql:host=localhost;port=3306;dbname=kyonxcbt_fragcity_services;charset=utf8mb4", 'kyonxcbt_admin', 'Atrisayeafsorde824@');
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (PDOException $e) {
-    $pdo = null; // will show a generic error later
-}
+$supportSettings = fragcity_settings('files.pages.support', []);
+$supportProfile = isset($supportSettings['database_profile'])
+    ? (string) $supportSettings['database_profile']
+    : 'main';
+$pdo = fragcity_create_pdo($supportProfile);
 
 // Handle new ticket submission (only if logged in)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_ticket'])) {
@@ -26,12 +26,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_ticket'])) {
         if (empty($subject) || empty($body)) {
             $error = 'موضوع و متن تیکت نمی‌تواند خالی باشد.';
         } else {
-            $stmt = $pdo->prepare("INSERT INTO tickets (steamid, subject) VALUES (?, ?)");
-            $stmt->execute([$steamid, $subject]);
-            $ticketId = $pdo->lastInsertId();
-            $stmt = $pdo->prepare("INSERT INTO ticket_replies (ticket_id, steamid, message) VALUES (?, ?, ?)");
-            $stmt->execute([$ticketId, $steamid, $body]);
-            $message = '✅ تیکت شما با موفقیت ثبت شد.';
+            try {
+                $pdo->beginTransaction();
+                $stmt = $pdo->prepare("INSERT INTO tickets (steamid, subject) VALUES (?, ?)");
+                $stmt->execute([$steamid, $subject]);
+                $ticketId = $pdo->lastInsertId();
+
+                $stmt = $pdo->prepare("INSERT INTO ticket_replies (ticket_id, steamid, message) VALUES (?, ?, ?)");
+                $stmt->execute([$ticketId, $steamid, $body]);
+                $pdo->commit();
+                $message = '✅ تیکت شما با موفقیت ثبت شد.';
+            } catch (PDOException $e) {
+                if ($pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                error_log('[FragCity] Support ticket creation failed (SQLSTATE ' . $e->getCode() . ').');
+                $error = 'در حال حاضر امکان ثبت تیکت وجود ندارد.';
+            }
         }
     } else {
         $error = 'خطا در اتصال به دیتابیس.';
@@ -41,12 +52,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_ticket'])) {
 // Fetch tickets (only if logged in)
 $tickets = [];
 if ($isLoggedIn && $pdo) {
-    if ($isAdmin) {
-        $tickets = $pdo->query("SELECT * FROM tickets ORDER BY updated_at DESC")->fetchAll(PDO::FETCH_ASSOC);
-    } else {
-        $stmt = $pdo->prepare("SELECT * FROM tickets WHERE steamid = ? ORDER BY updated_at DESC");
-        $stmt->execute([$steamid]);
-        $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    try {
+        if ($isAdmin) {
+            $tickets = $pdo->query("SELECT * FROM tickets ORDER BY updated_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+        } else {
+            $stmt = $pdo->prepare("SELECT * FROM tickets WHERE steamid = ? ORDER BY updated_at DESC");
+            $stmt->execute([$steamid]);
+            $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+    } catch (PDOException $e) {
+        error_log('[FragCity] Support ticket list failed (SQLSTATE ' . $e->getCode() . ').');
+        $error = 'در حال حاضر امکان دریافت فهرست تیکت‌ها وجود ندارد.';
     }
 }
 
