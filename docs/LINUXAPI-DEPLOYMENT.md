@@ -18,15 +18,26 @@ the webroot and are not in Git.
 ## Install
 
 1. Create DNS A record `api.fragcity.ir` to the Linux node public IP.
-2. Copy the contents of repo folder `linuxapi/` to
-   `/var/www/fragcity-api/`, preserving the `public/` directory.
+2. From the repository root on the Linux node, copy the API package and keep
+   the app files root-owned/read-only to the web worker:
+   ```bash
+   sudo install -d -o root -g root -m 0755 /var/www/fragcity-api
+   sudo cp -a linuxapi/. /var/www/fragcity-api/
+   sudo chown -R root:root /var/www/fragcity-api
+   sudo find /var/www/fragcity-api -type d -exec chmod 0755 {} \;
+   sudo find /var/www/fragcity-api -type f -exec chmod 0644 {} \;
+   ```
+   If transferring with WinSCP instead, upload the *contents* of `linuxapi/`
+   into `/var/www/fragcity-api/`, preserving `public/index.php`, then apply
+   the ownership and permissions above.
 3. Confirm PHP-FPM socket and required modules:
    ```bash
    ls -l /run/php/
    php -m | grep -E 'PDO|pdo_mysql|curl|mbstring'
    ```
    The sample vhost assumes `/run/php/php8.3-fpm.sock`; update it only if your
-   actual socket name differs.
+   actual socket name differs. Check modules for the PHP-FPM version too.
+
 4. Confirm how host PHP-FPM reaches the existing MariaDB. Because it may be
    containerized, `127.0.0.1` is only correct if MariaDB is actually listening
    on the host loopback. Inspect Docker port bindings and the existing local/
@@ -43,30 +54,41 @@ the webroot and are not in Git.
 7. Create a separate MariaDB account `fragcity_weaponpaints_api` and grant
    only the privileges listed in `linuxapi/schema.sql`. The account should be
    restricted to the actual local connection source; never use root.
-8. Copy `linuxapi/config.example.php` to
-   `/etc/fragcity-api/config.php`. Enter the verified DB host/name/account and
-   the same generated shared secret. Protect it:
+8. Copy the example config outside the webroot and edit it:
    ```bash
    sudo install -d -o root -g www-data -m 0750 /etc/fragcity-api
-   sudo chown root:www-data /etc/fragcity-api/config.php
-   sudo chmod 0640 /etc/fragcity-api/config.php
+   sudo install -o root -g www-data -m 0640 \
+     /var/www/fragcity-api/config.example.php /etc/fragcity-api/config.php
+   sudo nano /etc/fragcity-api/config.php
    ```
-   Ensure the PHP-FPM worker can read the file but cannot write it.
-9. Copy `linuxapi/nginx/fragcity-api.conf.example` to
-   `/etc/nginx/sites-available/fragcity-api.conf`. Enable only this new vhost,
-   leave Pterodactyl's existing site alone, and run:
+   Set the actual DB connection and generated secret. The PHP-FPM worker must
+   be able to read this file but must not be able to write it.
+9. Install and enable only the new vhost:
    ```bash
+   sudo cp /var/www/fragcity-api/nginx/fragcity-api.conf.example \
+     /etc/nginx/sites-available/fragcity-api.conf
+   sudo ln -s /etc/nginx/sites-available/fragcity-api.conf \
+     /etc/nginx/sites-enabled/fragcity-api.conf
    sudo nginx -t
    sudo systemctl reload nginx
    ```
-10. Bootstrap HTTP then obtain the certificate through the existing Certbot/
-    ACME setup. After the certificate exists, replace the bootstrap vhost with
-    `linuxapi/nginx/fragcity-api-https.conf.example` (adjust the PHP-FPM socket
-    if required), then run `sudo nginx -t` and reload Nginx. Do not switch the
-    shared-host client to API mode before HTTPS works.
-11. Smoke test `GET https://api.fragcity.ir/health`. Then call the signed
-    `ping_db` action using the website's PHP client. Health alone does not test
-    the DB.
+   If the symlink already exists, do not create a duplicate. Leave the existing
+   Pterodactyl Panel server block unchanged.
+10. Bootstrap HTTP, verify `http://api.fragcity.ir/health`, then obtain the
+    certificate through the existing Certbot/ACME setup (for example
+    `sudo certbot certonly --nginx -d api.fragcity.ir`). After the certificate
+    exists, replace the bootstrap vhost with
+    `/var/www/fragcity-api/nginx/fragcity-api-https.conf.example`, then run
+    `sudo nginx -t` and reload Nginx. Do not switch the shared-host client to
+    API mode before HTTPS works.
+
+11. Smoke test `GET https://api.fragcity.ir/health`, then run the signed CLI
+    check from the repository root on Linux:
+    `php linuxapi/tools/smoke-test.php https://api.fragcity.ir`
+    Add a test account's SteamID as a second argument for a read-only selection
+    test. This checks signature/header forwarding, nonce persistence, DB access,
+    and (when supplied) the table SELECT grants.
+
 12. Test read/write actions with a test account and verify the data in MariaDB
     before switching the live shared-host runtime config to API transport.
 
