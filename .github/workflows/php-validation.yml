@@ -1,0 +1,36 @@
+name: PHP validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  php-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: curl, pdo_mysql, mbstring
+          coverage: none
+
+      - name: Lint API and affected website files
+        run: |
+          set -eu
+          for file in \
+            api-server/public/index.php \
+            api-server/config.example.php \
+            class/WeaponPaintsApiClient.php \
+            class/WeaponPaintsRepository.php \
+            pages/weaponpaints.php; do
+            php -l "$file"
+          done
+
+      - name: Validate tracked settings JSON
+        run: php -r "json_decode(file_get_contents('settings/settings.example.json'), true, 512, JSON_THROW_ON_ERROR); echo 'settings JSON OK', PHP_EOL;"
