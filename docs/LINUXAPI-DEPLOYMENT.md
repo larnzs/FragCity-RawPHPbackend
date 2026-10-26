@@ -60,9 +60,10 @@ the webroot and are not in Git.
    sudo systemctl reload nginx
    ```
 10. Bootstrap HTTP then obtain the certificate through the existing Certbot/
-    ACME setup. After the certificate exists, configure the TLS 443 server block
-    as documented in the Nginx example and redirect public HTTP to HTTPS. Do
-    not set the shared-host client to API mode before HTTPS works.
+    ACME setup. After the certificate exists, replace the bootstrap vhost with
+    `linuxapi/nginx/fragcity-api-https.conf.example` (adjust the PHP-FPM socket
+    if required), then run `sudo nginx -t` and reload Nginx. Do not switch the
+    shared-host client to API mode before HTTPS works.
 11. Smoke test `GET https://api.fragcity.ir/health`. Then call the signed
     `ping_db` action using the website's PHP client. Health alone does not test
     the DB.
