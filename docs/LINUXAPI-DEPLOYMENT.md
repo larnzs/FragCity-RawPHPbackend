@@ -81,7 +81,7 @@ these headers:
 
 The signed message is:
 ```text
-timestamp + "\\n" + nonce + "\\n" + uppercase_method + "\\n" + path + "\\n" + hex_sha256(raw_body)
+timestamp + "\n" + nonce + "\n" + uppercase_method + "\n" + path + "\n" + hex_sha256(raw_body)
 ```
 
 The API uses `hash_equals`, validates timestamps and saves nonce hashes in a
