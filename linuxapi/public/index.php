@@ -397,11 +397,19 @@ try {
         ]
     );
 
-    // Unique nonce hashes reject replays; cleanup is opportunistic.
-    apiExec($pdo,
-        'INSERT INTO fragcity_api_nonces (nonce_hash, created_at) VALUES (:nonce, UTC_TIMESTAMP())',
-        [':nonce' => hash('sha256', $nonce)]
-    );
+    // A duplicate nonce is rejected before any requested mutation is processed.
+    try {
+        apiExec($pdo,
+            'INSERT INTO fragcity_api_nonces (nonce_hash, created_at) VALUES (:nonce, UTC_TIMESTAMP())',
+            [':nonce' => hash('sha256', $nonce)]
+        );
+    } catch (PDOException $e) {
+        $driverCode = (int)($e->errorInfo[1] ?? 0);
+        if ((string)$e->getCode() === '23000' && $driverCode === 1062) {
+            apiRespond(401, ['success' => false, 'error' => 'unauthorized']);
+        }
+        throw $e;
+    }
     if (random_int(1, 20) === 1) {
         apiExec($pdo, 'DELETE FROM fragcity_api_nonces WHERE created_at < (UTC_TIMESTAMP() - INTERVAL 10 MINUTE)');
     }
@@ -455,10 +463,6 @@ try {
 } catch (InvalidArgumentException $e) {
     apiRespond(400, ['success' => false, 'error' => 'invalid_request']);
 } catch (PDOException $e) {
-    // SQLSTATE 23000 covers duplicate nonce replay; upsert conflicts are resolved in SQL.
-    if ((string)$e->getCode() === '23000') {
-        apiRespond(401, ['success' => false, 'error' => 'unauthorized']);
-    }
     error_log('[FragCity API] Database request failed; SQLSTATE ' . $e->getCode());
     apiRespond(500, ['success' => false, 'error' => 'database_error']);
 } catch (Throwable $e) {
