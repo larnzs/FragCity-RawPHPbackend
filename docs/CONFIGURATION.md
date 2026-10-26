@@ -96,3 +96,34 @@ Loader از `app.timezone` استفاده می‌کند و پیش‌فرض UTC �
 برای هر محیط فایل تنظیمات runtime جدا بساز. URL، DB و تنظیمات سرویس بیرونی باید مخصوص همان محیط باشند. پیش از انتشار backup بگیر، دسترسی HTTP به فایل تنظیمات را مسدود کن، smoke test اجرا کن و راه rollback را نگه دار. credentialهای Production هیچ‌وقت نباید وارد Git شوند.
 
 **وضعیت فعلی:** این راهنما وجود تنظیمات مرکزی را توضیح می‌دهد؛ کامل‌شدن مهاجرت تمام فایل‌های PHP قدیمی، آماده‌شدن DB آزمایشی و موفقیت تست کل سایت هنوز تأیید نشده‌اند. یافته‌های باز را در [Security Audit](SECURITY-AUDIT.md) ببین.
+
+## Local Windows database — login and weapon paints
+
+The tracked example is safe to commit; local credentials belong only in the ignored file `settings/settings.json`.
+
+1. If `settings/settings.json` does not already exist, copy the template:
+
+   ```powershell
+   Copy-Item .\settings\settings.example.json .\settings\settings.json
+   ```
+
+   If the local file already exists, edit it in place and preserve any existing integration settings.
+
+2. In `settings/settings.json`, configure the local MySQL/MariaDB connection:
+
+   - `databases.main.host`: `127.0.0.1`
+   - `databases.main.port`: `3306`
+   - `databases.main.name`: the local database containing the `users` table (the template uses `kyonxcbt_fragcity_services` as the expected default).
+   - `databases.main.username`: `root` for local development only.
+   - `databases.main.password`: enter the local database password here. Do not copy it into tracked PHP, JSON examples, logs, or commits.
+   - `databases.weaponpaints.name`: the database containing `wp_player_skins`, `wp_player_knife`, `wp_player_agents`, `wp_player_music`, and `wp_player_pins` (the template uses `kyonxcbt_weaponpaints_plugin` as the expected default).
+
+   The `weaponpaints` profile inherits host, port, username, and password from `main`. The `legacy_services` profile also inherits `main` by default so password recovery uses the same `users` database locally. Change only the database names if your imported schemas use different names.
+
+3. Confirm the local MySQL/MariaDB service is running and PHP has both `PDO` and `pdo_mysql` enabled. The login and registration handlers use the `main` profile; the weapon-paints page uses `weaponpaints`.
+
+4. The skin customization page requires an authenticated session and the plugin tables to be imported. Open it through `index.php?page=skins`; opening `pages/weaponpaints.php` directly is not the supported route.
+
+5. Keep `settings/settings.json` outside version control. If the repository root is the web document root, also apply `settings/nginx-protect.conf` to block web access to `/settings/`, or store the runtime JSON outside the document root and point `FRAGCITY_SETTINGS_FILE` at it.
+
+The support-ticket page now obtains its PDO connection from the `files.pages.support.database_profile` setting instead of embedding database credentials in PHP. Local credential changes should be made once in `settings/settings.json`, not inside page files.
