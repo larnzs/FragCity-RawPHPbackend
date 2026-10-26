@@ -74,7 +74,7 @@ session_write_close();
 |--------------------------------------------------------------------------
 */
 require_once __DIR__ . '/../class/config.php';
-require_once __DIR__ . '/../database/kyonxcbt_weaponpaints_plugin.php';
+require_once __DIR__ . '/../class/WeaponPaintsRepository.php';
 require_once __DIR__ . '/../class/utils.php';
 
 if (!defined('IMAGE_DEFAULT_GLOVE_T')) {
@@ -86,11 +86,11 @@ if (!defined('IMAGE_DEFAULT_GLOVE_CT')) {
 }
 
 try {
-    $db = new RemoteDataBase();
+    $db = new WeaponPaintsRepository();
 } catch (Throwable $e) {
     error_log('[FragCity] Weapon-paints DB initialization failed: ' . $e->getMessage());
     http_response_code(503);
-    echo '<div class="wp-auth-state" role="alert">اتصال به دیتابیس اسکین‌ها برقرار نشد. تنظیمات محلی دیتابیس را بررسی کنید.</div>';
+    echo '<div class="wp-auth-state" role="alert">اتصال سرویس اسکین‌ها برقرار نشد. تنظیمات API یا دیتابیس را بررسی کنید.</div>';
     return;
 }
 
@@ -525,102 +525,41 @@ $agentsData = normalizeAgentsDataset($agentsData);
 */
 
 try {
-$skinRows = $db->select(
-    "SELECT
-        weapon_defindex,
-        weapon_paint_id,
-        weapon_wear,
-        weapon_seed,
-        weapon_team,
-        weapon_nametag,
-        weapon_stattrak,
-        weapon_sticker_0,
-        weapon_sticker_1,
-        weapon_sticker_2,
-        weapon_sticker_3,
-        weapon_sticker_4,
-        weapon_keychain
-     FROM wp_player_skins
-     WHERE steamid = :steamid",
-    [
-        ':steamid' => $steamid
-    ]
-);
+$playerSelection = $db->getPlayerSelection($steamid);
 
+$skinRows = $playerSelection['skins'] ?? [];
 [
     $selectedSkins,
     $skinDetails,
     $selectedGloves
 ] = buildSkinSelectionMaps($skinRows);
 
-$selectedKnifeRows = $db->select(
-    "SELECT knife, weapon_team
-     FROM wp_player_knife
-     WHERE steamid = :steamid
-     LIMIT 1",
-    [
-        ':steamid' => $steamid
-    ]
-);
-
-$selectedKnife = $selectedKnifeRows[0] ?? [];
-
-$selectedAgents = $db->select(
-    "SELECT agent_t, agent_ct
-     FROM wp_player_agents
-     WHERE steamid = :s
-     LIMIT 1",
-    [
-        ':s' => $steamid
-    ]
-);
-
+$selectedKnifeRows = $playerSelection['knife'] ?? [];
+$selectedAgents = $playerSelection['agents'] ?? [];
 $selectedAgentT = $selectedAgents[0]['agent_t'] ?? '';
 $selectedAgentCT = $selectedAgents[0]['agent_ct'] ?? '';
 
-$selectedMusic = $db->select(
-    "SELECT weapon_team, music_id
-     FROM wp_player_music
-     WHERE steamid = :s",
-    [
-        ':s' => $steamid
-    ]
-);
-
+$selectedMusic = $playerSelection['music'] ?? [];
 $selectedMusicIds = [
     2 => 0,
     3 => 0
 ];
-
 foreach ($selectedMusic as $row) {
     $teamKey = (int)($row['weapon_team'] ?? 0);
-
     if ($teamKey === 2 || $teamKey === 3) {
-        $selectedMusicIds[$teamKey] =
-            (int)($row['music_id'] ?? 0);
+        $selectedMusicIds[$teamKey] = (int)($row['music_id'] ?? 0);
     }
 }
 
-$selectedPins = $db->select(
-    "SELECT weapon_team, id
-     FROM wp_player_pins
-     WHERE steamid = :s",
-    [
-        ':s' => $steamid
-    ]
-);
-
+$selectedPins = $playerSelection['pins'] ?? [];
 $selectedPinIds = [
     2 => 0,
     3 => 0
 ];
-
 foreach ($selectedPins as $row) {
     $teamKey = (int)($row['weapon_team'] ?? 0);
-
     if ($teamKey === 2 || $teamKey === 3) {
-        $selectedPinIds[$teamKey] =
-            (int)($row['id'] ?? 0);
+        $selectedPinIds[$teamKey] = (int)($row['id'] ?? 0);
     }
 }
 
@@ -738,77 +677,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     |--------------------------------------------------------------------------
     */
 
-    if (
-        isset(
-            $_POST['glove_defindex'],
-            $_POST['glove_paint']
-        )
-    ) {
+    if (isset($_POST['glove_defindex'], $_POST['glove_paint'])) {
         $def = (int)$_POST['glove_defindex'];
         $paint = (int)$_POST['glove_paint'];
 
-        foreach ($teams as $t) {
+        $db->saveGlove($steamid, $teams, $def, $paint);
 
-            $db->query(
-                "INSERT INTO wp_player_skins
-                (
-                    steamid,
-                    weapon_team,
-                    weapon_defindex,
-                    weapon_paint_id,
-                    weapon_wear,
-                    weapon_seed
-                )
-                VALUES
-                (
-                    :s,
-                    :t,
-                    :d,
-                    :p,
-                    0.001,
-                    0
-                )
-                ON DUPLICATE KEY UPDATE
-                    weapon_paint_id = :p2",
-                [
-                    ':s' => $steamid,
-                    ':t' => $t,
-                    ':d' => $def,
-                    ':p' => $paint,
-                    ':p2' => $paint
-                ]
-            );
-
-            $db->query(
-                "INSERT INTO wp_player_gloves
-                (
-                    steamid,
-                    weapon_team,
-                    weapon_defindex
-                )
-                VALUES
-                (
-                    :s,
-                    :t,
-                    :d
-                )
-                ON DUPLICATE KEY UPDATE
-                    weapon_defindex = :d2",
-                [
-                    ':s' => $steamid,
-                    ':t' => $t,
-                    ':d' => $def,
-                    ':d2' => $def
-                ]
-            );
-        }
-
-        redirectToSelf(
-            $save_team,
-            $activeTab,
-            $skinPage,
-            $pinPage
-        );
+        redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
     }
 
     /*
@@ -818,107 +693,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     */
 
     if (isset($_POST['agent_id'])) {
-
         $agent = (string)$_POST['agent_id'];
+        $db->saveAgent($steamid, $teams, $agent);
 
-        if ($save_team === 'both') {
-
-            $db->query(
-                "INSERT INTO wp_player_agents
-                (
-                    steamid,
-                    agent_t
-                )
-                VALUES
-                (
-                    :s,
-                    :a
-                )
-                ON DUPLICATE KEY UPDATE
-                    agent_t = :a2",
-                [
-                    ':s' => $steamid,
-                    ':a' => $agent,
-                    ':a2' => $agent
-                ]
-            );
-
-            $db->query(
-                "INSERT INTO wp_player_agents
-                (
-                    steamid,
-                    agent_ct
-                )
-                VALUES
-                (
-                    :s,
-                    :a
-                )
-                ON DUPLICATE KEY UPDATE
-                    agent_ct = :a2",
-                [
-                    ':s' => $steamid,
-                    ':a' => $agent,
-                    ':a2' => $agent
-                ]
-            );
-
-        } else {
-
-            $t = (int)$save_team;
-
-            if ($t === 2) {
-
-                $db->query(
-                    "INSERT INTO wp_player_agents
-                    (
-                        steamid,
-                        agent_t
-                    )
-                    VALUES
-                    (
-                        :s,
-                        :a
-                    )
-                    ON DUPLICATE KEY UPDATE
-                        agent_t = :a2",
-                    [
-                        ':s' => $steamid,
-                        ':a' => $agent,
-                        ':a2' => $agent
-                    ]
-                );
-
-            } else {
-
-                $db->query(
-                    "INSERT INTO wp_player_agents
-                    (
-                        steamid,
-                        agent_ct
-                    )
-                    VALUES
-                    (
-                        :s,
-                        :a
-                    )
-                    ON DUPLICATE KEY UPDATE
-                        agent_ct = :a2",
-                    [
-                        ':s' => $steamid,
-                        ':a' => $agent,
-                        ':a2' => $agent
-                    ]
-                );
-            }
-        }
-
-        redirectToSelf(
-            $save_team,
-            $activeTab,
-            $skinPage,
-            $pinPage
-        );
+        redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
     }
 
     /*
@@ -928,41 +706,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     */
 
     if (isset($_POST['music_id'])) {
-
         $mid = (int)$_POST['music_id'];
+        $db->saveMusic($steamid, $teams, $mid);
 
-        foreach ($teams as $t) {
-
-            $db->query(
-                "INSERT INTO wp_player_music
-                (
-                    steamid,
-                    weapon_team,
-                    music_id
-                )
-                VALUES
-                (
-                    :s,
-                    :t,
-                    :m
-                )
-                ON DUPLICATE KEY UPDATE
-                    music_id = :m2",
-                [
-                    ':s' => $steamid,
-                    ':t' => $t,
-                    ':m' => $mid,
-                    ':m2' => $mid
-                ]
-            );
-        }
-
-        redirectToSelf(
-            $save_team,
-            $activeTab,
-            $skinPage,
-            $pinPage
-        );
+        redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
     }
 
     /*
@@ -972,41 +719,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     */
 
     if (isset($_POST['pin_id'])) {
-
         $pid = (int)$_POST['pin_id'];
+        $db->savePin($steamid, $teams, $pid);
 
-        foreach ($teams as $t) {
-
-            $db->query(
-                "INSERT INTO wp_player_pins
-                (
-                    steamid,
-                    weapon_team,
-                    id
-                )
-                VALUES
-                (
-                    :s,
-                    :t,
-                    :p
-                )
-                ON DUPLICATE KEY UPDATE
-                    id = :p2",
-                [
-                    ':s' => $steamid,
-                    ':t' => $t,
-                    ':p' => $pid,
-                    ':p2' => $pid
-                ]
-            );
-        }
-
-        redirectToSelf(
-            $save_team,
-            $activeTab,
-            $skinPage,
-            $pinPage
-        );
+        redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
     }
 
     /*
@@ -1030,69 +746,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         */
 
         if (($parts[0] ?? '') === 'knife') {
-
             $knifeKey = $parts[1] ?? '';
 
-            if (
-                isset(
-                    $knifes[$knifeKey]['weapon_name']
-                )
-            ) {
-
-                $knifeName =
-                    $knifes[$knifeKey]['weapon_name'];
-
-                $db->query(
-                    "INSERT INTO wp_player_knife
-                    (
-                        steamid,
-                        knife,
-                        weapon_team
-                    )
-                    VALUES
-                    (
-                        :s,
-                        :k,
-                        2
-                    )
-                    ON DUPLICATE KEY UPDATE
-                        knife = :k2",
-                    [
-                        ':s' => $steamid,
-                        ':k' => $knifeName,
-                        ':k2' => $knifeName
-                    ]
-                );
-
-                $db->query(
-                    "INSERT INTO wp_player_knife
-                    (
-                        steamid,
-                        knife,
-                        weapon_team
-                    )
-                    VALUES
-                    (
-                        :s,
-                        :k,
-                        3
-                    )
-                    ON DUPLICATE KEY UPDATE
-                        knife = :k2",
-                    [
-                        ':s' => $steamid,
-                        ':k' => $knifeName,
-                        ':k2' => $knifeName
-                    ]
-                );
+            if (isset($knifes[$knifeKey]['weapon_name'])) {
+                $knifeName = (string)$knifes[$knifeKey]['weapon_name'];
+                $db->saveKnife($steamid, $knifeName);
             }
 
-            redirectToSelf(
-                $save_team,
-                $activeTab,
-                $skinPage,
-                $pinPage
-            );
+            redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
         }
 
         /*
@@ -1214,96 +875,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ]
         );
 
-        if (
-            isset(
-                $skins[$def][$paint]
-            )
-        ) {
-
-            foreach ($teams as $t) {
-
-                $db->query(
-                    "INSERT INTO wp_player_skins
-                    (
-                        steamid,
-                        weapon_team,
-                        weapon_defindex,
-                        weapon_paint_id,
-                        weapon_wear,
-                        weapon_seed,
-                        weapon_nametag,
-                        weapon_stattrak,
-                        weapon_sticker_0,
-                        weapon_sticker_1,
-                        weapon_sticker_2,
-                        weapon_sticker_3,
-                        weapon_sticker_4,
-                        weapon_keychain
-                    )
-                    VALUES
-                    (
-                        :s,
-                        :t,
-                        :d,
-                        :p,
-                        :w,
-                        :seed,
-                        :nametag,
-                        :stattrak,
-                        :s0,
-                        :s1,
-                        :s2,
-                        :s3,
-                        :s4,
-                        :keychain
-                    )
-                    ON DUPLICATE KEY UPDATE
-                        weapon_paint_id = :p2,
-                        weapon_wear = :w2,
-                        weapon_seed = :seed2,
-                        weapon_nametag = :nametag2,
-                        weapon_stattrak = :stattrak2,
-                        weapon_sticker_0 = :s02,
-                        weapon_sticker_1 = :s12,
-                        weapon_sticker_2 = :s22,
-                        weapon_sticker_3 = :s32,
-                        weapon_sticker_4 = :s42,
-                        weapon_keychain = :keychain2",
-                    [
-                        ':s' => $steamid,
-                        ':t' => $t,
-                        ':d' => $def,
-                        ':p' => $paint,
-                        ':w' => $wear,
-                        ':seed' => $seed,
-
-                        ':nametag' => $nametag,
-                        ':stattrak' => $stattrak,
-
-                        ':s0' => $stickers[0],
-                        ':s1' => $stickers[1],
-                        ':s2' => $stickers[2],
-                        ':s3' => $stickers[3],
-                        ':s4' => $stickers[4],
-
-                        ':keychain' => $keychainStr,
-
-                        ':p2' => $paint,
-                        ':w2' => $wear,
-                        ':seed2' => $seed,
-                        ':nametag2' => $nametag,
-                        ':stattrak2' => $stattrak,
-
-                        ':s02' => $stickers[0],
-                        ':s12' => $stickers[1],
-                        ':s22' => $stickers[2],
-                        ':s32' => $stickers[3],
-                        ':s42' => $stickers[4],
-
-                        ':keychain2' => $keychainStr
-                    ]
-                );
-            }
+        if (isset($skins[$def][$paint])) {
+            $db->saveSkin(
+                $steamid,
+                $teams,
+                (int)$def,
+                (int)$paint,
+                $wear,
+                $seed,
+                $nametag,
+                $stattrak,
+                $stickers,
+                $keychainStr
+            );
         }
 
         redirectToSelf(
