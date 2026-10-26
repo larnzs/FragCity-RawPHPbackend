@@ -71,16 +71,45 @@ Supported actions: \`ping_db\`, \`get_selection\`, \`save_glove\`, \`save_agent\
 \`save_music\`, \`save_pin\`, \`save_knife\`, \`save_skin\`. The API deliberately
 does not accept raw SQL, caller-supplied table names, or browser-originated writes.
 
-## Important current integration status
+## Configure the shared-hosting website to use the API
 
-This package creates the Linux-side API service but **does not yet switch**
-\`pages/weaponpaints.php\` away from its current database adapter. Do not consider
-the shared-hosting integration finished or point the live page at this API until
-the website-side signed client is implemented and the API's requests are tested
-against the real Linux schema. The current API's expected table/column shape is
-based on the existing FragCity page and still needs verification against the live
-database before production use.
+The repository now includes a signed client and a typed repository. In the local
+example config, \`transport\` defaults to \`local\`; this preserves local Laragon
+development. Only switch the production runtime file after the Linux API, its
+database account, and the live schema have been verified.
+
+In the shared host's ignored \`settings/settings.json\`, configure these values
+without committing the file:
+
+\`\`\`json
+{
+  "integrations": {
+    "weaponpaints_api": {
+      "base_url": "https://api.fragcity.ir",
+      "shared_secret": "THE_SAME_RANDOM_SECRET_USED_ON_LINUX"
+    }
+  },
+  "files": {
+    "database.weaponpaints_plugin": {
+      "database_profile": "weaponpaints",
+      "transport": "api"
+    }
+  }
+}
+\`\`\`
+
+Merge those values into the existing JSON; do not overwrite other settings.
+The setting key \`database.weaponpaints_plugin\` is a literal key under \`files\`.
+The shared-host PHP runtime also needs the cURL extension enabled. The secret is
+used only by PHP on the shared host and must never appear in HTML or JavaScript.
+
+The page uses \`WeaponPaintsRepository\`, which supports \`local\` or \`api\`
+transport without accepting raw SQL over HTTP. The production switch does not
+make the API live by itself: DNS, Nginx, HTTPS, the runtime config, schema,
+database grants, cURL, and signed request smoke tests must all pass first.
 
 The API intentionally has no CORS allowlist because browser JavaScript should not
-call it. The shared-hosting PHP backend will call it over HTTPS with the secret
-stored only in server-side runtime configuration.
+call it. The shared-hosting PHP backend calls it over HTTPS with the secret
+stored only in server-side runtime configuration. The PHP API currently follows
+the columns used by the existing WeaponPaints page, but compatibility with the
+actual Linux database has not yet been verified.
