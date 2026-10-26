@@ -17,6 +17,9 @@ server {
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root/index.php;
         fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param HTTP_X_FRAGCITY_TIMESTAMP $http_x_fragcity_timestamp;
+        fastcgi_param HTTP_X_FRAGCITY_NONCE $http_x_fragcity_nonce;
+        fastcgi_param HTTP_X_FRAGCITY_SIGNATURE $http_x_fragcity_signature;
         fastcgi_pass unix:/run/php/php8.3-fpm.sock;
     }
 
@@ -24,6 +27,9 @@ server {
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root/index.php;
         fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param HTTP_X_FRAGCITY_TIMESTAMP $http_x_fragcity_timestamp;
+        fastcgi_param HTTP_X_FRAGCITY_NONCE $http_x_fragcity_nonce;
+        fastcgi_param HTTP_X_FRAGCITY_SIGNATURE $http_x_fragcity_signature;
         fastcgi_pass unix:/run/php/php8.3-fpm.sock;
     }
 
