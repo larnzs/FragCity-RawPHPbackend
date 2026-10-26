@@ -11,22 +11,21 @@
       "driver": "mysql",
       "host": "127.0.0.1",
       "port": 3306,
-      "name": "",
+      "name": "kyonxcbt_fragcity_services",
       "username": "",
       "password": "",
       "charset": "utf8mb4"
     },
     "weaponpaints": {
       "extends": "main",
-      "name": ""
+      "name": "kyonxcbt_weaponpaints_plugin"
     },
     "plugin_sync": {
       "extends": "main",
       "name": ""
     },
     "legacy_services": {
-      "extends": "main",
-      "name": ""
+      "extends": "main"
     },
     "ranks_plugin": {
       "extends": "main",
@@ -255,6 +254,9 @@
       "database_profile": "main"
     },
     "panels.cs2.servers": {
+      "database_profile": "main"
+    },
+    "pages.support": {
       "database_profile": "main"
     }
   }
