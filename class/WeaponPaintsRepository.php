@@ -18,7 +18,9 @@ final class WeaponPaintsRepository
 
     public function __construct()
     {
-        $settings = fragcity_settings('files.database.weaponpaints_plugin', []);
+        // This repository's config key is stored literally with dots under files.
+        $files = fragcity_settings('files', []);
+        $settings = is_array($files) ? ($files['database.weaponpaints_plugin'] ?? []) : [];
         $transport = is_array($settings) ? (string)($settings['transport'] ?? 'local') : 'local';
 
         if ($transport === 'api') {
