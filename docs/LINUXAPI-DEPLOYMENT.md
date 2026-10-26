@@ -49,11 +49,15 @@ the webroot and are not in Git.
    Save it privately. Never put the real secret in the repository or browser.
 6. Verify the actual plugin database name and the columns/unique indexes in
    these tables: `wp_player_skins`, `wp_player_gloves`, `wp_player_knife`,
-   `wp_player_agents`, `wp_player_music`, `wp_player_pins`. Create
-   `fragcity_api_nonces` by running `linuxapi/schema.sql` in that database.
+   `wp_player_agents`, `wp_player_music`, `wp_player_pins`. Select that
+   database in your MariaDB client and run `linuxapi/schema.sql` to create
+   `fragcity_api_nonces`.
 7. Create a separate MariaDB account `fragcity_weaponpaints_api` and grant
-   only the privileges listed in `linuxapi/schema.sql`. The account should be
-   restricted to the actual local connection source; never use root.
+   only the privileges shown in `linuxapi/schema.sql`. Those `CREATE USER`
+   and `GRANT` lines are deliberately comments: replace the placeholder DB
+   name, password, and client host, then execute the uncommented statements in
+   your MariaDB client. Use the actual source address MariaDB sees; it may not
+   be `localhost` if the API connects through a Docker bridge. Never use root.
 8. Copy the example config outside the webroot and edit it:
    ```bash
    sudo install -d -o root -g www-data -m 0750 /etc/fragcity-api
