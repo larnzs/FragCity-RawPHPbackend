@@ -8,21 +8,24 @@ CREATE TABLE IF NOT EXISTS fragcity_api_nonces (
     KEY idx_fragcity_api_nonces_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Create a dedicated database account outside this file and grant only the
--- required privileges. Example below; replace database name and account host.
--- Do NOT use '%' or MariaDB root as the web API account.
+-- Replace verified_weaponpaints_db with the exact database name.
+-- Replace CLIENT_HOST with the real source host MariaDB sees (not necessarily localhost).
+-- Generate a unique password yourself; never use the sample literal below.
+-- Do NOT use '%' or MariaDB root as the API account.
 --
+-- CREATE USER 'fragcity_weaponpaints_api'@'CLIENT_HOST'
+--   IDENTIFIED BY 'REPLACE_WITH_A_LONG_UNIQUE_PASSWORD';
 -- GRANT SELECT, INSERT, UPDATE ON verified_weaponpaints_db.wp_player_skins
---   TO 'fragcity_weaponpaints_api'@'localhost';
+--   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
 -- GRANT INSERT, UPDATE ON verified_weaponpaints_db.wp_player_gloves
---   TO 'fragcity_weaponpaints_api'@'localhost';
+--   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
 -- GRANT SELECT, INSERT, UPDATE ON verified_weaponpaints_db.wp_player_knife
---   TO 'fragcity_weaponpaints_api'@'localhost';
+--   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
 -- GRANT SELECT, INSERT, UPDATE ON verified_weaponpaints_db.wp_player_agents
---   TO 'fragcity_weaponpaints_api'@'localhost';
+--   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
 -- GRANT SELECT, INSERT, UPDATE ON verified_weaponpaints_db.wp_player_music
---   TO 'fragcity_weaponpaints_api'@'localhost';
+--   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
 -- GRANT SELECT, INSERT, UPDATE ON verified_weaponpaints_db.wp_player_pins
---   TO 'fragcity_weaponpaints_api'@'localhost';
+--   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
 -- GRANT INSERT, DELETE ON verified_weaponpaints_db.fragcity_api_nonces
---   TO 'fragcity_weaponpaints_api'@'localhost';
+--   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
