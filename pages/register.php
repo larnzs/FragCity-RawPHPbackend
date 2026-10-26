@@ -53,6 +53,7 @@ $steamData = $isSteamRegister
         <!-- فرم ثبت‌نام -->
         <form id="registerForm" method="post" action="">
             <input type="hidden" name="auth_action" value="register">
+            <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string) ($authCsrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>">
 
             <?php if ($isSteamRegister): ?>
                 <input type="hidden" name="steam_register" value="1">
