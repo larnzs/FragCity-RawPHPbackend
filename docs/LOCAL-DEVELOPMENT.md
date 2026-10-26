@@ -106,3 +106,13 @@ Laragon/WAMP + دیتابیس محلی مستقل
 6. تعریف runbook انتشار cPanel شامل backup، تغییر فایل‌ها، بررسی smoke-test و rollback.
 
 این مراحل عمداً از updater جدا هستند: updater فقط کد Git را pull می‌کند؛ وظیفه‌اش انتشار سایت یا تغییر داده نیست.
+
+## Connect the local database for login and weapon paints
+
+The application reads runtime DB credentials from `settings/settings.json` (ignored by Git). If it is missing, copy `settings/settings.example.json` once; do not overwrite an existing local file.
+
+For the default local import, verify the schema names in MySQL first. The template expects `kyonxcbt_fragcity_services` for the website `users` table and `kyonxcbt_weaponpaints_plugin` for weapon-paints plugin tables. If your actual database names differ, update `databases.main.name` and `databases.weaponpaints.name` in the ignored runtime file.
+
+Set `databases.main.host` to `127.0.0.1`, the port to `3306`, and enter your local-only username/password there. For the current Windows development setup, use `root` only on the local machine. Never commit the runtime file or add its credentials to page PHP.
+
+Once the database schemas and plugin tables are imported, test login/registration through `index.php?page=login` and the protected skin page through `index.php?page=skins`. A 503 message on the skin page indicates that the DB profile or required tables need checking; the PHP error log contains the diagnostic detail. Before exposing the app publicly, replace root with a least-privilege database account and configure a production-specific settings file outside the public document root.
