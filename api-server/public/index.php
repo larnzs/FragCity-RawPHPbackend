@@ -101,7 +101,7 @@ function apiExec(PDO $pdo, string $sql, array $params = []): void
 
 function apiTextNumber(float $number): string
 {
-    return rtrim(rtrim(number_format($number, 6, '.', ''), '0'), '.');
+    return rtrim(rtrim(number_format($number, 12, '.', ''), '0'), '.');
 }
 
 function apiSaveGlove(PDO $pdo, string $steamid, array $teams, array $body): void
