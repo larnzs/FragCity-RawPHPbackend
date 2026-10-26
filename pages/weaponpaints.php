@@ -655,27 +655,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $teams = $save_team === 'both' ? [2, 3] : [(int)$save_team];
 
         if (isset($_POST['glove_defindex'], $_POST['glove_paint'])) {
-            $db->saveGlove(
-                $steamid,
-                $teams,
-                (int)$_POST['glove_defindex'],
-                (int)$_POST['glove_paint']
-            );
+            $def = (int)$_POST['glove_defindex'];
+            $paint = (int)$_POST['glove_paint'];
+            if (!isset($allGloves[$def][$paint])) {
+                http_response_code(400);
+                echo '<div class="wp-auth-state" role="alert">دستکش انتخاب‌شده معتبر نیست.</div>';
+                return;
+            }
+            $db->saveGlove($steamid, $teams, $def, $paint);
             redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
         }
 
         if (isset($_POST['agent_id'])) {
-            $db->saveAgent($steamid, $teams, (string)$_POST['agent_id']);
+            $agentId = (string)$_POST['agent_id'];
+            if (!isset($agentsData['t'][$agentId]) && !isset($agentsData['ct'][$agentId])) {
+                http_response_code(400);
+                echo '<div class="wp-auth-state" role="alert">Agent انتخاب‌شده معتبر نیست.</div>';
+                return;
+            }
+            $db->saveAgent($steamid, $teams, $agentId);
             redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
         }
 
         if (isset($_POST['music_id'])) {
-            $db->saveMusic($steamid, $teams, (int)$_POST['music_id']);
+            $musicId = (int)$_POST['music_id'];
+            if (!isset($musicData[$musicId])) {
+                http_response_code(400);
+                echo '<div class="wp-auth-state" role="alert">Music Kit انتخاب‌شده معتبر نیست.</div>';
+                return;
+            }
+            $db->saveMusic($steamid, $teams, $musicId);
             redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
         }
 
         if (isset($_POST['pin_id'])) {
-            $db->savePin($steamid, $teams, (int)$_POST['pin_id']);
+            $pinId = (int)$_POST['pin_id'];
+            if (!isset($pinsData[$pinId])) {
+                http_response_code(400);
+                echo '<div class="wp-auth-state" role="alert">Pin انتخاب‌شده معتبر نیست.</div>';
+                return;
+            }
+            $db->savePin($steamid, $teams, $pinId);
             redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
         }
 
@@ -703,8 +723,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stickers = [];
             for ($i = 0; $i < 5; $i++) {
                 $s = $_POST['sticker'][$i] ?? [];
+                if (!is_array($s)) {
+                    http_response_code(400);
+                    echo '<div class="wp-auth-state" role="alert">اطلاعات Sticker معتبر نیست.</div>';
+                    return;
+                }
+                $stickerId = (int)($s['id'] ?? 0);
+                if ($stickerId !== 0 && !isset($stickersData[$stickerId])) {
+                    http_response_code(400);
+                    echo '<div class="wp-auth-state" role="alert">Sticker انتخاب‌شده معتبر نیست.</div>';
+                    return;
+                }
                 $stickers[] = implode(';', [
-                    (int)($s['id'] ?? 0),
+                    $stickerId,
                     0,
                     (float)($s['x'] ?? 0),
                     (float)($s['y'] ?? 0),
@@ -715,8 +746,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $kc = $_POST['keychain'] ?? [];
+            if (!is_array($kc)) {
+                http_response_code(400);
+                echo '<div class="wp-auth-state" role="alert">اطلاعات Keychain معتبر نیست.</div>';
+                return;
+            }
+            $keychainId = (int)($kc['id'] ?? 0);
+            if ($keychainId !== 0 && !isset($keychainsData[$keychainId])) {
+                http_response_code(400);
+                echo '<div class="wp-auth-state" role="alert">Keychain انتخاب‌شده معتبر نیست.</div>';
+                return;
+            }
             $keychainStr = implode(';', [
-                (int)($kc['id'] ?? 0),
+                $keychainId,
                 (float)($kc['x'] ?? 0),
                 (float)($kc['y'] ?? 0),
                 (float)($kc['z'] ?? 0),
