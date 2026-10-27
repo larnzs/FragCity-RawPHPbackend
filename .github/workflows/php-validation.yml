@@ -20,7 +20,7 @@ jobs:
           extensions: curl, pdo_mysql, mbstring
           coverage: none
 
-      - name: Lint API, repository, and page files
+      - name: Lint active API, database boundary, and migrated pages
         run: |
           set -eu
           for file in \
@@ -32,7 +32,18 @@ jobs:
             tools/site-bridge-preflight.php \
             class/FragCityLinuxApiClient.php \
             class/WeaponPaintsRepository.php \
-            pages/weaponpaints.php; do
+            class/config.php \
+            pages/weaponpaints.php \
+            pages/buyserveropen.php \
+            pages/serverlist.php \
+            pages/zarinpal/zarinpal_buyserver_request.php \
+            pages/zarinpal/zarinpal_buyserver_callback.php \
+            panels/cs2/_server_backend_unavailable.php \
+            panels/cs2/servers.php \
+            panels/cs2/overview.php \
+            panels/cs2/config.php \
+            panels/cs2/players.php \
+            tst/weaponpaints.php; do
             php -l "$file"
           done
           php linuxapi/tools/architecture-check.php
