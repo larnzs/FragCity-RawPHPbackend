@@ -72,11 +72,12 @@ $check(
         && !preg_match('/\b(?:SELECT|INSERT\s+INTO|UPDATE|DELETE\s+FROM)\b/i', $weaponRepo)
 );
 $check(
-    'WeaponPaints client verifies TLS and disables redirects',
+    'WeaponPaints client verifies TLS, signs requests, disables redirects, and API verifies signatures',
     str_contains($apiClient, 'CURLOPT_SSL_VERIFYPEER => true')
         && str_contains($apiClient, 'CURLOPT_SSL_VERIFYHOST => 2')
         && str_contains($apiClient, 'CURLOPT_FOLLOWLOCATION => false')
-        && str_contains($apiClient, 'hash_equals(')
+        && str_contains($apiClient, "hash_hmac('sha256'")
+        && str_contains($index, 'hash_equals(')
 );
 $check(
     'Settings sample defaults WeaponPaints to API transport and contains no site bridge secret',
