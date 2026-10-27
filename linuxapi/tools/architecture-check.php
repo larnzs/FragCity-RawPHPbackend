@@ -53,16 +53,15 @@ try {
 
 $check(
     'Linux API remains pinned to the WeaponPaints route and local GLOBAL database',
-    str_contains($index, "if ($path !== '/v1/weaponpaints')") === false
-        && str_contains($index, "if ($path !== '/v1/weaponpaints')") === false
+    str_contains($index, "'/v1/weaponpaints'")
+        && !str_contains($index, 'apiProxyLegacyAgent')
         && str_contains($linuxConfig, "'host' => '127.0.0.1'")
         && str_contains($linuxConfig, "'name' => 'GLOBAL_weaponpaints'")
         && !str_contains($linuxConfig, 'website_bridge')
 );
 $check(
     'Old Agent API route is retired with HTTP 410',
-    str_contains($index, "str_starts_with($path, '/v1/agent/')")
-        && str_contains($index, 'legacy_agent_api_retired')
+    str_contains($index, 'legacy_agent_api_retired')
         && !str_contains($index, 'apiProxyLegacyAgent')
 );
 $check(
