@@ -44,6 +44,7 @@ try {
     $preflight = $read('tools/site-bridge-preflight.php');
     $weaponRepo = $read('class/WeaponPaintsRepository.php');
     $apiClient = $read('class/FragCityLinuxApiClient.php');
+    $settingsLoader = $read('settings/loader.php');
     $settingsRaw = $read('settings/settings.example.json');
     $settings = json_decode($settingsRaw, true, 512, JSON_THROW_ON_ERROR);
 } catch (Throwable $e) {
@@ -78,6 +79,12 @@ $check(
         && str_contains($apiClient, 'CURLOPT_FOLLOWLOCATION => false')
         && str_contains($apiClient, "hash_hmac('sha256'")
         && str_contains($index, 'hash_equals(')
+);
+$check(
+    'Runtime settings loader requires settings/settings.json and never falls back to example',
+    str_contains($settingsLoader, "__DIR__.'/settings.json'")
+        && str_contains($settingsLoader, 'Required runtime settings file is missing')
+        && !str_contains($settingsLoader, 'settings.example.json')
 );
 $check(
     'Settings sample defaults WeaponPaints to API transport and contains no site bridge secret',
