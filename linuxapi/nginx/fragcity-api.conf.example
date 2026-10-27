@@ -23,6 +23,22 @@ server {
         fastcgi_pass unix:/run/php/php8.3-fpm.sock;
     }
 
+    # Legacy Agent endpoints terminate in the Linux API gateway, which proxies
+    # signed HTTPS requests to the shared-host website connector. No site MySQL is
+    # exposed to this server. PHP still routes only to the fixed index.php script.
+    location ^~ /v1/agent/ {
+        client_max_body_size 64k;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param HTTP_X_FRAGCITY_TIMESTAMP $http_x_fragcity_timestamp;
+        fastcgi_param HTTP_X_FRAGCITY_NONCE $http_x_fragcity_nonce;
+        fastcgi_param HTTP_X_FRAGCITY_SIGNATURE $http_x_fragcity_signature;
+        fastcgi_param HTTP_AUTHORIZATION $http_authorization;
+        fastcgi_param HTTP_X_AGENT_SECRET $http_x_agent_secret;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+    }
+
     location = /v1/weaponpaints {
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root/index.php;
