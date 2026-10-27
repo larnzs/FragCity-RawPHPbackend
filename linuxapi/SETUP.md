@@ -18,6 +18,39 @@ For the current FragCity installation, the website API must use **GLOBAL_weaponp
 
 The API is a separate service. Do not place it in the Pterodactyl Panel directory, inside a game-server container, or in the shared-hosting website document root.
 
+
+## Current installation record — verified 2026-10-27
+
+This section records the state of the existing `server1` install so a future operator can continue from the correct step rather than rerunning first-install commands.
+
+### Completed and verified
+
+- API package was copied to `/var/www/fragcity-api/`. The package contains `public/index.php`, the Nginx examples, `schema.sql`, `config.example.php`, and `tools/smoke-test.php`.
+- PHP CLI is 8.3.35. The `curl`, `mbstring`, and `pdo_mysql` extensions are present.
+- Syntax checks passed for the API entry point, config example, smoke-test script, and private runtime config.
+- PHP-FPM socket exists at `/run/php/php8.3-fpm.sock`.
+- `/etc/fragcity-api/config.php` exists; `www-data` can read it and cannot write it. Do not replace it with the example or generate a new secret during continuation.
+- MariaDB listens on `127.0.0.1:3306` and also on `172.18.0.1:3306`. The API is configured to use the verified host loopback `127.0.0.1:3306`.
+- The correct application database is `GLOBAL_weaponpaints`, shared by the CS2 plugin containers. `GLOBAL_simpleadmin` is not the API target, and `s2_weaponpaints` is not the website API target.
+- The existing six plugin tables and their primary keys were inspected. No plugin table was altered.
+- `GLOBAL_weaponpaints.fragcity_api_nonces` was created and its definition verified.
+- Account `fragcity_weaponpaints_api`@ `127.0.0.1` exists. The granted permissions were inspected. It has table-specific permissions only; it is not a MariaDB root account.
+- A permission check executed as `www-data` passed for database `GLOBAL_weaponpaints`, the required plugin-table SELECT checks, and Nonce INSERT/DELETE within a transaction that was rolled back.
+- `nginx -t` passes for the current Nginx configuration.
+
+### Not completed yet
+
+- At the last check, `getent ahostsv4 api.fragcity.ir` returned no address.
+- `/etc/letsencrypt/live/api.fragcity.ir/fullchain.pem` did not exist.
+- `nginx -T` showed no vhost for `api.fragcity.ir`.
+- The HTTPS health check, signed `ping_db`, signed `get_selection`, and any test-player write tests have **not** been completed.
+- The shared-host website must remain on `transport: local` until the signed API smoke tests pass.
+
+### Where to resume
+
+Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. Use the “Repair the current account if it already exists” instructions only if a permission issue reappears. The next deployment step is to configure/verify the DNS A record, install the separate API Nginx vhost, bootstrap HTTP, issue TLS, and then run the signed smoke test. Keep the existing Pterodactyl Panel vhost untouched.
+
+
 ## 1. Preflight checks
 
 Run these read-only checks before creating users or changing config:
@@ -90,7 +123,7 @@ The schema uses CREATE TABLE IF NOT EXISTS. It does not recreate or replace the 
 
 Use this section only on a fresh install where both the private config and the MariaDB account do not already exist. If either exists, inspect it and use the recovery section below instead of overwriting it.
 
-Run the block from a root shell (use sudo -i first if needed). It generates a unique database password and HMAC secret, keeps temporary SQL/config files restricted, and does not print either secret.
+**Do not paste this whole installation block directly at an interactive SSH prompt.** A guard intentionally uses `exit 1` when the config/user already exists; pasted directly into the interactive shell, that can end the shell session. Save the script section to a root-owned file (for example `/root/setup-fragcity-api.sh`) and run it as a child process with `bash /root/setup-fragcity-api.sh`. This way its `exit` only stops the script, not your SSH session. Review the generated file before running it. The script generates a unique database password and HMAC secret, keeps temporary SQL/config files restricted, and does not print either secret.
 
 ~~~bash
 set -euo pipefail
@@ -320,7 +353,14 @@ The integrations key holds the same generated secret as the Linux config. Keep i
 ## Troubleshooting
 
 - HTTP 503 service_not_configured: check that /etc/fragcity-api/config.php exists, is PHP syntax-valid, contains a 64-character lowercase hex shared_secret, and is readable by www-data but not writable by it.
-- SQLSTATE 42000 / error 1143 on fragcity_api_nonces: check SHOW GRANTS; the nonce table needs SELECT, INSERT, DELETE for the cleanup and nonce test.
+- SQLSTATE 42000 / error 1143 on `fragcity_api_nonces`: the first version of the grant omitted `SELECT`. MariaDB also requires SELECT permission for a column referenced by a DELETE statement's WHERE clause. Fix the existing account with:
+  ```sql
+  GRANT SELECT, INSERT, DELETE
+  ON GLOBAL_weaponpaints.fragcity_api_nonces
+  TO 'fragcity_weaponpaints_api'@'127.0.0.1';
+  ```
+  Then inspect `SHOW GRANTS FOR 'fragcity_weaponpaints_api'@'127.0.0.1';` and rerun the permission check as `www-data`. Do not recreate the account or overwrite its config just to fix this grant.
+- Long pasted blocks appear to have lost/interleaved text in the terminal during the first attempt. If output contains fragments from two lines mixed together, do not assume the entire block ran cleanly: rerun one command block at a time, preferably by saving scripts and executing them with `bash /path/to/script.sh`. For PHP, prefer a saved `.php` file or the documented here-document and check that the full expected success output appears. Never paste actual passwords or the shared secret into chat.
 - Database connection failure: confirm the DB name is GLOBAL_weaponpaints, verify the actual MariaDB listener with ss -lntp, and test as www-data. Do not guess Docker addressing.
 - Signed request rejected: ensure time is synchronized, all three X-FragCity headers are forwarded by Nginx, and the client and server use the exact same secret.
 - TLS/redirect failure: verify DNS, certificate paths, and nginx -t before reload.
