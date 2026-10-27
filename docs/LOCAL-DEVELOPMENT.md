@@ -107,12 +107,33 @@ Laragon/WAMP + دیتابیس محلی مستقل
 
 این مراحل عمداً از updater جدا هستند: updater فقط کد Git را pull می‌کند؛ وظیفه‌اش انتشار سایت یا تغییر داده نیست.
 
-## Connect the local database for login and weapon paints
+## Local database — website login and WeaponPaints API
 
-The application reads runtime DB credentials from `settings/settings.json` (ignored by Git). If it is missing, copy `settings/settings.example.json` once; do not overwrite an existing local file.
+The local runtime file is `settings/settings.json`, ignored by Git. If it does not exist, copy the example once; do not overwrite an existing local file.
 
-For the default local import, verify the schema names in MySQL first. The template expects `kyonxcbt_fragcity_services` for the website `users` table and `kyonxcbt_weaponpaints_plugin` for weapon-paints plugin tables. If your actual database names differ, update `databases.main.name` and `databases.weaponpaints.name` in the ignored runtime file.
+For the supplied website schema, set:
 
-Set `databases.main.host` to `127.0.0.1`, the port to `3306`, and enter your local-only username/password there. For the current Windows development setup, use `root` only on the local machine. Never commit the runtime file or add its credentials to page PHP.
+- `databases.main.host`: `127.0.0.1`
+- `databases.main.port`: `3306`
+- `databases.main.name`: `kyonxcbt_fragcity_services`
+- `databases.main.username/password`: the credentials for the local Laragon MySQL/MariaDB instance only.
 
-Once the database schemas and plugin tables are imported, test login/registration through `index.php?page=login` and the protected skin page through `index.php?page=skins`. A 503 message on the skin page indicates that the DB profile or required tables need checking; the PHP error log contains the diagnostic detail. Before exposing the app publicly, replace root with a least-privilege database account and configure a production-specific settings file outside the public document root.
+The only confirmed tables in that website database are `donations`, `password_resets`, `tickets`, `ticket_replies`, `users`, `user_wallets`, `vip_codes`, `vip_usage`, `wallet_transactions`, and `withdraw_requests`. Do not add the old Windows-Agent tables to make old screens pass.
+
+WeaponPaints is separate. The actual game data remains in `GLOBAL_weaponpaints` on Debian and the website must access it through `https://api.fragcity.ir/v1/weaponpaints`. Set `integrations.weaponpaints_api.base_url` and the private `integrations.weaponpaints_api.shared_secret`; ensure `files.database.weaponpaints_plugin.transport` is `api`. Do not set a direct `databases.weaponpaints` profile or use `kyonxcbt_weaponpaints_plugin`.
+
+**Warning:** API writes reach the real Linux WeaponPaints database unless a separate test API is provided. Use a dedicated test SteamID/account for save tests. The local website DB copy does not make the remote WeaponPaints API sandboxed.
+
+To check the ten website tables without writes:
+
+```powershell
+php tools/site-bridge-preflight.php
+```
+
+For the static architecture check:
+
+```powershell
+php linuxapi/tools/architecture-check.php
+```
+
+Keep `settings/settings.json` out of version control and block web access to `/settings/` when the repository root is the document root.
