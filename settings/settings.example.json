@@ -42,7 +42,8 @@
       "startpay_base_url": "https://payment.zarinpal.com/pg/StartPay/"
     },
     "weaponpaints_api": {
-      "base_url": "",
+      "_comment": "Server-to-server only. The shared secret must match /etc/fragcity-api/config.php on the Linux host and must never be sent to browser JavaScript.",
+      "base_url": "https://api.fragcity.ir",
       "shared_secret": ""
     }
   },
