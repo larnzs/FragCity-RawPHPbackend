@@ -27,5 +27,6 @@ CREATE TABLE IF NOT EXISTS fragcity_api_nonces (
 --   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
 -- GRANT SELECT, INSERT, UPDATE ON verified_weaponpaints_db.wp_player_pins
 --   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
--- GRANT INSERT, DELETE ON verified_weaponpaints_db.fragcity_api_nonces
+-- SELECT is required because the API deletes by created_at and tests may delete by nonce_hash.
+-- GRANT SELECT, INSERT, DELETE ON verified_weaponpaints_db.fragcity_api_nonces
 --   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
