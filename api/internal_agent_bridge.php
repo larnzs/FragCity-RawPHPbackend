@@ -400,9 +400,21 @@ function fragcityBridgeRcon(PDO $pdo, array $data): never
         $steamId = fragcityBridgeString($data['steam_id'] ?? '', 20);
         $command = fragcityBridgeString($data['user_command'] ?? '', 1024);
         if ($serverIp === '' || filter_var($serverIp, FILTER_VALIDATE_IP) === false
-            || $serverPort === null || $command === '') {
+            || $serverPort === null || $command === ''
+            || preg_match('/[\x00-\x1F\x7F]/', $command)
+            || ($steamId !== '' && !preg_match('/^[0-9]{17}$/D', $steamId))) {
             fragcityBridgeRespond(400, ['status' => 'error', 'message' => 'Invalid command parameters']);
         }
+
+        // Do not let the Agent API enqueue arbitrary RCON traffic to arbitrary IPs.
+        $serverCheck = $pdo->prepare(
+            'SELECT server_id FROM registered_servers WHERE server_ip = ? AND port = ? LIMIT 1'
+        );
+        $serverCheck->execute([$serverIp, $serverPort]);
+        if (!$serverCheck->fetchColumn()) {
+            fragcityBridgeRespond(404, ['status' => 'error', 'message' => 'Registered server not found']);
+        }
+
         $stmt = $pdo->prepare(
             'INSERT INTO rcon_command_logs (server_ip, server_port, steam_id, user_command, server_response, status, created_at)
              VALUES (?, ?, ?, ?, \'\', \'pending\', NOW())'
