@@ -70,7 +70,7 @@ This section records the state of the existing `server1` install so a future ope
 - HTTPS origin test succeeded: `curl --resolve api.fragcity.ir:443:85.185.40.85 https://api.fragcity.ir/health` returned `HTTP/2 200` and the expected API JSON. This test was run from the Debian host while pinning the hostname to the public IP; it verifies the TLS listener/certificate and health route for that path, but does not by itself prove reachability from every off-host network.
 - Nginx emitted two warnings during config validation: (1) `listen ... http2` is deprecated in the API vhost on lines 22-23; (2) protocol options were redefined for `[::]:443`, with a reference to `/etc/nginx/sites-enabled/pterodactyl.conf:52`. They were warnings, not fatal errors; the config test and reload succeeded. Do not edit the Panel vhost just to silence the warning without reviewing the shared 443 listener definitions. A future cleanup can update the API vhost to the Nginx-version-supported HTTP/2 syntax and then re-test.
 - The signed `ping_db` smoke test passed on `server1` on 2026-10-27 after applying the temporary `/etc/hosts` mapping for the test. Response: HTTP 200, `success: true`, `data.database: ok`, followed by `PASS: signed ping_db`. This verifies the signed request path (including HMAC/header forwarding), nonce insertion, API-to-MariaDB connection, and `GLOBAL_weaponpaints` selection for this request.
-- Signed read-only `get_selection` and controlled test-player write/read-back tests remain unverified. Continue with the read-only selection test in Section 8. The temporary marked `/etc/hosts` entry was removed automatically when the previous test block exited; do not change NetworkManager or ISP DNS settings.
+- Signed read-only `get_selection` and controlled test-player write/read-back tests remain unverified. Continue with the read-only selection test in Section 8. Because the successful commands were pasted directly into an interactive shell, its `EXIT` trap may remain installed and the marked `/etc/hosts` line may still exist. Check the marker and use the subshell-wrapped Section 8 command so cleanup runs when that test finishes; do not change NetworkManager or ISP DNS settings.
 - The shared-host website must remain on `transport: local` until the signed API smoke tests pass.
 
 Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The direct-origin HTTP test, Let's Encrypt issuance, TLS vhost install, Nginx reload, HTTPS health test, and signed `ping_db` smoke test have completed successfully. The next step is the read-only player-selection test. Do not switch the shared-host website to API transport until those tests and controlled test-player writes are verified. Do not touch the existing Pterodactyl Panel vhost or change DNS resolver settings globally without explicit operator approval.
@@ -396,26 +396,37 @@ php /var/www/fragcity-api/tools/smoke-test.php https://api.fragcity.ir
 
 On `server1`, `ERROR: Request transport failed (cURL code 6)` means cURL could not resolve `api.fragcity.ir`. This occurs before the request reaches TLS/HMAC/API/database verification; it is not evidence that HMAC or database configuration is wrong. On the current host, the configured ISP resolver participates in the existing DNS-tunnel setup and returns NXDOMAIN for this API hostname, while authoritative/public resolvers return `85.185.40.85`. Do not alter `/etc/resolv.conf`, NetworkManager, or resolver order to work around this single-name failure.
 
-Run this temporary local mapping only for the signed smoke test. It refuses to proceed if an entry already exists, and removes its marked line automatically when the shell exits:
+Run this temporary local mapping only for the signed smoke test. The command below is deliberately wrapped in a subshell so the marked line is removed when the test ends even if pasted directly into an interactive root shell. It reuses an existing line only if it carries the exact temporary marker; an unrelated pre-existing entry makes it stop:
 
 ~~~bash
+# Clear the EXIT trap that may have been left in the current interactive shell by the previous pasted block.
+trap - EXIT
+
+# Use a subshell so the cleanup trap runs when this test finishes.
+(
 set -eu
 if grep -Eq '(^|[[:space:]])api\.fragcity\.ir([[:space:]]|$)' /etc/hosts; then
-    echo "STOP: api.fragcity.ir already exists in /etc/hosts; no changes made."
-    grep -n 'api\.fragcity\.ir' /etc/hosts
-    exit 1
+    if grep -q 'FRAGCITY_API_SMOKE_TEMP' /etc/hosts; then
+        echo "Using existing temporary API host mapping; it will be removed at exit."
+    else
+        echo "STOP: api.fragcity.ir already exists in /etc/hosts without the temporary marker; no changes made."
+        grep -n 'api\.fragcity\.ir' /etc/hosts
+        exit 1
+    fi
+else
+    printf '%s\n' '85.185.40.85 api.fragcity.ir # FRAGCITY_API_SMOKE_TEMP' >> /etc/hosts
 fi
-printf '%s\n' '85.185.40.85 api.fragcity.ir # FRAGCITY_API_SMOKE_TEMP' >> /etc/hosts
 trap 'sed -i "/FRAGCITY_API_SMOKE_TEMP/d" /etc/hosts' EXIT
 getent ahostsv4 api.fragcity.ir
 php /var/www/fragcity-api/tools/smoke-test.php https://api.fragcity.ir
+)
 ~~~
 
 This pins name resolution locally only for the test; it does not change DNS settings and does not validate the ISP DNS-tunnel route. The previously successful `curl --resolve ...:443:85.185.40.85` remains the separate direct-origin TLS/health check.
 
 ### Successful signed `ping_db` test — 2026-10-27
 
-The following run passed using the temporary host mapping above. The temporary line was removed by the shell `EXIT` trap when the block finished:
+The following run passed using the temporary host mapping above. Since that first block was pasted directly into an interactive root shell, the `EXIT` trap may still be installed in that shell and the temporary line may persist until it exits. Use the subshell-wrapped command above for subsequent tests, which guarantees cleanup at the end of each test block:
 
 ~~~text
 HTTP 200: {
