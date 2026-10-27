@@ -29,6 +29,7 @@ jobs:
             linuxapi/config.example.php \
             linuxapi/tools/smoke-test.php \
             linuxapi/tools/architecture-check.php \
+            tools/site-bridge-preflight.php \
             class/FragCityLinuxApiClient.php \
             class/WeaponPaintsRepository.php \
             pages/weaponpaints.php; do
