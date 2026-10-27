@@ -30,6 +30,7 @@ $index = $read('linuxapi/public/index.php');
 $config = $read('linuxapi/config.example.php');
 $bridge = $read('api/internal_agent_bridge.php');
 $schema = $read('linuxapi/site-bridge-schema.sql');
+$preflight = $read('tools/site-bridge-preflight.php');
 
 $checks = [
     'Agent routes are allowlisted' =>
@@ -76,6 +77,11 @@ $checks = [
     'Legacy static skin-sync secret is absent from active API source' =>
         !str_contains($index, 'secretagent67')
         && !str_contains($bridge, 'secretagent67'),
+    'Shared-host schema preflight is CLI-only and read-only' =>
+        str_contains($preflight, "PHP_SAPI !== 'cli'")
+        && str_contains($preflight, 'INFORMATION_SCHEMA.COLUMNS')
+        && str_contains($preflight, 'INFORMATION_SCHEMA.STATISTICS')
+        && !preg_match('/\\b(?:INSERT\\s+INTO|UPDATE\\s+[A-Za-z_][A-Za-z0-9_]*\\s+SET|DELETE\\s+FROM|CREATE\\s+TABLE|ALTER\\s+TABLE|DROP\\s+TABLE|TRUNCATE\\s+TABLE)\\b/i', $preflight),
 ];
 
 $failed = 0;
