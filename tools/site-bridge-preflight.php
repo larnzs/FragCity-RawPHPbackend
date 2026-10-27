@@ -73,6 +73,31 @@ try {
     $check('read the active database identity', false, 'read-only identity query failed');
 }
 
+$expectedWeaponPaintsDb = 'kyonxcbt_weaponpaints_plugin';
+$weaponSettings = fragcity_database_settings('weaponpaints');
+$configuredWeaponPaintsDb = isset($weaponSettings['name']) ? trim((string)$weaponSettings['name']) : '';
+$check(
+    'weaponpaints profile targets the expected website plugin database',
+    $configuredWeaponPaintsDb !== '' && hash_equals($expectedWeaponPaintsDb, $configuredWeaponPaintsDb),
+    $configuredWeaponPaintsDb === '' ? 'weaponpaints database name is empty' : 'configured database name does not match the expected plugin database'
+);
+
+$weaponPdo = fragcity_create_pdo('weaponpaints');
+if (!$weaponPdo instanceof PDO) {
+    $check('connect to the configured weaponpaints profile', false, 'PDO connection unavailable; credentials are never printed');
+} else {
+    try {
+        $actualWeaponPaintsDb = (string)$weaponPdo->query('SELECT DATABASE()')->fetchColumn();
+        $check(
+            'connected weaponpaints profile matches the expected plugin database',
+            $actualWeaponPaintsDb !== '' && hash_equals($expectedWeaponPaintsDb, $actualWeaponPaintsDb),
+            $actualWeaponPaintsDb === '' ? 'database identity could not be determined' : 'connected database is not the expected plugin database'
+        );
+    } catch (Throwable $e) {
+        $check('read the active weaponpaints database identity', false, 'read-only identity query failed');
+    }
+}
+
 $requiredColumns = [
     'agent_tokens' => ['token_id', 'username', 'token', 'expires_at', 'created_at', 'last_used'],
     'users' => ['username', 'steamid64', 'phone', 'password_hash', 'insmaster'],
