@@ -1,6 +1,6 @@
 <?php
 /**
- * The old public list queried registered_servers, which belonged to the
+ * The old public list queried a server-inventory table belonging to the
  * retired Windows-Agent backend. No dynamic server catalog exists in the
  * current website database. Do not query arbitrary IPs/ports without a
  * server inventory supplied by the future Pterodactyl integration.
