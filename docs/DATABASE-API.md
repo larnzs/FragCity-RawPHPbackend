@@ -112,5 +112,5 @@ The bridge uses a separate secret stored in the private website setting `integra
 
 The first migration preserves only actions with an understood contract. The legacy billing/expiry route `registered_servers_api.php` stays disabled (HTTP 410) until the planned panel/wallet design is specified. The legacy tasks poll returns an empty list because the provided database inventory does not include a `tasks` table. Generic bulk sync is constrained to an explicit plugin-table allowlist and column metadata; it cannot select arbitrary tables or write `kyonxcbt_fragcity_services`.
 
-The new bridge is not production-ready merely because the code exists. Deploy the bridge and schema on the shared host, configure separate matching secrets, validate the bridge health check, and test each mutating action against a controlled node before switching the C# client.
+The new bridge is not production-ready merely because the code exists. Verify the real website schema, deploy the bridge and site-only schema on shared hosting, configure separate matching secrets, validate the signed bridge health check, and test each mutating action against a controlled node. The C# WebAPIClient repository is reference-only for this workstream; no C# code changes or client-switching work belong in this PR.
 
