@@ -61,11 +61,15 @@ This section records the state of the existing `server1` install so a future ope
 - Local virtual-host test `curl -H 'Host: api.fragcity.ir' http://127.0.0.1/health` returned HTTP 200 with the expected `fragcity-linuxapi` health JSON.
 - A normal curl by hostname did not resolve through the configured default resolver, as recorded above. Public/authoritative DNS is correct; the public HTTP route still needs to be checked separately.
 - A direct-origin HTTP test then succeeded: `curl --resolve api.fragcity.ir:80:85.185.40.85 http://api.fragcity.ir/health` returned HTTP 200 with the expected API health JSON. This confirms the selected public-IP route answered from the Debian host while bypassing only local DNS lookup for that request. It does **not** replace a true off-host reachability test, but it is the recorded successful direct-origin check.
-- `/etc/letsencrypt/live/api.fragcity.ir/fullchain.pem` was absent at the last check; TLS is not configured yet.
+- Certbot 4.0.0 is installed; the `nginx`, `standalone`, and `webroot` plugins are available.
+- On 2026-10-27, `sudo certbot certonly --nginx -d api.fragcity.ir` completed successfully. The certificate is saved at `/etc/letsencrypt/live/api.fragcity.ir/fullchain.pem` and the private key at `/etc/letsencrypt/live/api.fragcity.ir/privkey.pem`. Certbot reported expiry on 2027-01-25 and said automatic renewal was scheduled.
+- Before issuing the certificate, the original HTTP vhost was backed up to `/etc/nginx/sites-available/fragcity-api.conf.pre-letsencrypt`.
+- Certbot did not ask for an email during this issuance. The existing node already had certificates and likely reused its existing Certbot account/contact configuration. Fresh installations may still ask for email and terms acceptance.
+- The active API vhost is still the bootstrap HTTP config at the last verified check. The certificate has been issued, but HTTPS is **not active until the HTTPS vhost is installed, Nginx is reloaded successfully, and an HTTPS health request succeeds**.
 - The signed `ping_db`, signed `get_selection`, and any test-player write tests have **not** been completed.
 - The shared-host website must remain on `transport: local` until the signed API smoke tests pass.
 
-Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The next deployment step is to test the HTTP origin (using the resolver path intended for API traffic, with the direct-origin diagnostic above only if appropriate), then obtain TLS without touching the existing Pterodactyl Panel vhost. Do not change DNS resolver settings globally without explicit operator approval.
+Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The direct-origin HTTP test and Let's Encrypt certificate issuance are complete. Next, install the TLS vhost below, validate and reload Nginx, then verify HTTPS health and perform the signed API tests. Do not touch the existing Pterodactyl Panel vhost or change DNS resolver settings globally without explicit operator approval.
 
 
 
@@ -330,11 +334,13 @@ sudo systemctl reload nginx
 curl -i http://api.fragcity.ir/health
 ~~~
 
-3. Only after DNS and HTTP are correct, obtain the certificate using the node's established Certbot/ACME process. Example:
+3. Only after the authoritative DNS check and HTTP-origin test succeed, obtain the certificate using the node's established Certbot/ACME process:
 
 ~~~bash
 sudo certbot certonly --nginx -d api.fragcity.ir
 ~~~
+
+On the current node, Certbot 4.0.0 completed this command successfully on 2026-10-27. It saved `fullchain.pem` and `privkey.pem` under `/etc/letsencrypt/live/api.fragcity.ir/`, reported expiry on 2027-01-25, and reported that a scheduled automatic renewal task was configured. The command did not ask for an email on this run; the node already had Certbot setup for other certificates, and likely reused its existing ACME account/contact configuration. Do not assume fresh nodes will skip those prompts.
 
 4. After the certificate exists, switch the vhost to the TLS example and test before reloading:
 
@@ -346,6 +352,16 @@ curl -fsS https://api.fragcity.ir/health
 ~~~
 
 The health response is public and does not prove database connectivity. Do not switch the website to API transport until the signed smoke test passes.
+
+After the HTTPS vhost is active, verify the certificate and scheduled renewal before declaring TLS setup complete:
+
+~~~bash
+sudo certbot certificates
+systemctl list-timers --all | grep -Ei 'certbot|letsencrypt' || true
+sudo certbot renew --dry-run
+~~~
+
+The dry run checks the renewal path; it does not replace the live certificate. Do not delete or reissue a valid certificate just because Certbot did not ask for an email.
 
 ## 8. Signed API smoke tests
 
