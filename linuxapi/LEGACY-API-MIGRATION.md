@@ -1,7 +1,8 @@
 # نقشهٔ مهاجرت API قدیمی به Linux API
 
-> وضعیت این سند: inventory و طراحی مهاجرت؛ هنوز به معنی پیاده‌سازی یا آماده‌بودن endpointهای Agent در Linux API نیست.
-> شاخهٔ کاری: feature/linuxapi-legacy-api-migration
+> وضعیت این سند: نقشهٔ مهاجرت و وضعیت پیاده‌سازی. وجود route به معنی کامل‌بودن عملیات وابسته به schema ناشناخته یا آماده‌بودن Production نیست.
+> شاخهٔ canonical: feature/linuxapi-site-db-bridge
+> رپوی WebAPIClient فقط برای فهم قراردادها و پیدا کردن وابستگی‌های قدیمی مرجع است؛ این کار هیچ کد C# را تغییر نمی‌دهد.
 
 ## هدف
 
@@ -95,4 +96,4 @@
 
 This is still a development branch. The site connector has not been deployed to shared hosting, the two runtime secrets have not been generated/configured here, and the site-only SQL schema has not been imported. No production database rows have been migrated or changed by this repository work.
 
-The existing Linux WeaponPaints route remains separate and unchanged. After the branch passes PHP lint, the next step is to deploy the site connector and schema to the shared host, configure the matching bridge secret on both sides, run the signed bridge health check, and only then update the C# client URLs and token handling. Do not connect the website database to Linux or change its MySQL port/firewall settings.
+The existing Linux WeaponPaints route remains separate and unchanged. Before deployment, verify the real website schema (especially users and agent_tokens), then deploy the site connector and site-only schema on shared hosting, configure the matching bridge secrets, and run the signed bridge health check plus controlled action-by-action integration tests. The C# repository is reference-only in this workstream; do not modify it or treat client switching as part of this PR. Do not connect the website database to Linux or change its MySQL port/firewall settings.
