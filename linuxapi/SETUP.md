@@ -2,33 +2,15 @@
 
 This is the repeatable setup guide for the files in this directory. Follow it on the Debian API host when deploying FragCity on a new node or rebuilding the service.
 
-## Two deliberately separate data paths
+## Active data paths and retired Agent bridge
 
-- **WeaponPaints:** the Linux API itself connects to the Linux-local MariaDB database GLOBAL_weaponpaints through 127.0.0.1:3306. This is the existing API path and stays unchanged.
-- **Website / Agent data:** requests under /v1/agent/ are received by the Linux API but forwarded over signed HTTPS to api/internal_agent_bridge.php on fragcity.ir. That PHP connector executes queries locally on the shared-hosting website using the site's own settings and PDO connection.
-- The Linux host must never open a MySQL connection to kyonxcbt_fragcity_services. Do not copy that database to Linux, add its host/password to /etc/fragcity-api/config.php, or open remote MySQL for this integration.
-- The files linuxapi/site-bridge-schema.sql are intended to run ONLY in the shared-hosting website database kyonxcbt_fragcity_services. Never run that file against the Linux node or GLOBAL_weaponpaints.
-
-## Site database bridge: current migration design
-
-The website-side bridge is api/internal_agent_bridge.php. It uses the normal settings/loader.php and databases.main profile, verifies a timestamp + nonce + HMAC signature, and stores replay-protection / login-throttling records in two small tables on the website DB.
-
-Deployment prerequisites:
-1. Deploy api/internal_agent_bridge.php together with settings/loader.php and the site's private settings/settings.json. Do not commit settings.json.
-2. Generate a fresh secret with openssl rand -hex 32. Put it in integrations.linuxapi_site_bridge.shared_secret in the site's private settings/settings.json.
-3. Import linuxapi/site-bridge-schema.sql into kyonxcbt_fragcity_services through the shared-hosting database manager. It creates only bridge nonce and rate-limit tables.
-4. Put the same bridge secret in website_bridge.shared_secret in /etc/fragcity-api/config.php on Linux. It MUST be different from the WeaponPaints shared_secret.
-5. Set website_bridge.url to https://fragcity.ir/api/internal_agent_bridge.php. Keep the private API config readable by PHP-FPM but not writable by www-data.
-6. Deploy the updated Nginx location for /v1/agent/ and run nginx -t before reloading. The current example uses a fixed index.php entry point and explicitly forwards Authorization / X-Agent-Secret headers.
-7. Smoke-test GET https://api.fragcity.ir/v1/agent/agent_health.php. Expected response: status=success, service=fragcity-site-bridge, database=ok. This proves the signed HTTPS bridge can query the site's database; it does not validate every Agent operation.
-8. Before using privileged Agent routes, run the new read-only schema preflight from the website repository root on shared hosting: `php tools/site-bridge-preflight.php`. It must exit 0. It checks the active `main` database identity, required bridge columns and unique indexes, HMAC setting presence, and the mapped plugin databases/tables used by bulk sync and skin export. It never prints secrets and performs no schema/data writes. If shell access is unavailable on the hosting plan, do not upload it as a public web diagnostic; run the equivalent read-only checks in the hosting provider's CLI or database console instead.
-
-This branch is code preparation only. Do not assume the bridge has been deployed or that the runtime secrets/schema tables exist until those deployment steps have been completed. The C# WebAPIClient repository is read-only reference for legacy contracts in this workstream; no C# source is changed here.
-
-**Security blocker:** the current Agent token proves an InsMaster website account, not a specific node. `node_name` is request input and is not a cryptographic node identity. Before enabling privileged multi-node production actions, verify the live schema and define a node-bound credential/authorization contract; the current ownership checks are defense-in-depth, not a replacement for node authentication.
-
-The initial migration intentionally keeps uncertain website billing / panel behavior isolated: registered_servers_api.php returns HTTP 410 pending the billing/panel redesign; fetch_tasks.php returns an empty task list because the supplied table inventory has no tasks table. api_sync_skins.php uses a valid Agent token, fixed table allowlist, and bounded pagination rather than the old query-string static secret. sync_bulk.php is limited to a fixed plugin-table/database allowlist with database column validation; it does not accept tables from kyonxcbt_fragcity_services.
-
+- **WeaponPaints:** the Linux API connects to the Linux-local MariaDB database `GLOBAL_weaponpaints` through `127.0.0.1:3306`. Keep this DB and API path unchanged.
+- **Website data:** the main website database `kyonxcbt_fragcity_services` stays on shared hosting; Laragon uses a local copy. The confirmed website schema consists of `donations`, `password_resets`, `tickets`, `ticket_replies`, `users`, `user_wallets`, `vip_codes`, `vip_usage`, `wallet_transactions`, and `withdraw_requests`.
+- The Linux API must never open a MySQL connection to `kyonxcbt_fragcity_services`, receive its credentials, or expose MariaDB port 3306.
+- **Windows Agent API:** retired. `/v1/agent/*` returns HTTP 410; `api/internal_agent_bridge.php` is a fail-closed retired endpoint. Do not configure `website_bridge`, set `integrations.linuxapi_site_bridge`, create bridge-specific tables, or execute the former `site-bridge-schema.sql`.
+- The old Agent/instance-maker tables (including `agent_tokens`, `agent_nodes`, `pending_servers`, `registered_servers`, `server_ports`, `server_configs`, and related queue/runtime tables) are not in the active website schema and must not be re-created for this migration.
+- Server purchase and old server-management screens remain disabled until a new integration with the Pterodactyl API and a clear billing/source-of-truth contract is implemented.
+- The C# `WebAPIClient` repository is reference-only for understanding old contracts; no C# code is changed by this work.
 
 ## FragCity database target
 
