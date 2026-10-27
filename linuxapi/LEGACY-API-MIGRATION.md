@@ -92,6 +92,12 @@
 - registered_servers_api.php is intentionally disabled with HTTP 410 pending the planned billing/panel redesign. fetch_tasks.php returns an empty task list because tasks is not present in the supplied schema inventory.
 - The old query-string skin API token is not accepted. Skin export now requires an authenticated Agent token and paginated requests.
 
+## Security blocker before production
+
+The current compatibility flow authenticates an unexpired Agent token belonging to a website user with `insmaster = 1`. That token is **account-scoped, not proven to be node-scoped**. The request's `node_name` is input data and cannot by itself prove which physical node sent it. The new ownership checks reduce cross-node writes, but they do not replace a per-node credential bound to a known `agent_nodes` record.
+
+Before enabling privileged Agent actions on multiple production nodes, inspect the real schema and define node credential issuance, storage/rotation/revocation and endpoint authorization. The C# WebAPIClient stays reference-only in this PR; no client code is changed here. Until the node identity contract is implemented and integration-tested, treat multi-node Agent authorization as a deployment blocker.
+
 ## Deployment / validation status
 
 This is still a development branch. The site connector has not been deployed to shared hosting, the two runtime secrets have not been generated/configured here, and the site-only SQL schema has not been imported. No production database rows have been migrated or changed by this repository work.
