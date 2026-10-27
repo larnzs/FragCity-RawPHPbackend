@@ -1,5 +1,5 @@
 {
-  "_comment": "Copy to settings.json; fill only credentials for the current environment. Never commit settings.json.",
+  "_comment": "Reference sample only. The runtime loader never uses this file; create the Git-ignored settings/settings.json for this environment. Never commit runtime credentials or API shared secrets.",
   "app": {
     "environment": "local",
     "timezone": "UTC",
