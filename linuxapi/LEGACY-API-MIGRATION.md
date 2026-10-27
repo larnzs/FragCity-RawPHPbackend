@@ -81,9 +81,18 @@
 7. تغییر کلاینت فقط برای actionهایی که قرار است حفظ شوند؛ سپس تست integration روی حساب و نود آزمایشی.
 8. حذف باقی‌مانده‌های legacy بعد از اثبات عدم وجود consumer در production.
 
-## وضعیت آخر
+## Implemented in the current working branch
 
-- Legacy PHP endpoints از شاخهٔ پاک‌سازی فعال حذف شده‌اند، اما source history پاک نشده است.
-- Linux API فعلی برای WeaponPaints باقی مانده است.
-- این سند قراردادها و مانع‌های مهاجرت را ثبت می‌کند؛ هیچ route قدیمی به‌عنوان route لینوکسی فعال معرفی نشده است.
-- هیچ migration database، write-test روی دیتابیس live، یا تغییر deploy انجام نشده است.
+- Linux API gateway aliases now exist under /v1/agent/<legacy-file>.php and forward requests to the site-side connector over signed HTTPS.
+- Website-side connector source is api/internal_agent_bridge.php. It opens only the website-local main database using settings/loader.php; the Linux API does not use a network connection to kyonxcbt_fragcity_services.
+- linuxapi/site-bridge-schema.sql creates replay-protection and login-throttling tables on the shared-hosting website DB only.
+- The Linux runtime config has a separate website_bridge secret and URL; it is distinct from the existing WeaponPaints shared secret.
+- Preserved legacy-safe operations include Agent login, heartbeat, get-pending/update-status/sync-metrics, RCON command polling/result updates, node config reads, port operations, agent command queue, allowlisted plugin-table bulk upsert, and paged skin export.
+- registered_servers_api.php is intentionally disabled with HTTP 410 pending the planned billing/panel redesign. fetch_tasks.php returns an empty task list because tasks is not present in the supplied schema inventory.
+- The old query-string skin API token is not accepted. Skin export now requires an authenticated Agent token and paginated requests.
+
+## Deployment / validation status
+
+This is still a development branch. The site connector has not been deployed to shared hosting, the two runtime secrets have not been generated/configured here, and the site-only SQL schema has not been imported. No production database rows have been migrated or changed by this repository work.
+
+The existing Linux WeaponPaints route remains separate and unchanged. After the branch passes PHP lint, the next step is to deploy the site connector and schema to the shared host, configure the matching bridge secret on both sides, run the signed bridge health check, and only then update the C# client URLs and token handling. Do not connect the website database to Linux or change its MySQL port/firewall settings.
