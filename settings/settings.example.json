@@ -74,49 +74,6 @@
     "class.customer_db": {
       "database_profile": "main"
     },
-    "agent.db": {
-      "database_profile": "main"
-    },
-    "agent.agent_login": {
-      "database_profile": "main"
-    },
-    "agent.registered_servers_api": {
-      "database_profile": "main"
-    },
-    "agent.sync_bulk": {
-      "database_profile": "main",
-      "plugin_database_profile": "plugin_sync",
-      "database_mapping": {
-        "matchzy_stats_maps": "kyonxcbt_matchzy_plugin",
-        "matchzy_stats_matches": "kyonxcbt_matchzy_plugin",
-        "matchzy_stats_players": "kyonxcbt_matchzy_plugin",
-        "lvl_base": "kyonxcbt_ranks_plugin",
-        "lvl_base_geoip": "kyonxcbt_ranks_plugin",
-        "lvl_base_hits": "kyonxcbt_ranks_plugin",
-        "sa_admins": "kyonxcbt_simpleadmin_plugin",
-        "sa_admins_flags": "kyonxcbt_simpleadmin_plugin",
-        "sa_bans": "kyonxcbt_simpleadmin_plugin",
-        "sa_groups": "kyonxcbt_simpleadmin_plugin",
-        "sa_groups_flags": "kyonxcbt_simpleadmin_plugin",
-        "sa_groups_servers": "kyonxcbt_simpleadmin_plugin",
-        "sa_migrations": "kyonxcbt_simpleadmin_plugin",
-        "sa_mutes": "kyonxcbt_simpleadmin_plugin",
-        "sa_players_ips": "kyonxcbt_simpleadmin_plugin",
-        "sa_servers": "kyonxcbt_simpleadmin_plugin",
-        "sa_unbans": "kyonxcbt_simpleadmin_plugin",
-        "sa_unmutes": "kyonxcbt_simpleadmin_plugin",
-        "sa_warns": "kyonxcbt_simpleadmin_plugin",
-        "vipcore_test": "kyonxcbt_vip_plugin",
-        "vip_servers": "kyonxcbt_vip_plugin",
-        "vip_users": "kyonxcbt_vip_plugin",
-        "wp_player_agents": "kyonxcbt_weaponpaints_plugin",
-        "wp_player_gloves": "kyonxcbt_weaponpaints_plugin",
-        "wp_player_knife": "kyonxcbt_weaponpaints_plugin",
-        "wp_player_music": "kyonxcbt_weaponpaints_plugin",
-        "wp_player_pins": "kyonxcbt_weaponpaints_plugin",
-        "wp_player_skins": "kyonxcbt_weaponpaints_plugin"
-      }
-    },
     "steam.steam_login": {
       "database_profile": "main",
       "login_page": "/index.php?page=login",
@@ -205,24 +162,6 @@
         "en"
       ],
       "preference_storage": "browser"
-    },
-    "agent.agent_commands_api": {
-      "database_profile": "main"
-    },
-    "agent.agent_getservers_api": {
-      "database_profile": "main"
-    },
-    "agent.api_sync_skins": {
-      "database_profile": "weaponpaints"
-    },
-    "agent.rcon_commands_api": {
-      "database_profile": "main"
-    },
-    "agent.server_configs_api": {
-      "database_profile": "main"
-    },
-    "agent.server_ports_api": {
-      "database_profile": "main"
     },
     "pages.buyserveropen": {
       "database_profile": "main"
