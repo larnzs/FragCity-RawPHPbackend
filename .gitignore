@@ -7,6 +7,9 @@ config.local.php
 config.local.*.php
 **/config.local.*.php
 
+# Local setup scripts may contain generated environment-only credentials
+/local-config/
+
 # Runtime settings include per-environment database credentials and API secrets
 /settings/settings.json
 /settings/*.local.json
