@@ -304,12 +304,193 @@ function apiSaveSkin(PDO $pdo, string $steamid, array $teams, array $body): void
     }
 }
 
+
+/**
+ * Relay the legacy Agent API to a site-side connector over signed HTTPS.
+ * The Linux host never opens a connection to kyonxcbt_fragcity_services.
+ */
+function apiProxyLegacyAgent(string $route, string $method): never
+{
+    $allowedRoutes = [
+        'agent_health.php',
+        'agent_login.php',
+        'heartbeat.php',
+        'fetch_tasks.php',
+        'agent_getservers_api.php',
+        'rcon_commands_api.php',
+        'server_configs_api.php',
+        'server_ports_api.php',
+        'agent_commands_api.php',
+        'sync_bulk.php',
+        'api_sync_skins.php',
+        'registered_servers_api.php',
+    ];
+    if (!in_array($route, $allowedRoutes, true)) {
+        apiRespond(404, ['status' => 'error', 'message' => 'not_found']);
+    }
+
+    $getRoutes = ['agent_health.php', 'fetch_tasks.php', 'api_sync_skins.php'];
+    if ($method === 'GET' && !in_array($route, $getRoutes, true)) {
+        header('Allow: POST');
+        apiRespond(405, ['status' => 'error', 'message' => 'method_not_allowed']);
+    }
+    if ($method !== 'GET' && $method !== 'POST') {
+        header('Allow: GET, POST');
+        apiRespond(405, ['status' => 'error', 'message' => 'method_not_allowed']);
+    }
+
+    $payload = [];
+    if ($method === 'POST') {
+        $contentType = strtolower(trim(explode(';', (string)($_SERVER['CONTENT_TYPE'] ?? ''))[0]));
+        if ($contentType !== 'application/json') {
+            apiRespond(415, ['status' => 'error', 'message' => 'content_type_must_be_json']);
+        }
+        $rawRequest = file_get_contents('php://input');
+        if (!is_string($rawRequest) || strlen($rawRequest) > 65536) {
+            apiRespond(413, ['status' => 'error', 'message' => 'request_too_large']);
+        }
+        $decoded = json_decode($rawRequest, true);
+        if (!is_array($decoded) || json_last_error() !== JSON_ERROR_NONE) {
+            apiRespond(400, ['status' => 'error', 'message' => 'invalid_json']);
+        }
+        $payload = $decoded;
+    } elseif ($route === 'api_sync_skins.php') {
+        $payload = [
+            'table' => isset($_GET['table']) && is_string($_GET['table']) ? $_GET['table'] : 'wp_player_skins',
+            'offset' => isset($_GET['offset']) ? $_GET['offset'] : 0,
+            'limit' => isset($_GET['limit']) ? $_GET['limit'] : 1000,
+        ];
+        // Deliberately do not accept a token from the query string.
+    }
+
+    $authToken = '';
+    $authorization = apiHeader('Authorization');
+    if (preg_match('/^Bearer\s+([A-Fa-f0-9]{32,128})$/D', $authorization, $match)) {
+        $authToken = $match[1];
+    }
+    if ($authToken === '') {
+        $authToken = apiHeader('X-Agent-Secret');
+    }
+    if ($authToken === '') {
+        $bodyToken = $payload['token'] ?? '';
+        if (is_string($bodyToken) && preg_match('/^[A-Fa-f0-9]{32,128}$/D', $bodyToken)) {
+            $authToken = $bodyToken;
+        }
+    }
+
+    $configPath = getenv('FRAGCITY_API_CONFIG') ?: '/etc/fragcity-api/config.php';
+    if (!is_file($configPath) || !is_readable($configPath)) {
+        error_log('[FragCity API] Runtime config missing/unreadable for site bridge.');
+        apiRespond(503, ['status' => 'error', 'message' => 'service_not_configured']);
+    }
+    try {
+        $config = require $configPath;
+    } catch (Throwable $e) {
+        error_log('[FragCity API] Runtime config failed to load for site bridge.');
+        apiRespond(503, ['status' => 'error', 'message' => 'service_not_configured']);
+    }
+
+    $bridge = is_array($config) ? ($config['website_bridge'] ?? null) : null;
+    $bridgeUrl = is_array($bridge) ? trim((string)($bridge['url'] ?? '')) : '';
+    $bridgeSecret = is_array($bridge) ? (string)($bridge['shared_secret'] ?? '') : '';
+    $parts = parse_url($bridgeUrl);
+    if (!is_array($parts)
+        || strtolower((string)($parts['scheme'] ?? '')) !== 'https'
+        || strtolower((string)($parts['host'] ?? '')) !== 'fragcity.ir'
+        || (isset($parts['port']) && (int)$parts['port'] !== 443)
+        || (string)($parts['path'] ?? '') !== '/api/internal_agent_bridge.php'
+        || isset($parts['user']) || isset($parts['pass'])
+        || isset($parts['query']) || isset($parts['fragment'])
+        || !preg_match('/^[a-f0-9]{64,128}$/D', $bridgeSecret)) {
+        error_log('[FragCity API] Website bridge configuration missing/invalid.');
+        apiRespond(503, ['status' => 'error', 'message' => 'service_not_configured']);
+    }
+    if (!function_exists('curl_init')) {
+        apiRespond(503, ['status' => 'error', 'message' => 'transport_unavailable']);
+    }
+
+    $remoteIp = (string)($_SERVER['REMOTE_ADDR'] ?? '');
+    if (filter_var($remoteIp, FILTER_VALIDATE_IP) === false) {
+        $remoteIp = '127.0.0.1';
+    }
+    $envelope = [
+        'route' => $route,
+        'payload' => $payload,
+        'auth_token' => $authToken,
+        'client_ip' => $remoteIp,
+    ];
+    try {
+        $body = json_encode(
+            $envelope,
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+        );
+    } catch (JsonException $e) {
+        apiRespond(400, ['status' => 'error', 'message' => 'invalid_json']);
+    }
+
+    $timestamp = (string)time();
+    $nonce = bin2hex(random_bytes(32));
+    $bridgePath = '/api/internal_agent_bridge.php';
+    $canonical = $timestamp . "\n" . $nonce . "\nPOST\n" . $bridgePath . "\n" . hash('sha256', $body);
+    $signature = hash_hmac('sha256', $canonical, $bridgeSecret);
+
+    $handle = curl_init($bridgeUrl);
+    if ($handle === false) {
+        apiRespond(502, ['status' => 'error', 'message' => 'site_bridge_unavailable']);
+    }
+    curl_setopt_array($handle, [
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => $body,
+        CURLOPT_HTTPHEADER => [
+            'Accept: application/json',
+            'Content-Type: application/json',
+            'X-FragCity-Timestamp: ' . $timestamp,
+            'X-FragCity-Nonce: ' . $nonce,
+            'X-FragCity-Signature: ' . $signature,
+        ],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_TIMEOUT => 25,
+        CURLOPT_FOLLOWLOCATION => false,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
+        CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
+    ]);
+    $response = curl_exec($handle);
+    $curlError = curl_errno($handle);
+    $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
+    curl_close($handle);
+
+    if ($response === false || $curlError !== 0) {
+        error_log('[FragCity API] Site bridge transport failed; cURL code=' . $curlError);
+        apiRespond(502, ['status' => 'error', 'message' => 'site_bridge_unavailable']);
+    }
+    $decodedResponse = json_decode((string)$response, true);
+    if (!is_array($decodedResponse) || json_last_error() !== JSON_ERROR_NONE) {
+        error_log('[FragCity API] Site bridge returned invalid JSON; HTTP=' . $status);
+        apiRespond(502, ['status' => 'error', 'message' => 'site_bridge_invalid_response']);
+    }
+    if ($status < 100 || $status > 599) {
+        $status = 502;
+    }
+    apiRespond($status, $decodedResponse);
+}
+
 $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
 $uri = (string)($_SERVER['REQUEST_URI'] ?? '/');
 $path = (string)(parse_url($uri, PHP_URL_PATH) ?: '/');
 
 if ($method === 'GET' && $path === '/health') {
     apiRespond(200, ['ok' => true, 'service' => 'fragcity-linuxapi', 'version' => 1]);
+}
+$agentPrefix = '/v1/agent/';
+if (str_starts_with($path, $agentPrefix)) {
+    $agentRoute = substr($path, strlen($agentPrefix));
+    if ($agentRoute === '' || str_contains($agentRoute, '/')) {
+        apiRespond(404, ['status' => 'error', 'message' => 'not_found']);
+    }
+    apiProxyLegacyAgent($agentRoute, $method);
 }
 if ($path !== '/v1/weaponpaints') {
     apiRespond(404, ['success' => false, 'error' => 'not_found']);

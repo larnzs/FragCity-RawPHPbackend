@@ -56,39 +56,20 @@ WeaponPaints plugin on CS2 servers
 - write/read-back های کنترل‌شده هنوز انجام نشده‌اند. تا پایان آن‌ها و بررسی‌های تکمیلی، سایت shared-host باید روی `transport: local` بماند.
 - resolver پیش‌فرض خود Debian برای `api.fragcity.ir` با مسیر DNS-tunnel فعلی پاسخ `NXDOMAIN` داده است؛ authoritative/public DNS رکورد درست دارد. تست‌های CLI روی Debian از mapping موقت و محدود hostname استفاده کردند. تنظیمات ISP DNS/NetworkManager را برای این workaround تغییر ندهید.
 
-## 4. APIهای قدیمی Agent و C# — نیازمند بازبینی
+## 4. API قدیمی Agent/CMD — خارج از مسیر فعال سایت
 
-در ریپوی `FragCity-RawPHPbackend` مسیرهایی مانند این‌ها وجود دارند:
-- `agent/agent_login.php`
-- `agent/heartbeat.php`
-- `agent/fetch_tasks.php`
-- `agent/sync_bulk.php`
-- `agent/db.php`
+در شاخهٔ پاک‌سازی `cleanup/remove-legacy-agent-api`، فایل‌های endpoint قدیمی زیر `agent/` از درخت کاری ریپو حذف شده‌اند؛ این مسیرها جزو API فعلی سایت نیستند و نباید برای توسعهٔ جدید استفاده شوند.
 
-این فایل‌ها یک نقطهٔ شروع موجود هستند، نه API آمادهٔ Production. قبل از تکیه به آن‌ها، احراز هویت و validation باید اصلاح و قراردادهای ورودی/خروجی تثبیت شوند.
+- API فعال سایت برای WeaponPaints فقط از `linuxapi/` و کلاینت `class/FragCityLinuxApiClient.php` استفاده می‌کند.
+- `api/wallet_api.php` یک مسیر جدا برای رابط کیف پول سایت است و حذف نشده است.
+- ریپوی `FragCity-WebAPIClient` یک پروژهٔ مستقل C# است؛ پاک‌سازی این ریپو به معنی حذف یا تغییر آن پروژه نیست.
+- حذف فایل‌ها از شاخهٔ جاری، نسخه‌های قدیمی را از تاریخچهٔ Git پاک نمی‌کند. اگر credentialی قبلاً در سورس یا لاگ بوده، باید جداگانه بررسی و در صورت نیاز rotate شود.
 
-### نکته‌های کشف‌شده از بررسی ایستا
-- بعضی endpointها Bearer token را الزامی می‌کنند؛ C# bulk sync در نسخه بررسی‌شده آن header را ارسال نمی‌کند.
-- جریان login یک token تولید می‌کند، ولی ثبت token و انتقال token در همه مسیرها هماهنگ به نظر نمی‌رسد.
-- در heartbeat عبارت نحوی مشکوک/نامعتبر برای fetch رکورد دیده شده و باید با PHP lint تأیید شود.
-- نام جدول به map محدود شده، اما نام ستون از payload وارد SQL می‌شود؛ برای شناسهٔ جدول/ستون باید allowlist مجاز داشته باشیم.
-- sync مستقیم عمومی دیتابیس C# از `DELETE FROM` پیش از درج استفاده می‌کند و برای هدف چندنودی/دادهٔ مشترک گزینهٔ امنی نیست.
-- برخی فایل‌ها credential را داخل سورس نگه می‌دارند؛ Rotation و انتقال به تنظیمات امن باید با برنامه انجام شود، نه با تغییر ناگهانی که سرویس زنده را از کار بیندازد.
+گزارش امنیتی قدیمی هنوز می‌تواند برای فهم ریسک‌های تاریخی مفید باشد، اما ارجاع‌های آن به فایل‌های `agent/` وضعیت فعلی شاخهٔ پاک‌سازی را توصیف نمی‌کنند.
 
-شرح کامل در [Security Review](SECURITY-AUDIT.md) است.
+## 5. تصمیم دربارهٔ برنامهٔ C# فعلی
 
-## 5. تصمیم دربارهٔ C# فعلی
-
-فعلاً کل C# Agent را به Debian منتقل نکنیم. ابتدا پنل بازی و فروشگاه را در PoC ارزیابی می‌کنیم؛ ممکن است مدیریت سرور، کنسول و بخشی از provisioning را کاملاً جایگزین کنند. پس از تست، فقط مسئولیت‌هایی باقی می‌مانند که محصولات منتخب پوشش نمی‌دهند.
-
-اگر برای داده‌های plugin به worker نیاز باشد، worker جدید باید:
-- فقط schema/table/columnهای تأییدشده را بخواند.
-- هر نود را با credential مستقل و مجوز محدود بشناسد.
-- payload محدود، idempotency و retry با backoff داشته باشد.
-- داده را روی HTTPS بفرستد و نتیجه API را بررسی کند.
-- برای خطاها log امن و قابل ردیابی بنویسد.
-- امکان reconciliation پس از offline بودن نود/API داشته باشد.
-- هرگز تمام دیتابیس‌ها را با suffix matching یا پاک‌کردن کلی جدول‌ها synchronize نکند.
+توسعه و مهاجرت برنامهٔ C# Agent/CMD در محدودهٔ فعلی سایت نیست. این ریپو روی سایت Raw PHP، تنظیمات محیطی و APIهای HTTPS موردنیاز سایت تمرکز دارد. اگر در آینده نیاز مشخصی به قابلیت‌های آن برنامه پیدا شد، باید جداگانه و با تعریف دامنهٔ کار بررسی شود.
 
 ## 6. قواعد داده
 
@@ -120,3 +101,16 @@ WeaponPaints plugin on CS2 servers
 6. مشخص کنید کدام سرویس منبع حقیقت داده است؛ برای نمونه، سایت می‌تواند درخواست تغییر rank/VIP را بفرستد، اما قرارداد باید روشن کند وضعیت نهایی کجا ذخیره می‌شود، کدام سرورها آن را می‌خوانند و چه زمانی اعمال می‌شود. از ایجاد چند نسخهٔ متناقض از یک وضعیت جلوگیری شود.
 
 هیچ API برای Ranks، VIP یا SimpleAdmin تا قبل از این بررسی‌ها، تعریف قرارداد و تست مجزا، آماده یا تأییدشده محسوب نمی‌شود.
+
+## 9. Website database remains on shared hosting — no Linux MySQL connection
+
+The main website database `kyonxcbt_fragcity_services` is owned by the website and remains on shared hosting. The Linux API does not connect to that database and must not be given its host, username, or password.
+
+For Agent/CMD traffic, `api.fragcity.ir/v1/agent/...` acts as a signed HTTPS gateway. It forwards the request to `https://fragcity.ir/api/internal_agent_bridge.php`; that PHP endpoint runs on shared hosting and opens the local `databases.main` PDO connection. The original database remains the source of truth; no replica or database dump is copied to Linux.
+
+The bridge uses a separate secret stored in the private website setting `integrations.linuxapi_site_bridge.shared_secret` and the Linux runtime setting `website_bridge.shared_secret`. This secret must differ from the WeaponPaints API secret. `linuxapi/site-bridge-schema.sql` creates nonce and login-throttling tables on the shared-hosting main DB only; never execute it on Linux.
+
+The first migration preserves only actions with an understood contract. The legacy billing/expiry route `registered_servers_api.php` stays disabled (HTTP 410) until the planned panel/wallet design is specified. The legacy tasks poll returns an empty list because the provided database inventory does not include a `tasks` table. Generic bulk sync is constrained to an explicit plugin-table allowlist and column metadata; it cannot select arbitrary tables or write `kyonxcbt_fragcity_services`.
+
+The new bridge is not production-ready merely because the code exists. Verify the real website schema, deploy the bridge and site-only schema on shared hosting, configure separate matching secrets, validate the signed bridge health check, and test each mutating action against a controlled node. The C# WebAPIClient repository is reference-only for this workstream; no C# code changes or client-switching work belong in this PR.
+
