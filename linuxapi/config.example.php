@@ -8,11 +8,11 @@ return [
     'shared_secret' => 'REPLACE_WITH_A_RANDOM_64_CHARACTER_HEX_SECRET',
 
     'database' => [
-        // Verify how PHP-FPM reaches MariaDB before filling this in.
-        // If MariaDB runs in Docker, 127.0.0.1 may not reach the container.
+        // Verify the host listener with ss -lntp before reusing on another node.
+        // This FragCity node has MariaDB listening on 127.0.0.1:3306.
         'host' => '127.0.0.1',
         'port' => 3306,
-        // Current FragCity Linux node uses the shared container database.
+        // The shared WeaponPaints database used by the CS2 containers and website.
         // Verify this again before reusing the guide on a different node.
         'name' => 'GLOBAL_weaponpaints',
         'username' => 'fragcity_weaponpaints_api',
