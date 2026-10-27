@@ -1,6 +1,6 @@
 # FragCity Linux API — deployment guide
 
-The source folder is `linuxapi/`. It is a standalone PHP-FPM application. Do
+The source folder is `linuxapi/`. The repeatable, end-to-end setup and recovery steps are documented in [`linuxapi/SETUP.md`](../linuxapi/SETUP.md). This is a standalone PHP-FPM application. Do
 **not** place it inside `/var/www/pterodactyl`, the Panel's public directory,
 a game-server container, or the shared-hosting website document root.
 
@@ -53,7 +53,9 @@ the webroot and are not in Git.
    database in your MariaDB client and run `linuxapi/schema.sql` to create
    `fragcity_api_nonces`.
 7. Create a separate MariaDB account `fragcity_weaponpaints_api` and grant
-   only the privileges shown in `linuxapi/schema.sql`. Those `CREATE USER`
+   only the privileges shown in `linuxapi/schema.sql`. The nonce table requires
+   SELECT as well as INSERT and DELETE because cleanup and validation use WHERE clauses.
+   Those `CREATE USER`
    and `GRANT` lines are deliberately comments: replace the placeholder DB
    name, password, and client host, then execute the uncommented statements in
    your MariaDB client. Use the actual source address MariaDB sees; it may not
