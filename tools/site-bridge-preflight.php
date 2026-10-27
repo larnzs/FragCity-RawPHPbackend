@@ -131,9 +131,9 @@ foreach ($requiredUniqueColumns as $table => $column) {
         $stmt = $pdo->prepare(
             'SELECT INDEX_NAME
              FROM INFORMATION_SCHEMA.STATISTICS
-             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND NON_UNIQUE = 0
              GROUP BY INDEX_NAME
-             HAVING MAX(NON_UNIQUE) = 0 AND COUNT(*) = 1'
+             HAVING COUNT(*) = 1 AND SUM(COLUMN_NAME = ?) = 1'
         );
         $stmt->execute([$table, $column]);
         $check(
