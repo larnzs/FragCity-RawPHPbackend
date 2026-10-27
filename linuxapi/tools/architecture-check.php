@@ -56,7 +56,8 @@ $checks = [
         && str_contains($bridge, '$assignedNode !== $nodeName'),
     'RCON command polling matches node, IP, and port' =>
         str_contains($bridge, 'c.server_ip = rs.server_ip')
-        && str_contains($bridge, 'WHERE rs.node_name = ? AND c.status = \'pending\''),
+        && str_contains($bridge, 'WHERE rs.node_name = ? AND c.status =')
+        && str_contains($bridge, "c.status = \\'pending\\'"),
     'RCON result updates match node, IP, port, and pending state' =>
         str_contains($bridge, 'UPDATE rcon_command_logs c')
         && str_contains($bridge, 'rs.server_ip = c.server_ip')
