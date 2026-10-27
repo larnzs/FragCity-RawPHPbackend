@@ -9,6 +9,8 @@ database access stays disabled and an error is written to the PHP error log.
 
 ## Laragon / local setup
 
+Extract the provided local configuration bundle at the repository root. It creates the ignored `settings/settings.json` and `local-config/laragon-site-db-user.sql`; the latter contains the generated local DB password and must remain local. The tracked `tools/laragon-site-db-user.sql` is only a placeholder template.
+
 1. Put the environment-specific JSON at `settings/settings.json`.
 2. Set `databases.main` to a least-privileged local account for
    `kyonxcbt_fragcity_services`.
