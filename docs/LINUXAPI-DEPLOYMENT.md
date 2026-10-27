@@ -1,156 +1,47 @@
-# FragCity Linux API — deployment guide
+# FragCity Linux API — Deployment Notes
 
-The source folder is `linuxapi/`. The repeatable, end-to-end setup and recovery steps are documented in [`linuxapi/SETUP.md`](../linuxapi/SETUP.md). This is a standalone PHP-FPM application. Do
-**not** place it inside `/var/www/pterodactyl`, the Panel's public directory,
-a game-server container, or the shared-hosting website document root.
+> Architecture baseline (2026-10-27): this service currently exposes the WeaponPaints API only. The old Windows-Agent bridge is retired and must not be re-enabled as part of a routine deployment.
 
-## Target layout on Debian
+## Active endpoint
 
-- Application files: `/var/www/fragcity-api/`
-- Nginx document root: `/var/www/fragcity-api/public/`
-- Runtime secret + DB configuration: `/etc/fragcity-api/config.php`
-- Nginx vhost: `/etc/nginx/sites-available/fragcity-api.conf`
-- Public hostname: `api.fragcity.ir`
+- Public health: `GET /health`
+- WeaponPaints: `POST /v1/weaponpaints`
+- Retired Windows-Agent compatibility routes: `/v1/agent/*` returns HTTP 410.
 
-Only `public/index.php` is routed to PHP-FPM. Runtime credentials live outside
-the webroot and are not in Git.
+The Linux application connects to `GLOBAL_weaponpaints` via `127.0.0.1:3306`. It does not connect to `kyonxcbt_fragcity_services`. The website’s main database remains on the website host (or a local Laragon copy during development).
 
-## Install
+## Website client configuration
 
-1. Create DNS A record `api.fragcity.ir` to the Linux node public IP and verify it against the authoritative nameservers. Read [the Linux API setup runbook](../linuxapi/SETUP.md) for the current Debian/ISP DNS-tunnel behavior. If the host intentionally uses `5.200.200.200` as its ISP DNS-tunnel resolver and that resolver returns a different answer, do not globally replace `/etc/resolv.conf` or reorder NetworkManager DNS settings without the operator's approval.
-2. From the repository root on the Linux node, copy the API package and keep
-   the app files root-owned/read-only to the web worker:
-   ```bash
-   sudo install -d -o root -g root -m 0755 /var/www/fragcity-api
-   sudo cp -a linuxapi/. /var/www/fragcity-api/
-   sudo chown -R root:root /var/www/fragcity-api
-   sudo find /var/www/fragcity-api -type d -exec chmod 0755 {} \;
-   sudo find /var/www/fragcity-api -type f -exec chmod 0644 {} \;
-   ```
-   If transferring with WinSCP instead, upload the *contents* of `linuxapi/`
-   into `/var/www/fragcity-api/`, preserving `public/index.php`, then apply
-   the ownership and permissions above.
-3. Confirm PHP-FPM socket and required modules:
-   ```bash
-   ls -l /run/php/
-   php -m | grep -E 'PDO|pdo_mysql|curl|mbstring'
-   ```
-   The sample vhost assumes `/run/php/php8.3-fpm.sock`; update it only if your
-   actual socket name differs. Check modules for the PHP-FPM version too.
+The website uses `class/FragCityLinuxApiClient.php` and `class/WeaponPaintsRepository.php`. In the private website `settings/settings.json`, configure:
 
-4. Confirm how host PHP-FPM reaches the existing MariaDB. Because it may be
-   containerized, `127.0.0.1` is only correct if MariaDB is actually listening
-   on the host loopback. Inspect Docker port bindings and the existing local/
-   bridge listener first. Do not expose TCP 3306 to the public Internet.
-5. Create a random secret on Linux:
-   ```bash
-   openssl rand -hex 32
-   ```
-   Save it privately. Never put the real secret in the repository or browser.
-6. Verify the actual plugin database name and the columns/unique indexes in
-   these tables: `wp_player_skins`, `wp_player_gloves`, `wp_player_knife`,
-   `wp_player_agents`, `wp_player_music`, `wp_player_pins`. Select that
-   database in your MariaDB client and run `linuxapi/schema.sql` to create
-   `fragcity_api_nonces`.
-7. Create a separate MariaDB account `fragcity_weaponpaints_api` and grant
-   only the privileges shown in `linuxapi/schema.sql`. The nonce table requires
-   SELECT as well as INSERT and DELETE because cleanup and validation use WHERE clauses.
-   Those `CREATE USER`
-   and `GRANT` lines are deliberately comments: replace the placeholder DB
-   name, password, and client host, then execute the uncommented statements in
-   your MariaDB client. Use the actual source address MariaDB sees; it may not
-   be `localhost` if the API connects through a Docker bridge. Never use root.
-8. Copy the example config outside the webroot and edit it:
-   ```bash
-   sudo install -d -o root -g www-data -m 0750 /etc/fragcity-api
-   sudo install -o root -g www-data -m 0640 \
-     /var/www/fragcity-api/config.example.php /etc/fragcity-api/config.php
-   sudo nano /etc/fragcity-api/config.php
-   ```
-   Set the actual DB connection and generated secret. The PHP-FPM worker must
-   be able to read this file but must not be able to write it.
-9. Install and enable only the new vhost:
-   ```bash
-   sudo cp /var/www/fragcity-api/nginx/fragcity-api.conf.example \
-     /etc/nginx/sites-available/fragcity-api.conf
-   sudo ln -s /etc/nginx/sites-available/fragcity-api.conf \
-     /etc/nginx/sites-enabled/fragcity-api.conf
-   sudo nginx -t
-   sudo systemctl reload nginx
-   ```
-   If the symlink already exists, do not create a duplicate. Leave the existing
-   Pterodactyl Panel server block unchanged.
-10. Bootstrap HTTP, verify `http://api.fragcity.ir/health`, then obtain the
-    certificate through the existing Certbot/ACME setup (for example
-    `sudo certbot certonly --nginx -d api.fragcity.ir`). After the certificate
-    exists, replace the bootstrap vhost with
-    `/var/www/fragcity-api/nginx/fragcity-api-https.conf.example`, then run
-    `sudo nginx -t` and reload Nginx. Do not switch the shared-host client to
-    API mode before HTTPS works.
+- `integrations.weaponpaints_api.base_url`: `https://api.fragcity.ir`
+- `integrations.weaponpaints_api.shared_secret`: the existing API shared secret, stored privately only.
+- `files.database.weaponpaints_plugin.transport`: `api`
 
-11. Smoke test `GET https://api.fragcity.ir/health`, then run the signed CLI
-    check from the repository root on Linux:
-    `php /var/www/fragcity-api/tools/smoke-test.php https://api.fragcity.ir`
-    Add a test account's SteamID as a second argument for a read-only selection
-    test. This checks signature/header forwarding, nonce persistence, DB access,
-    and (when supplied) the table SELECT grants.
+Do not configure `databases.weaponpaints`, `kyonxcbt_weaponpaints_plugin`, or any Linux MariaDB credentials in the website settings. Keep the actual secret out of Git and browser JavaScript.
 
-12. Test read/write actions with a test account and verify the data in MariaDB
-    before switching the live shared-host runtime config to API transport.
+**Important:** local PHP may still be calling the real API. During save tests, use a dedicated test SteamID/account only; the API targets the real `GLOBAL_weaponpaints` data store.
 
-## Request security
+## Server API security and deployment
 
-Only `POST /v1/weaponpaints` accepts data. Every request must include JSON and
-these headers:
+- Keep MariaDB port 3306 private.
+- Keep `/etc/fragcity-api/config.php` readable by PHP-FPM and not writable by the web process.
+- Keep TLS certificate verification enabled.
+- Preserve the existing Pterodactyl Nginx vhost when changing the API vhost.
+- The old `website_bridge` config block and `linuxapi/site-bridge-schema.sql` are obsolete and have been removed. Do not recreate bridge nonce/login-attempt tables or restore `api/internal_agent_bridge.php` as an active DB connector.
 
-- `X-FragCity-Timestamp`: Unix timestamp within ±300 seconds.
-- `X-FragCity-Nonce`: fresh 64-character random hex nonce.
-- `X-FragCity-Signature`: HMAC-SHA256 hex digest.
+## Validation
 
-The signed message is:
-```text
-timestamp + "\n" + nonce + "\n" + uppercase_method + "\n" + path + "\n" + hex_sha256(raw_body)
+From the repository root in the local PHP CLI:
+
+```powershell
+php -l linuxapi/public/index.php
+php -l class/FragCityLinuxApiClient.php
+php -l class/WeaponPaintsRepository.php
+php linuxapi/tools/architecture-check.php
+php tools/site-bridge-preflight.php
 ```
 
-The API uses `hash_equals`, validates timestamps and saves nonce hashes in a
-unique-key table to reject replays. It has fixed actions only; no arbitrary SQL
-or caller-supplied table names are accepted. Request bodies are size-limited.
+The schema preflight checks the ten supplied website tables through the local `main` DB profile. It does not connect to WeaponPaints or alter any data.
 
-Actions: `ping_db`, `get_selection`, `save_glove`, `save_agent`,
-`save_music`, `save_pin`, `save_knife`, `save_skin`.
-
-## Shared-host settings
-
-The website PHP client uses the shared secret server-side only and requires PHP
-cURL. In the shared host's ignored `settings/settings.json`, merge these keys
-without replacing the rest of your settings:
-
-```json
-{
-  "integrations": {
-    "weaponpaints_api": {
-      "base_url": "https://api.fragcity.ir",
-      "shared_secret": "SAME_RANDOM_64_CHARACTER_HEX_SECRET_AS_LINUX"
-    }
-  },
-  "files": {
-    "database.weaponpaints_plugin": {
-      "database_profile": "weaponpaints",
-      "transport": "api"
-    }
-  }
-}
-```
-
-The `database.weaponpaints_plugin` key is a literal object key inside
-`files`. Local Laragon remains `transport: local` in the tracked example.
-The actual shared-host JSON should never be committed.
-
-## Validation status and production caveats
-
-The API code is shaped around SQL currently used by the existing FragCity page.
-Actual MariaDB schema details, duplicate/unique indexes, Docker listener path,
-PHP-FPM socket, DNS, TLS, and live requests must still be verified on the Debian
-node. Those facts cannot be confirmed from the Git repository alone. Do not
-declare production live until both the PHP lint workflow and the server smoke
-tests succeed.
+Repository changes are not automatically deployed to Debian or cPanel. After deployment, independently run the existing signed WeaponPaints smoke test from the Debian host and controlled test-player read/write tests before treating API writes as production-verified.
