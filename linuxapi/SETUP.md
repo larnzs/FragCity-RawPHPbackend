@@ -38,17 +38,33 @@ This section records the state of the existing `server1` install so a future ope
 - A permission check executed as `www-data` passed for database `GLOBAL_weaponpaints`, the required plugin-table SELECT checks, and Nonce INSERT/DELETE within a transaction that was rolled back.
 - `nginx -t` passes for the current Nginx configuration.
 
-### Not completed yet
+### DNS and network behavior recorded on 2026-10-27
 
-- At the last check, `getent ahostsv4 api.fragcity.ir` returned no address.
-- `/etc/letsencrypt/live/api.fragcity.ir/fullchain.pem` did not exist.
-- `nginx -T` showed no vhost for `api.fragcity.ir`.
-- The HTTPS health check, signed `ping_db`, signed `get_selection`, and any test-player write tests have **not** been completed.
+- The authoritative nameservers `ns835.mihanwebhost.com` and `ns836.mihanwebhost.com` both returned `api.fragcity.ir A 85.185.40.85`.
+- Public recursive resolvers `1.1.1.1` and `8.8.8.8` also returned `85.185.40.85`, TTL 3600 seconds.
+- The Debian host's `/etc/resolv.conf` is managed by NetworkManager and lists `5.200.200.200` first and `8.8.8.8` second.
+- The operator confirmed that `5.200.200.200` is the intentionally configured Telecom/ISP resolver used with the existing DNS-tunnel setup. Do **not** replace it with public DNS or edit `/etc/resolv.conf` just because this resolver returns a different answer for one API hostname. Preserve the existing ISP/DNS-tunnel behavior unless the operator explicitly chooses to change it.
+- On this date, `dig @5.200.200.200 api.fragcity.ir A` and the default `dig api.fragcity.ir A` returned `NXDOMAIN`, while direct queries to both authoritative nameservers and public resolvers returned the A record. Therefore `getent ahostsv4 api.fragcity.ir` and an ordinary `curl http://api.fragcity.ir/health` failed on the Debian host even though DNS authority is correct. Record this as a resolver-path discrepancy; do not assume the authoritative DNS record is missing.
+- For a **diagnostic direct-origin test only**, bypass the local resolver for this one curl invocation while retaining the HTTP Host header:
+  ```bash
+  curl -i --connect-timeout 5 --max-time 10 \
+    --resolve api.fragcity.ir:80:85.185.40.85 \
+    http://api.fragcity.ir/health
+  ```
+  This deliberately bypasses the configured resolver/tunnel for this request. It can test direct reachability of the public origin; it does **not** test the configured DNS-tunnel path. For a TLS test after a certificate exists, the equivalent is `--resolve api.fragcity.ir:443:85.185.40.85`, which preserves hostname/SNI verification.
+- If the default resolver is required to route the API through the ISP DNS tunnel, diagnose that route separately rather than globally changing the DNS settings. Keep the selected resolver order as-is until the operator explicitly requests a change.
+
+### Current status and next step
+
+- The separate bootstrap HTTP vhost now exists at `/etc/nginx/sites-available/fragcity-api.conf` and is enabled by `/etc/nginx/sites-enabled/fragcity-api.conf`.
+- `nginx -t` passed and reloading Nginx succeeded.
+- Local virtual-host test `curl -H 'Host: api.fragcity.ir' http://127.0.0.1/health` returned HTTP 200 with the expected `fragcity-linuxapi` health JSON.
+- A normal curl by hostname did not resolve through the configured default resolver, as recorded above. Public/authoritative DNS is correct; the public HTTP route still needs to be checked separately.
+- `/etc/letsencrypt/live/api.fragcity.ir/fullchain.pem` was absent at the last check; TLS is not configured yet.
+- The signed `ping_db`, signed `get_selection`, and any test-player write tests have **not** been completed.
 - The shared-host website must remain on `transport: local` until the signed API smoke tests pass.
 
-### Where to resume
-
-Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. Use the “Repair the current account if it already exists” instructions only if a permission issue reappears. The next deployment step is to configure/verify the DNS A record, install the separate API Nginx vhost, bootstrap HTTP, issue TLS, and then run the signed smoke test. Keep the existing Pterodactyl Panel vhost untouched.
+Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The next deployment step is to test the HTTP origin (using the resolver path intended for API traffic, with the direct-origin diagnostic above only if appropriate), then obtain TLS without touching the existing Pterodactyl Panel vhost. Do not change DNS resolver settings globally without explicit operator approval.
 
 
 ## 1. Preflight checks
@@ -281,7 +297,7 @@ Expected result: database is GLOBAL_weaponpaints and both permission checks say 
 
 ## 7. Configure Nginx and HTTPS
 
-1. Create an A record for api.fragcity.ir pointing to this node's public IP. Confirm the PHP-FPM socket and verify ports 80/443 are already allowed by the intended firewall policy. Do not add a public rule for port 3306.
+1. Create an A record for api.fragcity.ir pointing to this node's public IP. Confirm it from the domain's authoritative nameservers, not only from the Debian host's default resolver. Some nodes intentionally use an ISP DNS resolver for a DNS-tunnel/network path; do not replace or reorder that resolver just because a separate query returns NXDOMAIN. See “DNS and network behavior recorded on 2026-10-27” above. Confirm the PHP-FPM socket and verify ports 80/443 are already allowed by the intended firewall policy. Do not add a public rule for port 3306.
 2. Copy the bootstrap HTTP vhost and enable only this new site. Keep the existing Pterodactyl Panel vhost untouched:
 
 ~~~bash
