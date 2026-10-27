@@ -28,11 +28,13 @@ jobs:
             linuxapi/public/index.php \
             linuxapi/config.example.php \
             linuxapi/tools/smoke-test.php \
+            linuxapi/tools/architecture-check.php \
             class/FragCityLinuxApiClient.php \
             class/WeaponPaintsRepository.php \
             pages/weaponpaints.php; do
             php -l "$file"
           done
+          php linuxapi/tools/architecture-check.php
 
       - name: Validate settings JSON
         run: php -r "json_decode(file_get_contents('settings/settings.example.json'), true, 512, JSON_THROW_ON_ERROR); echo 'settings JSON OK', PHP_EOL;"
