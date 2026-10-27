@@ -17,7 +17,7 @@ the webroot and are not in Git.
 
 ## Install
 
-1. Create DNS A record `api.fragcity.ir` to the Linux node public IP.
+1. Create DNS A record `api.fragcity.ir` to the Linux node public IP and verify it against the authoritative nameservers. Read [the Linux API setup runbook](../linuxapi/SETUP.md) for the current Debian/ISP DNS-tunnel behavior. If the host intentionally uses `5.200.200.200` as its ISP DNS-tunnel resolver and that resolver returns a different answer, do not globally replace `/etc/resolv.conf` or reorder NetworkManager DNS settings without the operator's approval.
 2. From the repository root on the Linux node, copy the API package and keep
    the app files root-owned/read-only to the web worker:
    ```bash
