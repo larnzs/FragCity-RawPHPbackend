@@ -12,8 +12,9 @@ return [
         // If MariaDB runs in Docker, 127.0.0.1 may not reach the container.
         'host' => '127.0.0.1',
         'port' => 3306,
-        // Verify the real database name on the target node.
-        'name' => 'kyonxcbt_weaponpaints_plugin',
+        // Current FragCity Linux node uses the shared container database.
+        // Verify this again before reusing the guide on a different node.
+        'name' => 'GLOBAL_weaponpaints',
         'username' => 'fragcity_weaponpaints_api',
         'password' => 'REPLACE_WITH_A_UNIQUE_DATABASE_PASSWORD',
         'charset' => 'utf8mb4',
