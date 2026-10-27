@@ -22,7 +22,7 @@ Deployment prerequisites:
 6. Deploy the updated Nginx location for /v1/agent/ and run nginx -t before reloading. The current example uses a fixed index.php entry point and explicitly forwards Authorization / X-Agent-Secret headers.
 7. Smoke-test GET https://api.fragcity.ir/v1/agent/agent_health.php. Expected response: status=success, service=fragcity-site-bridge, database=ok. This proves the signed HTTPS bridge can query the site's database; it does not validate every Agent operation.
 
-This branch is code preparation only. Do not assume the bridge has been deployed or that the runtime secrets/schema tables exist until those deployment steps have been completed.
+This branch is code preparation only. Do not assume the bridge has been deployed or that the runtime secrets/schema tables exist until those deployment steps have been completed. The C# WebAPIClient repository is read-only reference for legacy contracts in this workstream; no C# source is changed here.
 
 The initial migration intentionally keeps uncertain website billing / panel behavior isolated: registered_servers_api.php returns HTTP 410 pending the billing/panel redesign; fetch_tasks.php returns an empty task list because the supplied table inventory has no tasks table. api_sync_skins.php uses a valid Agent token, fixed table allowlist, and bounded pagination rather than the old query-string static secret. sync_bulk.php is limited to a fixed plugin-table/database allowlist with database column validation; it does not accept tables from kyonxcbt_fragcity_services.
 
