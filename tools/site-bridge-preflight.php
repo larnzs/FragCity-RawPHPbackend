@@ -81,6 +81,28 @@ $requiredColumns = [
     'withdraw_requests' => ['id', 'steamid', 'amount', 'card_number', 'status', 'created_at'],
 ];
 
+try {
+    $actualTables = $pdo->query(
+        "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_TYPE = 'BASE TABLE'"
+    )->fetchAll(PDO::FETCH_COLUMN);
+    sort($actualTables);
+    $expectedTables = array_keys($requiredColumns);
+    sort($expectedTables);
+    $unexpectedTables = array_values(array_diff($actualTables, $expectedTables));
+    $missingTables = array_values(array_diff($expectedTables, $actualTables));
+    $check(
+        'database contains exactly the ten confirmed base tables',
+        $unexpectedTables === [] && $missingTables === [],
+        implode('; ', array_filter([
+            $missingTables === [] ? '' : 'missing: ' . implode(', ', $missingTables),
+            $unexpectedTables === [] ? '' : 'unexpected: ' . implode(', ', $unexpectedTables),
+        ]))
+    );
+} catch (Throwable $e) {
+    $check('inspect website database table inventory', false, 'INFORMATION_SCHEMA read failed');
+}
+
 foreach ($requiredColumns as $table => $columns) {
     try {
         $stmt = $pdo->prepare(
