@@ -69,8 +69,8 @@ This section records the state of the existing `server1` install so a future ope
 - `nginx -t` passed and `systemctl reload nginx` succeeded with the TLS vhost active.
 - HTTPS origin test succeeded: `curl --resolve api.fragcity.ir:443:85.185.40.85 https://api.fragcity.ir/health` returned `HTTP/2 200` and the expected API JSON. This test was run from the Debian host while pinning the hostname to the public IP; it verifies the TLS listener/certificate and health route for that path, but does not by itself prove reachability from every off-host network.
 - Nginx emitted two warnings during config validation: (1) `listen ... http2` is deprecated in the API vhost on lines 22-23; (2) protocol options were redefined for `[::]:443`, with a reference to `/etc/nginx/sites-enabled/pterodactyl.conf:52`. They were warnings, not fatal errors; the config test and reload succeeded. Do not edit the Panel vhost just to silence the warning without reviewing the shared 443 listener definitions. A future cleanup can update the API vhost to the Nginx-version-supported HTTP/2 syntax and then re-test.
-- The signed `ping_db`, signed `get_selection`, and any test-player write tests have **not** been completed.
-- The signed `ping_db`, signed `get_selection`, and any test-player write tests have **not** been completed.
+- The signed `ping_db` smoke test was attempted from `server1` on 2026-10-27, but returned `Request transport failed (cURL code 6)`. cURL could not resolve the API hostname through the node's normal resolver. This happens before TLS/HMAC/database validation; do not interpret it as an API signature or database failure.
+- Signed `ping_db`, signed `get_selection`, and test-player write tests remain unverified. Use the temporary single-host `/etc/hosts` workaround in Section 8 for the next smoke-test attempt; do not change NetworkManager or ISP DNS settings.
 - The shared-host website must remain on `transport: local` until the signed API smoke tests pass.
 
 Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The direct-origin HTTP test, Let's Encrypt issuance, TLS vhost install, Nginx reload, and HTTPS health test have completed successfully. The next step is to run the signed API smoke test, then the read-only player-selection test. Do not switch the shared-host website to API transport until those tests and controlled test-player writes are verified. Do not touch the existing Pterodactyl Panel vhost or change DNS resolver settings globally without explicit operator approval.
@@ -392,6 +392,27 @@ The script reads /etc/fragcity-api/config.php and tests HMAC verification, Nginx
 php /var/www/fragcity-api/tools/smoke-test.php https://api.fragcity.ir
 ~~~
 
+### If smoke test returns cURL code 6
+
+On `server1`, `ERROR: Request transport failed (cURL code 6)` means cURL could not resolve `api.fragcity.ir`. This occurs before the request reaches TLS/HMAC/API/database verification; it is not evidence that HMAC or database configuration is wrong. On the current host, the configured ISP resolver participates in the existing DNS-tunnel setup and returns NXDOMAIN for this API hostname, while authoritative/public resolvers return `85.185.40.85`. Do not alter `/etc/resolv.conf`, NetworkManager, or resolver order to work around this single-name failure.
+
+Run this temporary local mapping only for the signed smoke test. It refuses to proceed if an entry already exists, and removes its marked line automatically when the shell exits:
+
+~~~bash
+set -eu
+if grep -Eq '(^|[[:space:]])api\.fragcity\.ir([[:space:]]|$)' /etc/hosts; then
+    echo "STOP: api.fragcity.ir already exists in /etc/hosts; no changes made."
+    grep -n 'api\.fragcity\.ir' /etc/hosts
+    exit 1
+fi
+printf '%s\n' '85.185.40.85 api.fragcity.ir # FRAGCITY_API_SMOKE_TEMP' >> /etc/hosts
+trap 'sed -i "/FRAGCITY_API_SMOKE_TEMP/d" /etc/hosts' EXIT
+getent ahostsv4 api.fragcity.ir
+php /var/www/fragcity-api/tools/smoke-test.php https://api.fragcity.ir
+~~~
+
+This pins name resolution locally only for the test; it does not change DNS settings and does not validate the ISP DNS-tunnel route. The previously successful `curl --resolve ...:443:85.185.40.85` remains the separate direct-origin TLS/health check.
+
 To test read-only selection queries, pass a test SteamID as the second argument. Keep the identifier in your own terminal; do not post it in public logs or chat.
 
 ~~~bash
@@ -435,6 +456,7 @@ The integrations key holds the same generated secret as the Linux config. Keep i
   Then inspect `SHOW GRANTS FOR 'fragcity_weaponpaints_api'@'127.0.0.1';` and rerun the permission check as `www-data`. Do not recreate the account or overwrite its config just to fix this grant.
 - Long pasted blocks appear to have lost/interleaved text in the terminal during the first attempt. If output contains fragments from two lines mixed together, do not assume the entire block ran cleanly: rerun one command block at a time, preferably by saving scripts and executing them with `bash /path/to/script.sh`. For PHP, prefer a saved `.php` file or the documented here-document and check that the full expected success output appears. Never paste actual passwords or the shared secret into chat.
 - Database connection failure: confirm the DB name is GLOBAL_weaponpaints, verify the actual MariaDB listener with ss -lntp, and test as www-data. Do not guess Docker addressing.
+- `ERROR: Request transport failed (cURL code 6)`: local name resolution failed before TLS/HMAC/DB checks. Use the temporary Section 8 host mapping to test this single hostname without changing the intentional ISP DNS-tunnel resolver settings. Do not treat this error as an HMAC rejection.
 - Signed request rejected: ensure time is synchronized, all three X-FragCity headers are forwarded by Nginx, and the client and server use the exact same secret.
 - TLS/redirect failure: verify DNS, certificate paths, and nginx -t before reload.
 
