@@ -121,7 +121,7 @@ $iterator = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
 );
 foreach ($iterator as $fileInfo) {
-    if (!$fileInfo instanceof SplFileInfo || !$fileInfo->isFile()) {
+    if (!($fileInfo instanceof SplFileInfo) || !$fileInfo->isFile()) {
         continue;
     }
 
