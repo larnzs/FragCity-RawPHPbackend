@@ -24,6 +24,8 @@ Deployment prerequisites:
 
 This branch is code preparation only. Do not assume the bridge has been deployed or that the runtime secrets/schema tables exist until those deployment steps have been completed. The C# WebAPIClient repository is read-only reference for legacy contracts in this workstream; no C# source is changed here.
 
+**Security blocker:** the current Agent token proves an InsMaster website account, not a specific node. `node_name` is request input and is not a cryptographic node identity. Before enabling privileged multi-node production actions, verify the live schema and define a node-bound credential/authorization contract; the current ownership checks are defense-in-depth, not a replacement for node authentication.
+
 The initial migration intentionally keeps uncertain website billing / panel behavior isolated: registered_servers_api.php returns HTTP 410 pending the billing/panel redesign; fetch_tasks.php returns an empty task list because the supplied table inventory has no tasks table. api_sync_skins.php uses a valid Agent token, fixed table allowlist, and bounded pagination rather than the old query-string static secret. sync_bulk.php is limited to a fixed plugin-table/database allowlist with database column validation; it does not accept tables from kyonxcbt_fragcity_services.
 
 
