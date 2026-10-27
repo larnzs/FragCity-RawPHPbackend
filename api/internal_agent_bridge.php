@@ -699,12 +699,18 @@ if (random_int(1, 20) === 1) {
 }
 
 $routes = [
-    'agent_login.php', 'heartbeat.php', 'fetch_tasks.php', 'agent_getservers_api.php',
-    'rcon_commands_api.php', 'server_configs_api.php', 'server_ports_api.php',
-    'agent_commands_api.php', 'sync_bulk.php', 'api_sync_skins.php',
+    'agent_health.php', 'agent_login.php', 'heartbeat.php', 'fetch_tasks.php',
+    'agent_getservers_api.php', 'rcon_commands_api.php', 'server_configs_api.php',
+    'server_ports_api.php', 'agent_commands_api.php', 'sync_bulk.php',
+    'api_sync_skins.php', 'registered_servers_api.php',
 ];
 if (!in_array($route, $routes, true)) {
     fragcityBridgeRespond(404, ['status' => 'error', 'message' => 'Unknown route']);
+}
+
+if ($route === 'agent_health.php') {
+    $pdo->query('SELECT 1')->fetchColumn();
+    fragcityBridgeRespond(200, ['status' => 'success', 'service' => 'fragcity-site-bridge', 'database' => 'ok']);
 }
 
 if ($route === 'agent_login.php') {
