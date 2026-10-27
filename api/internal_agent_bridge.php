@@ -271,7 +271,7 @@ function fragcityBridgeGetServers(PDO $pdo, array $data): never
             );
             $node->execute([$nodeName, $publicIp, $cpu, $ram]);
 
-            $lookup = $pdo->prepare('SELECT server_name FROM pending_servers WHERE server_id = ? LIMIT 1');
+            $lookup = $pdo->prepare('SELECT server_name, server_ip, port, node_name FROM pending_servers WHERE server_id = ? LIMIT 1');
             $updatePending = $pdo->prepare(
                 'UPDATE pending_servers SET node_name = ?, server_ip = ?, port = COALESCE(?, port), status = \'Running\'
                  WHERE server_id = ? AND (node_name IS NULL OR node_name = \'\' OR node_name = ?)'
@@ -302,10 +302,22 @@ function fragcityBridgeGetServers(PDO $pdo, array $data): never
                 if ($serverId === null || $port === null || ($ip !== '' && filter_var($ip, FILTER_VALIDATE_IP) === false)) {
                     continue;
                 }
+                // A valid Agent token alone must not let one node publish runtime data
+                // for a server assigned to another node. pending_servers is the ownership
+                // record for this legacy telemetry path.
+                $lookup->execute([$serverId]);
+                $pendingServer = $lookup->fetch(PDO::FETCH_ASSOC);
+                if (!$pendingServer) {
+                    continue;
+                }
+                $assignedNode = trim((string)($pendingServer['node_name'] ?? ''));
+                if ($assignedNode !== '' && $assignedNode !== $nodeName) {
+                    continue;
+                }
+
                 $serverName = fragcityBridgeString($server['server_name'] ?? '', 128);
                 if ($serverName === '') {
-                    $lookup->execute([$serverId]);
-                    $serverName = (string)($lookup->fetchColumn() ?: 'GameServer');
+                    $serverName = trim((string)($pendingServer['server_name'] ?? '')) ?: 'GameServer';
                 }
                 $players = fragcityBridgeInt($server['current_players'] ?? 0, 0, 1000) ?? 0;
                 $maxPlayers = fragcityBridgeInt($server['max_players'] ?? 0, 0, 1000) ?? 0;
@@ -345,7 +357,9 @@ function fragcityBridgeRcon(PDO $pdo, array $data): never
         $stmt = $pdo->prepare(
             'SELECT c.id, c.server_ip, c.server_port, c.steam_id, c.user_command
              FROM rcon_command_logs c
-             JOIN registered_servers rs ON c.server_port = rs.port
+             JOIN registered_servers rs
+               ON c.server_port = rs.port
+              AND c.server_ip = rs.server_ip
              WHERE rs.node_name = ? AND c.status = \'pending\'
              ORDER BY c.id ASC LIMIT 50'
         );
@@ -360,10 +374,23 @@ function fragcityBridgeRcon(PDO $pdo, array $data): never
         if ($commandId === null || !in_array($status, ['success', 'error'], true)) {
             fragcityBridgeRespond(400, ['status' => 'error', 'message' => 'Invalid command result']);
         }
+        $nodeName = fragcityBridgeNodeName($data);
         $stmt = $pdo->prepare(
-            'UPDATE rcon_command_logs SET server_response = ?, status = ? WHERE id = ?'
+            'UPDATE rcon_command_logs c
+             INNER JOIN registered_servers rs
+               ON rs.port = c.server_port
+              AND rs.server_ip = c.server_ip
+              AND rs.node_name = ?
+             SET c.server_response = ?, c.status = ?
+             WHERE c.id = ? AND c.status = \'pending\''
         );
-        $stmt->execute([$response, $status, $commandId]);
+        $stmt->execute([$nodeName, $response, $status, $commandId]);
+        if ($stmt->rowCount() < 1) {
+            fragcityBridgeRespond(404, [
+                'status' => 'error',
+                'message' => 'Pending command not found for this node',
+            ]);
+        }
         fragcityBridgeRespond(200, ['status' => 'success', 'message' => 'Command result updated successfully']);
     }
 
