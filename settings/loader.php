@@ -7,11 +7,15 @@ if (!function_exists('fragcity_load_settings')) {
   if(is_array($settings))return $settings;
   $path=getenv('FRAGCITY_SETTINGS_FILE');
   if(!is_string($path)||trim($path)==='')$path=__DIR__.'/settings.json';
-  if(!is_file($path))$path=__DIR__.'/settings.example.json';
-  $raw=is_readable($path)?file_get_contents($path):false;
+  $raw=(is_file($path)&&is_readable($path))?file_get_contents($path):false;
   $decoded=is_string($raw)?json_decode($raw,true):null;
-  if(!is_array($decoded)||json_last_error()!==JSON_ERROR_NONE){error_log('[FragCity] Settings JSON missing, unreadable, or invalid; DB access remains disabled.');$settings=array();}
-  else $settings=$decoded;
+  if(!is_string($raw)){
+   error_log('[FragCity] Required runtime settings file is missing or unreadable; refusing to load example settings. DB access remains disabled.');
+   $settings=array();
+  }elseif(!is_array($decoded)||json_last_error()!==JSON_ERROR_NONE){
+   error_log('[FragCity] Runtime settings JSON is invalid; DB access remains disabled.');
+   $settings=array();
+  }else $settings=$decoded;
   $timezone=isset($settings['app']['timezone'])&&is_string($settings['app']['timezone'])?trim($settings['app']['timezone']):'UTC';
   $valid=DateTimeZone::listIdentifiers(DateTimeZone::ALL_WITH_BC);
   if($timezone!=='UTC'&&!in_array($timezone,$valid,true)){error_log('[FragCity] Invalid timezone setting; UTC will be used.');$timezone='UTC';}
