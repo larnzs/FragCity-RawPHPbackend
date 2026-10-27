@@ -16,14 +16,6 @@
       "password": "",
       "charset": "utf8mb4"
     },
-    "weaponpaints": {
-      "extends": "main",
-      "name": "kyonxcbt_weaponpaints_plugin"
-    },
-    "plugin_sync": {
-      "extends": "main",
-      "name": ""
-    },
     "legacy_services": {
       "extends": "main"
     },
@@ -52,10 +44,6 @@
     "weaponpaints_api": {
       "base_url": "",
       "shared_secret": ""
-    },
-    "linuxapi_site_bridge": {
-      "_comment": "Server-to-server signature shared with api.fragcity.ir. Use a unique random secret; never commit the runtime value.",
-      "shared_secret": ""
     }
   },
   "files": {
@@ -63,7 +51,6 @@
       "database_profile": "main"
     },
     "class.config": {
-      "database_profile": "weaponpaints",
       "skin_language": "skins_en",
       "web_style_dark": true,
       "site_base": "/",
@@ -90,75 +77,6 @@
     "pages.zarinpal.wallet_callback": {
       "database_profile": "main"
     },
-    "pages.zarinpal.buyserver_request": {
-      "database_profile": "main"
-    },
-    "pages.zarinpal.buyserver_callback": {
-      "database_profile": "main"
-    },
-    "panels.cs2.config": {
-      "database_profile": "main",
-      "default_language": "fa",
-      "allowed_languages": [
-        "fa",
-        "en"
-      ],
-      "all_configs": [
-        "1v1.cfg",
-        "45.cfg",
-        "aim.cfg",
-        "awp.cfg",
-        "battle.cfg",
-        "bhop.cfg",
-        "br.cfg",
-        "Casual-1.6.cfg",
-        "casual.cfg",
-        "casuala.cfg",
-        "casualw.cfg",
-        "comp.cfg",
-        "course.cfg",
-        "ctf.cfg",
-        "deathmatch.cfg",
-        "deathrun.cfg",
-        "dm-valve.cfg",
-        "dm.cfg",
-        "executes.cfg",
-        "gamemode_armsrace.cfg",
-        "gamemode_casual.cfg",
-        "gamemode_competitive.cfg",
-        "gamemode_competitive2v2.cfg",
-        "gamemode_competitive2v2_offline.cfg",
-        "gamemode_competitive_offline.cfg",
-        "gamemode_competitive_short.cfg",
-        "gamemode_competitive_tmm.cfg",
-        "gamemode_cooperative.cfg",
-        "gamemode_coopmission.cfg",
-        "gamemode_custom.cfg",
-        "gamemode_deathmatch.cfg",
-        "gamemode_deathmatch_short.cfg",
-        "gamemode_deathmatch_tmm.cfg",
-        "gamemode_demolition.cfg",
-        "gamemode_dm_freeforall.cfg",
-        "gamemode_new_user_training.cfg",
-        "gamemode_retakecasual.cfg",
-        "gamemode_teamdeathmatch.cfg",
-        "gamemode_workshop.cfg",
-        "gg.cfg",
-        "hns.cfg",
-        "kz.cfg",
-        "minigames.cfg",
-        "mods.cfg",
-        "oitc.cfg",
-        "prac.cfg",
-        "practice.cfg",
-        "prefire.cfg",
-        "retake.cfg",
-        "scoutzknivez.cfg",
-        "soccer.cfg",
-        "surf.cfg",
-        "wingman.cfg"
-      ]
-    },
     "panels.cs2.settings": {
       "default_language": "fa",
       "allowed_languages": [
@@ -166,12 +84,6 @@
         "en"
       ],
       "preference_storage": "browser"
-    },
-    "pages.buyserveropen": {
-      "database_profile": "main"
-    },
-    "pages.serverlist": {
-      "database_profile": "main"
     },
     "pages.vip": {
       "database_profile": "main"
@@ -192,17 +104,7 @@
       "database_profile": "simpleadmin_plugin"
     },
     "database.weaponpaints_plugin": {
-      "database_profile": "weaponpaints",
-      "transport": "local"
-    },
-    "panels.cs2.overview": {
-      "database_profile": "main"
-    },
-    "panels.cs2.players": {
-      "database_profile": "main"
-    },
-    "panels.cs2.servers": {
-      "database_profile": "main"
+      "transport": "api"
     },
     "pages.support": {
       "database_profile": "main"
