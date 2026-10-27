@@ -34,7 +34,7 @@ $schema = $read('linuxapi/site-bridge-schema.sql');
 $checks = [
     'Agent routes are allowlisted' =>
         str_contains($index, '$allowedRoutes = [')
-        && str_contains($index, "if (!in_array($route, $allowedRoutes, true))"),
+        && str_contains($index, 'if (!in_array($route, $allowedRoutes, true))'),
     'Bridge URL is pinned to HTTPS and one known site endpoint' =>
         str_contains($index, "!== 'https'")
         && str_contains($index, "!== 'fragcity.ir'")
@@ -44,7 +44,7 @@ $checks = [
         && str_contains($index, 'CURLOPT_SSL_VERIFYHOST => 2')
         && str_contains($index, 'CURLOPT_FOLLOWLOCATION => false'),
     'Site bridge verifies HMAC in constant time' =>
-        str_contains($bridge, "hash_equals(hash_hmac('sha256', $canonical, $secret), $signature)"),
+        str_contains($bridge, 'hash_equals(hash_hmac(\'sha256\', $canonical, $secret), $signature)'),
     'Site bridge has persistent replay protection' =>
         str_contains($bridge, 'INSERT INTO fragcity_api_bridge_nonces')
         && str_contains($schema, 'CREATE TABLE IF NOT EXISTS fragcity_api_bridge_nonces'),
@@ -53,7 +53,7 @@ $checks = [
         && str_contains($bridge, 'u.insmaster = 1'),
     'Metrics require an existing server assigned to this node' =>
         str_contains($bridge, 'SELECT server_name, server_ip, port, node_name FROM pending_servers')
-        && str_contains($bridge, "$assignedNode !== $nodeName"),
+        && str_contains($bridge, '$assignedNode !== $nodeName'),
     'RCON command polling matches node, IP, and port' =>
         str_contains($bridge, 'c.server_ip = rs.server_ip')
         && str_contains($bridge, 'WHERE rs.node_name = ? AND c.status = \'pending\''),
