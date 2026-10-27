@@ -206,7 +206,7 @@ function fragcityBridgeGetServers(PDO $pdo, array $data): never
                     modes, tickrate, rcon_password, server_password, gslt_token, insecure,
                     paid_price, payment_token, time_left, expire_date, status, created_at
              FROM pending_servers
-             WHERE status = \'Pending\' AND (node_name IS NULL OR node_name = \'\'' . ' OR node_name = ?)
+             WHERE status = \'Pending\' AND (node_name IS NULL OR node_name = \'\' OR node_name = ?)
              ORDER BY server_id ASC LIMIT 5'
         );
         $stmt->execute([$nodeName]);
