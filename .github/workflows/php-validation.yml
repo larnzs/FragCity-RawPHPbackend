@@ -20,33 +20,16 @@ jobs:
           extensions: curl, pdo_mysql, mbstring
           coverage: none
 
-      - name: Lint active API, database boundary, and migrated pages
+      - name: Lint every PHP source file
         run: |
           set -eu
-          for file in \
-            api/internal_agent_bridge.php \
-            linuxapi/public/index.php \
-            linuxapi/config.example.php \
-            linuxapi/tools/smoke-test.php \
-            linuxapi/tools/architecture-check.php \
-            tools/site-bridge-preflight.php \
-            class/FragCityLinuxApiClient.php \
-            class/WeaponPaintsRepository.php \
-            class/config.php \
-            pages/weaponpaints.php \
-            pages/buyserveropen.php \
-            pages/serverlist.php \
-            pages/zarinpal/zarinpal_buyserver_request.php \
-            pages/zarinpal/zarinpal_buyserver_callback.php \
-            panels/cs2/_server_backend_unavailable.php \
-            panels/cs2/servers.php \
-            panels/cs2/overview.php \
-            panels/cs2/config.php \
-            panels/cs2/players.php \
-            tst/weaponpaints.php; do
-            php -l "$file"
-          done
-          php linuxapi/tools/architecture-check.php
+          find . \
+            -type d \( -name .git -o -name vendor -o -name node_modules \) -prune -o \
+            -type f -name '*.php' -print0 \
+            | xargs -0 -r -n1 php -l
+
+      - name: Check current database/API architecture
+        run: php linuxapi/tools/architecture-check.php
 
       - name: Validate settings JSON
         run: php -r "json_decode(file_get_contents('settings/settings.example.json'), true, 512, JSON_THROW_ON_ERROR); echo 'settings JSON OK', PHP_EOL;"
