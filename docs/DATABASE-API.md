@@ -101,3 +101,16 @@ WeaponPaints plugin on CS2 servers
 6. مشخص کنید کدام سرویس منبع حقیقت داده است؛ برای نمونه، سایت می‌تواند درخواست تغییر rank/VIP را بفرستد، اما قرارداد باید روشن کند وضعیت نهایی کجا ذخیره می‌شود، کدام سرورها آن را می‌خوانند و چه زمانی اعمال می‌شود. از ایجاد چند نسخهٔ متناقض از یک وضعیت جلوگیری شود.
 
 هیچ API برای Ranks، VIP یا SimpleAdmin تا قبل از این بررسی‌ها، تعریف قرارداد و تست مجزا، آماده یا تأییدشده محسوب نمی‌شود.
+
+## 9. Website database remains on shared hosting — no Linux MySQL connection
+
+The main website database `kyonxcbt_fragcity_services` is owned by the website and remains on shared hosting. The Linux API does not connect to that database and must not be given its host, username, or password.
+
+For Agent/CMD traffic, `api.fragcity.ir/v1/agent/...` acts as a signed HTTPS gateway. It forwards the request to `https://fragcity.ir/api/internal_agent_bridge.php`; that PHP endpoint runs on shared hosting and opens the local `databases.main` PDO connection. The original database remains the source of truth; no replica or database dump is copied to Linux.
+
+The bridge uses a separate secret stored in the private website setting `integrations.linuxapi_site_bridge.shared_secret` and the Linux runtime setting `website_bridge.shared_secret`. This secret must differ from the WeaponPaints API secret. `linuxapi/site-bridge-schema.sql` creates nonce and login-throttling tables on the shared-hosting main DB only; never execute it on Linux.
+
+The first migration preserves only actions with an understood contract. The legacy billing/expiry route `registered_servers_api.php` stays disabled (HTTP 410) until the planned panel/wallet design is specified. The legacy tasks poll returns an empty list because the provided database inventory does not include a `tasks` table. Generic bulk sync is constrained to an explicit plugin-table allowlist and column metadata; it cannot select arbitrary tables or write `kyonxcbt_fragcity_services`.
+
+The new bridge is not production-ready merely because the code exists. Deploy the bridge and schema on the shared host, configure separate matching secrets, validate the bridge health check, and test each mutating action against a controlled node before switching the C# client.
+
