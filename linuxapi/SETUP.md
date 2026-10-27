@@ -60,12 +60,32 @@ This section records the state of the existing `server1` install so a future ope
 - `nginx -t` passed and reloading Nginx succeeded.
 - Local virtual-host test `curl -H 'Host: api.fragcity.ir' http://127.0.0.1/health` returned HTTP 200 with the expected `fragcity-linuxapi` health JSON.
 - A normal curl by hostname did not resolve through the configured default resolver, as recorded above. Public/authoritative DNS is correct; the public HTTP route still needs to be checked separately.
+- A direct-origin HTTP test then succeeded: `curl --resolve api.fragcity.ir:80:85.185.40.85 http://api.fragcity.ir/health` returned HTTP 200 with the expected API health JSON. This confirms the selected public-IP route answered from the Debian host while bypassing only local DNS lookup for that request. It does **not** replace a true off-host reachability test, but it is the recorded successful direct-origin check.
 - `/etc/letsencrypt/live/api.fragcity.ir/fullchain.pem` was absent at the last check; TLS is not configured yet.
 - The signed `ping_db`, signed `get_selection`, and any test-player write tests have **not** been completed.
 - The shared-host website must remain on `transport: local` until the signed API smoke tests pass.
 
 Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The next deployment step is to test the HTTP origin (using the resolver path intended for API traffic, with the direct-origin diagnostic above only if appropriate), then obtain TLS without touching the existing Pterodactyl Panel vhost. Do not change DNS resolver settings globally without explicit operator approval.
 
+
+
+### Successful HTTP origin check — 2026-10-27
+
+The following command succeeded on `server1` and returned HTTP 200 with the expected FragCity API health response:
+
+~~~bash
+curl -i --connect-timeout 5 --max-time 10 \
+  --resolve api.fragcity.ir:80:85.185.40.85 \
+  http://api.fragcity.ir/health
+~~~
+
+Expected response body:
+
+~~~json
+{"ok":true,"service":"fragcity-linuxapi","version":1}
+~~~
+
+This diagnostic resolves the name explicitly to the public origin only for this request; it does not change DNS configuration or verify that every off-host network can reach port 80.
 
 ## 1. Preflight checks
 
