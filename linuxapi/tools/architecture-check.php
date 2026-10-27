@@ -100,19 +100,6 @@ $check(
         && !preg_match('/\b(?:INSERT\s+INTO|UPDATE\s+[A-Za-z_][A-Za-z0-9_]*\s+SET|DELETE\s+FROM|CREATE\s+TABLE|ALTER\s+TABLE|DROP\s+TABLE|TRUNCATE\s+TABLE)\b/i', $preflight)
 );
 
-$sourceFiles = [
-    'api/internal_agent_bridge.php',
-    'pages/buyserveropen.php',
-    'pages/serverlist.php',
-    'pages/zarinpal/zarinpal_buyserver_request.php',
-    'pages/zarinpal/zarinpal_buyserver_callback.php',
-    'panels/cs2/_server_backend_unavailable.php',
-    'panels/cs2/servers.php',
-    'panels/cs2/overview.php',
-    'panels/cs2/config.php',
-    'panels/cs2/players.php',
-];
-
 $retiredTables = [
     'agent_' . 'tokens',
     'agent_' . 'nodes',
@@ -129,22 +116,42 @@ $retiredTables = [
 ];
 
 $runtimeClean = true;
-foreach ($sourceFiles as $relative) {
-    try {
-        $contents = $read($relative);
-    } catch (Throwable $e) {
-        $runtimeClean = false;
-        fwrite(STDERR, 'FAIL: ' . $e->getMessage() . PHP_EOL);
+$excludedDirectories = ['.git', 'vendor', 'node_modules'];
+$iterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($root, FilesystemIterator::SKIP_DOTS)
+);
+foreach ($iterator as $fileInfo) {
+    if (!$fileInfo instanceof SplFileInfo || !$fileInfo->isFile()) {
         continue;
     }
+
+    $relative = substr($fileInfo->getPathname(), strlen($root) + 1);
+    $relative = str_replace(DIRECTORY_SEPARATOR, '/', $relative);
+    if (strtolower(pathinfo($relative, PATHINFO_EXTENSION)) !== 'php'
+        || $relative === 'linuxapi/tools/architecture-check.php') {
+        continue;
+    }
+
+    $segments = explode('/', $relative);
+    if (array_intersect($segments, $excludedDirectories) !== []) {
+        continue;
+    }
+
+    $contents = file_get_contents($fileInfo->getPathname());
+    if (!is_string($contents)) {
+        $runtimeClean = false;
+        fwrite(STDERR, 'FAIL: unable to read PHP source: ' . $relative . PHP_EOL);
+        continue;
+    }
+
     foreach ($retiredTables as $table) {
-        if (preg_match('/\b' . preg_quote($table, '/') . '\b/i', $contents)) {
+        if (preg_match('/\\b' . preg_quote($table, '/') . '\\b/i', $contents)) {
             $runtimeClean = false;
             fwrite(STDERR, 'FAIL: retired table reference remains in ' . $relative . PHP_EOL);
         }
     }
 }
-$check('Retired Windows-Agent table names are absent from active server/API pages', $runtimeClean);
+$check('All PHP files exclude retired Windows-Agent table dependencies', $runtimeClean);
 
 $failed = 0;
 foreach ($checks as $name => $passed) {
