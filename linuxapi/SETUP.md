@@ -69,11 +69,11 @@ This section records the state of the existing `server1` install so a future ope
 - `nginx -t` passed and `systemctl reload nginx` succeeded with the TLS vhost active.
 - HTTPS origin test succeeded: `curl --resolve api.fragcity.ir:443:85.185.40.85 https://api.fragcity.ir/health` returned `HTTP/2 200` and the expected API JSON. This test was run from the Debian host while pinning the hostname to the public IP; it verifies the TLS listener/certificate and health route for that path, but does not by itself prove reachability from every off-host network.
 - Nginx emitted two warnings during config validation: (1) `listen ... http2` is deprecated in the API vhost on lines 22-23; (2) protocol options were redefined for `[::]:443`, with a reference to `/etc/nginx/sites-enabled/pterodactyl.conf:52`. They were warnings, not fatal errors; the config test and reload succeeded. Do not edit the Panel vhost just to silence the warning without reviewing the shared 443 listener definitions. A future cleanup can update the API vhost to the Nginx-version-supported HTTP/2 syntax and then re-test.
-- The signed `ping_db` smoke test was attempted from `server1` on 2026-10-27, but returned `Request transport failed (cURL code 6)`. cURL could not resolve the API hostname through the node's normal resolver. This happens before TLS/HMAC/database validation; do not interpret it as an API signature or database failure.
-- Signed `ping_db`, signed `get_selection`, and test-player write tests remain unverified. Use the temporary single-host `/etc/hosts` workaround in Section 8 for the next smoke-test attempt; do not change NetworkManager or ISP DNS settings.
+- The signed `ping_db` smoke test passed on `server1` on 2026-10-27 after applying the temporary `/etc/hosts` mapping for the test. Response: HTTP 200, `success: true`, `data.database: ok`, followed by `PASS: signed ping_db`. This verifies the signed request path (including HMAC/header forwarding), nonce insertion, API-to-MariaDB connection, and `GLOBAL_weaponpaints` selection for this request.
+- Signed read-only `get_selection` and controlled test-player write/read-back tests remain unverified. Continue with the read-only selection test in Section 8. The temporary marked `/etc/hosts` entry was removed automatically when the previous test block exited; do not change NetworkManager or ISP DNS settings.
 - The shared-host website must remain on `transport: local` until the signed API smoke tests pass.
 
-Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The direct-origin HTTP test, Let's Encrypt issuance, TLS vhost install, Nginx reload, and HTTPS health test have completed successfully. The next step is to run the signed API smoke test, then the read-only player-selection test. Do not switch the shared-host website to API transport until those tests and controlled test-player writes are verified. Do not touch the existing Pterodactyl Panel vhost or change DNS resolver settings globally without explicit operator approval.
+Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The direct-origin HTTP test, Let's Encrypt issuance, TLS vhost install, Nginx reload, HTTPS health test, and signed `ping_db` smoke test have completed successfully. The next step is the read-only player-selection test. Do not switch the shared-host website to API transport until those tests and controlled test-player writes are verified. Do not touch the existing Pterodactyl Panel vhost or change DNS resolver settings globally without explicit operator approval.
 
 
 
@@ -413,6 +413,22 @@ php /var/www/fragcity-api/tools/smoke-test.php https://api.fragcity.ir
 
 This pins name resolution locally only for the test; it does not change DNS settings and does not validate the ISP DNS-tunnel route. The previously successful `curl --resolve ...:443:85.185.40.85` remains the separate direct-origin TLS/health check.
 
+### Successful signed `ping_db` test — 2026-10-27
+
+The following run passed using the temporary host mapping above. The temporary line was removed by the shell `EXIT` trap when the block finished:
+
+~~~text
+HTTP 200: {
+    "success": true,
+    "data": {
+        "database": "ok"
+    }
+}
+PASS: signed ping_db.
+~~~
+
+This verifies that the request reached the API, its HMAC was accepted, the nonce could be stored, and the API established a DB connection to `GLOBAL_weaponpaints`. It does not yet verify the read-only selection queries or any player-data writes.
+
 To test read-only selection queries, pass a test SteamID as the second argument. Keep the identifier in your own terminal; do not post it in public logs or chat.
 
 ~~~bash
@@ -460,4 +476,4 @@ The integrations key holds the same generated secret as the Linux config. Keep i
 - Signed request rejected: ensure time is synchronized, all three X-FragCity headers are forwarded by Nginx, and the client and server use the exact same secret.
 - TLS/redirect failure: verify DNS, certificate paths, and nginx -t before reload.
 
-Do not declare the service production-ready until the database permission test, HTTPS health check, signed ping_db smoke test, and read-only get_selection test all pass.
+The database permission test, HTTPS health check, and signed `ping_db` smoke test are verified on this node. Do not declare the service production-ready until the read-only `get_selection` test and controlled test-player write/read-back tests also pass.
