@@ -65,11 +65,15 @@ This section records the state of the existing `server1` install so a future ope
 - On 2026-10-27, `sudo certbot certonly --nginx -d api.fragcity.ir` completed successfully. The certificate is saved at `/etc/letsencrypt/live/api.fragcity.ir/fullchain.pem` and the private key at `/etc/letsencrypt/live/api.fragcity.ir/privkey.pem`. Certbot reported expiry on 2027-01-25 and said automatic renewal was scheduled.
 - Before issuing the certificate, the original HTTP vhost was backed up to `/etc/nginx/sites-available/fragcity-api.conf.pre-letsencrypt`.
 - Certbot did not ask for an email during this issuance. The existing node already had certificates and likely reused its existing Certbot account/contact configuration. Fresh installations may still ask for email and terms acceptance.
-- The active API vhost is still the bootstrap HTTP config at the last verified check. The certificate has been issued, but HTTPS is **not active until the HTTPS vhost is installed, Nginx is reloaded successfully, and an HTTPS health request succeeds**.
+- On 2026-10-27, the TLS vhost was installed from `/var/www/fragcity-api/nginx/fragcity-api-https.conf.example` into `/etc/nginx/sites-available/fragcity-api.conf`; the enabled symlink remained `/etc/nginx/sites-enabled/fragcity-api.conf`.
+- `nginx -t` passed and `systemctl reload nginx` succeeded with the TLS vhost active.
+- HTTPS origin test succeeded: `curl --resolve api.fragcity.ir:443:85.185.40.85 https://api.fragcity.ir/health` returned `HTTP/2 200` and the expected API JSON. This test was run from the Debian host while pinning the hostname to the public IP; it verifies the TLS listener/certificate and health route for that path, but does not by itself prove reachability from every off-host network.
+- Nginx emitted two warnings during config validation: (1) `listen ... http2` is deprecated in the API vhost on lines 22-23; (2) protocol options were redefined for `[::]:443`, with a reference to `/etc/nginx/sites-enabled/pterodactyl.conf:52`. They were warnings, not fatal errors; the config test and reload succeeded. Do not edit the Panel vhost just to silence the warning without reviewing the shared 443 listener definitions. A future cleanup can update the API vhost to the Nginx-version-supported HTTP/2 syntax and then re-test.
+- The signed `ping_db`, signed `get_selection`, and any test-player write tests have **not** been completed.
 - The signed `ping_db`, signed `get_selection`, and any test-player write tests have **not** been completed.
 - The shared-host website must remain on `transport: local` until the signed API smoke tests pass.
 
-Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The direct-origin HTTP test and Let's Encrypt certificate issuance are complete. Next, install the TLS vhost below, validate and reload Nginx, then verify HTTPS health and perform the signed API tests. Do not touch the existing Pterodactyl Panel vhost or change DNS resolver settings globally without explicit operator approval.
+Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The direct-origin HTTP test, Let's Encrypt issuance, TLS vhost install, Nginx reload, and HTTPS health test have completed successfully. The next step is to run the signed API smoke test, then the read-only player-selection test. Do not switch the shared-host website to API transport until those tests and controlled test-player writes are verified. Do not touch the existing Pterodactyl Panel vhost or change DNS resolver settings globally without explicit operator approval.
 
 
 
@@ -350,6 +354,23 @@ sudo nginx -t
 sudo systemctl reload nginx
 curl -fsS https://api.fragcity.ir/health
 ~~~
+
+**Verified on this node (2026-10-27):** `nginx -t` succeeded and the reload completed. The HTTPS request, using a direct-origin override because the default resolver follows the ISP DNS-tunnel path, returned:
+
+~~~text
+HTTP/2 200
+{"ok":true,"service":"fragcity-linuxapi","version":1}
+~~~
+
+The exact test used was:
+
+~~~bash
+curl -i --connect-timeout 5 --max-time 10 \
+  --resolve api.fragcity.ir:443:85.185.40.85 \
+  https://api.fragcity.ir/health
+~~~
+
+Nginx warned that `listen 443 ssl http2` is deprecated in the installed version, and warned that protocol options are redefined for the IPv6 port-443 listener with a reference to the existing Pterodactyl vhost. These warnings did not prevent config validation or reload. Do not make an unreviewed change to the Pterodactyl vhost; if cleaning up the HTTP/2 syntax, use the syntax supported by the installed Nginx version and re-run `nginx -t`.
 
 The health response is public and does not prove database connectivity. Do not switch the website to API transport until the signed smoke test passes.
 
