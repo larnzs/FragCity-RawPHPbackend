@@ -52,6 +52,10 @@
     "weaponpaints_api": {
       "base_url": "",
       "shared_secret": ""
+    },
+    "linuxapi_site_bridge": {
+      "_comment": "Server-to-server signature shared with api.fragcity.ir. Use a unique random secret; never commit the runtime value.",
+      "shared_secret": ""
     }
   },
   "files": {
