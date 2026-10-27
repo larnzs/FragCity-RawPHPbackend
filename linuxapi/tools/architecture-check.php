@@ -61,6 +61,9 @@ $checks = [
         str_contains($bridge, 'UPDATE rcon_command_logs c')
         && str_contains($bridge, 'rs.server_ip = c.server_ip')
         && str_contains($bridge, "WHERE c.id = ? AND c.status = \'pending\'"),
+    'RCON queue rejects arbitrary unregistered destinations and control characters' =>
+        str_contains($bridge, 'SELECT server_id FROM registered_servers WHERE server_ip = ? AND port = ? LIMIT 1')
+        && str_contains($bridge, "preg_match('/[\\x00-\\x1F\\x7F]/', \$command)"),
     'Bulk sync uses a fixed plugin-table map, not the website-services DB' =>
         str_contains($bridge, '$tableMap = [')
         && str_contains($bridge, 'kyonxcbt_ranks_plugin')
