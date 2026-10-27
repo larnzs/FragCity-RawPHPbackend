@@ -1,3 +1,5 @@
+> **Current status — 2026-10-27:** this document contains historical findings about the Windows Agent/C# compatibility design. Those endpoints and table dependencies have since been retired in the active RawPHPbackend branch. The current PHP runtime must not query `agent_tokens`, `agent_nodes`, `pending_servers`, `registered_servers`, or the related legacy server/queue tables. The current website DB inventory is the ten-table list in `docs/DATABASE-API.md`; WeaponPaints remains behind the signed Linux API. Do not treat the historical Agent recommendations below as active deployment instructions.
+
 > **یادداشت وضعیت ریپو — ۲۷ اکتبر ۲۰۲۶:** این سند یک ممیزی تاریخی از کد Agent/C# پیش از پاک‌سازی است. در شاخهٔ `cleanup/remove-legacy-agent-api`، endpointهای قدیمی پوشهٔ `agent/` از درخت کاری حذف شده‌اند و نباید وجود فعلی آن فایل‌ها را از متن زیر نتیجه گرفت. حذف فایل‌ها تاریخچهٔ Git را پاک نمی‌کند؛ هر credential قدیمی که در commitها یا لاگ‌های سابق بوده باید همچنان افشاشده فرض شود و جداگانه بررسی/تعویض شود. این سند به‌عنوان سابقه نگه داشته شده است، نه فهرست فایل‌های فعال فعلی.
 
 # FragCity — Initial Security Review
