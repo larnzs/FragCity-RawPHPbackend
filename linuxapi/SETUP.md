@@ -36,6 +36,8 @@ This section records the state of the existing `server1` install so a future ope
 - `GLOBAL_weaponpaints.fragcity_api_nonces` was created and its definition verified.
 - Account `fragcity_weaponpaints_api`@ `127.0.0.1` exists. The granted permissions were inspected. It has table-specific permissions only; it is not a MariaDB root account.
 - A permission check executed as `www-data` passed for database `GLOBAL_weaponpaints`, the required plugin-table SELECT checks, and Nonce INSERT/DELETE within a transaction that was rolled back.
+- The signed `ping_db` smoke test passed with HTTP 200 and `data.database: ok`.
+- The signed read-only `get_selection` smoke test passed with HTTP 200 and populated data for `skins`, `knife`, `agents`, `music`, and `pins`; the test player's SteamID and actual selected items are intentionally not recorded here.
 - `nginx -t` passes for the current Nginx configuration.
 
 ### DNS and network behavior recorded on 2026-10-27
@@ -69,11 +71,12 @@ This section records the state of the existing `server1` install so a future ope
 - `nginx -t` passed and `systemctl reload nginx` succeeded with the TLS vhost active.
 - HTTPS origin test succeeded: `curl --resolve api.fragcity.ir:443:85.185.40.85 https://api.fragcity.ir/health` returned `HTTP/2 200` and the expected API JSON. This test was run from the Debian host while pinning the hostname to the public IP; it verifies the TLS listener/certificate and health route for that path, but does not by itself prove reachability from every off-host network.
 - Nginx emitted two warnings during config validation: (1) `listen ... http2` is deprecated in the API vhost on lines 22-23; (2) protocol options were redefined for `[::]:443`, with a reference to `/etc/nginx/sites-enabled/pterodactyl.conf:52`. They were warnings, not fatal errors; the config test and reload succeeded. Do not edit the Panel vhost just to silence the warning without reviewing the shared 443 listener definitions. A future cleanup can update the API vhost to the Nginx-version-supported HTTP/2 syntax and then re-test.
-- The signed `ping_db` smoke test passed on `server1` on 2026-10-27 after applying the temporary `/etc/hosts` mapping for the test. Response: HTTP 200, `success: true`, `data.database: ok`, followed by `PASS: signed ping_db`. This verifies the signed request path (including HMAC/header forwarding), nonce insertion, API-to-MariaDB connection, and `GLOBAL_weaponpaints` selection for this request.
-- Signed read-only `get_selection` and controlled test-player write/read-back tests remain unverified. Continue with the read-only selection test in Section 8. Because the successful commands were pasted directly into an interactive shell, its `EXIT` trap may remain installed and the marked `/etc/hosts` line may still exist. Check the marker and use the subshell-wrapped Section 8 command so cleanup runs when that test finishes; do not change NetworkManager or ISP DNS settings.
-- The shared-host website must remain on `transport: local` until the signed API smoke tests pass.
+- The signed `ping_db` smoke test passed on `server1` on 2026-10-27 after locally mapping `api.fragcity.ir` for that test. Response: HTTP 200, `success: true`, `data.database: ok`, followed by `PASS: signed ping_db`.
+- The signed read-only `get_selection` smoke test passed on 2026-10-27 with HTTP 200 and `PASS: read-only get_selection`. The response included existing rows under `skins`, `knife`, `agents`, `music`, and `pins`; the player identifier and selected-item values are not recorded in this guide. The current query does not return glove selections.
+- Both signed tests verify that the tested requests reached the API, passed HMAC validation and nonce handling, and used the intended `GLOBAL_weaponpaints` connection. The `get_selection` result also verifies the SELECT queries it actually executes; it does not test any writes.
+- Controlled test-player write/read-back tests remain unverified. Keep the shared-host website on `transport: local` until write/read-back tests and the remaining integration checks are complete. Do not change NetworkManager or ISP DNS settings to work around the local resolver discrepancy.
 
-Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The direct-origin HTTP test, Let's Encrypt issuance, TLS vhost install, Nginx reload, HTTPS health test, and signed `ping_db` smoke test have completed successfully. The next step is the read-only player-selection test. Do not switch the shared-host website to API transport until those tests and controlled test-player writes are verified. Do not touch the existing Pterodactyl Panel vhost or change DNS resolver settings globally without explicit operator approval.
+Do not repeat the database account creation/config-generation block under “Fresh-install account and private config”; the account and config already exist on this node. The direct-origin HTTP test, Let's Encrypt issuance, TLS vhost install, Nginx reload, HTTPS health test, signed `ping_db`, and read-only `get_selection` tests have completed successfully. The next step is controlled test-player write/read-back verification. Do not switch the shared-host website to API transport until this and the remaining checks are verified. Do not touch the existing Pterodactyl Panel vhost or change DNS resolver settings globally without explicit operator approval.
 
 
 
@@ -426,7 +429,7 @@ This pins name resolution locally only for the test; it does not change DNS sett
 
 ### Successful signed `ping_db` test — 2026-10-27
 
-The following run passed using the temporary host mapping above. Since that first block was pasted directly into an interactive root shell, the `EXIT` trap may still be installed in that shell and the temporary line may persist until it exits. Use the subshell-wrapped command above for subsequent tests, which guarantees cleanup at the end of each test block:
+The following run passed using the temporary host mapping above. The next command uses a subshell and a marked `EXIT` cleanup, so the temporary mapping is scoped to the test block. The guide does not ask you to alter the existing ISP resolver configuration:
 
 ~~~text
 HTTP 200: {
@@ -445,6 +448,33 @@ To test read-only selection queries, pass a test SteamID as the second argument.
 ~~~bash
 php /var/www/fragcity-api/tools/smoke-test.php https://api.fragcity.ir TEST_STEAMID
 ~~~
+
+### Successful read-only `get_selection` test — 2026-10-27
+
+The same signed smoke-test script was run with a test SteamID as the second argument. It returned HTTP 200, `success: true`, populated result arrays, and `PASS: read-only get_selection`. The response contained records for:
+
+- `skins` — weapon skin selections, including team-specific rows and sticker/keychain fields.
+- `knife` — the saved knife selection.
+- `agents` — T/CT agent selections.
+- `music` — team-specific music selections.
+- `pins` — team-specific pin selections.
+
+This verifies only the SELECT statements actually implemented in `get_selection`. The current endpoint does **not** query `wp_player_gloves`, so do not claim glove reads have been tested. The output included real player data; keep SteamIDs and selected-item details out of generic installation documentation and public logs.
+
+### Reusable API pattern for future plugin integrations
+
+The successful WeaponPaints deployment is the reference pattern for future **Ranks, VIP, and SimpleAdmin** integrations. Those integrations are future work; this does not mean their endpoints have already been implemented or their schemas verified.
+
+Reuse the security/transport pattern where appropriate:
+
+1. HTTPS only, with certificate validation on clients; keep MariaDB port 3306 private rather than exposing it to plugin nodes or the Internet.
+2. Signed requests using HMAC-SHA256 over a canonical representation of the timestamp, nonce, HTTP method, path, and SHA-256 hash of the exact request body. Validate timestamps within the allowed window, verify signatures with a constant-time comparison, and reject replayed nonces.
+3. Strict request validation, prepared SQL statements, explicit action/route allowlists, bounded payload sizes, and generic external errors with useful but secret-free server logs. Never accept a caller-provided table name, column name, or SQL fragment.
+4. Domain-specific routes and schemas, for example `/v1/ranks`, `/v1/vip`, and `/v1/simpleadmin`, or equivalent separately versioned endpoints. These are examples for future design, not live routes today. Share the authentication implementation where sensible, but do not turn `/v1/weaponpaints` into an unrestricted all-plugin SQL endpoint.
+5. Least-privilege database permissions. Keep `fragcity_weaponpaints_api` limited to its existing WeaponPaints/nonce grants; do not broaden it as a shortcut for future plugins. Before implementation, inspect the exact plugin version, schema, primary keys, and current read/write behavior, then create narrowly scoped credentials/grants for the required tables. In particular, inspect `GLOBAL_simpleadmin` independently before designing its API; it is not the WeaponPaints database target.
+6. Test in stages: signed `ping_db`; read-only queries against known test data; controlled writes for a test player/account; then read-after-write comparison against the expected database rows. Record the request contract, expected database mutations, rollback/recovery approach, and test results before enabling the website integration.
+
+For future work, first document the actual Ranks/VIP/SimpleAdmin tables and ownership rules. Decide whether each plugin's data is global across CS2 nodes or node-local, which operations the website genuinely needs, and which service account should access each table. Do not assume their schema or add grants until this inspection is complete.
 
 Write operations should only be tested with a test player/account and should be verified against GLOBAL_weaponpaints. The smoke-test script itself does not perform player-data writes.
 
@@ -487,4 +517,4 @@ The integrations key holds the same generated secret as the Linux config. Keep i
 - Signed request rejected: ensure time is synchronized, all three X-FragCity headers are forwarded by Nginx, and the client and server use the exact same secret.
 - TLS/redirect failure: verify DNS, certificate paths, and nginx -t before reload.
 
-The database permission test, HTTPS health check, and signed `ping_db` smoke test are verified on this node. Do not declare the service production-ready until the read-only `get_selection` test and controlled test-player write/read-back tests also pass.
+The database permission test, HTTPS health check, signed `ping_db`, and read-only `get_selection` tests are verified on this node. Do not declare the service production-ready until controlled test-player write/read-back tests and the remaining deployment checks pass.
