@@ -1238,9 +1238,12 @@
     }
 
 
+    const floatingClientPages = new Map();
+
     /* =========================================================
        Floating Pagination Rail
-       Mirrors the active pane's pagination without moving source DOM.
+       Mirrors server pagination where available and adds client-side
+       pagination to tabs that previously rendered their full grids.
     ========================================================== */
 
     function syncFloatingPagination() {
@@ -1288,8 +1291,71 @@
                 const target = event.target instanceof Element
                     ? event.target
                     : event.target && event.target.parentElement;
-                const link = target && target.closest('a[data-wp-navigation]');
 
+                if (!target) {
+                    return;
+                }
+
+                const localControl = target.closest(
+                    '[data-wp-local-page], [data-wp-local-navigation]'
+                );
+
+                if (localControl && dock.contains(localControl)) {
+                    event.preventDefault();
+
+                    const pane = getActivePane();
+                    if (!pane || !pane.id) {
+                        return;
+                    }
+
+                    const items = Array.from(
+                        pane.querySelectorAll('.wp-items-grid .wp-item')
+                    );
+                    const matchingItems = items.filter(
+                        item => !item.classList.contains('is-search-hidden')
+                    );
+                    const totalPages = Math.max(
+                        1,
+                        Math.ceil(matchingItems.length / 24)
+                    );
+
+                    let nextPage = floatingClientPages.get(pane.id) || 1;
+                    if (localControl.dataset.wpLocalPage) {
+                        nextPage = parseInt(
+                            localControl.dataset.wpLocalPage,
+                            10
+                        ) || 1;
+                    } else if (
+                        localControl.dataset.wpLocalNavigation === 'previous'
+                    ) {
+                        nextPage -= 1;
+                    } else if (
+                        localControl.dataset.wpLocalNavigation === 'next'
+                    ) {
+                        nextPage += 1;
+                    }
+
+                    nextPage = Math.max(1, Math.min(nextPage, totalPages));
+                    floatingClientPages.set(pane.id, nextPage);
+                    syncFloatingPagination();
+
+                    const grid = pane.querySelector('.wp-items-grid');
+                    if (grid) {
+                        const targetTop =
+                            grid.getBoundingClientRect().top
+                            + window.scrollY
+                            - 96;
+
+                        window.scrollTo({
+                            top: Math.max(0, targetTop),
+                            behavior: 'smooth'
+                        });
+                    }
+
+                    return;
+                }
+
+                const link = target.closest('a[data-wp-navigation]');
                 if (!link || !dock.contains(link)) {
                     return;
                 }
@@ -1309,75 +1375,149 @@
         }
 
         const activePane = getActivePane();
-        const sourceWrap = activePane
-            ? activePane.querySelector('.wp-pagination-wrap')
-            : null;
+        if (!activePane || !activePane.id) {
+            controls.replaceChildren();
+            if (info) info.textContent = '';
+            dock.hidden = true;
+            app.classList.remove('has-floating-pagination');
+            return;
+        }
+
+        const sourceWrap = activePane.querySelector('.wp-pagination-wrap');
         const sourcePagination = sourceWrap
             ? sourceWrap.querySelector('.wp-pagination')
             : null;
 
-        if (!sourcePagination) {
-            controls.replaceChildren();
-            if (info) info.textContent = '';
-            dock.hidden = true;
-            app.classList.remove('has-floating-pagination');
-            return;
-        }
+        let floatingPagination = null;
+        let currentPageLink = null;
+        let totalPages = 1;
+        let currentPage = 1;
 
-        const sourcePageNumbers = Array.from(
-            sourcePagination.querySelectorAll('.wp-page-btn:not(.wp-page-btn--nav)')
-        );
+        if (sourcePagination) {
+            // Server-paginated panes (All Skins / Pins / weapon categories)
+            // keep using their existing URLs and navigation callbacks.
+            const sourcePageNumbers = Array.from(
+                sourcePagination.querySelectorAll('.wp-page-btn:not(.wp-page-btn--nav)')
+            );
+            totalPages = Math.max(1, sourcePageNumbers.length);
 
-        // A one-page category has no useful paging interaction; leave its original controls in place.
-        if (sourcePageNumbers.length <= 1) {
-            controls.replaceChildren();
-            if (info) info.textContent = '';
-            dock.hidden = true;
-            app.classList.remove('has-floating-pagination');
-            return;
-        }
+            floatingPagination = sourcePagination.cloneNode(true);
+            floatingPagination.classList.add('wp-pagination--floating');
+            floatingPagination.setAttribute('aria-label', 'Page navigation');
 
-        const floatingPagination = sourcePagination.cloneNode(true);
-        floatingPagination.classList.add('wp-pagination--floating');
-        floatingPagination.setAttribute('aria-label', 'Page navigation');
+            const navLinks = floatingPagination.querySelectorAll('.wp-page-btn--nav');
+            if (navLinks.length >= 2) {
+                const previousIcon = navLinks[0].querySelector('i');
+                const nextIcon = navLinks[navLinks.length - 1].querySelector('i');
 
-        const navLinks = floatingPagination.querySelectorAll('.wp-page-btn--nav');
-        if (navLinks.length >= 2) {
-            const previousIcon = navLinks[0].querySelector('i');
-            const nextIcon = navLinks[navLinks.length - 1].querySelector('i');
+                if (previousIcon) {
+                    previousIcon.className = 'fas fa-angle-up wp-floating-pagination__previous-icon';
+                }
 
-            if (previousIcon) {
-                previousIcon.className = 'fas fa-angle-up wp-floating-pagination__previous-icon';
+                if (nextIcon) {
+                    nextIcon.className = 'fas fa-angle-down wp-floating-pagination__next-icon';
+                }
             }
 
-            if (nextIcon) {
-                nextIcon.className = 'fas fa-angle-down wp-floating-pagination__next-icon';
+            floatingPagination.querySelectorAll('a.wp-page-btn').forEach(link => {
+                link.dataset.wpFloatingLink = '1';
+                if (link.classList.contains('is-active')) {
+                    link.setAttribute('aria-current', 'page');
+                } else {
+                    link.removeAttribute('aria-current');
+                }
+            });
+
+            currentPageLink = floatingPagination.querySelector(
+                '.wp-page-btn.is-active:not(.wp-page-btn--nav)'
+            );
+            currentPage = currentPageLink
+                ? (parseInt(currentPageLink.textContent.trim(), 10) || 1)
+                : 1;
+
+            if (totalPages <= 1) {
+                floatingPagination.classList.add('wp-pagination--single-page');
+            }
+        } else {
+            // Tabs without server-side paging get a matching client-side paginator.
+            const items = Array.from(
+                activePane.querySelectorAll('.wp-items-grid .wp-item')
+            );
+            const matchingItems = items.filter(
+                item => !item.classList.contains('is-search-hidden')
+            );
+
+            const pageSize = 24;
+            totalPages = Math.max(1, Math.ceil(matchingItems.length / pageSize));
+            currentPage = floatingClientPages.get(activePane.id) || 1;
+            currentPage = Math.max(1, Math.min(currentPage, totalPages));
+            floatingClientPages.set(activePane.id, currentPage);
+
+            const firstVisibleIndex = (currentPage - 1) * pageSize;
+            const visibleItems = new Set(
+                matchingItems.slice(firstVisibleIndex, firstVisibleIndex + pageSize)
+            );
+
+            items.forEach(item => {
+                item.classList.toggle('wp-page-hidden', !visibleItems.has(item));
+            });
+
+            floatingPagination = document.createElement('div');
+            floatingPagination.className = 'wp-pagination wp-pagination--floating';
+            floatingPagination.setAttribute('aria-label', 'Page navigation');
+
+            if (totalPages > 1) {
+                const previous = document.createElement('button');
+                previous.type = 'button';
+                previous.className = 'wp-page-btn wp-page-btn--nav';
+                previous.innerHTML = '<i class="fas fa-angle-up" aria-hidden="true"></i>';
+                previous.dataset.wpLocalNavigation = 'previous';
+                previous.setAttribute('aria-label', 'Previous page');
+                previous.disabled = currentPage <= 1;
+                floatingPagination.appendChild(previous);
+            }
+
+            for (let page = 1; page <= totalPages; page += 1) {
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'wp-page-btn';
+                button.textContent = String(page);
+                button.dataset.wpLocalPage = String(page);
+
+                if (page === currentPage) {
+                    button.classList.add('is-active');
+                    button.setAttribute('aria-current', 'page');
+                    currentPageLink = button;
+                }
+
+                floatingPagination.appendChild(button);
+            }
+
+            if (totalPages > 1) {
+                const next = document.createElement('button');
+                next.type = 'button';
+                next.className = 'wp-page-btn wp-page-btn--nav';
+                next.innerHTML = '<i class="fas fa-angle-down" aria-hidden="true"></i>';
+                next.dataset.wpLocalNavigation = 'next';
+                next.setAttribute('aria-label', 'Next page');
+                next.disabled = currentPage >= totalPages;
+                floatingPagination.appendChild(next);
+            }
+
+            if (totalPages <= 1) {
+                floatingPagination.classList.add('wp-pagination--single-page');
             }
         }
-
-        floatingPagination.querySelectorAll('a.wp-page-btn').forEach(link => {
-            link.dataset.wpFloatingLink = '1';
-            if (link.classList.contains('is-active')) {
-                link.setAttribute('aria-current', 'page');
-            } else {
-                link.removeAttribute('aria-current');
-            }
-        });
-
-        const currentPageLink = floatingPagination.querySelector(
-            '.wp-page-btn.is-active:not(.wp-page-btn--nav)'
-        );
 
         if (info) {
-            info.textContent = (currentPageLink ? currentPageLink.textContent.trim() : '1')
-                + ' / ' + sourcePageNumbers.length;
+            info.textContent = currentPage + ' / ' + totalPages;
         }
 
         controls.replaceChildren(floatingPagination);
         dock.hidden = false;
         app.classList.add('has-floating-pagination');
 
-        // Keep the active page number visible inside the scrollable rail on long catalogues.
+        // Keep the current page number visible in the rail on long catalogues.
         if (currentPageLink && typeof currentPageLink.scrollIntoView === 'function') {
             window.requestAnimationFrame(() => {
                 if (currentPageLink.isConnected) {
@@ -2503,6 +2643,8 @@
             }
 
         }
+
+        syncFloatingPagination();
 
     }
 
