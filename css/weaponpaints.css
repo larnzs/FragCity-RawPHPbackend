@@ -4666,3 +4666,207 @@ body > .wp-modal#skinModal .modal-dialog {
         max-width: none;
     }
 }
+
+
+
+/* =========================================================
+   31. Floating, Active-Tab Pagination Rail
+========================================================= */
+
+.wp-floating-pagination[hidden] {
+    display: none !important;
+}
+
+.wp-floating-pagination {
+    position: fixed;
+    z-index: 1040;
+    left: max(10px, env(safe-area-inset-left));
+    top: 50%;
+    transform: translateY(-50%);
+    width: 60px;
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 9px 6px;
+    color: var(--wp-text);
+    background: rgba(8, 11, 18, 0.94);
+    border: 1px solid rgba(96, 165, 250, 0.22);
+    border-radius: 18px;
+    box-shadow: 0 16px 42px rgba(0, 0, 0, 0.42), 0 0 22px rgba(59, 130, 246, 0.08);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+}
+
+.wp-floating-pagination__heading {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    color: var(--wp-text-muted);
+    font-size: 0.56rem;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.06em;
+}
+
+.wp-floating-pagination__heading i {
+    color: var(--wp-blue-soft);
+    font-size: 0.9rem;
+}
+
+.wp-floating-pagination__info {
+    flex: 0 0 auto;
+    color: var(--wp-text);
+    text-align: center;
+    font-size: 0.62rem;
+    font-weight: 800;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.wp-floating-pagination__controls {
+    min-height: 0;
+    min-width: 0;
+}
+
+.wp-floating-pagination .wp-pagination--floating {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 5px;
+    width: 100%;
+    max-height: calc(100dvh - 116px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 1px 0;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(96, 165, 250, 0.35) transparent;
+    overscroll-behavior: contain;
+}
+
+.wp-floating-pagination .wp-pagination--floating::-webkit-scrollbar {
+    width: 3px;
+}
+
+.wp-floating-pagination .wp-pagination--floating::-webkit-scrollbar-thumb {
+    background: rgba(96, 165, 250, 0.35);
+    border-radius: 99px;
+}
+
+.wp-floating-pagination .wp-page-btn {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 46px;
+    height: 34px;
+    box-sizing: border-box;
+    padding: 0;
+    border-radius: 10px;
+    font-size: 0.7rem;
+}
+
+.wp-floating-pagination .wp-page-btn--nav {
+    color: var(--wp-cyan);
+    background: rgba(59, 130, 246, 0.08);
+}
+
+.wp-floating-pagination .wp-page-btn.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+    border-color: rgba(56, 189, 248, 0.7);
+    box-shadow: 0 5px 14px rgba(37, 99, 235, 0.24);
+}
+
+.wp-floating-pagination .wp-page-btn:focus-visible {
+    outline: 2px solid var(--wp-blue-soft);
+    outline-offset: 2px;
+}
+
+/* Hide the old bottom strip only while the active pane has a floating rail. */
+.wp-app.has-floating-pagination .wp-main .wp-pagination-wrap {
+    display: none !important;
+}
+
+/* Reserve a small left gutter so the fixed rail never covers the first card column. */
+.wp-app.has-floating-pagination .wp-main {
+    width: min(calc(100% - 112px), 1550px) !important;
+    position: relative;
+    left: 36px;
+}
+
+@media (max-width: 760px) {
+    .wp-floating-pagination {
+        left: 50%;
+        right: auto;
+        top: auto;
+        bottom: max(10px, env(safe-area-inset-bottom));
+        transform: translateX(-50%);
+        width: min(calc(100vw - 20px), 560px);
+        max-height: 58px;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px;
+        border-radius: 15px;
+    }
+
+    .wp-floating-pagination__heading {
+        display: none;
+    }
+
+    .wp-floating-pagination__info {
+        flex: 0 0 auto;
+        min-width: 38px;
+    }
+
+    .wp-floating-pagination__controls {
+        flex: 1 1 auto;
+        width: 0;
+        overflow: hidden;
+    }
+
+    .wp-floating-pagination .wp-pagination--floating {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 4px;
+        max-height: none;
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 0 1px 2px;
+    }
+
+    .wp-floating-pagination .wp-page-btn {
+        flex: 0 0 32px;
+        width: 32px;
+        min-width: 32px;
+        height: 32px;
+        max-width: 32px;
+        border-radius: 9px;
+    }
+
+    .wp-floating-pagination .wp-page-btn--nav:first-child i,
+    .wp-floating-pagination .wp-page-btn--nav:last-child i {
+        transform: rotate(90deg);
+    }
+
+    .wp-app.has-floating-pagination {
+        padding-bottom: 96px !important;
+    }
+
+    .wp-app.has-floating-pagination .wp-main {
+        width: min(calc(100% - 24px), 1550px) !important;
+        left: auto;
+        margin: 24px auto 0;
+    }
+}
