@@ -28,52 +28,28 @@
        01. Configuration
     ========================================================== */
 
-    const config = window.WeaponPaintsConfig || {};
+    let config = window.WeaponPaintsConfig || {};
 
-    const csrfToken =
-        typeof config.csrfToken === 'string'
-            ? config.csrfToken
-            : '';
-
-    const weapons =
-        config.weapons || {};
-
-    const skins =
-        config.skins || {};
-
-    const selectedSkins =
-        config.selectedSkins || {};
-
-    const skinDetails =
-        config.skinDetails || {};
-
-    const stickersData =
-        config.stickersData || {};
-
-    const keychainsData =
-        config.keychainsData || {};
-
-    const skinInventory =
-        Array.isArray(config.skinInventory)
-            ? config.skinInventory
-            : [];
+    let csrfToken = '';
+    let weapons = {};
+    let skins = {};
+    let selectedSkins = {};
+    let skinDetails = {};
+    let stickersData = {};
+    let keychainsData = {};
+    let skinInventory = [];
 
     const skinInventoryByKey = Object.create(null);
     const skinDraftsByKey = Object.create(null);
 
-    skinInventory.forEach(entry => {
-        const team = Number(entry.weapon_team);
-        const defindex = Number(entry.weapon_defindex);
-        const paintId = Number(entry.weapon_paint_id);
-
-        if (
-            (team === 2 || team === 3) &&
-            Number.isFinite(defindex) &&
-            Number.isFinite(paintId)
-        ) {
-            skinInventoryByKey[`${team}:${defindex}:${paintId}`] = entry;
-        }
-    });
+    const pageLifecycle = {
+        pageRoot: null,
+        modalDelegatesBound: false,
+        modalEscapeBound: false,
+        delegatedEventsBound: false,
+        imageFallbackBound: false,
+        keyboardShortcutsBound: false
+    };
 
 
     /* =========================================================
@@ -89,7 +65,7 @@
 
         currentActiveTab:
             String(
-                config.currentTab || 'tab-knives'
+                config.currentTab || 'tab-inventory'
             ),
 
         currentSkinPage:
@@ -218,6 +194,65 @@
 
     };
 
+
+    function refreshDomReferences() {
+        dom.body = document.body;
+        dom.mainPageFader = document.getElementById('mainPageFader');
+        dom.skinGridFade = document.getElementById('skinsFade');
+        dom.pinGridFade = document.getElementById('pinsFade');
+        dom.globalSearch = document.getElementById('skinSearchGlobal');
+        dom.mainTabs = document.getElementById('mainTabs');
+        dom.skinModal = document.getElementById('skinModal');
+        dom.skinModalTitle = document.getElementById('skinModalTitle');
+        dom.skinModalBody = document.getElementById('skinModalBody');
+        dom.stickerModal = document.getElementById('stickerModal');
+        dom.stickerModalBody = document.getElementById('stickerModalBody');
+        dom.keychainModal = document.getElementById('keychainModal');
+        dom.keychainModalBody = document.getElementById('keychainModalBody');
+    }
+
+    function refreshRuntimeContext() {
+        config = window.WeaponPaintsConfig || {};
+        csrfToken = typeof config.csrfToken === 'string' ? config.csrfToken : '';
+        weapons = config.weapons || {};
+        skins = config.skins || {};
+        selectedSkins = config.selectedSkins || {};
+        skinDetails = config.skinDetails || {};
+        stickersData = config.stickersData || {};
+        keychainsData = config.keychainsData || {};
+        skinInventory = Array.isArray(config.skinInventory) ? config.skinInventory : [];
+
+        Object.keys(skinInventoryByKey).forEach(key => delete skinInventoryByKey[key]);
+        skinInventory.forEach(entry => {
+            const team = Number(entry.weapon_team);
+            const defindex = Number(entry.weapon_defindex);
+            const paintId = Number(entry.weapon_paint_id);
+            if ((team === 2 || team === 3) && Number.isFinite(defindex) && Number.isFinite(paintId)) {
+                skinInventoryByKey[`${team}:${defindex}:${paintId}`] = entry;
+            }
+        });
+
+        Object.keys(skinDraftsByKey).forEach(key => delete skinDraftsByKey[key]);
+        window.clearTimeout(state.searchTimer);
+        window.clearTimeout(state.modalSearchTimer);
+
+        state.currentTeamParam = String(config.currentTeamParam || '2');
+        state.currentActiveTab = String(config.currentTab || 'tab-inventory');
+        state.currentSkinPage = Number(config.currentSkinPage || 1);
+        state.currentPinPage = Number(config.currentPinPage || 1);
+        state.activeDefindex = null;
+        state.activeSkinPaintId = null;
+        state.currentStickerSlot = null;
+        state.parentModalId = null;
+        state.parentModalTemporarilyHidden = false;
+        state.navigationLocked = false;
+        state.searchTimer = null;
+        state.modalSearchTimer = null;
+        state.stickerPage = 0;
+        state.stickerFilter = '';
+        state.keychainPage = 0;
+        state.keychainFilter = '';
+    }
 
     /* =========================================================
        04. Utility Helpers
@@ -1280,7 +1315,7 @@
         return String(
             state.currentActiveTab ||
             config.currentTab ||
-            'tab-knives'
+            'tab-inventory'
         );
 
     }
@@ -2358,6 +2393,10 @@
             const normalizedTeam = String(team || '2');
             const activeTab = getCurrentActiveTab();
 
+            if (activeTab === 'tab-agents' && normalizedTeam === 'both') {
+                return false;
+            }
+
             state.currentActiveTab = activeTab;
             state.currentTeamParam = normalizedTeam;
 
@@ -2559,6 +2598,56 @@
     }
 
 
+    function syncAgentTeamSwitcher(tabId = getCurrentActiveTab()) {
+        const isAgentsTab = tabId === 'tab-agents';
+        const bothButton = dom.mainTabs
+            ? dom.mainTabs.querySelector('.wp-team-btn--both')
+            : null;
+
+        if (bothButton) {
+            bothButton.classList.toggle('is-disabled', isAgentsTab);
+            bothButton.setAttribute('aria-disabled', isAgentsTab ? 'true' : 'false');
+            if (isAgentsTab) {
+                bothButton.tabIndex = -1;
+            } else {
+                bothButton.removeAttribute('tabindex');
+            }
+        }
+
+        const currentUrl = getCurrentUrl();
+        if (isAgentsTab && (
+            state.currentTeamParam === 'both' ||
+            currentUrl.searchParams.get('team') === 'both'
+        )) {
+            state.currentTeamParam = state.currentTeamParam === '3' ? '3' : '2';
+            currentUrl.searchParams.set('team', state.currentTeamParam);
+            currentUrl.searchParams.set('tab', 'tab-agents');
+            window.history.replaceState(
+                { ...(window.history.state || {}), team: state.currentTeamParam, tab: 'tab-agents' },
+                '',
+                currentUrl.toString()
+            );
+        }
+
+        if (dom.mainTabs) {
+            dom.mainTabs.querySelectorAll('.wp-team-switcher .wp-team-btn').forEach(link => {
+                const team = String(link.dataset.wpTeam || link.dataset.team || '');
+                link.classList.toggle('is-active', team === state.currentTeamParam);
+            });
+        }
+
+        const agentCards = document.querySelectorAll('.wp-app #agentsContainer .agent-item');
+        const visibleSide = state.currentTeamParam === '3' ? 'ct' : 't';
+        agentCards.forEach(card => {
+            const shouldHide = isAgentsTab && card.dataset.agentTeam !== visibleSide;
+            card.classList.toggle('wp-agent-team-hidden', shouldHide);
+        });
+
+        if (isAgentsTab) {
+            syncTeamLinkUrls('tab-agents');
+        }
+    }
+
     /* =========================================================
        06.5. Main Tab Controller
 
@@ -2683,6 +2772,7 @@
             );
 
         state.currentActiveTab = tabId;
+        syncAgentTeamSwitcher(tabId);
         syncFloatingPagination();
 
         if (updateUrl) {
@@ -2810,7 +2900,7 @@
 
         const initialTab =
             state.currentActiveTab ||
-            'tab-knives';
+            'tab-inventory';
 
 
         if (
@@ -5990,6 +6080,8 @@
 
         prepareCustomModalTriggers();
 
+        if (!pageLifecycle.modalDelegatesBound) {
+
         // Make clickable knife cards usable from the keyboard as well.
         document.addEventListener(
             'keydown',
@@ -6088,7 +6180,11 @@
             }
         );
 
-        if (dom.skinModal) {
+        pageLifecycle.modalDelegatesBound = true;
+        }
+
+        if (dom.skinModal && dom.skinModal.dataset.wpHiddenEventBound !== '1') {
+            dom.skinModal.dataset.wpHiddenEventBound = '1';
 
             dom.skinModal.addEventListener(
                 'hidden.wp.modal',
@@ -6115,7 +6211,8 @@
 
         }
 
-        if (dom.stickerModal) {
+        if (dom.stickerModal && dom.stickerModal.dataset.wpHiddenEventBound !== '1') {
+            dom.stickerModal.dataset.wpHiddenEventBound = '1';
 
             dom.stickerModal.addEventListener(
                 'hidden.wp.modal',
@@ -6126,7 +6223,8 @@
 
         }
 
-        if (dom.keychainModal) {
+        if (dom.keychainModal && dom.keychainModal.dataset.wpHiddenEventBound !== '1') {
+            dom.keychainModal.dataset.wpHiddenEventBound = '1';
 
             dom.keychainModal.addEventListener(
                 'hidden.wp.modal',
@@ -6137,6 +6235,7 @@
 
         }
 
+        if (!pageLifecycle.modalEscapeBound) {
         window.addEventListener(
             'keydown',
             event => {
@@ -6170,6 +6269,8 @@
             },
             true
         );
+        pageLifecycle.modalEscapeBound = true;
+        }
 
     }
 
@@ -6179,6 +6280,9 @@
     ========================================================== */
 
     function bindDelegatedEvents() {
+
+        if (!pageLifecycle.delegatedEventsBound) {
+            pageLifecycle.delegatedEventsBound = true;
 
         document.addEventListener(
             'change',
@@ -6286,7 +6390,7 @@
                     (getActivePane() && getActivePane().id) ||
                     getTabIdFromElement(form) ||
                     state.currentActiveTab ||
-                    'tab-knives';
+                    'tab-inventory';
 
                 state.currentActiveTab = sourceTab;
 
@@ -6416,17 +6520,15 @@
             true
         );
 
-        if (dom.globalSearch) {
-
-            dom.globalSearch.addEventListener(
-                'input',
-                queueGlobalSearch
-            );
-
         }
 
-        if (dom.mainTabs) {
+        if (dom.globalSearch && dom.globalSearch.dataset.wpSearchBound !== '1') {
+            dom.globalSearch.dataset.wpSearchBound = '1';
+            dom.globalSearch.addEventListener('input', queueGlobalSearch);
+        }
 
+        if (dom.mainTabs && dom.mainTabs.dataset.wpShownTabBound !== '1') {
+            dom.mainTabs.dataset.wpShownTabBound = '1';
             dom.mainTabs.addEventListener(
                 'shown.bs.tab',
                 event => {
@@ -6610,6 +6712,11 @@
 
 
     function bindImageFallback() {
+
+        if (pageLifecycle.imageFallbackBound) {
+            return;
+        }
+        pageLifecycle.imageFallbackBound = true;
 
         document.addEventListener(
             'error',
@@ -6832,6 +6939,11 @@
 
     function bindKeyboardShortcuts() {
 
+        if (pageLifecycle.keyboardShortcutsBound) {
+            return;
+        }
+        pageLifecycle.keyboardShortcutsBound = true;
+
         document.addEventListener(
             'keydown',
             event => {
@@ -6897,38 +7009,39 @@
 
     function init() {
 
-        moveWeaponPaintsModalsToBody();
+        const pageRoot = document.querySelector('.wp-app');
+        if (!pageRoot) {
+            return;
+        }
 
-        // Remove any Bootstrap modal state left by the host site's AJAX layer.
-        document.body.classList.remove('modal-open');
+        // Page scripts are cached by the site-wide AJAX navigator. A new
+        // fragment must rebuild state and DOM references before binding.
+        if (pageLifecycle.pageRoot === pageRoot) {
+            setPageReady();
+            applyWeaponPaintsLayoutMode();
+            applyGlobalSearch();
+            return;
+        }
+
+        pageLifecycle.pageRoot = pageRoot;
+        refreshRuntimeContext();
+        refreshDomReferences();
+
+        moveWeaponPaintsModalsToBody();
+        refreshDomReferences();
+
+        document.body.classList.remove('modal-open', 'wp-modal-open');
+        floatingClientPages.clear();
 
         bindModalEvents();
-
         bindDelegatedEvents();
-
         bindMainTabs();
-
         bindImageFallback();
-
         applyWeaponPaintsLayoutMode();
-
         bindKeyboardShortcuts();
 
-
-        /*
-         * Make sure the server-rendered
-         * active state is reflected immediately.
-         */
-
         setPageReady();
-
-
-        /*
-         * Apply initial global search,
-         * in case the browser restored
-         * the input value automatically.
-         */
-
+        syncFloatingPagination();
         applyGlobalSearch();
 
     }
@@ -6961,6 +7074,13 @@
 
         }
     );
+
+    window.addEventListener('content-loaded', event => {
+        const page = event.detail && event.detail.page;
+        if (page === 'skins' && document.querySelector('.wp-app')) {
+            init();
+        }
+    });
 
 
     if (
