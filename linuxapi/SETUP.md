@@ -165,16 +165,19 @@ php -l /var/www/fragcity-api/tools/smoke-test.php
 
 The sample Nginx vhost assumes the PHP-FPM socket /run/php/php8.3-fpm.sock. Verify the socket exists before enabling that vhost.
 
-## 3. Create the anti-replay table
+## 3. Create the API-owned tables
 
-This is the only new table required by the API; it stores hashes of request nonces, not player data. Execute it against the verified global WeaponPaints database:
+The schema creates two service-owned tables in the verified global WeaponPaints database: `fragcity_api_nonces` prevents replayed signed requests, and `wp_player_skin_inventory` stores one customization per player, team, weapon and paint. The existing `wp_player_skins` table remains unchanged because the CS2 plugin uses it as the active loadout row.
+
+Run this migration **before deploying the API code that reads the new inventory table**:
 
 ~~~bash
 sudo mariadb GLOBAL_weaponpaints < /var/www/fragcity-api/schema.sql
 sudo mariadb -t -e "SHOW CREATE TABLE GLOBAL_weaponpaints.fragcity_api_nonces;"
+sudo mariadb -t -e "SHOW CREATE TABLE GLOBAL_weaponpaints.wp_player_skin_inventory;"
 ~~~
 
-The schema uses CREATE TABLE IF NOT EXISTS. It does not recreate or replace the six existing plugin tables.
+The schema uses CREATE TABLE IF NOT EXISTS. It does not recreate or replace any of the six existing plugin tables.
 
 ## 4. Fresh-install account and private config
 
@@ -198,9 +201,9 @@ if [ "$EXISTING_USER" != "0" ]; then
     exit 1
 fi
 
-TABLE_COUNT="$(mariadb --batch --skip-column-names -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='GLOBAL_weaponpaints' AND table_name IN ('wp_player_skins','wp_player_gloves','wp_player_knife','wp_player_agents','wp_player_music','wp_player_pins','fragcity_api_nonces');")"
-if [ "$TABLE_COUNT" != "7" ]; then
-    echo "STOP: expected six plugin tables and fragcity_api_nonces in GLOBAL_weaponpaints."
+TABLE_COUNT="$(mariadb --batch --skip-column-names -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='GLOBAL_weaponpaints' AND table_name IN ('wp_player_skins','wp_player_gloves','wp_player_knife','wp_player_agents','wp_player_music','wp_player_pins','wp_player_skin_inventory','fragcity_api_nonces');")"
+if [ "$TABLE_COUNT" != "8" ]; then
+    echo "STOP: expected six plugin tables, wp_player_skin_inventory and fragcity_api_nonces in GLOBAL_weaponpaints."
     exit 1
 fi
 
@@ -223,6 +226,7 @@ cat > "$SQL_FILE" <<SQL
 CREATE USER 'fragcity_weaponpaints_api'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';
 
 GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_skins TO 'fragcity_weaponpaints_api'@'127.0.0.1';
+GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_skin_inventory TO 'fragcity_weaponpaints_api'@'127.0.0.1';
 GRANT INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_gloves TO 'fragcity_weaponpaints_api'@'127.0.0.1';
 GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_knife TO 'fragcity_weaponpaints_api'@'127.0.0.1';
 GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_agents TO 'fragcity_weaponpaints_api'@'127.0.0.1';
@@ -266,9 +270,13 @@ The nonce table grant includes SELECT intentionally. The API cleanup query check
 
 ## 5. Repair the current account if it already exists
 
-The current installation created the account and config before this guide was added. Its first permission test failed when deleting a test nonce because SELECT was not granted on fragcity_api_nonces. Do not recreate the user or overwrite the existing config. As root, apply the missing table-level SELECT privilege while retaining the required insert/delete privileges:
+The current installation created the account and config before this guide was added. Do not recreate the user or overwrite the existing config. After creating `wp_player_skin_inventory` with the schema migration above, grant the existing API account access to it. Preserve the nonce permissions as well:
 
 ~~~sql
+GRANT SELECT, INSERT, UPDATE
+ON GLOBAL_weaponpaints.wp_player_skin_inventory
+TO 'fragcity_weaponpaints_api'@'127.0.0.1';
+
 GRANT SELECT, INSERT, DELETE
 ON GLOBAL_weaponpaints.fragcity_api_nonces
 TO 'fragcity_weaponpaints_api'@'127.0.0.1';
@@ -303,6 +311,7 @@ $pdo = new PDO(
 
 foreach ([
     'wp_player_skins',
+    'wp_player_skin_inventory',
     'wp_player_knife',
     'wp_player_agents',
     'wp_player_music',
