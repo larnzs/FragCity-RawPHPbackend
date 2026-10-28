@@ -4681,7 +4681,8 @@ body > .wp-modal#skinModal .modal-dialog {
     position: fixed;
     z-index: 1040;
     left: max(10px, env(safe-area-inset-left));
-    top: 50%;
+    top: 50vh;
+    top: 50dvh;
     transform: translateY(-50%);
     width: 60px;
     max-height: calc(100vh - 24px);
