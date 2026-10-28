@@ -1230,11 +1230,123 @@
     function getActivePane() {
 
         return document.querySelector(
-            '.tab-pane.show.active'
+            '.wp-main .tab-content > .tab-pane.show.active'
         ) || document.querySelector(
-            '.tab-pane.active'
+            '.wp-main .tab-content > .tab-pane.active'
         );
 
+    }
+
+
+    /* =========================================================
+       Floating Pagination Rail
+       Mirrors the active pane's pagination without moving source DOM.
+    ========================================================== */
+
+    function syncFloatingPagination() {
+
+        const dock = document.getElementById('wpFloatingPagination');
+        const controls = document.getElementById('wpFloatingPaginationControls');
+        const info = document.getElementById('wpFloatingPaginationInfo');
+        const app = document.querySelector('.wp-app');
+
+        if (!dock || !controls || !app) {
+            return;
+        }
+
+        if (dock.dataset.wpFloatingBound !== '1') {
+            dock.addEventListener('click', event => {
+                const target = event.target instanceof Element
+                    ? event.target
+                    : event.target && event.target.parentElement;
+                const link = target && target.closest('a[data-wp-navigation]');
+
+                if (!link || !dock.contains(link)) {
+                    return;
+                }
+
+                const navigationName = link.dataset.wpNavigation;
+                const navigate = navigationName
+                    ? window[navigationName]
+                    : null;
+
+                if (typeof navigate === 'function') {
+                    event.preventDefault();
+                    navigate(link.dataset.wpPage || '1');
+                }
+            });
+
+            dock.dataset.wpFloatingBound = '1';
+        }
+
+        const activePane = getActivePane();
+        const sourceWrap = activePane
+            ? activePane.querySelector('.wp-pagination-wrap')
+            : null;
+        const sourcePagination = sourceWrap
+            ? sourceWrap.querySelector('.wp-pagination')
+            : null;
+
+        if (!sourcePagination) {
+            controls.replaceChildren();
+            if (info) info.textContent = '';
+            dock.hidden = true;
+            app.classList.remove('has-floating-pagination');
+            return;
+        }
+
+        const sourcePageNumbers = Array.from(
+            sourcePagination.querySelectorAll('.wp-page-btn:not(.wp-page-btn--nav)')
+        );
+
+        // A one-page category has no useful paging interaction; leave its original controls in place.
+        if (sourcePageNumbers.length <= 1) {
+            controls.replaceChildren();
+            if (info) info.textContent = '';
+            dock.hidden = true;
+            app.classList.remove('has-floating-pagination');
+            return;
+        }
+
+        const floatingPagination = sourcePagination.cloneNode(true);
+        floatingPagination.classList.add('wp-pagination--floating');
+        floatingPagination.setAttribute('aria-label', 'Page navigation');
+
+        const navLinks = floatingPagination.querySelectorAll('.wp-page-btn--nav');
+        if (navLinks.length >= 2) {
+            const previousIcon = navLinks[0].querySelector('i');
+            const nextIcon = navLinks[navLinks.length - 1].querySelector('i');
+
+            if (previousIcon) {
+                previousIcon.className = 'fas fa-angle-up wp-floating-pagination__previous-icon';
+            }
+
+            if (nextIcon) {
+                nextIcon.className = 'fas fa-angle-down wp-floating-pagination__next-icon';
+            }
+        }
+
+        floatingPagination.querySelectorAll('a.wp-page-btn').forEach(link => {
+            link.dataset.wpFloatingLink = '1';
+            if (link.classList.contains('is-active')) {
+                link.setAttribute('aria-current', 'page');
+            } else {
+                link.removeAttribute('aria-current');
+            }
+        });
+
+        const currentPageLink = floatingPagination.querySelector(
+            '.wp-page-btn.is-active:not(.wp-page-btn--nav)'
+        );
+
+        if (info) {
+            info.textContent = (currentPageLink ? currentPageLink.textContent.trim() : '1')
+                + ' / ' + sourcePageNumbers.length;
+        }
+
+        controls.replaceChildren(floatingPagination);
+        dock.hidden = false;
+        app.classList.add('has-floating-pagination');
     }
 
 
@@ -2054,6 +2166,7 @@
             );
 
         state.currentActiveTab = tabId;
+        syncFloatingPagination();
 
         if (updateUrl) {
             updateTabUrl(tabId);
