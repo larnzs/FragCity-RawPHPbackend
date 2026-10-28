@@ -125,9 +125,13 @@ class UtilsClass
             $id   = $item['id'] ?? $item['music_id'] ?? null;
             $name = $item['name'] ?? $item['music_name'] ?? 'Unknown';
             if ($id === null) continue;
+            $image = trim((string)($item['image'] ?? ''));
+            $imageUrl = preg_match('#^https?://#i', $image)
+                ? $image
+                : IMAGE_BASE_SKINS . ltrim($image, '/');
             $music[$id] = [
                 'name'      => $name,
-                'image_url' => IMAGE_BASE_SKINS . ($item['image'] ?? ''),
+                'image_url' => $imageUrl,
             ];
         }
         return $music;
