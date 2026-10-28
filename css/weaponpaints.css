@@ -6383,3 +6383,108 @@ body > #skinModal .wp-modal-header-tools .wp-selection-search .wp-addon-search {
     }
 }
 
+/* =========================================================
+   37. Equal-Width Minimal Skin Settings
+========================================================= */
+
+/* Put Wear, Seed, Name Tag and StatTrak in a true vertical stack. */
+#skinModalBody .wp-skin-controls {
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-content: start;
+    align-items: stretch;
+    gap: 6px !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 116, 139, .45) transparent;
+}
+
+#skinModalBody .wp-skin-controls > .wp-control-card:not(.wp-addon-control-card) {
+    grid-column: 1 !important;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: 7px 9px !important;
+    gap: 4px;
+    border-radius: 9px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-label {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px !important;
+    margin: 0 0 3px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-value {
+    align-self: auto;
+    margin-left: auto;
+    font-size: .59rem !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-input {
+    width: 100% !important;
+    max-width: none;
+    height: 29px !important;
+    min-height: 29px !important;
+}
+
+/* StatTrak uses the same card width as every other setting and stays short. */
+#skinModalBody .wp-skin-controls > .wp-control-card:has(.wp-inline-toggle) {
+    grid-column: 1 !important;
+    width: 100%;
+    min-height: 38px;
+    padding: 6px 9px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-inline-toggle {
+    min-height: 24px;
+    width: 100%;
+    gap: 8px !important;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-content {
+    flex: 0 1 auto;
+    gap: 5px !important;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-content strong {
+    font-size: .64rem !important;
+}
+
+/* Sticker/Keychain picker shares the exact same outer width, but stays compact. */
+#skinModalBody .wp-skin-controls > .wp-addon-control-card {
+    grid-column: 1 !important;
+    width: 100%;
+    padding: 7px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addons-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn {
+    min-height: 42px !important;
+    height: 42px !important;
+    padding: 3px !important;
+    gap: 2px !important;
+}
+
+@media (max-width: 720px) {
+    #skinModalBody .wp-skin-controls {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 5px !important;
+        overflow-y: visible;
+    }
+
+    #skinModalBody .wp-skin-controls > .wp-control-card:not(.wp-addon-control-card),
+    #skinModalBody .wp-skin-controls > .wp-control-card:has(.wp-inline-toggle),
+    #skinModalBody .wp-skin-controls > .wp-addon-control-card {
+        grid-column: 1 !important;
+        width: 100%;
+        padding: 6px 7px !important;
+    }
+}
+
