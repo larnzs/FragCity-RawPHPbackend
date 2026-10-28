@@ -354,6 +354,152 @@ function resolveAgentImageUrl(string $image): string
     );
 }
 
+/**
+ * Resolve built-in T/CT agent and glove artwork without allowing an empty
+ * optional setting to suppress the shipped image. It checks explicit known
+ * filenames first, then recognizes side-specific files already present in
+ * img/weapon on the installed site.
+ */
+function resolveDefaultTeamAsset(
+    string $kind,
+    string $side,
+    string $configured = ''
+): string {
+    static $cache = [];
+
+    $kind = strtolower(trim($kind));
+    $side = strtolower(trim($side));
+
+    if (!in_array($kind, ['agent', 'glove'], true) || !in_array($side, ['t', 'ct'], true)) {
+        return '';
+    }
+
+    $cacheKey = $kind . ':' . $side . ':' . trim($configured);
+    if (array_key_exists($cacheKey, $cache)) {
+        return $cache[$cacheKey];
+    }
+
+    $documentRoot = rtrim((string)($_SERVER['DOCUMENT_ROOT'] ?? ''), '/\\');
+    $projectRoot = dirname(__DIR__);
+    $roots = array_values(array_unique(array_filter([
+        $documentRoot,
+        $projectRoot
+    ], static fn(string $root): bool => $root !== '')));
+
+    $candidates = [];
+    if ($kind === 'glove') {
+        $candidates = [
+            "img/weapon/glove_default_{$side}.png",
+            "img/weapon/default_glove_{$side}.png",
+            "img/weapon/glove_{$side}_default.png",
+            "img/weapon/{$side}_glove_default.png",
+        ];
+    } else {
+        $candidates = [
+            "img/weapon/agent_default_{$side}.png",
+            "img/weapon/default_agent_{$side}.png",
+            "img/weapon/agent_{$side}_default.png",
+            "img/weapon/{$side}_agent_default.png",
+            "img/weapon/default_{$side}_agent.png",
+            "img/weapon/agent_{$side}.png",
+            "img/weapon/{$side}_agent.png",
+            "img/weapon/agent_default_" . ($side === 't' ? 'terrorist' : 'counterterrorist') . ".png",
+            "img/weapon/default_" . ($side === 't' ? 'terrorist' : 'counterterrorist') . ".png",
+        ];
+    }
+
+    // Preserve a configured local/remote image only when it is non-empty.
+    $configured = trim($configured);
+    if ($configured !== '') {
+        if (preg_match('#^(https?:)?//#i', $configured) || str_starts_with($configured, 'data:')) {
+            return $cache[$cacheKey] = $configured;
+        }
+
+        $normalizedConfigured = ltrim(str_replace('\\', '/', $configured), '/');
+        foreach ($roots as $root) {
+            if (is_file($root . '/' . $normalizedConfigured)) {
+                return $cache[$cacheKey] = $normalizedConfigured;
+            }
+        }
+
+        // Keep a non-empty configured URL as a final compatibility fallback.
+        $candidates[] = $normalizedConfigured;
+    }
+
+    foreach ($candidates as $candidate) {
+        foreach ($roots as $root) {
+            if (is_file($root . '/' . $candidate)) {
+                return $cache[$cacheKey] = $candidate;
+            }
+        }
+    }
+
+    // Some deployments use a different but descriptive filename. Resolve
+    // that asset by name and team instead of hard-coding one guessed path.
+    $matches = [];
+    foreach ($roots as $root) {
+        $files = glob($root . '/img/weapon/*') ?: [];
+        foreach ($files as $file) {
+            if (!is_file($file)) {
+                continue;
+            }
+
+            $extension = strtolower((string)pathinfo($file, PATHINFO_EXTENSION));
+            if (!in_array($extension, ['png', 'webp', 'jpg', 'jpeg', 'avif'], true)) {
+                continue;
+            }
+
+            $filename = strtolower((string)pathinfo($file, PATHINFO_FILENAME));
+            if ($kind === 'glove') {
+                if (!str_contains($filename, 'glove')) {
+                    continue;
+                }
+            } else {
+                if (
+                    str_contains($filename, 'glove') ||
+                    !preg_match('/agent|player|default|terrorist|counter/', $filename)
+                ) {
+                    continue;
+                }
+            }
+
+            $sideMatches = $side === 'ct'
+                ? (bool)preg_match('/(?:^|[^a-z0-9])ct(?:[^a-z0-9]|$)|counter.?terrorist|_ct$|^ct_|ctm_/', $filename)
+                : (bool)preg_match('/(?:^|[^a-z0-9])t(?:[^a-z0-9]|$)|terrorist|_t$|^t_|tm_/', $filename);
+
+            if (!$sideMatches) {
+                continue;
+            }
+
+            $matches[] = [
+                'path' => $file,
+                'relative' => 'img/weapon/' . basename($file),
+            ];
+        }
+    }
+
+    if ($matches) {
+        usort($matches, static function (array $a, array $b) use ($side): int {
+            $aName = strtolower(basename($a['path']));
+            $bName = strtolower(basename($b['path']));
+            $aExact = str_contains($aName, $side) ? 0 : 1;
+            $bExact = str_contains($bName, $side) ? 0 : 1;
+            return ($aExact <=> $bExact) ?: strnatcasecmp($aName, $bName);
+        });
+
+        return $cache[$cacheKey] = $matches[0]['relative'];
+    }
+
+    // For gloves the historical configured filenames remain the fallback,
+    // including installations where the static root differs from the code root.
+    if ($kind === 'glove') {
+        return $cache[$cacheKey] = "img/weapon/glove_default_{$side}.png";
+    }
+
+    return $cache[$cacheKey] = '';
+}
+
+
 function normalizeAgentsDataset(array $agentsData): array
 {
     foreach ($agentsData as $teamKey => $agents) {
@@ -378,11 +524,16 @@ function normalizeAgentsDataset(array $agentsData): array
                 $agent['name'] = $name;
             }
 
-            $image = (string)(
+            $image = trim((string)(
                 $agent['image_url']
                 ?? $agent['image']
                 ?? ''
-            );
+            ));
+
+            $side = strtolower(trim((string)$teamKey));
+            if ($image === '' && in_array($side, ['t', 'ct'], true)) {
+                $image = resolveDefaultTeamAsset('agent', $side);
+            }
 
             $agent['image_url'] =
                 resolveAgentImageUrl($image);
@@ -1612,12 +1763,17 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
                         $firstPaint = reset($paints);
 
+                        $defaultGloveSide = (int)$displayTeam === 2 ? 't' : 'ct';
+                        $configuredDefaultGlove = $defaultGloveSide === 't'
+                            ? (defined('IMAGE_DEFAULT_GLOVE_T') ? (string)IMAGE_DEFAULT_GLOVE_T : '')
+                            : (defined('IMAGE_DEFAULT_GLOVE_CT') ? (string)IMAGE_DEFAULT_GLOVE_CT : '');
+
                         $displayImage =
-                            $defindex == 0
-                                ? (
-                                    $displayTeam == 2
-                                        ? IMAGE_DEFAULT_GLOVE_T
-                                        : IMAGE_DEFAULT_GLOVE_CT
+                            (int)$defindex === 0
+                                ? resolveDefaultTeamAsset(
+                                    'glove',
+                                    $defaultGloveSide,
+                                    $configuredDefaultGlove
                                 )
                                 : (
                                     $currentPaint
