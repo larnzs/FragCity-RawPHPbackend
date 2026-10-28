@@ -395,6 +395,7 @@ function resolveDefaultTeamAsset(
             "img/weapon/{$side}_glove_default.png",
         ];
     } else {
+        $sideWord = $side === 't' ? 'terrorist' : 'counterterrorist';
         $candidates = [
             "img/weapon/agent_default_{$side}.png",
             "img/weapon/default_agent_{$side}.png",
@@ -403,8 +404,15 @@ function resolveDefaultTeamAsset(
             "img/weapon/default_{$side}_agent.png",
             "img/weapon/agent_{$side}.png",
             "img/weapon/{$side}_agent.png",
-            "img/weapon/agent_default_" . ($side === 't' ? 'terrorist' : 'counterterrorist') . ".png",
-            "img/weapon/default_" . ($side === 't' ? 'terrorist' : 'counterterrorist') . ".png",
+            "img/weapon/weapon_default_{$side}.png",
+            "img/weapon/default_weapon_{$side}.png",
+            "img/weapon/weapon_{$side}.png",
+            "img/weapon/player_{$side}.png",
+            "img/weapon/{$side}_player.png",
+            "img/weapon/{$side}.png",
+            "img/weapon/{$sideWord}.png",
+            "img/weapon/agent_default_{$sideWord}.png",
+            "img/weapon/default_{$sideWord}.png",
         ];
     }
 
