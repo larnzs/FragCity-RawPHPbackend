@@ -4427,3 +4427,96 @@ body > .wp-modal#skinModal .modal-dialog {
     outline: 2px solid var(--wp-blue-soft);
     outline-offset: 3px;
 }
+
+
+/* =========================================================
+   29. Unified top toolbar: team + categories + search
+========================================================= */
+
+.wp-app .wp-header {
+    padding: 10px 0;
+}
+
+.wp-app .wp-header .wp-tabs {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 7px;
+    margin: 0 auto;
+    padding: 0 2px 2px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.wp-app .wp-header .wp-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-team-switcher {
+    flex: 0 0 auto;
+    height: 46px;
+    min-height: 46px;
+    box-sizing: border-box;
+    padding: 3px;
+    margin: 0;
+    gap: 4px;
+    align-self: center;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn {
+    flex: 0 0 auto;
+    height: 38px;
+    min-width: 54px;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-tab {
+    flex: 0 0 46px;
+    width: 46px;
+    min-width: 46px;
+    height: 46px;
+    min-height: 46px;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-search-wrap {
+    flex: 1 1 320px;
+    min-width: 220px;
+    max-width: 380px;
+    order: 0;
+    margin: 0;
+    align-self: center;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-search-wrap .wp-search {
+    width: 100%;
+    height: 46px;
+    min-height: 46px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 760px) {
+    .wp-app .wp-header {
+        padding: 8px 0;
+    }
+
+    .wp-app .wp-header .wp-tabs {
+        gap: 6px;
+        padding-bottom: 2px;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-search-wrap {
+        flex: 0 0 230px;
+        min-width: 230px;
+        max-width: 230px;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn {
+        min-width: 50px;
+        padding: 0 8px;
+    }
+}
