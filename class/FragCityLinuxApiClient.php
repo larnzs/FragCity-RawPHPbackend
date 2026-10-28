@@ -107,6 +107,9 @@ final class FragCityLinuxApiClient
         if ($status < 200 || $status >= 300 || ($decoded['success'] ?? false) !== true) {
             $code = is_string($decoded['error'] ?? null) ? $decoded['error'] : 'request_failed';
             error_log('[FragCity] Linux API request failed; HTTP=' . $status . '; code=' . $code);
+            if (PHP_SAPI === 'cli') {
+                throw new RuntimeException('Linux API request failed (HTTP ' . $status . '; code=' . $code . ').');
+            }
             throw new RuntimeException('Linux API request failed.');
         }
 
