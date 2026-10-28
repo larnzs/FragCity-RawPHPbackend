@@ -3258,7 +3258,7 @@
 
                     <button
                         type="button"
-                        class="wp-addon-btn wp-sticker-slot"
+                        class="wp-addon-btn wp-sticker-slot ${stickerInfo && String(sticker.id) !== '0' ? 'has-sticker' : 'is-empty'}"
                         data-sticker-slot="${slot}"
                     >
 
@@ -3363,7 +3363,7 @@
 
                     <button
                         type="button"
-                        class="wp-addon-btn"
+                        class="wp-addon-btn wp-keychain-slot ${keychainInfo && String(keychain.id) !== '0' ? 'has-keychain' : 'is-empty'}"
                         data-keychain-trigger
                     >
 
