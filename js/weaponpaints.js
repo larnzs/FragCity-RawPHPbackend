@@ -117,9 +117,6 @@
             '',
 
         modalSearchTimer:
-            null,
-
-        sourceTabForModal:
             null
 
     };
@@ -1238,6 +1235,23 @@
     }
 
 
+    function getCurrentActiveTab() {
+
+        const activePane = getActivePane();
+
+        if (activePane && activePane.id) {
+            return activePane.id;
+        }
+
+        return String(
+            state.currentActiveTab ||
+            config.currentTab ||
+            'tab-knives'
+        );
+
+    }
+
+
     const floatingClientPages = new Map();
 
     /* =========================================================
@@ -2033,27 +2047,18 @@
             team
         ) {
 
-            const url =
-                buildNavigationUrl({
+            const normalizedTeam = String(team || '2');
+            const activeTab = getCurrentActiveTab();
 
-                    team:
-                        team,
+            state.currentActiveTab = activeTab;
+            state.currentTeamParam = normalizedTeam;
 
-                    tab:
-                        state.currentActiveTab,
+            const url = buildNavigationUrl({
+                team: normalizedTeam,
+                tab: activeTab
+            });
 
-                    skin_page:
-                        state.currentSkinPage,
-
-                    pin_page:
-                        state.currentPinPage
-
-                });
-
-
-            return navigateWithFade(
-                url
-            );
+            return navigateWithFade(url);
 
         };
 
@@ -2150,43 +2155,69 @@
        06. URL / Tab State
     ========================================================== */
 
+    function syncTeamLinkUrls(tabId = getCurrentActiveTab()) {
+
+        if (!dom.mainTabs || !tabId) {
+            return;
+        }
+
+        const currentUrl = getCurrentUrl();
+
+        dom.mainTabs
+            .querySelectorAll('.wp-team-switcher a[data-wp-team]')
+            .forEach(link => {
+                const team = String(
+                    link.dataset.wpTeam ||
+                    link.dataset.team ||
+                    ''
+                );
+
+                if (!['2', '3', 'both'].includes(team)) {
+                    return;
+                }
+
+                const targetUrl = new URL(currentUrl.toString());
+                targetUrl.searchParams.set('team', team);
+                targetUrl.searchParams.set('tab', tabId);
+                link.href = targetUrl.toString();
+            });
+
+    }
+
+
     function updateTabUrl(
         tabId
     ) {
 
-        if (
-            !tabId
-        ) {
-
+        if (!tabId) {
             return;
-
         }
 
+        const url = getCurrentUrl();
+        const previousTab = url.searchParams.get('tab');
 
-        state.currentActiveTab =
-            tabId;
+        // Page numbers belong to their own category. Do not carry a previous
+        // tab's pagination into a different category when switching tabs.
+        if (previousTab && previousTab !== tabId) {
+            url.searchParams.delete('skin_page');
+            url.searchParams.delete('pin_page');
+            state.currentSkinPage = 1;
+            state.currentPinPage = 1;
+        }
 
-
-        const url =
-            getCurrentUrl();
-
-
-        url.searchParams.set(
-            'tab',
-            tabId
-        );
-
+        state.currentActiveTab = tabId;
+        url.searchParams.set('tab', tabId);
 
         window.history.replaceState(
             {
-                tab:
-                    tabId
+                ...(window.history.state || {}),
+                tab: tabId
             },
             '',
             url.toString()
         );
 
-
+        syncTeamLinkUrls(tabId);
         applyGlobalSearch();
 
     }
@@ -2205,19 +2236,16 @@
         }
 
 
+        const currentTab = getCurrentActiveTab();
+        state.currentActiveTab = currentTab;
+
         const activeTab =
             form.elements.namedItem(
                 'active_tab'
             );
 
-
-        if (
-            activeTab
-        ) {
-
-            activeTab.value =
-                state.currentActiveTab;
-
+        if (activeTab) {
+            activeTab.value = currentTab;
         }
 
     }
@@ -2442,6 +2470,36 @@
         );
 
 
+        if (dom.mainTabs.dataset.wpTeamSwitcherBound !== '1') {
+            dom.mainTabs.addEventListener(
+                'click',
+                event => {
+                    const target = event.target instanceof Element
+                        ? event.target
+                        : event.target && event.target.parentElement;
+                    const teamLink = target
+                        ? target.closest('.wp-team-switcher a[data-wp-team]')
+                        : null;
+
+                    if (!teamLink || !dom.mainTabs.contains(teamLink)) {
+                        return;
+                    }
+
+                    const team = teamLink.dataset.wpTeam || teamLink.dataset.team;
+                    if (!['2', '3', 'both'].includes(String(team))) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    event.stopPropagation();
+                    window.changeTeam(team);
+                },
+                true
+            );
+
+            dom.mainTabs.dataset.wpTeamSwitcherBound = '1';
+        }
+
         const initialTab =
             state.currentActiveTab ||
             'tab-knives';
@@ -2459,6 +2517,8 @@
             );
 
         }
+
+        syncTeamLinkUrls(getCurrentActiveTab());
 
     }
 
@@ -5514,17 +5574,8 @@
             );
 
         if (sourceTab) {
-
-            state.sourceTabForModal =
-                sourceTab;
-
-            state.currentActiveTab =
-                sourceTab;
-
-            updateTabUrl(
-                sourceTab
-            );
-
+            state.currentActiveTab = sourceTab;
+            updateTabUrl(sourceTab);
         }
 
         if (
@@ -5673,9 +5724,6 @@
                     }
 
                     state.activeDefindex =
-                        null;
-
-                    state.sourceTabForModal =
                         null;
 
                     if (dom.skinModalBody) {
@@ -5858,13 +5906,12 @@
                 }
 
                 const sourceTab =
-                    state.sourceTabForModal ||
+                    (getActivePane() && getActivePane().id) ||
                     getTabIdFromElement(form) ||
                     state.currentActiveTab ||
                     'tab-knives';
 
-                state.currentActiveTab =
-                    sourceTab;
+                state.currentActiveTab = sourceTab;
 
                 syncFormActiveTab(
                     form
