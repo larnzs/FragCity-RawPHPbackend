@@ -98,7 +98,7 @@ function smokeRequest(string $baseUrl, string $secret, array $payload): bool
 
     if ($response === false || $curlError !== 0) {
         $detail = $curlErrorText !== '' ? $curlErrorText : 'no cURL detail available';
-        fwrite(STDERR, "ERROR: Request transport failed (cURL code " . $curlError . ": " . $detail . ").\\n");
+        fwrite(STDERR, "ERROR: Request transport failed (cURL code " . $curlError . ": " . $detail . ").\n");
         return false;
     }
 
