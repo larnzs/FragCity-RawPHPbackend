@@ -1612,11 +1612,21 @@
 
     function getTransitionTargets() {
 
-        return [
+        // Each weapon category now has its own fader ID (skinsFade-tab-*).
+        // Include every grid fader so the page-ready state clears opacity: 0
+        // on Rifles, SMG, Shotguns, Pistols, Snipers and the legacy grids too.
+        const categoryGridFaders = Array.from(
+            document.querySelectorAll(
+                '.wp-app .wp-grid-fader'
+            )
+        );
+
+        return Array.from(new Set([
             dom.mainPageFader,
             dom.skinGridFade,
-            dom.pinGridFade
-        ]
+            dom.pinGridFade,
+            ...categoryGridFaders
+        ]))
             .filter(Boolean);
 
     }
