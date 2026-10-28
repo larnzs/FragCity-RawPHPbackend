@@ -1784,7 +1784,7 @@
                 'tab-skins',
                 'tab-rifles',
                 'tab-smg',
-                'tab-shotgun',
+                'tab-heavy',
                 'tab-pistol',
                 'tab-sniper'
             ];
