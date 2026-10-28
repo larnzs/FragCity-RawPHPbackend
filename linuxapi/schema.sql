@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS fragcity_api_nonces (
 --   IDENTIFIED BY 'REPLACE_WITH_A_LONG_UNIQUE_PASSWORD';
 -- GRANT SELECT, INSERT, UPDATE ON verified_weaponpaints_db.wp_player_skins
 --   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
+-- GRANT SELECT, INSERT, UPDATE ON verified_weaponpaints_db.wp_player_skin_inventory
+--   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
 -- GRANT INSERT, UPDATE ON verified_weaponpaints_db.wp_player_gloves
 --   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
 -- GRANT SELECT, INSERT, UPDATE ON verified_weaponpaints_db.wp_player_knife
@@ -30,3 +32,27 @@ CREATE TABLE IF NOT EXISTS fragcity_api_nonces (
 -- SELECT is required because the API deletes by created_at and tests may delete by nonce_hash.
 -- GRANT SELECT, INSERT, DELETE ON verified_weaponpaints_db.fragcity_api_nonces
 --   TO 'fragcity_weaponpaints_api'@'CLIENT_HOST';
+
+-- Per-player, per-team, per-weapon, per-paint customization inventory.
+-- The existing wp_player_skins table remains the single active loadout row
+-- consumed by the CS2 plugin; this table preserves saved configurations for
+-- paint finishes when the active paint changes.
+CREATE TABLE IF NOT EXISTS wp_player_skin_inventory (
+    steamid VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    weapon_team TINYINT UNSIGNED NOT NULL,
+    weapon_defindex INT UNSIGNED NOT NULL,
+    weapon_paint_id INT UNSIGNED NOT NULL,
+    weapon_wear DECIMAL(10,6) NOT NULL DEFAULT 0.001,
+    weapon_seed INT UNSIGNED NOT NULL DEFAULT 0,
+    weapon_nametag VARCHAR(80) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+    weapon_stattrak TINYINT(1) NOT NULL DEFAULT 0,
+    weapon_sticker_0 VARCHAR(255) NOT NULL DEFAULT '0;0;0;0.001;1;0',
+    weapon_sticker_1 VARCHAR(255) NOT NULL DEFAULT '0;0;0;0.001;1;0',
+    weapon_sticker_2 VARCHAR(255) NOT NULL DEFAULT '0;0;0;0.001;1;0',
+    weapon_sticker_3 VARCHAR(255) NOT NULL DEFAULT '0;0;0;0.001;1;0',
+    weapon_sticker_4 VARCHAR(255) NOT NULL DEFAULT '0;0;0;0.001;1;0',
+    weapon_keychain VARCHAR(255) NOT NULL DEFAULT '0;0;0;0;0',
+    PRIMARY KEY (steamid, weapon_team, weapon_defindex, weapon_paint_id),
+    KEY idx_wp_skin_inventory_weapon (steamid, weapon_team, weapon_defindex)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
