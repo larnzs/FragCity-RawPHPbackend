@@ -3127,15 +3127,13 @@
 
 
         const selectedWear =
-            selected
-                ? selected.weapon_wear
-                : '0.001';
+            detail.weapon_wear ??
+            (selected ? selected.weapon_wear : '0.001');
 
 
         const selectedSeed =
-            selected
-                ? selected.weapon_seed
-                : '0';
+            detail.weapon_seed ??
+            (selected ? selected.weapon_seed : '0');
 
 
         const selectedNameTag =
