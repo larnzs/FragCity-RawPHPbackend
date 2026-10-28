@@ -272,6 +272,60 @@ function apiSaveSkin(PDO $pdo, string $steamid, array $teams, array $body): void
     ]);
 
     foreach ($teams as $team) {
+        // Preserve the previously active paint before wp_player_skins is
+        // overwritten. This also migrates the legacy active row into inventory
+        // on the first save after deploying per-paint storage.
+        apiExec($pdo,
+            'INSERT IGNORE INTO wp_player_skin_inventory
+                (steamid, weapon_team, weapon_defindex, weapon_paint_id, weapon_wear, weapon_seed,
+                 weapon_nametag, weapon_stattrak, weapon_sticker_0, weapon_sticker_1,
+                 weapon_sticker_2, weapon_sticker_3, weapon_sticker_4, weapon_keychain)
+             SELECT steamid, weapon_team, weapon_defindex, weapon_paint_id, weapon_wear, weapon_seed,
+                    weapon_nametag, weapon_stattrak, weapon_sticker_0, weapon_sticker_1,
+                    weapon_sticker_2, weapon_sticker_3, weapon_sticker_4, weapon_keychain
+             FROM wp_player_skins
+             WHERE steamid = :old_steamid AND weapon_team = :old_team
+               AND weapon_defindex = :old_defindex',
+            [
+                ':old_steamid' => $steamid,
+                ':old_team' => $team,
+                ':old_defindex' => $defindex,
+            ]
+        );
+
+        // Keep an independent saved configuration for each paint finish.
+        apiExec($pdo,
+            'INSERT INTO wp_player_skin_inventory
+                (steamid, weapon_team, weapon_defindex, weapon_paint_id, weapon_wear, weapon_seed,
+                 weapon_nametag, weapon_stattrak, weapon_sticker_0, weapon_sticker_1,
+                 weapon_sticker_2, weapon_sticker_3, weapon_sticker_4, weapon_keychain)
+             VALUES
+                (:inv_steamid, :inv_team, :inv_defindex, :inv_paint, :inv_wear, :inv_seed,
+                 :inv_nametag, :inv_stattrak, :inv_sticker0, :inv_sticker1,
+                 :inv_sticker2, :inv_sticker3, :inv_sticker4, :inv_keychain)
+             ON DUPLICATE KEY UPDATE
+                weapon_wear = :inv_wear_update, weapon_seed = :inv_seed_update,
+                weapon_nametag = :inv_nametag_update, weapon_stattrak = :inv_stattrak_update,
+                weapon_sticker_0 = :inv_sticker0_update, weapon_sticker_1 = :inv_sticker1_update,
+                weapon_sticker_2 = :inv_sticker2_update, weapon_sticker_3 = :inv_sticker3_update,
+                weapon_sticker_4 = :inv_sticker4_update, weapon_keychain = :inv_keychain_update',
+            [
+                ':inv_steamid' => $steamid, ':inv_team' => $team,
+                ':inv_defindex' => $defindex, ':inv_paint' => $paint,
+                ':inv_wear' => $wear, ':inv_seed' => $seed,
+                ':inv_nametag' => $nametag, ':inv_stattrak' => $stattrak,
+                ':inv_sticker0' => $stickers[0], ':inv_sticker1' => $stickers[1],
+                ':inv_sticker2' => $stickers[2], ':inv_sticker3' => $stickers[3],
+                ':inv_sticker4' => $stickers[4], ':inv_keychain' => $keychainText,
+                ':inv_wear_update' => $wear, ':inv_seed_update' => $seed,
+                ':inv_nametag_update' => $nametag, ':inv_stattrak_update' => $stattrak,
+                ':inv_sticker0_update' => $stickers[0], ':inv_sticker1_update' => $stickers[1],
+                ':inv_sticker2_update' => $stickers[2], ':inv_sticker3_update' => $stickers[3],
+                ':inv_sticker4_update' => $stickers[4], ':inv_keychain_update' => $keychainText,
+            ]
+        );
+
+        // The plugin's original table continues to track only the active paint.
         apiExec($pdo,
             'INSERT INTO wp_player_skins
                 (steamid, weapon_team, weapon_defindex, weapon_paint_id, weapon_wear, weapon_seed,
@@ -436,6 +490,12 @@ try {
                                weapon_nametag, weapon_stattrak, weapon_sticker_0, weapon_sticker_1,
                                weapon_sticker_2, weapon_sticker_3, weapon_sticker_4, weapon_keychain
                         FROM wp_player_skins WHERE steamid = :steamid',
+            'skin_inventory' => 'SELECT weapon_defindex, weapon_paint_id, weapon_wear, weapon_seed, weapon_team,
+                                         weapon_nametag, weapon_stattrak, weapon_sticker_0, weapon_sticker_1,
+                                         weapon_sticker_2, weapon_sticker_3, weapon_sticker_4, weapon_keychain
+                                  FROM wp_player_skin_inventory
+                                  WHERE steamid = :steamid
+                                  ORDER BY weapon_team, weapon_defindex, weapon_paint_id',
             'knife' => 'SELECT knife, weapon_team FROM wp_player_knife WHERE steamid = :steamid LIMIT 1',
             'agents' => 'SELECT agent_t, agent_ct FROM wp_player_agents WHERE steamid = :steamid LIMIT 1',
             'music' => 'SELECT weapon_team, music_id FROM wp_player_music WHERE steamid = :steamid',
