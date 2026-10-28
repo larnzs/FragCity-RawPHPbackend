@@ -527,4 +527,32 @@ The integrations key holds the same generated secret as the Linux config. Keep i
 - Signed request rejected: ensure time is synchronized, all three X-FragCity headers are forwarded by Nginx, and the client and server use the exact same secret.
 - TLS/redirect failure: verify DNS, certificate paths, and nginx -t before reload.
 
+### تفسیر خروجی smoke test محلی Laragon
+
+این بخش برای اجرای دستور زیر در ریشهٔ ریپوی وب‌سایت روی ویندوز است:
+
+```powershell
+php tools\\weaponpaints-smoke-test.php
+```
+
+| خروجی | معنی و اقدام بعدی |
+|---|---|
+| `Linux API shared secret is not configured.` | فایل `settings/settings.json` بارگذاری شده، اما `integrations.weaponpaints_api.shared_secret` با قالب مورد انتظار سازگار نیست. کلید باید با مقدار `shared_secret` در `/etc/fragcity-api/config.php` یکسان و ۶۴ تا ۱۲۸ کاراکتر هگزادسیمال کوچک باشد؛ دستور `openssl rand -hex 32` یک کلید معتبر ۶۴ کاراکتری می‌سازد. این خطا پیش از درخواست شبکه رخ می‌دهد. |
+| `Linux API request failed (HTTP ...; code=...)` | درخواست پاسخی از API گرفته، ولی status HTTP یا فیلد `success` نشان می‌دهد درخواست پذیرفته نشده است. `HTTP 503; code=service_not_configured` معمولاً به کانفیگ اجرایی API یا قالب secret روی لینوکس مربوط است؛ `HTTP 401; code=unauthorized` معمولاً به عدم تطابق secret، زمان سیستم، یا هدرهای امضا مربوط می‌شود. جزئیات بیشتری را در لاگ API/Nginx بررسی کن. |
+| `Linux API is currently unavailable (cURL error N: ...).` | درخواست در لایهٔ انتقال HTTPS شکست خورده است. کد و پیام cURL در خروجی CLI نشان داده می‌شود؛ از آن برای تفکیک DNS، اتصال TCP، timeout یا خطای TLS استفاده کن. |
+| `PASS: Signed API request succeeded and the WeaponPaints database is reachable.` | درخواست HMAC امضاشده موفق شده و API پاسخ تأیید دسترسی دیتابیس WeaponPaints را داده است. این تست به‌تنهایی ذخیرهٔ واقعی یک اسکین را آزمایش نمی‌کند. |
+
+کدهای رایج cURL: `6` یعنی نام میزبان resolve نشده؛ `7` یعنی اتصال به میزبان/پورت برقرار نشده؛ `28` یعنی timeout؛ `35` معمولاً خطای handshake مربوط به TLS است؛ و `60` معمولاً اعتبارسنجی گواهی TLS را رد می‌کند. این‌ها راهنمای تشخیص اولیه‌اند؛ پیام کامل cURL را نیز بخوان.
+
+برای جداکردن مشکل DNS/TLS از امضای API، این درخواست GET عمومی را در PowerShell اجرا کن:
+
+```powershell
+nslookup api.fragcity.ir
+curl.exe -i --connect-timeout 5 --max-time 10 https://api.fragcity.ir/health
+```
+
+انتظار می‌رود `/health` یک پاسخ HTTP موفق با `"service":"fragcity-linuxapi"` برگرداند. این فقط دسترسی HTTPS و مسیر health را آزمایش می‌کند و نه امضای HMAC یا اتصال دیتابیس.
+
+**نکتهٔ PHP 8.5:** پیام `Deprecated: Function curl_close() is deprecated` به‌خودی‌خود دلیل شکست اتصال نیست؛ شکست واقعی در نسخهٔ کلاینت به‌صورت خطای cURL ثبت می‌شود. فراخوانی `curl_close()` از کلاینت وب و smoke test لینوکس حذف شده و تست CLI اکنون باید کد و پیام واقعی cURL را نشان دهد. پس از `git pull`، تست را دوباره اجرا کن. اگر خطای انتقال باقی ماند، متن کامل خطای جدید را بفرست، اما هیچ secret، رمز دیتابیس، یا هدر امضا را ارسال نکن.
+
 The database permission test, HTTPS health check, signed `ping_db`, and read-only `get_selection` tests are verified on this node. Do not declare the service production-ready until controlled test-player write/read-back tests and the remaining deployment checks pass.
