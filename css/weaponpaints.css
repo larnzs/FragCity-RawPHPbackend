@@ -6174,3 +6174,212 @@ body > .wp-modal.wp-modal-closing .modal-dialog {
     }
 }
 
+/* =========================================================
+   36. Compact Vertical Setting Cards and Clean Header Search
+========================================================= */
+
+/* Search sits cleanly in the header without an extra floating icon. */
+body > #skinModal .wp-modal-header-tools {
+    flex-wrap: nowrap;
+    gap: 7px;
+    overflow: hidden;
+}
+
+body > #skinModal .wp-modal-header-tools .wp-selection-toolbar-info {
+    flex: 0 1 auto;
+    gap: 6px !important;
+    white-space: nowrap;
+}
+
+body > #skinModal .wp-modal-header-tools .wp-selection-search {
+    display: flex;
+    flex: 1 1 190px;
+    align-items: center;
+    min-width: 0;
+    max-width: 255px;
+    margin-left: auto;
+}
+
+body > #skinModal .wp-modal-header-tools .wp-selection-search .wp-addon-search {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+}
+
+/* Each setting reads top-to-bottom instead of crowding label/value side by side. */
+#skinModalBody .wp-skin-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-content: start;
+    gap: 7px !important;
+    overflow: hidden;
+}
+
+#skinModalBody .wp-skin-controls > .wp-control-card:not(.wp-addon-control-card) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 5px;
+    min-width: 0;
+    padding: 8px 9px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    flex-wrap: nowrap;
+    gap: 3px !important;
+    margin: 0 0 2px !important;
+    line-height: 1.2;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-label > span {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-value {
+    align-self: flex-start;
+    font-size: .6rem !important;
+    opacity: .8;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-input {
+    width: 100% !important;
+    min-width: 0;
+    height: 30px !important;
+    min-height: 30px !important;
+    margin: 0 !important;
+}
+
+/* StatTrak remains a compact single toggle card, not a stretched banner. */
+#skinModalBody .wp-skin-controls > .wp-control-card:has(.wp-inline-toggle) {
+    grid-column: 1 / -1;
+    padding: 7px 10px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-inline-toggle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px !important;
+    width: 100%;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-content {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-content strong {
+    white-space: nowrap;
+    font-size: .68rem !important;
+}
+
+/* Stickers/keychain: six small, vertical tiles arranged as a compact 3×2 grid. */
+#skinModalBody .wp-skin-controls > .wp-addon-control-card {
+    grid-column: 1 / -1;
+    padding: 8px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 8px !important;
+    margin-bottom: 6px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addons-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+    width: 100%;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
+    justify-content: center;
+    gap: 3px !important;
+    width: 100%;
+    min-width: 0;
+    min-height: 45px !important;
+    height: 45px !important;
+    padding: 4px !important;
+    overflow: hidden;
+    border-radius: 8px !important;
+    font-size: .59rem !important;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn img,
+#skinModalBody .wp-skin-controls .wp-addon-btn .wp-addon-preview-image,
+#skinModalBody .wp-skin-controls .wp-addon-btn .wp-addon-empty-icon {
+    flex: 0 0 auto;
+    width: 22px !important;
+    max-width: 22px !important;
+    height: 21px !important;
+    max-height: 21px !important;
+    object-fit: contain;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn > span:last-child {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: center;
+}
+
+/* The narrow layout keeps the same vertical hierarchy, with smaller gaps. */
+@media (max-width: 720px) {
+    body > #skinModal .wp-modal-header-tools {
+        flex-wrap: wrap;
+        overflow: visible;
+    }
+
+    body > #skinModal .wp-modal-header-tools .wp-selection-toolbar-info {
+        flex: 1 1 100%;
+        flex-wrap: wrap;
+        white-space: normal;
+    }
+
+    body > #skinModal .wp-modal-header-tools .wp-selection-search {
+        flex: 1 1 100%;
+        max-width: none;
+        margin-left: 0;
+    }
+
+    #skinModalBody .wp-skin-controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 5px !important;
+        padding: 6px !important;
+    }
+
+    #skinModalBody .wp-skin-controls > .wp-control-card:not(.wp-addon-control-card) {
+        padding: 6px !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addons-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 4px !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addon-btn {
+        min-height: 40px !important;
+        height: 40px !important;
+        font-size: .55rem !important;
+    }
+}
+
