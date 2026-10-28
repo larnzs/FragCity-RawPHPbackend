@@ -25,8 +25,7 @@ CREATE TABLE IF NOT EXISTS wp_player_skin_inventory (
     weapon_sticker_3 VARCHAR(255) NOT NULL DEFAULT '0;0;0;0;0.001;1;0',
     weapon_sticker_4 VARCHAR(255) NOT NULL DEFAULT '0;0;0;0;0.001;1;0',
     weapon_keychain VARCHAR(255) NOT NULL DEFAULT '0;0;0;0;0',
-    PRIMARY KEY (steamid, weapon_team, weapon_defindex, weapon_paint_id),
-    KEY idx_wp_skin_inventory_weapon (steamid, weapon_team, weapon_defindex)
+    PRIMARY KEY (steamid, weapon_team, weapon_defindex, weapon_paint_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- One-time-safe backfill: preserve all currently active plugin rows as
