@@ -1770,6 +1770,18 @@
                     1
                 );
 
+            const skinCategoryTabs = [
+                'tab-skins',
+                'tab-rifles',
+                'tab-smg',
+                'tab-shotgun',
+                'tab-pistol',
+                'tab-sniper'
+            ];
+
+            const targetTab = skinCategoryTabs.includes(state.currentActiveTab)
+                ? state.currentActiveTab
+                : 'tab-skins';
 
             const url =
                 buildNavigationUrl({
@@ -1778,7 +1790,7 @@
                         state.currentTeamParam,
 
                     tab:
-                        'tab-skins',
+                        targetTab,
 
                     skin_page:
                         page
