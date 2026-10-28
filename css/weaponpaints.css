@@ -7164,3 +7164,49 @@ body > #skinModal .wp-modal-header-tools .wp-selection-search .wp-addon-search {
         transition: none !important;
     }
 }
+
+/* =========================================================
+   42. AJAX lifecycle, Agents team guard and shared page alignment
+========================================================= */
+
+/* Keep the category bar and the item workspace on the exact same rails. */
+body:has(.wp-app) .wp-header .wp-tabs,
+body:has(.wp-app) .wp-main {
+    width: min(calc(100% - 32px), 1550px) !important;
+    max-width: 1550px !important;
+    margin-inline: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* The first grid area is the right-hand edge in the RTL toolbar. */
+body:has(.wp-app) .wp-header .wp-tabs {
+    direction: rtl;
+}
+
+.wp-app .wp-header .wp-category-switcher {
+    direction: rtl;
+    justify-content: flex-start;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.wp-app .wp-team-switcher .wp-team-btn--both.is-disabled {
+    opacity: 0.4 !important;
+    filter: saturate(0.35);
+    pointer-events: none !important;
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.wp-app #agentsContainer .agent-item.wp-agent-team-hidden {
+    display: none !important;
+}
+
+@media (max-width: 760px) {
+    body:has(.wp-app) .wp-header .wp-tabs,
+    body:has(.wp-app) .wp-main {
+        width: min(calc(100% - 24px), 1550px) !important;
+    }
+}
