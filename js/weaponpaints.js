@@ -5244,6 +5244,28 @@
 
         prepareCustomModalTriggers();
 
+        // Make clickable knife cards usable from the keyboard as well.
+        document.addEventListener(
+            'keydown',
+            event => {
+                if (event.key !== 'Enter' && event.key !== ' ') {
+                    return;
+                }
+
+                const trigger = event.target.closest(
+                    '[data-wp-modal-trigger="1"][role="button"]'
+                );
+
+                if (!trigger) {
+                    return;
+                }
+
+                event.preventDefault();
+                trigger.click();
+            },
+            true
+        );
+
         document.addEventListener(
             'click',
             event => {
