@@ -53,6 +53,28 @@
     const keychainsData =
         config.keychainsData || {};
 
+    const skinInventory =
+        Array.isArray(config.skinInventory)
+            ? config.skinInventory
+            : [];
+
+    const skinInventoryByKey = Object.create(null);
+    const skinDraftsByKey = Object.create(null);
+
+    skinInventory.forEach(entry => {
+        const team = Number(entry.weapon_team);
+        const defindex = Number(entry.weapon_defindex);
+        const paintId = Number(entry.weapon_paint_id);
+
+        if (
+            (team === 2 || team === 3) &&
+            Number.isFinite(defindex) &&
+            Number.isFinite(paintId)
+        ) {
+            skinInventoryByKey[`${team}:${defindex}:${paintId}`] = entry;
+        }
+    });
+
 
     /* =========================================================
        02. State
@@ -81,6 +103,9 @@
             ),
 
         activeDefindex:
+            null,
+
+        activeSkinPaintId:
             null,
 
         currentStickerSlot:
@@ -1757,7 +1782,7 @@
         const parts =
             String(
                 value ||
-                '0;0;0;0;0;0;0'
+                '0;0;0;0;0.001;1;0'
             )
                 .split(';');
 
@@ -1849,14 +1874,7 @@
 
 
         const teams =
-            state.currentTeamParam ===
-            'both'
-                ? [2, 3]
-                : [
-                    Number(
-                        state.currentTeamParam
-                    )
-                ];
+            getSkinTeamCandidates();
 
 
         for (
@@ -1885,6 +1903,287 @@
 
 
         return {};
+
+    }
+
+
+    function getSkinTeamCandidates() {
+
+        return state.currentTeamParam === 'both'
+            ? [2, 3]
+            : [Number(state.currentTeamParam)].filter(
+                team => team === 2 || team === 3
+            );
+
+    }
+
+
+    function getSkinPaintKey(team, defindex, paintId) {
+
+        return `${Number(team)}:${Number(defindex)}:${String(paintId)}`;
+
+    }
+
+
+    function getDefaultSkinDetail(defindex, paintId, team) {
+
+        const detail = {
+            weapon_team: Number(team),
+            weapon_defindex: Number(defindex),
+            weapon_paint_id: Number(paintId),
+            weapon_wear: '0.001',
+            weapon_seed: '0',
+            weapon_nametag: '',
+            weapon_stattrak: 0,
+            weapon_keychain: '0;0;0;0;0'
+        };
+
+        for (let slot = 0; slot < 5; slot++) {
+            detail[`weapon_sticker_${slot}`] = '0;0;0;0;0.001;1;0';
+        }
+
+        return detail;
+
+    }
+
+
+    function getSkinDetailForPaint(defindex, paintId) {
+
+        const keyPaintId = String(paintId ?? '');
+        const teams = getSkinTeamCandidates();
+
+        for (const team of teams) {
+            const key = getSkinPaintKey(team, defindex, keyPaintId);
+            const draft = skinDraftsByKey[key];
+            const saved = skinInventoryByKey[key];
+
+            if (draft) {
+                return draft;
+            }
+
+            if (saved) {
+                return saved;
+            }
+
+            const details = skinDetails[String(defindex)] || skinDetails[defindex] || {};
+            const active = details[String(team)] || details[team];
+
+            if (
+                active &&
+                String(active.weapon_paint_id ?? '') === keyPaintId
+            ) {
+                return active;
+            }
+        }
+
+        // The active plugin row may belong to the other team when viewing Both.
+        const details = skinDetails[String(defindex)] || skinDetails[defindex] || {};
+        for (const team of [2, 3]) {
+            const active = details[String(team)] || details[team];
+            if (
+                active &&
+                String(active.weapon_paint_id ?? '') === keyPaintId
+            ) {
+                return active;
+            }
+        }
+
+        return getDefaultSkinDetail(
+            defindex,
+            keyPaintId,
+            teams[0] || 2
+        );
+
+    }
+
+
+    function getSkinFormValue(form, name, fallback = '') {
+
+        if (!form || !form.elements) {
+            return String(fallback);
+        }
+
+        const field = form.elements.namedItem(name);
+        if (!field || !('value' in field)) {
+            return String(fallback);
+        }
+
+        return String(field.value ?? fallback);
+
+    }
+
+
+    function captureSkinDraftFromForm(form, defindex, paintId) {
+
+        if (!form || paintId === null || paintId === undefined || paintId === '') {
+            return;
+        }
+
+        const teams = getSkinTeamCandidates();
+        const stattrak = form.elements.namedItem('stattrak');
+        const detail = {
+            weapon_defindex: Number(defindex),
+            weapon_paint_id: Number(paintId),
+            weapon_wear: getSkinFormValue(form, 'wear', '0.001'),
+            weapon_seed: getSkinFormValue(form, 'seed', '0'),
+            weapon_nametag: getSkinFormValue(form, 'nametag', ''),
+            weapon_stattrak: stattrak && stattrak.checked ? 1 : 0,
+            weapon_keychain: [
+                getSkinFormValue(form, 'keychain[id]', '0'),
+                getSkinFormValue(form, 'keychain[x]', '0'),
+                getSkinFormValue(form, 'keychain[y]', '0'),
+                getSkinFormValue(form, 'keychain[z]', '0'),
+                getSkinFormValue(form, 'keychain[seed]', '0')
+            ].join(';')
+        };
+
+        for (let slot = 0; slot < 5; slot++) {
+            detail[`weapon_sticker_${slot}`] = [
+                getSkinFormValue(form, `sticker[${slot}][id]`, '0'),
+                '0',
+                getSkinFormValue(form, `sticker[${slot}][x]`, '0'),
+                getSkinFormValue(form, `sticker[${slot}][y]`, '0'),
+                getSkinFormValue(form, `sticker[${slot}][wear]`, '0.001'),
+                getSkinFormValue(form, `sticker[${slot}][scale]`, '1'),
+                getSkinFormValue(form, `sticker[${slot}][rotate]`, '0')
+            ].join(';');
+        }
+
+        teams.forEach(team => {
+            const key = getSkinPaintKey(team, defindex, paintId);
+            skinDraftsByKey[key] = {
+                ...detail,
+                weapon_team: team
+            };
+        });
+
+    }
+
+
+    function refreshStickerSlotButton(form, slot, sticker) {
+
+        const button = form.querySelector(
+            `[data-sticker-slot="${slot}"]`
+        );
+
+        if (!button) {
+            return;
+        }
+
+        const hasSticker = Number(sticker.id) > 0;
+        const info = hasSticker
+            ? (stickersData[sticker.id] || stickersData[String(sticker.id)] || null)
+            : null;
+
+        button.classList.toggle('has-sticker', hasSticker);
+        button.classList.toggle('is-empty', !hasSticker);
+        button.title = hasSticker && info
+            ? `Sticker ${slot + 1}: ${info.name || 'Selected sticker'}`
+            : `Choose Sticker ${slot + 1}`;
+        button.setAttribute(
+            'aria-label',
+            button.title
+        );
+
+        const image = hasSticker && info
+            ? imageMarkup(
+                info.image_url,
+                info.name || `Sticker ${slot + 1}`,
+                'wp-addon-preview-image'
+            )
+            : `<span class="wp-addon-empty-icon"><i class="fas ${hasSticker ? 'fa-stamp' : 'fa-plus'}"></i></span>`;
+
+        const label = hasSticker && info && info.name
+            ? info.name
+            : `Sticker ${slot + 1}`;
+
+        button.innerHTML = `${image}<span>${escapeHtml(label)}</span>`;
+
+    }
+
+
+    function refreshKeychainButton(form, keychain) {
+
+        const button = form.querySelector('[data-keychain-trigger]');
+
+        if (!button) {
+            return;
+        }
+
+        const hasKeychain = Number(keychain.id) > 0;
+        const info = hasKeychain
+            ? (keychainsData[keychain.id] || keychainsData[String(keychain.id)] || null)
+            : null;
+
+        button.classList.toggle('has-keychain', hasKeychain);
+        button.classList.toggle('is-empty', !hasKeychain);
+        button.title = hasKeychain && info
+            ? `Keychain: ${info.name || 'Selected keychain'}`
+            : 'Choose Keychain';
+        button.setAttribute('aria-label', button.title);
+
+        const image = hasKeychain && info
+            ? imageMarkup(
+                info.image_url,
+                info.name || 'Keychain',
+                'wp-addon-preview-image'
+            )
+            : `<span class="wp-addon-empty-icon"><i class="fas ${hasKeychain ? 'fa-key' : 'fa-plus'}"></i></span>`;
+
+        const label = hasKeychain && info && info.name
+            ? info.name
+            : 'Keychain';
+
+        button.innerHTML = `${image}<span>${escapeHtml(label)}</span>`;
+
+    }
+
+
+    function applySkinDetailToForm(form, defindex, paintId) {
+
+        const detail = getSkinDetailForPaint(defindex, paintId);
+
+        setFormValue(form, 'wear', detail.weapon_wear ?? '0.001');
+        setFormValue(form, 'seed', detail.weapon_seed ?? '0');
+        setFormValue(form, 'nametag', detail.weapon_nametag ?? '');
+
+        const wearValue = form.querySelector('#wearValue');
+        if (wearValue) {
+            const wearNumber = Number(detail.weapon_wear ?? 0.001);
+            wearValue.textContent = Number.isFinite(wearNumber)
+                ? wearNumber.toFixed(3)
+                : '0.001';
+        }
+
+        const stattrak = form.elements.namedItem('stattrak');
+        if (stattrak && 'checked' in stattrak) {
+            stattrak.checked = Number(detail.weapon_stattrak ?? 0) === 1;
+        }
+
+        for (let slot = 0; slot < 5; slot++) {
+            const sticker = parseStickerValue(
+                detail[`weapon_sticker_${slot}`] || '0;0;0;0;0.001;1;0'
+            );
+
+            setFormValue(form, `sticker[${slot}][id]`, sticker.id);
+            setFormValue(form, `sticker[${slot}][wear]`, sticker.wear);
+            setFormValue(form, `sticker[${slot}][x]`, sticker.x);
+            setFormValue(form, `sticker[${slot}][y]`, sticker.y);
+            setFormValue(form, `sticker[${slot}][scale]`, sticker.scale);
+            setFormValue(form, `sticker[${slot}][rotate]`, sticker.rotate);
+
+            refreshStickerSlotButton(form, slot, sticker);
+        }
+
+        const keychain = parseKeychainValue(
+            detail.weapon_keychain || '0;0;0;0;0'
+        );
+        setFormValue(form, 'keychain[id]', keychain.id);
+        setFormValue(form, 'keychain[seed]', keychain.seed);
+        setFormValue(form, 'keychain[x]', keychain.x);
+        setFormValue(form, 'keychain[y]', keychain.y);
+        setFormValue(form, 'keychain[z]', keychain.z);
+        refreshKeychainButton(form, keychain);
 
     }
 
@@ -2791,10 +3090,18 @@
             );
 
 
-        const detail =
-            getSkinDetailForCurrentTeam(
-                defindex
-            );
+        const selectedPaintId =
+            selected
+                ? String(selected.weapon_paint_id)
+                : '';
+
+
+        const detail = selectedPaintId
+            ? getSkinDetailForPaint(defindex, selectedPaintId)
+            : getSkinDetailForCurrentTeam(defindex);
+
+        state.activeDefindex = String(defindex);
+        state.activeSkinPaintId = selectedPaintId || null;
 
 
         const weaponId =
@@ -2817,14 +3124,6 @@
             Object.entries(
                 skinList
             );
-
-
-        const selectedPaintId =
-            selected
-                ? String(
-                    selected.weapon_paint_id
-                )
-                : '';
 
 
         const selectedWear =
@@ -3233,7 +3532,7 @@
                     detail[
                         `weapon_sticker_${slot}`
                     ] ||
-                    '0;0;0;0.001;1;0';
+                    '0;0;0;0;0.001;1;0';
 
 
                 const sticker =
@@ -3525,6 +3824,54 @@
             document.getElementById(
                 'skinPaintSearch'
             );
+
+        const paintGrid =
+            dom.skinModalBody.querySelector('#skinSelectionGrid');
+
+        if (paintGrid) {
+            paintGrid.addEventListener('change', event => {
+                const target = event.target;
+
+                if (
+                    !(target instanceof HTMLInputElement) ||
+                    target.name !== 'forma' ||
+                    !target.checked
+                ) {
+                    return;
+                }
+
+                const [targetDefindex, targetPaintId] =
+                    String(target.value).split('-', 2);
+
+                if (
+                    !targetDefindex ||
+                    !targetPaintId ||
+                    Number(targetDefindex) !== Number(state.activeDefindex)
+                ) {
+                    return;
+                }
+
+                const form = target.closest('form');
+                if (!form) {
+                    return;
+                }
+
+                captureSkinDraftFromForm(
+                    form,
+                    state.activeDefindex,
+                    state.activeSkinPaintId
+                );
+
+                applySkinDetailToForm(
+                    form,
+                    targetDefindex,
+                    targetPaintId
+                );
+
+                state.activeDefindex = String(targetDefindex);
+                state.activeSkinPaintId = String(targetPaintId);
+            });
+        }
 
 
         if (
