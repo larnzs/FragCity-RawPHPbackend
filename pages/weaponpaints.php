@@ -15,9 +15,8 @@ ini_set('display_errors', '0');
 ini_set('display_startup_errors', '0');
 ini_set('log_errors', '1');
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+require_once __DIR__ . '/../settings/session.php';
+fragcity_start_session();
 
 /*
 |--------------------------------------------------------------------------
@@ -198,7 +197,7 @@ function buildSkinSelectionMaps(array $rows): array
             ? (int)$row['weapon_team']
             : 0;
 
-        if ($def === 0 || $team === 0) {
+        if ($team === 0) {
             continue;
         }
 
@@ -208,7 +207,12 @@ function buildSkinSelectionMaps(array $rows): array
             $selectedGloves[$team][$def] =
                 $row['weapon_paint_id'] ?? null;
         } else {
-            $selectedSkins[$def] = $row;
+            if (
+                !isset($selectedSkins[$def]) ||
+                ($team === 2 && (int)($selectedSkins[$def]['weapon_team'] ?? 0) !== 2)
+            ) {
+                $selectedSkins[$def] = $row;
+            }
         }
     }
 
@@ -1623,9 +1627,11 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                         $def = $item['def'];
                         $default = $item['weapon'];
 
-                        $hasSelectedSkin = isset($selectedSkins[$def]);
+                        $selectedSkinRow = $skinDetails[$def][$team] ?? null;
+                        $hasSelectedSkin = is_array($selectedSkinRow)
+                            && isset($selectedSkinRow['weapon_paint_id']);
                         $selectedPaintId = $hasSelectedSkin
-                            ? $selectedSkins[$def]['weapon_paint_id']
+                            ? $selectedSkinRow['weapon_paint_id']
                             : null;
 
                         $selectedSkin = (

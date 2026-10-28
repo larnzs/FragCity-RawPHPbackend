@@ -489,7 +489,8 @@ try {
             'skins' => 'SELECT weapon_defindex, weapon_paint_id, weapon_wear, weapon_seed, weapon_team,
                                weapon_nametag, weapon_stattrak, weapon_sticker_0, weapon_sticker_1,
                                weapon_sticker_2, weapon_sticker_3, weapon_sticker_4, weapon_keychain
-                        FROM wp_player_skins WHERE steamid = :steamid',
+                        FROM wp_player_skins WHERE steamid = :steamid
+                        ORDER BY weapon_team, weapon_defindex',
             'skin_inventory' => 'SELECT weapon_defindex, weapon_paint_id, weapon_wear, weapon_seed, weapon_team,
                                          weapon_nametag, weapon_stattrak, weapon_sticker_0, weapon_sticker_1,
                                          weapon_sticker_2, weapon_sticker_3, weapon_sticker_4, weapon_keychain

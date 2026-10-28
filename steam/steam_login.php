@@ -2,12 +2,10 @@
 
 // steam/steam_login.php
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+require_once __DIR__ . '/../settings/session.php';
+fragcity_start_session();
 
 // Load runtime settings and constants before using the settings helpers/constants.
-require_once __DIR__ . '/../settings/loader.php';
 require_once __DIR__ . '/../class/config.php';
 require_once __DIR__ . '/openid.php';
 

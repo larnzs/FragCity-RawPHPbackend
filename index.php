@@ -1,9 +1,7 @@
 <?php
-require_once __DIR__ . '/settings/loader.php';
+require_once __DIR__ . '/settings/session.php';
 ob_start();
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+fragcity_start_session();
 
 if (
     !isset($_SESSION['auth_csrf_token']) ||

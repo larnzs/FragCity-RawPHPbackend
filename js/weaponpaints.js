@@ -1587,6 +1587,14 @@
        pagination to tabs that previously rendered their full grids.
     ========================================================== */
 
+    function removeFloatingPagination() {
+        document.querySelectorAll('#wpFloatingPagination').forEach(dock => dock.remove());
+        document.querySelectorAll('.wp-app.has-floating-pagination').forEach(app => {
+            app.classList.remove('has-floating-pagination');
+        });
+    }
+
+
     function syncFloatingPagination() {
 
         const app = document.querySelector('.wp-app');
@@ -1597,9 +1605,7 @@
         const dock = appDock || bodyDock;
 
         if (!app) {
-            if (bodyDock) {
-                bodyDock.hidden = true;
-            }
+            removeFloatingPagination();
             return;
         }
 
@@ -2488,19 +2494,28 @@
     function getSelectedSkin(
         defindex
     ) {
+        const currentTeamSelection = getSkinDetailForCurrentTeam(defindex);
 
-        return (
-            selectedSkins[
-                String(
-                    defindex
-                )
-            ] ||
-            selectedSkins[
-                defindex
-            ] ||
-            null
-        );
+        if (
+            currentTeamSelection &&
+            Object.prototype.hasOwnProperty.call(currentTeamSelection, 'weapon_paint_id')
+        ) {
+            return currentTeamSelection;
+        }
 
+        const perTeamDetails =
+            skinDetails[String(defindex)] ||
+            skinDetails[defindex] ||
+            {};
+
+        // If the API has a row for the other team only, do not mark its paint
+        // as selected while editing this team.
+        if (Object.keys(perTeamDetails).length > 0) {
+            return null;
+        }
+
+        // Compatibility fallback for older payloads without per-team details.
+        return selectedSkins[String(defindex)] || selectedSkins[defindex] || null;
     }
 
 
@@ -7454,6 +7469,11 @@
         const page = event.detail && event.detail.page;
         if (page === 'skins' && document.querySelector('.wp-app')) {
             init();
+            return;
+        }
+
+        if ((page && page !== 'skins') || !document.querySelector('.wp-app')) {
+            removeFloatingPagination();
         }
     });
 

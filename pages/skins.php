@@ -1,9 +1,8 @@
 <?php
 // pages/skins.php
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
+require_once __DIR__ . '/../settings/session.php';
+fragcity_start_session();
 
 if (
     empty($_SESSION['user_logged_in']) ||
