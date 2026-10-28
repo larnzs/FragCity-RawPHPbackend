@@ -2818,19 +2818,27 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
         <div class="modal-content bg-site-dark">
 
-            <div class="modal-header wp-modal-header">
+            <div class="modal-header wp-modal-header wp-modal-header--weapon">
 
-                <div class="wp-modal-title-wrap">
+                <div class="wp-modal-identity">
 
-                    <span class="wp-modal-eyebrow">
+                    <span class="wp-modal-icon-tile" aria-hidden="true">
                         <i class="fas fa-paint-brush"></i>
-                        Weapon Customization
                     </span>
 
-                    <h5
-                        id="skinModalTitle"
-                        class="wp-modal-title"
-                    ></h5>
+                    <div class="wp-modal-title-wrap">
+
+                        <span class="wp-modal-eyebrow">
+                            Weapon Customization
+                        </span>
+
+                        <h5
+                            id="skinModalTitle"
+                            class="wp-modal-title"
+                            aria-live="polite"
+                        ></h5>
+
+                    </div>
 
                 </div>
 
