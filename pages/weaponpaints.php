@@ -2781,6 +2781,25 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
     </main>
 
+    <!-- Floating pagination is synchronized to the currently active tab by weaponpaints.js. -->
+    <aside
+        class="wp-floating-pagination"
+        id="wpFloatingPagination"
+        aria-label="Page navigation"
+        hidden
+    >
+        <div class="wp-floating-pagination__heading">
+            <i class="fas fa-list-ol" aria-hidden="true"></i>
+            <span>PAGE</span>
+        </div>
+        <div class="wp-floating-pagination__info" id="wpFloatingPaginationInfo">1 / 1</div>
+        <nav
+            class="wp-floating-pagination__controls"
+            id="wpFloatingPaginationControls"
+            aria-label="Choose page"
+        ></nav>
+    </aside>
+
 </div>
 
 
