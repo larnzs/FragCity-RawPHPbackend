@@ -1347,6 +1347,18 @@
         controls.replaceChildren(floatingPagination);
         dock.hidden = false;
         app.classList.add('has-floating-pagination');
+
+        // Keep the active page number visible inside the scrollable rail on long catalogues.
+        if (currentPageLink && typeof currentPageLink.scrollIntoView === 'function') {
+            window.requestAnimationFrame(() => {
+                if (currentPageLink.isConnected) {
+                    currentPageLink.scrollIntoView({
+                        block: 'nearest',
+                        inline: 'nearest'
+                    });
+                }
+            });
+        }
     }
 
 
