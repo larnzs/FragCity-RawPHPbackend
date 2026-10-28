@@ -2784,11 +2784,14 @@
             );
 
 
-        const weaponName =
+        const weaponId =
             String(
                 weapon.weapon_name ||
-                ''
-            );
+                ('weapon_' + String(defindex))
+            ).trim();
+
+        const weaponName =
+            weaponId;
 
 
         const knifeWeapon =
@@ -2883,21 +2886,21 @@
 
                     <div class="wp-selection-toolbar-info">
 
-                        <span class="wp-meta-pill">
-
+                        <span
+                            class="wp-meta-pill wp-meta-pill--weapon-id"
+                            data-weapon-id="${escapeHtml(weaponId)}"
+                            title="${escapeHtml(weaponId)}"
+                        >
                             <i class="fas fa-gun"></i>
-
-                            ${escapeHtml(weaponName)}
-
+                            ${escapeHtml(weaponId)}
                         </span>
 
-                        <span class="wp-meta-pill">
-
+                        <span
+                            class="wp-meta-pill wp-meta-pill--paint-count"
+                            data-paint-count="${paintEntries.length}"
+                        >
                             <i class="fas fa-layer-group"></i>
-
-                            ${paintEntries.length}
-                            Paints
-
+                            ${paintEntries.length} Paints
                         </span>
 
                     </div>
@@ -3694,8 +3697,8 @@
 
         empty.classList.toggle(
             'is-hidden',
-            visible >
-            0
+            !normalized ||
+            visible > 0
         );
 
     }
