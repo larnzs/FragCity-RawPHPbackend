@@ -857,21 +857,17 @@
         const backdrop =
             getCustomModalBackdrop();
 
-        element.classList.add(
-            'wp-is-open'
-        );
+        // Keep the hidden state measurable for one frame so the dialog and
+        // backdrop animate from their initial transform/opacity to visible.
+        element.classList.remove('wp-modal-visible');
+        element.classList.add('wp-is-open');
         element.setAttribute(
             'aria-hidden',
             'false'
         );
-        element.style.display =
-            'flex';
-        document.body.classList.add(
-            'wp-modal-open'
-        );
-        backdrop.classList.add(
-            'is-visible'
-        );
+        element.style.display = 'flex';
+        document.body.classList.add('wp-modal-open');
+
         element.dispatchEvent(
             new CustomEvent(
                 'show.wp.modal',
@@ -881,22 +877,22 @@
             )
         );
 
-        window.requestAnimationFrame(
-            () => {
-                element.classList.add(
-                    'wp-modal-visible'
-                );
+        void element.offsetWidth;
+        void backdrop.offsetWidth;
 
-                element.dispatchEvent(
-                    new CustomEvent(
-                        'shown.wp.modal',
-                        {
-                            bubbles: false
-                        }
-                    )
-                );
-            }
-        );
+        window.requestAnimationFrame(() => {
+            backdrop.classList.add('is-visible');
+            element.classList.add('wp-modal-visible');
+
+            element.dispatchEvent(
+                new CustomEvent(
+                    'shown.wp.modal',
+                    {
+                        bubbles: false
+                    }
+                )
+            );
+        });
 
         if (
             options.focus !== false
@@ -1065,11 +1061,8 @@
             'wp-modal-visible'
         );
 
-        element.classList.remove(
-            'wp-is-open',
-            'show'
-        );
-
+        // Keep the modal in the layout while the exit animation plays.
+        // The timer below removes .wp-is-open after the transition.
         element.setAttribute(
             'aria-hidden',
             'true'
@@ -1139,8 +1132,11 @@
             window.setTimeout(
             () => {
 
-                element.style.display =
-                    'none';
+                element.style.display = 'none';
+                element.classList.remove(
+                    'wp-is-open',
+                    'show'
+                );
 
                 element.dispatchEvent(
                     new CustomEvent(
