@@ -2644,6 +2644,11 @@
         });
 
         if (isAgentsTab) {
+            // When arriving from BOTH without a full reload, rewrite each
+            // card's submitted team as well as the visible team selector.
+            document.querySelectorAll('.wp-app #agentsContainer input[name="team"]').forEach(input => {
+                input.value = state.currentTeamParam;
+            });
             syncTeamLinkUrls('tab-agents');
         }
     }
