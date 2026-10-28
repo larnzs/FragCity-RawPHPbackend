@@ -4520,3 +4520,149 @@ body > .wp-modal#skinModal .modal-dialog {
         padding: 0 8px;
     }
 }
+
+
+/* =========================================================
+   30. Centered team switcher, left search and vivid active tabs
+========================================================= */
+
+.wp-app .wp-header .wp-tabs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: "categories team search";
+    align-items: center;
+    justify-content: stretch;
+    gap: 8px;
+    overflow: visible;
+}
+
+.wp-app .wp-header .wp-category-switcher {
+    grid-area: categories;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 7px;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+}
+
+.wp-app .wp-header .wp-category-switcher::-webkit-scrollbar {
+    display: none;
+}
+
+.wp-app .wp-header .wp-category-switcher > .wp-tab {
+    flex: 0 0 46px;
+    width: 46px;
+    min-width: 46px;
+    height: 46px;
+    min-height: 46px;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-team-switcher {
+    grid-area: team;
+    justify-self: center;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-search-wrap {
+    grid-area: search;
+    justify-self: end;
+    width: min(100%, 380px);
+    min-width: 220px;
+    max-width: 380px;
+    margin: 0;
+    align-self: center;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-search-wrap .wp-search {
+    width: 100%;
+    height: 46px;
+    min-height: 46px;
+    box-sizing: border-box;
+}
+
+/* Strong active states reuse the T / CT / BOTH accent palette. */
+.wp-app .wp-header .wp-category-switcher > .wp-tab.is-active,
+.wp-app .wp-header .wp-category-switcher > .wp-tab.active {
+    color: #ffffff;
+    background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+    border-color: rgba(56, 189, 248, 0.58);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.28);
+    transform: translateY(-1px);
+}
+
+.wp-app .wp-header .wp-category-switcher > .wp-tab.is-active > i,
+.wp-app .wp-header .wp-category-switcher > .wp-tab.active > i {
+    color: #ffffff;
+}
+
+.wp-app .wp-header .wp-category-switcher > .wp-tab.is-active::after,
+.wp-app .wp-header .wp-category-switcher > .wp-tab.active::after {
+    left: 7px;
+    right: 7px;
+    bottom: 3px;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+/* Rifles and Heavy Guns use the warm T accent. */
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-rifles"].is-active,
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-rifles"].active,
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-heavy"].is-active,
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-heavy"].active {
+    background: linear-gradient(135deg, #b45309, #f59e0b);
+    border-color: rgba(245, 158, 11, 0.62);
+    box-shadow: 0 8px 22px rgba(245, 158, 11, 0.22);
+}
+
+/* SMG and Snipers use the bright CT accent. */
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-smg"].is-active,
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-smg"].active,
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-sniper"].is-active,
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-sniper"].active {
+    background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+    border-color: rgba(56, 189, 248, 0.58);
+    box-shadow: 0 8px 22px rgba(37, 99, 235, 0.28);
+}
+
+/* All Skins and Pistols use the violet BOTH accent. */
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-skins"].is-active,
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-skins"].active,
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-pistol"].is-active,
+.wp-app .wp-header .wp-category-switcher > .wp-tab[data-bs-target="#tab-pistol"].active {
+    background: linear-gradient(135deg, #4f46e5, #3b82f6);
+    border-color: rgba(99, 102, 241, 0.62);
+    box-shadow: 0 8px 22px rgba(79, 70, 229, 0.24);
+}
+
+@media (max-width: 760px) {
+    .wp-app .wp-header .wp-tabs {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "team"
+            "categories"
+            "search";
+        gap: 8px;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher {
+        justify-self: center;
+    }
+
+    .wp-app .wp-header .wp-category-switcher {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-search-wrap {
+        justify-self: end;
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+    }
+}
