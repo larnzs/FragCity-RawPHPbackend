@@ -30,6 +30,11 @@
 
     const config = window.WeaponPaintsConfig || {};
 
+    const csrfToken =
+        typeof config.csrfToken === 'string'
+            ? config.csrfToken
+            : '';
+
     const weapons =
         config.weapons || {};
 
@@ -2475,6 +2480,12 @@
                 data-wp-source-tab="${escapeHtml(state.currentActiveTab)}"
                 data-wp-native-submit="true"
             >
+
+                <input
+                    type="hidden"
+                    name="wp_csrf_token"
+                    value="${escapeHtml(csrfToken)}"
+                >
 
                 <input
                     type="hidden"
