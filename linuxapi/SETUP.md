@@ -532,7 +532,7 @@ The integrations key holds the same generated secret as the Linux config. Keep i
 این بخش برای اجرای دستور زیر در ریشهٔ ریپوی وب‌سایت روی ویندوز است:
 
 ```powershell
-php tools\\weaponpaints-smoke-test.php
+php tools\weaponpaints-smoke-test.php
 ```
 
 | خروجی | معنی و اقدام بعدی |
