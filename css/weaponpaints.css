@@ -4395,3 +4395,35 @@ body > .wp-modal#skinModal .modal-dialog {
 .wp-form-submitting .wp-btn[type="submit"] {
     pointer-events: none !important;
 }
+
+  
+/* =========================================================
+   Icon-only category navigation and clickable knife cards
+========================================================= */
+
+.wp-tabs .wp-tab {
+    width: 46px;
+    min-width: 46px;
+    height: 46px;
+    min-height: 46px;
+    padding: 0;
+    gap: 0;
+}
+
+.wp-tabs .wp-tab > span {
+    display: none !important;
+}
+
+.wp-tabs .wp-tab > i {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.wp-card--clickable {
+    cursor: pointer;
+}
+
+.wp-card--clickable:focus-visible {
+    outline: 2px solid var(--wp-blue-soft);
+    outline-offset: 3px;
+}
