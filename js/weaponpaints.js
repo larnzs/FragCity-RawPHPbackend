@@ -742,6 +742,10 @@
             element
         );
 
+        element.classList.remove('wp-modal-closing');
+        document.querySelectorAll('.modal-backdrop.wp-modal-fast-close, .wp-modal-backdrop.wp-modal-fast-close')
+            .forEach(backdrop => backdrop.classList.remove('wp-modal-fast-close'));
+
         const bootstrapModal =
             getBootstrapModalInstance(
                 element
@@ -947,6 +951,10 @@
                 element
             );
 
+        element.classList.add('wp-modal-closing');
+        document.querySelectorAll('.modal-backdrop, .wp-modal-backdrop')
+            .forEach(backdrop => backdrop.classList.add('wp-modal-fast-close'));
+
         if (bootstrapModal) {
             window.clearTimeout(
                 element.__wpHideTimer
@@ -993,8 +1001,12 @@
                 element.classList.remove(
                     'wp-modal-visible',
                     'wp-is-open',
+                    'wp-modal-closing',
                     'show'
                 );
+
+                document.querySelectorAll('.modal-backdrop.wp-modal-fast-close, .wp-modal-backdrop.wp-modal-fast-close')
+                    .forEach(backdrop => backdrop.classList.remove('wp-modal-fast-close'));
 
                 element.setAttribute(
                     'aria-hidden',
@@ -1135,6 +1147,7 @@
                 element.style.display = 'none';
                 element.classList.remove(
                     'wp-is-open',
+                    'wp-modal-closing',
                     'show'
                 );
 
@@ -1172,7 +1185,7 @@
                 }
 
             },
-            260
+            135
         );
 
         return null;
@@ -2843,7 +2856,7 @@
         ) {
 
             dom.skinModalTitle.textContent =
-                weaponName;
+                '';
 
         }
 
@@ -3483,6 +3496,25 @@
         dom.skinModalBody.innerHTML =
             html;
 
+        const headerTools = document.getElementById('skinModalHeaderTools');
+        const toolbar = dom.skinModalBody.querySelector('.wp-selection-toolbar');
+
+        if (headerTools && toolbar) {
+            headerTools.replaceChildren();
+
+            const toolbarInfo = toolbar.querySelector('.wp-selection-toolbar-info');
+            const toolbarSearch = toolbar.querySelector('.wp-selection-search');
+
+            if (toolbarInfo) {
+                headerTools.appendChild(toolbarInfo);
+            }
+
+            if (toolbarSearch) {
+                headerTools.appendChild(toolbarSearch);
+            }
+
+            toolbar.remove();
+        }
 
         bindSkinModalInteractions();
 
