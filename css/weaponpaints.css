@@ -4901,3 +4901,383 @@ body > .wp-modal#skinModal .modal-dialog {
     cursor: not-allowed;
     transform: none;
 }
+
+
+
+/* =========================================================
+   32. Compact, Refined Weapon Paints Modals
+========================================================= */
+
+/* A lighter veil with genuine backdrop blur, keeping the page visible but subdued. */
+.wp-modal-backdrop {
+    background: rgba(3, 7, 14, 0.60) !important;
+    -webkit-backdrop-filter: blur(3.5px) saturate(0.88) !important;
+    backdrop-filter: blur(3.5px) saturate(0.88) !important;
+    transition:
+        opacity 260ms cubic-bezier(.22,.61,.36,1),
+        visibility 260ms ease,
+        backdrop-filter 260ms ease !important;
+}
+
+.wp-modal-backdrop.is-visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Center dialogs against the viewport and constrain their total height. */
+body > .wp-modal {
+    align-items: center !important;
+    padding: clamp(10px, 2.2vh, 22px) !important;
+    overscroll-behavior: contain;
+}
+
+body > .wp-modal .modal-dialog {
+    width: min(960px, calc(100vw - 36px)) !important;
+    max-width: 960px !important;
+    max-height: calc(100vh - 32px) !important;
+    max-height: calc(100dvh - 32px) !important;
+    margin: 0 auto !important;
+    opacity: 0 !important;
+    transform: translateY(12px) scale(.985) !important;
+    transform-origin: center center;
+    transition:
+        opacity 220ms ease,
+        transform 300ms cubic-bezier(.2,.75,.25,1) !important;
+    will-change: opacity, transform;
+}
+
+body > .wp-modal.wp-modal-visible .modal-dialog {
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+}
+
+body > .wp-modal .modal-content {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100%;
+    max-height: calc(100vh - 32px) !important;
+    max-height: calc(100dvh - 32px) !important;
+    border-radius: 17px !important;
+    border-color: rgba(96, 165, 250, 0.20) !important;
+    background:
+        radial-gradient(circle at 88% 0%, rgba(59, 130, 246, .075), transparent 32%),
+        linear-gradient(180deg, #0d1420 0%, #080e18 100%) !important;
+    box-shadow:
+        0 24px 72px rgba(0, 0, 0, .48),
+        0 0 0 1px rgba(148, 163, 184, .025) !important;
+}
+
+body > .wp-modal.wp-modal-visible .modal-content {
+    box-shadow:
+        0 28px 80px rgba(0, 0, 0, .48),
+        0 0 28px rgba(59, 130, 246, .045) !important;
+}
+
+/* Smaller title bar, close control, and typography. */
+body > .wp-modal .wp-modal-header {
+    flex: 0 0 auto;
+    padding: 11px 15px !important;
+    gap: 10px !important;
+    min-height: 0;
+    background: rgba(7, 12, 21, .76) !important;
+    border-bottom-color: rgba(148, 163, 184, .10) !important;
+}
+
+body > .wp-modal .wp-modal-eyebrow {
+    font-size: .60rem !important;
+    line-height: 1.2;
+    gap: 5px !important;
+}
+
+body > .wp-modal .wp-modal-eyebrow i {
+    font-size: .78rem !important;
+}
+
+body > .wp-modal .wp-modal-title {
+    margin-top: 3px !important;
+    font-size: .94rem !important;
+    line-height: 1.35;
+    letter-spacing: -.01em;
+}
+
+body > .wp-modal .modal-x-btn {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 9px !important;
+    font-size: .86rem !important;
+}
+
+body > .wp-modal .modal-body,
+body > .wp-modal .wp-modal-body {
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    max-height: calc(100vh - 98px) !important;
+    max-height: calc(100dvh - 98px) !important;
+    padding: 13px 15px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 116, 139, .6) transparent;
+}
+
+body > .wp-modal .modal-body::-webkit-scrollbar,
+body > .wp-modal .wp-modal-body::-webkit-scrollbar {
+    width: 5px;
+}
+
+body > .wp-modal .modal-body::-webkit-scrollbar-thumb,
+body > .wp-modal .wp-modal-body::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, .55);
+    border-radius: 999px;
+}
+
+/* Paint picker: tighter toolbar, denser grid and smaller thumbnails. */
+body > .wp-modal .wp-selection-toolbar {
+    gap: 9px !important;
+    margin-bottom: 11px !important;
+}
+
+body > .wp-modal .wp-selection-toolbar-info {
+    gap: 6px !important;
+}
+
+body > .wp-modal .wp-meta-pill {
+    min-height: 25px;
+    padding: 5px 8px !important;
+    gap: 5px !important;
+    font-size: .60rem !important;
+    border-radius: 8px !important;
+}
+
+body > .wp-modal .wp-selection-search {
+    max-width: 300px;
+}
+
+body > .wp-modal .wp-addon-search {
+    height: 35px !important;
+    min-height: 35px;
+    padding: 0 10px !important;
+    font-size: .72rem !important;
+    border-radius: 9px !important;
+}
+
+body > .wp-modal .selection-grid {
+    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)) !important;
+    gap: 8px !important;
+}
+
+body > .wp-modal .selection-grid--skin {
+    grid-template-columns: repeat(auto-fill, minmax(126px, 1fr)) !important;
+}
+
+body > .wp-modal .selection-grid--glove {
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)) !important;
+}
+
+body > .wp-modal .selection-card {
+    padding: 7px !important;
+    gap: 5px !important;
+    border-radius: 11px !important;
+}
+
+body > .wp-modal .selection-card:hover,
+body > .wp-modal .wp-addon-card:hover {
+    transform: translateY(-2px) !important;
+}
+
+body > .wp-modal .selection-image {
+    height: 78px !important;
+    min-height: 0 !important;
+    padding: 5px !important;
+    border-radius: 8px !important;
+}
+
+body > .wp-modal .selection-title {
+    font-size: .65rem !important;
+    line-height: 1.35 !important;
+    font-weight: 700 !important;
+}
+
+body > .wp-modal .selection-meta {
+    font-size: .56rem !important;
+    line-height: 1.35;
+}
+
+body > .wp-modal .selection-meta i {
+    font-size: .58rem !important;
+}
+
+body > .wp-modal .selection-footer {
+    margin-top: 12px !important;
+    padding-top: 10px !important;
+}
+
+body > .wp-modal .wp-btn {
+    min-height: 33px !important;
+    padding: 7px 11px !important;
+    gap: 6px !important;
+    border-radius: 9px !important;
+    font-size: .68rem !important;
+    line-height: 1.2;
+}
+
+body > .wp-modal .wp-btn i {
+    font-size: .72rem !important;
+}
+
+/* Compact editor layout for weapon preview and advanced controls. */
+body > .wp-modal .wp-skin-config-layout {
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr) !important;
+    gap: 12px !important;
+}
+
+body > .wp-modal .wp-skin-preview {
+    min-height: 225px !important;
+    max-height: 255px;
+    padding: 12px !important;
+    border-radius: 13px !important;
+}
+
+body > .wp-modal .wp-skin-preview img {
+    max-height: 220px !important;
+    max-width: 100%;
+}
+
+body > .wp-modal .wp-skin-controls {
+    gap: 9px !important;
+}
+
+body > .wp-modal .wp-control-card {
+    padding: 10px !important;
+    border-radius: 11px !important;
+}
+
+body > .wp-modal .wp-control-label {
+    margin-bottom: 7px !important;
+    gap: 8px !important;
+    font-size: .66rem !important;
+}
+
+body > .wp-modal .wp-control-value {
+    font-size: .64rem !important;
+}
+
+body > .wp-modal .wp-control-input {
+    height: 35px !important;
+    min-height: 35px;
+    padding: 0 9px !important;
+    border-radius: 8px !important;
+    font-size: .72rem !important;
+}
+
+body > .wp-modal .wp-addon-btn {
+    min-height: 36px !important;
+    padding: 0 9px !important;
+    gap: 6px !important;
+    border-radius: 9px !important;
+    font-size: .65rem !important;
+}
+
+body > .wp-modal .wp-addon-grid {
+    grid-template-columns: repeat(auto-fill, minmax(105px, 1fr)) !important;
+    gap: 7px !important;
+}
+
+body > .wp-modal .wp-addon-card {
+    padding: 7px !important;
+    border-radius: 10px !important;
+}
+
+body > .wp-modal .wp-addon-card img {
+    height: 66px !important;
+}
+
+body > .wp-modal .wp-addon-card-title {
+    margin-top: 5px !important;
+    font-size: .60rem !important;
+}
+
+body > .wp-modal .wp-addon-toolbar {
+    gap: 8px !important;
+    margin-bottom: 10px !important;
+}
+
+@media (max-width: 900px) {
+    body > .wp-modal .wp-skin-config-layout {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    body > .wp-modal .wp-skin-preview {
+        min-height: 175px !important;
+        max-height: 205px;
+    }
+
+    body > .wp-modal .wp-skin-preview img {
+        max-height: 175px !important;
+    }
+}
+
+@media (max-width: 600px) {
+    body > .wp-modal {
+        padding: 8px !important;
+    }
+
+    body > .wp-modal .modal-dialog,
+    body > .wp-modal#skinModal .modal-dialog {
+        width: calc(100vw - 16px) !important;
+        max-height: calc(100dvh - 16px) !important;
+        margin: 0 auto !important;
+    }
+
+    body > .wp-modal .modal-content {
+        max-height: calc(100dvh - 16px) !important;
+        border-radius: 13px !important;
+    }
+
+    body > .wp-modal .wp-modal-header {
+        padding: 9px 11px !important;
+    }
+
+    body > .wp-modal .modal-body,
+    body > .wp-modal .wp-modal-body {
+        max-height: calc(100dvh - 78px) !important;
+        padding: 10px !important;
+    }
+
+    body > .wp-modal .selection-grid,
+    body > .wp-modal .selection-grid--skin,
+    body > .wp-modal .selection-grid--glove {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 7px !important;
+    }
+
+    body > .wp-modal .selection-image {
+        height: 68px !important;
+    }
+
+    body > .wp-modal .wp-skin-preview {
+        min-height: 140px !important;
+        max-height: 160px;
+    }
+
+    body > .wp-modal .wp-skin-preview img {
+        max-height: 135px !important;
+    }
+
+    body > .wp-modal .wp-addon-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    body > .wp-modal .wp-selection-search {
+        max-width: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wp-modal-backdrop,
+    body > .wp-modal .modal-dialog {
+        transition: none !important;
+    }
+}
