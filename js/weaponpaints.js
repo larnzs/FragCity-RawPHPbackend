@@ -1245,12 +1245,41 @@
 
     function syncFloatingPagination() {
 
-        const dock = document.getElementById('wpFloatingPagination');
-        const controls = document.getElementById('wpFloatingPaginationControls');
-        const info = document.getElementById('wpFloatingPaginationInfo');
         const app = document.querySelector('.wp-app');
+        const appDock = app
+            ? app.querySelector('#wpFloatingPagination')
+            : null;
+        const bodyDock = document.querySelector('body > #wpFloatingPagination');
+        const dock = appDock || bodyDock;
 
-        if (!dock || !controls || !app) {
+        if (!app) {
+            if (bodyDock) {
+                bodyDock.hidden = true;
+            }
+            return;
+        }
+
+        if (!dock) {
+            app.classList.remove('has-floating-pagination');
+            return;
+        }
+
+        // Detach the rail from transformed page wrappers. A fixed element directly
+        // under body is positioned against the browser viewport, not the page content.
+        if (bodyDock && bodyDock !== dock) {
+            bodyDock.remove();
+        }
+
+        if (dock.parentElement !== document.body) {
+            document.body.appendChild(dock);
+        }
+
+        const controls = dock.querySelector('#wpFloatingPaginationControls');
+        const info = dock.querySelector('#wpFloatingPaginationInfo');
+
+        if (!controls) {
+            dock.hidden = true;
+            app.classList.remove('has-floating-pagination');
             return;
         }
 
