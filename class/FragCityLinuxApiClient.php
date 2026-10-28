@@ -80,11 +80,22 @@ final class FragCityLinuxApiClient
 
         $response = curl_exec($handle);
         $curlError = curl_errno($handle);
+        $curlErrorText = curl_error($handle);
         $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        curl_close($handle);
+
+        // PHP 8.5 deprecates curl_close(); releasing the CurlHandle reference closes it.
+        $handle = null;
 
         if ($response === false || $curlError !== 0) {
-            error_log('[FragCity] Linux API transport error; cURL code=' . $curlError);
+            $detail = $curlErrorText !== '' ? $curlErrorText : 'no cURL detail available';
+            error_log('[FragCity] Linux API transport error; cURL code=' . $curlError . '; message=' . $detail);
+
+            // The CLI smoke test may display diagnostic details; web requests stay generic.
+            if (PHP_SAPI === 'cli') {
+                throw new RuntimeException(
+                    'Linux API is currently unavailable (cURL error ' . $curlError . ': ' . $detail . ').'
+                );
+            }
             throw new RuntimeException('Linux API is currently unavailable.');
         }
 
