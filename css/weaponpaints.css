@@ -5943,6 +5943,17 @@ body > #skinModal .wp-modal-header-tools .wp-meta-pill--weapon-id {
     max-width: 230px;
     overflow: hidden;
     text-overflow: ellipsis;
+    color: #fff;
+    background: rgba(249, 115, 22, .10);
+    border-color: rgba(249, 115, 22, .34);
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-weight: 700;
+}
+body > #skinModal .wp-modal-header-tools .wp-meta-pill--paint-count {
+    color: #f8fafc;
+    background: rgba(255, 255, 255, .045);
+    border-color: rgba(255, 255, 255, .12);
+    font-weight: 750;
 }
 
 body > #skinModal .wp-modal-header-tools .wp-selection-search {
@@ -5966,7 +5977,7 @@ body > #skinModal .modal-dialog {
 }
 
 #skinModalBody .wp-skin-workspace {
-    grid-template-columns: minmax(460px, .92fr) minmax(0, 1.08fr);
+    grid-template-columns: minmax(520px, .92fr) minmax(0, 1.08fr);
     gap: 13px;
 }
 
@@ -5988,9 +5999,11 @@ body > #skinModal .modal-dialog {
 }
 
 #skinModalBody .wp-skin-controls .wp-control-label {
+    display: flex;
+    align-items: center;
     min-width: 0;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 4px 6px !important;
 }
 
@@ -5999,7 +6012,37 @@ body > #skinModal .modal-dialog {
 }
 
 #skinModalBody .wp-skin-controls .wp-control-value {
+    flex: 0 0 auto;
     white-space: nowrap;
+}
+
+#skinModalBody .wp-skin-controls .wp-inline-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 6px !important;
+    min-width: 0;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-content {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    min-width: 0;
+    gap: 5px !important;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-icon {
+    width: 20px !important;
+    height: 20px !important;
+    flex: 0 0 20px !important;
+    font-size: .62rem !important;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-content strong {
+    font-size: .61rem !important;
+    line-height: 1.15;
 }
 
 #skinModalBody .wp-skin-controls .wp-control-input {
