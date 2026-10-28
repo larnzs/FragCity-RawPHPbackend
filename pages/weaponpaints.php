@@ -121,6 +121,11 @@ function normalizeTabSelection(string $tab): string
     $allowedTabs = [
         'tab-knives',
         'tab-skins',
+        'tab-rifles',
+        'tab-smg',
+        'tab-shotgun',
+        'tab-pistol',
+        'tab-sniper',
         'tab-gloves',
         'tab-agents',
         'tab-music',
@@ -393,14 +398,16 @@ function normalizeAgentsDataset(array $agentsData): array
 
 function buildSkinPageUrl(
     string $teamParam,
-    int $page
+    int $page,
+    string $tab = 'tab-skins'
 ): string {
     $teamParam = normalizeTeamSelection($teamParam);
+    $tab = normalizeTabSelection($tab);
     $page = max(1, $page);
 
     return currentScriptPath()
         . '&team=' . rawurlencode($teamParam)
-        . '&tab=tab-skins'
+        . '&tab=' . rawurlencode($tab)
         . '&skin_page=' . $page;
 }
 
@@ -441,18 +448,21 @@ function renderPagination(
     string $type,
     string $teamParam,
     int $currentPage,
-    int $totalPages
+    int $totalPages,
+    string $tab = 'tab-skins'
 ): string {
     $currentPage = max(1, min($currentPage, $totalPages));
     $isSkin = ($type === 'skins');
 
-    $builder = $isSkin
-        ? 'buildSkinPageUrl'
-        : 'buildPinPageUrl';
-
     $navigateFunction = $isSkin
         ? 'navigateSkinPage'
         : 'navigatePinPage';
+
+    $pageUrl = static function (int $page) use ($isSkin, $teamParam, $tab): string {
+        return $isSkin
+            ? buildSkinPageUrl($teamParam, $page, $tab)
+            : buildPinPageUrl($teamParam, $page);
+    };
 
     $previousPage = max(1, $currentPage - 1);
     $nextPage = min($totalPages, $currentPage + 1);
@@ -463,10 +473,9 @@ function renderPagination(
         '<a href="%s" class="wp-page-btn wp-page-btn--nav" data-wp-page="%d" data-wp-navigation="%s" aria-label="Previous page">'
         . '<i class="fas fa-angle-right"></i>'
         . '</a>',
-        esc($builder($teamParam, $previousPage)),
+        esc($pageUrl($previousPage)),
         $previousPage,
-        $navigateFunction,
-        $previousPage
+        $navigateFunction
     );
 
     for ($page = 1; $page <= $totalPages; $page++) {
@@ -476,11 +485,10 @@ function renderPagination(
 
         $html .= sprintf(
             '<a href="%s" class="wp-page-btn%s" data-wp-page="%d" data-wp-navigation="%s">%d</a>',
-            esc($builder($teamParam, $page)),
+            esc($pageUrl($page)),
             $activeClass,
             $page,
             $navigateFunction,
-            $page,
             $page
         );
     }
@@ -489,10 +497,9 @@ function renderPagination(
         '<a href="%s" class="wp-page-btn wp-page-btn--nav" data-wp-page="%d" data-wp-navigation="%s" aria-label="Next page">'
         . '<i class="fas fa-angle-left"></i>'
         . '</a>',
-        esc($builder($teamParam, $nextPage)),
+        esc($pageUrl($nextPage)),
         $nextPage,
-        $navigateFunction,
-        $nextPage
+        $navigateFunction
     );
 
     $html .= '</div>';
@@ -829,44 +836,120 @@ foreach ($weapons as $def => $weapon) {
 
 $skinPerPage = 24;
 
-$skinTotalItems =
-    count($weaponsList);
+// Every category is a separate top-level tab. The original Skins tab remains
+// the complete non-knife catalogue so uncommon weapon finishes stay reachable.
+$weaponSkinTabDefinitions = [
+    'tab-skins' => [
+        'title' => 'All Skins',
+        'icon' => 'fas fa-paint-brush',
+        'weapon_names' => null,
+    ],
+    'tab-rifles' => [
+        'title' => 'Rifles',
+        'icon' => 'fas fa-crosshairs',
+        'weapon_names' => [
+            'weapon_ak47',
+            'weapon_aug',
+            'weapon_famas',
+            'weapon_galilar',
+            'weapon_m4a1',
+            'weapon_m4a1_silencer',
+            'weapon_sg556',
+        ],
+    ],
+    'tab-smg' => [
+        'title' => 'SMG',
+        'icon' => 'fas fa-bolt',
+        'weapon_names' => [
+            'weapon_bizon',
+            'weapon_mac10',
+            'weapon_mp5sd',
+            'weapon_mp7',
+            'weapon_mp9',
+            'weapon_p90',
+            'weapon_ump45',
+        ],
+    ],
+    'tab-shotgun' => [
+        'title' => 'Shotguns',
+        'icon' => 'fas fa-fire',
+        'weapon_names' => [
+            'weapon_mag7',
+            'weapon_nova',
+            'weapon_sawedoff',
+            'weapon_xm1014',
+        ],
+    ],
+    'tab-pistol' => [
+        'title' => 'Pistols',
+        'icon' => 'fas fa-gun',
+        'weapon_names' => [
+            'weapon_cz75a',
+            'weapon_deagle',
+            'weapon_elite',
+            'weapon_fiveseven',
+            'weapon_glock',
+            'weapon_hkp2000',
+            'weapon_p250',
+            'weapon_revolver',
+            'weapon_tec9',
+            'weapon_usp_silencer',
+        ],
+    ],
+    'tab-sniper' => [
+        'title' => 'Snipers',
+        'icon' => 'fas fa-binoculars',
+        'weapon_names' => [
+            'weapon_awp',
+            'weapon_g3sg1',
+            'weapon_scar20',
+            'weapon_ssg08',
+        ],
+    ],
+];
 
-$skinTotalPages = max(
-    1,
-    (int)ceil(
-        $skinTotalItems
-        / $skinPerPage
-    )
-);
+$requestedSkinPage = max(1, $skinPage);
+$skinCategoryViews = [];
 
-$skinPage = min(
-    $skinPage,
-    $skinTotalPages
-);
+foreach ($weaponSkinTabDefinitions as $tabId => $definition) {
+    $categoryItems = $weaponsList;
+    $allowedWeaponNames = $definition['weapon_names'];
 
-$skinOffset =
-    ($skinPage - 1)
-    * $skinPerPage;
+    if (is_array($allowedWeaponNames)) {
+        $categoryItems = array_values(array_filter(
+            $weaponsList,
+            static function (array $item) use ($allowedWeaponNames): bool {
+                $weaponName = (string)($item['weapon']['weapon_name'] ?? '');
+                return in_array($weaponName, $allowedWeaponNames, true);
+            }
+        ));
+    }
 
-$skinPageItems =
-    array_slice(
-        $weaponsList,
-        $skinOffset,
-        $skinPerPage
-    );
+    $totalItems = count($categoryItems);
+    $totalPages = max(1, (int)ceil($totalItems / $skinPerPage));
+    $categoryPage = min($requestedSkinPage, $totalPages);
+    $offset = ($categoryPage - 1) * $skinPerPage;
+    $pageItems = array_slice($categoryItems, $offset, $skinPerPage);
 
-$skinStartIndex =
-    $skinTotalItems > 0
-        ? $skinOffset + 1
-        : 0;
+    $skinCategoryViews[$tabId] = [
+        'title' => $definition['title'],
+        'icon' => $definition['icon'],
+        'total_items' => $totalItems,
+        'total_pages' => $totalPages,
+        'page' => $categoryPage,
+        'page_items' => $pageItems,
+        'start_index' => $totalItems > 0 ? $offset + 1 : 0,
+        'end_index' => min($offset + $skinPerPage, $totalItems),
+    ];
+}
 
-$skinEndIndex =
-    min(
-        $skinOffset
-        + $skinPerPage,
-        $skinTotalItems
-    );
+$activeSkinView = $skinCategoryViews[$currentTab] ?? $skinCategoryViews['tab-skins'];
+$skinPage = $activeSkinView['page'];
+$skinTotalItems = $activeSkinView['total_items'];
+$skinTotalPages = $activeSkinView['total_pages'];
+$skinPageItems = $activeSkinView['page_items'];
+$skinStartIndex = $activeSkinView['start_index'];
+$skinEndIndex = $activeSkinView['end_index'];
 
 /*
 |--------------------------------------------------------------------------
@@ -1089,12 +1172,67 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
             <button
                 type="button"
                 class="wp-tab <?= $currentTab === 'tab-skins' ? 'is-active' : '' ?>"
-                title="Skins"
-                aria-label="Skins"
+                title="All Skins"
+                aria-label="All Skins"
                 data-bs-toggle="tab"
                 data-bs-target="#tab-skins"
             >
                 <i class="fas fa-paint-brush"></i>
+            </button>
+
+            <button
+                type="button"
+                class="wp-tab <?= $currentTab === 'tab-rifles' ? 'is-active' : '' ?>"
+                title="Rifles"
+                aria-label="Rifles"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-rifles"
+            >
+                <i class="fas fa-crosshairs"></i>
+            </button>
+
+            <button
+                type="button"
+                class="wp-tab <?= $currentTab === 'tab-smg' ? 'is-active' : '' ?>"
+                title="SMG"
+                aria-label="SMG"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-smg"
+            >
+                <i class="fas fa-bolt"></i>
+            </button>
+
+            <button
+                type="button"
+                class="wp-tab <?= $currentTab === 'tab-shotgun' ? 'is-active' : '' ?>"
+                title="Shotguns"
+                aria-label="Shotguns"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-shotgun"
+            >
+                <i class="fas fa-fire"></i>
+            </button>
+
+            <button
+                type="button"
+                class="wp-tab <?= $currentTab === 'tab-pistol' ? 'is-active' : '' ?>"
+                title="Pistols"
+                aria-label="Pistols"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-pistol"
+            >
+                <i class="fas fa-gun"></i>
+            </button>
+
+            <button
+                type="button"
+                class="wp-tab <?= $currentTab === 'tab-sniper' ? 'is-active' : '' ?>"
+                title="Snipers"
+                aria-label="Snipers"
+                data-bs-toggle="tab"
+                data-bs-target="#tab-sniper"
+            >
+                <i class="fas fa-binoculars"></i>
             </button>
 
             <button
@@ -1287,9 +1425,11 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
              SKINS
         ====================================================== -->
 
+        <?php foreach ($skinCategoryViews as $skinTabId => $skinView): ?>
+
         <section
-            class="tab-pane fade <?= $currentTab === 'tab-skins' ? 'show active' : '' ?>"
-            id="tab-skins"
+            class="tab-pane fade <?= $currentTab === $skinTabId ? 'show active' : '' ?>"
+            id="<?= esc($skinTabId) ?>"
         >
 
             <div class="wp-section-head">
@@ -1297,12 +1437,12 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 <div>
 
                     <span class="wp-section-kicker">
-                        <i class="fas fa-paint-brush"></i>
-                        Weapon Skins
+                        <i class="<?= esc($skinView['icon']) ?>"></i>
+                        <?= esc($skinView['title']) ?>
                     </span>
 
                     <h2 class="wp-section-title">
-                        انتخاب اسکین سلاح
+                        انتخاب اسکین سلاح — <?= esc($skinView['title']) ?>
                     </h2>
 
                 </div>
@@ -1311,7 +1451,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
                     <span class="wp-meta-pill">
                         <i class="fas fa-layer-group"></i>
-                        <?= $skinTotalItems ?> آیتم
+                        <?= $skinView['total_items'] ?> آیتم
                     </span>
 
                     <span class="wp-meta-pill">
@@ -1321,7 +1461,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
                     <span class="wp-meta-pill">
                         <i class="fas fa-circle-info"></i>
-                        صفحه <?= $skinPage ?> از <?= $skinTotalPages ?>
+                        صفحه <?= $skinView['page'] ?> از <?= $skinView['total_pages'] ?>
                     </span>
 
                 </div>
@@ -1330,53 +1470,42 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
             <div
                 class="page-fader wp-grid-fader"
-                id="skinsFade"
+                id="skinsFade-<?= esc($skinTabId) ?>"
             >
 
                 <div
                     class="wp-items-grid wp-items-grid--skins"
-                    id="skinsContainer"
+                    id="skinsContainer-<?= esc($skinTabId) ?>"
+                    data-wp-skin-category="<?= esc($skinTabId) ?>"
                 >
 
-                    <?php foreach ($skinPageItems as $item): ?>
+                    <?php foreach ($skinView['page_items'] as $item): ?>
 
                         <?php
-
                         $def = $item['def'];
                         $default = $item['weapon'];
 
-                        $hasSelectedSkin =
-                            isset($selectedSkins[$def]);
+                        $hasSelectedSkin = isset($selectedSkins[$def]);
+                        $selectedPaintId = $hasSelectedSkin
+                            ? $selectedSkins[$def]['weapon_paint_id']
+                            : null;
 
-                        $selectedPaintId =
+                        $selectedSkin = (
                             $hasSelectedSkin
-                                ? $selectedSkins[$def]['weapon_paint_id']
-                                : null;
+                            && isset($skins[$def][$selectedPaintId])
+                        )
+                            ? $skins[$def][$selectedPaintId]
+                            : null;
 
-                        $selectedSkin =
-                            (
-                                $hasSelectedSkin
-                                && isset(
-                                    $skins[$def][$selectedPaintId]
-                                )
-                            )
-                                ? $skins[$def][$selectedPaintId]
-                                : null;
-
-                        $displayImage =
-                            $selectedSkin['image_url']
+                        $displayImage = $selectedSkin['image_url']
                             ?? $default['image_url']
                             ?? '';
 
-                        $displayTitle =
-                            $selectedSkin['paint_name']
+                        $displayTitle = $selectedSkin['paint_name']
                             ?? $default['paint_name']
                             ?? '';
 
-                        $weaponName =
-                            $default['weapon_name']
-                            ?? '';
-
+                        $weaponName = $default['weapon_name'] ?? '';
                         ?>
 
                         <article
@@ -1430,23 +1559,26 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
                 <div class="wp-pagination-info">
                     نمایش
-                    <?= $skinStartIndex ?>
+                    <?= $skinView['start_index'] ?>
                     تا
-                    <?= $skinEndIndex ?>
+                    <?= $skinView['end_index'] ?>
                     از
-                    <?= $skinTotalItems ?>
+                    <?= $skinView['total_items'] ?>
                 </div>
 
                 <?= renderPagination(
                     'skins',
                     $teamParam,
-                    $skinPage,
-                    $skinTotalPages
+                    $skinView['page'],
+                    $skinView['total_pages'],
+                    $skinTabId
                 ) ?>
 
             </div>
 
         </section>
+
+        <?php endforeach; ?>
 
 
         <!-- =====================================================
