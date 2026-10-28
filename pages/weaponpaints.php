@@ -842,7 +842,7 @@ $weaponSkinTabDefinitions = [
     'tab-skins' => [
         'title' => 'All Skins',
         'icon' => 'fas fa-paint-brush',
-        'weapon_names' => null,
+        'defindexes' => null,
     ],
     'tab-rifles' => [
         'title' => 'Rifles',
