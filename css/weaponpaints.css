@@ -4870,3 +4870,11 @@ body > .wp-modal#skinModal .modal-dialog {
         margin: 24px auto 0;
     }
 }
+
+
+/* Match the host page's :has() selector specificity on narrow screens. */
+@media (max-width: 760px) {
+    body:has(.wp-app.has-floating-pagination) .wp-app {
+        padding-bottom: 96px !important;
+    }
+}
