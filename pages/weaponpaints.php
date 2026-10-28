@@ -135,7 +135,7 @@ function normalizeTabSelection(string $tab): string
 
     return in_array($tab, $allowedTabs, true)
         ? $tab
-        : 'tab-knives';
+        : 'tab-inventory';
 }
 
 function currentScriptPath(): string
@@ -588,8 +588,15 @@ $team = $teamParam === 'both'
     : (int)$teamParam;
 
 $currentTab = normalizeTabSelection(
-    (string)($_GET['tab'] ?? 'tab-knives')
+    (string)($_GET['tab'] ?? 'tab-inventory')
 );
+
+// Agents are team-specific. If a stale URL requests BOTH while opening
+// this tab, use T as the deterministic single-team fallback.
+if ($currentTab === 'tab-agents' && $teamParam === 'both') {
+    $teamParam = '2';
+    $team = 2;
+}
 
 $skinPage = max(
     1,
@@ -658,7 +665,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        $activeTab = (string)($_POST['active_tab'] ?? 'tab-knives');
+        $activeTab = (string)($_POST['active_tab'] ?? 'tab-inventory');
         $save_team = normalizeTeamSelection((string)($_POST['team'] ?? '2'));
         $teams = $save_team === 'both' ? [2, 3] : [(int)$save_team];
 
@@ -676,12 +683,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (isset($_POST['agent_id'])) {
             $agentId = (string)$_POST['agent_id'];
-            if (!isset($agentsData['t'][$agentId]) && !isset($agentsData['ct'][$agentId])) {
+            $agentSide = $save_team === '2'
+                ? 't'
+                : ($save_team === '3' ? 'ct' : null);
+
+            // Never accept a BOTH save or an agent that belongs to the
+            // opposite side, even if the request is manually forged.
+            if (
+                $agentSide === null ||
+                !isset($agentsData[$agentSide][$agentId])
+            ) {
                 http_response_code(400);
-                echo '<div class="wp-auth-state" role="alert">Agent انتخاب‌شده معتبر نیست.</div>';
+                echo '<div class="wp-auth-state" role="alert">Agent انتخاب‌شده با تیم انتخابی مطابقت ندارد.</div>';
                 return;
             }
-            $db->saveAgent($steamid, $teams, $agentId);
+
+            $db->saveAgent($steamid, [(int)$save_team], $agentId);
             redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
         }
 
@@ -1738,6 +1755,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
                         <article
                             class="wp-item agent-item"
+                            data-agent-team="<?= esc($side) ?>"
                             data-name="<?= esc(strtolower($agentName)) ?>"
                         >
 
