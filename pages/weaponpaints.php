@@ -2832,15 +2832,17 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                             Weapon Customization
                         </span>
 
-                        <h5
-                            id="skinModalTitle"
-                            class="wp-modal-title"
-                            aria-live="polite"
-                        ></h5>
+
 
                     </div>
 
                 </div>
+
+                <div
+                    class="wp-modal-header-tools"
+                    id="skinModalHeaderTools"
+                    aria-label="Weapon details and paint search"
+                ></div>
 
                 <button
                     type="button"
