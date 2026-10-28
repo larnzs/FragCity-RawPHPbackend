@@ -2920,10 +2920,16 @@
                 </div>
 
 
-                <div
-                    class="selection-grid selection-grid--skin"
-                    id="skinSelectionGrid"
-                >
+                <div class="wp-skin-workspace">
+
+                    <section class="wp-skin-list-pane" aria-label="Available paint finishes">
+
+                        <div class="wp-skin-grid-scroll">
+
+                            <div
+                                class="selection-grid selection-grid--skin"
+                                id="skinSelectionGrid"
+                            >
 
         `;
 
@@ -3032,10 +3038,14 @@
 
         html += `
 
-                </div>
+                            </div>
+
+                        </div>
+
+                    </section>
 
 
-                <div class="wp-skin-controls">
+                    <aside class="wp-skin-controls" aria-label="Skin customization settings">
 
 
                     <div class="wp-control-card">
@@ -3440,6 +3450,8 @@
 
 
         html += `
+
+                    </aside>
 
                 </div>
 
