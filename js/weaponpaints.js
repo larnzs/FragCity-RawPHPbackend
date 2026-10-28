@@ -3062,24 +3062,17 @@
                     <aside class="wp-skin-controls" aria-label="Skin customization settings">
 
 
-                    <div class="wp-control-card">
+                    <div class="wp-control-card wp-setting-card wp-setting-card--wear">
 
-                        <label class="wp-control-label">
-
-                            <span>
-                                Wear
+                        <div class="wp-setting-heading">
+                            <span class="wp-setting-icon" aria-hidden="true">
+                                <i class="fas fa-tint"></i>
                             </span>
-
-                            <span
-                                class="wp-control-value"
-                                id="wearValue"
-                            >
-                                ${escapeHtml(
-                                    selectedWear
-                                )}
-                            </span>
-
-                        </label>
+                            <div class="wp-setting-heading-copy">
+                                <label class="wp-setting-title" for="skinWearInput">Wear</label>
+                                <span class="wp-control-value" id="wearValue">${escapeHtml(selectedWear)}</span>
+                            </div>
+                        </div>
 
                         <input
                             type="number"
@@ -3097,23 +3090,22 @@
                     </div>
 
 
-                    <div class="wp-control-card">
+                    <div class="wp-control-card wp-setting-card wp-setting-card--seed">
 
-                        <label class="wp-control-label">
-
-                            <span>
-                                Seed
+                        <div class="wp-setting-heading">
+                            <span class="wp-setting-icon" aria-hidden="true">
+                                <i class="fas fa-hashtag"></i>
                             </span>
-
-                            <span class="wp-control-value">
-                                Pattern
-                            </span>
-
-                        </label>
+                            <div class="wp-setting-heading-copy">
+                                <label class="wp-setting-title" for="skinSeedInput">Seed</label>
+                                <span class="wp-control-value">Pattern</span>
+                            </div>
+                        </div>
 
                         <input
                             type="number"
                             name="seed"
+                            id="skinSeedInput"
                             min="0"
                             value="${escapeHtml(
                                 selectedSeed
@@ -3124,23 +3116,22 @@
                     </div>
 
 
-                    <div class="wp-control-card">
+                    <div class="wp-control-card wp-setting-card wp-setting-card--nametag">
 
-                        <label class="wp-control-label">
-
-                            <span>
-                                Name Tag
+                        <div class="wp-setting-heading">
+                            <span class="wp-setting-icon" aria-hidden="true">
+                                <i class="fas fa-tag"></i>
                             </span>
-
-                            <span class="wp-control-value">
-                                Max 20
-                            </span>
-
-                        </label>
+                            <div class="wp-setting-heading-copy">
+                                <label class="wp-setting-title" for="skinNameTagInput">Name Tag</label>
+                                <span class="wp-control-value">Max 20</span>
+                            </div>
+                        </div>
 
                         <input
                             type="text"
                             name="nametag"
+                            id="skinNameTagInput"
                             maxlength="20"
                             value="${escapeHtml(
                                 selectedNameTag
@@ -3152,15 +3143,15 @@
                     </div>
 
 
-                    <div class="wp-control-card">
+                    <div class="wp-control-card wp-setting-card wp-setting-card--stattrak">
 
                         <label class="settings-option wp-inline-toggle">
 
                             <span class="settings-option-content">
 
-                                <span class="settings-option-icon">
+                                <span class="settings-option-icon wp-setting-icon" aria-hidden="true">
 
-                                    <i class="fas fa-star"></i>
+                                    <i class="fas fa-chart-line"></i>
 
                                 </span>
 
