@@ -2932,6 +2932,8 @@ window.WeaponPaintsConfig = {
 
     currentPinPage: <?= (int)$pinPage ?>,
 
-    currentPhpFile: <?= json_encode(currentScriptPath(), $jsonFlags) ?>
+    currentPhpFile: <?= json_encode(currentScriptPath(), $jsonFlags) ?>,
+
+    csrfToken: <?= json_encode($csrfToken, $jsonFlags) ?>
 };
 </script>
