@@ -7181,6 +7181,7 @@ body:has(.wp-app) .wp-main {
 /* The first grid area is the right-hand edge in the RTL toolbar. */
 body:has(.wp-app) .wp-header .wp-tabs {
     direction: rtl;
+    padding-inline: 0 !important;
 }
 
 .wp-app .wp-header .wp-category-switcher {
