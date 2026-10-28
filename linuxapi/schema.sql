@@ -1,5 +1,5 @@
 -- Run in the VERIFIED WeaponPaints database on the Linux host.
--- This table stores used nonce hashes to prevent captured request replays.
+-- API-owned support tables. The existing CS2 plugin tables are never recreated.
 
 CREATE TABLE IF NOT EXISTS fragcity_api_nonces (
     nonce_hash CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
@@ -7,6 +7,17 @@ CREATE TABLE IF NOT EXISTS fragcity_api_nonces (
     PRIMARY KEY (nonce_hash),
     KEY idx_fragcity_api_nonces_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- One-time-safe backfill: preserve every currently active plugin row as an
+-- inventory entry. INSERT IGNORE makes rerunning this migration non-destructive.
+INSERT IGNORE INTO wp_player_skin_inventory
+    (steamid, weapon_team, weapon_defindex, weapon_paint_id, weapon_wear, weapon_seed,
+     weapon_nametag, weapon_stattrak, weapon_sticker_0, weapon_sticker_1,
+     weapon_sticker_2, weapon_sticker_3, weapon_sticker_4, weapon_keychain)
+SELECT steamid, weapon_team, weapon_defindex, weapon_paint_id, weapon_wear, weapon_seed,
+       weapon_nametag, weapon_stattrak, weapon_sticker_0, weapon_sticker_1,
+       weapon_sticker_2, weapon_sticker_3, weapon_sticker_4, weapon_keychain
+FROM wp_player_skins;
 
 -- Replace verified_weaponpaints_db with the exact database name.
 -- Replace CLIENT_HOST with the real source host MariaDB sees (not necessarily localhost).
