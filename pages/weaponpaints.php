@@ -847,64 +847,27 @@ $weaponSkinTabDefinitions = [
     'tab-rifles' => [
         'title' => 'Rifles',
         'icon' => 'fas fa-crosshairs',
-        'weapon_names' => [
-            'weapon_ak47',
-            'weapon_aug',
-            'weapon_famas',
-            'weapon_galilar',
-            'weapon_m4a1',
-            'weapon_m4a1_silencer',
-            'weapon_sg556',
-        ],
+        'defindexes' => [7, 8, 10, 13, 16, 39, 60],
     ],
     'tab-smg' => [
         'title' => 'SMG',
         'icon' => 'fas fa-bolt',
-        'weapon_names' => [
-            'weapon_bizon',
-            'weapon_mac10',
-            'weapon_mp5sd',
-            'weapon_mp7',
-            'weapon_mp9',
-            'weapon_p90',
-            'weapon_ump45',
-        ],
+        'defindexes' => [17, 19, 23, 24, 26, 33, 34],
     ],
     'tab-shotgun' => [
         'title' => 'Shotguns',
         'icon' => 'fas fa-fire',
-        'weapon_names' => [
-            'weapon_mag7',
-            'weapon_nova',
-            'weapon_sawedoff',
-            'weapon_xm1014',
-        ],
+        'defindexes' => [25, 27, 29, 35],
     ],
     'tab-pistol' => [
         'title' => 'Pistols',
         'icon' => 'fas fa-gun',
-        'weapon_names' => [
-            'weapon_cz75a',
-            'weapon_deagle',
-            'weapon_elite',
-            'weapon_fiveseven',
-            'weapon_glock',
-            'weapon_hkp2000',
-            'weapon_p250',
-            'weapon_revolver',
-            'weapon_tec9',
-            'weapon_usp_silencer',
-        ],
+        'defindexes' => [1, 2, 3, 4, 30, 32, 36, 61, 63, 64],
     ],
     'tab-sniper' => [
         'title' => 'Snipers',
         'icon' => 'fas fa-binoculars',
-        'weapon_names' => [
-            'weapon_awp',
-            'weapon_g3sg1',
-            'weapon_scar20',
-            'weapon_ssg08',
-        ],
+        'defindexes' => [9, 11, 38, 40],
     ],
 ];
 
@@ -913,14 +876,14 @@ $skinCategoryViews = [];
 
 foreach ($weaponSkinTabDefinitions as $tabId => $definition) {
     $categoryItems = $weaponsList;
-    $allowedWeaponNames = $definition['weapon_names'];
+    $allowedDefindexes = $definition['defindexes'];
 
-    if (is_array($allowedWeaponNames)) {
+    if (is_array($allowedDefindexes)) {
         $categoryItems = array_values(array_filter(
             $weaponsList,
-            static function (array $item) use ($allowedWeaponNames): bool {
-                $weaponName = (string)($item['weapon']['weapon_name'] ?? '');
-                return in_array($weaponName, $allowedWeaponNames, true);
+            static function (array $item) use ($allowedDefindexes): bool {
+                $defindex = (int)($item['def'] ?? 0);
+                return in_array($defindex, $allowedDefindexes, true);
             }
         ));
     }
