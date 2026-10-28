@@ -123,7 +123,7 @@ function normalizeTabSelection(string $tab): string
         'tab-skins',
         'tab-rifles',
         'tab-smg',
-        'tab-shotgun',
+        'tab-heavy',
         'tab-pistol',
         'tab-sniper',
         'tab-gloves',
@@ -854,10 +854,10 @@ $weaponSkinTabDefinitions = [
         'icon' => 'fas fa-bolt',
         'defindexes' => [17, 19, 23, 24, 26, 33, 34],
     ],
-    'tab-shotgun' => [
-        'title' => 'Shotguns',
+    'tab-heavy' => [
+        'title' => 'Heavy Guns',
         'icon' => 'fas fa-fire',
-        'defindexes' => [25, 27, 29, 35],
+        'defindexes' => [14, 25, 27, 28, 29, 35],
     ],
     'tab-pistol' => [
         'title' => 'Pistols',
@@ -1147,11 +1147,11 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
             <button
                 type="button"
-                class="wp-tab <?= $currentTab === 'tab-shotgun' ? 'is-active' : '' ?>"
-                title="Shotguns"
-                aria-label="Shotguns"
+                class="wp-tab <?= $currentTab === 'tab-heavy' ? 'is-active' : '' ?>"
+                title="Heavy Guns"
+                aria-label="Heavy Guns"
                 data-bs-toggle="tab"
-                data-bs-target="#tab-shotgun"
+                data-bs-target="#tab-heavy"
             >
                 <i class="fas fa-fire"></i>
             </button>
