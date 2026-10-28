@@ -102,12 +102,12 @@ class UtilsClass
             if ($team === 3) {
                 $agents['ct'][$model] = [
                     'name'      => $name,
-                    'image_url' => IMAGE_BASE_SKINS . $image,
+                    'image_url' => $image !== '' ? IMAGE_BASE_SKINS . $image : '',
                 ];
             } else {
                 $agents['t'][$model] = [
                     'name'      => $name,
-                    'image_url' => IMAGE_BASE_SKINS . $image,
+                    'image_url' => $image !== '' ? IMAGE_BASE_SKINS . $image : '',
                 ];
             }
         }
