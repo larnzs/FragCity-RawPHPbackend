@@ -21,9 +21,42 @@ $domain = $configuredDomain !== ''
 // آدرس‌های روت‌شده منطبق بر ساختار index.php شما
 
 $steamRoutes = fragcity_settings('files.steam.steam_login', array());
-$loginPage=isset($steamRoutes['login_page'])?$steamRoutes['login_page']:'index.php?page=login';
-$completeRegistrationPage=isset($steamRoutes['registration_complete_page'])?$steamRoutes['registration_complete_page']:'index.php?page=register';
-$dashboardPage=isset($steamRoutes['dashboard_page'])?$steamRoutes['dashboard_page']:'index.php';
+$steamRoutes = is_array($steamRoutes) ? $steamRoutes : array();
+
+/*
+ * Build internal destinations relative to this repository's actual web path.
+ * This supports both a Laragon subdirectory URL and a dedicated virtual host.
+ * Configured routes are paths only; external redirect targets are rejected.
+ */
+$scriptName = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? '/steam/steam_login.php'));
+$siteBasePath = dirname(dirname($scriptName));
+if ($siteBasePath === '/' || $siteBasePath === '.' || $siteBasePath === '\\') {
+    $siteBasePath = '';
+} else {
+    $siteBasePath = '/' . trim($siteBasePath, '/');
+}
+
+$resolveSteamRoute = static function ($configuredRoute, string $fallback) use ($siteBasePath): string {
+    $route = is_string($configuredRoute) ? trim($configuredRoute) : '';
+    if (
+        $route === ''
+        || str_starts_with($route, '//')
+        || preg_match('/^[a-z][a-z0-9+.-]*:/i', $route)
+        || str_contains($route, "\r")
+        || str_contains($route, "\n")
+    ) {
+        $route = $fallback;
+    }
+
+    return $siteBasePath . '/' . ltrim($route, '/');
+};
+
+$loginPage = $resolveSteamRoute($steamRoutes['login_page'] ?? null, 'index.php?page=login');
+$completeRegistrationPage = $resolveSteamRoute(
+    $steamRoutes['registration_complete_page'] ?? null,
+    'index.php?page=register&steam=1'
+);
+$dashboardPage = $resolveSteamRoute($steamRoutes['dashboard_page'] ?? null, 'index.php');
 
 try {
 
@@ -109,7 +142,7 @@ try {
 
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            
+            error_log('[FragCity] Steam login user lookup completed; match=' . ($user ? 'yes' : 'no') . '.');
 
             if ($user) {
 
