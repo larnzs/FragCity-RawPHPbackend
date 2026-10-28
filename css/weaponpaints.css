@@ -5716,3 +5716,149 @@ body > #skinModal .wp-modal-body {
         transition: none !important;
     }
 }
+
+
+/* =========================================================
+   34. Responsive Weapon Modal Identity / Typography
+========================================================= */
+
+body > #skinModal .wp-modal-header--weapon {
+    container-type: inline-size;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(8px, .9cqi, 14px);
+    min-width: 0;
+    padding: clamp(10px, .95cqi, 16px) clamp(12px, 1.25cqi, 20px) !important;
+    background:
+        linear-gradient(105deg, rgba(249, 115, 22, .095), rgba(59, 130, 246, .035) 62%, rgba(7, 12, 21, .92)) !important;
+    border-bottom: 1px solid rgba(148, 163, 184, .13) !important;
+}
+
+body > #skinModal .wp-modal-identity {
+    display: flex;
+    align-items: center;
+    gap: clamp(9px, .9cqi, 13px);
+    min-width: 0;
+}
+
+body > #skinModal .wp-modal-icon-tile {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: clamp(34px, 2.8cqi, 42px);
+    height: clamp(34px, 2.8cqi, 42px);
+    color: #fdba74;
+    font-size: clamp(.95rem, 1.15cqi, 1.12rem);
+    background: linear-gradient(145deg, rgba(249, 115, 22, .20), rgba(249, 115, 22, .07));
+    border: 1px solid rgba(249, 115, 22, .29);
+    border-radius: clamp(10px, .8cqi, 13px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045);
+}
+
+body > #skinModal .wp-modal-title-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+}
+
+body > #skinModal .wp-modal-eyebrow {
+    display: block;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: #f1f5f9 !important;
+    font-size: clamp(.78rem, 1.08cqi, 1.02rem) !important;
+    font-weight: 850 !important;
+    line-height: 1.22;
+    letter-spacing: -.018em;
+}
+
+body > #skinModal .wp-modal-title {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 3px 8px !important;
+    color: #fdba74 !important;
+    background: rgba(249, 115, 22, .075) !important;
+    border: 1px solid rgba(249, 115, 22, .17) !important;
+    border-radius: 6px !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+    font-size: clamp(.64rem, .74cqi, .78rem) !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+    letter-spacing: .025em;
+    overflow-wrap: anywhere;
+    white-space: normal;
+}
+
+body > #skinModal .wp-modal-header--weapon .modal-x-btn {
+    flex: 0 0 auto;
+    width: clamp(30px, 2.3cqi, 36px) !important;
+    height: clamp(30px, 2.3cqi, 36px) !important;
+    border-radius: 10px !important;
+}
+
+@media (max-width: 720px) {
+    body > #skinModal .wp-modal-header--weapon {
+        gap: 8px;
+        padding: 9px 10px !important;
+    }
+
+    body > #skinModal .wp-modal-identity {
+        gap: 8px;
+    }
+
+    body > #skinModal .wp-modal-icon-tile {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        font-size: .95rem;
+    }
+
+    body > #skinModal .wp-modal-eyebrow {
+        font-size: clamp(.78rem, 3.7cqi, .9rem) !important;
+    }
+
+    body > #skinModal .wp-modal-title {
+        font-size: clamp(.62rem, 2.7cqi, .72rem) !important;
+        padding: 3px 6px !important;
+    }
+}
+
+@media (max-height: 600px) and (min-width: 721px) {
+    body > #skinModal .wp-modal-header--weapon {
+        padding-top: 7px !important;
+        padding-bottom: 7px !important;
+    }
+
+    body > #skinModal .wp-modal-icon-tile {
+        width: 31px;
+        height: 31px;
+    }
+
+    body > #skinModal .wp-modal-title-wrap {
+        gap: 2px;
+    }
+
+    body > #skinModal .wp-modal-eyebrow {
+        font-size: clamp(.75rem, .92cqi, .9rem) !important;
+    }
+
+    body > #skinModal .wp-modal-title {
+        padding-top: 2px !important;
+        padding-bottom: 2px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body > #skinModal .wp-modal-icon-tile {
+        box-shadow: none;
+    }
+}
