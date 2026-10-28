@@ -90,11 +90,15 @@ function smokeRequest(string $baseUrl, string $secret, array $payload): bool
 
     $response = curl_exec($handle);
     $curlError = curl_errno($handle);
+    $curlErrorText = curl_error($handle);
     $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
-    curl_close($handle);
+
+    // PHP 8.5 deprecates curl_close(); releasing the CurlHandle reference closes it.
+    $handle = null;
 
     if ($response === false || $curlError !== 0) {
-        fwrite(STDERR, "ERROR: Request transport failed (cURL code " . $curlError . ").\n");
+        $detail = $curlErrorText !== '' ? $curlErrorText : 'no cURL detail available';
+        fwrite(STDERR, "ERROR: Request transport failed (cURL code " . $curlError . ": " . $detail . ").\\n");
         return false;
     }
 
