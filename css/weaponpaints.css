@@ -7226,8 +7226,7 @@ body > .wp-modal .modal-dialog {
         transform 300ms cubic-bezier(.22, .61, .36, 1) !important;
 }
 
-body > .wp-modal.wp-modal-visible .modal-dialog,
-body > .wp-modal.wp-is-open .modal-dialog {
+body > .wp-modal.wp-modal-visible .modal-dialog {
     opacity: 1 !important;
     transform: translateY(0) scale(1) !important;
 }
