@@ -37,6 +37,7 @@ final class WeaponPaintsRepository
         $data = $this->callApi('get_selection', ['steamid' => $steamid]);
         return [
             'skins' => is_array($data['skins'] ?? null) ? $data['skins'] : [],
+            'skin_inventory' => is_array($data['skin_inventory'] ?? null) ? $data['skin_inventory'] : [],
             'knife' => is_array($data['knife'] ?? null) ? $data['knife'] : [],
             'agents' => is_array($data['agents'] ?? null) ? $data['agents'] : [],
             'music' => is_array($data['music'] ?? null) ? $data['music'] : [],
