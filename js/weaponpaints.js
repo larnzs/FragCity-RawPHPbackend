@@ -84,6 +84,12 @@
         activeSkinPaintId:
             null,
 
+        activeSkinEditTeam:
+            null,
+
+        requestedSkinPaintId:
+            null,
+
         currentStickerSlot:
             null,
 
@@ -242,6 +248,8 @@
         state.currentPinPage = Number(config.currentPinPage || 1);
         state.activeDefindex = null;
         state.activeSkinPaintId = null;
+        state.activeSkinEditTeam = null;
+        state.requestedSkinPaintId = null;
         state.currentStickerSlot = null;
         state.parentModalId = null;
         state.parentModalTemporarilyHidden = false;
@@ -2194,6 +2202,10 @@
 
     function getSkinTeamCandidates() {
 
+        if (state.activeSkinEditTeam === 2 || state.activeSkinEditTeam === 3) {
+            return [state.activeSkinEditTeam];
+        }
+
         return state.currentTeamParam === 'both'
             ? [2, 3]
             : [Number(state.currentTeamParam)].filter(
@@ -3435,10 +3447,15 @@
             );
 
 
-        const selectedPaintId =
-            selected
-                ? String(selected.weapon_paint_id)
-                : '';
+        const requestedPaintId = state.requestedSkinPaintId === null
+            || state.requestedSkinPaintId === undefined
+            ? ''
+            : String(state.requestedSkinPaintId);
+
+        const selectedPaintId = requestedPaintId !== ''
+            && Object.prototype.hasOwnProperty.call(skinList, requestedPaintId)
+                ? requestedPaintId
+                : (selected ? String(selected.weapon_paint_id) : '');
 
 
         const detail = selectedPaintId
@@ -3528,7 +3545,7 @@
                 <input
                     type="hidden"
                     name="team"
-                    value="${escapeHtml(state.currentTeamParam)}"
+                    value="${escapeHtml(state.activeSkinEditTeam || state.currentTeamParam)}"
                 >
 
                 <input
@@ -4420,25 +4437,24 @@
     ========================================================== */
 
     function openSkinModal(
-        defindex
+        defindex,
+        paintId = null,
+        team = null
     ) {
 
-        state.activeDefindex =
-            String(
-                defindex
-            );
+        state.activeDefindex = String(defindex);
+        state.activeSkinEditTeam = Number(team) === 2 || Number(team) === 3
+            ? Number(team)
+            : null;
+        state.requestedSkinPaintId = paintId === null || paintId === undefined || String(paintId) === ''
+            ? null
+            : String(paintId);
 
-        renderSkinModal(
-            defindex
-        );
+        renderSkinModal(defindex);
 
         if (dom.skinModal) {
-            ensureModalInBody(
-                dom.skinModal
-            );
-            showCustomModal(
-                dom.skinModal
-            );
+            ensureModalInBody(dom.skinModal);
+            showCustomModal(dom.skinModal);
         }
 
     }
@@ -4630,6 +4646,56 @@
     }
 
 
+    function prepareAddonModalLayout(
+        modalBody,
+        headerToolsId,
+        gridId,
+        loadMoreId,
+        ariaLabel
+    ) {
+        if (!modalBody) {
+            return;
+        }
+
+        const headerTools = document.getElementById(headerToolsId);
+        const toolbar = modalBody.querySelector('.wp-addon-toolbar');
+
+        if (headerTools && toolbar) {
+            headerTools.replaceChildren();
+            toolbar.setAttribute('aria-label', ariaLabel);
+            headerTools.appendChild(toolbar);
+        }
+
+        const grid = modalBody.querySelector('[id="' + gridId + '"]');
+        const loadMore = modalBody.querySelector('[id="' + loadMoreId + '"]');
+        const propertiesCard = modalBody.querySelector('.wp-control-card');
+        const footer = modalBody.querySelector('.selection-footer');
+
+        if (!grid || !loadMore || !propertiesCard || !footer) {
+            return;
+        }
+
+        const workspace = document.createElement('div');
+        workspace.className = 'wp-addon-workspace';
+
+        const propertiesPane = document.createElement('aside');
+        propertiesPane.className = 'wp-addon-properties';
+        propertiesPane.setAttribute('aria-label', ariaLabel + ' properties');
+
+        const listPane = document.createElement('section');
+        listPane.className = 'wp-addon-list-pane';
+        listPane.setAttribute('aria-label', ariaLabel + ' choices');
+
+        propertiesPane.appendChild(propertiesCard);
+        listPane.appendChild(grid);
+        listPane.appendChild(loadMore);
+        workspace.appendChild(propertiesPane);
+        workspace.appendChild(listPane);
+
+        modalBody.insertBefore(workspace, footer);
+    }
+
+
     function renderStickerModal() {
 
         if (
@@ -4801,11 +4867,15 @@
         `;
 
 
-        renderStickerPage(
-            false
+        prepareAddonModalLayout(
+            dom.stickerModalBody,
+            'stickerModalHeaderTools',
+            'stickerGrid',
+            'stickerLoadMore',
+            'Sticker selector'
         );
 
-
+        renderStickerPage(false);
         bindStickerModalEvents();
 
     }
@@ -5630,11 +5700,15 @@
         `;
 
 
-        renderKeychainPage(
-            false
+        prepareAddonModalLayout(
+            dom.keychainModalBody,
+            'keychainModalHeaderTools',
+            'keychainGrid',
+            'keychainLoadMore',
+            'Keychain selector'
         );
 
-
+        renderKeychainPage(false);
         bindKeychainModalEvents();
 
     }
@@ -6313,8 +6387,13 @@
                 return;
             }
 
+            const requestedPaintId = trigger.getAttribute('data-paint-id');
+            const requestedTeam = Number(trigger.getAttribute('data-team'));
+
             openSkinModal(
-                defindex
+                defindex,
+                requestedPaintId,
+                requestedTeam === 2 || requestedTeam === 3 ? requestedTeam : null
             );
             return;
 

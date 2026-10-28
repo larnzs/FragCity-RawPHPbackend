@@ -2180,6 +2180,130 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
             </div>
 
+<?php
+$inventoryPaintItems = [];
+foreach ($skinInventory as $inventoryEntry) {
+    if (!is_array($inventoryEntry)) {
+        continue;
+    }
+    $inventoryEntryTeam = (int)($inventoryEntry['weapon_team'] ?? 0);
+    if (in_array($inventoryEntryTeam, $displayTeamList, true)) {
+        $inventoryPaintItems[] = $inventoryEntry;
+    }
+}
+?>
+
+<section class="wp-inventory-saved" aria-labelledby="wpSavedPaintsTitle">
+    <div class="wp-inventory-subhead">
+        <div class="wp-inventory-subhead-copy">
+            <span class="wp-section-kicker">
+                <i class="fas fa-layer-group" aria-hidden="true"></i>
+                Saved Paint Configurations
+            </span>
+            <h3 class="wp-inventory-subtitle" id="wpSavedPaintsTitle">اسکین‌های ذخیره‌شده</h3>
+            <p class="wp-inventory-description">هر Paint تنظیمات استیکر و کی‌چین مخصوص خودش را دارد. برای ویرایش، روی کارت همان Paint بزنید.</p>
+        </div>
+        <span class="wp-meta-pill wp-inventory-count">
+            <i class="fas fa-box-archive" aria-hidden="true"></i>
+            <?= count($inventoryPaintItems) ?> Saved
+        </span>
+    </div>
+
+    <?php if ($inventoryPaintItems): ?>
+        <div class="wp-items-grid wp-saved-paints-grid" id="savedPaintInventoryGrid">
+            <?php foreach ($inventoryPaintItems as $savedEntry): ?>
+                <?php
+                $savedTeam = (int)($savedEntry['weapon_team'] ?? 0);
+                $savedDef = (int)($savedEntry['weapon_defindex'] ?? 0);
+                $savedPaintId = (int)($savedEntry['weapon_paint_id'] ?? 0);
+                $savedWeapon = $weapons[$savedDef] ?? $weapons[(string)$savedDef] ?? [];
+                $savedPaint = $skins[$savedDef][$savedPaintId] ?? $skins[(string)$savedDef][(string)$savedPaintId] ?? null;
+                $savedPaintName = is_array($savedPaint)
+                    ? (string)($savedPaint['paint_name'] ?? $savedPaint['name'] ?? ('Paint #' . $savedPaintId))
+                    : ('Paint #' . $savedPaintId);
+                $savedWeaponName = is_array($savedWeapon)
+                    ? (string)($savedWeapon['weapon_name'] ?? $savedWeapon['name'] ?? ('weapon_' . $savedDef))
+                    : ('weapon_' . $savedDef);
+                $savedWeaponLabel = preg_replace('/^weapon_/', '', $savedWeaponName) ?: $savedWeaponName;
+                $savedStickerCount = 0;
+                for ($savedSlot = 0; $savedSlot < 5; $savedSlot++) {
+                    $savedStickerValue = (string)($savedEntry['weapon_sticker_' . $savedSlot] ?? '0;0;0;0;0.001;1;0');
+                    $savedStickerParts = explode(';', $savedStickerValue, 2);
+                    if ((int)($savedStickerParts[0] ?? 0) > 0) {
+                        $savedStickerCount++;
+                    }
+                }
+                $savedKeychainParts = explode(';', (string)($savedEntry['weapon_keychain'] ?? '0;0;0;0;0'));
+                $savedHasKeychain = (int)($savedKeychainParts[0] ?? 0) > 0;
+                $savedCanEdit = $savedDef > 0 && isset($weapons[$savedDef]) && is_array($savedPaint);
+                $savedTeamLabel = $savedTeam === 3 ? 'CT' : 'T';
+                $savedImage = is_array($savedPaint) ? (string)($savedPaint['image_url'] ?? '') : '';
+                ?>
+                <article class="wp-item wp-saved-paint-item">
+                    <?php if ($savedCanEdit): ?>
+                        <button
+                            type="button"
+                            class="wp-card wp-card--clickable wp-saved-paint-card"
+                            data-wp-modal-trigger="1"
+                            data-bs-target="#skinModal"
+                            data-def="<?= esc($savedDef) ?>"
+                            data-paint-id="<?= esc($savedPaintId) ?>"
+                            data-team="<?= esc($savedTeam) ?>"
+                            aria-label="<?= esc('ویرایش ' . $savedWeaponLabel . ' - ' . $savedPaintName . ' (' . $savedTeamLabel . ')') ?>"
+                        >
+                    <?php else: ?>
+                        <div class="wp-card wp-saved-paint-card wp-saved-paint-card--readonly">
+                    <?php endif; ?>
+                        <div class="wp-card-media">
+                            <?= imageMarkup($savedImage, $savedPaintName) ?>
+                        </div>
+                        <div class="wp-card-content">
+                            <span class="wp-card-title"><?= esc($savedPaintName) ?></span>
+                            <span class="wp-saved-paint-weapon"><?= esc($savedWeaponLabel) ?></span>
+                            <div class="wp-saved-paint-badges">
+                                <span class="wp-saved-paint-badge wp-saved-paint-badge--team"><?= esc($savedTeamLabel) ?></span>
+                                <span class="wp-saved-paint-badge">
+                                    <i class="fas fa-sticky-note" aria-hidden="true"></i>
+                                    <?= $savedStickerCount ?> Sticker<?= $savedStickerCount === 1 ? '' : 's' ?>
+                                </span>
+                                <span class="wp-saved-paint-badge <?= $savedHasKeychain ? 'is-present' : '' ?>">
+                                    <i class="fas fa-key" aria-hidden="true"></i>
+                                    <?= $savedHasKeychain ? 'Keychain' : 'No Keychain' ?>
+                                </span>
+                            </div>
+                            <?php if ($savedCanEdit): ?>
+                                <span class="wp-saved-paint-action"><i class="fas fa-pen" aria-hidden="true"></i> ویرایش Paint</span>
+                            <?php else: ?>
+                                <span class="wp-saved-paint-action is-muted">اطلاعات نمایشی این آیتم در دسترس نیست</span>
+                            <?php endif; ?>
+                        </div>
+                    <?php if ($savedCanEdit): ?>
+                        </button>
+                    <?php else: ?>
+                        </div>
+                    <?php endif; ?>
+                </article>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <div class="wp-inventory-empty">
+            <i class="fas fa-box-open" aria-hidden="true"></i>
+            <strong>هنوز Paint ذخیره‌شده‌ای در Inventory نیست.</strong>
+            <span>پس از ذخیرهٔ تنظیمات یک سلاح، هر Paint ذخیره‌شده اینجا نمایش داده می‌شود.</span>
+        </div>
+    <?php endif; ?>
+</section>
+
+<div class="wp-inventory-subhead wp-inventory-subhead--current">
+    <div class="wp-inventory-subhead-copy">
+        <span class="wp-section-kicker">
+            <i class="fas fa-crosshairs" aria-hidden="true"></i>
+            Current Loadout
+        </span>
+        <h3 class="wp-inventory-subtitle">آیتم‌های فعال و سایر انتخاب‌ها</h3>
+    </div>
+</div>
+
             <div class="wp-items-grid">
 
                 <!-- Current Knife -->
@@ -2901,27 +3025,19 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
         <div class="modal-content bg-site-dark">
 
-            <div class="modal-header wp-modal-header">
+            <div class="modal-header wp-modal-header wp-modal-header--weapon">
 
-                <div class="wp-modal-title-wrap">
-
-                    <span class="wp-modal-eyebrow">
-                        <i class="fas fa-sticky-note"></i>
-                        Skin Add-on
-                    </span>
-
-                    <h5 class="wp-modal-title">
-                        Select Sticker
-                    </h5>
-
+                <div class="wp-modal-identity">
+                    <span class="wp-modal-icon-tile" aria-hidden="true"><i class="fas fa-sticky-note"></i></span>
+                    <div class="wp-modal-title-wrap">
+                        <span class="wp-modal-eyebrow">Weapon Customization</span>
+                        <h5 class="wp-modal-title">Select Sticker</h5>
+                    </div>
                 </div>
 
-                <button
-                    type="button"
-                    class="modal-x-btn"
-                    data-wp-modal-close="1"
-                    aria-label="Close"
-                >
+                <div class="wp-modal-header-tools" id="stickerModalHeaderTools" aria-label="Sticker details and search"></div>
+
+                <button type="button" class="modal-x-btn" data-wp-modal-close="1" aria-label="Close">
                     <i class="fas fa-xmark"></i>
                 </button>
 
@@ -2954,27 +3070,19 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
         <div class="modal-content bg-site-dark">
 
-            <div class="modal-header wp-modal-header">
+            <div class="modal-header wp-modal-header wp-modal-header--weapon">
 
-                <div class="wp-modal-title-wrap">
-
-                    <span class="wp-modal-eyebrow">
-                        <i class="fas fa-key"></i>
-                        Skin Add-on
-                    </span>
-
-                    <h5 class="wp-modal-title">
-                        Select Keychain
-                    </h5>
-
+                <div class="wp-modal-identity">
+                    <span class="wp-modal-icon-tile" aria-hidden="true"><i class="fas fa-key"></i></span>
+                    <div class="wp-modal-title-wrap">
+                        <span class="wp-modal-eyebrow">Weapon Customization</span>
+                        <h5 class="wp-modal-title">Select Keychain</h5>
+                    </div>
                 </div>
 
-                <button
-                    type="button"
-                    class="modal-x-btn"
-                    data-wp-modal-close="1"
-                    aria-label="Close"
-                >
+                <div class="wp-modal-header-tools" id="keychainModalHeaderTools" aria-label="Keychain details and search"></div>
+
+                <button type="button" class="modal-x-btn" data-wp-modal-close="1" aria-label="Close">
                     <i class="fas fa-xmark"></i>
                 </button>
 
