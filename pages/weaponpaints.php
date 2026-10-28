@@ -765,7 +765,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 (int)($kc['seed'] ?? 0),
             ]);
 
-            if (isset($skins[$def][$paint])) {
+            if (isset($skins[(int)$def][(int)$paint])) {
+                $selectedPaint = $skins[(int)$def][(int)$paint];
+
                 $db->saveSkin(
                     $steamid,
                     $teams,
@@ -778,6 +780,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stickers,
                     $keychainStr
                 );
+
+                // Choosing a knife finish also equips that knife model.
+                // Defindex 0 is the separate "Default knife" reset card.
+                if ((int)$def !== 0 && isset($knifes[(int)$def])) {
+                    $knifeWeaponName = (string)($selectedPaint['weapon_name'] ?? '');
+                    if ($knifeWeaponName !== '') {
+                        $db->saveKnife($steamid, $knifeWeaponName);
+                    }
+                }
             }
 
             redirectToSelf($save_team, $activeTab, $skinPage, $pinPage);
@@ -797,7 +808,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $weaponsList = [];
 
+// Knife finishes are selected directly from the Knife tab's modal.
+// Keep the complete $weapons/$skins maps for that modal, but do not
+// duplicate knife families in the general firearm Skins tab.
+$knifeDefindexes = array_fill_keys(
+    array_map('intval', array_keys($knifes)),
+    true
+);
+
 foreach ($weapons as $def => $weapon) {
+    if (isset($knifeDefindexes[(int)$def])) {
+        continue;
+    }
+
     $weaponsList[] = [
         'def' => $def,
         'weapon' => $weapon
@@ -1003,71 +1026,78 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
             <button
                 type="button"
                 class="wp-tab <?= $currentTab === 'tab-inventory' ? 'is-active' : '' ?>"
+                title="Inventory"
+                aria-label="Inventory"
                 data-bs-toggle="tab"
                 data-bs-target="#tab-inventory"
             >
                 <i class="fas fa-box"></i>
-                <span>Inventory</span>
             </button>
 
             <button
                 type="button"
                 class="wp-tab <?= $currentTab === 'tab-knives' ? 'is-active' : '' ?>"
+                title="Knives"
+                aria-label="Knives"
                 data-bs-toggle="tab"
                 data-bs-target="#tab-knives"
             >
                 <i class="fas fa-cutlery"></i>
-                <span>Knives</span>
             </button>
 
             <button
                 type="button"
                 class="wp-tab <?= $currentTab === 'tab-skins' ? 'is-active' : '' ?>"
+                title="Skins"
+                aria-label="Skins"
                 data-bs-toggle="tab"
                 data-bs-target="#tab-skins"
             >
                 <i class="fas fa-paint-brush"></i>
-                <span>Skins</span>
             </button>
 
             <button
                 type="button"
                 class="wp-tab <?= $currentTab === 'tab-gloves' ? 'is-active' : '' ?>"
+                title="Gloves"
+                aria-label="Gloves"
                 data-bs-toggle="tab"
                 data-bs-target="#tab-gloves"
             >
                 <i class="fas fa-hand-paper"></i>
-                <span>Gloves</span>
             </button>
 
             <button
                 type="button"
                 class="wp-tab <?= $currentTab === 'tab-agents' ? 'is-active' : '' ?>"
+                title="Agents"
+                aria-label="Agents"
                 data-bs-toggle="tab"
                 data-bs-target="#tab-agents"
             >
                 <i class="fas fa-user-secret"></i>
-                <span>Agents</span>
             </button>
 
             <button
                 type="button"
                 class="wp-tab <?= $currentTab === 'tab-music' ? 'is-active' : '' ?>"
+                title="Music"
+                aria-label="Music"
                 data-bs-toggle="tab"
                 data-bs-target="#tab-music"
             >
                 <i class="fas fa-music"></i>
-                <span>Music</span>
             </button>
 
             <button
                 type="button"
                 class="wp-tab <?= $currentTab === 'tab-pins' ? 'is-active' : '' ?>"
+                title="Pins"
+                aria-label="Pins"
                 data-bs-toggle="tab"
                 data-bs-target="#tab-pins"
             >
                 <i class="fas fa-thumbtack"></i>
-                <span>Pins</span>
             </button>
 
         </nav>
@@ -1124,7 +1154,18 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                         data-name="<?= esc(strtolower($knife['paint_name'])) ?>"
                     >
 
-                        <div class="wp-card">
+                        <div
+                            class="wp-card <?= (int)$key !== 0 ? 'wp-card--clickable' : '' ?>"
+                            <?php if ((int)$key !== 0): ?>
+                            data-bs-toggle="modal"
+                            data-bs-target="#skinModal"
+                            data-def="<?= esc((string)$key) ?>"
+                            role="button"
+                            tabindex="0"
+                            aria-label="<?= esc('Choose a skin for ' . (string)$knife['paint_name']) ?>"
+                            title="Choose skin"
+                            <?php endif; ?>
+                        >
 
                             <div class="wp-card-media">
 
@@ -1141,39 +1182,52 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                     <?= esc($knife['paint_name']) ?>
                                 </h3>
 
-                                <form
-                                    method="post"
-                                    class="wp-auto-submit wp-card-action" data-wp-native-submit="true"
-                                >
-<input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
+                                <?php if ((int)$key === 0): ?>
 
-                                    <input
-                                        type="hidden"
-                                        name="active_tab"
-                                        value="tab-knives"
+                                    <form
+                                        method="post"
+                                        class="wp-auto-submit wp-card-action"
+                                        data-wp-native-submit="true"
                                     >
+                                        <input type="hidden" name="wp_csrf_token" value="<?= esc($csrfToken) ?>">
 
-                                    <input
-                                        type="hidden"
-                                        name="team"
-                                        value="<?= esc($teamParam) ?>"
-                                    >
+                                        <input
+                                            type="hidden"
+                                            name="active_tab"
+                                            value="tab-knives"
+                                        >
 
-                                    <input
-                                        type="hidden"
-                                        name="forma"
-                                        value="knife-<?= esc($key) ?>"
-                                    >
+                                        <input
+                                            type="hidden"
+                                            name="team"
+                                            value="<?= esc($teamParam) ?>"
+                                        >
 
-                                    <button
-                                        type="submit"
-                                        class="wp-btn wp-btn--primary wp-btn--sm"
-                                    >
-                                        <i class="fas fa-check"></i>
-                                        Select
-                                    </button>
+                                        <input
+                                            type="hidden"
+                                            name="forma"
+                                            value="knife-<?= esc($key) ?>"
+                                        >
 
-                                </form>
+                                        <button
+                                            type="submit"
+                                            class="wp-btn wp-btn--primary wp-btn--sm"
+                                        >
+                                            <i class="fas fa-rotate-left"></i>
+                                            Reset to default
+                                        </button>
+                                    </form>
+
+                                <?php else: ?>
+
+                                    <div class="wp-card-action">
+                                        <span class="wp-btn wp-btn--primary wp-btn--sm">
+                                            <i class="fas fa-palette"></i>
+                                            Choose skin
+                                        </span>
+                                    </div>
+
+                                <?php endif; ?>
 
                             </div>
 
