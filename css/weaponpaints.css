@@ -5887,3 +5887,247 @@ body > #skinModal .wp-modal-header--weapon .modal-x-btn {
     font-weight: 700;
 }
 
+/* =========================================================
+   35. One-Line Weapon Header, Faster Close, and Balanced Controls
+========================================================= */
+
+/* The header owns the weapon id, paint count, and search in one row. */
+body > #skinModal .wp-modal-header--weapon {
+    flex-wrap: nowrap;
+    gap: 12px;
+}
+
+body > #skinModal .wp-modal-identity {
+    flex: 0 0 auto;
+    min-width: 0;
+}
+
+body > #skinModal .wp-modal-title-wrap {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    min-width: max-content;
+}
+
+body > #skinModal .wp-modal-eyebrow {
+    white-space: nowrap;
+    font-size: clamp(.82rem, .95vw, 1rem) !important;
+}
+
+body > #skinModal .wp-modal-header-tools {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 9px;
+    min-width: 0;
+}
+
+body > #skinModal .wp-modal-header-tools .wp-selection-toolbar-info {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 7px !important;
+    min-width: 0;
+}
+
+body > #skinModal .wp-modal-header-tools .wp-meta-pill {
+    min-height: 29px;
+    padding: 5px 9px !important;
+    font-size: .67rem !important;
+}
+
+body > #skinModal .wp-modal-header-tools .wp-meta-pill--weapon-id {
+    max-width: 230px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body > #skinModal .wp-modal-header-tools .wp-selection-search {
+    flex: 1 1 220px;
+    min-width: 125px;
+    max-width: 300px;
+    margin-left: auto;
+}
+
+body > #skinModal .wp-modal-header-tools .wp-addon-search {
+    width: 100%;
+    height: 34px !important;
+    min-height: 34px !important;
+    font-size: .72rem !important;
+}
+
+/* The full desktop dialog has room for comfortably sized setting cards. */
+body > #skinModal .modal-dialog {
+    width: min(1280px, calc(100vw - 32px)) !important;
+    max-width: 1280px !important;
+}
+
+#skinModalBody .wp-skin-workspace {
+    grid-template-columns: minmax(460px, .92fr) minmax(0, 1.08fr);
+    gap: 13px;
+}
+
+#skinModalBody .wp-skin-controls {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-content: start;
+    align-items: stretch;
+    gap: 8px !important;
+    overflow: hidden;
+    padding: 10px;
+}
+
+#skinModalBody .wp-skin-controls > .wp-control-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    padding: 9px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-label {
+    min-width: 0;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 6px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-label > span {
+    min-width: 0;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-value {
+    white-space: nowrap;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-input {
+    display: block;
+    width: 100% !important;
+    min-width: 0;
+    margin: 0;
+}
+
+#skinModalBody .wp-skin-controls > .wp-addon-control-card {
+    grid-column: 1 / -1;
+    padding: 10px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+}
+
+#skinModalBody .wp-skin-controls .wp-addons-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    width: 100%;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn {
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    min-height: 56px !important;
+    height: 56px !important;
+    padding: 5px 3px !important;
+    font-size: .62rem !important;
+    white-space: nowrap;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn > span:last-child {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Closing is intentionally much faster than the entrance animation. */
+body > .wp-modal.wp-modal-closing,
+body > .wp-modal.fade.wp-modal-closing {
+    transition-duration: 105ms !important;
+}
+
+body > .wp-modal.wp-modal-closing .modal-dialog {
+    transition-duration: 105ms !important;
+}
+
+.modal-backdrop.wp-modal-fast-close,
+.wp-modal-backdrop.wp-modal-fast-close {
+    transition-duration: 100ms !important;
+}
+
+/* Keep the top line readable when the viewport is not wide enough. */
+@media (max-width: 1100px) {
+    body > #skinModal .wp-modal-header--weapon {
+        flex-wrap: wrap;
+    }
+
+    body > #skinModal .wp-modal-header-tools {
+        flex: 1 1 100%;
+        order: 3;
+        width: 100%;
+    }
+
+    body > #skinModal .wp-modal-header-tools .wp-selection-search {
+        max-width: none;
+    }
+
+    #skinModalBody .wp-skin-workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    #skinModalBody .wp-skin-controls {
+        grid-column: 1;
+        grid-row: 1;
+        height: auto;
+        overflow: visible;
+    }
+
+    #skinModalBody .wp-skin-list-pane {
+        grid-column: 1;
+        grid-row: 2;
+    }
+}
+
+@media (max-width: 720px) {
+    body > #skinModal .wp-modal-header-tools {
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+
+    body > #skinModal .wp-modal-header-tools .wp-selection-toolbar-info {
+        flex-wrap: wrap;
+        gap: 5px !important;
+    }
+
+    body > #skinModal .wp-modal-header-tools .wp-selection-search {
+        flex: 1 1 100%;
+        order: 2;
+        min-width: 0;
+    }
+
+    #skinModalBody .wp-skin-controls {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px !important;
+        padding: 7px;
+    }
+
+    #skinModalBody .wp-skin-controls > .wp-control-card {
+        padding: 7px !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addons-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 5px !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addon-btn {
+        min-height: 44px !important;
+        height: 44px !important;
+    }
+}
+
