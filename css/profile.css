@@ -432,3 +432,59 @@
         transition: none;
     }
 }
+
+
+/* Steam Community data panel */
+.profile-fullscreen .steam-profile-card {
+    margin: 0 2rem 1.25rem; padding: 1.15rem 1.25rem;
+    border: 1px solid #24324a; border-radius: 18px;
+    background: linear-gradient(135deg, #111927 0%, #0d1320 100%);
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+}
+.profile-fullscreen .steam-profile-card__heading,
+.profile-fullscreen .steam-profile-card__identity {
+    display: flex; align-items: center; gap: 0.75rem;
+}
+.profile-fullscreen .steam-profile-card__heading {
+    justify-content: space-between; gap: 1rem; padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgba(123, 151, 196, 0.16);
+}
+.profile-fullscreen .steam-profile-card__identity { min-width: 0; flex-wrap: wrap; }
+.profile-fullscreen .steam-profile-card__name {
+    color: #f5f8ff; font-size: 1.05rem; font-weight: 800;
+    text-decoration: none; overflow-wrap: anywhere;
+}
+.profile-fullscreen .steam-profile-card__name:hover { color: #91b5ff; }
+.profile-fullscreen .steam-profile-card__eyebrow {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    color: #91a3c0; font-size: 0.72rem; white-space: nowrap;
+}
+.profile-fullscreen .steam-profile-card__status {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    padding: 0.35rem 0.65rem; border: 1px solid rgba(124, 148, 185, 0.22);
+    border-radius: 999px; color: #d7e3f8; font-size: 0.76rem; white-space: nowrap;
+}
+.profile-fullscreen .steam-profile-card__status-dot {
+    width: 7px; height: 7px; border-radius: 50%; background: #7f8da3;
+}
+.profile-fullscreen .steam-profile-card__status[data-state="1"] .steam-profile-card__status-dot {
+    background: #55d98a; box-shadow: 0 0 10px rgba(85, 217, 138, 0.32);
+}
+.profile-fullscreen .steam-profile-card__details {
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem; padding-top: 0.9rem;
+}
+.profile-fullscreen .steam-profile-card__detail {
+    display: flex; flex-direction: column; gap: 0.35rem; min-width: 0;
+    padding: 0.65rem 0.75rem; border-radius: 12px; background: rgba(255, 255, 255, 0.025);
+}
+.profile-fullscreen .steam-profile-card__detail span { color: #8191ac; font-size: 0.72rem; }
+.profile-fullscreen .steam-profile-card__detail strong {
+    color: #e8eefb; font-size: 0.82rem; font-weight: 700; overflow-wrap: anywhere;
+}
+.profile-fullscreen .steam-profile-card__note { margin: 0.8rem 0 0; color: #93a0b6; font-size: 0.78rem; }
+@media (max-width: 700px) {
+    .profile-fullscreen .steam-profile-card { margin: 0 1rem 1rem; padding: 0.9rem; }
+    .profile-fullscreen .steam-profile-card__heading { align-items: flex-start; }
+    .profile-fullscreen .steam-profile-card__details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

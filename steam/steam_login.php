@@ -7,6 +7,7 @@ fragcity_start_session();
 
 // Load runtime settings and constants before using the settings helpers/constants.
 require_once __DIR__ . '/../class/config.php';
+require_once __DIR__ . '/../class/SteamProfileService.php';
 require_once __DIR__ . '/openid.php';
 
 $configuredDomain = defined('STEAM_DOMAIN_NAME')
@@ -100,31 +101,8 @@ try {
 
             
 
-            // دریافت اطلاعات پروفایل از Steam API
-
-            $apiKey = defined('STEAM_API_KEY') ? STEAM_API_KEY : '';
-
-            $steamProfile = [];
-
-            if (!empty($apiKey)) {
-
-                $apiUrl = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={$apiKey}&steamids={$steamid64}";
-
-                $json = @file_get_contents($apiUrl);
-
-                if ($json) {
-
-                    $data = json_decode($json, true);
-
-                    $player = $data['response']['players'][0] ?? [];
-
-                    $steamProfile['personaname'] = $player['personaname'] ?? '';
-
-                    $steamProfile['avatarfull'] = $player['avatarfull'] ?? '';
-
-                }
-
-            }
+            // Use a single cached, server-side Steam summary implementation.
+            $steamProfile = SteamProfileService::getPlayerSummary((string)$steamid64, true);
 
             
 

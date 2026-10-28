@@ -273,7 +273,10 @@
                         '?page=profile',
                         {
                             method: 'POST',
-                            body: formData
+                            body: formData,
+                            headers: {
+                                'X-Profile-CSRF': root.dataset.profileCsrf || ''
+                            }
                         }
                     )
                         .then(
@@ -412,7 +415,8 @@
                             method: 'POST',
                             headers: {
                                 'Content-Type':
-                                    'application/x-www-form-urlencoded'
+                                    'application/x-www-form-urlencoded',
+                                'X-Profile-CSRF': root.dataset.profileCsrf || ''
                             },
                             body:
                                 'avatar_data=' +

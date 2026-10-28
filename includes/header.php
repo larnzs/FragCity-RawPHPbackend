@@ -19,6 +19,27 @@ if (!function_exists('getUserAvatarHeader')) {
             if (is_file($avatarDiskPath)) {
                 return 'img/avatars/' . rawurlencode($avatarFile) . '?v=' . filemtime($avatarDiskPath);
             }
+
+            $digits = preg_replace('/[^0-9]/', '', $steamid);
+            $profile = $_SESSION['steam_profile'] ?? [];
+            $cache = is_string($digits) && $digits !== ''
+                ? ($_SESSION['steam_profile_cache'][$digits]['player'] ?? [])
+                : [];
+            $steamAvatar = is_array($profile)
+                && (string)($profile['steamid'] ?? '') === $digits
+                ? (string)($profile['avatarfull'] ?? '')
+                : (is_array($cache) ? (string)($cache['avatarfull'] ?? '') : '');
+            if ($steamAvatar === '') $steamAvatar = (string)($_SESSION['steam_avatarfull'] ?? '');
+
+            if (filter_var($steamAvatar, FILTER_VALIDATE_URL)) {
+                $parts = parse_url($steamAvatar);
+                $host = strtolower((string)($parts['host'] ?? ''));
+                $safeCdn = preg_match('/(^|\\.)steamstatic\\.com$/D', $host)
+                    || preg_match('/(^|\\.)akamaihd\\.net$/D', $host);
+                if (is_array($parts) && strtolower((string)($parts['scheme'] ?? '')) === 'https' && $safeCdn) {
+                    return $steamAvatar;
+                }
+            }
         }
 
         return 'assets/images/default_avatar.png';
