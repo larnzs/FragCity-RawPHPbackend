@@ -5862,3 +5862,28 @@ body > #skinModal .wp-modal-header--weapon .modal-x-btn {
         box-shadow: none;
     }
 }
+
+/* Search empty states must stay hidden until a search returns no matches. */
+.wp-search-empty.is-hidden {
+    display: none !important;
+}
+
+/* Keep the modal weapon identifier and paint total readable in the info bar. */
+#skinModalBody .wp-meta-pill--weapon-id {
+    flex: 0 0 auto;
+    color: #fff;
+    background: rgba(249, 115, 22, .10);
+    border-color: rgba(249, 115, 22, .34);
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-weight: 700;
+    letter-spacing: .01em;
+}
+
+#skinModalBody .wp-meta-pill--paint-count {
+    flex: 0 0 auto;
+    color: #f8fafc;
+    background: rgba(255, 255, 255, .045);
+    border-color: rgba(255, 255, 255, .12);
+    font-weight: 700;
+}
+
