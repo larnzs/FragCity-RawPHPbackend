@@ -535,6 +535,7 @@ try {
 $playerSelection = $db->getPlayerSelection($steamid);
 
 $skinRows = $playerSelection['skins'] ?? [];
+$skinInventory = $playerSelection['skin_inventory'] ?? [];
 [
     $selectedSkins,
     $skinDetails,
@@ -3136,6 +3137,8 @@ window.WeaponPaintsConfig = {
     selectedSkins: <?= json_encode($selectedSkins, $jsonFlags) ?>,
 
     skinDetails: <?= json_encode($skinDetails, $jsonFlags) ?>,
+
+    skinInventory: <?= json_encode($skinInventory, $jsonFlags) ?>,
 
     stickersData: <?= json_encode($stickersData, $jsonFlags) ?>,
 
