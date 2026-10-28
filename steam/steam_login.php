@@ -2,19 +2,25 @@
 
 // steam/steam_login.php
 
-session_start();
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
+// Load runtime settings and constants before using the settings helpers/constants.
+require_once __DIR__ . '/../settings/loader.php';
+require_once __DIR__ . '/../class/config.php';
 require_once __DIR__ . '/openid.php';
 
-
-
-$domain = defined('STEAM_DOMAIN_NAME') ? STEAM_DOMAIN_NAME : $_SERVER['HTTP_HOST'];
-
-
+$configuredDomain = defined('STEAM_DOMAIN_NAME')
+    ? trim((string) STEAM_DOMAIN_NAME)
+    : '';
+$domain = $configuredDomain !== ''
+    ? $configuredDomain
+    : (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
 
 // آدرس‌های روت‌شده منطبق بر ساختار index.php شما
 
-$steamRoutes=fragcity_settings('files.steam.steam_login',array());
+$steamRoutes = fragcity_settings('files.steam.steam_login', array());
 $loginPage=isset($steamRoutes['login_page'])?$steamRoutes['login_page']:'index.php?page=login';
 $completeRegistrationPage=isset($steamRoutes['registration_complete_page'])?$steamRoutes['registration_complete_page']:'index.php?page=register';
 $dashboardPage=isset($steamRoutes['dashboard_page'])?$steamRoutes['dashboard_page']:'index.php';
@@ -107,6 +113,8 @@ try {
 
             if ($user) {
 
+                // Prevent session fixation when elevating an anonymous session to an authenticated one.
+                session_regenerate_id(true);
                 $_SESSION['user_logged_in'] = true;
 
                 $_SESSION['steamid'] = $steamid64;
@@ -149,11 +157,12 @@ try {
 
     }
 
-} catch (ErrorException $e) {
+} catch (Throwable $e) {
 
-    $_SESSION['auth_error'] = 'خطای ارتباط با استیم: ' . $e->getMessage();
+    error_log('[FragCity] Steam OpenID login failed: ' . $e->getMessage());
+    $_SESSION['auth_error'] = 'ورود با استیم انجام نشد. لطفاً دوباره تلاش کنید.';
 
-    header('Location: ' . $loginPage);
+    header('Location: ' . $loginPage, true, 303);
 
     exit;
 
