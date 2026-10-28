@@ -16,7 +16,7 @@ class LightOpenID
     public $returnUrl
          , $required = array()
          , $optional = array()
-         , $verify_peer = null
+         , $verify_peer = true
          , $capath = null
          , $cainfo = null
          , $cnmatch = null
@@ -187,14 +187,17 @@ class LightOpenID
         return $use_secure_protocol ? 'https://' : 'http://';
     }
 
-    protected function request_curl($url, $method='GET', $params=array(), $update_claimed_id)
+    protected function request_curl($url, $method, $params, $update_claimed_id)
     {
         $params = http_build_query($params, '', '&');
         $curl = curl_init($url . ($method == 'GET' && $params ? '?' . $params : ''));
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_HEADER, false);
         curl_setopt($curl, CURLOPT_USERAGENT, $this->user_agent);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        // Verify the certificate chain and hostname by default. Explicit false is opt-out only.
+        $verifyPeer = ($this->verify_peer !== false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, $verifyPeer);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, $verifyPeer ? 2 : 0);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         
         if ($method == 'POST') {
@@ -218,15 +221,12 @@ class LightOpenID
             }
         }
 
-        if($this->verify_peer !== null) {
-            curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, $this->verify_peer);
-            if($this->capath) {
-                curl_setopt($curl, CURLOPT_CAPATH, $this->capath);
-            }
+        if ($verifyPeer && $this->capath) {
+            curl_setopt($curl, CURLOPT_CAPATH, $this->capath);
+        }
 
-            if($this->cainfo) {
-                curl_setopt($curl, CURLOPT_CAINFO, $this->cainfo);
-            }
+        if ($verifyPeer && $this->cainfo) {
+            curl_setopt($curl, CURLOPT_CAINFO, $this->cainfo);
         }
 
         if ($method == 'POST') {
@@ -317,7 +317,7 @@ class LightOpenID
         return $headers;
     }
 
-    protected function request_streams($url, $method='GET', $params=array(), $update_claimed_id)
+    protected function request_streams($url, $method, $params, $update_claimed_id)
     {
         if(!$this->hostExists($url)) {
             throw new ErrorException("Could not connect to $url.", 404);
@@ -396,18 +396,26 @@ class LightOpenID
                 )
             );
             
-            // Enable validation of the SSL certificates.
-            if ($this->verify_peer) {
+            // Preserve secure defaults while temporarily configuring get_headers(), which
+            // does not accept an explicit stream context.
+            if ($this->verify_peer !== false) {
                 $default['ssl'] += array(
-                    'verify_peer' => false,
+                    'verify_peer' => true,
+                    'verify_peer_name' => true,
                     'capath' => '',
                     'cafile' => ''
                 );
-                $opts['ssl'] += array(
-                    'verify_peer' => true,
-                    'capath' => $this->capath,
-                    'cafile' => $this->cainfo
-                );
+                $opts['ssl']['verify_peer'] = true;
+                $opts['ssl']['verify_peer_name'] = true;
+                if ($this->capath) {
+                    $opts['ssl']['capath'] = $this->capath;
+                }
+                if ($this->cainfo) {
+                    $opts['ssl']['cafile'] = $this->cainfo;
+                }
+            } else {
+                $opts['ssl']['verify_peer'] = false;
+                $opts['ssl']['verify_peer_name'] = false;
             }
             
             // Change the stream context options.
@@ -435,20 +443,35 @@ class LightOpenID
             return $headers;
         }
 
-        if ($this->verify_peer) {
-            $opts['ssl'] += array(
-                'verify_peer' => true,
-                'capath'      => $this->capath,
-                'cafile'      => $this->cainfo
-            );
+        $verifyPeer = ($this->verify_peer !== false);
+        $opts['ssl']['verify_peer'] = $verifyPeer;
+        $opts['ssl']['verify_peer_name'] = $verifyPeer;
+
+        if ($verifyPeer && $this->capath) {
+            $opts['ssl']['capath'] = $this->capath;
+        }
+        if ($verifyPeer && $this->cainfo) {
+            $opts['ssl']['cafile'] = $this->cainfo;
         }
 
         $context = stream_context_create ($opts);
         $data = file_get_contents($url, false, $context);
         # This is a hack for providers who don't support HEAD requests.
         # It just creates the headers array for the last request in $this->headers.
-        if(isset($http_response_header)) {
-            $this->headers = $this->parse_header_array($http_response_header, $update_claimed_id);
+        if (function_exists('http_get_last_response_headers')) {
+            // Available from PHP 8.4; avoids the PHP 8.5 deprecation of $http_response_header.
+            $responseHeaders = http_get_last_response_headers();
+            if (function_exists('http_clear_last_response_headers')) {
+                http_clear_last_response_headers();
+            }
+        } else {
+            // PHP < 8.4 compatibility. Use a variable-variable so PHP 8.5 does not
+            // trigger the deprecated predefined variable on the modern path above.
+            $responseHeaders = ${'http_response_header'} ?? null;
+        }
+
+        if (is_array($responseHeaders)) {
+            $this->headers = $this->parse_header_array($responseHeaders, $update_claimed_id);
         }
 
         return $data;
