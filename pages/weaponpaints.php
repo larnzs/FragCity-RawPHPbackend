@@ -1042,23 +1042,13 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
     <header class="wp-header">
 
-        <div class="wp-header-main">
+        <!-- Main toolbar: team, categories and search share one aligned row. -->
 
-            <!-- Search -->
-
-            <div class="wp-search-wrap">
-
-                <i class="fas fa-magnifying-glass"></i>
-
-                <input
-                    type="search"
-                    id="skinSearchGlobal"
-                    class="wp-search"
-                    placeholder="جستجو در آیتم‌ها..."
-                    autocomplete="off"
-                >
-
-            </div>
+        <nav
+            class="wp-tabs"
+            id="mainTabs"
+            aria-label="Weapon categories"
+        >
 
             <!-- Current Team -->
 
@@ -1099,16 +1089,6 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 </a>
 
             </div>
-
-        </div>
-
-        <!-- Main Navigation -->
-
-        <nav
-            class="wp-tabs"
-            id="mainTabs"
-            aria-label="Weapon categories"
-        >
 
             <button
                 type="button"
@@ -1241,6 +1221,22 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
             >
                 <i class="fas fa-thumbtack"></i>
             </button>
+
+            <!-- Search stays on the same toolbar row as team and category controls. -->
+
+            <div class="wp-search-wrap">
+
+                <i class="fas fa-magnifying-glass"></i>
+
+                <input
+                    type="search"
+                    id="skinSearchGlobal"
+                    class="wp-search"
+                    placeholder="جستجو در آیتم‌ها..."
+                    autocomplete="off"
+                >
+
+            </div>
 
         </nav>
 
