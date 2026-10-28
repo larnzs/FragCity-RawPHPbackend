@@ -321,6 +321,8 @@
         toast.className =
             `wp-toast is-visible wp-toast--${String(type || 'info')}`;
 
+        toast.setAttribute('role', type === 'error' ? 'alert' : 'status');
+        toast.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
         toast.textContent =
             String(message || '');
 
@@ -336,6 +338,254 @@
                 3200
             );
 
+    }
+
+
+    function upsertSavedSkinInventoryEntry(entry) {
+        const key = getSkinPaintKey(
+            entry.weapon_team,
+            entry.weapon_defindex,
+            entry.weapon_paint_id
+        );
+
+        skinInventoryByKey[key] = entry;
+        skinDraftsByKey[key] = Object.assign({}, entry);
+
+        const existingIndex = skinInventory.findIndex(row =>
+            Number(row.weapon_team) === Number(entry.weapon_team) &&
+            Number(row.weapon_defindex) === Number(entry.weapon_defindex) &&
+            String(row.weapon_paint_id) === String(entry.weapon_paint_id)
+        );
+
+        if (existingIndex >= 0) {
+            skinInventory[existingIndex] = entry;
+        } else {
+            skinInventory.push(entry);
+        }
+    }
+
+
+    function syncSavedSkinStateFromForm(form) {
+        const selectedPaint = form.querySelector('input[name="forma"]:checked');
+        if (!selectedPaint) {
+            return false;
+        }
+
+        const parts = String(selectedPaint.value || '').split('-', 2);
+        if (!parts[0] || parts[0] === 'knife') {
+            return false;
+        }
+
+        const defindex = Number(parts[0]);
+        const paintId = Number(parts[1]);
+
+        if (
+            !Number.isInteger(defindex) ||
+            !Number.isInteger(paintId) ||
+            !(skins[String(defindex)] || {})[String(paintId)]
+        ) {
+            return false;
+        }
+
+        const teamParam = String(getSkinFormValue(form, 'team', state.currentTeamParam));
+        const teams = (teamParam === 'both' ? [2, 3] : [Number(teamParam)])
+            .filter(team => team === 2 || team === 3);
+
+        if (!teams.length) {
+            return false;
+        }
+
+        const stattrakField = form.elements.namedItem('stattrak');
+        const baseDetail = {
+            weapon_defindex: defindex,
+            weapon_paint_id: paintId,
+            weapon_wear: getSkinFormValue(form, 'wear', '0.001'),
+            weapon_seed: getSkinFormValue(form, 'seed', '0'),
+            weapon_nametag: getSkinFormValue(form, 'nametag', ''),
+            weapon_stattrak: stattrakField && 'checked' in stattrakField && stattrakField.checked ? 1 : 0,
+            weapon_keychain: [
+                getSkinFormValue(form, 'keychain[id]', '0'),
+                getSkinFormValue(form, 'keychain[x]', '0'),
+                getSkinFormValue(form, 'keychain[y]', '0'),
+                getSkinFormValue(form, 'keychain[z]', '0'),
+                getSkinFormValue(form, 'keychain[seed]', '0')
+            ].join(';')
+        };
+
+        for (let slot = 0; slot < 5; slot++) {
+            baseDetail['weapon_sticker_' + slot] = [
+                getSkinFormValue(form, 'sticker[' + slot + '][id]', '0'),
+                '0',
+                getSkinFormValue(form, 'sticker[' + slot + '][x]', '0'),
+                getSkinFormValue(form, 'sticker[' + slot + '][y]', '0'),
+                getSkinFormValue(form, 'sticker[' + slot + '][wear]', '0.001'),
+                getSkinFormValue(form, 'sticker[' + slot + '][scale]', '1'),
+                getSkinFormValue(form, 'sticker[' + slot + '][rotate]', '0')
+            ].join(';');
+        }
+
+        const savedEntries = [];
+
+        teams.forEach(team => {
+            const entry = Object.assign({}, baseDetail, {
+                weapon_team: team,
+                weapon_defindex: defindex,
+                weapon_paint_id: paintId
+            });
+
+            upsertSavedSkinInventoryEntry(entry);
+
+            if (!skinDetails[String(defindex)]) {
+                skinDetails[String(defindex)] = {};
+            }
+            skinDetails[String(defindex)][String(team)] = entry;
+            savedEntries.push(entry);
+        });
+
+        const preferredTeam = Number(state.currentTeamParam);
+        const activeEntry = savedEntries.find(entry => entry.weapon_team === preferredTeam) || savedEntries[0];
+        selectedSkins[String(defindex)] = activeEntry;
+        config.skinInventory = skinInventory;
+        config.skinDetails = skinDetails;
+        config.selectedSkins = selectedSkins;
+
+        const paint = (skins[String(defindex)] || {})[String(paintId)];
+        const cardSelector = '.wp-item.skin-item[data-def="' + CSS.escape(String(defindex)) + '"]';
+        document.querySelectorAll(cardSelector).forEach(card => {
+            const title = card.querySelector('.wp-card-title');
+            const media = card.querySelector('.wp-card-media');
+            const paintName = paint && (paint.paint_name || paint.name);
+
+            if (title && paintName) {
+                title.textContent = paintName;
+            }
+
+            if (media && paint) {
+                media.innerHTML = imageMarkup(paint.image_url || '', paintName || '');
+            }
+        });
+
+        updateSelectionCardState(selectedPaint);
+        return true;
+    }
+
+
+    function syncSavedGloveStateFromForm(form) {
+        const selectedPaint = form.querySelector('input[name="glove_paint"]:checked');
+        if (!selectedPaint) {
+            return false;
+        }
+
+        updateSelectionCardState(selectedPaint);
+        return true;
+    }
+
+
+    function syncSavedAgentState(form, submitter) {
+        const agentField = form.querySelector('input[name="agent_id"], select[name="agent_id"]');
+        if (!agentField) {
+            return false;
+        }
+
+        const agentItem = form.closest('.wp-item.agent-item');
+        const teamValue = Number((form.querySelector('input[name="team"]') || {}).value || 2);
+        const side = agentItem ? agentItem.dataset.agentTeam : (teamValue === 3 ? 'ct' : 't');
+        const agentId = String(agentField.value || '');
+        const targetAgentCard = Array.from(document.querySelectorAll('.wp-item.agent-item'))
+            .find(card => card.dataset.agentTeam === side && String((card.querySelector('input[name="agent_id"]') || {}).value) === agentId);
+
+        const inventoryTeam = side === 'ct' ? 3 : 2;
+        const inventoryForm = Array.from(document.querySelectorAll('#tab-inventory form'))
+            .find(candidate => {
+                const teamField = candidate.querySelector('input[name="team"]');
+                const selectField = candidate.querySelector('select[name="agent_id"]');
+                return selectField && Number(teamField ? teamField.value : 0) === inventoryTeam;
+            });
+
+        if (inventoryForm) {
+            const inventoryCard = inventoryForm.closest('.wp-item');
+            const name = agentField instanceof HTMLSelectElement
+                ? String(agentField.selectedOptions[0] ? agentField.selectedOptions[0].textContent : '').trim()
+                : (targetAgentCard ? String((targetAgentCard.querySelector('.wp-card-title') || {}).textContent || '').trim() : '');
+
+            const title = inventoryCard ? inventoryCard.querySelector('.wp-card-title') : null;
+            const sourceMedia = targetAgentCard ? targetAgentCard.querySelector('.wp-card-media') : null;
+            const targetMedia = inventoryCard ? inventoryCard.querySelector('.wp-card-media') : null;
+
+            if (title && name) {
+                title.textContent = name;
+            }
+            if (sourceMedia && targetMedia) {
+                targetMedia.innerHTML = sourceMedia.innerHTML;
+            }
+        }
+
+        if (!agentItem) {
+            return false;
+        }
+
+        document.querySelectorAll('.wp-item.agent-item').forEach(card => {
+            if (card.dataset.agentTeam !== side) {
+                return;
+            }
+
+            card.classList.remove('wp-agent-save-success');
+            const button = card.querySelector('form button[type="submit"]');
+            if (!button) {
+                return;
+            }
+
+            button.classList.remove('wp-btn--success', 'wp-save-success');
+            button.classList.add('wp-btn--primary');
+            button.innerHTML = '<i class="fas fa-check"></i> Select';
+            button.removeAttribute('aria-label');
+        });
+
+        const successButton = submitter instanceof HTMLButtonElement
+            ? submitter
+            : agentItem.querySelector('form button[type="submit"]');
+
+        if (successButton) {
+            successButton.classList.remove('wp-btn--primary');
+            successButton.classList.add('wp-btn--success', 'wp-save-success');
+            successButton.innerHTML = '<i class="fas fa-check-circle"></i> Saved';
+            successButton.setAttribute('aria-label', 'Agent saved successfully');
+        }
+
+        agentItem.classList.add('wp-agent-save-success');
+        return true;
+    }
+
+
+    function showTransientButtonSaved(button) {
+        if (!(button instanceof HTMLButtonElement) || !button.isConnected) {
+            return;
+        }
+
+        if (button.__wpSaveTimer) {
+            window.clearTimeout(button.__wpSaveTimer);
+        }
+
+        const originalHtml = button.dataset.wpOriginalHtml || button.innerHTML;
+        const originalClass = button.dataset.wpOriginalClass || button.className;
+        button.dataset.wpOriginalHtml = originalHtml;
+        button.dataset.wpOriginalClass = originalClass;
+
+        button.classList.remove('wp-btn--primary');
+        button.classList.add('wp-btn--success', 'wp-save-success');
+        button.innerHTML = '<i class="fas fa-check-circle"></i> Saved';
+        button.setAttribute('aria-label', 'Changes saved successfully');
+        button.__wpSaveTimer = window.setTimeout(() => {
+            if (!button.isConnected) {
+                return;
+            }
+            button.innerHTML = button.dataset.wpOriginalHtml || originalHtml;
+            button.className = button.dataset.wpOriginalClass || originalClass;
+            button.removeAttribute('aria-label');
+            delete button.dataset.wpOriginalHtml;
+            delete button.dataset.wpOriginalClass;
+            delete button.__wpSaveTimer;
+        }, 2200);
     }
 
 
@@ -6490,14 +6740,55 @@
                         );
                     }
 
-                    // redirectToSelf() returns a 303 after saving to SQL.
-                    // fetch follows it and exposes the final canonical URL.
-                    const finalUrl =
-                        response.url ||
-                        actionUrl.toString();
+                    // A completed save must return the canonical 303 redirect.
+                    // fetch follows it; update the address bar without navigating/reloading.
+                    const finalUrl = new URL(
+                        response.url || actionUrl.toString(),
+                        window.location.origin
+                    );
 
-                    window.location.replace(
-                        finalUrl
+                    if (
+                        !response.redirected ||
+                        finalUrl.origin !== window.location.origin ||
+                        finalUrl.searchParams.get('page') !== 'skins' ||
+                        !finalUrl.searchParams.get('tab')
+                    ) {
+                        throw new Error('The save request did not return a successful canonical redirect.');
+                    }
+
+                    window.history.replaceState(
+                        window.history.state,
+                        '',
+                        finalUrl.pathname + finalUrl.search + finalUrl.hash
+                    );
+
+                    // Keep the current UI in sync with the confirmed server save.
+                    let agentFeedbackHandled = false;
+                    try {
+                        if (form.id === 'skinForm') {
+                            syncSavedSkinStateFromForm(form);
+                        }
+                        if (form.querySelector('input[name="glove_paint"]')) {
+                            syncSavedGloveStateFromForm(form);
+                        }
+                        agentFeedbackHandled = syncSavedAgentState(form, submitter);
+                    } catch (uiError) {
+                        console.warn('Weapon Paints saved, but a local UI refresh failed:', uiError);
+                    }
+
+                    form.dataset.wpSubmitInProgress = '0';
+                    form.classList.remove('wp-form-submitting');
+
+                    const submittedModal = form.closest('.wp-modal');
+                    if (submittedModal) {
+                        hideCustomModal(submittedModal);
+                    } else if (!agentFeedbackHandled && submitter instanceof HTMLButtonElement) {
+                        showTransientButtonSaved(submitter);
+                    }
+
+                    showWpToast(
+                        'تغییرات با موفقیت ذخیره شد.',
+                        'success'
                     );
 
                 } catch (error) {
