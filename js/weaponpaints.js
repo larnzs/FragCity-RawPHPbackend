@@ -2921,8 +2921,6 @@
 
                     <div class="wp-selection-search">
 
-                        <i class="fas fa-magnifying-glass"></i>
-
                         <input
                             type="search"
                             id="skinPaintSearch"
