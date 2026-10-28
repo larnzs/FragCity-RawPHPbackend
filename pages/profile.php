@@ -167,9 +167,9 @@ if ($steamid64 !== '') {
     catch (Throwable $e) { error_log('[FragCity] Steam profile lookup failed for profile page.'); }
 }
 
-$steamPersonaname = trim((string)($steamProfile['personaname'] ?? $_SESSION['steam_personaname'] ?? ''));
+$steamPersonaname = trim((string)($steamProfile['personaname'] ?? ''));
 if ($steamPersonaname === '') $steamPersonaname = (string)$username;
-$steamProfileUrl = (string)($steamProfile['profileurl'] ?? $_SESSION['steam_profile_url'] ?? '');
+$steamProfileUrl = (string)($steamProfile['profileurl'] ?? '');
 $steamStatusLabels = [0 => 'آفلاین', 1 => 'آنلاین', 2 => 'مشغول', 3 => 'غایب', 4 => 'خواب', 5 => 'مایل به معامله', 6 => 'مایل به بازی'];
 $steamStatus = isset($steamProfile['personastate'])
     ? ($steamStatusLabels[(int)$steamProfile['personastate']] ?? 'نامشخص')
@@ -258,7 +258,7 @@ $bannerUrl = $bannerFile !== '' && is_file($bannerFile)
 $avatarUrl = $avatarFile !== '' && is_file($avatarFile)
     ? 'img/avatars/avatar_' . rawurlencode($bannerKey) . '.jpg?v=' . filemtime($avatarFile)
     : '';
-if ($avatarUrl === '') $avatarUrl = (string)($steamProfile['avatarfull'] ?? $_SESSION['steam_avatarfull'] ?? '');
+if ($avatarUrl === '') $avatarUrl = (string)($steamProfile['avatarfull'] ?? '');
 $faceitLevel = 0;
 
 if (!function_exists('formatPlaytime')) {

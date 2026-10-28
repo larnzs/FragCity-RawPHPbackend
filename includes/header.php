@@ -29,8 +29,6 @@ if (!function_exists('getUserAvatarHeader')) {
                 && (string)($profile['steamid'] ?? '') === $digits
                 ? (string)($profile['avatarfull'] ?? '')
                 : (is_array($cache) ? (string)($cache['avatarfull'] ?? '') : '');
-            if ($steamAvatar === '') $steamAvatar = (string)($_SESSION['steam_avatarfull'] ?? '');
-
             if (filter_var($steamAvatar, FILTER_VALIDATE_URL)) {
                 $parts = parse_url($steamAvatar);
                 $host = strtolower((string)($parts['host'] ?? ''));

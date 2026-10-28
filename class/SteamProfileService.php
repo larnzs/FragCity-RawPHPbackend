@@ -88,6 +88,15 @@ final class SteamProfileService
     private static function syncSession(array $player): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE || empty($player['steamid'])) return;
+
+        // Never let a lookup for another SteamID overwrite the active account's
+        // identity/avatar session fields. Cache entries remain per-SteamID.
+        $sessionSteamId = (string)($_SESSION['steamid'] ?? '');
+        if ($sessionSteamId === '') {
+            $sessionSteamId = (string)($_SESSION['steam_temp']['steamid64'] ?? '');
+        }
+        if ($sessionSteamId === '' || $sessionSteamId !== (string)$player['steamid']) return;
+
         $_SESSION['steam_profile'] = $player;
         $_SESSION['steam_personaname'] = (string)($player['personaname'] ?? '');
         $_SESSION['steam_avatarfull'] = (string)($player['avatarfull'] ?? '');

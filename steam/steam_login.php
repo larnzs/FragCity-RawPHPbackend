@@ -132,6 +132,9 @@ try {
 
                 $_SESSION['role'] = $user['role'] ?? 'user';
 
+                // The session now belongs to this SteamID; activate its cached summary.
+                SteamProfileService::getPlayerSummary((string)$steamid64);
+
                 header('Location: ' . $dashboardPage);
 
                 exit;
@@ -147,6 +150,10 @@ try {
                     'avatar' => $steamProfile['avatarfull'] ?? '',
 
                 ];
+
+                // Store the new profile in the temp registration session only when no
+                // other authenticated account is currently active.
+                SteamProfileService::getPlayerSummary((string)$steamid64);
 
                 header('Location: ' . $completeRegistrationPage);
 
