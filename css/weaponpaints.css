@@ -6894,3 +6894,273 @@ body > #skinModal .wp-modal-header-tools .wp-selection-search .wp-addon-search {
     }
 }
 
+
+
+/* =========================================================
+   41. Equal-Height Setting Cards and Styled Sticker / Keychain Slots
+========================================================= */
+
+/* Wear, Seed, Name Tag and StatTrak share one exact card height. */
+#skinModalBody .wp-skin-controls > .wp-setting-card {
+    box-sizing: border-box !important;
+    height: 82px !important;
+    min-height: 82px !important;
+}
+
+#skinModalBody .wp-skin-controls > .wp-setting-card--stattrak {
+    height: 82px !important;
+    min-height: 82px !important;
+    padding: 8px !important;
+}
+
+#skinModalBody .wp-skin-controls > .wp-setting-card--stattrak .wp-inline-toggle {
+    min-height: 30px;
+}
+
+/* Give the sticker/keychain group its own panel treatment. */
+#skinModalBody .wp-skin-controls > .wp-addon-control-card {
+    --addon-accent: #60a5fa;
+    width: 100%;
+    min-width: 0;
+    padding: 9px !important;
+    border: 1px solid rgba(96, 165, 250, .21) !important;
+    border-radius: 11px !important;
+    background:
+        linear-gradient(145deg, rgba(30, 64, 175, .12), rgba(14, 21, 32, .97)) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025) !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 7px !important;
+    margin: 0 0 8px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label > span:first-child {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    gap: 7px;
+    color: #eaf2ff;
+    font-size: .68rem !important;
+    font-weight: 750;
+    line-height: 1.2;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label > span:first-child > i {
+    display: inline-flex;
+    flex: 0 0 27px;
+    align-items: center;
+    justify-content: center;
+    width: 27px;
+    height: 27px;
+    color: #93c5fd;
+    background: rgba(96, 165, 250, .10);
+    border: 1px solid rgba(96, 165, 250, .22);
+    border-radius: 8px;
+    font-size: .76rem;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label .wp-control-value {
+    flex: 0 0 auto;
+    padding: 4px 7px !important;
+    color: #b7c5d8 !important;
+    background: rgba(148, 163, 184, .07);
+    border: 1px solid rgba(148, 163, 184, .12);
+    border-radius: 999px;
+    font-size: .55rem !important;
+    line-height: 1.15;
+}
+
+/* Six distinct, boxed tiles: five sticker slots and one keychain. */
+#skinModalBody .wp-skin-controls .wp-addons-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    width: 100%;
+    min-width: 0;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn {
+    --slot-accent: #60a5fa;
+    position: relative;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
+    justify-content: center;
+    gap: 4px !important;
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 64px !important;
+    height: 64px !important;
+    padding: 7px 4px 5px !important;
+    color: #cbd5e1 !important;
+    background: linear-gradient(145deg, rgba(25, 39, 57, .92), rgba(7, 13, 23, .96)) !important;
+    border: 1px solid rgba(148, 163, 184, .19) !important;
+    border-radius: 10px !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+    font-size: .58rem !important;
+    line-height: 1.1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    transition: border-color 140ms ease, background 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn.is-empty {
+    border-style: dashed !important;
+    border-color: rgba(148, 163, 184, .26) !important;
+    background: linear-gradient(145deg, rgba(15, 23, 42, .72), rgba(6, 11, 20, .94)) !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn.has-sticker {
+    border-color: rgba(96, 165, 250, .38) !important;
+    background: linear-gradient(145deg, rgba(30, 64, 175, .20), rgba(7, 13, 23, .96)) !important;
+    box-shadow: inset 0 1px 0 rgba(147, 197, 253, .05);
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn.wp-keychain-slot {
+    --slot-accent: #fbbf24;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn.wp-keychain-slot.has-keychain {
+    border-color: rgba(251, 191, 36, .40) !important;
+    background: linear-gradient(145deg, rgba(161, 98, 7, .18), rgba(7, 13, 23, .96)) !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn:hover,
+#skinModalBody .wp-skin-controls .wp-addon-btn:focus-visible {
+    border-color: color-mix(in srgb, var(--slot-accent) 62%, transparent) !important;
+    background: linear-gradient(145deg, color-mix(in srgb, var(--slot-accent) 13%, rgba(14, 21, 32, .96)), rgba(7, 13, 23, .97)) !important;
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--slot-accent) 9%, transparent), inset 0 1px 0 rgba(255, 255, 255, .04);
+    transform: translateY(-1px);
+}
+
+#skinModalBody .wp-skin-controls .wp-sticker-slot::before {
+    position: absolute;
+    top: 4px;
+    right: 5px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 13px;
+    color: #a7c9f7;
+    background: rgba(96, 165, 250, .10);
+    border: 1px solid rgba(96, 165, 250, .16);
+    border-radius: 4px;
+    font-size: .45rem;
+    font-weight: 800;
+    line-height: 1;
+    pointer-events: none;
+}
+
+#skinModalBody .wp-skin-controls .wp-sticker-slot[data-sticker-slot="0"]::before { content: "01"; }
+#skinModalBody .wp-skin-controls .wp-sticker-slot[data-sticker-slot="1"]::before { content: "02"; }
+#skinModalBody .wp-skin-controls .wp-sticker-slot[data-sticker-slot="2"]::before { content: "03"; }
+#skinModalBody .wp-skin-controls .wp-sticker-slot[data-sticker-slot="3"]::before { content: "04"; }
+#skinModalBody .wp-skin-controls .wp-sticker-slot[data-sticker-slot="4"]::before { content: "05"; }
+
+#skinModalBody .wp-skin-controls .wp-addon-btn > img,
+#skinModalBody .wp-skin-controls .wp-addon-btn > .wp-addon-preview-image {
+    display: block;
+    flex: 0 0 auto;
+    width: 29px !important;
+    max-width: 29px !important;
+    height: 28px !important;
+    max-height: 28px !important;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .2));
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn > .wp-addon-empty-icon {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    width: 27px !important;
+    max-width: 27px !important;
+    height: 26px !important;
+    max-height: 26px !important;
+    color: #9fb1c8;
+    background: rgba(148, 163, 184, .07);
+    border: 1px solid rgba(148, 163, 184, .15);
+    border-radius: 8px;
+    font-size: .7rem;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn.wp-keychain-slot > .wp-addon-empty-icon {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, .08);
+    border-color: rgba(251, 191, 36, .20);
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn > span:last-child {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    color: #cbd5e1;
+    font-size: .56rem !important;
+    font-weight: 650;
+    line-height: 1.1;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn.is-empty > span:last-child {
+    color: #9aa9bc;
+}
+
+@media (max-width: 720px) {
+    #skinModalBody .wp-skin-controls > .wp-setting-card {
+        height: 72px !important;
+        min-height: 72px !important;
+    }
+
+    #skinModalBody .wp-skin-controls > .wp-setting-card--stattrak {
+        height: 72px !important;
+        min-height: 72px !important;
+        padding: 6px 7px !important;
+    }
+
+    #skinModalBody .wp-skin-controls > .wp-addon-control-card {
+        padding: 7px !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label {
+        gap: 5px !important;
+        margin-bottom: 6px !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label > span:first-child {
+        gap: 5px;
+        font-size: .64rem !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label > span:first-child > i {
+        flex-basis: 25px;
+        width: 25px;
+        height: 25px;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addons-grid {
+        gap: 5px !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addon-btn {
+        min-height: 60px !important;
+        height: 60px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #skinModalBody .wp-skin-controls .wp-addon-btn {
+        transition: none !important;
+    }
+}
