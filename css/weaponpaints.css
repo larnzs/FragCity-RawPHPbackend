@@ -4856,9 +4856,12 @@ body > .wp-modal#skinModal .modal-dialog {
         border-radius: 9px;
     }
 
-    .wp-floating-pagination .wp-page-btn--nav:first-child i,
+    .wp-floating-pagination .wp-page-btn--nav:first-child i {
+        transform: rotate(-90deg);
+    }
+
     .wp-floating-pagination .wp-page-btn--nav:last-child i {
-        transform: rotate(90deg);
+        transform: rotate(-90deg);
     }
 
     .wp-app.has-floating-pagination {
@@ -4878,4 +4881,23 @@ body > .wp-modal#skinModal .modal-dialog {
     body:has(.wp-app.has-floating-pagination) .wp-app {
         padding-bottom: 96px !important;
     }
+}
+
+
+/* Client-side page slicing for tabs without server pagination. */
+
+.wp-item.wp-page-hidden {
+    display: none !important;
+}
+
+
+.wp-floating-pagination .wp-pagination--single-page .wp-page-btn--nav {
+    display: none !important;
+}
+
+
+.wp-floating-pagination .wp-page-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    transform: none;
 }
