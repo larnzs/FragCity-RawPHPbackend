@@ -5281,3 +5281,438 @@ body > .wp-modal .wp-addon-toolbar {
         transition: none !important;
     }
 }
+
+
+/* =========================================================
+   33. Wide, Low-Overhead Skin Customization Workspace
+   - Keep settings visible on the left.
+   - Scroll only the paint grid.
+   - Avoid full-screen backdrop filters that can tank FPS.
+========================================================= */
+
+/* A translucent veil is much cheaper to composite than a full-screen blur. */
+.wp-modal-backdrop {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    transition: opacity 150ms ease, visibility 150ms ease !important;
+}
+
+body > .wp-modal .modal-dialog {
+    will-change: auto !important;
+    transition:
+        opacity 170ms ease,
+        transform 190ms cubic-bezier(.2, .75, .25, 1) !important;
+}
+
+body > .wp-modal .modal-content {
+    box-shadow: 0 16px 44px rgba(0, 0, 0, .40) !important;
+}
+
+body > #skinModal .modal-dialog {
+    width: min(1440px, calc(100vw - 40px)) !important;
+    max-width: 1440px !important;
+    height: min(840px, calc(100dvh - 36px)) !important;
+    max-height: calc(100dvh - 36px) !important;
+    margin: 0 auto !important;
+}
+
+body > #skinModal .modal-content {
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background: linear-gradient(180deg, #0d1420 0%, #080e18 100%) !important;
+    box-shadow: 0 16px 44px rgba(0, 0, 0, .40) !important;
+}
+
+body > #skinModal .modal-body,
+body > #skinModal .wp-modal-body {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: hidden !important;
+    padding: 10px !important;
+}
+
+#skinModalBody .wp-skin-form {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+}
+
+#skinModalBody .wp-selection-toolbar {
+    flex: 0 0 auto;
+    min-width: 0;
+    align-items: center;
+    gap: 10px !important;
+    margin: 0 !important;
+    padding: 0 1px 2px;
+}
+
+#skinModalBody .wp-selection-toolbar-info {
+    flex: 0 1 auto;
+    min-width: 0;
+    gap: 6px !important;
+}
+
+#skinModalBody .wp-meta-pill {
+    min-height: 27px;
+    padding: 5px 8px !important;
+    font-size: .63rem !important;
+    white-space: nowrap;
+}
+
+#skinModalBody .wp-selection-search {
+    flex: 0 1 360px;
+    min-width: 150px;
+    max-width: 360px;
+}
+
+#skinModalBody .wp-addon-search {
+    height: 33px !important;
+    min-height: 33px !important;
+    font-size: .72rem !important;
+}
+
+#skinModalBody .wp-skin-workspace {
+    display: grid;
+    grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 12px;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    direction: ltr;
+}
+
+#skinModalBody .wp-skin-controls {
+    grid-column: 1;
+    grid-row: 1;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    align-items: stretch;
+    gap: 7px !important;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+    padding: 9px;
+    border: 1px solid rgba(148, 163, 184, .12);
+    border-radius: 12px;
+    background: linear-gradient(160deg, rgba(16, 25, 39, .98), rgba(8, 14, 24, .98));
+    direction: ltr;
+}
+
+#skinModalBody .wp-skin-controls > .wp-control-card {
+    min-width: 0;
+    margin: 0 !important;
+    padding: 8px !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+    background: rgba(5, 11, 20, .62) !important;
+}
+
+#skinModalBody .wp-skin-controls > .wp-control-card:nth-child(5),
+#skinModalBody .wp-skin-controls > .wp-addon-control-card {
+    grid-column: 1 / -1;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-label {
+    gap: 6px !important;
+    margin-bottom: 5px !important;
+    font-size: .64rem !important;
+    line-height: 1.25;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-value {
+    font-size: .62rem !important;
+    white-space: nowrap;
+}
+
+#skinModalBody .wp-skin-controls .wp-control-input {
+    width: 100%;
+    height: 31px !important;
+    min-height: 31px !important;
+    padding: 0 8px !important;
+    border-radius: 8px !important;
+    font-size: .72rem !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-inline-toggle {
+    min-width: 0;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 6px !important;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-content {
+    min-width: 0;
+    gap: 6px !important;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-content small {
+    display: none !important;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-content strong {
+    font-size: .68rem !important;
+    white-space: nowrap;
+}
+
+#skinModalBody .wp-skin-controls .settings-option-icon {
+    width: 25px !important;
+    height: 25px !important;
+    flex: 0 0 25px;
+    font-size: .72rem !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card {
+    padding: 8px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label {
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px 8px !important;
+    margin-bottom: 6px !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addons-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+    min-width: 0;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px !important;
+    min-width: 0;
+    min-height: 46px !important;
+    height: 46px;
+    padding: 3px !important;
+    border-radius: 8px !important;
+    font-size: .58rem !important;
+    line-height: 1.1;
+    overflow: hidden;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn img,
+#skinModalBody .wp-skin-controls .wp-addon-preview-image {
+    display: block;
+    width: 25px !important;
+    max-width: 25px !important;
+    height: 24px !important;
+    max-height: 24px !important;
+    object-fit: contain;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-empty-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    font-size: .75rem;
+}
+
+#skinModalBody .wp-skin-list-pane {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, .10);
+    border-radius: 12px;
+    background: rgba(4, 9, 16, .30);
+}
+
+#skinModalBody .wp-skin-grid-scroll {
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 8px;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(100, 116, 139, .55) transparent;
+    contain: layout paint;
+}
+
+#skinModalBody .wp-skin-grid-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+#skinModalBody .wp-skin-grid-scroll::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(100, 116, 139, .55);
+}
+
+#skinModalBody #skinSelectionGrid.selection-grid--skin {
+    grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)) !important;
+    align-content: start;
+    gap: 8px !important;
+    min-width: 0;
+}
+
+#skinModalBody .selection-card--skin {
+    min-width: 0;
+    content-visibility: auto;
+    contain-intrinsic-size: 148px;
+}
+
+#skinModalBody .selection-card--skin .selection-image {
+    height: 76px !important;
+}
+
+#skinModalBody .selection-card--skin .selection-title {
+    font-size: .68rem !important;
+    line-height: 1.3;
+}
+
+#skinModalBody .selection-card--skin .selection-meta {
+    font-size: .57rem !important;
+}
+
+#skinModalBody .selection-footer {
+    flex: 0 0 auto;
+    margin: 0 !important;
+    padding: 2px 1px 0 !important;
+}
+
+#skinModalBody .selection-footer .wp-btn {
+    min-height: 34px !important;
+    height: 34px;
+    padding: 0 14px !important;
+    font-size: .7rem !important;
+}
+
+/* Compact stacked layout for phones and narrow portrait windows. */
+@media (max-width: 720px) {
+    body > #skinModal {
+        padding: 8px !important;
+    }
+
+    body > #skinModal .modal-dialog {
+        width: calc(100vw - 16px) !important;
+        height: calc(100dvh - 16px) !important;
+        max-height: calc(100dvh - 16px) !important;
+    }
+
+    body > #skinModal .modal-header {
+        padding: 9px 11px !important;
+    }
+
+    body > #skinModal .modal-body,
+    body > #skinModal .wp-modal-body {
+        padding: 8px !important;
+    }
+
+    #skinModalBody .wp-skin-form {
+        gap: 7px;
+    }
+
+    #skinModalBody .wp-selection-toolbar {
+        flex-wrap: wrap;
+        gap: 6px !important;
+    }
+
+    #skinModalBody .wp-selection-search {
+        flex: 1 1 100%;
+        max-width: none;
+        order: 2;
+    }
+
+    #skinModalBody .wp-skin-workspace {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 7px;
+    }
+
+    #skinModalBody .wp-skin-controls {
+        grid-column: 1;
+        grid-row: 1;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 5px !important;
+        height: auto;
+        padding: 6px;
+    }
+
+    #skinModalBody .wp-skin-controls > .wp-control-card {
+        padding: 6px !important;
+    }
+
+    #skinModalBody .wp-skin-controls > .wp-control-card:nth-child(5),
+    #skinModalBody .wp-skin-controls > .wp-addon-control-card {
+        grid-column: 1 / -1;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-control-label {
+        margin-bottom: 3px !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-control-input {
+        height: 29px !important;
+        min-height: 29px !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addon-btn {
+        min-height: 39px !important;
+        height: 39px;
+    }
+
+    #skinModalBody .wp-skin-list-pane {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    #skinModalBody .wp-skin-grid-scroll {
+        padding: 6px;
+    }
+
+    #skinModalBody #skinSelectionGrid.selection-grid--skin {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+    }
+
+    #skinModalBody .selection-card--skin .selection-image {
+        height: 62px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    #skinModalBody .wp-skin-controls .wp-addons-grid {
+        gap: 4px !important;
+    }
+
+    #skinModalBody .wp-skin-controls .wp-addon-btn {
+        font-size: .53rem !important;
+    }
+
+    #skinModalBody .wp-meta-pill {
+        font-size: .58rem !important;
+        padding: 4px 6px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wp-modal-backdrop,
+    body > .wp-modal .modal-dialog {
+        transition: none !important;
+    }
+}
