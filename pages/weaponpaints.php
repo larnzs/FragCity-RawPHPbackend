@@ -894,15 +894,56 @@ $currentKnifeName =
         ?: null;
 
 $currentKnife = null;
+$currentKnifeDefindex = null;
 
 if ($currentKnifeName) {
-    foreach ($knifes as $knife) {
+    foreach ($knifes as $knifeDefindex => $knife) {
         if (
             $knife['weapon_name']
             === $currentKnifeName
         ) {
             $currentKnife = $knife;
+            $currentKnifeDefindex = (int)$knifeDefindex;
             break;
+        }
+    }
+}
+
+// Resolve the equipped knife's saved finish for the Inventory card.
+// Knife models are stored separately from paints, so the vanilla model data
+// must be overlaid with the selected paint from the saved skin rows.
+if (
+    $currentKnifeDefindex !== null
+    && $currentKnifeDefindex !== 0
+) {
+    $currentKnifeSkinRow = null;
+
+    // Prefer the currently selected team, since knife finishes may be saved
+    // independently for T and CT. The "Both" view resolves to T first.
+    if (isset($skinDetails[$currentKnifeDefindex][$team])) {
+        $currentKnifeSkinRow = $skinDetails[$currentKnifeDefindex][$team];
+    } else {
+        $currentKnifeSkinRow =
+            $skinDetails[$currentKnifeDefindex][2]
+            ?? $skinDetails[$currentKnifeDefindex][3]
+            ?? $selectedSkins[$currentKnifeDefindex]
+            ?? null;
+    }
+
+    if (is_array($currentKnifeSkinRow)) {
+        $currentKnifePaintId = (int)($currentKnifeSkinRow['weapon_paint_id'] ?? 0);
+        $currentKnifePaint = $skins[$currentKnifeDefindex][$currentKnifePaintId] ?? null;
+
+        if (is_array($currentKnifePaint)) {
+            $currentKnife['paint_name'] =
+                $currentKnifePaint['paint_name']
+                ?? $currentKnife['paint_name'];
+
+            $currentKnife['image_url'] =
+                $currentKnifePaint['image_url']
+                ?? $currentKnife['image_url'];
+
+            $currentKnife['weapon_paint_id'] = $currentKnifePaintId;
         }
     }
 }
