@@ -21,6 +21,20 @@ if (!function_exists('getUserAvatarHeader')) {
             }
 
             $digits = preg_replace('/[^0-9]/', '', $steamid);
+
+            // Prefer the locally cached Steam Community avatar after the user's
+            // custom uploaded avatar. The two locations are intentionally separate.
+            if (preg_match('/^[0-9]{17}$/D', (string)$digits)) {
+                foreach (['jpg', 'png', 'webp'] as $extension) {
+                    $steamAvatarFile = 'steam_' . $digits . '.' . $extension;
+                    $steamAvatarDiskPath = dirname(__DIR__) . '/img/steam-avatars/' . $steamAvatarFile;
+                    if (is_file($steamAvatarDiskPath)) {
+                        return 'img/steam-avatars/' . rawurlencode($steamAvatarFile)
+                            . '?v=' . filemtime($steamAvatarDiskPath);
+                    }
+                }
+            }
+
             $profile = $_SESSION['steam_profile'] ?? [];
             $cache = is_string($digits) && $digits !== ''
                 ? ($_SESSION['steam_profile_cache'][$digits]['player'] ?? [])
