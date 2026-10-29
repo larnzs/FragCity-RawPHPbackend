@@ -1535,3 +1535,112 @@
         transition: none;
     }
 }
+
+
+/* Compact loadout cards: keep the item art readable without dominating the profile. */
+.profile-fullscreen .profile-inventory-card {
+    padding: 1rem 1.05rem 0.85rem;
+}
+
+.profile-fullscreen .profile-loadout-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.58rem;
+    padding-top: 0.75rem;
+}
+
+.profile-fullscreen .profile-loadout-item {
+    padding: 0.42rem;
+    border-radius: 12px;
+}
+
+.profile-fullscreen .profile-loadout-item__media {
+    height: 66px;
+    border-radius: 9px;
+}
+
+.profile-fullscreen .profile-loadout-item__media img {
+    padding: 0.22rem;
+}
+
+.profile-fullscreen .profile-loadout-item__team {
+    top: 5px;
+    right: 5px;
+    min-width: 23px;
+    padding: 0.12rem 0.28rem;
+    font-size: 0.56rem;
+}
+
+.profile-fullscreen .profile-loadout-item__copy {
+    gap: 0.12rem;
+    padding: 0.42rem 0.08rem 0;
+}
+
+.profile-fullscreen .profile-loadout-item__kicker {
+    font-size: 0.52rem;
+}
+
+.profile-fullscreen .profile-loadout-item__copy strong {
+    font-size: 0.72rem;
+    line-height: 1.45;
+}
+
+.profile-fullscreen .profile-loadout-item__weapon {
+    font-size: 0.64rem;
+}
+
+.profile-fullscreen .profile-loadout-item__stickers {
+    gap: 0.22rem;
+    margin-top: 0.3rem;
+    padding: 0.18rem 0.32rem;
+    font-size: 0.57rem;
+}
+
+.profile-fullscreen .profile-inventory-card__footer {
+    margin-top: 0.75rem;
+    padding-top: 0.65rem;
+    font-size: 0.68rem;
+}
+
+@media (min-width: 1500px) {
+    .profile-fullscreen .profile-loadout-grid {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1100px) {
+    .profile-fullscreen .profile-loadout-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 780px) {
+    .profile-fullscreen .profile-loadout-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.5rem;
+    }
+
+    .profile-fullscreen .profile-loadout-item__media {
+        height: 62px;
+    }
+}
+
+@media (max-width: 520px) {
+    .profile-fullscreen .profile-loadout-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.45rem;
+    }
+
+    .profile-fullscreen .profile-loadout-item__media {
+        height: 58px;
+    }
+
+    .profile-fullscreen .profile-loadout-item__copy strong {
+        font-size: 0.68rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .profile-fullscreen .profile-loadout-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
