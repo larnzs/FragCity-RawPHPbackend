@@ -137,6 +137,7 @@ if ($existingColumns !== [] && count(array_filter($requiredColumns, static fn(st
                 $value = $userRow[$field] ?? null;
                 $populated[$field] = $value !== null && trim((string)$value) !== '';
             }
+            echo 'INFO: stored-field counts below are read BEFORE the Steam API lookup; this preflight never writes to the database.' . PHP_EOL;
             echo 'INFO: populated Steam fields = ' . count(array_filter($populated)) . '/' . count($populated) . PHP_EOL;
             foreach ($populated as $field => $isPopulated) {
                 echo 'INFO: ' . $field . ' = ' . ($isPopulated ? 'populated' : 'empty') . PHP_EOL;
