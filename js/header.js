@@ -17,6 +17,33 @@
 
     const pageAssets = window.FragCityPageAssets || {};
 
+    const siteHeader = document.getElementById('siteHeader');
+
+    /*
+     * Keep the shared navigation pinned while scrolling. The scrolled
+     * class only adds the glass surface and shadow; at scrollY = 0 the
+     * header returns to its clean top-of-page appearance.
+     */
+    if (siteHeader) {
+        let scrollFramePending = false;
+
+        const syncHeaderScrollState = function () {
+            siteHeader.classList.toggle('is-scrolled', window.scrollY > 8);
+        };
+
+        window.addEventListener('scroll', function () {
+            if (scrollFramePending) return;
+
+            scrollFramePending = true;
+            window.requestAnimationFrame(function () {
+                syncHeaderScrollState();
+                scrollFramePending = false;
+            });
+        }, { passive: true });
+
+        syncHeaderScrollState();
+    }
+
     function getDropdownTrigger(dropdown) {
         return dropdown.querySelector(':scope > button, :scope > a');
     }
