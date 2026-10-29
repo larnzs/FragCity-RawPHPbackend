@@ -2749,3 +2749,22 @@
         font-size: 0.5rem;
     }
 }
+
+
+/* Keep the Steam persona heading flat inside the inline identity strip. */
+.profile-fullscreen .name-and-xp .profile-identity-name {
+    color: #F5F5F5;
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    font-size: clamp(1.12rem, 1.75vw, 1.45rem);
+    font-weight: 800;
+    filter: none;
+    text-shadow: none;
+}
+
+.profile-fullscreen .profile-identity-id > span {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 700;
+}
