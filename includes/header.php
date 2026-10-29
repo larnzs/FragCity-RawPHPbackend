@@ -151,15 +151,21 @@ $mobileNavItems = [
                         </button>
 
                         <div class="frag-dropdown-menu" id="shockUserMenu">
-                            <div class="frag-drop-header">
-                                <img src="<?= htmlspecialchars($avatarSrc, ENT_QUOTES, 'UTF-8') ?>"
-                                     class="frag-drop-avatar"
-                                     alt=""
-                                     onerror="this.onerror=null;this.src='assets/images/default_avatar.png';">
+                            <div class="frag-drop-header frag-drop-header--profile">
+                                <span class="frag-drop-avatar-frame">
+                                    <img src="<?= htmlspecialchars($avatarSrc, ENT_QUOTES, 'UTF-8') ?>"
+                                         class="frag-drop-avatar"
+                                         alt=""
+                                         onerror="this.onerror=null;this.src='assets/images/default_avatar.png';">
+                                </span>
                                 <div class="frag-drop-info">
+                                    <span class="frag-drop-eyebrow">FRAGCITY PLAYER</span>
                                     <span class="frag-drop-name"><?= htmlspecialchars((string) $displayName, ENT_QUOTES, 'UTF-8') ?></span>
-                                    <span class="frag-drop-steam"><?= htmlspecialchars($steamShort, ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="frag-drop-steam">STEAM · <?= htmlspecialchars($steamShort, ENT_QUOTES, 'UTF-8') ?></span>
                                 </div>
+                                <span class="frag-drop-profile-mark" aria-hidden="true">
+                                    <i class="fa-solid fa-gamepad"></i>
+                                </span>
                             </div>
 
                             <div class="frag-drop-divider"></div>
