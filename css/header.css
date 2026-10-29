@@ -308,7 +308,7 @@ body.mobile-menu-open {
         90deg,
         transparent,
         rgba(249, 115, 22, 0.35),
-        rgba(56, 189, 248, 0.25),
+        rgba(255, 179, 71, 0.22),
         transparent
     );
     pointer-events: none;
@@ -857,5 +857,211 @@ body.mobile-menu-open {
     .shock-header,
     .shock-header::before {
         transition: none;
+    }
+}
+
+
+/* =========================================
+   Header visual cleanup — flat, polished nav
+   Keep scroll behavior and dropdown mechanics intact.
+========================================= */
+
+/* Prevent site-wide anchor/button rules from adding underlines,
+   rectangular outlines, or inherited card-like borders in the header. */
+.shock-header a,
+.shock-header a:visited,
+.shock-header a:hover,
+.shock-header a:active,
+.shock-header button {
+    text-decoration: none !important;
+}
+
+.shock-header a:focus:not(:focus-visible),
+.shock-header button:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.shock-header a:focus-visible,
+.shock-header button:focus-visible {
+    outline: 2px solid rgba(249, 115, 22, 0.78);
+    outline-offset: 3px;
+    text-decoration: none !important;
+}
+
+.shock-header {
+    background: rgba(13, 13, 13, 0.78);
+    border-bottom: 1px solid transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.shock-header::before {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(249, 115, 22, 0.42),
+        rgba(255, 179, 71, 0.18),
+        transparent
+    );
+}
+
+.shock-header.is-scrolled {
+    background: rgba(13, 13, 13, 0.91);
+    border-bottom-color: rgba(249, 115, 22, 0.14);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.36);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+}
+
+.shock-container {
+    min-height: 76px;
+    grid-template-columns: minmax(150px, 1fr) auto minmax(150px, 1fr);
+    gap: clamp(10px, 1.5vw, 24px);
+    padding-inline: clamp(16px, 2.6vw, 36px);
+}
+
+.shock-logo-link,
+.shock-logo-link:hover,
+.shock-logo-link:visited {
+    color: var(--header-text);
+    text-decoration: none !important;
+}
+
+.shock-logo-img {
+    filter: none;
+}
+
+.shock-nav {
+    gap: 4px;
+}
+
+.shock-header .shock-nav-item,
+.shock-header .shock-nav-item:hover,
+.shock-header .shock-nav-item:visited,
+.shock-header .shock-nav-item:active,
+.shock-header .shock-nav-item.active,
+.shock-header .frag-dropdown.open > .shock-nav-item {
+    min-height: 40px;
+    padding: 8px 14px;
+    border: 1px solid transparent !important;
+    border-radius: 10px;
+    background: transparent;
+    box-shadow: none !important;
+    color: #b8b8b8;
+    text-decoration: none !important;
+    transform: none;
+    outline: none;
+}
+
+.shock-header .shock-nav-item:hover,
+.shock-header .shock-nav-item.active,
+.shock-header .frag-dropdown.open > .shock-nav-item {
+    color: #fff;
+    background: rgba(249, 115, 22, 0.10);
+}
+
+.shock-header .shock-nav-item i,
+.shock-header .shock-nav-item:hover i {
+    color: #F97316;
+}
+
+.shock-header .frag-user-trigger,
+.shock-header .frag-user-trigger:hover,
+.shock-header .action-icon-btn,
+.shock-header .action-icon-btn:hover,
+.shock-header .shock-mobile-toggle,
+.shock-header .shock-mobile-toggle:hover {
+    border: 1px solid transparent;
+    background: transparent;
+    box-shadow: none;
+    text-decoration: none !important;
+    transform: none;
+}
+
+.shock-header .frag-user-trigger:hover,
+.shock-header .action-icon-btn:hover,
+.shock-header .shock-mobile-toggle:hover {
+    border-color: transparent;
+    background: rgba(249, 115, 22, 0.09);
+}
+
+.shock-header .frag-user-trigger {
+    border-radius: 999px;
+    padding: 4px 10px 4px 6px;
+}
+
+.shock-header .frag-avatar {
+    border: 2px solid rgba(249, 115, 22, 0.42);
+    box-shadow: none;
+}
+
+.shock-header .action-icon-btn,
+.shock-header .shock-mobile-toggle {
+    border-radius: 11px;
+}
+
+.shock-header .frag-dropdown-menu {
+    border: 1px solid rgba(249, 115, 22, 0.16);
+    border-radius: 14px;
+    background: rgba(18, 18, 18, 0.98);
+}
+
+.shock-header .frag-drop-link,
+.shock-header .frag-drop-link:hover,
+.shock-header .frag-drop-link:visited,
+.shock-header .frag-drop-link:active {
+    text-decoration: none !important;
+}
+
+.shock-header .frag-drop-link.active {
+    color: #fff;
+    background: rgba(249, 115, 22, 0.10);
+}
+
+.shock-header .frag-drop-link.active i {
+    color: #F97316;
+}
+
+.shock-header .frag-login-btn,
+.shock-header .frag-login-btn:hover,
+.shock-header .frag-login-btn:visited,
+.shock-header .frag-login-btn:active {
+    border: 0;
+    text-decoration: none !important;
+}
+
+.shock-header .frag-login-btn {
+    box-shadow: 0 6px 18px rgba(249, 115, 22, 0.16);
+}
+
+.shock-header .frag-login-btn:hover {
+    box-shadow: 0 9px 24px rgba(249, 115, 22, 0.22);
+}
+
+.mobile-nav a,
+.mobile-nav a:hover,
+.mobile-nav a:visited,
+.mobile-nav a:active {
+    text-decoration: none !important;
+}
+
+@media (max-width: 1100px) {
+    .shock-container {
+        min-height: 70px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        padding-inline: 20px;
+    }
+}
+
+@media (max-width: 700px) {
+    .shock-container {
+        min-height: 64px;
+        padding-inline: 14px;
+    }
+
+    .shock-header .frag-user-trigger {
+        padding: 4px;
     }
 }
