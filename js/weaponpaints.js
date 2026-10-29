@@ -1649,8 +1649,8 @@
             if (empty) {
                 empty.hidden = visibleSavedCount > 0;
                 if (allowed === 'all' || allowed === 'skins') {
-                    empty.querySelector('strong').textContent = 'Your inventory is empty.';
-                    empty.querySelector('span').textContent = 'Saved paint configurations and current loadout items will appear here.';
+                    empty.querySelector('strong').textContent = 'No saved paint configurations yet.';
+                    empty.querySelector('span').textContent = 'Saved paint configurations will appear here after you save a skin.';
                 } else {
                     empty.querySelector('strong').textContent = `No saved paints in ${inventoryCategoryLabels[allowed]}.`;
                     empty.querySelector('span').textContent = 'Saved paints for other categories remain in your inventory.';
