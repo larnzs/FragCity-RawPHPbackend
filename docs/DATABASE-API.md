@@ -15,6 +15,16 @@
 - بازیابی رمز: `password_resets`
 - کمک‌های مالی: `donations`
 
+### اطلاعات پایدار حساب Steam
+
+ورود از `steam/steam_login.php` اطلاعات عمومی Steam Community را می‌گیرد. پس از اعمال migration زیر، مشخصات عمومی حساب در همان ردیف `users` ذخیره می‌شوند:
+
+- `steam_personaname`, `steam_profileurl`, وضعیت آنلاین و visibility، تاریخ ساخت، آخرین خروج، کشور و بازی جاری.
+- `steam_avatar_url` آدرس امن آواتار Steam و `steam_avatar_path` مسیر نسخهٔ cacheشده روی سرور را نگه می‌دارند.
+- فایل تصویر در `img/steam-avatars/` نگهداری می‌شود؛ آواتار سفارشی و قابل‌ویرایش کاربر در `img/avatars/` جدا و با اولویت باقی می‌ماند. این طراحی از ذخیرهٔ باینری عکس در هر خواندن ردیف کاربر جلوگیری می‌کند.
+
+قبل از تست، از دیتابیس هدف backup بگیر و فایل `database/migrations/20261030_add_steam_profile_fields_to_users.sql` را **یک‌بار** با حساب دیتابیسی دارای مجوز `ALTER` اجرا کن؛ این کار را جداگانه برای کپی محلی Laragon و دیتابیس Production انجام بده. تا قبل از migration، ورود Steam همچنان مجاز می‌ماند اما ذخیرهٔ مشخصات ممکن است انجام نشود؛ `php tools/site-bridge-preflight.php` پس از migration باید ستون‌های جدید را هم تأیید کند.
+
 هیچ جدول قدیمی Windows Agent جزو این schema نیست. در مسیر فعال PHP نباید queryای به `agent_tokens`, `agent_nodes`, `pending_servers`, `registered_servers`, `server_ports`, `server_configs`, `agent_commands`, `game_servers`, `server_runtime_stats` یا `rcon_command_logs` اجرا شود.
 
 ### WeaponPaints
