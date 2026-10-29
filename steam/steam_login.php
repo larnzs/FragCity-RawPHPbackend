@@ -106,10 +106,17 @@ try {
 
             
 
-            $steamSettings=fragcity_settings('files.steam.steam_login',array());
-            $profile=isset($steamSettings['database_profile'])?$steamSettings['database_profile']:'main';
-            $pdo=fragcity_create_pdo($profile);
-            if(!$pdo){$_SESSION['auth_error']='Database unavailable. Please try again later.';header('Location: '.$loginPage);exit;}
+            $siteDatabaseProfile = fragcity_settings('files.index.database_profile', 'main');
+            $siteDatabaseProfile = is_string($siteDatabaseProfile) && trim($siteDatabaseProfile) !== ''
+                ? trim($siteDatabaseProfile)
+                : 'main';
+            $pdo = fragcity_create_pdo($siteDatabaseProfile);
+            if (!$pdo) {
+                error_log('[FragCity] Steam login could not connect to the configured site database profile.');
+                $_SESSION['auth_error'] = 'اتصال به دیتابیس سایت برقرار نشد. لطفاً کمی بعد دوباره تلاش کنید.';
+                header('Location: ' . $loginPage, true, 303);
+                exit;
+            }
 
 
             $stmt = $pdo->prepare("SELECT * FROM users WHERE steamid64 = ?");
