@@ -112,10 +112,17 @@ try {
                 : 'main';
             $pdo = fragcity_create_pdo($siteDatabaseProfile);
             if (!$pdo) {
-                error_log('[FragCity] Steam login could not connect to the configured site database profile.');
+                error_log('[FragCity] Steam login could not connect to configured site database profile "' . $siteDatabaseProfile . '".');
                 $_SESSION['auth_error'] = 'اتصال به دیتابیس سایت برقرار نشد. لطفاً کمی بعد دوباره تلاش کنید.';
                 header('Location: ' . $loginPage, true, 303);
                 exit;
+            }
+
+            try {
+                $activeDatabaseName = (string)$pdo->query('SELECT DATABASE()')->fetchColumn();
+                error_log('[FragCity] Steam login database target confirmed (profile "' . $siteDatabaseProfile . '", database "' . $activeDatabaseName . '").');
+            } catch (Throwable $databaseIdentityError) {
+                error_log('[FragCity] Steam login connected, but active database identity could not be read.');
             }
 
 
