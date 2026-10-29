@@ -256,6 +256,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                 redirect_back();
             }
 
+            // Steam OpenID registration has just created the user row; now persist the
+            // normalized public Steam summary without making signup depend on the migration.
+            if ($isSteamRegister) {
+                try {
+                    require_once __DIR__ . '/class/SteamProfileService.php';
+                    $profileForStorage = $_SESSION['steam_profile_cache'][$steamid]['player']
+                        ?? ($_SESSION['steam_profile'] ?? []);
+                    if (!is_array($profileForStorage) || (string)($profileForStorage['steamid'] ?? '') !== $steamid) {
+                        $steamTemp = $_SESSION['steam_temp'] ?? [];
+                        $profileForStorage = [
+                            'steamid' => $steamid,
+                            'personaname' => (string)($steamTemp['personaname'] ?? $username),
+                            'avatarfull' => (string)($steamTemp['avatar'] ?? ''),
+                        ];
+                    }
+                    if ($profileForStorage !== []) {
+                        SteamProfileService::persistPlayerSummary($pdo, $steamid, $profileForStorage);
+                    }
+                } catch (Throwable $profileStoreError) {
+                    error_log('[FragCity] Steam profile persistence after registration failed; check the users profile migration.');
+                }
+            }
+
             session_regenerate_id(true);
             $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 
