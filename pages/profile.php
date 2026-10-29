@@ -349,7 +349,50 @@ $steamCardAvatarUrl = $steamAvatarUrl !== ''
     ? $steamAvatarUrl
     : (string)($steamProfile['avatarfull'] ?? '');
 if ($avatarUrl === '') $avatarUrl = $steamCardAvatarUrl;
-$faceitLevel = 0;
+// FACEIT stats are optional until a verified FACEIT integration populates the session.
+$faceitProfileData = $_SESSION['faceit_profile'] ?? [];
+$faceitEloCandidate = is_array($faceitProfileData)
+    ? ($faceitProfileData['elo'] ?? $faceitProfileData['faceit_elo'] ?? null)
+    : null;
+$faceitElo = is_numeric($faceitEloCandidate) ? (int)$faceitEloCandidate : null;
+if ($faceitElo !== null && $faceitElo < 100) $faceitElo = null;
+
+$faceitLevel = null;
+$faceitProgress = 0.0;
+$faceitProgressText = 'اتصال FACEIT تنظیم نشده';
+if ($faceitElo !== null) {
+    // Current CS2 FACEIT level thresholds; Level 10 is open-ended.
+    $faceitLevels = [
+        1 => ['min' => 100, 'next' => 501],
+        2 => ['min' => 501, 'next' => 751],
+        3 => ['min' => 751, 'next' => 901],
+        4 => ['min' => 901, 'next' => 1051],
+        5 => ['min' => 1051, 'next' => 1201],
+        6 => ['min' => 1201, 'next' => 1351],
+        7 => ['min' => 1351, 'next' => 1531],
+        8 => ['min' => 1531, 'next' => 1751],
+        9 => ['min' => 1751, 'next' => 2001],
+        10 => ['min' => 2001, 'next' => null],
+    ];
+
+    foreach ($faceitLevels as $level => $range) {
+        if ($faceitElo >= $range['min']) {
+            $faceitLevel = $level;
+        } else {
+            break;
+        }
+    }
+
+    if ($faceitLevel === 10) {
+        // FACEIT Level 10 has no upper Elo limit; the level cap is shown as full.
+        $faceitProgress = 100.0;
+    } elseif ($faceitLevel !== null) {
+        $range = $faceitLevels[$faceitLevel];
+        $faceitProgress = (($faceitElo - $range['min']) / max(1, $range['next'] - $range['min'])) * 100;
+        $faceitProgress = max(0, min(100, $faceitProgress));
+    }
+    $faceitProgressText = 'Level ' . (int)$faceitLevel . ' · ' . number_format($faceitElo) . ' ELO';
+}
 
 // Load this player's saved Paint configurations through the same signed Linux API
 // boundary used by the WeaponPaints page. Never connect to the plugin database here.
@@ -436,28 +479,47 @@ if (!function_exists('formatPlaytime')) {
                         <i class="fa-solid fa-user" aria-hidden="true"></i>
                     </div>
                 <?php endif; ?>
-                <button type="button" class="avatar-edit-btn" id="editAvatarBtn" aria-label="تغییر آواتار">
-                    <i class="fa-solid fa-camera" aria-hidden="true"></i>
-                </button>
             </div>
-            <div class="rank-badge"><?= htmlspecialchars($hasRankStats ? $currentRank : 'بدون رنک', ENT_QUOTES, 'UTF-8') ?></div>
         </div>
 
         <div class="name-and-xp">
             <h1><?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?></h1>
             <p class="steam-id">SteamID: <?= htmlspecialchars($steamid, ENT_QUOTES, 'UTF-8') ?></p>
-            <div class="xp-bar-container">
-                <div
-                    class="xp-bar"
-                    data-progress="<?= htmlspecialchars((string) round($xpProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
-                    role="progressbar"
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                    aria-valuenow="<?= htmlspecialchars((string) round($xpProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
-                ></div>
-                <span class="xp-text">
-                    <?= $hasRankStats ? number_format($points) . ' XP / ' . number_format($nextThreshold) . ' XP' : 'اطلاعات XP در دسترس نیست' ?>
-                </span>
+            <div class="profile-progress-stack">
+                <div class="profile-progress-item">
+                    <div class="profile-progress-head">
+                        <span class="profile-progress-label"><i class="fa-solid fa-chart-line" aria-hidden="true"></i> Rank Plugin XP</span>
+                        <span class="profile-progress-value"><?= $hasRankStats ? number_format($points) . ' / ' . number_format($nextThreshold) . ' XP' : 'اطلاعات XP در دسترس نیست' ?></span>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div
+                            class="xp-bar xp-bar--rank"
+                            data-progress="<?= htmlspecialchars((string) round($xpProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
+                            role="progressbar"
+                            aria-label="پیشرفت XP پلاگین رنک"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            aria-valuenow="<?= htmlspecialchars((string) round($xpProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
+                        ></div>
+                    </div>
+                </div>
+                <div class="profile-progress-item">
+                    <div class="profile-progress-head">
+                        <span class="profile-progress-label"><i class="fa-solid fa-ranking-star" aria-hidden="true"></i> FACEIT LEVEL / ELO</span>
+                        <span class="profile-progress-value"><?= htmlspecialchars($faceitProgressText, ENT_QUOTES, 'UTF-8') ?></span>
+                    </div>
+                    <div class="xp-bar-container">
+                        <div
+                            class="xp-bar xp-bar--faceit"
+                            data-progress="<?= htmlspecialchars((string) round($faceitProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
+                            role="progressbar"
+                            aria-label="پیشرفت سطح FACEIT"
+                            aria-valuemin="0"
+                            aria-valuemax="100"
+                            aria-valuenow="<?= htmlspecialchars((string) round($faceitProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
+                        ></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -578,10 +640,6 @@ if (!function_exists('formatPlaytime')) {
         <div class="stat-card">
             <span class="stat-label"><i class="fa-solid fa-clock" aria-hidden="true"></i> زمان بازی</span>
             <span class="stat-value"><?= $hasRankStats ? htmlspecialchars(formatPlaytime($playtime), ENT_QUOTES, 'UTF-8') : '—' ?></span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> FACEIT Level</span>
-            <span class="stat-value"><?= $faceitLevel ?></span>
         </div>
     </div>
     <!-- مودال برش آواتار -->
