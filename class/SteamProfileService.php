@@ -72,6 +72,63 @@ final class SteamProfileService
         return $player;
     }
 
+    /**
+     * Save normalized public Steam profile fields for an existing user.
+     * The caller catches schema/DB errors so OpenID authentication is not blocked.
+     */
+    public static function persistPlayerSummary(\PDO $pdo, string $steamid64, array $player): bool
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $steamid64)
+            || (string)($player['steamid'] ?? '') !== $steamid64) {
+            return false;
+        }
+
+        $personaname = trim((string)($player['personaname'] ?? ''));
+        $personaname = function_exists('mb_substr')
+            ? mb_substr($personaname, 0, 128, 'UTF-8')
+            : substr($personaname, 0, 128);
+        $profileUrl = self::safeProfileUrl((string)($player['profileurl'] ?? ''));
+        $avatarUrl = self::safeAvatarUrl((string)($player['avatarfull'] ?? ''));
+        $country = strtoupper((string)($player['loccountrycode'] ?? ''));
+        if (!preg_match('/^[A-Z]{2}$/D', $country)) $country = '';
+        $game = trim((string)($player['gameextrainfo'] ?? ''));
+        $game = function_exists('mb_substr') ? mb_substr($game, 0, 255, 'UTF-8') : substr($game, 0, 255);
+        $gameId = (string)($player['gameid'] ?? '');
+        if (!preg_match('/^[0-9]{1,20}$/D', $gameId)) $gameId = '';
+
+        $stmt = $pdo->prepare(
+            "UPDATE users SET
+                steam_personaname = COALESCE(NULLIF(?, ''), steam_personaname),
+                steam_profileurl = COALESCE(NULLIF(?, ''), steam_profileurl),
+                steam_avatar_url = COALESCE(NULLIF(?, ''), steam_avatar_url),
+                steam_personastate = ?,
+                steam_communityvisibilitystate = ?,
+                steam_profilestate = ?,
+                steam_timecreated = COALESCE(NULLIF(?, 0), steam_timecreated),
+                steam_lastlogoff = COALESCE(NULLIF(?, 0), steam_lastlogoff),
+                steam_loccountrycode = COALESCE(NULLIF(?, ''), steam_loccountrycode),
+                steam_gameextrainfo = ?,
+                steam_gameid = ?,
+                steam_profile_updated_at = CURRENT_TIMESTAMP
+             WHERE steamid64 = ?"
+        );
+        $stmt->execute([
+            $personaname,
+            $profileUrl,
+            $avatarUrl,
+            self::boundedInt($player['personastate'] ?? 0, 0, 6),
+            self::boundedInt($player['communityvisibilitystate'] ?? 0, 0, 3),
+            self::boundedInt($player['profilestate'] ?? 0, 0, 1),
+            self::boundedInt($player['timecreated'] ?? 0, 0, PHP_INT_MAX),
+            self::boundedInt($player['lastlogoff'] ?? 0, 0, PHP_INT_MAX),
+            $country,
+            $game,
+            $gameId,
+            $steamid64,
+        ]);
+        return $stmt->rowCount() > 0;
+    }
+
     private static function getCachedPlayer(string $steamid64): array
     {
         if (session_status() !== PHP_SESSION_ACTIVE) return [];
