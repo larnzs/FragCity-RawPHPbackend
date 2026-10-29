@@ -132,8 +132,16 @@ try {
 
                 $_SESSION['role'] = $user['role'] ?? 'user';
 
-                // The session now belongs to this SteamID; activate its cached summary.
-                SteamProfileService::getPlayerSummary((string)$steamid64);
+                // The session now belongs to this SteamID; activate and persist its public summary.
+                $profileToStore = SteamProfileService::getPlayerSummary((string)$steamid64);
+                if ($profileToStore !== []) {
+                    try {
+                        SteamProfileService::persistPlayerSummary($pdo, (string)$steamid64, $profileToStore);
+                    } catch (Throwable $profileStoreError) {
+                        // Authentication must not fail because a profile migration is pending.
+                        error_log('[FragCity] Steam profile persistence failed; check the users profile migration.');
+                    }
+                }
 
                 header('Location: ' . $dashboardPage);
 
