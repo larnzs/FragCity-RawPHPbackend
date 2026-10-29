@@ -1372,3 +1372,224 @@ body.mobile-menu-open {
         transition: none;
     }
 }
+
+
+/* =========================================
+   Minimal graphite base — keep inventory/profile cards untouched
+   Flat navigation and controls; profile/loadout card styles remain in
+   css/profile.css and css/weaponpaints.css.
+========================================= */
+:root {
+    --header-bg: #0D0D0D;
+    --header-bg-2: #111111;
+    --header-border: rgba(255, 255, 255, 0.08);
+    --header-border-soft: rgba(255, 255, 255, 0.08);
+    --header-shadow: none;
+    --header-orange: #F97316;
+    --header-orange-2: #FB923C;
+    --header-red: #EF4444;
+    --header-green: #22C55E;
+}
+
+.shock-header,
+.shock-header.is-scrolled {
+    background: #0D0D0D;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.shock-header::before {
+    display: none;
+}
+
+.shock-container {
+    min-height: 72px;
+}
+
+.shock-logo-link,
+.shock-logo-link:hover {
+    border-color: transparent;
+    background: transparent;
+    filter: none;
+}
+
+.shock-logo-img {
+    filter: none;
+}
+
+.shock-nav {
+    gap: 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.shock-nav-item {
+    min-height: 38px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #A3A3A3;
+    box-shadow: none;
+    text-shadow: none;
+    transform: none;
+    transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease;
+}
+
+.shock-nav-item:hover,
+.shock-nav-item.active,
+.frag-dropdown.open > .shock-nav-item {
+    border-color: rgba(249, 115, 22, 0.14);
+    background: rgba(249, 115, 22, 0.075);
+    color: #F97316;
+    box-shadow: none;
+    text-shadow: none;
+    transform: none;
+}
+
+.shock-nav-item i,
+.shock-nav-item:hover i,
+.shock-nav-item.active i {
+    color: #F97316;
+}
+
+.action-icon-btn,
+.shock-mobile-toggle {
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 10px;
+    background: #171717;
+    box-shadow: none;
+    overflow: visible;
+}
+
+.action-icon-btn:hover,
+.shock-mobile-toggle:hover {
+    border-color: rgba(249, 115, 22, 0.38);
+    background: #202020;
+    color: #FB923C;
+    box-shadow: none;
+}
+
+.frag-login-btn {
+    border: 1px solid #F97316;
+    border-radius: 9px;
+    background: #F97316;
+    color: #111111;
+    box-shadow: none;
+    transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.frag-login-btn:hover {
+    border-color: #EA580C;
+    background: #EA580C;
+    box-shadow: none;
+}
+
+.mobile-nav {
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    background: #0D0D0D;
+    box-shadow: -16px 0 36px rgba(0, 0, 0, 0.28);
+}
+
+.mobile-nav-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: #111111;
+}
+
+.mobile-nav-link {
+    border-color: transparent;
+    border-radius: 8px;
+    background: transparent;
+    box-shadow: none;
+}
+
+.mobile-nav-link:hover,
+.mobile-nav-link.active {
+    border-color: rgba(249, 115, 22, 0.14);
+    background: rgba(249, 115, 22, 0.075);
+    box-shadow: none;
+}
+
+#shockUserDropdown .frag-user-trigger,
+#shockUserDropdown .frag-user-trigger:hover,
+#shockUserDropdown .frag-user-trigger:focus-visible,
+#shockUserDropdown.open .frag-user-trigger {
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 10px;
+    background: #171717;
+    box-shadow: none;
+}
+
+#shockUserDropdown .frag-user-trigger:hover,
+#shockUserDropdown .frag-user-trigger:focus-visible,
+#shockUserDropdown.open .frag-user-trigger {
+    border-color: rgba(249, 115, 22, 0.42);
+    background: #1C1C1C;
+}
+
+#shockUserDropdown .frag-avatar {
+    box-shadow: none;
+    border-color: rgba(249, 115, 22, 0.42);
+}
+
+#shockUserDropdown .frag-dropdown-menu {
+    border-color: rgba(255, 255, 255, 0.10);
+    border-radius: 16px;
+    background: #111111;
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.36);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+#shockUserDropdown .frag-dropdown-menu::before {
+    display: none;
+}
+
+.shock-header .shock-nav .frag-dropdown-menu {
+    border-color: rgba(255, 255, 255, 0.10);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.36);
+}
+
+#shockUserDropdown .frag-drop-link:hover,
+#shockUserDropdown .frag-drop-link:focus-visible {
+    border-color: rgba(249, 115, 22, 0.12);
+    background: rgba(249, 115, 22, 0.07);
+    box-shadow: none;
+    transform: none;
+}
+
+#shockUserDropdown .frag-drop-steam-profile-link {
+    background: rgba(249, 115, 22, 0.075);
+    box-shadow: none;
+}
+
+#shockUserDropdown .frag-drop-steam-profile-link:hover {
+    background: rgba(249, 115, 22, 0.12);
+    box-shadow: none;
+    transform: none;
+}
+
+@media (max-width: 1100px) {
+    .shock-nav {
+        gap: 4px;
+        padding: 0;
+    }
+}
+
+@media (max-width: 700px) {
+    .shock-container {
+        min-height: 66px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-nav-item,
+    .frag-login-btn,
+    #shockUserDropdown .frag-drop-steam-profile-link {
+        transition: none !important;
+    }
+}
