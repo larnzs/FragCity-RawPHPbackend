@@ -512,6 +512,7 @@ if (!function_exists('formatPlaytime')) {
                 <h1 class="profile-identity-name"><?= htmlspecialchars($steamPersonaname !== '' ? $steamPersonaname : $username, ENT_QUOTES, 'UTF-8') ?></h1>
                 <span class="profile-identity-id" title="SteamID64">
                     <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                    <span>SteamID64:</span>
                     <?= htmlspecialchars($steamIdForDisplay, ENT_QUOTES, 'UTF-8') ?>
                 </span>
                 <span class="profile-steam-chip profile-steam-status" data-state="<?= (int)$steamStateValue ?>">
@@ -521,28 +522,28 @@ if (!function_exists('formatPlaytime')) {
                 <?php if ($steamGame !== ''): ?>
                     <span class="profile-steam-chip profile-steam-game">
                         <i class="fa-solid fa-gamepad" aria-hidden="true"></i>
-                        <?= htmlspecialchars($steamGame, ENT_QUOTES, 'UTF-8') ?>
+                        در حال بازی: <?= htmlspecialchars($steamGame, ENT_QUOTES, 'UTF-8') ?>
                     </span>
                 <?php endif; ?>
                 <span class="profile-steam-chip" title="وضعیت Community">
                     <i class="fa-solid fa-eye" aria-hidden="true"></i>
-                    <?= htmlspecialchars($steamVisibility, ENT_QUOTES, 'UTF-8') ?>
+                    Community: <?= htmlspecialchars($steamVisibility, ENT_QUOTES, 'UTF-8') ?>
                 </span>
                 <span class="profile-steam-chip" title="وضعیت تنظیمات پروفایل">
                     <i class="fa-solid fa-user-check" aria-hidden="true"></i>
-                    <?= htmlspecialchars($steamProfileState, ENT_QUOTES, 'UTF-8') ?>
+                    پروفایل: <?= htmlspecialchars($steamProfileState, ENT_QUOTES, 'UTF-8') ?>
                 </span>
                 <span class="profile-steam-chip" title="تاریخ ساخت حساب">
                     <i class="fa-regular fa-calendar" aria-hidden="true"></i>
-                    <?= htmlspecialchars($steamCreatedDate, ENT_QUOTES, 'UTF-8') ?>
+                    ساخت حساب: <?= htmlspecialchars($steamCreatedDate, ENT_QUOTES, 'UTF-8') ?>
                 </span>
                 <span class="profile-steam-chip" title="کشور">
                     <i class="fa-solid fa-globe" aria-hidden="true"></i>
-                    <?= htmlspecialchars($steamCountry !== '' ? $steamCountry : '—', ENT_QUOTES, 'UTF-8') ?>
+                    کشور: <?= htmlspecialchars($steamCountry !== '' ? $steamCountry : '—', ENT_QUOTES, 'UTF-8') ?>
                 </span>
                 <span class="profile-steam-chip" title="آخرین فعالیت">
                     <i class="fa-regular fa-clock" aria-hidden="true"></i>
-                    <?= htmlspecialchars($steamLastLogoffDate, ENT_QUOTES, 'UTF-8') ?>
+                    آخرین فعالیت: <?= htmlspecialchars($steamLastLogoffDate, ENT_QUOTES, 'UTF-8') ?>
                 </span>
                 <?php if ($steamProfileUrl !== ''): ?>
                     <a class="profile-steam-link" href="<?= htmlspecialchars($steamProfileUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" aria-label="مشاهده حساب در Steam" title="مشاهده حساب در Steam">
