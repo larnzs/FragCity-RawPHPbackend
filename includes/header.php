@@ -214,13 +214,36 @@ $mobileNavItems = [
                                          onerror="this.onerror=null;this.src='assets/images/default_avatar.png';">
                                 </span>
                                 <div class="frag-drop-info">
-                                    <span class="frag-drop-eyebrow">FRAGCITY PLAYER</span>
-                                    <span class="frag-drop-name"><?= htmlspecialchars((string) $displayName, ENT_QUOTES, 'UTF-8') ?></span>
-                                    <span class="frag-drop-steam">STEAM · <?= htmlspecialchars($steamShort, ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="frag-drop-eyebrow">اکانت استیم فعلی</span>
+                                    <span class="frag-drop-name"><?= htmlspecialchars($headerSteamPersonaName, ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="frag-drop-steam">STEAMID64 · <?= htmlspecialchars($headerSteamId64 !== '' ? $headerSteamId64 : '—', ENT_QUOTES, 'UTF-8') ?></span>
                                 </div>
                                 <span class="frag-drop-profile-mark" aria-hidden="true">
                                     <i class="fa-solid fa-gamepad"></i>
                                 </span>
+                            </div>
+
+                            <div class="frag-drop-steam-details">
+                                <div class="frag-drop-status" data-state="<?= $headerSteamState ?>">
+                                    <span class="frag-drop-status-dot" aria-hidden="true"></span>
+                                    <strong><?= htmlspecialchars($headerSteamStatus, ENT_QUOTES, 'UTF-8') ?></strong>
+                                    <?php if ($headerSteamGame !== ''): ?>
+                                        <span class="frag-drop-playing">در حال بازی: <?= htmlspecialchars($headerSteamGame, ENT_QUOTES, 'UTF-8') ?></span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="frag-drop-detail-grid">
+                                    <div class="frag-drop-detail"><span>وضعیت پروفایل</span><strong><?= htmlspecialchars($headerSteamVisibility, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>تاریخ ساخت حساب</span><strong><?= htmlspecialchars($headerCreatedLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>کشور</span><strong dir="ltr"><?= htmlspecialchars($headerCountry !== '' ? $headerCountry : '—', ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>آخرین فعالیت</span><strong><?= htmlspecialchars($headerLastLogoffLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                </div>
+                                <?php if ($headerSteamProfileUrl !== ''): ?>
+                                    <a class="frag-drop-steam-profile-link" href="<?= htmlspecialchars($headerSteamProfileUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer">
+                                        <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                                        مشاهده حساب در Steam
+                                        <i class="fa-solid fa-arrow-up-left-from-circle" aria-hidden="true"></i>
+                                    </a>
+                                <?php endif; ?>
                             </div>
 
                             <div class="frag-drop-divider"></div>
