@@ -20,18 +20,29 @@
     const siteHeader = document.getElementById('siteHeader');
 
     /*
-     * Keep the shared navigation pinned while scrolling. The scrolled
-     * class only adds the glass surface and shadow; at scrollY = 0 the
-     * header returns to its clean top-of-page appearance.
+     * Hysteresis prevents the header state from bouncing at the top:
+     * enable the shadow after 12px; remove it only when fully back at
+     * the top (<= 1px). CSS keeps dimensions fixed across both states.
      */
     if (siteHeader) {
         let scrollFramePending = false;
 
         const syncHeaderScrollState = function () {
-            siteHeader.classList.toggle('is-scrolled', window.scrollY > 8);
+            const scrollY = Math.max(
+                0,
+                window.scrollY || window.pageYOffset ||
+                document.documentElement.scrollTop || 0
+            );
+            const isScrolled = siteHeader.classList.contains('is-scrolled');
+
+            if (!isScrolled && scrollY > 12) {
+                siteHeader.classList.add('is-scrolled');
+            } else if (isScrolled && scrollY <= 1) {
+                siteHeader.classList.remove('is-scrolled');
+            }
         };
 
-        window.addEventListener('scroll', function () {
+        const scheduleHeaderSync = function () {
             if (scrollFramePending) return;
 
             scrollFramePending = true;
@@ -39,8 +50,10 @@
                 syncHeaderScrollState();
                 scrollFramePending = false;
             });
-        }, { passive: true });
+        };
 
+        window.addEventListener('scroll', scheduleHeaderSync, { passive: true });
+        window.addEventListener('pageshow', scheduleHeaderSync);
         syncHeaderScrollState();
     }
 
