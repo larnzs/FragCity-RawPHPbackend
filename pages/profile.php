@@ -353,82 +353,35 @@ $faceitLevel = 0;
 
 // Load this player's saved Paint configurations through the same signed Linux API
 // boundary used by the WeaponPaints page. Never connect to the plugin database here.
-$profileInventoryItems = [];
+// Build a compact loadout overview instead of resolving/rendering large gun-skin image cards.
+// All selection data is read through the signed Linux API boundary.
 $profileInventoryTotal = 0;
+$profileLoadoutConfigured = [
+    'knife' => false,
+    'agents' => false,
+    'music' => false,
+    'pins' => false,
+];
 $profileInventoryUnavailable = false;
-try {
-    require_once __DIR__ . '/../class/WeaponPaintsRepository.php';
-    require_once __DIR__ . '/../class/utils.php';
 
+try {
+    if ($steamid64 === '') {
+        throw new RuntimeException('SteamID64 is not available for the profile loadout.');
+    }
+
+    require_once __DIR__ . '/../class/WeaponPaintsRepository.php';
     $profileWeaponPaints = new WeaponPaintsRepository();
     $profileSelection = $profileWeaponPaints->getPlayerSelection($steamid64);
+
     $profileSavedPaintRows = is_array($profileSelection['skin_inventory'] ?? null)
         ? $profileSelection['skin_inventory']
         : [];
     $profileInventoryTotal = count($profileSavedPaintRows);
 
-    $profileSkinCatalog = UtilsClass::skinsFromJson();
-    $profileWeaponCatalog = UtilsClass::getWeaponsFromArray();
-
-    foreach ($profileSavedPaintRows as $profileSavedPaint) {
-        if (count($profileInventoryItems) >= 10) {
-            break;
-        }
-        if (!is_array($profileSavedPaint)) {
-            continue;
-        }
-
-        $profileDefindex = (int)($profileSavedPaint['weapon_defindex'] ?? 0);
-        $profilePaintId = (int)($profileSavedPaint['weapon_paint_id'] ?? 0);
-        if ($profileDefindex < 1 || $profilePaintId < 0) {
-            continue;
-        }
-
-        $profileWeaponEntry = $profileWeaponCatalog[$profileDefindex]
-            ?? $profileWeaponCatalog[(string)$profileDefindex]
-            ?? [];
-        $profilePaintEntry = $profileSkinCatalog[$profileDefindex][$profilePaintId]
-            ?? $profileSkinCatalog[(string)$profileDefindex][(string)$profilePaintId]
-            ?? [];
-
-        $profileWeaponRawName = (string)($profileWeaponEntry['weapon_name'] ?? ('weapon_' . $profileDefindex));
-        $profileWeaponLabel = preg_replace('/^weapon_/', '', $profileWeaponRawName) ?: $profileWeaponRawName;
-        $profileWeaponLabel = str_replace('_', ' ', $profileWeaponLabel);
-        $profilePaintName = trim((string)($profilePaintEntry['paint_name'] ?? ''));
-        if ($profilePaintName === '') {
-            $profilePaintName = 'Paint #' . $profilePaintId;
-        }
-
-        $profileImageUrl = trim((string)($profilePaintEntry['image_url'] ?? $profileWeaponEntry['image_url'] ?? ''));
-        if ($profileImageUrl !== '') {
-            $profileRemoteImage = filter_var($profileImageUrl, FILTER_VALIDATE_URL) !== false
-                && in_array(strtolower((string)parse_url($profileImageUrl, PHP_URL_SCHEME)), ['http', 'https'], true);
-            $profileLocalImage = (bool)preg_match('#^/?[A-Za-z0-9_.\\-/]+$#D', $profileImageUrl)
-                && !preg_match('#(^|/)\\.\\.?(/|$)#', $profileImageUrl);
-            if (!$profileRemoteImage && !$profileLocalImage) {
-                $profileImageUrl = '';
-            }
-        }
-
-        $profileTeam = (int)($profileSavedPaint['weapon_team'] ?? 0);
-        $profileTeamLabel = $profileTeam === 2 ? 'T' : ($profileTeam === 3 ? 'CT' : 'ANY');
-
-        $profileStickerCount = 0;
-        for ($profileStickerSlot = 0; $profileStickerSlot < 5; $profileStickerSlot++) {
-            $profileStickerValue = (string)($profileSavedPaint['weapon_sticker_' . $profileStickerSlot] ?? '0;0;0;0;0.001;1;0');
-            $profileStickerParts = explode(';', $profileStickerValue, 2);
-            if ((int)($profileStickerParts[0] ?? 0) > 0) {
-                $profileStickerCount++;
-            }
-        }
-
-        $profileInventoryItems[] = [
-            'weapon_name' => $profileWeaponLabel,
-            'paint_name' => $profilePaintName,
-            'image_url' => $profileImageUrl,
-            'team' => $profileTeamLabel,
-            'sticker_count' => $profileStickerCount,
-        ];
+    foreach (array_keys($profileLoadoutConfigured) as $profileLoadoutCategory) {
+        $profileCategoryItems = $profileSelection[$profileLoadoutCategory] ?? [];
+        $profileLoadoutConfigured[$profileLoadoutCategory] =
+            is_array($profileCategoryItems) && !empty($profileCategoryItems);
     }
 } catch (Throwable $profileInventoryError) {
     // Keep profile, stats, and avatar available even while the Linux API is offline.
@@ -509,25 +462,25 @@ if (!function_exists('formatPlaytime')) {
         </div>
     </div>
 
-    <section class="profile-inventory-card" aria-labelledby="profileInventoryTitle">
+    <section class="profile-inventory-card profile-loadout-overview" aria-labelledby="profileInventoryTitle">
         <div class="profile-inventory-card__topline">
             <div class="profile-inventory-card__brand">
                 <span class="profile-inventory-card__brand-icon" aria-hidden="true">
-                    <i class="fa-solid fa-layer-group"></i>
+                    <i class="fa-solid fa-sliders"></i>
                 </span>
                 <div class="profile-inventory-card__title-wrap">
                     <span class="profile-inventory-card__eyebrow">PLAYER LOADOUT</span>
-                    <h2 id="profileInventoryTitle">اسکین‌های ذخیره‌شده شما</h2>
-                    <p>پیش‌نمایش Paintهایی که در Inventory خود ذخیره کرده‌اید</p>
+                    <h2 id="profileInventoryTitle">نمای کلی لوداوت</h2>
+                    <p>وضعیت آیتم‌هایی که برای حساب شما ذخیره شده‌اند</p>
                 </div>
             </div>
             <div class="profile-inventory-card__actions">
                 <span class="profile-inventory-card__count">
-                    <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
-                    <?= number_format($profileInventoryTotal) ?> آیتم
+                    <i class="fa-solid fa-crosshairs" aria-hidden="true"></i>
+                    <?= number_format($profileInventoryTotal) ?> اسکین گان
                 </span>
                 <a class="profile-inventory-card__view-all" href="?page=skins" data-ajax-nav data-slug="skins">
-                    مدیریت Inventory
+                    مدیریت اسکین‌ها
                     <i class="fa-solid fa-arrow-up-left-from-circle" aria-hidden="true"></i>
                 </a>
             </div>
@@ -538,67 +491,57 @@ if (!function_exists('formatPlaytime')) {
                 <div class="profile-inventory-state profile-inventory-state--error" role="status">
                     <span class="profile-inventory-state__icon"><i class="fa-solid fa-plug-circle-xmark" aria-hidden="true"></i></span>
                     <div>
-                        <strong>Inventory موقتاً در دسترس نیست</strong>
-                        <p>بقیهٔ پروفایل در دسترس است؛ سرویس اسکین‌ها را بعداً دوباره امتحان کنید.</p>
+                        <strong>اطلاعات لوداوت موقتاً در دسترس نیست</strong>
+                        <p>بقیهٔ پروفایل همچنان در دسترس است؛ کمی بعد دوباره امتحان کنید.</p>
                     </div>
-                </div>
-            <?php elseif ($profileInventoryItems): ?>
-                <div class="profile-loadout-grid">
-                    <?php foreach ($profileInventoryItems as $profileItem): ?>
-                        <article class="profile-loadout-item">
-                            <div class="profile-loadout-item__media">
-                                <?php if ($profileItem['image_url'] !== ''): ?>
-                                    <img
-                                        src="<?= htmlspecialchars($profileItem['image_url'], ENT_QUOTES, 'UTF-8') ?>"
-                                        alt=""
-                                        loading="lazy"
-                                        decoding="async"
-                                        onerror="this.onerror=null;this.hidden=true;this.nextElementSibling.hidden=false;"
-                                    >
-                                <?php endif; ?>
-                                <span class="profile-loadout-item__fallback" <?= $profileItem['image_url'] !== '' ? 'hidden' : '' ?> aria-hidden="true">
-                                    <i class="fa-solid fa-gun"></i>
-                                </span>
-                                <span class="profile-loadout-item__team" data-team="<?= htmlspecialchars($profileItem['team'], ENT_QUOTES, 'UTF-8') ?>">
-                                    <?= htmlspecialchars($profileItem['team'], ENT_QUOTES, 'UTF-8') ?>
-                                </span>
-                            </div>
-                            <div class="profile-loadout-item__copy">
-                                <span class="profile-loadout-item__kicker">SAVED PAINT</span>
-                                <strong title="<?= htmlspecialchars($profileItem['paint_name'], ENT_QUOTES, 'UTF-8') ?>">
-                                    <?= htmlspecialchars($profileItem['paint_name'], ENT_QUOTES, 'UTF-8') ?>
-                                </strong>
-                                <span class="profile-loadout-item__weapon">
-                                    <?= htmlspecialchars($profileItem['weapon_name'], ENT_QUOTES, 'UTF-8') ?>
-                                </span>
-                            </div>
-                            <?php if ((int)$profileItem['sticker_count'] > 0): ?>
-                                <span class="profile-loadout-item__stickers">
-                                    <i class="fa-solid fa-certificate" aria-hidden="true"></i>
-                                    <?= (int)$profileItem['sticker_count'] ?> استیکر
-                                </span>
-                            <?php endif; ?>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
-                <div class="profile-inventory-card__footer">
-                    <span><i class="fa-solid fa-sparkles" aria-hidden="true"></i> نمایش <?= count($profileInventoryItems) ?> مورد از <?= number_format($profileInventoryTotal) ?> Paint ذخیره‌شده</span>
-                    <a href="?page=skins" data-ajax-nav data-slug="skins">دیدن همهٔ اسکین‌ها <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+                    <a href="?page=skins" data-ajax-nav data-slug="skins">باز کردن مدیریت اسکین‌ها <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
                 </div>
             <?php else: ?>
-                <div class="profile-inventory-state">
-                    <span class="profile-inventory-state__icon"><i class="fa-solid fa-box-open" aria-hidden="true"></i></span>
-                    <div>
-                        <strong>هنوز Paint ذخیره‌شده‌ای نداری</strong>
-                        <p>از بخش Inventory اسکین‌ها را انتخاب کن و تنظیماتشان را ذخیره کن تا اینجا نمایش داده شوند.</p>
-                    </div>
-                    <a href="?page=skins" data-ajax-nav data-slug="skins">رفتن به Inventory <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+                <div class="profile-loadout-summary-grid" aria-label="خلاصه آیتم‌های ذخیره‌شده">
+                    <article class="profile-loadout-summary profile-loadout-summary--guns">
+                        <span class="profile-loadout-summary__icon" aria-hidden="true"><i class="fa-solid fa-crosshairs"></i></span>
+                        <span class="profile-loadout-summary__label">اسکین گان</span>
+                        <strong class="profile-loadout-summary__value"><?= number_format($profileInventoryTotal) ?></strong>
+                        <span class="profile-loadout-summary__meta">آیتم ذخیره‌شده</span>
+                    </article>
+
+                    <article class="profile-loadout-summary" data-configured="<?= $profileLoadoutConfigured['knife'] ? 'true' : 'false' ?>">
+                        <span class="profile-loadout-summary__icon" aria-hidden="true"><i class="fa-solid fa-khanda"></i></span>
+                        <span class="profile-loadout-summary__label">چاقو</span>
+                        <strong class="profile-loadout-summary__value"><?= $profileLoadoutConfigured['knife'] ? 'تنظیم شده' : 'تنظیم نشده' ?></strong>
+                        <span class="profile-loadout-summary__meta"><?= $profileLoadoutConfigured['knife'] ? 'لوداوت آماده است' : 'هنوز انتخابی ثبت نشده' ?></span>
+                    </article>
+
+                    <article class="profile-loadout-summary" data-configured="<?= $profileLoadoutConfigured['agents'] ? 'true' : 'false' ?>">
+                        <span class="profile-loadout-summary__icon" aria-hidden="true"><i class="fa-solid fa-user-shield"></i></span>
+                        <span class="profile-loadout-summary__label">ایجنت‌ها</span>
+                        <strong class="profile-loadout-summary__value"><?= $profileLoadoutConfigured['agents'] ? 'تنظیم شده' : 'تنظیم نشده' ?></strong>
+                        <span class="profile-loadout-summary__meta"><?= $profileLoadoutConfigured['agents'] ? 'انتخاب ذخیره شده' : 'هنوز انتخابی ثبت نشده' ?></span>
+                    </article>
+
+                    <article class="profile-loadout-summary" data-configured="<?= $profileLoadoutConfigured['music'] ? 'true' : 'false' ?>">
+                        <span class="profile-loadout-summary__icon" aria-hidden="true"><i class="fa-solid fa-music"></i></span>
+                        <span class="profile-loadout-summary__label">موزیک‌کیت</span>
+                        <strong class="profile-loadout-summary__value"><?= $profileLoadoutConfigured['music'] ? 'تنظیم شده' : 'تنظیم نشده' ?></strong>
+                        <span class="profile-loadout-summary__meta"><?= $profileLoadoutConfigured['music'] ? 'انتخاب ذخیره شده' : 'هنوز انتخابی ثبت نشده' ?></span>
+                    </article>
+
+                    <article class="profile-loadout-summary" data-configured="<?= $profileLoadoutConfigured['pins'] ? 'true' : 'false' ?>">
+                        <span class="profile-loadout-summary__icon" aria-hidden="true"><i class="fa-solid fa-medal"></i></span>
+                        <span class="profile-loadout-summary__label">پین‌ها</span>
+                        <strong class="profile-loadout-summary__value"><?= $profileLoadoutConfigured['pins'] ? 'تنظیم شده' : 'تنظیم نشده' ?></strong>
+                        <span class="profile-loadout-summary__meta"><?= $profileLoadoutConfigured['pins'] ? 'انتخاب ذخیره شده' : 'هنوز انتخابی ثبت نشده' ?></span>
+                    </article>
+                </div>
+                <div class="profile-inventory-card__footer">
+                    <span><i class="fa-solid fa-circle-info" aria-hidden="true"></i> برای افزودن یا تغییر آیتم‌ها وارد مدیریت اسکین‌ها شوید.</span>
+                    <a href="?page=skins" data-ajax-nav data-slug="skins">مدیریت لوداوت <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
                 </div>
             <?php endif; ?>
         </div>
     </section>
 
-    <!-- کارت‌های آمار -->
+ی آمار -->
     <div class="stats-grid">
         <div class="stat-card">
             <span class="stat-label"><i class="fa-solid fa-earth-americas" aria-hidden="true"></i> رتبه جهانی</span>
