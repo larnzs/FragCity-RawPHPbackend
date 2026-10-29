@@ -1065,3 +1065,34 @@ body.mobile-menu-open {
         padding: 4px;
     }
 }
+
+
+/* =========================================
+   Stable transparent-at-top header
+   Avoid animating backdrop-filter/background while the
+   scroll state changes; those effects can flicker near y=0.
+========================================= */
+.shock-header {
+    background: transparent;
+    border-bottom-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    transition: box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.shock-header::before {
+    opacity: 0;
+}
+
+.shock-header.is-scrolled {
+    background: rgba(13, 13, 13, 0.78);
+    border-bottom-color: rgba(249, 115, 22, 0.14);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.36);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.shock-header.is-scrolled::before {
+    opacity: 1;
+}
