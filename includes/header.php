@@ -66,6 +66,61 @@ $morePages = ['skins', 'skins_vps', 'launcher', 'usermanual', 'leaderboard', 'le
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
+$headerSteamId64 = preg_match('/^[0-9]{17}$/D', (string)$displaySteamID)
+    ? (string)$displaySteamID : '';
+if ($headerSteamId64 === '' && preg_match('/^STEAM_[0-5]:([01]):([0-9]+)$/D', (string)$displaySteamID, $idMatch)) {
+    $headerSteamId64 = (string)(76561197960265728 + ((int)$idMatch[2] * 2) + (int)$idMatch[1]);
+}
+$headerSteamProfile = $_SESSION['steam_profile'] ?? [];
+if (!is_array($headerSteamProfile) || (string)($headerSteamProfile['steamid'] ?? '') !== $headerSteamId64) {
+    $headerSteamProfile = $_SESSION['steam_profile_cache'][$headerSteamId64]['player'] ?? [];
+}
+if (!is_array($headerSteamProfile)) $headerSteamProfile = [];
+if ($isLoggedIn && $headerSteamId64 !== '' && isset($pdo) && $pdo instanceof PDO) {
+    try {
+        $profileStmt = $pdo->prepare('SELECT steam_personaname, steam_profileurl, steam_avatar_url, steam_personastate, steam_communityvisibilitystate, steam_timecreated, steam_lastlogoff, steam_loccountrycode, steam_gameextrainfo FROM users WHERE steamid64 = ? LIMIT 1');
+        $profileStmt->execute([$headerSteamId64]);
+        $profileRow = $profileStmt->fetch(PDO::FETCH_ASSOC);
+        if (is_array($profileRow)) {
+            $dbProfile = [
+                'steamid' => $headerSteamId64,
+                'personaname' => $profileRow['steam_personaname'] ?? '',
+                'profileurl' => $profileRow['steam_profileurl'] ?? '',
+                'avatarfull' => $profileRow['steam_avatar_url'] ?? '',
+                'personastate' => $profileRow['steam_personastate'] ?? null,
+                'communityvisibilitystate' => $profileRow['steam_communityvisibilitystate'] ?? null,
+                'timecreated' => $profileRow['steam_timecreated'] ?? null,
+                'lastlogoff' => $profileRow['steam_lastlogoff'] ?? null,
+                'loccountrycode' => $profileRow['steam_loccountrycode'] ?? '',
+                'gameextrainfo' => $profileRow['steam_gameextrainfo'] ?? '',
+            ];
+            foreach ($dbProfile as $key => $value) {
+                if ($value !== null && $value !== '') $headerSteamProfile[$key] = $value;
+            }
+        }
+    } catch (Throwable $error) {
+        error_log('[FragCity] Header Steam profile details unavailable.');
+    }
+}
+$headerSteamPersonaName = trim((string)($headerSteamProfile['personaname'] ?? '')) ?: trim((string)$displayName);
+if ($headerSteamPersonaName === '') $headerSteamPersonaName = 'Steam Player';
+$headerSteamState = isset($headerSteamProfile['personastate']) ? (int)$headerSteamProfile['personastate'] : -1;
+$headerSteamStatus = [0 => 'آفلاین', 1 => 'آنلاین', 2 => 'مشغول', 3 => 'غایب', 4 => 'خواب', 5 => 'مایل به معامله', 6 => 'مایل به بازی'][$headerSteamState] ?? 'نامشخص';
+$headerVisibilityState = (int)($headerSteamProfile['communityvisibilitystate'] ?? 0);
+$headerSteamVisibility = $headerVisibilityState === 3 ? 'عمومی' : ($headerVisibilityState === 1 ? 'خصوصی' : ($headerVisibilityState === 2 ? 'فقط دوستان' : 'نامشخص'));
+$headerCreated = (int)($headerSteamProfile['timecreated'] ?? 0);
+$headerCreatedLabel = $headerCreated > 0 ? date('Y-m-d', $headerCreated) : '—';
+$headerLastLogoff = (int)($headerSteamProfile['lastlogoff'] ?? 0);
+$headerLastLogoffLabel = $headerLastLogoff > 0 ? date('Y-m-d', $headerLastLogoff) : '—';
+$headerCountry = strtoupper(trim((string)($headerSteamProfile['loccountrycode'] ?? '')));
+if (!preg_match('/^[A-Z]{2}$/D', $headerCountry)) $headerCountry = '';
+$headerSteamGame = trim((string)($headerSteamProfile['gameextrainfo'] ?? ''));
+$headerSteamProfileUrl = trim((string)($headerSteamProfile['profileurl'] ?? ''));
+$steamUrlParts = $headerSteamProfileUrl !== '' ? parse_url($headerSteamProfileUrl) : false;
+if (!is_array($steamUrlParts) || strtolower((string)($steamUrlParts['scheme'] ?? '')) !== 'https' || !in_array(strtolower((string)($steamUrlParts['host'] ?? '')), ['steamcommunity.com', 'www.steamcommunity.com'], true)) {
+    $headerSteamProfileUrl = '';
+}
+
 $mobileNavItems = [
     ['servers_vps', 'لیست سرورها', 'fa-server', ['servers_vps', 'servers']],
     ['buyserveropen', 'خرید سرور', 'fa-shopping-cart', ['buyserveropen', 'buyserver']],
