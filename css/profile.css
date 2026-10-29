@@ -2432,3 +2432,320 @@
         transition: none !important;
     }
 }
+
+
+/* Identity strip and hero layout: Steam details in one row, stats before loadout. */
+.profile-fullscreen .profile-hero {
+    align-items: flex-start;
+    gap: 1.2rem;
+    padding-top: 0.75rem;
+}
+
+.profile-fullscreen .avatar-section {
+    flex: 0 0 174px;
+    width: 174px;
+    height: 174px;
+    margin-top: -94px;
+    margin-right: 8px;
+}
+
+.profile-fullscreen .name-and-xp {
+    align-self: center;
+    min-width: 0;
+    padding-top: 0.1rem;
+}
+
+.profile-fullscreen .profile-identity-strip {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0.48rem;
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0.15rem 0 0.35rem;
+    scrollbar-width: none;
+    overscroll-behavior-inline: contain;
+}
+
+.profile-fullscreen .profile-identity-strip::-webkit-scrollbar {
+    display: none;
+}
+
+.profile-fullscreen .profile-identity-name {
+    flex: 0 0 auto;
+    max-width: 210px;
+    margin: 0;
+    overflow: hidden;
+    color: #F5F5F5;
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    font-size: clamp(1.12rem, 1.75vw, 1.45rem);
+    font-weight: 800;
+    line-height: 1.45;
+    letter-spacing: -0.015em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    filter: none;
+}
+
+.profile-fullscreen .profile-identity-id,
+.profile-fullscreen .profile-steam-chip,
+.profile-fullscreen .profile-steam-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    gap: 0.3rem;
+    min-height: 25px;
+    padding: 0.23rem 0.48rem;
+    border: 1px solid #292929;
+    border-radius: 6px;
+    background: #141414;
+    color: #B8B8B8;
+    font-size: 0.62rem;
+    font-weight: 600;
+    line-height: 1.35;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.profile-fullscreen .profile-identity-id {
+    color: #D4D4D4;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    direction: ltr;
+    unicode-bidi: isolate;
+    letter-spacing: 0;
+}
+
+.profile-fullscreen .profile-identity-id i {
+    color: #F97316;
+    font-size: 0.75rem;
+}
+
+.profile-fullscreen .profile-steam-chip > i {
+    color: #858585;
+    font-size: 0.65rem;
+}
+
+.profile-fullscreen .profile-steam-status[data-state="1"] {
+    border-color: rgba(34, 197, 94, 0.2);
+    background: rgba(34, 197, 94, 0.06);
+    color: #86EFAC;
+}
+
+.profile-fullscreen .profile-steam-status__dot {
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: #737373;
+}
+
+.profile-fullscreen .profile-steam-status[data-state="1"] .profile-steam-status__dot {
+    background: #22C55E;
+}
+
+.profile-fullscreen .profile-steam-status[data-state="2"],
+.profile-fullscreen .profile-steam-status[data-state="3"],
+.profile-fullscreen .profile-steam-status[data-state="4"],
+.profile-fullscreen .profile-steam-status[data-state="5"],
+.profile-fullscreen .profile-steam-status[data-state="6"] {
+    border-color: rgba(249, 115, 22, 0.18);
+    color: #FDBA74;
+}
+
+.profile-fullscreen .profile-steam-status[data-state="2"] .profile-steam-status__dot,
+.profile-fullscreen .profile-steam-status[data-state="3"] .profile-steam-status__dot,
+.profile-fullscreen .profile-steam-status[data-state="4"] .profile-steam-status__dot,
+.profile-fullscreen .profile-steam-status[data-state="5"] .profile-steam-status__dot,
+.profile-fullscreen .profile-steam-status[data-state="6"] .profile-steam-status__dot {
+    background: #F97316;
+}
+
+.profile-fullscreen .profile-steam-game {
+    border-color: rgba(249, 115, 22, 0.2);
+    color: #FDBA74;
+}
+
+.profile-fullscreen .profile-steam-link {
+    width: 27px;
+    padding-inline: 0.4rem;
+    border-color: rgba(249, 115, 22, 0.22);
+    color: #F97316;
+    font-size: 0.8rem;
+}
+
+.profile-fullscreen .profile-steam-link:hover,
+.profile-fullscreen .profile-steam-link:focus-visible {
+    border-color: rgba(249, 115, 22, 0.48);
+    background: rgba(249, 115, 22, 0.08);
+    color: #FB923C;
+}
+
+.profile-fullscreen .profile-progress-stack {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 1rem;
+    max-width: none;
+    margin-top: 0.45rem;
+}
+
+.profile-fullscreen .profile-progress-item {
+    flex: 1 1 0;
+    width: 0;
+    max-width: none;
+}
+
+.profile-fullscreen .profile-progress-head {
+    gap: 0.4rem;
+}
+
+.profile-fullscreen .profile-progress-label {
+    font-size: 0.61rem;
+}
+
+.profile-fullscreen .profile-progress-value {
+    font-size: 0.61rem;
+    white-space: nowrap;
+}
+
+.profile-fullscreen .profile-progress-item .xp-bar-container {
+    height: 5px;
+    min-height: 5px;
+}
+
+.profile-fullscreen .profile-progress-item .xp-bar,
+.profile-fullscreen .profile-progress-item .xp-bar--rank,
+.profile-fullscreen .profile-progress-item .xp-bar--faceit {
+    height: 100%;
+    min-height: 5px;
+}
+
+@media (max-width: 1100px) {
+    .profile-fullscreen .avatar-section {
+        flex-basis: 148px;
+        width: 148px;
+        height: 148px;
+        margin-top: -80px;
+        margin-right: 0;
+    }
+
+    .profile-fullscreen .profile-identity-strip {
+        gap: 0.38rem;
+    }
+
+    .profile-fullscreen .profile-identity-name {
+        max-width: 180px;
+    }
+
+    .profile-fullscreen .profile-steam-chip,
+    .profile-fullscreen .profile-identity-id,
+    .profile-fullscreen .profile-steam-link {
+        font-size: 0.59rem;
+    }
+}
+
+@media (max-width: 780px) {
+    .profile-fullscreen .profile-hero {
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+
+    .profile-fullscreen .avatar-section {
+        flex-basis: 122px;
+        width: 122px;
+        height: 122px;
+        margin-top: -62px;
+    }
+
+    .profile-fullscreen .name-and-xp {
+        align-self: flex-start;
+        padding-top: 0;
+    }
+
+    .profile-fullscreen .profile-identity-strip {
+        flex-wrap: wrap;
+        overflow: visible;
+        padding-bottom: 0;
+    }
+
+    .profile-fullscreen .profile-identity-name {
+        max-width: 100%;
+    }
+
+    .profile-fullscreen .profile-progress-stack {
+        gap: 0.7rem;
+    }
+}
+
+@media (max-width: 520px) {
+    .profile-fullscreen .profile-hero {
+        align-items: flex-start;
+        gap: 0.65rem;
+        padding: 0.7rem 0.8rem 0.9rem;
+    }
+
+    .profile-fullscreen .avatar-section {
+        flex-basis: 100px;
+        width: 100px;
+        height: 100px;
+        margin-top: -48px;
+    }
+
+    .profile-fullscreen .profile-identity-strip {
+        column-gap: 0.32rem;
+        row-gap: 0.3rem;
+    }
+
+    .profile-fullscreen .profile-identity-name {
+        width: 100%;
+        max-width: 100%;
+        font-size: 1.08rem;
+    }
+
+    .profile-fullscreen .profile-identity-id,
+    .profile-fullscreen .profile-steam-chip,
+    .profile-fullscreen .profile-steam-link {
+        min-height: 23px;
+        padding: 0.2rem 0.38rem;
+        font-size: 0.56rem;
+    }
+
+    .profile-fullscreen .profile-steam-link {
+        width: 25px;
+    }
+
+    .profile-fullscreen .profile-progress-stack {
+        gap: 0.48rem;
+        margin-top: 0.55rem;
+    }
+
+    .profile-fullscreen .profile-progress-head {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.08rem;
+    }
+
+    .profile-fullscreen .profile-progress-label,
+    .profile-fullscreen .profile-progress-value {
+        font-size: 0.54rem;
+        white-space: normal;
+    }
+}
+
+@media (max-width: 360px) {
+    .profile-fullscreen .avatar-section {
+        flex-basis: 84px;
+        width: 84px;
+        height: 84px;
+        margin-top: -40px;
+    }
+
+    .profile-fullscreen .profile-progress-label,
+    .profile-fullscreen .profile-progress-value {
+        font-size: 0.5rem;
+    }
+}
