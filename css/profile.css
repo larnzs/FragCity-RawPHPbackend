@@ -1644,3 +1644,587 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
+
+
+/* Profile minimalist pass: flat surfaces, quiet borders, compact loadout summary. */
+.profile-fullscreen {
+    --profile-accent: #F97316;
+    --profile-accent-warm: #FB923C;
+    --profile-surface: #141414;
+    --profile-border: #292929;
+    background: #0D0D0D;
+}
+
+.profile-fullscreen::before {
+    display: none !important;
+}
+
+.profile-fullscreen .banner-section {
+    border-bottom: 1px solid #262626;
+    box-shadow: none;
+}
+
+.profile-fullscreen .banner-section::after {
+    height: 56px;
+    background: linear-gradient(180deg, transparent, rgba(13, 13, 13, 0.74));
+}
+
+.profile-fullscreen .banner-overlay {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.04), rgba(13, 13, 13, 0.12) 46%, rgba(13, 13, 13, 0.86));
+}
+
+.profile-fullscreen .upload-btn {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    background: rgba(17, 17, 17, 0.88);
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.profile-fullscreen .upload-btn:hover,
+.profile-fullscreen .upload-btn:focus-visible {
+    border-color: rgba(249, 115, 22, 0.5);
+    background: #202020;
+    color: #FB923C;
+    box-shadow: none;
+}
+
+.profile-fullscreen .profile-hero {
+    gap: 1.1rem;
+    padding: 0.9rem clamp(1rem, 2.4vw, 2.1rem) 1.1rem;
+    background: #111111;
+    border-bottom: 1px solid #262626;
+    box-shadow: none;
+}
+
+.profile-fullscreen .profile-hero::after {
+    display: none;
+}
+
+.profile-fullscreen .avatar-section {
+    width: 112px;
+    height: 112px;
+    margin-top: -48px;
+}
+
+.profile-fullscreen .main-avatar,
+.profile-fullscreen .main-avatar-placeholder {
+    border: 2px solid #F97316;
+    background: #171717;
+    box-shadow: none;
+}
+
+.profile-fullscreen .main-avatar-placeholder {
+    color: #FB923C;
+}
+
+.profile-fullscreen .avatar-edit-btn {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #111111;
+    background: #F97316;
+    color: #111111;
+    box-shadow: none;
+}
+
+.profile-fullscreen .avatar-edit-btn:hover,
+.profile-fullscreen .avatar-edit-btn:focus-visible {
+    background: #FB923C;
+    transform: none;
+    box-shadow: none;
+}
+
+.profile-fullscreen .rank-badge {
+    left: -5px;
+    bottom: -5px;
+    padding: 4px 9px;
+    border: 1px solid rgba(249, 115, 22, 0.32);
+    border-radius: 8px;
+    background: rgba(249, 115, 22, 0.12);
+    color: #FB923C;
+    box-shadow: none;
+}
+
+.profile-fullscreen .name-and-xp h1 {
+    color: #F5F5F5;
+    background: none;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    font-weight: 800;
+    filter: none;
+    letter-spacing: -0.015em;
+}
+
+.profile-fullscreen .steam-id {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #8F8F8F;
+}
+
+.profile-fullscreen .xp-bar-container {
+    height: 14px;
+    border: 1px solid #303030;
+    border-radius: 5px;
+    background: #080808;
+    box-shadow: none;
+}
+
+.profile-fullscreen .xp-bar {
+    border-radius: 4px;
+    background: #F97316;
+    box-shadow: none;
+}
+
+.profile-fullscreen .xp-bar::after {
+    display: none;
+}
+
+.profile-fullscreen .xp-text {
+    font-size: 0.61rem;
+    text-shadow: none;
+}
+
+/* Loadout overview replaces large weapon artwork cards with concise status tiles. */
+.profile-fullscreen .profile-inventory-card {
+    margin: 1rem clamp(0.75rem, 2.3vw, 2rem) 0.6rem;
+    padding: 1rem;
+    border: 1px solid #292929;
+    border-radius: 14px;
+    background: #111111;
+    box-shadow: none;
+    overflow: hidden;
+}
+
+.profile-fullscreen .profile-inventory-card::before {
+    display: none;
+}
+
+.profile-fullscreen .profile-inventory-card__topline {
+    gap: 0.85rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid #262626;
+}
+
+.profile-fullscreen .profile-inventory-card__brand {
+    gap: 0.7rem;
+}
+
+.profile-fullscreen .profile-inventory-card__brand-icon {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+    border: 1px solid #3A2A1D;
+    border-radius: 10px;
+    background: rgba(249, 115, 22, 0.08);
+    color: #F97316;
+    font-size: 1.05rem;
+}
+
+.profile-fullscreen .profile-inventory-card__eyebrow {
+    color: #F97316;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+}
+
+.profile-fullscreen .profile-inventory-card__title-wrap h2 {
+    font-size: 0.98rem;
+    font-weight: 750;
+}
+
+.profile-fullscreen .profile-inventory-card__title-wrap p {
+    font-size: 0.72rem;
+    color: #929292;
+}
+
+.profile-fullscreen .profile-inventory-card__actions {
+    gap: 0.5rem;
+}
+
+.profile-fullscreen .profile-inventory-card__count {
+    border: 1px solid #2B2B2B;
+    border-radius: 8px;
+    background: #171717;
+    color: #D4D4D4;
+    font-weight: 650;
+}
+
+.profile-fullscreen .profile-inventory-card__count i {
+    color: #F97316;
+}
+
+.profile-fullscreen .profile-inventory-card__view-all {
+    min-height: 34px;
+    padding: 0.42rem 0.65rem;
+    border: 1px solid #F97316;
+    border-radius: 8px;
+    background: #F97316;
+    color: #111111;
+    box-shadow: none;
+    transition: background-color 140ms ease, border-color 140ms ease;
+}
+
+.profile-fullscreen .profile-inventory-card__view-all:hover {
+    border-color: #EA580C;
+    background: #EA580C;
+    color: #111111;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+}
+
+.profile-fullscreen .profile-loadout-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.65rem;
+    padding-top: 0.85rem;
+}
+
+.profile-fullscreen .profile-loadout-summary {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-content: center;
+    align-items: center;
+    column-gap: 0.6rem;
+    row-gap: 0.06rem;
+    min-width: 0;
+    min-height: 82px;
+    padding: 0.75rem;
+    border: 1px solid #292929;
+    border-radius: 11px;
+    background: #171717;
+    transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.profile-fullscreen .profile-loadout-summary:hover {
+    border-color: #454545;
+    background: #1B1B1B;
+}
+
+.profile-fullscreen .profile-loadout-summary__icon {
+    display: grid;
+    place-items: center;
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    width: 34px;
+    height: 34px;
+    border: 1px solid #3A2A1D;
+    border-radius: 9px;
+    background: rgba(249, 115, 22, 0.08);
+    color: #F97316;
+    font-size: 0.9rem;
+}
+
+.profile-fullscreen .profile-loadout-summary__label {
+    min-width: 0;
+    color: #B8B8B8;
+    font-size: 0.68rem;
+    line-height: 1.5;
+}
+
+.profile-fullscreen .profile-loadout-summary__value {
+    min-width: 0;
+    color: #F5F5F5;
+    font-size: 0.82rem;
+    font-weight: 750;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.profile-fullscreen .profile-loadout-summary__meta {
+    min-width: 0;
+    color: #777777;
+    font-size: 0.61rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.profile-fullscreen .profile-loadout-summary[data-configured="true"] .profile-loadout-summary__value {
+    color: #4ADE80;
+}
+
+.profile-fullscreen .profile-loadout-summary[data-configured="true"] .profile-loadout-summary__icon {
+    border-color: rgba(34, 197, 94, 0.20);
+    background: rgba(34, 197, 94, 0.07);
+    color: #4ADE80;
+}
+
+.profile-fullscreen .profile-loadout-summary--guns .profile-loadout-summary__value {
+    color: #FB923C;
+    font-size: 1.08rem;
+}
+
+.profile-fullscreen .profile-inventory-card__footer {
+    gap: 0.75rem;
+    margin-top: 0.85rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #262626;
+    color: #858585;
+    font-size: 0.68rem;
+}
+
+.profile-fullscreen .profile-inventory-card__footer span {
+    color: #858585;
+}
+
+.profile-fullscreen .profile-inventory-card__footer i {
+    color: #F97316;
+}
+
+.profile-fullscreen .profile-inventory-card__footer a {
+    color: #FB923C;
+    font-weight: 650;
+}
+
+.profile-fullscreen .profile-inventory-card__footer a:hover {
+    color: #FDBA74;
+    text-decoration: underline;
+}
+
+.profile-fullscreen .profile-inventory-state {
+    gap: 0.75rem;
+    padding: 1rem 0.25rem 0.25rem;
+}
+
+.profile-fullscreen .profile-inventory-state--error {
+    border-color: rgba(239, 68, 68, 0.24);
+    background: rgba(239, 68, 68, 0.045);
+}
+
+.profile-fullscreen .profile-inventory-state--error .profile-inventory-state__icon {
+    color: #F87171;
+}
+
+.profile-fullscreen .profile-inventory-state > a {
+    border: 1px solid #F97316;
+    border-radius: 8px;
+    background: #F97316;
+    color: #111111;
+    box-shadow: none;
+}
+
+.profile-fullscreen .profile-inventory-state > a:hover {
+    background: #EA580C;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Player statistics: restrained cards, orange reserved for emphasis. */
+.profile-fullscreen .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 0.65rem;
+    padding: 0.8rem clamp(0.75rem, 2.3vw, 2rem) 1.5rem;
+    background: transparent;
+}
+
+.profile-fullscreen .stat-card {
+    min-height: 92px;
+    padding: 0.85rem 0.7rem;
+    border: 1px solid #292929;
+    border-radius: 11px;
+    background: #141414;
+    box-shadow: none;
+    transform: none;
+    transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.profile-fullscreen .stat-card::before {
+    display: none;
+}
+
+.profile-fullscreen .stat-card:hover {
+    border-color: rgba(249, 115, 22, 0.38);
+    background: #191919;
+    box-shadow: none;
+    transform: none;
+}
+
+.profile-fullscreen .stat-label {
+    color: #929292;
+    font-size: 0.69rem;
+}
+
+.profile-fullscreen .stat-label i {
+    color: #F97316;
+}
+
+.profile-fullscreen .stat-card:hover .stat-label i {
+    color: #FB923C;
+    transform: none;
+}
+
+.profile-fullscreen .stat-value {
+    color: #F5F5F5;
+    font-size: clamp(1rem, 1.3vw, 1.2rem);
+    font-weight: 800;
+    text-shadow: none;
+}
+
+.profile-fullscreen .avatar-modal {
+    background: rgba(0, 0, 0, 0.72);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+}
+
+.profile-fullscreen .avatar-modal-content {
+    border-color: #303030;
+    border-radius: 14px;
+    background: #141414;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+}
+
+.profile-fullscreen .btn-crop {
+    border: 1px solid #F97316;
+    border-radius: 8px;
+    background: #F97316;
+    color: #111111;
+    box-shadow: none;
+}
+
+.profile-fullscreen .btn-crop:hover {
+    background: #EA580C;
+    transform: none;
+}
+
+.profile-fullscreen .toast-message {
+    border: 1px solid #303030;
+    border-radius: 10px;
+    background: #191919;
+    color: #F5F5F5;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.profile-fullscreen .toast-message.success {
+    border-color: rgba(34, 197, 94, 0.28);
+    background: #14261A;
+    color: #BBF7D0;
+}
+
+.profile-fullscreen .toast-message.error {
+    border-color: rgba(239, 68, 68, 0.30);
+    background: #2A1515;
+    color: #FECACA;
+}
+
+@media (max-width: 1100px) {
+    .profile-fullscreen .profile-loadout-summary-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 780px) {
+    .profile-fullscreen .profile-hero {
+        align-items: flex-end;
+        padding: 0.8rem 1rem 1rem;
+    }
+
+    .profile-fullscreen .avatar-section {
+        width: 96px;
+        height: 96px;
+        margin-top: -40px;
+    }
+
+    .profile-fullscreen .profile-inventory-card__topline {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .profile-fullscreen .profile-inventory-card__actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .profile-fullscreen .profile-loadout-summary-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.5rem;
+    }
+
+    .profile-fullscreen .profile-loadout-summary {
+        min-height: 76px;
+        padding: 0.6rem;
+    }
+
+    .profile-fullscreen .profile-inventory-card__footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 520px) {
+    .profile-fullscreen .banner-section {
+        height: 170px;
+    }
+
+    .profile-fullscreen .profile-hero {
+        gap: 0.8rem;
+    }
+
+    .profile-fullscreen .avatar-section {
+        width: 78px;
+        height: 78px;
+        margin-top: -30px;
+    }
+
+    .profile-fullscreen .rank-badge {
+        left: -7px;
+        bottom: -5px;
+        padding: 3px 6px;
+        font-size: 0.61rem;
+    }
+
+    .profile-fullscreen .name-and-xp h1 {
+        font-size: 1.18rem;
+    }
+
+    .profile-fullscreen .xp-text {
+        font-size: 0.55rem;
+    }
+
+    .profile-fullscreen .profile-inventory-card {
+        margin-inline: 0.65rem;
+        padding: 0.8rem;
+        border-radius: 12px;
+    }
+
+    .profile-fullscreen .profile-inventory-card__brand-icon {
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
+    }
+
+    .profile-fullscreen .profile-loadout-summary {
+        grid-template-columns: 30px minmax(0, 1fr);
+        column-gap: 0.45rem;
+        min-height: 72px;
+        padding: 0.55rem;
+    }
+
+    .profile-fullscreen .profile-loadout-summary__icon {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+
+    .profile-fullscreen .profile-loadout-summary__value {
+        font-size: 0.75rem;
+    }
+
+    .profile-fullscreen .profile-loadout-summary__meta {
+        font-size: 0.57rem;
+    }
+
+    .profile-fullscreen .stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .profile-fullscreen .profile-loadout-summary,
+    .profile-fullscreen .stat-card,
+    .profile-fullscreen .profile-inventory-card__view-all {
+        transition: none !important;
+    }
+}
