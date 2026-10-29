@@ -139,14 +139,20 @@ function normalizeTabSelection(string $tab): string
 
 function normalizeInventoryCategory(string $category): string
 {
+    // Older URLs used "skins" for the all-firearm view. Keep them readable,
+    // while "all" now means the complete Inventory across every item type.
+    if ($category === 'skins') {
+        return 'all';
+    }
+
     $allowedCategories = [
-        'skins', 'rifles', 'smg', 'heavy', 'pistol', 'sniper',
+        'all', 'rifles', 'smg', 'heavy', 'pistol', 'sniper',
         'knives', 'gloves', 'agents', 'music', 'pins'
     ];
 
     return in_array($category, $allowedCategories, true)
         ? $category
-        : 'skins';
+        : 'all';
 }
 
 function inventoryCategoryForWeaponDefindex(int $defindex): string
@@ -792,7 +798,7 @@ $currentTab = normalizeTabSelection(
     (string)($_GET['tab'] ?? 'tab-inventory')
 );
 $inventoryCategory = normalizeInventoryCategory(
-    (string)($_GET['inventory_category'] ?? 'skins')
+    (string)($_GET['inventory_category'] ?? 'all')
 );
 
 // Agents are team-specific. If a stale URL requests BOTH while opening
@@ -1303,17 +1309,6 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 aria-label="Already selected categories"
                 <?= $currentTab !== 'tab-inventory' ? 'hidden' : '' ?>
             >
-                <button
-                    type="button"
-                    class="wp-tab <?= $inventoryCategory === 'skins' ? 'is-active' : '' ?>"
-                    title="All Skins"
-                    aria-label="All Skins"
-                    aria-pressed="<?= $inventoryCategory === 'skins' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="skins"
-                >
-                    <i class="fas fa-paint-brush" aria-hidden="true"></i>
-                </button>
-
                 <button
                     type="button"
                     class="wp-tab <?= $inventoryCategory === 'rifles' ? 'is-active' : '' ?>"

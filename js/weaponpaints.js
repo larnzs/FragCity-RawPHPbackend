@@ -70,7 +70,7 @@
 
         currentInventoryCategory:
             String(
-                config.currentInventoryCategory || 'skins'
+                config.currentInventoryCategory || 'all'
             ),
 
         currentSkinPage:
@@ -249,7 +249,7 @@
 
         state.currentTeamParam = String(config.currentTeamParam || '2');
         state.currentActiveTab = String(config.currentTab || 'tab-inventory');
-        state.currentInventoryCategory = String(config.currentInventoryCategory || 'skins');
+        state.currentInventoryCategory = String(config.currentInventoryCategory || 'all');
         state.currentSkinPage = Number(config.currentSkinPage || 1);
         state.currentPinPage = Number(config.currentPinPage || 1);
         state.activeDefindex = null;
@@ -1585,7 +1585,8 @@
     }
     
     const inventoryCategoryLabels = {
-        skins: 'All Skins', rifles: 'Rifles', smg: 'SMG', heavy: 'Heavy Guns',
+        all: 'Inventory', skins: 'All Skins',
+        rifles: 'Rifles', smg: 'SMG', heavy: 'Heavy Guns',
         pistol: 'Pistols', sniper: 'Snipers', knives: 'Knives', gloves: 'Gloves',
         agents: 'Agents', music: 'Music', pins: 'Pins'
     };
@@ -1610,7 +1611,7 @@
     function applyInventoryCategoryFilter(category = state.currentInventoryCategory, runSearch = true) {
         const allowed = Object.prototype.hasOwnProperty.call(inventoryCategoryLabels, String(category))
             ? String(category)
-            : 'skins';
+            : 'all';
         state.currentInventoryCategory = allowed;
 
         document.querySelectorAll('[data-wp-inventory-filter]').forEach(button => {
@@ -1625,7 +1626,7 @@
         const inventoryPane = document.getElementById('tab-inventory');
         if (!inventoryPane) return;
 
-        const paintCategories = ['skins', 'rifles', 'smg', 'heavy', 'pistol', 'sniper', 'knives'];
+        const paintCategories = ['all', 'skins', 'rifles', 'smg', 'heavy', 'pistol', 'sniper', 'knives'];
         const savedSection = inventoryPane.querySelector('.wp-inventory-saved');
         if (savedSection) savedSection.hidden = !paintCategories.includes(allowed);
 
@@ -1635,9 +1636,11 @@
             let visibleSavedCount = 0;
             savedItems.forEach(item => {
                 const itemCategory = item.dataset.wpInventoryCategory || 'skins';
-                const matches = allowed === 'skins'
-                    ? itemCategory !== 'knives'
-                    : itemCategory === allowed;
+                const matches = allowed === 'all'
+                    ? true
+                    : (allowed === 'skins'
+                        ? itemCategory !== 'knives'
+                        : itemCategory === allowed);
                 item.classList.toggle('wp-inventory-category-hidden', !matches);
                 if (matches) visibleSavedCount++;
             });
@@ -1645,9 +1648,9 @@
             const empty = ensureInventoryFilterEmpty(savedGrid);
             if (empty) {
                 empty.hidden = visibleSavedCount > 0;
-                if (allowed === 'skins') {
-                    empty.querySelector('strong').textContent = 'No saved weapon paints yet.';
-                    empty.querySelector('span').textContent = 'Save a weapon paint configuration and it will appear in this inventory.';
+                if (allowed === 'all' || allowed === 'skins') {
+                    empty.querySelector('strong').textContent = 'Your inventory is empty.';
+                    empty.querySelector('span').textContent = 'Saved paint configurations and current loadout items will appear here.';
                 } else {
                     empty.querySelector('strong').textContent = `No saved paints in ${inventoryCategoryLabels[allowed]}.`;
                     empty.querySelector('span').textContent = 'Saved paints for other categories remain in your inventory.';
@@ -1661,9 +1664,11 @@
             let visibleCurrentCount = 0;
             currentItems.forEach(item => {
                 const itemCategory = item.dataset.wpInventoryCategory || 'skins';
-                const matches = allowed === 'skins'
-                    ? ['skins', 'rifles', 'smg', 'heavy', 'pistol', 'sniper'].includes(itemCategory)
-                    : itemCategory === allowed;
+                const matches = allowed === 'all'
+                    ? true
+                    : (allowed === 'skins'
+                        ? ['skins', 'rifles', 'smg', 'heavy', 'pistol', 'sniper'].includes(itemCategory)
+                        : itemCategory === allowed);
                 item.classList.toggle('wp-inventory-category-hidden', !matches);
                 if (matches) visibleCurrentCount++;
             });
@@ -3205,6 +3210,10 @@
                 const requestedMode = button.dataset.wpModeTarget;
                 const currentTab = getCurrentActiveTab();
                 if (requestedMode === 'inventory') {
+                    // Clicking Already selected always returns to the complete
+                    // Inventory rather than leaving an old category filter active.
+                    state.currentInventoryCategory = 'all';
+                    applyInventoryCategoryFilter('all', false);
                     activateMainTab('tab-inventory', true);
                     return;
                 }
@@ -3222,7 +3231,7 @@
             button.dataset.wpInventoryFilterBound = '1';
             button.addEventListener('click', event => {
                 event.preventDefault();
-                applyInventoryCategoryFilter(button.dataset.wpInventoryFilter || 'skins', true);
+                applyInventoryCategoryFilter(button.dataset.wpInventoryFilter || 'all', true);
                 const url = getCurrentUrl();
                 url.searchParams.set('inventory_category', state.currentInventoryCategory);
                 window.history.replaceState(

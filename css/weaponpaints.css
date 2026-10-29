@@ -7620,61 +7620,68 @@ body > #stickerModal #stickerLoadMore, body > #keychainModal #keychainLoadMore {
 
 
 /* =========================================================
-   33. Two-level inventory / skin-selection navigation
+   33. Inventory / skin-selection navigation
 ========================================================= */
 
 .wp-view-mode-switcher {
-    width: min(100%, 1550px);
+    width: fit-content;
+    max-width: calc(100% - 24px);
     margin: 8px auto 0;
-    padding: 4px;
+    padding: 3px;
     display: flex;
-    align-items: stretch;
-    gap: 8px;
-    background: rgba(15, 23, 42, 0.82);
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background: rgba(15, 23, 42, 0.72);
     border: 1px solid var(--wp-border);
-    border-radius: 15px;
+    border-radius: 12px;
     box-shadow: var(--wp-shadow-soft);
 }
 
 .wp-mode-tab {
     position: relative;
-    flex: 1 1 0;
+    flex: 0 0 auto;
     min-width: 0;
-    min-height: 44px;
-    padding: 0 16px;
+    height: 46px;
+    min-height: 46px;
+    padding: 0 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 9px;
-    color: var(--wp-text-muted);
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 11px;
+    gap: 7px;
+    color: #bfdbfe;
+    background: rgba(30, 64, 175, 0.08);
+    border: 1px solid rgba(96, 165, 250, 0.18);
+    border-radius: 9px;
     font: inherit;
-    font-size: 0.82rem;
+    font-size: 0.74rem;
     font-weight: 800;
     white-space: nowrap;
     cursor: pointer;
-    transition: color var(--wp-transition), background var(--wp-transition),
-        border-color var(--wp-transition), transform var(--wp-transition), box-shadow var(--wp-transition);
+    transition:
+        color var(--wp-transition),
+        background var(--wp-transition),
+        border-color var(--wp-transition),
+        transform var(--wp-transition),
+        box-shadow var(--wp-transition);
 }
 
 .wp-mode-tab > i {
-    color: var(--wp-orange, #F97316);
-    font-size: 0.95rem;
+    color: #60a5fa;
+    font-size: 0.82rem;
 }
 
 .wp-mode-tab:hover {
     color: #fff;
-    background: rgba(255, 255, 255, 0.045);
-    border-color: rgba(148, 163, 184, 0.12);
+    background: rgba(37, 99, 235, 0.18);
+    border-color: rgba(96, 165, 250, 0.4);
 }
 
 .wp-mode-tab.is-active {
     color: #fff;
-    background: linear-gradient(135deg, #9a3412, #f97316);
-    border-color: rgba(251, 146, 60, 0.65);
-    box-shadow: 0 7px 20px rgba(249, 115, 22, 0.18);
+    background: linear-gradient(135deg, #1d4ed8, #38bdf8);
+    border-color: rgba(56, 189, 248, 0.62);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.22);
 }
 
 .wp-mode-tab.is-active > i {
@@ -7702,19 +7709,22 @@ body > #stickerModal #stickerLoadMore, body > #keychainModal #keychainLoadMore {
 
 @media (max-width: 760px) {
     .wp-app .wp-header .wp-view-mode-switcher {
-        width: calc(100% - 24px);
-        gap: 5px;
+        width: fit-content;
+        max-width: calc(100% - 16px);
+        gap: 4px;
         margin-top: 4px;
+        padding: 3px;
     }
 
     .wp-app .wp-header .wp-mode-tab {
-        min-height: 42px;
-        padding: 0 7px;
-        gap: 6px;
-        font-size: 0.72rem;
+        height: 46px;
+        min-height: 46px;
+        padding: 0 9px;
+        gap: 5px;
+        font-size: 0.68rem;
     }
 
     .wp-app .wp-header .wp-mode-tab > i {
-        font-size: 0.82rem;
+        font-size: 0.78rem;
     }
 }
