@@ -89,6 +89,7 @@ final class SteamProfileService
             : substr($personaname, 0, 128);
         $profileUrl = self::safeProfileUrl((string)($player['profileurl'] ?? ''));
         $avatarUrl = self::safeAvatarUrl((string)($player['avatarfull'] ?? ''));
+        $avatarPath = $avatarUrl !== '' ? self::cacheAvatarImage($avatarUrl, $steamid64) : '';
         $country = strtoupper((string)($player['loccountrycode'] ?? ''));
         if (!preg_match('/^[A-Z]{2}$/D', $country)) $country = '';
         $game = trim((string)($player['gameextrainfo'] ?? ''));
@@ -101,6 +102,7 @@ final class SteamProfileService
                 steam_personaname = COALESCE(NULLIF(?, ''), steam_personaname),
                 steam_profileurl = COALESCE(NULLIF(?, ''), steam_profileurl),
                 steam_avatar_url = COALESCE(NULLIF(?, ''), steam_avatar_url),
+                steam_avatar_path = COALESCE(NULLIF(?, ''), steam_avatar_path),
                 steam_personastate = ?,
                 steam_communityvisibilitystate = ?,
                 steam_profilestate = ?,
@@ -116,6 +118,7 @@ final class SteamProfileService
             $personaname,
             $profileUrl,
             $avatarUrl,
+            $avatarPath,
             self::boundedInt($player['personastate'] ?? 0, 0, 6),
             self::boundedInt($player['communityvisibilitystate'] ?? 0, 0, 3),
             self::boundedInt($player['profilestate'] ?? 0, 0, 1),
@@ -127,6 +130,59 @@ final class SteamProfileService
             $steamid64,
         ]);
         return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * Cache the Steam CDN avatar locally after validating its host, size and raster format.
+     * The custom avatar uploaded by the user lives under img/avatars and is not overwritten.
+     */
+    private static function cacheAvatarImage(string $url, string $steamid64): string
+    {
+        $url = self::safeAvatarUrl($url);
+        if ($url === '' || !function_exists('getimagesizefromstring')) return '';
+
+        $bytes = null;
+        if (function_exists('curl_init')) {
+            $handle = curl_init($url);
+            if ($handle === false) return '';
+            curl_setopt_array($handle, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_FOLLOWLOCATION => false,
+                CURLOPT_CONNECTTIMEOUT => 3,
+                CURLOPT_TIMEOUT => 6,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_SSL_VERIFYHOST => 2,
+                CURLOPT_HTTPHEADER => ['Accept: image/jpeg,image/png,image/webp'],
+                CURLOPT_USERAGENT => 'FragCity/1.0 (+https://fragcity.ir)',
+            ]);
+            $response = curl_exec($handle);
+            $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
+            curl_close($handle);
+            if (is_string($response) && $status === 200) $bytes = $response;
+        } else {
+            return '';
+        }
+
+        if (!is_string($bytes) || $bytes === '' || strlen($bytes) > 2 * 1024 * 1024) return '';
+        $image = @getimagesizefromstring($bytes);
+        if (!is_array($image)) return '';
+        $width = (int)($image[0] ?? 0);
+        $height = (int)($image[1] ?? 0);
+        $types = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+        $mime = (string)($image['mime'] ?? '');
+        if (!isset($types[$mime]) || $width < 1 || $height < 1 || $width > 4096 || $height > 4096 || $width * $height > 8000000) return '';
+
+        $root = dirname(__DIR__);
+        $directory = $root . '/img/steam-avatars';
+        if (!is_dir($directory) && !@mkdir($directory, 0755, true) && !is_dir($directory)) return '';
+
+        $filename = 'steam_' . $steamid64 . '.' . $types[$mime];
+        $diskPath = $directory . '/' . $filename;
+        $written = @file_put_contents($diskPath, $bytes, LOCK_EX);
+        if ($written !== strlen($bytes)) return '';
+        @chmod($diskPath, 0644);
+
+        return 'img/steam-avatars/' . $filename;
     }
 
     private static function getCachedPlayer(string $steamid64): array
