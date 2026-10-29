@@ -6,11 +6,15 @@
    ========================================= */
 
 .profile-fullscreen {
+    --profile-accent: #F97316;
+    --profile-accent-warm: #FFB347;
+    --profile-surface: #171717;
+    --profile-border: rgba(255, 255, 255, 0.10);
     width: calc(100% + 50px);
     min-height: calc(100vh - 66px);
     margin: -25px;
-    color: #e9edf7;
-    background: #0b0f18;
+    color: #F5F5F5;
+    background: #0D0D0D;
     font-family: 'Vazirmatn', 'Segoe UI', sans-serif;
     overflow-x: hidden;
 }
@@ -55,7 +59,7 @@
     height: 220px;
     position: relative;
     flex-shrink: 0;
-    background-color: #121827;
+    background-color: #171717;
     background-size: cover;
     background-position: center 30%;
     background-repeat: no-repeat;
@@ -66,7 +70,7 @@
     inset: 0;
     background:
         linear-gradient(180deg, rgba(5, 9, 18, 0.12) 0%, rgba(5, 9, 18, 0.26) 45%, rgba(5, 9, 18, 0.82) 100%),
-        linear-gradient(90deg, rgba(50, 115, 246, 0.06), transparent 45%, rgba(50, 115, 246, 0.05));
+        linear-gradient(90deg, rgba(249, 115, 22, 0.06), transparent 45%, rgba(249, 115, 22, 0.05));
 }
 
 .profile-fullscreen .upload-btn {
@@ -89,9 +93,9 @@
 }
 
 .profile-fullscreen .upload-btn:hover {
-    background: var(--accent-blue);
+    background: var(--profile-accent);
     border-color: rgba(255, 255, 255, 0.34);
-    box-shadow: 0 0 18px rgba(50, 115, 246, 0.35);
+    box-shadow: 0 0 18px rgba(249, 115, 22, 0.35);
 }
 
 .profile-fullscreen .profile-file-input {
@@ -104,8 +108,8 @@
     align-items: center;
     gap: 1rem;
     padding: 0.8rem 2rem 1rem;
-    background: linear-gradient(135deg, #111725 0%, #0b0f18 100%);
-    border-bottom: 1px solid #20283a;
+    background: linear-gradient(135deg, #171717 0%, #0D0D0D 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .profile-fullscreen .avatar-section {
@@ -128,10 +132,10 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    border: 3px solid var(--accent-blue);
+    border: 3px solid var(--profile-accent);
     object-fit: cover;
-    background: #151c2b;
-    box-shadow: 0 0 0 5px rgba(50, 115, 246, 0.08), 0 0 24px rgba(50, 115, 246, 0.28);
+    background: #171717;
+    box-shadow: 0 0 0 5px rgba(249, 115, 22, 0.08), 0 0 24px rgba(249, 115, 22, 0.28);
 }
 
 .profile-fullscreen .main-avatar-placeholder {
@@ -139,7 +143,7 @@
     align-items: center;
     justify-content: center;
     font-size: 3rem;
-    color: #77a4ff;
+    color: #FFB347;
 }
 
 .profile-fullscreen .avatar-edit-btn {
@@ -151,18 +155,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid #eef3ff;
+    border: 2px solid #FAFAFA;
     border-radius: 50%;
-    background: var(--accent-blue);
+    background: var(--profile-accent);
     color: #fff;
     cursor: pointer;
     transition: 0.2s ease;
 }
 
 .profile-fullscreen .avatar-edit-btn:hover {
-    background: #255ed4;
+    background: #C2410C;
     transform: translateY(-1px);
-    box-shadow: 0 6px 18px rgba(50, 115, 246, 0.35);
+    box-shadow: 0 6px 18px rgba(249, 115, 22, 0.35);
 }
 
 .profile-fullscreen .avatar-edit-btn i {
@@ -175,12 +179,12 @@
     bottom: -10px;
     padding: 4px 10px;
     border-radius: 20px;
-    background: var(--accent-blue);
+    background: var(--profile-accent);
     color: #fff;
     font-weight: 800;
     font-size: 0.7rem;
     white-space: nowrap;
-    box-shadow: 0 4px 14px rgba(50, 115, 246, 0.35);
+    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
 }
 
 .profile-fullscreen .name-and-xp {
@@ -194,7 +198,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    background: linear-gradient(135deg, #ffffff, #72a1ff);
+    background: linear-gradient(135deg, #ffffff, #FFB347);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -202,7 +206,7 @@
 
 .profile-fullscreen .steam-id {
     margin: 0.2rem 0 0.5rem;
-    color: #7d879c;
+    color: #A3A3A3;
     font-size: 0.75rem;
     font-family: monospace;
     direction: ltr;
@@ -215,16 +219,16 @@
     height: 20px;
     overflow: hidden;
     border-radius: 30px;
-    background: #151b29;
-    border: 1px solid #263149;
+    background: #171717;
+    border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
 .profile-fullscreen .xp-bar {
     width: 0;
     height: 100%;
     border-radius: 30px;
-    background: linear-gradient(90deg, #255ed4, var(--accent-blue), #65a0ff);
-    box-shadow: 0 0 14px rgba(50, 115, 246, 0.28);
+    background: linear-gradient(90deg, #C2410C, var(--profile-accent), #FFB347);
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.28);
     transition: width 0.45s ease;
 }
 
@@ -246,28 +250,28 @@
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 1rem;
     padding: 1.5rem 2rem;
-    background: #0b0f18;
+    background: #0D0D0D;
 }
 
 .profile-fullscreen .stat-card {
     padding: 0.9rem 0.65rem;
     text-align: center;
-    background: linear-gradient(180deg, #121927 0%, #0f1521 100%);
-    border: 1px solid #222d42;
+    background: linear-gradient(180deg, #171717 0%, #141414 100%);
+    border: 1px solid rgba(255, 255, 255, 0.10);
     border-radius: 16px;
     transition: all 0.2s ease;
 }
 
 .profile-fullscreen .stat-card:hover {
-    border-color: rgba(50, 115, 246, 0.72);
-    box-shadow: 0 0 22px rgba(50, 115, 246, 0.16);
+    border-color: rgba(249, 115, 22, 0.72);
+    box-shadow: 0 0 22px rgba(249, 115, 22, 0.16);
     transform: translateY(-2px);
 }
 
 .profile-fullscreen .stat-label {
     display: block;
     margin-bottom: 0.35rem;
-    color: #6ea0ff;
+    color: #FFB347;
     font-weight: 600;
     font-size: 0.7rem;
 }
@@ -305,15 +309,15 @@
     width: 90%;
     max-width: 600px;
     padding: 20px;
-    background: #151c2b;
-    border: 1px solid rgba(50, 115, 246, 0.62);
+    background: #171717;
+    border: 1px solid rgba(249, 115, 22, 0.62);
     border-radius: 24px;
     box-shadow: 0 22px 70px rgba(0, 0, 0, 0.55);
 }
 
 .profile-fullscreen .avatar-modal-content h3 {
     margin: 0;
-    color: #6ea0ff;
+    color: #FFB347;
 }
 
 .profile-fullscreen .img-container {
@@ -321,7 +325,7 @@
     overflow: hidden;
     margin: 15px 0;
     border-radius: 12px;
-    background: #0d121d;
+    background: #141414;
 }
 
 .profile-fullscreen #cropImage {
@@ -344,7 +348,7 @@
 }
 
 .profile-fullscreen .close-modal:hover {
-    color: #6ea0ff;
+    color: #FFB347;
 }
 
 .profile-fullscreen .crop-buttons {
@@ -365,22 +369,22 @@
 }
 
 .profile-fullscreen .btn-crop {
-    background: var(--accent-blue);
+    background: var(--profile-accent);
     color: #fff;
-    box-shadow: 0 6px 16px rgba(50, 115, 246, 0.24);
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.24);
 }
 
 .profile-fullscreen .btn-crop:hover {
-    background: #255ed4;
+    background: #C2410C;
 }
 
 .profile-fullscreen .btn-cancel {
-    background: #2a3345;
+    background: rgba(255, 255, 255, 0.12);
     color: #fff;
 }
 
 .profile-fullscreen .btn-cancel:hover {
-    background: #344056;
+    background: rgba(255, 255, 255, 0.14);
 }
 
 @media (max-width: 700px) {
@@ -434,57 +438,347 @@
 }
 
 
-/* Steam Community data panel */
+/* =========================================
+   Steam Account Info — FragCity orange/black
+========================================= */
 .profile-fullscreen .steam-profile-card {
-    margin: 0 2rem 1.25rem; padding: 1.15rem 1.25rem;
-    border: 1px solid #24324a; border-radius: 18px;
-    background: linear-gradient(135deg, #111927 0%, #0d1320 100%);
-    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    margin: 0 2rem 1.5rem;
+    padding: 1.25rem 1.4rem 1.35rem;
+    border: 1px solid rgba(249, 115, 22, 0.24);
+    border-radius: 20px;
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(249, 115, 22, 0.10), transparent 42%),
+        linear-gradient(145deg, #191919 0%, #111111 70%, #15110e 100%);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.025);
 }
-.profile-fullscreen .steam-profile-card__heading,
-.profile-fullscreen .steam-profile-card__identity {
-    display: flex; align-items: center; gap: 0.75rem;
+
+.profile-fullscreen .steam-profile-card::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #F97316 34%, #FFB347 66%, transparent);
+    opacity: 0.9;
 }
-.profile-fullscreen .steam-profile-card__heading {
-    justify-content: space-between; gap: 1rem; padding-bottom: 0.9rem;
-    border-bottom: 1px solid rgba(123, 151, 196, 0.16);
+
+.profile-fullscreen .steam-profile-card__topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
 }
-.profile-fullscreen .steam-profile-card__identity { min-width: 0; flex-wrap: wrap; }
-.profile-fullscreen .steam-profile-card__name {
-    color: #f5f8ff; font-size: 1.05rem; font-weight: 800;
-    text-decoration: none; overflow-wrap: anywhere;
+
+.profile-fullscreen .steam-profile-card__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    min-width: 0;
 }
-.profile-fullscreen .steam-profile-card__name:hover { color: #91b5ff; }
+
+.profile-fullscreen .steam-profile-card__brand-icon {
+    display: grid;
+    place-items: center;
+    flex: 0 0 46px;
+    width: 46px;
+    height: 46px;
+    border: 1px solid rgba(249, 115, 22, 0.28);
+    border-radius: 15px;
+    background: rgba(249, 115, 22, 0.10);
+    color: #FFB347;
+    font-size: 1.55rem;
+}
+
+.profile-fullscreen .steam-profile-card__title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+}
+
 .profile-fullscreen .steam-profile-card__eyebrow {
-    display: inline-flex; align-items: center; gap: 0.35rem;
-    color: #91a3c0; font-size: 0.72rem; white-space: nowrap;
+    color: #F97316;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
 }
+
+.profile-fullscreen .steam-profile-card__title-wrap h2 {
+    margin: 0;
+    color: #FAFAFA;
+    font-size: 1.02rem;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
 .profile-fullscreen .steam-profile-card__status {
-    display: inline-flex; align-items: center; gap: 0.45rem;
-    padding: 0.35rem 0.65rem; border: 1px solid rgba(124, 148, 185, 0.22);
-    border-radius: 999px; color: #d7e3f8; font-size: 0.76rem; white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.13);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.035);
+    color: #D4D4D4;
+    font-size: 0.76rem;
+    font-weight: 700;
+    white-space: nowrap;
 }
+
 .profile-fullscreen .steam-profile-card__status-dot {
-    width: 7px; height: 7px; border-radius: 50%; background: #7f8da3;
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: #737373;
 }
+
+.profile-fullscreen .steam-profile-card__status[data-state="1"] {
+    border-color: rgba(74, 222, 128, 0.24);
+    background: rgba(34, 197, 94, 0.07);
+    color: #BBF7D0;
+}
+
 .profile-fullscreen .steam-profile-card__status[data-state="1"] .steam-profile-card__status-dot {
-    background: #55d98a; box-shadow: 0 0 10px rgba(85, 217, 138, 0.32);
+    background: #4ADE80;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.35);
 }
+
+.profile-fullscreen .steam-profile-card__status[data-state="2"],
+.profile-fullscreen .steam-profile-card__status[data-state="3"],
+.profile-fullscreen .steam-profile-card__status[data-state="4"],
+.profile-fullscreen .steam-profile-card__status[data-state="5"],
+.profile-fullscreen .steam-profile-card__status[data-state="6"] {
+    border-color: rgba(255, 179, 71, 0.24);
+    color: #FFB347;
+}
+
+.profile-fullscreen .steam-profile-card__status[data-state="2"] .steam-profile-card__status-dot,
+.profile-fullscreen .steam-profile-card__status[data-state="3"] .steam-profile-card__status-dot,
+.profile-fullscreen .steam-profile-card__status[data-state="4"] .steam-profile-card__status-dot,
+.profile-fullscreen .steam-profile-card__status[data-state="5"] .steam-profile-card__status-dot,
+.profile-fullscreen .steam-profile-card__status[data-state="6"] .steam-profile-card__status-dot {
+    background: #FFB347;
+}
+
+.profile-fullscreen .steam-profile-card__main {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.15rem 0;
+}
+
+.profile-fullscreen .steam-profile-card__avatar {
+    display: grid;
+    place-items: center;
+    position: relative;
+    flex: 0 0 76px;
+    width: 76px;
+    height: 76px;
+    overflow: hidden;
+    border: 2px solid rgba(249, 115, 22, 0.68);
+    border-radius: 20px;
+    background: #202020;
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.08);
+    color: #FFB347;
+    font-size: 2.2rem;
+}
+
+.profile-fullscreen .steam-profile-card__avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-fullscreen .steam-profile-card__avatar-fallback[hidden] {
+    display: none !important;
+}
+
+.profile-fullscreen .steam-profile-card__identity {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.45rem;
+    min-width: 0;
+}
+
+.profile-fullscreen .steam-profile-card__name {
+    max-width: 100%;
+    color: #FAFAFA;
+    font-size: 1.2rem;
+    font-weight: 850;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+}
+
+.profile-fullscreen .steam-profile-card__name:hover {
+    color: #FFB347;
+}
+
+.profile-fullscreen .steam-profile-card__steamid {
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    padding: 0.28rem 0.55rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.22);
+    color: #A3A3A3;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.72rem;
+    overflow-wrap: anywhere;
+    unicode-bidi: plaintext;
+}
+
+.profile-fullscreen .steam-profile-card__game {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    color: #FFB347;
+    font-size: 0.77rem;
+    font-weight: 650;
+}
+
+.profile-fullscreen .steam-profile-card__visit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 0.55rem 0.85rem;
+    border: 1px solid rgba(249, 115, 22, 0.45);
+    border-radius: 11px;
+    background: linear-gradient(135deg, #F97316, #FFB347);
+    color: #171717;
+    font-size: 0.78rem;
+    font-weight: 850;
+    text-decoration: none;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    white-space: nowrap;
+}
+
+.profile-fullscreen .steam-profile-card__visit:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+    box-shadow: 0 8px 22px rgba(249, 115, 22, 0.18);
+    color: #0D0D0D;
+}
+
 .profile-fullscreen .steam-profile-card__details {
-    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.7rem; padding-top: 0.9rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.7rem;
 }
+
 .profile-fullscreen .steam-profile-card__detail {
-    display: flex; flex-direction: column; gap: 0.35rem; min-width: 0;
-    padding: 0.65rem 0.75rem; border-radius: 12px; background: rgba(255, 255, 255, 0.025);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+    padding: 0.8rem 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.025);
 }
-.profile-fullscreen .steam-profile-card__detail span { color: #8191ac; font-size: 0.72rem; }
+
+.profile-fullscreen .steam-profile-card__detail span {
+    color: #A3A3A3;
+    font-size: 0.72rem;
+    line-height: 1.45;
+}
+
 .profile-fullscreen .steam-profile-card__detail strong {
-    color: #e8eefb; font-size: 0.82rem; font-weight: 700; overflow-wrap: anywhere;
+    color: #F5F5F5;
+    font-size: 0.82rem;
+    font-weight: 750;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
 }
-.profile-fullscreen .steam-profile-card__note { margin: 0.8rem 0 0; color: #93a0b6; font-size: 0.78rem; }
+
+.profile-fullscreen .steam-profile-card__note {
+    margin: 0.9rem 0 0;
+    color: #A3A3A3;
+    font-size: 0.78rem;
+    line-height: 1.8;
+}
+
+@media (max-width: 900px) {
+    .profile-fullscreen .steam-profile-card__details {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 700px) {
-    .profile-fullscreen .steam-profile-card { margin: 0 1rem 1rem; padding: 0.9rem; }
-    .profile-fullscreen .steam-profile-card__heading { align-items: flex-start; }
-    .profile-fullscreen .steam-profile-card__details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .profile-fullscreen .steam-profile-card {
+        margin: 0 1rem 1rem;
+        padding: 1rem;
+        border-radius: 16px;
+    }
+
+    .profile-fullscreen .steam-profile-card__topline {
+        align-items: flex-start;
+    }
+
+    .profile-fullscreen .steam-profile-card__brand-icon {
+        flex-basis: 40px;
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        font-size: 1.35rem;
+    }
+
+    .profile-fullscreen .steam-profile-card__main {
+        flex-wrap: wrap;
+    }
+
+    .profile-fullscreen .steam-profile-card__avatar {
+        flex-basis: 64px;
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+    }
+
+    .profile-fullscreen .steam-profile-card__name {
+        font-size: 1.02rem;
+    }
+
+    .profile-fullscreen .steam-profile-card__visit {
+        margin-right: 0;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-fullscreen .steam-profile-card__topline {
+        flex-wrap: wrap;
+    }
+
+    .profile-fullscreen .steam-profile-card__status {
+        margin-right: 0;
+    }
+
+    .profile-fullscreen .steam-profile-card__details {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.55rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .profile-fullscreen .steam-profile-card__visit {
+        transition: none;
+    }
 }
