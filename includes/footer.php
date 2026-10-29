@@ -66,8 +66,7 @@
         </div>
 
         <div class="footer-bottom">
-            <p>طراحی و ساخت وبسایت : عرفان و الیاس</p>
-            <p>© <?= date('Y') ?> FragCity</p>
+            <p>Fragcity 2026</p>
         </div>
     </div>
 </footer>
