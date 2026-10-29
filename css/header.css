@@ -5,18 +5,18 @@
 ========================================= */
 
 :root {
-    --header-bg: rgba(11, 18, 32, 0.86);
-    --header-bg-2: rgba(15, 23, 42, 0.94);
-    --header-border: rgba(96, 165, 250, 0.16);
-    --header-border-soft: rgba(148, 163, 184, 0.14);
-    --header-shadow: 0 18px 45px rgba(2, 6, 23, 0.28);
-    --header-text: #f8fafc;
-    --header-muted: #94a3b8;
-    --header-blue: #60a5fa;
-    --header-blue-2: #38bdf8;
-    --header-blue-soft: rgba(59, 130, 246, 0.12);
-    --header-blue-soft-2: rgba(14, 165, 233, 0.08);
-    --header-red: #f87171;
+    --header-bg: rgba(13, 13, 13, 0.90);
+    --header-bg-2: rgba(23, 23, 23, 0.98);
+    --header-border: rgba(249, 115, 22, 0.22);
+    --header-border-soft: rgba(255, 255, 255, 0.10);
+    --header-shadow: 0 16px 40px rgba(0, 0, 0, 0.30);
+    --header-text: #fafafa;
+    --header-muted: #a3a3a3;
+    --header-orange: #F97316;
+    --header-orange-2: #FFB347;
+    --header-orange-soft: rgba(249, 115, 22, 0.12);
+    --header-orange-soft-2: rgba(255, 179, 71, 0.07);
+    --header-red: #fb7185;
 }
 
 body.mobile-menu-open {
@@ -46,12 +46,12 @@ body.mobile-menu-open {
     min-height: 42px;
     padding: 0.35rem 0.45rem 0.35rem 1rem;
     border-radius: 999px;
-    border: 1px solid rgba(148, 163, 184, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.16);
     background:
-        linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(11, 18, 32, 0.96));
+        linear-gradient(180deg, rgba(23, 23, 23, 0.96), rgba(13, 13, 13, 0.96));
     color: var(--header-text);
     cursor: pointer;
-    box-shadow: 0 10px 28px rgba(2, 6, 23, 0.18);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
     transition:
         transform 0.18s ease,
         border-color 0.18s ease,
@@ -62,10 +62,10 @@ body.mobile-menu-open {
 
 .frag-user-trigger:hover {
     transform: translateY(-1px);
-    border-color: rgba(96, 165, 250, 0.32);
+    border-color: rgba(249, 115, 22, 0.32);
     background:
-        linear-gradient(180deg, rgba(15, 23, 42, 1), rgba(11, 18, 32, 1));
-    box-shadow: 0 14px 30px rgba(2, 6, 23, 0.24);
+        linear-gradient(180deg, rgba(23, 23, 23, 1), rgba(13, 13, 13, 1));
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
 }
 
 .frag-avatar {
@@ -74,8 +74,8 @@ body.mobile-menu-open {
     border-radius: 50%;
     object-fit: cover;
     flex: 0 0 32px;
-    border: 2px solid rgba(96, 165, 250, 0.24);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+    border: 2px solid rgba(249, 115, 22, 0.24);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.08);
 }
 
 .frag-username {
@@ -106,11 +106,11 @@ body.mobile-menu-open {
     min-width: 275px;
     padding: 8px 0;
     border-radius: 18px;
-    border: 1px solid rgba(96, 165, 250, 0.16);
+    border: 1px solid rgba(249, 115, 22, 0.16);
     background:
-        linear-gradient(180deg, rgba(11, 18, 32, 0.98), rgba(15, 23, 42, 0.98));
+        linear-gradient(180deg, rgba(13, 13, 13, 0.98), rgba(23, 23, 23, 0.98));
     box-shadow:
-        0 18px 45px rgba(2, 6, 23, 0.45),
+        0 18px 45px rgba(0, 0, 0, 0.45),
         inset 0 1px 0 rgba(255, 255, 255, 0.02);
     opacity: 0;
     visibility: hidden;
@@ -142,8 +142,8 @@ body.mobile-menu-open {
     height: 46px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(96, 165, 250, 0.65);
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.10);
+    border: 2px solid rgba(249, 115, 22, 0.65);
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.10);
 }
 
 .frag-drop-info {
@@ -178,7 +178,7 @@ body.mobile-menu-open {
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(148, 163, 184, 0.16),
+        rgba(255, 255, 255, 0.16),
         transparent
     );
 }
@@ -188,7 +188,7 @@ body.mobile-menu-open {
     align-items: center;
     gap: 12px;
     padding: 11px 18px;
-    color: #cbd5e1;
+    color: #e5e5e5;
     text-decoration: none;
     font-size: 0.9rem;
     font-weight: 600;
@@ -209,14 +209,14 @@ body.mobile-menu-open {
 
 .frag-drop-link:hover {
     background:
-        linear-gradient(90deg, rgba(59, 130, 246, 0.12), rgba(14, 165, 233, 0.04));
+        linear-gradient(90deg, rgba(249, 115, 22, 0.12), rgba(255, 179, 71, 0.04));
     color: var(--header-text);
     padding-right: 22px;
     transform: translateX(-1px);
 }
 
 .frag-drop-link:hover i {
-    color: var(--header-blue);
+    color: var(--header-orange);
 }
 
 .frag-drop-link.logout:hover {
@@ -262,9 +262,9 @@ body.mobile-menu-open {
     text-decoration: none;
     font-weight: 800;
     font-size: 0.9rem;
-    color: #0b1020;
-    background: linear-gradient(135deg, var(--header-blue), var(--header-blue-2));
-    box-shadow: 0 14px 28px rgba(37, 99, 235, 0.24);
+    color: #0d0d0d;
+    background: linear-gradient(135deg, var(--header-orange), var(--header-orange-2));
+    box-shadow: 0 14px 28px rgba(249, 115, 22, 0.24);
     transition:
         transform 0.18s ease,
         box-shadow 0.18s ease,
@@ -274,7 +274,7 @@ body.mobile-menu-open {
 .frag-login-btn:hover {
     transform: translateY(-2px);
     filter: brightness(1.03);
-    box-shadow: 0 18px 34px rgba(37, 99, 235, 0.30);
+    box-shadow: 0 18px 34px rgba(249, 115, 22, 0.30);
 }
 
 .frag-login-btn i {
@@ -291,12 +291,19 @@ body.mobile-menu-open {
     z-index: 1050;
     width: 100%;
     isolation: isolate;
-    background:
-        linear-gradient(180deg, rgba(15, 23, 42, 0.88), rgba(11, 18, 32, 0.96));
-    border-bottom: 1px solid var(--header-border);
-    box-shadow: var(--header-shadow);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: rgba(13, 13, 13, 0.86);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: none;
+    transition:
+        background-color 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.shock-header.is-scrolled {
+    background: rgba(13, 13, 13, 0.98);
+    border-bottom-color: rgba(249, 115, 22, 0.20);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.38);
 }
 
 .shock-header::before {
@@ -307,8 +314,8 @@ body.mobile-menu-open {
     background: linear-gradient(
         90deg,
         transparent,
-        rgba(96, 165, 250, 0.35),
-        rgba(56, 189, 248, 0.25),
+        rgba(249, 115, 22, 0.38),
+        rgba(255, 179, 71, 0.28),
         transparent
     );
     pointer-events: none;
@@ -354,7 +361,7 @@ body.mobile-menu-open {
     height: 38px;
     max-width: 160px;
     object-fit: contain;
-    filter: drop-shadow(0 8px 16px rgba(59, 130, 246, 0.12));
+    filter: drop-shadow(0 8px 16px rgba(249, 115, 22, 0.12));
 }
 
 .shock-nav {
@@ -392,19 +399,19 @@ body.mobile-menu-open {
 .shock-nav-item:hover,
 .shock-nav-item.active,
 .frag-dropdown.open > .shock-nav-item {
-    color: var(--header-text);
-    background:
-        linear-gradient(180deg, rgba(59, 130, 246, 0.12), rgba(15, 23, 42, 0.76));
-    border-color: rgba(96, 165, 250, 0.18);
-    transform: translateY(-1px);
+    color: var(--header-orange-2);
+    background: transparent;
+    border-color: transparent;
+    transform: none;
 }
 
 .shock-nav-item.active {
-    box-shadow: inset 0 -2px 0 var(--header-blue);
+    text-shadow: 0 0 18px rgba(249, 115, 22, 0.16);
+    box-shadow: none;
 }
 
 .shock-nav-item i {
-    color: var(--header-blue);
+    color: var(--header-orange);
 }
 
 .shock-user-area-wrapper {
@@ -428,9 +435,9 @@ body.mobile-menu-open {
     align-items: center;
     justify-content: center;
     border-radius: 12px;
-    border: 1px solid rgba(148, 163, 184, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.16);
     background:
-        linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(11, 18, 32, 0.96));
+        linear-gradient(180deg, rgba(23, 23, 23, 0.96), rgba(13, 13, 13, 0.96));
     color: var(--header-text);
     cursor: pointer;
     transition:
@@ -438,15 +445,15 @@ body.mobile-menu-open {
         border-color 0.18s ease,
         background 0.18s ease,
         box-shadow 0.18s ease;
-    box-shadow: 0 10px 24px rgba(2, 6, 23, 0.14);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
 }
 
 .action-icon-btn:hover {
     transform: translateY(-1px);
-    border-color: rgba(96, 165, 250, 0.30);
+    border-color: rgba(249, 115, 22, 0.30);
     background:
-        linear-gradient(180deg, rgba(15, 23, 42, 1), rgba(11, 18, 32, 1));
-    box-shadow: 0 14px 28px rgba(2, 6, 23, 0.22);
+        linear-gradient(180deg, rgba(23, 23, 23, 1), rgba(13, 13, 13, 1));
+    box-shadow: 0 14px 28px rgba(0, 0, 0, 0.22);
 }
 
 .action-icon-btn i {
@@ -461,10 +468,10 @@ body.mobile-menu-open {
     justify-content: center;
     flex: 0 0 auto;
     padding: 0;
-    border: 1px solid rgba(148, 163, 184, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 12px;
     background:
-        linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(11, 18, 32, 0.96));
+        linear-gradient(180deg, rgba(23, 23, 23, 0.96), rgba(13, 13, 13, 0.96));
     color: var(--header-text);
     font: inherit;
     cursor: pointer;
@@ -476,9 +483,9 @@ body.mobile-menu-open {
 
 .shock-mobile-toggle:hover {
     transform: translateY(-1px);
-    border-color: rgba(96, 165, 250, 0.30);
+    border-color: rgba(249, 115, 22, 0.30);
     background:
-        linear-gradient(180deg, rgba(15, 23, 42, 1), rgba(11, 18, 32, 1));
+        linear-gradient(180deg, rgba(23, 23, 23, 1), rgba(13, 13, 13, 1));
 }
 
 /* Dropdown refinements for the site header */
@@ -511,7 +518,7 @@ body.mobile-menu-open {
     position: fixed;
     inset: 0;
     z-index: 1090;
-    background: rgba(2, 6, 23, 0.72);
+    background: rgba(0, 0, 0, 0.72);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -536,8 +543,8 @@ body.mobile-menu-open {
     flex-direction: column;
     overflow-y: auto;
     background:
-        linear-gradient(180deg, rgba(11, 18, 32, 0.98), rgba(15, 23, 42, 0.98));
-    border-left: 1px solid rgba(148, 163, 184, 0.08);
+        linear-gradient(180deg, rgba(13, 13, 13, 0.98), rgba(23, 23, 23, 0.98));
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: -24px 0 60px rgba(0, 0, 0, 0.45);
     direction: rtl;
     transform: translateX(105%);
@@ -558,7 +565,7 @@ body.mobile-menu-open {
     gap: 14px;
     flex: 0 0 auto;
     padding: 14px 18px;
-    border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.10);
     background: rgba(255, 255, 255, 0.02);
 }
 
@@ -588,10 +595,10 @@ body.mobile-menu-open {
     justify-content: center;
     flex: 0 0 auto;
     padding: 0;
-    border: 1px solid rgba(148, 163, 184, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 12px;
     background:
-        linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(11, 18, 32, 0.96));
+        linear-gradient(180deg, rgba(23, 23, 23, 0.96), rgba(13, 13, 13, 0.96));
     color: var(--header-text);
     font: inherit;
     cursor: pointer;
@@ -612,7 +619,7 @@ body.mobile-menu-open {
     padding: 10px 13px;
     border: 1px solid transparent;
     border-radius: 12px;
-    color: #cbd5e1;
+    color: #e5e5e5;
     text-decoration: none;
     font-size: 0.93rem;
     font-weight: 600;
@@ -627,19 +634,19 @@ body.mobile-menu-open {
     width: 22px;
     flex: 0 0 22px;
     text-align: center;
-    color: var(--header-blue);
+    color: var(--header-orange);
 }
 
 .mobile-nav-link:hover,
 .mobile-nav-link.active {
     color: var(--header-text);
-    background: rgba(59, 130, 246, 0.10);
-    border-color: rgba(96, 165, 250, 0.16);
+    background: rgba(249, 115, 22, 0.10);
+    border-color: rgba(249, 115, 22, 0.16);
     transform: translateX(-1px);
 }
 
 .mobile-nav-link.active {
-    box-shadow: inset -3px 0 0 var(--header-blue);
+    box-shadow: inset -3px 0 0 var(--header-orange);
 }
 
 .mobile-nav-link.logout-link:hover {
