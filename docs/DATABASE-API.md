@@ -29,6 +29,16 @@
 
 هیچ جدول قدیمی Windows Agent جزو این schema نیست. در مسیر فعال PHP نباید queryای به `agent_tokens`, `agent_nodes`, `pending_servers`, `registered_servers`, `server_ports`, `server_configs`, `agent_commands`, `game_servers`, `server_runtime_stats` یا `rcon_command_logs` اجرا شود.
 
+### عیب‌یابی ذخیره‌سازی اطلاعات Steam روی هاست
+
+پس از انتشار کد جدید، از Terminal هاست (با runtime settings همان هاست) اجرا کن:
+
+```bash
+php tools/steam-profile-preflight.php 7656119xxxxxxxxxx
+```
+
+شناسهٔ نمونه را با SteamID64 واقعیِ یک حسابی جایگزین کن که ثبت‌نامش در سایت کامل شده است. این ابزار فقط‌خواندنی است: رمزها و کلید API را چاپ نمی‌کند، یک درخواست خواندن به Steam Web API می‌زند و بررسی می‌کند که کلید تعریف شده، اتصال به کدام دیتابیس انجام شده، ستون‌های `users` وجود دارند، ردیف کاربر حاضر است و فیلدها پر شده‌اند یا نه. اگر دریافت Steam شکست بخورد، دلیل با جزئیات امن در `error_log` سمت PHP ثبت می‌شود. این اسکریپت را با PHP CLI اجرا کن؛ از طریق URL در مرورگر قابل اجرا نیست.
+
 ### WeaponPaints
 
 ```text
