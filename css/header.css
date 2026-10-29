@@ -761,3 +761,218 @@ body.mobile-menu-open {
         transition: none !important;
     }
 }
+
+/* Steam-card inspired account menu */
+#shockUserDropdown .frag-user-trigger {
+    position: relative;
+    border: 1px solid rgba(249, 115, 22, 0.24);
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(249, 115, 22, 0.09), transparent 58%),
+        linear-gradient(145deg, #1B1B1B, #101010);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+#shockUserDropdown .frag-user-trigger:hover,
+#shockUserDropdown .frag-user-trigger:focus-visible,
+#shockUserDropdown.open .frag-user-trigger {
+    border-color: rgba(249, 115, 22, 0.52);
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(249, 115, 22, 0.16), transparent 60%),
+        linear-gradient(145deg, #202020, #111111);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3), 0 0 22px rgba(249, 115, 22, 0.07);
+}
+
+#shockUserDropdown .frag-avatar {
+    border-color: rgba(255, 179, 71, 0.62);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1), 0 0 18px rgba(249, 115, 22, 0.12);
+}
+
+#shockUserDropdown .frag-dropdown-menu {
+    width: 330px;
+    max-width: calc(100vw - 24px);
+    min-width: min(285px, calc(100vw - 24px));
+    padding: 9px;
+    border-color: rgba(249, 115, 22, 0.28);
+    border-radius: 20px;
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(249, 115, 22, 0.08), transparent 48%),
+        linear-gradient(155deg, rgba(24, 24, 24, 0.99), rgba(11, 11, 11, 0.99));
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.54), 0 0 30px rgba(249, 115, 22, 0.055), inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    backdrop-filter: blur(18px);
+}
+
+#shockUserDropdown .frag-dropdown-menu::before {
+    content: "";
+    display: block;
+    height: 2px;
+    margin: -9px -9px 9px;
+    background: linear-gradient(90deg, transparent, #F97316 35%, #FFB347 66%, transparent);
+}
+
+#shockUserDropdown .frag-drop-header--profile {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    margin: 0;
+    padding: 14px 12px;
+    overflow: hidden;
+    border: 1px solid rgba(249, 115, 22, 0.2);
+    border-radius: 15px;
+    background:
+        radial-gradient(ellipse at 100% 0%, rgba(249, 115, 22, 0.12), transparent 55%),
+        linear-gradient(145deg, #1D1D1D, #111111);
+}
+
+#shockUserDropdown .frag-drop-header--profile::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 179, 71, 0.55), transparent);
+}
+
+#shockUserDropdown .frag-drop-avatar-frame {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex: 0 0 50px;
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #F97316, #FFB347);
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.08), 0 8px 20px rgba(0, 0, 0, 0.28);
+}
+
+#shockUserDropdown .frag-drop-avatar {
+    width: 46px;
+    height: 46px;
+    border: 2px solid #171717;
+    border-radius: 14px;
+    box-shadow: none;
+}
+
+#shockUserDropdown .frag-drop-info {
+    flex: 1 1 auto;
+    gap: 3px;
+    min-width: 0;
+}
+
+#shockUserDropdown .frag-drop-eyebrow {
+    color: #F97316;
+    font-size: 0.59rem;
+    font-weight: 900;
+    letter-spacing: 0.13em;
+    line-height: 1.4;
+}
+
+#shockUserDropdown .frag-drop-name {
+    max-width: 100%;
+    overflow: hidden;
+    color: #FAFAFA;
+    font-size: 0.92rem;
+    font-weight: 850;
+    line-height: 1.5;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#shockUserDropdown .frag-drop-steam {
+    align-self: flex-start;
+    padding: 3px 7px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(0, 0, 0, 0.24);
+    color: #A3A3A3;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 0.63rem;
+    letter-spacing: 0.03em;
+}
+
+#shockUserDropdown .frag-drop-profile-mark {
+    display: grid;
+    place-items: center;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 179, 71, 0.2);
+    border-radius: 11px;
+    background: rgba(255, 179, 71, 0.06);
+    color: #FFB347;
+    font-size: 0.88rem;
+}
+
+#shockUserDropdown .frag-drop-divider {
+    margin: 8px 4px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.11), transparent);
+}
+
+#shockUserDropdown .frag-drop-link {
+    margin: 3px 0;
+    padding: 11px 13px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    color: #D4D4D4;
+    transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+#shockUserDropdown .frag-drop-link:hover,
+#shockUserDropdown .frag-drop-link:focus-visible {
+    padding-right: 15px;
+    border-color: rgba(249, 115, 22, 0.14);
+    background: linear-gradient(90deg, rgba(249, 115, 22, 0.12), rgba(255, 179, 71, 0.035));
+    color: #FAFAFA;
+    transform: translateX(-1px);
+}
+
+#shockUserDropdown .frag-drop-link > i {
+    display: grid;
+    place-items: center;
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(249, 115, 22, 0.16);
+    border-radius: 9px;
+    background: rgba(249, 115, 22, 0.07);
+    color: #FFB347;
+}
+
+#shockUserDropdown .frag-drop-link.logout:hover {
+    border-color: rgba(248, 113, 113, 0.16);
+    background: rgba(248, 113, 113, 0.08);
+    color: #FECACA;
+}
+
+#shockUserDropdown .frag-drop-link.logout:hover > i {
+    border-color: rgba(248, 113, 113, 0.2);
+    background: rgba(248, 113, 113, 0.08);
+    color: #FCA5A5;
+}
+
+#shockUserDropdown .frag-user-trigger:focus-visible,
+#shockUserDropdown .frag-drop-link:focus-visible {
+    outline: 2px solid #FFB347;
+    outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+    #shockUserDropdown .frag-dropdown-menu {
+        right: auto;
+        left: 0;
+        width: min(330px, calc(100vw - 24px));
+    }
+
+    #shockUserDropdown .frag-drop-header--profile {
+        gap: 9px;
+        padding: 12px 9px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #shockUserDropdown .frag-user-trigger,
+    #shockUserDropdown .frag-drop-link {
+        transition: none;
+    }
+}
