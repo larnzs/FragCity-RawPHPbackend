@@ -541,7 +541,7 @@ if (!function_exists('formatPlaytime')) {
         </div>
     </section>
 
-ی آمار -->
+<!-- کارت‌های آمار -->
     <div class="stats-grid">
         <div class="stat-card">
             <span class="stat-label"><i class="fa-solid fa-earth-americas" aria-hidden="true"></i> رتبه جهانی</span>
