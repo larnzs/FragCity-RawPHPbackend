@@ -6944,6 +6944,13 @@
                         form
                     );
 
+                if (sourceTab === 'tab-inventory') {
+                    formData.set(
+                        'inventory_category',
+                        state.currentInventoryCategory || 'skins'
+                    );
+                }
+
                 if (
                     submitter &&
                     submitter.name

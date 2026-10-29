@@ -7682,7 +7682,8 @@ body > #stickerModal #stickerLoadMore, body > #keychainModal #keychainLoadMore {
 }
 
 .wp-app .wp-header .wp-category-switcher[hidden],
-.wp-app [data-wp-category-nav][hidden] {
+.wp-app [data-wp-category-nav][hidden],
+.wp-app .wp-inventory-saved[hidden] {
     display: none !important;
 }
 
