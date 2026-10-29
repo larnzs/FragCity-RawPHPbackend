@@ -370,7 +370,10 @@ try {
     $profileSkinCatalog = UtilsClass::skinsFromJson();
     $profileWeaponCatalog = UtilsClass::getWeaponsFromArray();
 
-    foreach (array_slice($profileSavedPaintRows, 0, 10) as $profileSavedPaint) {
+    foreach ($profileSavedPaintRows as $profileSavedPaint) {
+        if (count($profileInventoryItems) >= 10) {
+            break;
+        }
         if (!is_array($profileSavedPaint)) {
             continue;
         }
@@ -396,10 +399,15 @@ try {
             $profilePaintName = 'Paint #' . $profilePaintId;
         }
 
-        $profileImageUrl = trim((string)($profilePaintEntry['image_url'] ?? ''));
-        if ($profileImageUrl !== ''
-            && !preg_match('#^(?:https?://|/|[A-Za-z0-9_.-])#i', $profileImageUrl)) {
-            $profileImageUrl = '';
+        $profileImageUrl = trim((string)($profilePaintEntry['image_url'] ?? $profileWeaponEntry['image_url'] ?? ''));
+        if ($profileImageUrl !== '') {
+            $profileRemoteImage = filter_var($profileImageUrl, FILTER_VALIDATE_URL) !== false
+                && in_array(strtolower((string)parse_url($profileImageUrl, PHP_URL_SCHEME)), ['http', 'https'], true);
+            $profileLocalImage = (bool)preg_match('#^/?[A-Za-z0-9_.\\-/]+$#D', $profileImageUrl)
+                && !preg_match('#(^|/)\\.\\.?(/|$)#', $profileImageUrl);
+            if (!$profileRemoteImage && !$profileLocalImage) {
+                $profileImageUrl = '';
+            }
         }
 
         $profileTeam = (int)($profileSavedPaint['weapon_team'] ?? 0);
