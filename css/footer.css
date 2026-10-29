@@ -1,114 +1,123 @@
-/* =========================================
-   FragCity Footer
-   Flat, full-width, simplified column layout
-========================================= */
-
+/* FragCity footer — compact graphite / orange system. */
 .site-footer {
+    --footer-bg: #0D0D0D;
+    --footer-surface: #141414;
+    --footer-border: #262626;
+    --footer-text: #A3A3A3;
+    --footer-heading: #F5F5F5;
+    --footer-accent: #F97316;
     width: 100%;
-    border-top: 1px solid rgba(148, 163, 184, 0.10);
-    background: #0b1220;
-    color: #cbd5e1;
+    border-top: 1px solid var(--footer-border);
+    background: var(--footer-bg);
+    color: var(--footer-text);
+    font-family: "Vazirmatn", "Segoe UI", sans-serif;
 }
 
 .footer-content {
     width: 100%;
-    max-width: 1500px;
+    max-width: 1440px;
     margin: 0 auto;
-    padding: 40px 28px 24px;
+    padding: 20px 24px 9px;
     box-sizing: border-box;
 }
 
 .footer-grid {
     display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
-    gap: 32px;
+    grid-template-columns: minmax(210px, 1.25fr) repeat(2, minmax(130px, 0.7fr)) minmax(150px, 0.8fr);
+    gap: 22px;
     align-items: start;
 }
 
 .footer-brand-row {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 14px;
+    gap: 8px;
+    margin-bottom: 8px;
 }
 
 .footer-logo {
     display: block;
-    height: 34px;
     width: auto;
+    height: 28px;
     object-fit: contain;
 }
 
 .footer-brand-name {
-    font-size: 1.1rem;
+    color: var(--footer-heading);
+    font-size: 0.95rem;
     font-weight: 800;
-    color: #f8fafc;
 }
 
 .footer-desc {
+    max-width: 270px;
     margin: 0;
-    color: #94a3b8;
-    font-size: 0.88rem;
-    line-height: 1.9;
+    color: #858585;
+    font-size: 0.72rem;
+    line-height: 1.7;
 }
 
 .footer-socials {
     display: flex;
-    gap: 10px;
-    margin-top: 16px;
+    align-items: center;
+    gap: 6px;
+    margin-top: 10px;
 }
 
 .footer-socials a {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: rgba(148, 163, 184, 0.08);
-    color: #cbd5e1;
+    width: 29px;
+    height: 29px;
+    border: 1px solid transparent;
+    border-radius: 7px;
+    background: transparent;
+    color: #929292;
     text-decoration: none;
-    font-size: 0.95rem;
-    transition: background 0.18s ease, color 0.18s ease;
+    font-size: 0.82rem;
+    transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease;
 }
 
 .footer-socials a:hover {
-    background: #3b82f6;
-    color: #ffffff;
+    border-color: rgba(249, 115, 22, 0.18);
+    background: rgba(249, 115, 22, 0.08);
+    color: var(--footer-accent);
 }
 
 .footer-col h5 {
-    margin: 0 0 16px;
-    color: #f8fafc;
-    font-size: 0.92rem;
-    font-weight: 800;
+    margin: 2px 0 8px;
+    color: var(--footer-heading);
+    font-size: 0.76rem;
+    font-weight: 750;
+    line-height: 1.5;
 }
 
 .footer-links {
-    list-style: none;
-    margin: 0;
-    padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 .footer-links a {
-    color: #94a3b8;
+    color: #858585;
+    font-size: 0.72rem;
+    line-height: 1.55;
     text-decoration: none;
-    font-size: 0.86rem;
-    transition: color 0.18s ease;
+    transition: color 140ms ease;
 }
 
 .footer-links a:hover {
-    color: #60a5fa;
+    color: #FB923C;
 }
 
 .trust-badges {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
     align-items: center;
+    gap: 8px;
 }
 
 .enamad-badge,
@@ -116,63 +125,122 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-height: 40px;
 }
 
 .enamad-badge img {
     display: block;
-    width: 64px;
+    width: 48px;
+    max-height: 54px;
     height: auto;
-    border-radius: 6px;
+    border-radius: 5px;
 }
 
 #zarinpal img {
-    width: 76px;
+    display: block;
+    width: 54px;
+    max-height: 54px;
     height: auto;
-    border-radius: 6px;
+    border-radius: 5px;
 }
 
 .footer-bottom {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 8px 16px;
     align-items: center;
-    margin-top: 32px;
-    padding-top: 18px;
-    border-top: 1px solid rgba(148, 163, 184, 0.10);
-    color: #64748b;
-    font-size: 0.76rem;
+    justify-content: flex-end;
+    margin-top: 14px;
+    padding-top: 9px;
+    border-top: 1px solid #202020;
+    color: #686868;
+    font-size: 0.68rem;
+    line-height: 1.5;
 }
 
 .footer-bottom p {
     margin: 0;
 }
 
-.footer-content a:focus-visible,
-.footer-socials a:focus-visible {
-    outline: 2px solid rgba(96, 165, 250, 0.55);
+.site-footer a:focus-visible {
+    outline: 2px solid rgba(249, 115, 22, 0.65);
     outline-offset: 2px;
+    border-radius: 4px;
 }
 
-@media (max-width: 1100px) {
-    .footer-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-}
-
-@media (max-width: 640px) {
+@media (max-width: 1050px) {
     .footer-content {
-        padding: 28px 18px 20px;
+        padding-inline: 20px;
     }
 
     .footer-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
+        grid-template-columns: minmax(190px, 1.1fr) repeat(2, minmax(120px, 0.7fr)) minmax(120px, 0.65fr);
+        gap: 16px;
+    }
+}
+
+@media (max-width: 780px) {
+    .footer-content {
+        padding: 16px 16px 8px;
+    }
+
+    .footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 15px 20px;
+    }
+
+    .footer-brand {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 14px;
+        align-items: center;
+    }
+
+    .footer-brand-row {
+        grid-column: 1;
+        margin-bottom: 4px;
+    }
+
+    .footer-desc {
+        grid-column: 1;
+        max-width: none;
+    }
+
+    .footer-socials {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        margin-top: 0;
+    }
+
+    .footer-col h5 {
+        margin-bottom: 6px;
     }
 
     .footer-bottom {
-        flex-direction: column;
-        align-items: flex-start;
+        margin-top: 11px;
+        padding-top: 8px;
+    }
+}
+
+@media (max-width: 420px) {
+    .footer-content {
+        padding-inline: 12px;
+    }
+
+    .footer-grid {
+        gap: 13px;
+    }
+
+    .footer-logo {
+        height: 25px;
+    }
+
+    .footer-desc,
+    .footer-links a {
+        font-size: 0.68rem;
+    }
+
+    .trust-badges {
+        gap: 6px;
     }
 }
 
