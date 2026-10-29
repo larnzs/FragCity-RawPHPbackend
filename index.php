@@ -263,14 +263,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                     require_once __DIR__ . '/class/SteamProfileService.php';
                     $profileForStorage = $_SESSION['steam_profile_cache'][$steamid]['player']
                         ?? ($_SESSION['steam_profile'] ?? []);
-                    if (!is_array($profileForStorage) || (string)($profileForStorage['steamid'] ?? '') !== $steamid) {
-                        $steamTemp = $_SESSION['steam_temp'] ?? [];
-                        $profileForStorage = [
-                            'steamid' => $steamid,
-                            'personaname' => (string)($steamTemp['personaname'] ?? $username),
-                            'avatarfull' => (string)($steamTemp['avatar'] ?? ''),
-                        ];
+
+                    // Persist only a normalized Steam API summary for this exact account.
+                    // If Steam is temporarily unavailable, don't store the SteamID as a
+                    // fabricated persona name; the next successful login can fill the fields.
+                    if (
+                        !is_array($profileForStorage)
+                        || (string)($profileForStorage['steamid'] ?? '') !== $steamid
+                    ) {
+                        $profileForStorage = [];
                     }
+
                     if ($profileForStorage !== []) {
                         SteamProfileService::persistPlayerSummary($pdo, $steamid, $profileForStorage);
                     }
