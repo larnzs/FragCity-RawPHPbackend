@@ -1,252 +1,294 @@
-/* FragCity footer — compact graphite / orange system. */
+/* FragCity footer — standard responsive layout, pitch-black background. */
 .site-footer {
-    --footer-bg: #0D0D0D;
-    --footer-surface: #141414;
-    --footer-border: #262626;
-    --footer-text: #A3A3A3;
+    --footer-bg: #000000;
+    --footer-border: #242424;
     --footer-heading: #F5F5F5;
+    --footer-text: #A3A3A3;
+    --footer-muted: #777777;
     --footer-accent: #F97316;
+
     width: 100%;
-    border-top: 1px solid var(--footer-border);
     background: var(--footer-bg);
     color: var(--footer-text);
+    border-top: 1px solid var(--footer-border);
     font-family: "Vazirmatn", "Segoe UI", sans-serif;
 }
 
-.footer-content {
-    width: 100%;
-    max-width: 1440px;
-    margin: 0 auto;
-    padding: 20px 24px 9px;
+.site-footer,
+.site-footer * {
     box-sizing: border-box;
+}
+
+.footer-content {
+    width: min(1280px, calc(100% - 64px));
+    margin: 0 auto;
+    padding: 38px 0 0;
 }
 
 .footer-grid {
     display: grid;
-    grid-template-columns: minmax(210px, 1.25fr) repeat(2, minmax(130px, 0.7fr)) minmax(150px, 0.8fr);
-    gap: 22px;
+    grid-template-columns: minmax(240px, 1.55fr) minmax(135px, 0.8fr) minmax(160px, 0.9fr) minmax(130px, 0.75fr);
+    gap: clamp(22px, 3.2vw, 48px);
     align-items: start;
 }
 
-.footer-brand-row {
-    display: flex;
+.footer-col {
+    min-width: 0;
+}
+
+.footer-brand-link {
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 8px;
+    max-width: 100%;
+    margin: 0 0 13px;
+    text-decoration: none;
 }
 
 .footer-logo {
     display: block;
     width: auto;
-    height: 28px;
+    max-width: 190px;
+    height: 38px;
     object-fit: contain;
-}
-
-.footer-brand-name {
-    color: var(--footer-heading);
-    font-size: 0.95rem;
-    font-weight: 800;
+    object-position: right center;
 }
 
 .footer-desc {
-    max-width: 270px;
+    max-width: 340px;
     margin: 0;
-    color: #858585;
-    font-size: 0.72rem;
+    color: var(--footer-muted);
+    font-size: 0.82rem;
+    line-height: 1.95;
+    font-weight: 400;
+}
+
+.footer-heading {
+    margin: 1px 0 17px;
+    color: var(--footer-heading);
+    font-size: 0.88rem;
+    font-weight: 700;
     line-height: 1.7;
 }
 
-.footer-socials {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 10px;
-}
-
-.footer-socials a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 29px;
-    height: 29px;
-    border: 1px solid transparent;
-    border-radius: 7px;
-    background: transparent;
-    color: #929292;
-    text-decoration: none;
-    font-size: 0.82rem;
-    transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease;
-}
-
-.footer-socials a:hover {
-    border-color: rgba(249, 115, 22, 0.18);
-    background: rgba(249, 115, 22, 0.08);
-    color: var(--footer-accent);
-}
-
-.footer-col h5 {
-    margin: 2px 0 8px;
-    color: var(--footer-heading);
-    font-size: 0.76rem;
-    font-weight: 750;
-    line-height: 1.5;
+.footer-heading::after {
+    display: block;
+    width: 24px;
+    height: 2px;
+    margin-top: 8px;
+    border-radius: 2px;
+    background: var(--footer-accent);
+    content: "";
 }
 
 .footer-links {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    align-items: flex-start;
+    gap: 10px;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
+.footer-links li {
+    margin: 0;
+    padding: 0;
+}
+
 .footer-links a {
-    color: #858585;
-    font-size: 0.72rem;
-    line-height: 1.55;
+    display: inline-block;
+    color: var(--footer-text);
+    font-size: 0.8rem;
+    font-weight: 400;
+    line-height: 1.75;
     text-decoration: none;
-    transition: color 140ms ease;
+    transition: color 150ms ease, transform 150ms ease;
 }
 
 .footer-links a:hover {
-    color: #FB923C;
+    color: var(--footer-accent);
+    transform: translateX(-2px);
 }
 
 .trust-badges {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
 .enamad-badge,
 .zarinpal-box {
     display: inline-flex;
+    flex: 0 0 64px;
     align-items: center;
     justify-content: center;
-    min-height: 40px;
+    width: 64px;
+    height: 64px;
+    margin: 0;
+    padding: 5px;
+    overflow: hidden;
+    border: 1px solid #292929;
+    border-radius: 8px;
+    background: #050505;
+    transition: border-color 150ms ease;
 }
 
-.enamad-badge img {
-    display: block;
-    width: 48px;
-    max-height: 54px;
-    height: auto;
-    border-radius: 5px;
+.enamad-badge:hover,
+.zarinpal-box:hover {
+    border-color: #5A321B;
 }
 
+.enamad-badge img,
 #zarinpal img {
     display: block;
-    width: 54px;
-    max-height: 54px;
+    width: auto;
+    max-width: 52px;
     height: auto;
-    border-radius: 5px;
+    max-height: 52px;
+    object-fit: contain;
+}
+
+#zarinpal a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .footer-bottom {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    margin-top: 14px;
-    padding-top: 9px;
-    border-top: 1px solid #202020;
-    color: #686868;
-    font-size: 0.68rem;
-    line-height: 1.5;
+    justify-content: flex-start;
+    min-height: 52px;
+    margin-top: 30px;
+    border-top: 1px solid #1E1E1E;
+    color: #666666;
+    font-size: 0.74rem;
+    line-height: 1.6;
 }
 
 .footer-bottom p {
     margin: 0;
+    text-align: right;
 }
 
 .site-footer a:focus-visible {
-    outline: 2px solid rgba(249, 115, 22, 0.65);
-    outline-offset: 2px;
-    border-radius: 4px;
+    outline: 2px solid rgba(249, 115, 22, 0.8);
+    outline-offset: 4px;
+    border-radius: 3px;
 }
 
-@media (max-width: 1050px) {
+@media (max-width: 1080px) {
     .footer-content {
-        padding-inline: 20px;
+        width: min(100% - 48px, 960px);
     }
 
     .footer-grid {
-        grid-template-columns: minmax(190px, 1.1fr) repeat(2, minmax(120px, 0.7fr)) minmax(120px, 0.65fr);
-        gap: 16px;
+        grid-template-columns: minmax(210px, 1.35fr) minmax(125px, 0.8fr) minmax(145px, 0.9fr) minmax(112px, 0.7fr);
+        gap: 22px;
     }
 }
 
-@media (max-width: 780px) {
+@media (max-width: 900px) {
     .footer-content {
-        padding: 16px 16px 8px;
+        width: calc(100% - 48px);
+        padding-top: 32px;
     }
 
     .footer-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 15px 20px;
+        gap: 30px 40px;
     }
 
     .footer-brand {
         grid-column: 1 / -1;
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        column-gap: 14px;
-        align-items: center;
-    }
-
-    .footer-brand-row {
-        grid-column: 1;
-        margin-bottom: 4px;
+        max-width: 560px;
     }
 
     .footer-desc {
-        grid-column: 1;
-        max-width: none;
-    }
-
-    .footer-socials {
-        grid-column: 2;
-        grid-row: 1 / span 2;
-        margin-top: 0;
-    }
-
-    .footer-col h5 {
-        margin-bottom: 6px;
+        max-width: 460px;
     }
 
     .footer-bottom {
-        margin-top: 11px;
-        padding-top: 8px;
+        margin-top: 27px;
     }
 }
 
-@media (max-width: 420px) {
+@media (max-width: 560px) {
     .footer-content {
-        padding-inline: 12px;
+        width: calc(100% - 36px);
+        padding-top: 27px;
     }
 
     .footer-grid {
-        gap: 13px;
+        gap: 25px 20px;
+    }
+
+    .footer-brand {
+        margin-bottom: 2px;
     }
 
     .footer-logo {
-        height: 25px;
+        height: 34px;
+        max-width: 170px;
     }
 
-    .footer-desc,
+    .footer-desc {
+        font-size: 0.78rem;
+        line-height: 1.9;
+    }
+
+    .footer-heading {
+        margin-bottom: 13px;
+        font-size: 0.83rem;
+    }
+
+    .footer-links {
+        gap: 8px;
+    }
+
     .footer-links a {
-        font-size: 0.68rem;
+        font-size: 0.76rem;
+    }
+
+    .footer-trust {
+        grid-column: 1 / -1;
     }
 
     .trust-badges {
-        gap: 6px;
+        gap: 9px;
+    }
+
+    .footer-bottom {
+        min-height: 46px;
+        margin-top: 24px;
+        font-size: 0.72rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .footer-content {
+        width: calc(100% - 28px);
+    }
+
+    .footer-grid {
+        column-gap: 14px;
+    }
+
+    .enamad-badge,
+    .zarinpal-box {
+        flex-basis: 58px;
+        width: 58px;
+        height: 58px;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .footer-socials a,
-    .footer-links a {
+    .footer-links a,
+    .enamad-badge,
+    .zarinpal-box {
         transition: none !important;
     }
 }
