@@ -167,6 +167,69 @@ if ($steamid64 !== '') {
     catch (Throwable $e) { error_log('[FragCity] Steam profile lookup failed for profile page.'); }
 }
 
+// Keep Steam details usable even when the API is temporarily unavailable.
+// This SELECT intentionally omits binary images: users stores the local avatar path, not the bytes.
+$storedSteamAvatarPath = '';
+$storedSteamProfile = [];
+if ($steamid64 !== '' && isset($pdo) && $pdo instanceof PDO) {
+    try {
+        $storedStatement = $pdo->prepare(
+            'SELECT steam_personaname, steam_profileurl, steam_avatar_url, steam_avatar_path,
+                    steam_personastate, steam_communityvisibilitystate, steam_profilestate,
+                    steam_timecreated, steam_lastlogoff, steam_loccountrycode,
+                    steam_gameextrainfo, steam_gameid
+             FROM users WHERE steamid64 = ? LIMIT 1'
+        );
+        $storedStatement->execute([$steamid64]);
+        $storedRow = $storedStatement->fetch(PDO::FETCH_ASSOC);
+        if (is_array($storedRow)) {
+            $storedSteamAvatarPath = (string)($storedRow['steam_avatar_path'] ?? '');
+            $storedSteamProfile = [
+                'steamid' => $steamid64,
+                'personaname' => (string)($storedRow['steam_personaname'] ?? ''),
+                'profileurl' => (string)($storedRow['steam_profileurl'] ?? ''),
+                'avatarfull' => (string)($storedRow['steam_avatar_url'] ?? ''),
+                'personastate' => isset($storedRow['steam_personastate']) ? (int)$storedRow['steam_personastate'] : null,
+                'communityvisibilitystate' => isset($storedRow['steam_communityvisibilitystate']) ? (int)$storedRow['steam_communityvisibilitystate'] : null,
+                'profilestate' => isset($storedRow['steam_profilestate']) ? (int)$storedRow['steam_profilestate'] : null,
+                'timecreated' => isset($storedRow['steam_timecreated']) ? (int)$storedRow['steam_timecreated'] : null,
+                'lastlogoff' => isset($storedRow['steam_lastlogoff']) ? (int)$storedRow['steam_lastlogoff'] : null,
+                'loccountrycode' => (string)($storedRow['steam_loccountrycode'] ?? ''),
+                'gameextrainfo' => (string)($storedRow['steam_gameextrainfo'] ?? ''),
+                'gameid' => (string)($storedRow['steam_gameid'] ?? ''),
+            ];
+            $hasStoredProfileData = false;
+            foreach (['personaname', 'profileurl', 'avatarfull', 'loccountrycode', 'gameextrainfo', 'gameid'] as $field) {
+                if (trim((string)($storedSteamProfile[$field] ?? '')) !== '') {
+                    $hasStoredProfileData = true;
+                    break;
+                }
+            }
+            if (!$hasStoredProfileData) $storedSteamProfile = [];
+        }
+    } catch (Throwable $e) {
+        // A missing migration should not break the rest of the profile page.
+        error_log('[FragCity] Stored Steam profile is unavailable; check the users profile migration.');
+        $storedSteamProfile = [];
+    }
+}
+
+if ($storedSteamProfile !== []) {
+    if ($steamProfile === []) {
+        $steamProfile = $storedSteamProfile;
+    } else {
+        foreach ($storedSteamProfile as $field => $storedValue) {
+            $currentValue = $steamProfile[$field] ?? null;
+            if (
+                $currentValue === null
+                || (is_string($currentValue) && trim($currentValue) === '' && trim((string)$storedValue) !== '')
+            ) {
+                $steamProfile[$field] = $storedValue;
+            }
+        }
+    }
+}
+
 $steamPersonaname = trim((string)($steamProfile['personaname'] ?? ''));
 if ($steamPersonaname === '') $steamPersonaname = (string)$username;
 $steamProfileUrl = (string)($steamProfile['profileurl'] ?? '');
@@ -258,7 +321,34 @@ $bannerUrl = $bannerFile !== '' && is_file($bannerFile)
 $avatarUrl = $avatarFile !== '' && is_file($avatarFile)
     ? 'img/avatars/avatar_' . rawurlencode($bannerKey) . '.jpg?v=' . filemtime($avatarFile)
     : '';
-if ($avatarUrl === '') $avatarUrl = (string)($steamProfile['avatarfull'] ?? '');
+
+$steamAvatarUrl = '';
+$allowedStoredSteamPath = $steamid64 !== ''
+    && preg_match(
+        '#^img/steam-avatars/steam_' . preg_quote($steamid64, '#') . '\\.(?:jpg|png|webp)$#D',
+        $storedSteamAvatarPath
+    );
+if ($allowedStoredSteamPath) {
+    $storedSteamDiskPath = __DIR__ . '/../' . $storedSteamAvatarPath;
+    if (is_file($storedSteamDiskPath)) {
+        $steamAvatarUrl = $storedSteamAvatarPath . '?v=' . filemtime($storedSteamDiskPath);
+    }
+}
+if ($steamAvatarUrl === '' && $steamid64 !== '') {
+    foreach (['jpg', 'png', 'webp'] as $steamAvatarExtension) {
+        $steamAvatarFilename = 'steam_' . $steamid64 . '.' . $steamAvatarExtension;
+        $steamAvatarDiskPath = __DIR__ . '/../img/steam-avatars/' . $steamAvatarFilename;
+        if (is_file($steamAvatarDiskPath)) {
+            $steamAvatarUrl = 'img/steam-avatars/' . rawurlencode($steamAvatarFilename)
+                . '?v=' . filemtime($steamAvatarDiskPath);
+            break;
+        }
+    }
+}
+$steamCardAvatarUrl = $steamAvatarUrl !== ''
+    ? $steamAvatarUrl
+    : (string)($steamProfile['avatarfull'] ?? '');
+if ($avatarUrl === '') $avatarUrl = $steamCardAvatarUrl;
 $faceitLevel = 0;
 
 if (!function_exists('formatPlaytime')) {
@@ -334,27 +424,84 @@ if (!function_exists('formatPlaytime')) {
         </div>
     </div>
 
-    <section class="steam-profile-card" aria-label="اطلاعات پروفایل Steam">
-        <div class="steam-profile-card__heading">
-            <div class="steam-profile-card__identity">
-                <?php if ($steamProfileUrl !== ''): ?>
-                    <a class="steam-profile-card__name" href="<?= htmlspecialchars($steamProfileUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"><?= htmlspecialchars($steamPersonaname, ENT_QUOTES, 'UTF-8') ?></a>
-                <?php else: ?>
-                    <span class="steam-profile-card__name"><?= htmlspecialchars($steamPersonaname, ENT_QUOTES, 'UTF-8') ?></span>
-                <?php endif; ?>
-                <span class="steam-profile-card__eyebrow"><i class="fa-brands fa-steam" aria-hidden="true"></i> Steam Community</span>
+    <section class="steam-profile-card" aria-labelledby="steamProfileCardTitle">
+        <div class="steam-profile-card__topline">
+            <div class="steam-profile-card__brand">
+                <span class="steam-profile-card__brand-icon"><i class="fa-brands fa-steam" aria-hidden="true"></i></span>
+                <div class="steam-profile-card__title-wrap">
+                    <span class="steam-profile-card__eyebrow">STEAM ACCOUNT INFO</span>
+                    <h2 id="steamProfileCardTitle">اطلاعات حساب استیم</h2>
+                </div>
             </div>
-            <span class="steam-profile-card__status" data-state="<?= (int)($steamProfile['personastate'] ?? 0) ?>">
-                <span class="steam-profile-card__status-dot" aria-hidden="true"></span><?= htmlspecialchars($steamStatus, ENT_QUOTES, 'UTF-8') ?>
+            <span class="steam-profile-card__status" data-state="<?= (int)($steamProfile['personastate'] ?? -1) ?>">
+                <span class="steam-profile-card__status-dot" aria-hidden="true"></span>
+                <span><?= htmlspecialchars($steamStatus, ENT_QUOTES, 'UTF-8') ?></span>
             </span>
         </div>
-        <div class="steam-profile-card__details">
-            <div class="steam-profile-card__detail"><span>SteamID64</span><strong dir="ltr"><?= htmlspecialchars($steamid64 !== '' ? $steamid64 : '—', ENT_QUOTES, 'UTF-8') ?></strong></div>
-            <div class="steam-profile-card__detail"><span>وضعیت پروفایل</span><strong><?= htmlspecialchars($steamVisibility, ENT_QUOTES, 'UTF-8') ?></strong></div>
-            <div class="steam-profile-card__detail"><span>تاریخ ساخت حساب</span><strong><?= htmlspecialchars($steamCreatedDate, ENT_QUOTES, 'UTF-8') ?></strong></div>
-            <div class="steam-profile-card__detail"><span>کد کشور</span><strong dir="ltr"><?= htmlspecialchars($steamCountry !== '' ? $steamCountry : '—', ENT_QUOTES, 'UTF-8') ?></strong></div>
+
+        <div class="steam-profile-card__main">
+            <div class="steam-profile-card__avatar" aria-hidden="true">
+                <?php if ($steamCardAvatarUrl !== ''): ?>
+                    <img src="<?= htmlspecialchars($steamCardAvatarUrl, ENT_QUOTES, 'UTF-8') ?>"
+                         alt=""
+                         loading="lazy"
+                         decoding="async"
+                         onerror="this.onerror=null;this.hidden=true;this.nextElementSibling.hidden=false;">
+                <?php endif; ?>
+                <i class="fa-brands fa-steam steam-profile-card__avatar-fallback" aria-hidden="true" <?= $steamCardAvatarUrl !== '' ? 'hidden' : '' ?>></i>
+            </div>
+
+            <div class="steam-profile-card__identity">
+                <?php if ($steamProfileUrl !== ''): ?>
+                    <a class="steam-profile-card__name"
+                       href="<?= htmlspecialchars($steamProfileUrl, ENT_QUOTES, 'UTF-8') ?>"
+                       target="_blank"
+                       rel="noopener noreferrer"><?= htmlspecialchars($steamPersonaname, ENT_QUOTES, 'UTF-8') ?></a>
+                <?php else: ?>
+                    <strong class="steam-profile-card__name"><?= htmlspecialchars($steamPersonaname, ENT_QUOTES, 'UTF-8') ?></strong>
+                <?php endif; ?>
+                <span class="steam-profile-card__steamid" dir="ltr">STEAMID64 · <?= htmlspecialchars($steamid64 !== '' ? $steamid64 : '—', ENT_QUOTES, 'UTF-8') ?></span>
+                <?php if (trim((string)($steamProfile['gameextrainfo'] ?? '')) !== ''): ?>
+                    <span class="steam-profile-card__game">
+                        <i class="fa-solid fa-gamepad" aria-hidden="true"></i>
+                        در حال بازی: <?= htmlspecialchars((string)$steamProfile['gameextrainfo'], ENT_QUOTES, 'UTF-8') ?>
+                    </span>
+                <?php endif; ?>
+            </div>
+
+            <?php if ($steamProfileUrl !== ''): ?>
+                <a class="steam-profile-card__visit"
+                   href="<?= htmlspecialchars($steamProfileUrl, ENT_QUOTES, 'UTF-8') ?>"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                    <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                    مشاهده در Steam
+                </a>
+            <?php endif; ?>
         </div>
-        <?php if (!$steamProfile): ?><p class="steam-profile-card__note">اطلاعات کامل Steam فعلاً در دسترس نیست. در صورت وجود، آواتار محلی یا اطلاعات ذخیره‌شده در نشست استفاده می‌شود.</p><?php endif; ?>
+
+        <div class="steam-profile-card__details">
+            <div class="steam-profile-card__detail">
+                <span>SteamID64</span>
+                <strong dir="ltr"><?= htmlspecialchars($steamid64 !== '' ? $steamid64 : '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="steam-profile-card__detail">
+                <span>وضعیت پروفایل</span>
+                <strong><?= htmlspecialchars($steamVisibility, ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="steam-profile-card__detail">
+                <span>تاریخ ساخت حساب</span>
+                <strong><?= htmlspecialchars($steamCreatedDate, ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+            <div class="steam-profile-card__detail">
+                <span>کد کشور</span>
+                <strong dir="ltr"><?= htmlspecialchars($steamCountry !== '' ? $steamCountry : '—', ENT_QUOTES, 'UTF-8') ?></strong>
+            </div>
+        </div>
+
+        <?php if (!$steamProfile): ?>
+            <p class="steam-profile-card__note">اطلاعات Steam هنوز ذخیره نشده است. یک بار با Steam وارد شوید تا اطلاعات عمومی حساب دریافت و ذخیره شود.</p>
+        <?php endif; ?>
     </section>
 
     <!-- کارت‌های آمار -->
