@@ -73,7 +73,14 @@ $requiredColumns = [
     'password_resets' => ['id', 'steamid', 'token', 'expires_at', 'created_at'],
     'tickets' => ['id', 'steamid', 'subject', 'status', 'created_at', 'updated_at'],
     'ticket_replies' => ['id', 'ticket_id', 'steamid', 'message', 'is_admin', 'created_at'],
-    'users' => ['id', 'steamid64', 'steam', 'username', 'email', 'password_hash', 'role', 'created_at', 'vip_level', 'vip_expire', 'phone', 'insmaster', 'avatar'],
+    'users' => [
+        'id', 'steamid64', 'steam', 'username', 'email', 'password_hash', 'role', 'created_at',
+        'vip_level', 'vip_expire', 'phone', 'insmaster', 'avatar',
+        'steam_personaname', 'steam_profileurl', 'steam_avatar_url', 'steam_avatar_path',
+        'steam_personastate', 'steam_communityvisibilitystate', 'steam_profilestate',
+        'steam_timecreated', 'steam_lastlogoff', 'steam_loccountrycode',
+        'steam_gameextrainfo', 'steam_gameid', 'steam_profile_updated_at'
+    ],
     'user_wallets' => ['steamid', 'balance', 'updated_at'],
     'vip_codes' => ['id', 'code', 'vip_level', 'duration_days', 'max_uses', 'used_count', 'created_by', 'created_at'],
     'vip_usage' => ['id', 'code_id', 'steamid', 'used_at'],
