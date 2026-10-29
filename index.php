@@ -275,10 +275,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                     }
 
                     if ($profileForStorage !== []) {
-                        SteamProfileService::persistPlayerSummary($pdo, $steamid, $profileForStorage);
+                        $profilePersisted = SteamProfileService::persistPlayerSummary($pdo, $steamid, $profileForStorage);
+                        error_log($profilePersisted
+                            ? '[FragCity] Steam profile persistence after registration completed for the matching users row.'
+                            : '[FragCity] Steam profile persistence after registration found no matching users row.');
+                    } else {
+                        error_log('[FragCity] Steam profile persistence after registration skipped: no usable Steam summary was present in session.');
                     }
                 } catch (Throwable $profileStoreError) {
-                    error_log('[FragCity] Steam profile persistence after registration failed; check the users profile migration.');
+                    error_log('[FragCity] Steam profile persistence after registration failed (' . get_class($profileStoreError) . ', code ' . (string)$profileStoreError->getCode() . '): ' . substr($profileStoreError->getMessage(), 0, 300));
                 }
             }
 
