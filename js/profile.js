@@ -59,35 +59,20 @@
         }
     }
 
-    function setXpProgress(root) {
-        const xpBar =
-            root.querySelector(
-                '.xp-bar'
-            );
-
-        if (!xpBar) return;
-
-        const progress =
-            Math.max(
-                0,
-                Math.min(
-                    100,
-                    Number(
-                        xpBar.dataset.progress ||
-                            0
-                    )
-                )
-            );
-
-        xpBar.style.width =
-            progress + '%';
-
-        xpBar.setAttribute(
-            'aria-valuenow',
-            String(progress)
-        );
-    }
-
+    function setXpProgress(root) {
+        const xpBars = root.querySelectorAll('.xp-bar');
+        if (!xpBars.length) return;
+
+        xpBars.forEach(function (xpBar) {
+            const parsedProgress = Number(xpBar.dataset.progress || 0);
+            const progress = Number.isFinite(parsedProgress)
+                ? Math.max(0, Math.min(100, parsedProgress))
+                : 0;
+
+            xpBar.style.width = progress + '%';
+            xpBar.setAttribute('aria-valuenow', String(progress));
+        });
+    }
     function closeAvatarModal(root) {
         const modal =
             root.querySelector(
