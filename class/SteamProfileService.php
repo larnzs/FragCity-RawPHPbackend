@@ -148,6 +148,7 @@ final class SteamProfileService
             curl_setopt_array($handle, [
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_FOLLOWLOCATION => false,
+                CURLOPT_MAXFILESIZE => 2097152,
                 CURLOPT_CONNECTTIMEOUT => 3,
                 CURLOPT_TIMEOUT => 6,
                 CURLOPT_SSL_VERIFYPEER => true,
@@ -181,6 +182,13 @@ final class SteamProfileService
         $written = @file_put_contents($diskPath, $bytes, LOCK_EX);
         if ($written !== strlen($bytes)) return '';
         @chmod($diskPath, 0644);
+
+        // A SteamID should have one cached format at a time.
+        foreach (['jpg', 'png', 'webp'] as $oldExtension) {
+            if ($oldExtension === $types[$mime]) continue;
+            $oldPath = $directory . '/steam_' . $steamid64 . '.' . $oldExtension;
+            if (is_file($oldPath)) @unlink($oldPath);
+        }
 
         return 'img/steam-avatars/' . $filename;
     }
