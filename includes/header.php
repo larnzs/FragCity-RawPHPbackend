@@ -78,7 +78,7 @@ if (!is_array($headerSteamProfile) || (string)($headerSteamProfile['steamid'] ??
 if (!is_array($headerSteamProfile)) $headerSteamProfile = [];
 if ($isLoggedIn && $headerSteamId64 !== '' && isset($pdo) && $pdo instanceof PDO) {
     try {
-        $profileStmt = $pdo->prepare('SELECT steam_personaname, steam_profileurl, steam_avatar_url, steam_personastate, steam_communityvisibilitystate, steam_timecreated, steam_lastlogoff, steam_loccountrycode, steam_gameextrainfo FROM users WHERE steamid64 = ? LIMIT 1');
+        $profileStmt = $pdo->prepare('SELECT steam_personaname, steam_profileurl, steam_avatar_url, steam_personastate, steam_communityvisibilitystate, steam_profilestate, steam_timecreated, steam_lastlogoff, steam_loccountrycode, steam_gameextrainfo FROM users WHERE steamid64 = ? LIMIT 1');
         $profileStmt->execute([$headerSteamId64]);
         $profileRow = $profileStmt->fetch(PDO::FETCH_ASSOC);
         if (is_array($profileRow)) {
@@ -89,6 +89,7 @@ if ($isLoggedIn && $headerSteamId64 !== '' && isset($pdo) && $pdo instanceof PDO
                 'avatarfull' => $profileRow['steam_avatar_url'] ?? '',
                 'personastate' => $profileRow['steam_personastate'] ?? null,
                 'communityvisibilitystate' => $profileRow['steam_communityvisibilitystate'] ?? null,
+                'profilestate' => $profileRow['steam_profilestate'] ?? null,
                 'timecreated' => $profileRow['steam_timecreated'] ?? null,
                 'lastlogoff' => $profileRow['steam_lastlogoff'] ?? null,
                 'loccountrycode' => $profileRow['steam_loccountrycode'] ?? '',
@@ -108,12 +109,23 @@ $headerSteamState = isset($headerSteamProfile['personastate']) ? (int)$headerSte
 $headerSteamStatus = [0 => 'آفلاین', 1 => 'آنلاین', 2 => 'مشغول', 3 => 'غایب', 4 => 'خواب', 5 => 'مایل به معامله', 6 => 'مایل به بازی'][$headerSteamState] ?? 'نامشخص';
 $headerVisibilityState = (int)($headerSteamProfile['communityvisibilitystate'] ?? 0);
 $headerSteamVisibility = $headerVisibilityState === 3 ? 'عمومی' : ($headerVisibilityState === 1 ? 'خصوصی' : ($headerVisibilityState === 2 ? 'فقط دوستان' : 'نامشخص'));
+$headerProfileState = isset($headerSteamProfile['profilestate']) ? ((int)$headerSteamProfile['profilestate'] === 1 ? 'تنظیم‌شده' : 'کامل نشده') : 'نامشخص';
 $headerCreated = (int)($headerSteamProfile['timecreated'] ?? 0);
 $headerCreatedLabel = $headerCreated > 0 ? date('Y-m-d', $headerCreated) : '—';
 $headerLastLogoff = (int)($headerSteamProfile['lastlogoff'] ?? 0);
 $headerLastLogoffLabel = $headerLastLogoff > 0 ? date('Y-m-d', $headerLastLogoff) : '—';
 $headerCountry = strtoupper(trim((string)($headerSteamProfile['loccountrycode'] ?? '')));
 if (!preg_match('/^[A-Z]{2}$/D', $headerCountry)) $headerCountry = '';
+if ($isLoggedIn && $avatarSrc === 'assets/images/default_avatar.png') {
+    $avatarCandidate = trim((string)($headerSteamProfile['avatarfull'] ?? ''));
+    $avatarParts = $avatarCandidate !== '' ? parse_url($avatarCandidate) : false;
+    $avatarHost = is_array($avatarParts) ? strtolower((string)($avatarParts['host'] ?? '')) : '';
+    $avatarSafeHost = preg_match('/(^|\\.)steamstatic\\.com$/D', $avatarHost)
+        || preg_match('/(^|\\.)akamaihd\\.net$/D', $avatarHost);
+    if (is_array($avatarParts) && strtolower((string)($avatarParts['scheme'] ?? '')) === 'https' && $avatarSafeHost) {
+        $avatarSrc = $avatarCandidate;
+    }
+}
 $headerSteamGame = trim((string)($headerSteamProfile['gameextrainfo'] ?? ''));
 $headerSteamProfileUrl = trim((string)($headerSteamProfile['profileurl'] ?? ''));
 $steamUrlParts = $headerSteamProfileUrl !== '' ? parse_url($headerSteamProfileUrl) : false;
@@ -233,6 +245,7 @@ $mobileNavItems = [
                                 </div>
                                 <div class="frag-drop-detail-grid">
                                     <div class="frag-drop-detail"><span>وضعیت پروفایل</span><strong><?= htmlspecialchars($headerSteamVisibility, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>تنظیمات پروفایل</span><strong><?= htmlspecialchars($headerProfileState, ENT_QUOTES, 'UTF-8') ?></strong></div>
                                     <div class="frag-drop-detail"><span>تاریخ ساخت حساب</span><strong><?= htmlspecialchars($headerCreatedLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
                                     <div class="frag-drop-detail"><span>کشور</span><strong dir="ltr"><?= htmlspecialchars($headerCountry !== '' ? $headerCountry : '—', ENT_QUOTES, 'UTF-8') ?></strong></div>
                                     <div class="frag-drop-detail"><span>آخرین فعالیت</span><strong><?= htmlspecialchars($headerLastLogoffLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
