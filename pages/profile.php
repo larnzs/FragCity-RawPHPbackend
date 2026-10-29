@@ -351,6 +351,83 @@ $steamCardAvatarUrl = $steamAvatarUrl !== ''
 if ($avatarUrl === '') $avatarUrl = $steamCardAvatarUrl;
 $faceitLevel = 0;
 
+// Load this player's saved Paint configurations through the same signed Linux API
+// boundary used by the WeaponPaints page. Never connect to the plugin database here.
+$profileInventoryItems = [];
+$profileInventoryTotal = 0;
+$profileInventoryUnavailable = false;
+try {
+    require_once __DIR__ . '/../class/WeaponPaintsRepository.php';
+    require_once __DIR__ . '/../class/utils.php';
+
+    $profileWeaponPaints = new WeaponPaintsRepository();
+    $profileSelection = $profileWeaponPaints->getPlayerSelection($steamid64);
+    $profileSavedPaintRows = is_array($profileSelection['skin_inventory'] ?? null)
+        ? $profileSelection['skin_inventory']
+        : [];
+    $profileInventoryTotal = count($profileSavedPaintRows);
+
+    $profileSkinCatalog = UtilsClass::skinsFromJson();
+    $profileWeaponCatalog = UtilsClass::getWeaponsFromArray();
+
+    foreach (array_slice($profileSavedPaintRows, 0, 10) as $profileSavedPaint) {
+        if (!is_array($profileSavedPaint)) {
+            continue;
+        }
+
+        $profileDefindex = (int)($profileSavedPaint['weapon_defindex'] ?? 0);
+        $profilePaintId = (int)($profileSavedPaint['weapon_paint_id'] ?? 0);
+        if ($profileDefindex < 1 || $profilePaintId < 0) {
+            continue;
+        }
+
+        $profileWeaponEntry = $profileWeaponCatalog[$profileDefindex]
+            ?? $profileWeaponCatalog[(string)$profileDefindex]
+            ?? [];
+        $profilePaintEntry = $profileSkinCatalog[$profileDefindex][$profilePaintId]
+            ?? $profileSkinCatalog[(string)$profileDefindex][(string)$profilePaintId]
+            ?? [];
+
+        $profileWeaponRawName = (string)($profileWeaponEntry['weapon_name'] ?? ('weapon_' . $profileDefindex));
+        $profileWeaponLabel = preg_replace('/^weapon_/', '', $profileWeaponRawName) ?: $profileWeaponRawName;
+        $profileWeaponLabel = str_replace('_', ' ', $profileWeaponLabel);
+        $profilePaintName = trim((string)($profilePaintEntry['paint_name'] ?? ''));
+        if ($profilePaintName === '') {
+            $profilePaintName = 'Paint #' . $profilePaintId;
+        }
+
+        $profileImageUrl = trim((string)($profilePaintEntry['image_url'] ?? ''));
+        if ($profileImageUrl !== ''
+            && !preg_match('#^(?:https?://|/|[A-Za-z0-9_.-])#i', $profileImageUrl)) {
+            $profileImageUrl = '';
+        }
+
+        $profileTeam = (int)($profileSavedPaint['weapon_team'] ?? 0);
+        $profileTeamLabel = $profileTeam === 2 ? 'T' : ($profileTeam === 3 ? 'CT' : 'ANY');
+
+        $profileStickerCount = 0;
+        for ($profileStickerSlot = 0; $profileStickerSlot < 5; $profileStickerSlot++) {
+            $profileStickerValue = (string)($profileSavedPaint['weapon_sticker_' . $profileStickerSlot] ?? '0;0;0;0;0.001;1;0');
+            $profileStickerParts = explode(';', $profileStickerValue, 2);
+            if ((int)($profileStickerParts[0] ?? 0) > 0) {
+                $profileStickerCount++;
+            }
+        }
+
+        $profileInventoryItems[] = [
+            'weapon_name' => $profileWeaponLabel,
+            'paint_name' => $profilePaintName,
+            'image_url' => $profileImageUrl,
+            'team' => $profileTeamLabel,
+            'sticker_count' => $profileStickerCount,
+        ];
+    }
+} catch (Throwable $profileInventoryError) {
+    // Keep profile, stats, and avatar available even while the Linux API is offline.
+    error_log('[FragCity] Profile saved-paint inventory is unavailable (' . get_class($profileInventoryError) . ').');
+    $profileInventoryUnavailable = true;
+}
+
 if (!function_exists('formatPlaytime')) {
     function formatPlaytime($seconds) {
         $hours = floor($seconds / 3600);
@@ -424,84 +501,93 @@ if (!function_exists('formatPlaytime')) {
         </div>
     </div>
 
-    <section class="steam-profile-card" aria-labelledby="steamProfileCardTitle">
-        <div class="steam-profile-card__topline">
-            <div class="steam-profile-card__brand">
-                <span class="steam-profile-card__brand-icon"><i class="fa-brands fa-steam" aria-hidden="true"></i></span>
-                <div class="steam-profile-card__title-wrap">
-                    <span class="steam-profile-card__eyebrow">STEAM ACCOUNT INFO</span>
-                    <h2 id="steamProfileCardTitle">اطلاعات حساب استیم</h2>
+    <section class="profile-inventory-card" aria-labelledby="profileInventoryTitle">
+        <div class="profile-inventory-card__topline">
+            <div class="profile-inventory-card__brand">
+                <span class="profile-inventory-card__brand-icon" aria-hidden="true">
+                    <i class="fa-solid fa-layer-group"></i>
+                </span>
+                <div class="profile-inventory-card__title-wrap">
+                    <span class="profile-inventory-card__eyebrow">PLAYER LOADOUT</span>
+                    <h2 id="profileInventoryTitle">اسکین‌های ذخیره‌شده شما</h2>
+                    <p>پیش‌نمایش Paintهایی که در Inventory خود ذخیره کرده‌اید</p>
                 </div>
             </div>
-            <span class="steam-profile-card__status" data-state="<?= (int)($steamProfile['personastate'] ?? -1) ?>">
-                <span class="steam-profile-card__status-dot" aria-hidden="true"></span>
-                <span><?= htmlspecialchars($steamStatus, ENT_QUOTES, 'UTF-8') ?></span>
-            </span>
+            <div class="profile-inventory-card__actions">
+                <span class="profile-inventory-card__count">
+                    <i class="fa-solid fa-box-archive" aria-hidden="true"></i>
+                    <?= number_format($profileInventoryTotal) ?> آیتم
+                </span>
+                <a class="profile-inventory-card__view-all" href="?page=skins" data-ajax-nav data-slug="skins">
+                    مدیریت Inventory
+                    <i class="fa-solid fa-arrow-up-left-from-circle" aria-hidden="true"></i>
+                </a>
+            </div>
         </div>
 
-        <div class="steam-profile-card__main">
-            <div class="steam-profile-card__avatar" aria-hidden="true">
-                <?php if ($steamCardAvatarUrl !== ''): ?>
-                    <img src="<?= htmlspecialchars($steamCardAvatarUrl, ENT_QUOTES, 'UTF-8') ?>"
-                         alt=""
-                         loading="lazy"
-                         decoding="async"
-                         onerror="this.onerror=null;this.hidden=true;this.nextElementSibling.hidden=false;">
-                <?php endif; ?>
-                <i class="fa-brands fa-steam steam-profile-card__avatar-fallback" aria-hidden="true" <?= $steamCardAvatarUrl !== '' ? 'hidden' : '' ?>></i>
-            </div>
-
-            <div class="steam-profile-card__identity">
-                <?php if ($steamProfileUrl !== ''): ?>
-                    <a class="steam-profile-card__name"
-                       href="<?= htmlspecialchars($steamProfileUrl, ENT_QUOTES, 'UTF-8') ?>"
-                       target="_blank"
-                       rel="noopener noreferrer"><?= htmlspecialchars($steamPersonaname, ENT_QUOTES, 'UTF-8') ?></a>
-                <?php else: ?>
-                    <strong class="steam-profile-card__name"><?= htmlspecialchars($steamPersonaname, ENT_QUOTES, 'UTF-8') ?></strong>
-                <?php endif; ?>
-                <span class="steam-profile-card__steamid" dir="ltr">STEAMID64 · <?= htmlspecialchars($steamid64 !== '' ? $steamid64 : '—', ENT_QUOTES, 'UTF-8') ?></span>
-                <?php if (trim((string)($steamProfile['gameextrainfo'] ?? '')) !== ''): ?>
-                    <span class="steam-profile-card__game">
-                        <i class="fa-solid fa-gamepad" aria-hidden="true"></i>
-                        در حال بازی: <?= htmlspecialchars((string)$steamProfile['gameextrainfo'], ENT_QUOTES, 'UTF-8') ?>
-                    </span>
-                <?php endif; ?>
-            </div>
-
-            <?php if ($steamProfileUrl !== ''): ?>
-                <a class="steam-profile-card__visit"
-                   href="<?= htmlspecialchars($steamProfileUrl, ENT_QUOTES, 'UTF-8') ?>"
-                   target="_blank"
-                   rel="noopener noreferrer">
-                    <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-                    مشاهده در Steam
-                </a>
+        <div class="profile-inventory-card__body">
+            <?php if ($profileInventoryUnavailable): ?>
+                <div class="profile-inventory-state profile-inventory-state--error" role="status">
+                    <span class="profile-inventory-state__icon"><i class="fa-solid fa-plug-circle-xmark" aria-hidden="true"></i></span>
+                    <div>
+                        <strong>Inventory موقتاً در دسترس نیست</strong>
+                        <p>بقیهٔ پروفایل در دسترس است؛ سرویس اسکین‌ها را بعداً دوباره امتحان کنید.</p>
+                    </div>
+                </div>
+            <?php elseif ($profileInventoryItems): ?>
+                <div class="profile-loadout-grid">
+                    <?php foreach ($profileInventoryItems as $profileItem): ?>
+                        <article class="profile-loadout-item">
+                            <div class="profile-loadout-item__media">
+                                <?php if ($profileItem['image_url'] !== ''): ?>
+                                    <img
+                                        src="<?= htmlspecialchars($profileItem['image_url'], ENT_QUOTES, 'UTF-8') ?>"
+                                        alt=""
+                                        loading="lazy"
+                                        decoding="async"
+                                        onerror="this.onerror=null;this.hidden=true;this.nextElementSibling.hidden=false;"
+                                    >
+                                <?php endif; ?>
+                                <span class="profile-loadout-item__fallback" <?= $profileItem['image_url'] !== '' ? 'hidden' : '' ?> aria-hidden="true">
+                                    <i class="fa-solid fa-gun"></i>
+                                </span>
+                                <span class="profile-loadout-item__team" data-team="<?= htmlspecialchars($profileItem['team'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <?= htmlspecialchars($profileItem['team'], ENT_QUOTES, 'UTF-8') ?>
+                                </span>
+                            </div>
+                            <div class="profile-loadout-item__copy">
+                                <span class="profile-loadout-item__kicker">SAVED PAINT</span>
+                                <strong title="<?= htmlspecialchars($profileItem['paint_name'], ENT_QUOTES, 'UTF-8') ?>">
+                                    <?= htmlspecialchars($profileItem['paint_name'], ENT_QUOTES, 'UTF-8') ?>
+                                </strong>
+                                <span class="profile-loadout-item__weapon">
+                                    <?= htmlspecialchars($profileItem['weapon_name'], ENT_QUOTES, 'UTF-8') ?>
+                                </span>
+                            </div>
+                            <?php if ((int)$profileItem['sticker_count'] > 0): ?>
+                                <span class="profile-loadout-item__stickers">
+                                    <i class="fa-solid fa-certificate" aria-hidden="true"></i>
+                                    <?= (int)$profileItem['sticker_count'] ?> استیکر
+                                </span>
+                            <?php endif; ?>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+                <div class="profile-inventory-card__footer">
+                    <span><i class="fa-solid fa-sparkles" aria-hidden="true"></i> نمایش <?= count($profileInventoryItems) ?> مورد از <?= number_format($profileInventoryTotal) ?> Paint ذخیره‌شده</span>
+                    <a href="?page=skins" data-ajax-nav data-slug="skins">دیدن همهٔ اسکین‌ها <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+                </div>
+            <?php else: ?>
+                <div class="profile-inventory-state">
+                    <span class="profile-inventory-state__icon"><i class="fa-solid fa-box-open" aria-hidden="true"></i></span>
+                    <div>
+                        <strong>هنوز Paint ذخیره‌شده‌ای نداری</strong>
+                        <p>از بخش Inventory اسکین‌ها را انتخاب کن و تنظیماتشان را ذخیره کن تا اینجا نمایش داده شوند.</p>
+                    </div>
+                    <a href="?page=skins" data-ajax-nav data-slug="skins">رفتن به Inventory <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+                </div>
             <?php endif; ?>
         </div>
-
-        <div class="steam-profile-card__details">
-            <div class="steam-profile-card__detail">
-                <span>SteamID64</span>
-                <strong dir="ltr"><?= htmlspecialchars($steamid64 !== '' ? $steamid64 : '—', ENT_QUOTES, 'UTF-8') ?></strong>
-            </div>
-            <div class="steam-profile-card__detail">
-                <span>وضعیت پروفایل</span>
-                <strong><?= htmlspecialchars($steamVisibility, ENT_QUOTES, 'UTF-8') ?></strong>
-            </div>
-            <div class="steam-profile-card__detail">
-                <span>تاریخ ساخت حساب</span>
-                <strong><?= htmlspecialchars($steamCreatedDate, ENT_QUOTES, 'UTF-8') ?></strong>
-            </div>
-            <div class="steam-profile-card__detail">
-                <span>کد کشور</span>
-                <strong dir="ltr"><?= htmlspecialchars($steamCountry !== '' ? $steamCountry : '—', ENT_QUOTES, 'UTF-8') ?></strong>
-            </div>
-        </div>
-
-        <?php if (!$steamProfile): ?>
-            <p class="steam-profile-card__note">اطلاعات Steam هنوز ذخیره نشده است. یک بار با Steam وارد شوید تا اطلاعات عمومی حساب دریافت و ذخیره شود.</p>
-        <?php endif; ?>
     </section>
 
     <!-- کارت‌های آمار -->
