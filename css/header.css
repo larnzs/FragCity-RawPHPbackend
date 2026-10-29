@@ -1593,3 +1593,77 @@ body.mobile-menu-open {
         transition: none !important;
     }
 }
+
+
+/* Wallet action: icon-only at rest, accent only on hover/focus. */
+.shock-user-area-wrapper {
+    gap: 16px;
+}
+
+.shock-user-area-wrapper .action-icon-btn {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: #A3A3A3;
+    box-shadow: none;
+    transform: none;
+    transition: color 140ms ease, background-color 140ms ease, border-color 140ms ease;
+}
+
+.shock-user-area-wrapper .action-icon-btn:hover,
+.shock-user-area-wrapper .action-icon-btn:active {
+    border-color: rgba(249, 115, 22, 0.16);
+    background: rgba(249, 115, 22, 0.08);
+    color: #F97316;
+    box-shadow: none;
+    transform: none;
+}
+
+.shock-user-area-wrapper .action-icon-btn:focus-visible {
+    border-color: rgba(249, 115, 22, 0.35);
+    outline: 2px solid rgba(249, 115, 22, 0.45);
+    outline-offset: 2px;
+    background: rgba(249, 115, 22, 0.06);
+    color: #FB923C;
+    box-shadow: none;
+}
+
+.shock-user-area-wrapper .action-icon-btn.active {
+    border-color: transparent;
+    background: transparent;
+    color: #A3A3A3;
+    box-shadow: none;
+}
+
+.shock-user-area-wrapper .action-icon-btn.active:hover,
+.shock-user-area-wrapper .action-icon-btn.active:focus-visible {
+    border-color: rgba(249, 115, 22, 0.16);
+    background: rgba(249, 115, 22, 0.08);
+    color: #F97316;
+}
+
+.shock-user-area-wrapper .action-icon-btn i {
+    font-size: 1rem;
+}
+
+@media (max-width: 700px) {
+    .shock-user-area-wrapper {
+        gap: 10px;
+    }
+
+    .shock-user-area-wrapper .action-icon-btn {
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-user-area-wrapper .action-icon-btn {
+        transition: none !important;
+    }
+}
