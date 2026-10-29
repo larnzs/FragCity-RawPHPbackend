@@ -232,16 +232,41 @@ if ($storedSteamProfile !== []) {
 
 $steamPersonaname = trim((string)($steamProfile['personaname'] ?? ''));
 if ($steamPersonaname === '') $steamPersonaname = (string)$username;
-$steamProfileUrl = (string)($steamProfile['profileurl'] ?? '');
+
+$steamStateValue = isset($steamProfile['personastate']) ? (int)$steamProfile['personastate'] : -1;
 $steamStatusLabels = [0 => 'آفلاین', 1 => 'آنلاین', 2 => 'مشغول', 3 => 'غایب', 4 => 'خواب', 5 => 'مایل به معامله', 6 => 'مایل به بازی'];
-$steamStatus = isset($steamProfile['personastate'])
-    ? ($steamStatusLabels[(int)$steamProfile['personastate']] ?? 'نامشخص')
-    : 'در دسترس نیست';
+$steamStatus = $steamStatusLabels[$steamStateValue] ?? 'نامشخص';
+
 $visibility = (int)($steamProfile['communityvisibilitystate'] ?? 0);
-$steamVisibility = $visibility === 3 ? 'عمومی' : ($visibility === 1 ? 'خصوصی' : 'نامشخص');
-$steamCountry = (string)($steamProfile['loccountrycode'] ?? '');
+$steamVisibility = $visibility === 3
+    ? 'عمومی'
+    : ($visibility === 1 ? 'خصوصی' : ($visibility === 2 ? 'فقط دوستان' : 'نامشخص'));
+
+$steamProfileStateValue = isset($steamProfile['profilestate']) ? (int)$steamProfile['profilestate'] : null;
+$steamProfileState = $steamProfileStateValue === null
+    ? 'نامشخص'
+    : ($steamProfileStateValue === 1 ? 'تنظیم‌شده' : 'کامل نشده');
+
+$steamCountry = strtoupper(trim((string)($steamProfile['loccountrycode'] ?? '')));
+if (!preg_match('/^[A-Z]{2}$/D', $steamCountry)) $steamCountry = '';
+
 $steamCreatedAt = (int)($steamProfile['timecreated'] ?? 0);
 $steamCreatedDate = $steamCreatedAt > 0 ? date('Y-m-d', $steamCreatedAt) : '—';
+$steamLastLogoff = (int)($steamProfile['lastlogoff'] ?? 0);
+$steamLastLogoffDate = $steamLastLogoff > 0 ? date('Y-m-d', $steamLastLogoff) : '—';
+$steamGame = trim((string)($steamProfile['gameextrainfo'] ?? ''));
+
+$steamProfileUrl = trim((string)($steamProfile['profileurl'] ?? ''));
+$steamProfileUrlParts = $steamProfileUrl !== '' ? parse_url($steamProfileUrl) : false;
+if (
+    !is_array($steamProfileUrlParts)
+    || strtolower((string)($steamProfileUrlParts['scheme'] ?? '')) !== 'https'
+    || !in_array(strtolower((string)($steamProfileUrlParts['host'] ?? '')), ['steamcommunity.com', 'www.steamcommunity.com'], true)
+) {
+    $steamProfileUrl = '';
+}
+
+$steamIdForDisplay = $steamid64 !== '' ? $steamid64 : (string)$steamid;
 
 // Ranking data is optional; its database being unavailable must not hide Steam data.
 $playerStats = null;
@@ -483,8 +508,48 @@ if (!function_exists('formatPlaytime')) {
         </div>
 
         <div class="name-and-xp">
-            <h1><?= htmlspecialchars($username, ENT_QUOTES, 'UTF-8') ?></h1>
-            <p class="steam-id">SteamID: <?= htmlspecialchars($steamid, ENT_QUOTES, 'UTF-8') ?></p>
+            <div class="profile-identity-strip" aria-label="اطلاعات حساب Steam">
+                <h1 class="profile-identity-name"><?= htmlspecialchars($steamPersonaname !== '' ? $steamPersonaname : $username, ENT_QUOTES, 'UTF-8') ?></h1>
+                <span class="profile-identity-id" title="SteamID64">
+                    <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                    <?= htmlspecialchars($steamIdForDisplay, ENT_QUOTES, 'UTF-8') ?>
+                </span>
+                <span class="profile-steam-chip profile-steam-status" data-state="<?= (int)$steamStateValue ?>">
+                    <span class="profile-steam-status__dot" aria-hidden="true"></span>
+                    <?= htmlspecialchars($steamStatus, ENT_QUOTES, 'UTF-8') ?>
+                </span>
+                <?php if ($steamGame !== ''): ?>
+                    <span class="profile-steam-chip profile-steam-game">
+                        <i class="fa-solid fa-gamepad" aria-hidden="true"></i>
+                        <?= htmlspecialchars($steamGame, ENT_QUOTES, 'UTF-8') ?>
+                    </span>
+                <?php endif; ?>
+                <span class="profile-steam-chip" title="وضعیت Community">
+                    <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                    <?= htmlspecialchars($steamVisibility, ENT_QUOTES, 'UTF-8') ?>
+                </span>
+                <span class="profile-steam-chip" title="وضعیت تنظیمات پروفایل">
+                    <i class="fa-solid fa-user-check" aria-hidden="true"></i>
+                    <?= htmlspecialchars($steamProfileState, ENT_QUOTES, 'UTF-8') ?>
+                </span>
+                <span class="profile-steam-chip" title="تاریخ ساخت حساب">
+                    <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                    <?= htmlspecialchars($steamCreatedDate, ENT_QUOTES, 'UTF-8') ?>
+                </span>
+                <span class="profile-steam-chip" title="کشور">
+                    <i class="fa-solid fa-globe" aria-hidden="true"></i>
+                    <?= htmlspecialchars($steamCountry !== '' ? $steamCountry : '—', ENT_QUOTES, 'UTF-8') ?>
+                </span>
+                <span class="profile-steam-chip" title="آخرین فعالیت">
+                    <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                    <?= htmlspecialchars($steamLastLogoffDate, ENT_QUOTES, 'UTF-8') ?>
+                </span>
+                <?php if ($steamProfileUrl !== ''): ?>
+                    <a class="profile-steam-link" href="<?= htmlspecialchars($steamProfileUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" aria-label="مشاهده حساب در Steam" title="مشاهده حساب در Steam">
+                        <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                    </a>
+                <?php endif; ?>
+            </div>
             <div class="profile-progress-stack">
                 <div class="profile-progress-item">
                     <div class="profile-progress-head">
@@ -521,6 +586,46 @@ if (!function_exists('formatPlaytime')) {
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- کارت‌های آمار -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label"><i class="fa-solid fa-earth-americas" aria-hidden="true"></i> رتبه جهانی</span>
+            <span class="stat-value"><?= $globalPlace > 0 ? '#' . number_format($globalPlace) : '—' ?></span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label"><i class="fa-solid fa-trophy" aria-hidden="true"></i> رنک</span>
+            <span class="stat-value"><?= htmlspecialchars($hasRankStats ? $currentRank : '—', ENT_QUOTES, 'UTF-8') ?></span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label"><i class="fa-solid fa-crosshairs" aria-hidden="true"></i> K/D</span>
+            <span class="stat-value"><?= $hasRankStats ? htmlspecialchars((string)$kd, ENT_QUOTES, 'UTF-8') : '—' ?></span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label"><i class="fa-solid fa-skull" aria-hidden="true"></i> کشت</span>
+            <span class="stat-value"><?= $hasRankStats ? number_format($kills) : '—' ?></span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label"><i class="fa-solid fa-skull-crossbones" aria-hidden="true"></i> مرگ</span>
+            <span class="stat-value"><?= $hasRankStats ? number_format($deaths) : '—' ?></span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label"><i class="fa-solid fa-handshake" aria-hidden="true"></i> اسیست</span>
+            <span class="stat-value"><?= $hasRankStats ? number_format($assists) : '—' ?></span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label"><i class="fa-solid fa-bullseye" aria-hidden="true"></i> هدشات</span>
+            <span class="stat-value"><?= $hasRankStats ? number_format($headshots) . ' (' . $hsPercent . '%)' : '—' ?></span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label"><i class="fa-solid fa-trophy" aria-hidden="true"></i> برد</span>
+            <span class="stat-value"><?= $hasRankStats ? number_format($wins) : '—' ?></span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label"><i class="fa-solid fa-clock" aria-hidden="true"></i> زمان بازی</span>
+            <span class="stat-value"><?= $hasRankStats ? htmlspecialchars(formatPlaytime($playtime), ENT_QUOTES, 'UTF-8') : '—' ?></span>
         </div>
     </div>
 
@@ -603,45 +708,6 @@ if (!function_exists('formatPlaytime')) {
         </div>
     </section>
 
-<!-- کارت‌های آمار -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <span class="stat-label"><i class="fa-solid fa-earth-americas" aria-hidden="true"></i> رتبه جهانی</span>
-            <span class="stat-value"><?= $globalPlace > 0 ? '#' . number_format($globalPlace) : '—' ?></span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label"><i class="fa-solid fa-trophy" aria-hidden="true"></i> رنک</span>
-            <span class="stat-value"><?= htmlspecialchars($hasRankStats ? $currentRank : '—', ENT_QUOTES, 'UTF-8') ?></span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label"><i class="fa-solid fa-crosshairs" aria-hidden="true"></i> K/D</span>
-            <span class="stat-value"><?= $hasRankStats ? htmlspecialchars((string)$kd, ENT_QUOTES, 'UTF-8') : '—' ?></span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label"><i class="fa-solid fa-skull" aria-hidden="true"></i> کشت</span>
-            <span class="stat-value"><?= $hasRankStats ? number_format($kills) : '—' ?></span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label"><i class="fa-solid fa-skull-crossbones" aria-hidden="true"></i> مرگ</span>
-            <span class="stat-value"><?= $hasRankStats ? number_format($deaths) : '—' ?></span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label"><i class="fa-solid fa-handshake" aria-hidden="true"></i> اسیست</span>
-            <span class="stat-value"><?= $hasRankStats ? number_format($assists) : '—' ?></span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label"><i class="fa-solid fa-bullseye" aria-hidden="true"></i> هدشات</span>
-            <span class="stat-value"><?= $hasRankStats ? number_format($headshots) . ' (' . $hsPercent . '%)' : '—' ?></span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label"><i class="fa-solid fa-trophy" aria-hidden="true"></i> برد</span>
-            <span class="stat-value"><?= $hasRankStats ? number_format($wins) : '—' ?></span>
-        </div>
-        <div class="stat-card">
-            <span class="stat-label"><i class="fa-solid fa-clock" aria-hidden="true"></i> زمان بازی</span>
-            <span class="stat-value"><?= $hasRankStats ? htmlspecialchars(formatPlaytime($playtime), ENT_QUOTES, 'UTF-8') : '—' ?></span>
-        </div>
-    </div>
     <!-- مودال برش آواتار -->
     <div id="avatarModal" class="avatar-modal" aria-hidden="true">
         <div class="avatar-modal-content" role="dialog" aria-modal="true" aria-labelledby="avatarModalTitle">
