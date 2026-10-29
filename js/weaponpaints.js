@@ -68,6 +68,11 @@
                 config.currentTab || 'tab-inventory'
             ),
 
+        currentInventoryCategory:
+            String(
+                config.currentInventoryCategory || 'skins'
+            ),
+
         currentSkinPage:
             Number(
                 config.currentSkinPage || 1
@@ -244,6 +249,7 @@
 
         state.currentTeamParam = String(config.currentTeamParam || '2');
         state.currentActiveTab = String(config.currentTab || 'tab-inventory');
+        state.currentInventoryCategory = String(config.currentInventoryCategory || 'skins');
         state.currentSkinPage = Number(config.currentSkinPage || 1);
         state.currentPinPage = Number(config.currentPinPage || 1);
         state.activeDefindex = null;
@@ -1577,6 +1583,116 @@
         );
 
     }
+    
+    const inventoryCategoryLabels = {
+        skins: 'All Skins', rifles: 'Rifles', smg: 'SMG', heavy: 'Heavy Guns',
+        pistol: 'Pistols', sniper: 'Snipers', knives: 'Knives', gloves: 'Gloves',
+        agents: 'Agents', music: 'Music', pins: 'Pins'
+    };
+
+    function ensureInventoryFilterEmpty(container) {
+        if (!container) return null;
+        let empty = container.querySelector(':scope > .wp-inventory-filter-empty');
+        if (!empty) {
+            empty = document.createElement('div');
+            empty.className = 'wp-inventory-empty wp-inventory-filter-empty';
+            empty.hidden = true;
+            empty.innerHTML = `
+                <i class="fas fa-box-open" aria-hidden="true"></i>
+                <strong>No already selected items in this category.</strong>
+                <span>Switch to Selecting skins to browse and choose another item.</span>
+            `;
+            container.appendChild(empty);
+        }
+        return empty;
+    }
+
+    function applyInventoryCategoryFilter(category = state.currentInventoryCategory, runSearch = true) {
+        const allowed = Object.prototype.hasOwnProperty.call(inventoryCategoryLabels, String(category))
+            ? String(category)
+            : 'skins';
+        state.currentInventoryCategory = allowed;
+
+        document.querySelectorAll('[data-wp-inventory-filter]').forEach(button => {
+            const active = button.dataset.wpInventoryFilter === allowed;
+            button.classList.toggle('is-active', active);
+            button.classList.toggle('active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            if (active) button.removeAttribute('tabindex');
+            else button.setAttribute('tabindex', '-1');
+        });
+
+        const inventoryPane = document.getElementById('tab-inventory');
+        if (!inventoryPane) return;
+
+        const paintCategories = ['skins', 'rifles', 'smg', 'heavy', 'pistol', 'sniper', 'knives'];
+        const savedSection = inventoryPane.querySelector('.wp-inventory-saved');
+        if (savedSection) savedSection.hidden = !paintCategories.includes(allowed);
+
+        const savedGrid = inventoryPane.querySelector('#savedPaintInventoryGrid');
+        if (savedGrid) {
+            const savedItems = Array.from(savedGrid.querySelectorAll('.wp-item[data-wp-inventory-category]'));
+            let visibleSavedCount = 0;
+            savedItems.forEach(item => {
+                const itemCategory = item.dataset.wpInventoryCategory || 'skins';
+                const matches = allowed === 'skins'
+                    ? itemCategory !== 'knives'
+                    : itemCategory === allowed;
+                item.classList.toggle('wp-inventory-category-hidden', !matches);
+                if (matches) visibleSavedCount++;
+            });
+
+            const empty = ensureInventoryFilterEmpty(savedGrid);
+            if (empty) {
+                empty.hidden = visibleSavedCount > 0;
+                if (allowed === 'skins') {
+                    empty.querySelector('strong').textContent = 'No saved weapon paints yet.';
+                    empty.querySelector('span').textContent = 'Save a weapon paint configuration and it will appear in this inventory.';
+                } else {
+                    empty.querySelector('strong').textContent = `No saved paints in ${inventoryCategoryLabels[allowed]}.`;
+                    empty.querySelector('span').textContent = 'Saved paints for other categories remain in your inventory.';
+                }
+            }
+        }
+
+        const currentGrid = inventoryPane.querySelector('.wp-inventory-current-grid');
+        if (currentGrid) {
+            const currentItems = Array.from(currentGrid.querySelectorAll('.wp-item[data-wp-inventory-category]'));
+            let visibleCurrentCount = 0;
+            currentItems.forEach(item => {
+                const itemCategory = item.dataset.wpInventoryCategory || 'skins';
+                const matches = allowed === 'skins'
+                    ? ['skins', 'rifles', 'smg', 'heavy', 'pistol', 'sniper'].includes(itemCategory)
+                    : itemCategory === allowed;
+                item.classList.toggle('wp-inventory-category-hidden', !matches);
+                if (matches) visibleCurrentCount++;
+            });
+
+            const empty = ensureInventoryFilterEmpty(currentGrid);
+            if (empty) {
+                empty.hidden = visibleCurrentCount > 0;
+                empty.querySelector('strong').textContent = `No already selected items in ${inventoryCategoryLabels[allowed]}.`;
+                empty.querySelector('span').textContent = 'Switch to Selecting skins to browse and choose another item.';
+            }
+        }
+
+        if (runSearch) applyGlobalSearch();
+    }
+
+    function syncTopLevelView(tabId = getCurrentActiveTab()) {
+        const isInventory = tabId === 'tab-inventory';
+        const mode = isInventory ? 'inventory' : 'selecting';
+        document.querySelectorAll('[data-wp-category-nav]').forEach(nav => {
+            nav.hidden = nav.dataset.wpCategoryNav !== mode;
+        });
+        document.querySelectorAll('[data-wp-mode-target]').forEach(button => {
+            const active = button.dataset.wpModeTarget === mode;
+            button.classList.toggle('is-active', active);
+            button.setAttribute('aria-pressed', active ? 'true' : 'false');
+        });
+        applyInventoryCategoryFilter(state.currentInventoryCategory, false);
+    }
+
 
 
     const floatingClientPages = new Map();
@@ -1659,7 +1775,8 @@
                         pane.querySelectorAll('.wp-items-grid .wp-item')
                     );
                     const matchingItems = items.filter(
-                        item => !item.classList.contains('is-search-hidden')
+                        item => !item.classList.contains('is-search-hidden') &&
+                            !item.classList.contains('wp-inventory-category-hidden')
                     );
                     const totalPages = Math.max(
                         1,
@@ -1791,7 +1908,8 @@
                 activePane.querySelectorAll('.wp-items-grid .wp-item')
             );
             const matchingItems = items.filter(
-                item => !item.classList.contains('is-search-hidden')
+                item => !item.classList.contains('is-search-hidden') &&
+                    !item.classList.contains('wp-inventory-category-hidden')
             );
 
             const pageSize = 24;
@@ -3054,6 +3172,7 @@
             );
 
         state.currentActiveTab = tabId;
+        syncTopLevelView(tabId);
         syncAgentTeamSwitcher(tabId);
         syncFloatingPagination();
 
@@ -3077,6 +3196,42 @@
             return;
 
         }
+
+        document.querySelectorAll('[data-wp-mode-target]').forEach(button => {
+            if (button.dataset.wpModeBound === '1') return;
+            button.dataset.wpModeBound = '1';
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                const requestedMode = button.dataset.wpModeTarget;
+                const currentTab = getCurrentActiveTab();
+                if (requestedMode === 'inventory') {
+                    activateMainTab('tab-inventory', true);
+                    return;
+                }
+                const selectionTabs = [
+                    'tab-skins', 'tab-rifles', 'tab-smg', 'tab-heavy',
+                    'tab-pistol', 'tab-sniper', 'tab-knives', 'tab-gloves',
+                    'tab-agents', 'tab-music', 'tab-pins'
+                ];
+                activateMainTab(selectionTabs.includes(currentTab) ? currentTab : 'tab-skins', true);
+            });
+        });
+
+        document.querySelectorAll('[data-wp-inventory-filter]').forEach(button => {
+            if (button.dataset.wpInventoryFilterBound === '1') return;
+            button.dataset.wpInventoryFilterBound = '1';
+            button.addEventListener('click', event => {
+                event.preventDefault();
+                applyInventoryCategoryFilter(button.dataset.wpInventoryFilter || 'skins', true);
+                const url = getCurrentUrl();
+                url.searchParams.set('inventory_category', state.currentInventoryCategory);
+                window.history.replaceState(
+                    { ...(window.history.state || {}), inventoryCategory: state.currentInventoryCategory },
+                    '',
+                    url.toString()
+                );
+            });
+        });
 
 
         const tabButtons =
@@ -3341,12 +3496,8 @@
                 );
 
 
-                if (
-                    matches
-                ) {
-
+                if (matches && !item.classList.contains('wp-inventory-category-hidden')) {
                     visibleCount++;
-
                 }
 
             }

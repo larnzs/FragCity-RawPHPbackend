@@ -7617,3 +7617,103 @@ body > #stickerModal #stickerLoadMore, body > #keychainModal #keychainLoadMore {
 @media (prefers-reduced-motion:reduce) {
     .wp-saved-paint-card, body > #stickerModal .wp-modal-header--weapon, body > #keychainModal .wp-modal-header--weapon { transition:none !important; }
 }
+
+
+/* =========================================================
+   33. Two-level inventory / skin-selection navigation
+========================================================= */
+
+.wp-view-mode-switcher {
+    width: min(100%, 1550px);
+    margin: 8px auto 0;
+    padding: 4px;
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+    background: rgba(15, 23, 42, 0.82);
+    border: 1px solid var(--wp-border);
+    border-radius: 15px;
+    box-shadow: var(--wp-shadow-soft);
+}
+
+.wp-mode-tab {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    color: var(--wp-text-muted);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--wp-transition), background var(--wp-transition),
+        border-color var(--wp-transition), transform var(--wp-transition), box-shadow var(--wp-transition);
+}
+
+.wp-mode-tab > i {
+    color: var(--wp-orange, #F97316);
+    font-size: 0.95rem;
+}
+
+.wp-mode-tab:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.045);
+    border-color: rgba(148, 163, 184, 0.12);
+}
+
+.wp-mode-tab.is-active {
+    color: #fff;
+    background: linear-gradient(135deg, #9a3412, #f97316);
+    border-color: rgba(251, 146, 60, 0.65);
+    box-shadow: 0 7px 20px rgba(249, 115, 22, 0.18);
+}
+
+.wp-mode-tab.is-active > i {
+    color: #fff;
+}
+
+.wp-app .wp-header .wp-category-switcher[hidden],
+.wp-app [data-wp-category-nav][hidden] {
+    display: none !important;
+}
+
+.wp-inventory-category-hidden {
+    display: none !important;
+}
+
+.wp-inventory-filter-empty {
+    grid-column: 1 / -1;
+    width: 100%;
+}
+
+.wp-inventory-filter-empty[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 760px) {
+    .wp-app .wp-header .wp-view-mode-switcher {
+        width: calc(100% - 24px);
+        gap: 5px;
+        margin-top: 4px;
+    }
+
+    .wp-app .wp-header .wp-mode-tab {
+        min-height: 42px;
+        padding: 0 7px;
+        gap: 6px;
+        font-size: 0.72rem;
+    }
+
+    .wp-app .wp-header .wp-mode-tab > i {
+        font-size: 0.82rem;
+    }
+}
