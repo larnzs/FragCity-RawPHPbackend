@@ -5,6 +5,41 @@
     window.fragCityHeaderReady = true;
 
     const body = document.body;
+    const siteHeader = document.getElementById('siteHeader');
+    let scrollTicking = false;
+
+    /*
+     * Toggle a lightweight state only when crossing the threshold.
+     * The CSS deliberately avoids backdrop-filter animation here,
+     * which can cause sticky headers to flicker on some browsers.
+     */
+    function updateHeaderScrollState() {
+        if (!siteHeader) {
+            scrollTicking = false;
+            return;
+        }
+
+        const scrollTop = Math.max(
+            window.scrollY || 0,
+            document.documentElement.scrollTop || 0
+        );
+
+        if (scrollTop > 12) {
+            siteHeader.classList.add('is-scrolled');
+        } else if (scrollTop <= 1) {
+            siteHeader.classList.remove('is-scrolled');
+        }
+
+        scrollTicking = false;
+    }
+
+    window.addEventListener('scroll', function () {
+        if (scrollTicking) return;
+        scrollTicking = true;
+        window.requestAnimationFrame(updateHeaderScrollState);
+    }, { passive: true });
+
+    updateHeaderScrollState();
 
     const dropdowns = Array.from(
         document.querySelectorAll('.frag-dropdown')
