@@ -24,6 +24,9 @@ final class SteamProfileService
 
         $apiKey = defined('STEAM_API_KEY') ? trim((string)STEAM_API_KEY) : '';
         if ($apiKey === '') {
+            if ($cached === []) {
+                error_log('[FragCity] Steam profile fetch skipped: runtime setting integrations.steam.api_key is missing.');
+            }
             self::syncSession($cached);
             return $cached;
         }
@@ -37,8 +40,15 @@ final class SteamProfileService
         }
 
         $decoded = json_decode($json, true);
-        $players = $decoded['response']['players'] ?? [];
+        if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+            error_log('[FragCity] Steam profile fetch failed: Steam API response was not valid JSON (JSON error ' . json_last_error() . ').');
+            self::syncSession($cached);
+            return $cached;
+        }
+
+        $players = $decoded['response']['players'] ?? null;
         if (!is_array($players)) {
+            error_log('[FragCity] Steam profile fetch failed: API response did not contain response.players.');
             self::syncSession($cached);
             return $cached;
         }
@@ -51,15 +61,19 @@ final class SteamProfileService
             }
         }
         if (!is_array($rawPlayer)) {
+            error_log('[FragCity] Steam profile fetch returned no player summary for the authenticated SteamID.');
             self::syncSession($cached);
             return $cached;
         }
 
         $player = self::normalizePlayer($rawPlayer, $steamid64);
         if ($player === []) {
+            error_log('[FragCity] Steam profile fetch returned a player summary that failed SteamID normalization.');
             self::syncSession($cached);
             return $cached;
         }
+
+        error_log('[FragCity] Steam profile summary fetched and normalized successfully.');
 
         if (session_status() === PHP_SESSION_ACTIVE) {
             if (!isset($_SESSION['steam_profile_cache']) || !is_array($_SESSION['steam_profile_cache'])) {
@@ -129,7 +143,14 @@ final class SteamProfileService
             $gameId,
             $steamid64,
         ]);
-        return $stmt->rowCount() > 0;
+
+        // PDO/MySQL may report zero affected rows when values are unchanged.
+        // Distinguish that from a SteamID that has no row in the target database.
+        if ($stmt->rowCount() > 0) return true;
+
+        $check = $pdo->prepare('SELECT 1 FROM users WHERE steamid64 = ? LIMIT 1');
+        $check->execute([$steamid64]);
+        return $check->fetchColumn() !== false;
     }
 
     /**
@@ -303,8 +324,13 @@ final class SteamProfileService
             ]);
             $response = curl_exec($handle);
             $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
+            $curlError = curl_errno($handle);
             curl_close($handle);
-            return is_string($response) && $status === 200 ? $response : null;
+
+            if (is_string($response) && $status === 200) return $response;
+
+            error_log('[FragCity] Steam API HTTP request failed (HTTP status ' . $status . ', cURL error ' . $curlError . ').');
+            return null;
         }
 
         $context = stream_context_create([
@@ -315,6 +341,9 @@ final class SteamProfileService
             'ssl' => ['verify_peer' => true, 'verify_peer_name' => true],
         ]);
         $response = @file_get_contents($url, false, $context);
-        return is_string($response) ? $response : null;
+        if (is_string($response)) return $response;
+
+        error_log('[FragCity] Steam API HTTP request failed using PHP stream transport.');
+        return null;
     }
 }
