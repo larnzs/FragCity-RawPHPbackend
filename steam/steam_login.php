@@ -143,11 +143,15 @@ try {
                 $profileToStore = SteamProfileService::getPlayerSummary((string)$steamid64);
                 if ($profileToStore !== []) {
                     try {
-                        SteamProfileService::persistPlayerSummary($pdo, (string)$steamid64, $profileToStore);
+                        $profilePersisted = SteamProfileService::persistPlayerSummary($pdo, (string)$steamid64, $profileToStore);
+                        error_log($profilePersisted
+                            ? '[FragCity] Steam profile persistence completed for the matching users row.'
+                            : '[FragCity] Steam profile persistence found no matching users row in the connected database.');
                     } catch (Throwable $profileStoreError) {
-                        // Authentication must not fail because a profile migration is pending.
-                        error_log('[FragCity] Steam profile persistence failed; check the users profile migration.');
+                        error_log('[FragCity] Steam profile persistence failed (' . get_class($profileStoreError) . ', code ' . (string)$profileStoreError->getCode() . '): ' . substr($profileStoreError->getMessage(), 0, 300));
                     }
+                } else {
+                    error_log('[FragCity] Steam profile persistence skipped: no usable Steam summary was available.');
                 }
 
                 header('Location: ' . $dashboardPage);
