@@ -179,7 +179,6 @@ final class SteamProfileService
             ]);
             $response = curl_exec($handle);
             $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
-            curl_close($handle);
             if (is_string($response) && $status === 200) $bytes = $response;
         } else {
             return '';
@@ -325,7 +324,6 @@ final class SteamProfileService
             $response = curl_exec($handle);
             $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
             $curlError = curl_errno($handle);
-            curl_close($handle);
 
             if (is_string($response) && $status === 200) return $response;
 
