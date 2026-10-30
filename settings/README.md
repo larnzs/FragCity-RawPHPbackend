@@ -1,58 +1,93 @@
-# Runtime settings
+# FragCity runtime configuration
 
-FragCity loads runtime configuration only from `settings/settings.json` by default.
-It may be overridden with the `FRAGCITY_SETTINGS_FILE` environment variable.
+This directory contains the website settings loader, safe example files, and web-server protection snippets.
 
-`settings/settings.example.json` is documentation/reference only. The runtime never
-falls back to it. If the runtime settings file is missing, unreadable, or invalid,
-database access stays disabled and an error is written to the PHP error log.
+## Which file is actually loaded?
 
-## Laragon / local setup
+- `settings/settings.json` is the private runtime file used by Laragon and, by default, by the website on the host.
+- `settings/settings.example.json` is the complete tracked website template. It contains placeholders only and is safe to commit.
+- `FRAGCITY_SETTINGS_FILE` may point the PHP process to a different private JSON file. When it is set, that exact file is loaded.
+- `settings/*.integration.example.json` files are small, optional fragments. They are NOT loaded automatically. Merge the relevant `integrations` object into the private `settings/settings.json`.
 
-Extract the provided local configuration bundle at the repository root. It creates the ignored `settings/settings.json` and `local-config/laragon-site-db-user.sql`; the latter contains the generated local DB password and must remain local. The tracked `tools/laragon-site-db-user.sql` is only a placeholder template.
+The loader intentionally does not fall back to the example file. If the runtime file is missing, unreadable or invalid JSON, configuration stays fail-closed. Do not copy the example over an existing local or Production settings file.
 
-1. Put the environment-specific JSON at `settings/settings.json`.
-2. Set `databases.main` to a least-privileged local account for
-   `kyonxcbt_fragcity_services`.
-3. Set `integrations.weaponpaints_api.base_url` to
-   `https://api.fragcity.ir`.
-4. Set `integrations.weaponpaints_api.shared_secret` to the exact secret
-   configured in `/etc/fragcity-api/config.php` on the Linux host.
-5. Set `files.database.weaponpaints_plugin.transport` to `api`.
+Create the file only when it does not already exist:
 
-Do not configure a website-side connection to `GLOBAL_weaponpaints`; the website
-uses the signed HTTPS API. Do not expose the shared secret in browser JavaScript.
+```powershell
+Copy-Item .\settings\settings.example.json .\settings\settings.json
+```
 
-`settings/settings.json` is intentionally ignored by Git. A private repository is
-not a secure secret store: credentials accidentally committed remain in Git history
-and may be copied to clones, logs, backups, or automation systems.
+The main example uses valid JSON. JSON has no comment syntax, so it carries adjacent `_comment` metadata properties as inline documentation. The settings loader ignores these unknown metadata keys. Keep comments as JSON strings; do not add JavaScript-style `//` or `/* */` comments to the runtime JSON.
 
+## Website settings structure
 
-## Public CS2 Server Browser
+The complete template documents these sections:
 
-The active public Server Browser obtains the CS2 server inventory through the signed Pterodactyl Standby API. Merge `settings/pterodactyl-standby.integration.example.json` into the private `settings/settings.json`:
+| Section | Purpose |
+|---|---|
+| `app` | Environment name, timezone, canonical site URL and debug switch |
+| `databases.main` | FragCity website database connection for the current environment |
+| `databases.plugin_sync` | Optional isolated plugin-sync schema |
+| `databases.legacy_services` | Compatibility profile for older site pages |
+| `databases.ranks_plugin` | Optional Ranks plugin schema |
+| `databases.simpleadmin_plugin` | Optional SimpleAdmin plugin schema |
+| `integrations.steam` | Steam Web API and OpenID-related site settings |
+| `integrations.zarinpal` | Payment gateway URLs and merchant identity |
+| `integrations.weaponpaints_api` | Signed Linux WeaponPaints API client |
+| `integrations.pterodactyl_standby_api` | Signed Server Browser API client |
+| `integrations.pterodactyl_monitoring_api` | Signed admin Monitoring API client |
+| `files` | Per-page, panel, class and plugin behavior/settings |
 
-~~~json
-{
-  "integrations": {
-    "pterodactyl_standby_api": {
-      "base_url": "https://api.fragcity.ir",
-      "shared_secret": "MATCH_THE_LINUX_PTERODACTYL_STANDBY_SECRET"
-    }
-  }
-}
-~~~
+Every database profile referenced by `files.*.database_profile` must exist under `databases`. A profile with an empty schema name is intentionally unconfigured. Do not configure a website-side `databases.weaponpaints` connection: the site must never connect directly to the Linux WeaponPaints database.
 
-The Pterodactyl Application API key stays in `/etc/fragcity-api/config.php` on Linux and must never be placed in website settings or browser JavaScript. The Linux API reads the configured Pterodactyl Node and CS2 Egg/Docker image allowlist, selects each server's default Allocation, and performs concurrent A2S_INFO queries.
+## Website-to-Linux API credentials
 
-The API refreshes its short cache (10 seconds by default) when a website request arrives. No Cron Job or manual port-range scan is needed. The legacy database scanner files and tables are retained for rollback only; do not schedule `tools/refresh-public-server-browser.php`.
+There are three independent signed API clients. Keep their secrets different:
 
-See `docs/PTERODACTYL-STANDBY-API.md` for runtime config, cache permissions, deployment and validation. The admin resource dashboard is a separate integration documented in `docs/PTERODACTYL-MONITORING.md`.
+| Website setting | Matching Linux setting | Endpoint |
+|---|---|---|
+| `integrations.weaponpaints_api.shared_secret` | top-level `shared_secret` | `POST /v1/weaponpaints` |
+| `integrations.pterodactyl_standby_api.shared_secret` | `pterodactyl_standby.shared_secret` | `POST /v1/pterodactyl-standby` |
+| `integrations.pterodactyl_monitoring_api.shared_secret` | `pterodactyl_monitoring.shared_secret` | `POST /v1/pterodactyl-monitoring` |
 
-## Pterodactyl Monitoring
+For all three clients, `base_url` is the HTTPS origin only, for example `https://api.fragcity.ir`. Do not append `/v1`, an endpoint path, a query string or a trailing application subdirectory; the PHP client appends the fixed endpoint itself.
 
-The admin-only CS2 panel page `panels/cs2/monitoring.php` obtains live node/server resource information through the signed Linux API route `/v1/pterodactyl-monitoring`. Configure `integrations.pterodactyl_monitoring_api.base_url` and its separate `shared_secret` in the private website `settings/settings.json`; the matching Linux-side Pterodactyl Application API key, node allowlist, and Wings settings stay in `/etc/fragcity-api/config.php`.
+Each shared secret must be 64 lowercase hexadecimal characters or longer (up to 128), and should be generated independently on Linux with:
 
-Use `settings/pterodactyl-monitoring.integration.example.json` as the website-side fragment. Never put the Pterodactyl Application API key or Wings token in website settings or browser JavaScript. The browser is authorized by the FragCity admin session only; it never receives Pterodactyl credentials.
+```bash
+openssl rand -hex 32
+```
 
-See `docs/PTERODACTYL-MONITORING.md` for node allowlists, Wings TLS/private URL requirements, deployment, and validation.
+Do not paste secrets into chat, Git, issue trackers or browser JavaScript. The website stores only the matching HMAC secret for each integration. It must never store the Pterodactyl Application API token or a Wings token.
+
+### WeaponPaints
+
+Use `settings/weaponpaints-api.integration.example.json` as a small reference fragment, or use the complete template. The website's `files.database.weaponpaints_plugin.transport` must remain `api`. Its secret matches the root `shared_secret` in `/etc/fragcity-api/config.php`. The Linux API's database connection remains on `GLOBAL_weaponpaints`; this is separate from `databases.main`.
+
+### Public Server Browser / Standby
+
+Use `settings/pterodactyl-standby.integration.example.json`. Its secret matches Linux `pterodactyl_standby.shared_secret`. The website receives a sanitized server snapshot; the Linux API owns the read-only Pterodactyl Application API token and sends A2S_INFO to the selected default Allocations. The live implementation is single-Node for now and refreshes its 10-second cache on demand; no Cron job is needed.
+
+### Pterodactyl Monitoring
+
+Use `settings/pterodactyl-monitoring.integration.example.json`. Its secret matches Linux `pterodactyl_monitoring.shared_secret`. This route backs the admin-only Monitoring panel and reads Pterodactyl/Wings resource data. It is separate from the public Server Browser and WeaponPaints.
+
+## Linux API private configuration
+
+The matching Linux-side template is `linuxapi/config.example.php`. It documents:
+
+- root WeaponPaints `shared_secret` and the Linux-local MariaDB connection;
+- an independent `pterodactyl_standby` block, including cache, internal A2S query host, public connect host, Node ID, allowlists and read-only Application API token;
+- an independent `pterodactyl_monitoring` block, including Node allowlist, host metrics options, Wings URL overrides and the read-only Application API token.
+
+The example is copied to `/etc/fragcity-api/config.php` only for a fresh install. On an existing server, merge the required keys into the live config; never overwrite its real database password or current HMAC secrets. Keep the file outside the public document root, readable by PHP-FPM and not writable by the web process.
+
+The same Pterodactyl Application API token may be reused by Standby and Monitoring if its read-only scopes cover both features. Its value stays only on Linux. The HMAC secrets must still be unique per endpoint.
+
+## Web-server protection
+
+- Apache deployments should retain `settings/.htaccess` to block direct access to private settings.
+- Nginx does not read `.htaccess`; include `settings/nginx-protect.conf` inside the active website `server {}` block, or store the runtime settings outside the document root and set `FRAGCITY_SETTINGS_FILE`.
+- The API Nginx templates live under `linuxapi/nginx/`. The HTTP file is a bootstrap example; the HTTPS file is the TLS example. Both should route only the fixed API paths to `public/index.php`.
+
+See `docs/CONFIGURATION.md`, `docs/PTERODACTYL-STANDBY-API.md`, `docs/PTERODACTYL-MONITORING.md` and `docs/LINUXAPI-DEPLOYMENT.md` for deployment and validation steps.
