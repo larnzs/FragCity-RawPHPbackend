@@ -113,8 +113,9 @@ return [
         'region' => '',             // Optional display metadata; does not affect discovery.
         'pterodactyl' => [
             'base_url' => 'https://server1.fragcity.ir', // Pterodactyl Panel origin only.
-            // Read-only Application API token. It may be the same token used by Monitoring
-            // if its read-only permissions cover both features; each feature still has its OWN HMAC secret.
+            // Read-only Application API token. It needs Servers: Read and Allocations: Read
+            // so the API can resolve each server's primary Allocation ID and port.
+            // It may be shared with Monitoring if permissions cover both; HMAC secrets stay separate.
             'application_api_key' => 'REPLACE_WITH_READ_ONLY_APPLICATION_API_TOKEN',
             'node_id' => 0, // REQUIRED: replace with the real numeric Node ID from Admin → Nodes.
             // Add the exact Egg IDs used by CS2 servers where possible. Empty is allowed only when
