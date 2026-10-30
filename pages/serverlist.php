@@ -2,24 +2,32 @@
 /**
  * Public CS2 server browser.
  *
- * The active scanner writes A2S results to the site's main database from a
- * scheduled CLI Cron Job. This page performs read-only SQL only.
+ * Pterodactyl provides the allowlisted server allocations. The Linux API
+ * performs on-demand A2S_INFO queries and returns a short-lived cached snapshot.
+ * This page does not scan ports, access the Pterodactyl token, or send UDP.
  */
 if (!defined('FRAGCITY_INDEX_RENDER')) {
     header('Location: /index.php?page=servers_vps', true, 303);
     exit;
 }
 
-require_once dirname(__DIR__) . '/class/PublicServerBrowserRepository.php';
+require_once dirname(__DIR__) . '/class/PterodactylStandbyRepository.php';
 
 $serverInventory = [];
+$serverSnapshotStale = false;
+$serverSnapshotAge = null;
 
 try {
-    if ($pdo instanceof PDO) {
-        $serverInventory = (new PublicServerBrowserRepository($pdo))->getServers();
-    }
+    $serverSnapshot = (new PterodactylStandbyRepository())->getSnapshot();
+    $serverInventory = is_array($serverSnapshot['servers'] ?? null)
+        ? $serverSnapshot['servers']
+        : [];
+    $serverSnapshotStale = !empty($serverSnapshot['stale']);
+    $serverSnapshotAge = isset($serverSnapshot['cache_age_seconds'])
+        ? max(0, (int)$serverSnapshot['cache_age_seconds'])
+        : null;
 } catch (Throwable $e) {
-    error_log('[FragCity] Public Server Browser database read failed: ' . get_class($e));
+    error_log('[FragCity] Pterodactyl Server Browser API read failed: ' . get_class($e));
 }
 
 $escapeServerValue = static function ($value): string {
@@ -368,10 +376,10 @@ $statusLabels = [
                 </div>
                 <span class="sl-empty-kicker">SERVER DIRECTORY</span>
                 <h3>سرورها در حال آماده‌سازی‌اند</h3>
-                <p>پس از اجرای اولین Cron و شناسایی سرورهای فعال، نقشه، بازیکنان، ظرفیت و زمان پاسخ A2S اینجا نمایش داده می‌شود.</p>
+                <p>پس از اتصال Pterodactyl و دریافت اولین پاسخ A2S، نقشه، بازیکنان، ظرفیت و زمان پاسخ سرورها اینجا نمایش داده می‌شود.</p>
                 <div class="sl-empty-status">
                     <span class="sl-empty-status-dot"></span>
-                    در انتظار اولین اسکن
+                    در انتظار اتصال Pterodactyl
                 </div>
                 <small>فقط سرورهای تأییدشده با AppID 730 نمایش داده می‌شوند.</small>
             </div>
