@@ -49,6 +49,24 @@ copy settings\settings.example.json settings\settings.json
 
 **سازگاری PHP:** برنامه از امکانات PHP 8.x مثل `match` و `str_starts_with` استفاده می‌کند. در Laragon از Menu → PHP → Version، نسخهٔ PHP 8.4 را انتخاب کن. timezone Parse error ناشی از نسخهٔ PHP قدیمی را حل نمی‌کند. این انتخاب مخصوص سایت در Windows است؛ Pterodactyl Panel v1.15.1 در Debian جداگانه با PHP 8.3 اجرا می‌شود، پس نسخهٔ PHP این دو محیط را با هم اشتباه نگیر.
 
+### Public Server Browser محلی
+
+برای تست Server Browser با دیتابیس محلی Laragon، پس از واردکردن dump اصلی، Migration زیر را یک‌بار روی دیتابیس محلی اجرا کن:
+
+~~~powershell
+mysql -u root kyonxcbt_fragcity_services < database/migrations/20261030_create_public_server_browser_tables.sql
+~~~
+
+سپس دسترسی user محلی را با GRANTهای جدید در \`tools/laragon-site-db-user.sql\` به دو جدول scanner اضافه کن. تست UDP را فقط از همان محیطی اجرا کن که قرار است Worker در آن اجرا شود؛ موفقیت در Laragon ثابت نمی‌کند UDP خروجی از هاست اشتراکی نیز مجاز است.
+
+Worker را می‌توان برای تست دستی با PHP CLI اجرا کرد:
+
+~~~powershell
+php tools/refresh-public-server-browser.php
+~~~
+
+در Production همین Worker با Cron هاست اشتراکی اجرا می‌شود. مراحل کامل و تست UDP از خود هاست در \`docs/PUBLIC-SERVER-SCANNER.md\` آمده است.
+
 ## 4. استفاده از updater روزمره
 
 فایل update.bat در ریشهٔ ریپو قرار دارد و فقط ریپوی محلی را به‌روز می‌کند:
