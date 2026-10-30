@@ -965,7 +965,7 @@ if (!function_exists('formatPlaytime')) {
                             maxlength="11"
                             required
                         >
-                                            <small>شماره موبایل برای ورود با شماره نیز استفاده می‌شود.</small>
+                        <small>شماره موبایل برای ورود با شماره نیز استفاده می‌شود.</small>
                     </label>
                 </div>
 
