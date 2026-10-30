@@ -113,7 +113,7 @@ $check(
         && str_contains($publicScanner, '"\xFF\xFF\xFF\xFF\x49"')
         && str_contains($publicScanner, 'count($ports) > 128')
         && str_contains($publicWorker, '$scanner->queryBatch($host, $ports)')
-        && str_contains($publicWorker, "(int)$info['app_id'] === 730")
+        && str_contains($publicWorker, '(int)$info[\'app_id\'] === 730')
 );
 
 $check(
@@ -144,7 +144,7 @@ $check(
 
 $check(
     'Shared-hosting UDP preflight uses only explicit configured ports',
-    str_contains($publicUdpTest, 'count($ports) > 10')
+    str_contains($publicUdpTest, 'count($portArguments) > 10')
         && str_contains($publicUdpTest, 'outside the configured range')
         && str_contains($publicUdpTest, '$scanner->queryBatch($host, $ports)')
         && str_contains($publicDocs, 'test-public-server-browser-udp.php')
@@ -176,7 +176,7 @@ $check(
 $check(
     'Standby snapshot route and Nginx example use a distinct Pterodactyl Standby path',
     str_contains($index, "'/v1/pterodactyl-standby'")
-        && str_contains($index, "$config['pterodactyl_standby']['shared_secret']")
+        && str_contains($index, '$config[\'pterodactyl_standby\'][\'shared_secret\']')
         && str_contains($index, 'pterodactyl_standby_cache_unavailable')
         && str_contains($nginxApi, 'location = /v1/pterodactyl-standby')
         && str_contains($nginxApi, 'SCRIPT_FILENAME $document_root/index.php')
