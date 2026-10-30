@@ -68,6 +68,8 @@ Merge this block into /etc/fragcity-api/config.php. Preserve the existing Weapon
 
 Use a Pterodactyl Application API key with read-only access to server records and Allocation relationships for the selected Node. Configure the exact numeric Node ID from Pterodactyl Admin → Nodes. Prefer an Egg ID allowlist where possible; the Docker image allowlist is also supported. The Application API key remains only in /etc/fragcity-api/config.php.
 
+For the Server Browser token, grant **Servers: Read** and **Allocations: Read** in the Application API key permissions. The Application API server record exposes the primary allocation ID as `attributes.allocation`; the included Allocation records expose their own `attributes.id`. Discovery matches these IDs. Do not rely on the Client API's `is_default` field when reading Application API Allocation records. If the Allocations relationship is absent, discovery now fails with a specific diagnostic instead of silently returning an empty list.
+
 For more than one Node, the current Standby discovery is intentionally single-node. Add additional Node support only after the first configured Node is working end-to-end; do not add guessed IPs or port ranges.
 
 ### Cache directory permissions
@@ -119,6 +121,7 @@ php -l linuxapi/public/index.php
 php -l class/PterodactylStandbyApiClient.php
 php -l class/PterodactylStandbyRepository.php
 php -l pages/serverlist.php
+php linuxapi/tests/pterodactyl-primary-allocation-test.php
 php linuxapi/tools/architecture-check.php
 ~~~
 
@@ -136,7 +139,7 @@ Expected initial servers for the configured Node are the three known CS2 Allocat
 
 - pterodactyl_standby_disabled: set enabled to true in the Linux runtime config.
 - pterodactyl_standby_unavailable: inspect the Linux API PHP error log. The response deliberately does not expose Pterodactyl credentials or upstream URLs.
-- No servers returned: verify node_id, the Docker image/Egg allowlist, and that the servers have a default Allocation.
+- No servers returned: verify node_id, the Docker image/Egg allowlist, the server's primary Allocation, and that the Application API key has both Servers: Read and Allocations: Read permissions.
 - All discovered servers offline: verify query_host is reachable from the Linux API host over UDP, and that each default Allocation's game port is the A2S query port.
 - Names/maps load but Connect does not work: verify public_connect_host and router/NAT forwarding for the public game ports.
 - Cache write error: create /var/cache/fragcity-api and grant write access to the PHP-FPM account.
