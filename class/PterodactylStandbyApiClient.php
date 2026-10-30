@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../settings/loader.php';
 
-/** Server-to-server client for the on-demand Pterodactyl/A2S server snapshot. */
+/** Signed website client for the on-demand Pterodactyl/A2S public server snapshot. */
 final class PterodactylStandbyApiClient
 {
     private string $baseUrl;
