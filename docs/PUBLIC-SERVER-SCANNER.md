@@ -22,8 +22,11 @@ Only this explicitly configured host/range is scanned. To add another host, add 
 
 Back up the website database first. Run this migration **once** against `kyonxcbt_fragcity_services` (or the production site's equivalent database):
 
-~~~sql
-SOURCE database/migrations/20261030_create_public_server_browser_tables.sql;
+- **phpMyAdmin:** select the website database → Import → choose `database/migrations/20261030_create_public_server_browser_tables.sql` → Go.
+- **MySQL CLI:** from the repository root, run:
+
+~~~bash
+mysql -u DB_USER -p kyonxcbt_fragcity_services < database/migrations/20261030_create_public_server_browser_tables.sql
 ~~~
 
 The migration creates:
@@ -39,7 +42,7 @@ The first scheduled worker run creates the 2,016 per-port state rows. No manual 
 
 The web/Cron database account needs SELECT, INSERT and UPDATE on the two new tables. It does not need access to WeaponPaints or the Pterodactyl database.
 
-For the Laragon local account, the tracked `tools/laragon-site-db-user.sql` now includes grants for both scanner tables. Run the migration first, then re-run the GRANT statements (or the full local grant script) with a local MariaDB administrator.
+For the Laragon local account, the tracked `tools/laragon-site-db-user.sql` now includes grants for both scanner tables. Run the migration first, then execute only the two new GRANT statements at the end of that file with a local MariaDB administrator. Do not re-run its CREATE/ALTER USER statements unless you intentionally want to reset the local account password.
 
 On cPanel/shared hosting, the database user usually already has privileges over its assigned database. If not, grant SELECT, INSERT and UPDATE on just these two tables through the hosting control panel or ask the provider.
 
@@ -56,6 +59,20 @@ Defaults in the migration:
 For the full range of 2,016 ports, the worker processes at most 256 per invocation. With a one-minute Cron schedule, the initial pass takes approximately eight invocations. A slower schedule (for example every five minutes) takes longer to discover the first complete range, but does not change the retry policy.
 
 These are bounded batches; the worker does not open 2,016 sockets at once. A MySQL advisory lock prevents overlapping Cron processes. Each response must parse as a valid Source A2S_INFO packet and report AppID 730 before it is shown as an online CS2 server.
+
+## PHP syntax and architecture checks
+
+From the repository root, run:
+
+~~~powershell
+php -l class/PublicServerBrowserA2SScanner.php
+php -l class/PublicServerBrowserRepository.php
+php -l tools/refresh-public-server-browser.php
+php -l tools/test-public-server-browser-udp.php
+php linuxapi/tools/architecture-check.php
+~~~
+
+These are static/syntax checks. They do not prove the shared host can send UDP; the next section performs that separate network preflight.
 
 ## First test — run on the shared hosting account
 
