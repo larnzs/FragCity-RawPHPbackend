@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/PterodactylMonitoringPanelClient.php';
 require_once __DIR__ . '/WingsMonitoringClient.php';
+require_once __DIR__ . '/PterodactylHostMetrics.php';
 
 /**
  * Builds an on-demand, sanitized monitoring snapshot for allowlisted CS2
@@ -135,6 +136,23 @@ final class PterodactylMonitoringService
         $systemPayload = $wings->getSystemInformation();
         $wingsServers = $wings->getServers();
 
+        $hostMetrics = null;
+        $localNodeId = (int)($this->monitorConfig['local_node_id'] ?? 0);
+        if ($localNodeId > 0 && $localNodeId === $nodeId) {
+            $systemConfig = is_array($nodeConfig['system'] ?? null)
+                ? $nodeConfig['system']
+                : [];
+            $diskPath = trim((string)($this->monitorConfig['host_metrics_disk_path'] ?? ''));
+            if ($diskPath === '') {
+                $diskPath = trim((string)($systemConfig['data'] ?? '/'));
+            }
+            try {
+                $hostMetrics = (new PterodactylHostMetrics())->collect($diskPath);
+            } catch (Throwable $e) {
+                error_log('[FragCity Pterodactyl Monitoring] Local host metrics unavailable; type=' . get_class($e));
+            }
+        }
+
         $serverByUuid = [];
         foreach ($wingsServers as $wingsServer) {
             $configuration = is_array($wingsServer['configuration'] ?? null)
@@ -194,6 +212,7 @@ final class PterodactylMonitoringService
                 'containers_paused' => max(0, (int)($containers['paused'] ?? 0)),
                 'containers_stopped' => max(0, (int)($containers['stopped'] ?? 0)),
             ],
+            'host_metrics' => $hostMetrics,
             'allocation' => [
                 'memory_capacity_bytes' => $memoryMb * 1024 * 1024,
                 'memory_allocated_bytes' => max(0, (int)($allocated['memory'] ?? 0)) * 1024 * 1024,
@@ -324,6 +343,7 @@ final class PterodactylMonitoringService
                 'containers_paused' => 0,
                 'containers_stopped' => 0,
             ],
+            'host_metrics' => null,
             'allocation' => [
                 'memory_capacity_bytes' => $memoryMb * 1024 * 1024,
                 'memory_allocated_bytes' => max(0, (int)($allocated['memory'] ?? 0)) * 1024 * 1024,
