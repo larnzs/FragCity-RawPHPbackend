@@ -1,98 +1,109 @@
 # FragCity — راهنمای تنظیمات محیطی
 
-> دیتابیس اصلی سایت شامل ده جدول اصلی وب‌سایت است؛ Migration مربوط به Server Browser دو جدول عملیاتی جداگانه نیز به همین دیتابیس اضافه می‌کند. API قدیمی Agent/InstanceMaker ویندوزی و جدول‌های وابسته به آن دیگر بخشی از مسیر فعال سایت نیستند.
+> این مستند و فایل‌های Example باید با مصرف‌کننده‌های واقعی تنظیمات هماهنگ بمانند. فایل Runtime هر محیط مستقل است و هیچ Secret واقعی نباید وارد Git شود.
 
 ## ۱. فایل‌های تنظیمات
 
-- `settings/loader.php`: تنظیمات JSON و اتصال PDO به پروفایل `main` را فراهم می‌کند.
-- `settings/settings.example.json`: نمونهٔ قابل‌ثبت در Git؛ credentialهای دیتابیس خالی هستند.
-- `settings/settings.json`: تنظیمات خصوصی همان محیط؛ در Git ثبت نمی‌شود.
-- `integrations.weaponpaints_api`: آدرس HTTPS و HMAC secret کلاینت Linux API برای WeaponPaints.
-- `files.database.weaponpaints_plugin.transport`: باید `api` باشد. وب‌سایت نباید مستقیماً به دیتابیس WeaponPaints متصل شود.
+- `settings/loader.php`: فایل JSON محیط جاری را می‌خواند و اتصال PDO را از پروفایل‌های `databases.*` می‌سازد.
+- `settings/settings.example.json`: نمونهٔ کامل و قابل‌ثبت در Git برای تنظیمات سایت؛ دارای placeholder و فیلدهای `_comment` برای توضیحات inline است.
+- `settings/settings.json`: تنظیمات خصوصی همان محیط؛ در Git نادیده گرفته می‌شود. این فایل را از Example فقط در نصب اولیه بساز و بعداً overwrite نکن.
+- `FRAGCITY_SETTINGS_FILE`: در صورت تعریف، مسیر فایل JSON خصوصی جایگزین را به Loader می‌دهد؛ در غیر این صورت `settings/settings.json` خوانده می‌شود.
+- `settings/*.integration.example.json`: نمونه‌های کوچک Integration هستند و خودکار بارگذاری نمی‌شوند؛ فقط بخش `integrations` آن‌ها را در تنظیمات خصوصی ادغام کن.
+- `linuxapi/config.example.php`: نمونهٔ کامل تنظیمات Runtime لینوکس؛ نسخهٔ واقعی در `/etc/fragcity-api/config.php` قرار می‌گیرد و خارج از Git است.
 
-## ۲. دیتابیس‌ها و مالک داده
+JSON کامنت استاندارد ندارد؛ برای همین Example کامل از کلیدهای متنی `_comment` استفاده می‌کند. این کلیدها فقط توضیح هستند و Loader در زمان اجرا آن‌ها را مصرف نمی‌کند. فایل همچنان JSON معتبر است.
+
+## ۲. Integrationهای Website ↔ Linux API
+
+هر Integration یک آدرس HTTPS و یک HMAC Secret مستقل دارد. `base_url` فقط Origin است؛ مسیر `/v1/...` را به آن اضافه نکن.
+
+| تنظیم وب‌سایت | Secret متناظر در Linux | مسیر |
+|---|---|---|
+| `integrations.weaponpaints_api` | ریشهٔ `shared_secret` | `POST /v1/weaponpaints` |
+| `integrations.pterodactyl_standby_api` | `pterodactyl_standby.shared_secret` | `POST /v1/pterodactyl-standby` |
+| `integrations.pterodactyl_monitoring_api` | `pterodactyl_monitoring.shared_secret` | `POST /v1/pterodactyl-monitoring` |
+
+برای هر Secret به‌صورت مستقل روی Linux اجرا کن:
+
+```bash
+openssl rand -hex 32
+```
+
+هر مقدار را فقط در دو جای متناظر خودش قرار بده. Secret مربوط به WeaponPaints را با Standby یا Monitoring یکی نکن. Pterodactyl Application API token و Wings token فقط در فایل Runtime لینوکس هستند؛ هیچ‌وقت آن‌ها را در تنظیمات سایت یا JavaScript قرار نده.
+
+Exampleهای جزئی:
+
+- `settings/weaponpaints-api.integration.example.json`
+- `settings/pterodactyl-standby.integration.example.json`
+- `settings/pterodactyl-monitoring.integration.example.json`
+
+## ۳. مرز دیتابیس‌ها
 
 ### دیتابیس اصلی سایت
 
-پروفایل `databases.main` برای دیتابیس محلی/سایت `kyonxcbt_fragcity_services` است. تنها جداول تأییدشدهٔ این دیتابیس:
-
-`donations`, `password_resets`, `tickets`, `ticket_replies`, `users`, `user_wallets`, `vip_codes`, `vip_usage`, `wallet_transactions`, `withdraw_requests`.
-
-ورود و حساب کاربری از `users` استفاده می‌کنند؛ کیف پول از `user_wallets` و `wallet_transactions`؛ پشتیبانی از `tickets` و `ticket_replies`؛ و سایر قابلیت‌ها فقط از جدول‌های موجود در همین فهرست استفاده می‌کنند.
+پروفایل `databases.main` برای دیتابیس وب‌سایت `kyonxcbt_fragcity_services` است. Laragon باید credential دیتابیس محلی خودش را داشته باشد و هاست اشتراکی باید credential مخصوص Production را در Runtime خصوصی خودش نگه دارد.
 
 ### WeaponPaints
 
-دیتابیس `GLOBAL_weaponpaints` روی سرور Linux قرار دارد. وب‌سایت با `class/FragCityLinuxApiClient.php` و `class/WeaponPaintsRepository.php` از طریق `https://api.fragcity.ir/v1/weaponpaints` درخواست امضاشده می‌فرستد. در `settings.json` نباید پروفایل اتصال مستقیم `weaponpaints` یا نام دیتابیس قدیمی `kyonxcbt_weaponpaints_plugin` تعریف شود.
+دیتابیس `GLOBAL_weaponpaints` روی سرور Linux قرار دارد. سایت فقط با `class/FragCityLinuxApiClient.php` و `class/WeaponPaintsRepository.php` و مسیر امضاشدهٔ `/v1/weaponpaints` به آن دسترسی دارد. در `settings.json` پروفایل مستقیم `databases.weaponpaints` نساز و `files.database.weaponpaints_plugin.transport` را روی `api` نگه دار.
 
-### Server Browser
+### پروفایل‌های Plugin
 
-فهرست عمومی CS2 اکنون از Pterodactyl Application API و A2S_INFO به‌صورت on-demand استفاده می‌کند:
+`plugin_sync`, `ranks_plugin` و `simpleadmin_plugin` فقط زمانی باید به دیتابیس مستقل اشاره کنند که schema و user محدود آن‌ها واقعاً ایجاد شده باشند. مقدار `name` خالی در Example عمداً آن‌ها را غیرفعال/نامشخص نگه می‌دارد.
 
-- وب‌سایت: `class/PterodactylStandbyApiClient.php` و `class/PterodactylStandbyRepository.php`.
-- صفحهٔ عمومی: `pages/serverlist.php`.
-- مسیر امضاشدهٔ Linux API: `POST /v1/pterodactyl-standby`.
-- کش کوتاه و on-demand: `linuxapi/src/PterodactylStandby/PterodactylStandbySnapshotCache.php`.
-- کشف سرورها از Pterodactyl: `linuxapi/src/PterodactylStandby/PterodactylStandbyDiscovery.php`.
-- کوئری هم‌زمان A2S: `linuxapi/src/PterodactylStandby/A2SInfoQuery.php`.
+## ۴. Pterodactyl Server Browser
 
-وب‌سایت سرورها را از API می‌گیرد؛ Linux API با Application API فقط سرورهای مجاز و Default Allocation آن‌ها را پیدا می‌کند و روی همان پورت‌ها A2S می‌فرستد. درخواست‌های A2S موازی‌اند و فقط روی Allocationهای ثبت‌شده اجرا می‌شوند؛ هیچ بازهٔ پورت عمومی اسکن نمی‌شود.
+فهرست عمومی سرورها از `PterodactylStandbyRepository` و مسیر امضاشدهٔ `POST /v1/pterodactyl-standby` استفاده می‌کند. Linux API با Application API فقط سرورهای مجاز و Default Allocation را پیدا می‌کند و روی همان پورت‌ها A2S_INFO می‌فرستد. اسکن بازه‌ای پورت و Cron برای مسیر فعال لازم نیست. Cache به‌صورت on-demand و با TTL پیش‌فرض ۱۰ ثانیه تازه می‌شود. پیاده‌سازی فعلی Standby تک‌Node است.
 
-در `settings/settings.json` فقط `integrations.pterodactyl_standby_api.base_url` و HMAC secret مربوطه قرار می‌گیرد. Application API token فقط در `/etc/fragcity-api/config.php` روی Linux نگهداری می‌شود. Cache به‌طور پیش‌فرض ۱۰ ثانیه است و با درخواست وب‌سایت تازه می‌شود؛ Cron لازم نیست. جزئیات در `docs/PTERODACTYL-STANDBY-API.md` است.
+## ۵. Pterodactyl Monitoring
 
-اسکنر دیتابیسی قبلی در فایل‌ها و جداول باقی مانده، اما دیگر منبع فعال Server Browser نیست؛ Cron آن را فعال نکن و جداولش را فعلاً حذف نکن.
+صفحهٔ Monitoring در `panels/cs2/monitoring.php` فقط برای ادمین است. سایت از مسیر داخلی خودش درخواست را احراز هویت می‌کند و سپس از Linux API با HMAC درخواست امضاشده می‌فرستد. Linux API اطلاعات Pterodactyl/Wings را جمع می‌کند؛ Application API token و Wings token هرگز به Browser نمی‌رسند. این قابلیت Secret مستقل دارد و به Cron نیاز ندارد.
 
-ماژول Monitoring مستقل از Server Browser است:
+## ۶. تنظیمات محلی Laragon
 
-- صفحهٔ ادمین: `panels/cs2/monitoring.php` (فقط نقش `admin`).
-- endpoint داخلی سایت: `api/admin-pterodactyl-monitoring.php`.
-- کلاینت امضاشدهٔ سایت: `class/PterodactylMonitoringApiClient.php`.
-- route لینوکس: `POST /v1/pterodactyl-monitoring`.
-- سرویس خواندن Node/Server از Pterodactyl و Wings: `linuxapi/src/PterodactylMonitoring/`.
-
-این صفحه هر ۱۵ ثانیه، فقط هنگام باز بودن، اطلاعات زنده می‌گیرد و به Cron نیاز ندارد. Application API token و Wings token فقط روی Linux نگهداری می‌شوند. راهنمای کامل در `docs/PTERODACTYL-MONITORING.md` است.
-
-### قابلیت‌های سرور
-
-جداولی مانند `agent_tokens`, `agent_nodes`, `pending_servers`, `registered_servers`, `server_ports`, `agent_commands` و `server_configs` مربوط به سیستم قدیمی Windows Agent بودند و در schema جاری وجود ندارند. endpointهای قدیمی Agent با HTTP 410 بازنشسته شده‌اند. خرید و مدیریت سرور تا تکمیل اتصال جدید به Pterodactyl، عمداً غیرفعال است و نباید پرداخت/کسر کیف پول یا query به جدول‌های قدیمی انجام دهد.
-
-## ۳. ساخت تنظیمات محلی Laragon
-
-از ریشهٔ ریپو اجرا کن:
+در نصب اولیه:
 
 ```powershell
 Copy-Item .\settings\settings.example.json .\settings\settings.json
 ```
 
-اگر فایل `settings.json` از قبل وجود دارد، آن را بازنویسی نکن. مقادیر محلی را چنین تنظیم کن:
+اگر `settings/settings.json` از قبل وجود دارد، این دستور را اجرا نکن؛ فایل خصوصی فعلی را باز کن و فقط کلیدهای جدید را Merge کن.
 
 - `app.environment`: `local`
-- `app.site_base_url`: آدرس Virtual Host محلی؛ برای مثال `http://fragcity.test`
-- `databases.main.host`: معمولاً `127.0.0.1`
-- `databases.main.port`: معمولاً `3306`
-- `databases.main.name`: `kyonxcbt_fragcity_services`
-- `databases.main.username/password`: فقط credential دیتابیس محلی Laragon
-- `integrations.weaponpaints_api.base_url`: `https://api.fragcity.ir` فقط اگر عمدتاً می‌خواهی به API واقعی درخواست بفرستی.
-- `integrations.weaponpaints_api.shared_secret`: secret معتبر این API؛ آن را در چت، Git یا مرورگر قرار نده.
+- `app.site_base_url`: آدرس Virtual Host محلی؛ برای نمونه `http://fragcity.test`
+- `databases.main`: فقط اتصال دیتابیس محلی Laragon
+- سه Integration امضاشده: فقط در صورت تست واقعی آن قابلیت، Secret متناظر را تکمیل کن.
+- پرداخت واقعی زرین‌پال را در محیط محلی فعال نکن.
 
-**هشدار مهم:** API واقعی WeaponPaints ممکن است اطلاعات واقعی `GLOBAL_weaponpaints` را بخواند یا تغییر دهد. برای تست save از حساب/SteamID تستی استفاده کن. دیتابیس کپی‌شدهٔ `kyonxcbt_fragcity_services` را با API واقعی اشتباه نگیر؛ این دو دیتابیس مستقل‌اند.
+**هشدار:** تست نوشتن WeaponPaints از Laragon می‌تواند مستقیماً روی دیتابیس واقعی Linux اثر بگذارد. برای تست ذخیره‌سازی از حساب/SteamID اختصاصی تست استفاده کن.
 
-## ۴. کنترل‌های قبل از اجرا
+## ۷. تنظیمات Linux API
 
-1. اطمینان پیدا کن `settings/settings.json` وارد Git نشده باشد.
-2. پوشهٔ `settings` را از دسترسی HTTP عمومی مسدود کن یا فایل تنظیمات runtime را بیرون DocumentRoot بگذار.
-3. تنظیمات نمونه هیچ credential واقعی نداشته باشد.
-4. برای بررسی ساختار دیتابیس سایت از این فرمان read-only استفاده کن:
+نمونهٔ کامل PHP در `linuxapi/config.example.php` است. آن را فقط برای نصب تازه به `/etc/fragcity-api/config.php` کپی کن. برای سرور موجود، بلوک‌های جدید را Merge کن؛ جایگزین‌کردن کل فایل باعث از بین‌رفتن Database password و Secretهای فعلی می‌شود.
 
-   ```powershell
-   php tools/site-bridge-preflight.php
-   ```
+- `shared_secret`: مخصوص WeaponPaints.
+- `pterodactyl_standby.shared_secret`: مخصوص Server Browser.
+- `pterodactyl_monitoring.shared_secret`: مخصوص Monitoring.
+- `pterodactyl_standby.pterodactyl.application_api_key` و `pterodactyl_monitoring.pterodactyl.application_api_key`: توکن Application API فقط‌خواندنی Pterodactyl؛ فقط روی Linux.
+- `database`: دیتابیس محلی WeaponPaints و جدول nonceهای HMAC؛ هیچ‌وقت دیتابیس سایت نیست.
 
-   این اسکریپت فقط ده جدول مشخص‌شدهٔ بالا و ستون‌های موردنیاز فعلی را کنترل می‌کند. هیچ جدول یا داده‌ای ایجاد/ویرایش/حذف نمی‌کند. اجرای آن در محیط محلی Laragon است؛ برای آن نیاز نیست چیزی روی هاست آپلود شود.
+تنظیمات Standby شامل `node_id`، Allowlist مربوط به Egg/Image، `query_host` داخلی، `public_connect_host`، TTL و مسیر Cache است. Monitoring علاوه بر Allowlist نودها، تنظیمات Wings و در صورت نیاز `local_node_id` و `host_metrics_disk_path` دارد.
 
-5. workflow در GitHub syntax فایل‌های PHP و بررسی معماری API را کنترل می‌کند، اما جایگزین تست UI، اتصال محلی، callback پرداخت یا تست write/read-back نمی‌شود.
+## ۸. محافظت از تنظیمات
 
-## ۵. نسخهٔ PHP و انتشار
+- فایل `settings/settings.json` نباید وارد Git شود؛ الگوی آن در `.gitignore` وجود دارد.
+- در Apache فایل `settings/.htaccess` دسترسی مستقیم را مسدود می‌کند.
+- Nginx فایل `.htaccess` را اجرا نمی‌کند؛ `settings/nginx-protect.conf` را داخل server block سایت Include کن یا فایل Runtime را بیرون DocumentRoot قرار بده و `FRAGCITY_SETTINGS_FILE` را تنظیم کن.
+- فایل `/etc/fragcity-api/config.php` باید بیرون DocumentRoot و فقط برای PHP-FPM قابل‌خواندن باشد؛ PHP-FPM نباید بتواند آن را بنویسد.
+- فایل‌های Nginx API در `linuxapi/nginx/` نمونه هستند؛ vhost پنل Pterodactyl را با آن‌ها جایگزین نکن.
+- هیچ Secret، Application API token، Wings token یا Database password را در Git، چت یا مرورگر قرار نده.
 
-کد سایت از امکانات PHP 8.x استفاده می‌کند. برای Laragon نسخهٔ سازگار با کد و افزونه‌های PDO/cURL را انتخاب کن. نسخهٔ PHP مربوط به سایت را با نسخهٔ PHP پنل Pterodactyl روی Debian اشتباه نگیر.
+## ۹. کنترل قبل از اجرا
 
-هر انتشار Production باید جداگانه، پس از backup و تست، به‌صورت دستی انجام شود. pull کردن `main` روی ویندوز هیچ فایلی را روی cPanel یا Debian منتشر نمی‌کند.
+```powershell
+php -r "$j=json_decode(file_get_contents('settings/settings.example.json'),true); if(!is_array($j)) {fwrite(STDERR,json_last_error_msg().PHP_EOL); exit(1);} echo 'Valid website settings example'.PHP_EOL;"
+php -l linuxapi/config.example.php
+php linuxapi/tools/architecture-check.php
+```
+
+این بررسی‌ها ساختار و معماری را کنترل می‌کنند؛ جایگزین تست واقعی اتصال HTTPS، امضای HMAC، Pterodactyl، A2S، دیتابیس یا UI نیستند. انتشار Production نیز جدا از Git pull و فقط پس از Backup و تست انجام می‌شود.
