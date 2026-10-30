@@ -4,23 +4,23 @@
 
 The public Server Browser is intentionally independent from Pterodactyl and from the Linux WeaponPaints API.
 
-1. \`public_server_scan_targets\` stores an approved IPv4 address and inclusive port range.
-2. \`public_server_scan_ports\` stores one scan state per port, including the last A2S result and the next retry time.
-3. \`tools/refresh-public-server-browser.php\` runs from the shared host's PHP CLI Cron Job. It queries configured ports in bounded concurrent UDP batches and writes results to the website database.
-4. \`class/PublicServerBrowserRepository.php\` reads only online AppID 730 results for the public page.
+1. `public_server_scan_targets` stores an approved IPv4 address and inclusive port range.
+2. `public_server_scan_ports` stores one scan state per port, including the last A2S result and the next retry time.
+3. `tools/refresh-public-server-browser.php` runs from the shared host's PHP CLI Cron Job. It queries configured ports in bounded concurrent UDP batches and writes results to the website database.
+4. `class/PublicServerBrowserRepository.php` reads only online AppID 730 results for the public page.
 5. The page does not query UDP, Pterodactyl, or a separate API when visitors load it.
 
 The currently seeded target is:
 
 | IPv4 host | Port start | Port end | Total |
 |---|---:|---:|---:|
-| \`85.185.40.85\` | 27085 | 29100 | 2,016 |
+| `85.185.40.85` | 27085 | 29100 | 2,016 |
 
-Only this explicitly configured host/range is scanned. To add another host, add another row to \`public_server_scan_targets\`; the worker validates the IPv4 address and limits each configured range to at most 4,096 ports.
+Only this explicitly configured host/range is scanned. To add another host, add another row to `public_server_scan_targets`; the worker validates the IPv4 address and limits each configured range to at most 4,096 ports.
 
 ## Database migration
 
-Back up the website database first. Run this migration **once** against \`kyonxcbt_fragcity_services\` (or the production site's equivalent database):
+Back up the website database first. Run this migration **once** against `kyonxcbt_fragcity_services` (or the production site's equivalent database):
 
 ~~~sql
 SOURCE database/migrations/20261030_create_public_server_browser_tables.sql;
@@ -28,10 +28,10 @@ SOURCE database/migrations/20261030_create_public_server_browser_tables.sql;
 
 The migration creates:
 
-- \`public_server_scan_targets\`: target host, inclusive port range, region, enable switch and retry/query intervals.
-- \`public_server_scan_ports\`: per-port state, A2S metadata, last query time, next query time and last successful discovery time.
+- `public_server_scan_targets`: target host, inclusive port range, region, enable switch and retry/query intervals.
+- `public_server_scan_ports`: per-port state, A2S metadata, last query time, next query time and last successful discovery time.
 
-It also inserts the initial target \`85.185.40.85:27085-29100\`. Re-running the migration does not replace the existing target's enable switch or retry settings.
+It also inserts the initial target `85.185.40.85:27085-29100`. Re-running the migration does not replace the existing target's enable switch or retry settings.
 
 The first scheduled worker run creates the 2,016 per-port state rows. No manual IP/port row insertion is needed.
 
@@ -39,7 +39,7 @@ The first scheduled worker run creates the 2,016 per-port state rows. No manual 
 
 The web/Cron database account needs SELECT, INSERT and UPDATE on the two new tables. It does not need access to WeaponPaints or the Pterodactyl database.
 
-For the Laragon local account, the tracked \`tools/laragon-site-db-user.sql\` now includes grants for both scanner tables. Run the migration first, then re-run the GRANT statements (or the full local grant script) with a local MariaDB administrator.
+For the Laragon local account, the tracked `tools/laragon-site-db-user.sql` now includes grants for both scanner tables. Run the migration first, then re-run the GRANT statements (or the full local grant script) with a local MariaDB administrator.
 
 On cPanel/shared hosting, the database user usually already has privileges over its assigned database. If not, grant SELECT, INSERT and UPDATE on just these two tables through the hosting control panel or ask the provider.
 
@@ -59,7 +59,7 @@ These are bounded batches; the worker does not open 2,016 sockets at once. A MyS
 
 ## First test — run on the shared hosting account
 
-The PHP runtime that runs the Cron Job must permit outbound UDP streams and \`stream_select\`. A local Laragon test does not prove the shared host permits UDP.
+The PHP runtime that runs the Cron Job must permit outbound UDP streams and `stream_select`. A local Laragon test does not prove the shared host permits UDP.
 
 After running the migration and deploying the latest repository, execute this from the **shared hosting Terminal/SSH**, not from Laragon:
 
@@ -69,16 +69,16 @@ php tools/test-public-server-browser-udp.php 85.185.40.85 27085 29000 29001
 
 The test is CLI-only and checks only those three explicit ports. It verifies that the PHP runtime can send UDP, receive A2S responses, handle an A2S challenge if returned, and validate AppID 730.
 
-Expected output contains three lines with \`PASS\`, server name, map, player count and Query RTT. If it returns a timeout for all three ports, do not enable the range Cron yet.
+Expected output contains three lines with `PASS`, server name, map, player count and Query RTT. If it returns a timeout for all three ports, do not enable the range Cron yet.
 
 ### What a failed UDP preflight means
 
-- **All three ports time out:** either outbound UDP is blocked by the shared host, public UDP forwarding to \`192.168.2.3\` is missing, or the public route is not reaching Docker.
+- **All three ports time out:** either outbound UDP is blocked by the shared host, public UDP forwarding to `192.168.2.3` is missing, or the public route is not reaching Docker.
 - **Some pass and some time out:** verify the router's UDP forwarding and Docker allocation for each failed port.
 - **A non-CS2 response:** the port is reachable, but the application is not CS2 (AppID 730); it will not be listed publicly.
-- **PHP says \`stream_socket_client\` or \`stream_select\` is unavailable:** the hosting PHP policy/extensions do not support this approach. The active scanner cannot run there without provider changes or a different worker host.
+- **PHP says `stream_socket_client` or `stream_select` is unavailable:** the hosting PHP policy/extensions do not support this approach. The active scanner cannot run there without provider changes or a different worker host.
 
-The three earlier successful tests were run from Debian against the internal Docker address \`192.168.2.3\`. This new preflight is specifically required because the scanner will run from the shared host against the public address \`85.185.40.85\`. For those public queries, the MikroTik must forward the required inbound UDP ports to \`192.168.2.3\`, preserving each destination port. The existing internal test alone does not confirm that external path.
+The three earlier successful tests were run from Debian against the internal Docker address `192.168.2.3`. This new preflight is specifically required because the scanner will run from the shared host against the public address `85.185.40.85`. For those public queries, the MikroTik must forward the required inbound UDP ports to `192.168.2.3`, preserving each destination port. The existing internal test alone does not confirm that external path.
 
 ## Shared-hosting Cron Job
 
@@ -90,7 +90,7 @@ Recommended schedule: **once per minute**, if the hosting provider allows it. Ad
 * * * * * /usr/bin/php -q /home/ACCOUNT/public_html/tools/refresh-public-server-browser.php >> /home/ACCOUNT/logs/public-server-browser.log 2>&1
 ~~~
 
-Use the PHP CLI path/version recommended by the hosting provider. The Cron Job must run as the same website account that can read \`settings/settings.json\` and connect to the configured main database.
+Use the PHP CLI path/version recommended by the hosting provider. The Cron Job must run as the same website account that can read `settings/settings.json` and connect to the configured main database.
 
 If the provider enforces a five-minute minimum, use:
 
@@ -147,10 +147,10 @@ VALUES
     ('ANOTHER_IPV4_ADDRESS', 27015, 27100, 'Region name', 1);
 ~~~
 
-The worker automatically creates per-port rows for a new or extended range. To stop scanning a target, set \`enabled = 0\`; its rows remain stored but are no longer queried or displayed.
+The worker automatically creates per-port rows for a new or extended range. To stop scanning a target, set `enabled = 0`; its rows remain stored but are no longer queried or displayed.
 
 If you change the target range, the worker inserts missing rows. Old port rows outside the current configured range remain in the database but are ignored by both the worker and public page.
 
 ## Pterodactyl Standby
 
-The previous Pterodactyl Application API integration has been preserved separately under the Pterodactyl Standby names and is not part of the active scanner. See \`docs/PTERODACTYL-STANDBY-API.md\`. No Pterodactyl API key or Linux API secret is required for the active public Server Browser.
+The previous Pterodactyl Application API integration has been preserved separately under the Pterodactyl Standby names and is not part of the active scanner. See `docs/PTERODACTYL-STANDBY-API.md`. No Pterodactyl API key or Linux API secret is required for the active public Server Browser.
