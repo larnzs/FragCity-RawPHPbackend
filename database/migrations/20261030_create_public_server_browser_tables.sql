@@ -17,16 +17,6 @@ CREATE TABLE IF NOT EXISTS public_server_scan_targets (
     PRIMARY KEY (id),
     UNIQUE KEY uq_public_server_scan_target (host, port_start, port_end),
     KEY idx_public_server_scan_targets_enabled (enabled),
-    CONSTRAINT chk_public_server_scan_target_range
-        CHECK (port_start >= 1 AND port_end <= 65535 AND port_start <= port_end),
-    CONSTRAINT chk_public_server_scan_target_span
-        CHECK (port_end - port_start <= 4095),
-    CONSTRAINT chk_public_server_scan_timeout
-        CHECK (query_timeout_ms BETWEEN 250 AND 5000),
-    CONSTRAINT chk_public_server_scan_retries
-        CHECK (retry_offline_seconds BETWEEN 300 AND 86400),
-    CONSTRAINT chk_public_server_scan_refresh
-        CHECK (refresh_online_seconds BETWEEN 30 AND 3600)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS public_server_scan_ports (
@@ -56,8 +46,6 @@ CREATE TABLE IF NOT EXISTS public_server_scan_ports (
     CONSTRAINT fk_public_server_scan_ports_target
         FOREIGN KEY (target_id) REFERENCES public_server_scan_targets (id)
         ON DELETE CASCADE,
-    CONSTRAINT chk_public_server_scan_port_range
-        CHECK (port BETWEEN 1 AND 65535)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT IGNORE INTO public_server_scan_targets
