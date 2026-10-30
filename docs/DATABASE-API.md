@@ -1,6 +1,6 @@
 # FragCity — Database & API
 
-> وضعیت فعلی: WeaponPaints از Linux API استفاده می‌کند؛ Server Browser عمومی از دو جدول عملیاتی در دیتابیس اصلی سایت و Cron Job استفاده می‌کند. دیتابیس `GLOBAL_weaponpaints` همچنان روی Debian قرار دارد و فقط از طریق Linux API دسترسی داده می‌شود.
+> وضعیت فعلی: WeaponPaints، Server Browser عمومی (Pterodactyl + A2S) و Pterodactyl Monitoring از Linux API امضاشده استفاده می‌کنند. دیتابیس اصلی سایت روی هاست اشتراکی/کپی محلی Laragon می‌ماند؛ دیتابیس `GLOBAL_weaponpaints` فقط روی Debian قرار دارد و از طریق Linux API قابل دسترسی است. اسکنر دیتابیسی Server Browser فقط Legacy و برای rollback نگه داشته شده است.
 
 ## 1. مسیرهای داده
 
@@ -68,16 +68,21 @@ API از HMAC-SHA256، زمان درخواست، nonce ضد replay، TLS validat
 
 ### Server Browser عمومی
 
-Server Browser فعال برخلاف WeaponPaints نیازی به Linux API جداگانه ندارد:
+Server Browser فعال از مسیر امضاشدهٔ Pterodactyl Standby در Linux API استفاده می‌کند:
 
-- `public_server_scan_targets` نگهدارندهٔ IP و بازهٔ پورت مجاز است.
-- `public_server_scan_ports` وضعیت هر پورت، نتیجهٔ A2S و زمان Query بعدی را نگه می‌دارد.
-- Worker زمان‌بندی‌شدهٔ `tools/refresh-public-server-browser.php` از طریق UDP و در batchهای محدود Query می‌گیرد.
-- صفحهٔ سایت فقط `class/PublicServerBrowserRepository.php` را برای خواندن رکوردهای آنلاین استفاده می‌کند.
-- هیچ درخواست UDP یا اسکن پورت هنگام بازدید کاربر اجرا نمی‌شود.
-- پورت‌های بدون پاسخ تا یک ساعت دوباره Query نمی‌شوند؛ سرورهای معتبر آنلاین با فاصلهٔ کوتاه‌تری به‌روزرسانی می‌شوند.
+- صفحهٔ سایت: `pages/serverlist.php`.
+- کلاینت و Repository سایت: `class/PterodactylStandbyApiClient.php` و `class/PterodactylStandbyRepository.php`.
+- مسیر Linux API: `POST /v1/pterodactyl-standby`.
+- Linux API از Application API فقط Node، سرورهای مجاز و Default Allocation را می‌خواند.
+- روی پورت‌های Allocation تأییدشده، A2S_INFO از شبکهٔ داخلی اجرا می‌شود؛ هیچ بازهٔ پورت عمومی اسکن نمی‌شود.
+- Snapshot به‌صورت on-demand با TTL پیش‌فرض ۱۰ ثانیه cache می‌شود؛ Cron لازم نیست.
+- پیاده‌سازی فعلی Standby عمداً تک-Node است.
 
-Migration و راه‌اندازی Cron در `docs/PUBLIC-SERVER-SCANNER.md` مستند شده است. بخش مستقل Pterodactyl برای استفادهٔ احتمالی آینده با نام Pterodactyl Standby نگهداری می‌شود.
+اسکنر قدیمی `public_server_scan_targets`، `public_server_scan_ports` و `tools/refresh-public-server-browser.php` همچنان برای rollback/reference در ریپو باقی مانده‌اند، اما منبع فعال صفحه نیستند. Cron آن را فعال نکن و جداول قدیمی را بدون تصمیم جداگانه حذف نکن. جزئیات در `docs/PTERODACTYL-STANDBY-API.md` و توضیح مسیر Legacy در `docs/PUBLIC-SERVER-SCANNER.md` است.
+
+### Pterodactyl Monitoring
+
+صفحهٔ ادمین `panels/cs2/monitoring.php` از مسیر امضاشدهٔ `POST /v1/pterodactyl-monitoring` استفاده می‌کند. Linux API اطلاعات Node و سرورهای allowlist‌شده را از Pterodactyl و Wings می‌گیرد و فقط snapshot پاک‌سازی‌شده را برمی‌گرداند. این مسیر با Standby و WeaponPaints Secret مستقل دارد؛ Application API token و Wings token فقط روی Linux نگهداری می‌شوند. Monitoring فقط خواندنی و on-demand است و به Cron احتیاج ندارد. راهنما: `docs/PTERODACTYL-MONITORING.md`.
 
 ## 2. وضعیت Agent ویندوزی قدیمی
 
@@ -89,7 +94,7 @@ API قدیمی Agent/InstanceMaker بازنشسته شده است. `/v1/agent/*`
 
 خرید سرور، لیست سرورهای مشتری و کنترل‌های قدیمی پنل به جدول‌های حذف‌شدهٔ Agent وابسته بودند. اکنون مسیرهای قدیمی به‌صورت fail-closed غیرفعال‌اند؛ هیچ پرداختی برای خرید سرور آغاز یا تأیید نمی‌شود و از این صفحات موجودی کیف پول کسر نمی‌شود.
 
-مرحلهٔ بعد برای بازگردانی این قابلیت‌ها، پیاده‌سازی اتصال به Pterodactyl API و طراحی روشن منبع حقیقت سفارش/وضعیت است. تا آن زمان از schema قدیمی استفاده نکن و جدول‌های حذف‌شده را صرفاً برای pass کردن تست دوباره نساز.
+اتصال read-only به Pterodactyl برای Server Browser و Monitoring اکنون وجود دارد؛ اما مرحلهٔ بعد برای بازگردانی خرید و مدیریت مشتری، پیاده‌سازی عملیات provisioning کنترل‌شده و طراحی روشن منبع حقیقت سفارش/وضعیت است. تا آن زمان از schema قدیمی استفاده نکن و جدول‌های حذف‌شده را صرفاً برای pass کردن تست دوباره نساز.
 
 ## 4. Preflight محلی
 
