@@ -236,7 +236,7 @@ foreach ($iterator as $fileInfo) {
     }
 
     foreach ($retiredTables as $table) {
-        if (preg_match('/\\\\b' . preg_quote($table, '/') . '\\\\b/i', $contents)) {
+        if (preg_match('/\b' . preg_quote($table, '/') . '\b/i', $contents)) {
             $runtimeClean = false;
             fwrite(STDERR, 'FAIL: retired table reference remains in ' . $relative . PHP_EOL);
         }
