@@ -80,7 +80,7 @@ try {
         'FRAGCITY_SERVER_BROWSER_TIME_LIMIT',
         $scannerSettings,
         'time_limit_seconds',
-        25,
+        30,
         0,
         300
     );
