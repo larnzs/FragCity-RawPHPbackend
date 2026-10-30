@@ -38,7 +38,7 @@ Back up `/etc/fragcity-api/config.php` first, then merge the following block int
     // Optional override; otherwise uses the node configuration's system.data path.
     'host_metrics_disk_path' => '',
     'pterodactyl' => [
-        'base_url' => 'https://server1.fragcity.ir',
+        'base_url' => 'https://panel.fragcity.ir',
         'application_api_key' => 'READ_ONLY_APPLICATION_API_KEY',
         'allowed_node_ids' => [1], // Replace 1 with the actual numeric Pterodactyl node ID.
         'allowed_egg_ids' => [],
