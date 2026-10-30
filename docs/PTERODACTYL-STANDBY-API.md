@@ -1,6 +1,6 @@
 # Pterodactyl Standby API
 
-This integration is preserved for a later Pterodactyl-backed server inventory. It is **not** the active public Server Browser path.
+This integration is preserved for a later Pterodactyl-backed server inventory. This is not the active public Server Browser path.
 
 ## Components
 
@@ -21,4 +21,4 @@ Keep the Pterodactyl Application API key only in `/etc/fragcity-api/config.php`.
 
 ## Status
 
-The active Server Browser currently uses the website database and a shared-hosting CLI Cron Job. Do not enable this standby worker or point the public page at this API unless the Pterodactyl-based inventory is deliberately reactivated.
+This legacy snapshot route remains separate from the active admin Monitoring API described in `docs/PTERODACTYL-MONITORING.md`. It still uses its optional cache-refresh worker and is not required by the monitoring page.
