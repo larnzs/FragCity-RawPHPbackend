@@ -1,12 +1,15 @@
 # FragCity Linux API — Deployment Notes
 
-> Architecture baseline (2026-10-27): this service currently exposes the WeaponPaints API only. The old Windows-Agent bridge is retired and must not be re-enabled as part of a routine deployment.
+> Architecture baseline: the Linux API exposes WeaponPaints and a read-only, cached Server Browser snapshot. The old Windows-Agent bridge is retired and must not be re-enabled as part of a routine deployment.
 
 ## Active endpoint
 
 - Public health: `GET /health`
 - WeaponPaints: `POST /v1/weaponpaints`
+- Public Server Browser snapshot: `POST /v1/server-browser` (separate HMAC key; read-only)
 - Retired Windows-Agent compatibility routes: `/v1/agent/*` returns HTTP 410.
+
+The Server Browser endpoint returns a snapshot created by the CLI discovery worker. It does not query Pterodactyl or send UDP packets while a visitor is loading the website. See `docs/SERVER-BROWSER-API.md` for its runtime configuration, systemd timer and deployment steps.
 
 The Linux application connects to `GLOBAL_weaponpaints` via `127.0.0.1:3306`. It does not connect to `kyonxcbt_fragcity_services`. The website’s main database remains on the website host (or a local Laragon copy during development).
 
