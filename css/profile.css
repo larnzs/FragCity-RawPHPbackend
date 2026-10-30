@@ -1263,7 +1263,7 @@
 
 .profile-fullscreen .profile-settings-fields {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 0.85rem;
     margin-top: 1rem;
 }
@@ -1295,6 +1295,13 @@
 .profile-fullscreen .profile-settings-required-note b {
     color: var(--profile-accent);
     font-weight: 800;
+}
+
+.profile-fullscreen .profile-settings-field > span em {
+    color: #777777;
+    font-size: 0.62rem;
+    font-style: normal;
+    font-weight: 500;
 }
 
 .profile-fullscreen .profile-settings-field input {
@@ -1419,6 +1426,7 @@
 
 @media (max-width: 780px) {
     .profile-fullscreen .profile-settings-fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 0.7rem;
     }
 }
