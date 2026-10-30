@@ -67,8 +67,9 @@ Merge the following block into the existing `/etc/fragcity-api/config.php` retur
 Important configuration notes:
 
 - Generate a new independent HMAC secret with `openssl rand -hex 32`. The website value and Linux value must match. Do not reuse the WeaponPaints key.
-- Create a Pterodactyl Application API key with only the read permissions required to list servers. Do not grant server create, update, delete, power, or user-management permissions.
-- Set `node_id` to the numeric ID of the node hosting these CS2 containers. The sample value is a placeholder.
+- Create a Pterodactyl Application API key with read-only access to the server list and its allocations (the applicable `servers.read` and `allocations.read` permissions). Do not grant server create, update, delete, power, or user-management permissions. The key is stored only on Linux.
+- Set `node_id` to the numeric ID of the node hosting these CS2 containers. Find it in the Panel under Admin → Nodes; the numeric ID is shown in the node detail URL. The sample value is a placeholder.
+- The list request asks only for the `allocations` relationship. The Egg ID and node ID are read from the server's own attributes; no write permission is required.
 - The Docker image allowlist is based on the configured CS2 Egg image. If the Application API reports a different image string, add the verified image or the exact Egg ID to the allowlist.
 - For additional nodes, configure `node_query_hosts` as a map from numeric node ID to the IP bound by Docker for that node. Keep public connect hosts separate if nodes use different public addresses.
 - The endpoint's HMAC key is separate from WeaponPaints. The current Linux API still uses its existing nonce table for request replay protection.
