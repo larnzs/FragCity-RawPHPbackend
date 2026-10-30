@@ -32,6 +32,9 @@ return [
         'cache_max_age_seconds' => 180,
         'public_connect_host' => '85.185.40.85',
         'query_host' => '192.168.2.3',
+        // Optional overrides keyed by numeric Pterodactyl node ID:
+        // 'node_public_connect_hosts' => [1 => '85.185.40.85'],
+        // 'node_query_hosts' => [1 => '192.168.2.3'],
         'query_timeout_ms' => 1500,
         'max_servers' => 40,
         'region' => '',
