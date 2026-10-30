@@ -41,3 +41,11 @@ The active public Server Browser uses the main website database. It does not req
 See `docs/PUBLIC-SERVER-SCANNER.md` for the database migration, runtime requirements, environment overrides, UDP preflight and portable Cron setup. Any runner still needs outbound UDP permission and database reachability; hosting-provider firewall restrictions cannot be bypassed by the PHP module.
 
 The separate Pterodactyl API experiment is preserved under `Pterodactyl Standby`; it is not required to display public servers.
+
+## Pterodactyl Monitoring
+
+The admin-only CS2 panel page `panels/cs2/monitoring.php` obtains live node/server resource information through the signed Linux API route `/v1/pterodactyl-monitoring`. Configure `integrations.pterodactyl_monitoring_api.base_url` and its separate `shared_secret` in the private website `settings/settings.json`; the matching Linux-side Pterodactyl Application API key, node allowlist, and Wings settings stay in `/etc/fragcity-api/config.php`.
+
+Use `settings/pterodactyl-monitoring.integration.example.json` as the website-side fragment. Never put the Pterodactyl Application API key or Wings token in website settings or browser JavaScript. The browser is authorized by the FragCity admin session only; it never receives Pterodactyl credentials.
+
+See `docs/PTERODACTYL-MONITORING.md` for node allowlists, Wings TLS/private URL requirements, deployment, and validation.
