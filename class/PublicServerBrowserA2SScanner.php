@@ -37,7 +37,6 @@ final class PublicServerBrowserA2SScanner
         $packet = "\xFF\xFF\xFF\xFF\x54Source Engine Query\x00";
         $pending = [];
         $results = [];
-        $startedAt = hrtime(true);
         $deadlineSeconds = $this->timeoutMs / 1000;
 
         foreach ($ports as $port) {
