@@ -36,7 +36,7 @@ The active public Server Browser uses the main website database. It does not req
 - The scheduled CLI job is `tools/refresh-public-server-browser.php`.
 - The public page reads results through `class/PublicServerBrowserRepository.php`.
 - The Cron Job and PHP website use the existing `files.index.database_profile` / `databases.main` connection. A separate runner can select its profile with `FRAGCITY_SERVER_BROWSER_DB_PROFILE`; its runtime JSON path can be supplied with `FRAGCITY_SETTINGS_FILE`.
-- The A2S parser, scanner-table repository and batch worker are separate classes. Per-host workload settings can be overridden with `FRAGCITY_SERVER_BROWSER_MAX_PER_RUN`, `FRAGCITY_SERVER_BROWSER_BATCH_SIZE` and `FRAGCITY_SERVER_BROWSER_TIME_LIMIT`.
+- The A2S parser, storage interface, PDO scanner-table repository and batch worker are separate classes. Per-host workload settings can be overridden with `FRAGCITY_SERVER_BROWSER_MAX_PER_RUN`, `FRAGCITY_SERVER_BROWSER_BATCH_SIZE` and `FRAGCITY_SERVER_BROWSER_TIME_LIMIT`.
 
 See `docs/PUBLIC-SERVER-SCANNER.md` for the database migration, runtime requirements, environment overrides, UDP preflight and portable Cron setup. Any runner still needs outbound UDP permission and database reachability; hosting-provider firewall restrictions cannot be bypassed by the PHP module.
 
