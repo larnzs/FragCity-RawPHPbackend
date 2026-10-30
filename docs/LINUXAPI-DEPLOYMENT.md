@@ -1,50 +1,113 @@
 # FragCity Linux API — Deployment Notes
 
-> Architecture baseline: the Linux API exposes WeaponPaints and an optional Pterodactyl Standby snapshot route. The active public Server Browser runs from the website database and shared-hosting Cron. The old Windows-Agent bridge is retired.
+> Current architecture: WeaponPaints, the on-demand Pterodactyl/A2S Server Browser, and Pterodactyl/Wings Monitoring are served by the Linux API. The website keeps its own database on shared hosting (or a local Laragon copy). The retired Windows-Agent API returns HTTP 410.
 
-## Active endpoint
+## Active and retired endpoints
 
-- Public health: `GET /health`
-- WeaponPaints: `POST /v1/weaponpaints`
-- Optional Pterodactyl Standby snapshot: `POST /v1/pterodactyl-standby` (separate HMAC key; dormant)
-- Retired Windows-Agent compatibility routes: `/v1/agent/*` returns HTTP 410.
+| Method | Path | Purpose | Authentication |
+|---|---|---|---|
+| GET | `/health` | Public service health only | None |
+| POST | `/v1/weaponpaints` | WeaponPaints read/write operations | Root `shared_secret` |
+| POST | `/v1/pterodactyl-standby` | Public CS2 Server Browser snapshot | `pterodactyl_standby.shared_secret` |
+| POST | `/v1/pterodactyl-monitoring` | Node and CS2-container resource snapshot | `pterodactyl_monitoring.shared_secret` |
+| any | `/v1/agent/*` | Retired Windows-Agent compatibility route | Returns HTTP 410 |
 
-The active public Server Browser does not use this Linux API. It uses `public_server_scan_targets` / `public_server_scan_ports` in the website database and `tools/refresh-public-server-browser.php` as a shared-hosting Cron Job. See `docs/PUBLIC-SERVER-SCANNER.md`. The optional Pterodactyl Standby route is documented separately in `docs/PTERODACTYL-STANDBY-API.md`.
+All POST endpoints use timestamped HMAC-SHA256 signatures and nonce replay protection. Each endpoint has an independent HMAC secret. The Linux API records request nonces in `GLOBAL_weaponpaints.fragcity_api_nonces`.
 
-The Linux application connects to `GLOBAL_weaponpaints` via `127.0.0.1:3306`. It does not connect to `kyonxcbt_fragcity_services`. The website’s main database remains on the website host (or a local Laragon copy during development).
+## Configuration files
 
-## Website client configuration
+- Tracked example: `linuxapi/config.example.php`.
+- Live private Linux config: `/etc/fragcity-api/config.php`.
+- Override path for CLI/manual diagnostics: environment variable `FRAGCITY_API_CONFIG`.
+- Website-side complete template: `settings/settings.example.json`.
+- Website-side fragments: `settings/weaponpaints-api.integration.example.json`, `settings/pterodactyl-standby.integration.example.json` and `settings/pterodactyl-monitoring.integration.example.json`.
 
-The website uses `class/FragCityLinuxApiClient.php` and `class/WeaponPaintsRepository.php`. In the private website `settings/settings.json`, configure:
+For a first installation, copy the PHP example to the private path and replace every placeholder. For an existing installation, merge only the new keys; do not overwrite the current database password or root WeaponPaints HMAC secret.
 
-- `integrations.weaponpaints_api.base_url`: `https://api.fragcity.ir`
-- `integrations.weaponpaints_api.shared_secret`: the existing API shared secret, stored privately only.
-- `files.database.weaponpaints_plugin.transport`: `api`
+Generate each HMAC key separately on Linux:
 
-Do not configure `databases.weaponpaints`, `kyonxcbt_weaponpaints_plugin`, or any Linux MariaDB credentials in the website settings. Keep the actual secret out of Git and browser JavaScript.
+```bash
+openssl rand -hex 32
+```
 
-**Important:** local PHP may still be calling the real API. During save tests, use a dedicated test SteamID/account only; the API targets the real `GLOBAL_weaponpaints` data store.
+The 64-character output for the WeaponPaints root key matches website `integrations.weaponpaints_api.shared_secret`. Generate a second key for Standby and a third for Monitoring. The corresponding website settings must match each endpoint's Linux block exactly.
 
-## Server API security and deployment
+The website `base_url` values must be the HTTPS origin `https://api.fragcity.ir` only. Do not append an endpoint path.
 
-- Keep MariaDB port 3306 private.
-- Keep `/etc/fragcity-api/config.php` readable by PHP-FPM and not writable by the web process.
-- Keep TLS certificate verification enabled.
-- Preserve the existing Pterodactyl Nginx vhost when changing the API vhost.
-- The old `website_bridge` config block and `linuxapi/site-bridge-schema.sql` are obsolete and have been removed. Do not recreate bridge nonce/login-attempt tables or restore `api/internal_agent_bridge.php` as an active DB connector.
+## Data boundaries and feature behavior
+
+### WeaponPaints
+
+The Linux API connects to `GLOBAL_weaponpaints` via `127.0.0.1:3306`. It must never connect to `kyonxcbt_fragcity_services` or receive the website database credentials. The website's `databases.main` profile is independent.
+
+The website uses `class/FragCityLinuxApiClient.php` and `class/WeaponPaintsRepository.php`. Keep `files.database.weaponpaints_plugin.transport` set to `api`; do not create a direct website-side WeaponPaints DB profile.
+
+### Public CS2 Server Browser
+
+The active public page `pages/serverlist.php` uses `PterodactylStandbyRepository`. The website sends a signed request to Linux API; Linux reads the allowlisted CS2 server inventory through the read-only Pterodactyl Application API, selects each server's default Allocation, then performs A2S_INFO over UDP to the configured internal `query_host`.
+
+Only explicit Allocation ports are queried; visitor-controlled hosts/ports and broad port-range scans are not accepted. The active flow is on-demand with a 10-second snapshot cache and does not need Cron. The current discovery implementation is intentionally single-Node. The legacy database scanner and its tables remain for rollback/reference only; do not schedule its worker as the active source.
+
+The website receives only sanitized fields. Keep the Pterodactyl Application API token on Linux; it must never be placed in website settings or browser JavaScript.
+
+### Pterodactyl Monitoring
+
+The admin-only CS2 panel calls the website's authenticated endpoint, which sends a signed request to Linux API. Linux reads Pterodactyl Node/server data and Wings resource counters, then returns a sanitized snapshot. The Application API token and dynamically retrieved Wings tokens remain on Linux. Monitoring is on-demand and the browser refreshes while the admin page is open; no Cron is required.
+
+## Private Linux configuration and permissions
+
+The PHP runtime config must remain outside the document root:
+
+```text
+/etc/fragcity-api/config.php
+```
+
+The file should be owned by root and readable by the PHP-FPM group, but not writable by the web process. Keep the API's MariaDB account least-privileged and MariaDB port 3306 private. Do not use the MariaDB root account.
+
+For the current Debian service, PHP-FPM runs as `www-data`. The Standby snapshot cache directory can be prepared with:
+
+```bash
+sudo install -d -o www-data -g www-data -m 0750 /var/cache/fragcity-api
+```
+
+The API requires access to the configured database for nonce replay protection. The existing `fragcity_api_nonces` table and grants must be preserved.
+
+## Nginx configuration
+
+- `linuxapi/nginx/fragcity-api.conf.example` is the HTTP bootstrap example.
+- `linuxapi/nginx/fragcity-api-https.conf.example` is the HTTPS/TLS example.
+
+Both examples route the fixed API paths to `public/index.php` and reject other paths/PHP files. Verify the PHP-FPM socket matches the installed Debian version. Do not replace or edit the Pterodactyl Panel vhost as part of the API deployment.
+
+After modifying the live API vhost:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
 
 ## Validation
 
-From the repository root in the local PHP CLI:
+From the website repository root on Laragon:
 
 ```powershell
-php -l linuxapi/public/index.php
 php -l class/FragCityLinuxApiClient.php
 php -l class/WeaponPaintsRepository.php
+php -l class/PterodactylStandbyApiClient.php
+php -l class/PterodactylStandbyRepository.php
+php -l class/PterodactylMonitoringApiClient.php
+php -l class/PterodactylMonitoringRepository.php
+php -l linuxapi/public/index.php
+php -l linuxapi/config.example.php
 php linuxapi/tools/architecture-check.php
-php tools/site-bridge-preflight.php
 ```
 
-The schema preflight checks the ten supplied website tables through the local `main` DB profile. It does not connect to WeaponPaints or alter any data.
+On the Linux API host, test the explicit A2S Allocation ports configured for the current Node:
 
-Repository changes are not automatically deployed to Debian or cPanel. After deployment, independently run the existing signed WeaponPaints smoke test from the Debian host and controlled test-player read/write tests before treating API writes as production-verified.
+```bash
+php bin/pterodactyl-standby-test-a2s.php 27085 29000 29001
+```
+
+This manual test verifies direct A2S connectivity from the Linux host; it does not by itself verify the shared-host website-to-Linux HTTPS/HMAC path. Test the signed routes separately using the existing smoke-test tooling and the website CLI repository tests.
+
+Repository changes are not automatically deployed to Debian or cPanel. Back up private runtime configuration before merging new keys, deploy API source through the existing deployment procedure, and validate each environment independently. Never paste API tokens, HMAC secrets, database passwords or Wings tokens into chat or Git.
