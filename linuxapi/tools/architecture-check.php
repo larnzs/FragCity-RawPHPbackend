@@ -42,6 +42,11 @@ try {
     $apiClient = $read('class/FragCityLinuxApiClient.php');
     $settingsLoader = $read('settings/loader.php');
 
+    // Runtime settings examples are tracked templates, never live credentials.
+    $websiteSettingsRaw = $read('settings/settings.example.json');
+    $websiteSettings = json_decode($websiteSettingsRaw, true, 512, JSON_THROW_ON_ERROR);
+    $weaponPaintsSettingsRaw = $read('settings/weaponpaints-api.integration.example.json');
+    $weaponPaintsSettings = json_decode($weaponPaintsSettingsRaw, true, 512, JSON_THROW_ON_ERROR);
     $standbySettingsRaw = $read('settings/pterodactyl-standby.integration.example.json');
     $standbySettings = json_decode($standbySettingsRaw, true, 512, JSON_THROW_ON_ERROR);
     $standbyApiClient = $read('class/PterodactylStandbyApiClient.php');
@@ -68,6 +73,7 @@ try {
     $monitoringSettingsRaw = $read('settings/pterodactyl-monitoring.integration.example.json');
     $monitoringSettings = json_decode($monitoringSettingsRaw, true, 512, JSON_THROW_ON_ERROR);
     $monitoringDocs = $read('docs/PTERODACTYL-MONITORING.md');
+    $nginxApiBootstrap = $read('linuxapi/nginx/fragcity-api.conf.example');
 
     $publicPage = $read('pages/serverlist.php');
     $publicRepository = $read('class/PublicServerBrowserRepository.php');
@@ -111,6 +117,42 @@ $check(
     str_contains($settingsLoader, "settings.json")
         && str_contains($settingsLoader, 'Required runtime settings file is missing')
         && !str_contains($settingsLoader, 'settings.example.json')
+);
+
+$check(
+    'Complete website settings example is valid and includes every active API integration',
+    is_array($websiteSettings['app'] ?? null)
+        && is_array($websiteSettings['databases']['main'] ?? null)
+        && (($websiteSettings['files']['database.weaponpaints_plugin']['transport'] ?? null) === 'api')
+        && (($websiteSettings['integrations']['weaponpaints_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
+        && (($websiteSettings['integrations']['pterodactyl_standby_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
+        && (($websiteSettings['integrations']['pterodactyl_monitoring_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
+        && is_string($websiteSettings['integrations']['weaponpaints_api']['shared_secret'] ?? null)
+        && is_string($websiteSettings['integrations']['pterodactyl_standby_api']['shared_secret'] ?? null)
+        && is_string($websiteSettings['integrations']['pterodactyl_monitoring_api']['shared_secret'] ?? null)
+);
+
+$check(
+    'Standalone website Integration examples are valid and document the matching Linux secrets',
+    (($weaponPaintsSettings['integrations']['weaponpaints_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
+        && str_contains((string)($weaponPaintsSettings['integrations']['weaponpaints_api']['_comment'] ?? ''), 'shared_secret')
+        && (($standbySettings['integrations']['pterodactyl_standby_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
+        && str_contains((string)($standbySettings['integrations']['pterodactyl_standby_api']['_comment'] ?? ''), 'pterodactyl_standby.shared_secret')
+        && (($monitoringSettings['integrations']['pterodactyl_monitoring_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
+        && str_contains((string)($monitoringSettings['integrations']['pterodactyl_monitoring_api']['_comment'] ?? ''), 'pterodactyl_monitoring.shared_secret')
+);
+
+$check(
+    'Linux runtime example documents all three independent HMAC keys and the Pterodactyl feature settings',
+    str_contains($linuxConfig, 'REPLACE_WITH_WEAPONPAINTS_64_HEX_SECRET')
+        && str_contains($linuxConfig, 'REPLACE_WITH_STANDBY_64_HEX_SECRET')
+        && str_contains($linuxConfig, 'REPLACE_WITH_MONITORING_64_HEX_SECRET')
+        && str_contains($linuxConfig, "'cache_ttl_seconds' => 10")
+        && str_contains($linuxConfig, "'cache_max_stale_seconds' => 180")
+        && str_contains($linuxConfig, "'allowed_node_ids' => []")
+        && str_contains($linuxConfig, "'node_id' => 0")
+        && str_contains($linuxConfig, "'wings_base_urls' => []")
+        && str_contains($linuxConfig, "'transport'") === false
 );
 
 $check(
@@ -322,6 +364,18 @@ $check(
         && str_contains($index, 'new PterodactylStandbySnapshotCache($serverConfig)')
         && str_contains($index, 'getOrRefresh')
         && str_contains($nginxApi, 'location = /v1/pterodactyl-standby')
+        && str_contains($nginxApi, 'SCRIPT_FILENAME $document_root/index.php')
+);
+
+$check(
+    'HTTP bootstrap and HTTPS API Nginx examples route every active endpoint to the fixed front controller',
+    str_contains($nginxApiBootstrap, 'location = /v1/weaponpaints')
+        && str_contains($nginxApiBootstrap, 'location = /v1/pterodactyl-standby')
+        && str_contains($nginxApiBootstrap, 'location = /v1/pterodactyl-monitoring')
+        && str_contains($nginxApi, 'location = /v1/weaponpaints')
+        && str_contains($nginxApi, 'location = /v1/pterodactyl-standby')
+        && str_contains($nginxApi, 'location = /v1/pterodactyl-monitoring')
+        && str_contains($nginxApiBootstrap, 'SCRIPT_FILENAME $document_root/index.php')
         && str_contains($nginxApi, 'SCRIPT_FILENAME $document_root/index.php')
 );
 
