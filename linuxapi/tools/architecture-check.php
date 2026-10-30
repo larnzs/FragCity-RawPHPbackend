@@ -56,6 +56,7 @@ try {
     $standbyA2S = $read('linuxapi/src/PterodactylStandby/A2SInfoQuery.php');
     $standbyCache = $read('linuxapi/src/PterodactylStandby/PterodactylStandbySnapshotCache.php');
     $standbyA2STest = $read('linuxapi/bin/pterodactyl-standby-test-a2s.php');
+    $standbyAllocationTest = $read('linuxapi/tests/pterodactyl-primary-allocation-test.php');
     $standbyWorker = $read('linuxapi/bin/pterodactyl-standby-refresh.php');
 
     $monitoringPanelClient = $read('linuxapi/src/PterodactylMonitoring/PterodactylMonitoringPanelClient.php');
@@ -339,12 +340,14 @@ $check(
 );
 
 $check(
-    'Pterodactyl standby client is read-only and filters configured default allocations',
+    'Pterodactyl standby client is read-only and selects the Application API primary Allocation by ID',
     str_contains($standbyPterodactylClient, 'CURLOPT_HTTPGET => true')
         && str_contains($standbyPterodactylClient, 'Authorization: Bearer ')
         && str_contains($standbyPterodactylClient, 'allowed_egg_ids')
         && str_contains($standbyPterodactylClient, 'allowed_docker_images')
-        && str_contains($standbyPterodactylClient, 'is_default')
+        && str_contains($standbyPterodactylClient, "['allocation']")
+        && str_contains($standbyPterodactylClient, '(int)$allocationId === (int)$primaryAllocationId')
+        && str_contains($standbyPterodactylClient, 'read access to Allocations')
         && !str_contains($standbyPterodactylClient, 'CURLOPT_POST => true')
         && str_contains($standbyDiscovery, '$this->a2s->queryBatch')
         && str_contains($standbyA2S, 'queryBatch')
@@ -353,6 +356,8 @@ $check(
         && str_contains($standbyCache, 'getOrRefresh')
         && str_contains($standbyCache, 'cache_ttl_seconds')
         && str_contains($standbyA2STest, 'queryBatch')
+        && str_contains($standbyAllocationTest, "'allocation' => 77")
+        && str_contains($standbyAllocationTest, 'primary Allocation was selected')
         && str_contains($standbyDocs, 'does not require Cron')
 );
 
