@@ -302,6 +302,7 @@ $statusLabels = [
                                     <article
                                         class="sl-server-card"
                                         data-sl-card
+                                        data-server-id="<?= $escapeServerValue($server['id']) ?>"
                                         data-status="<?= $escapeServerValue($status) ?>"
                                         data-name="<?= $escapeServerValue($nameSearch) ?>"
                                         data-map="<?= $escapeServerValue($mapSearch) ?>"
@@ -371,10 +372,27 @@ $statusLabels = [
                                                     <?= $escapeServerValue($server['region'] !== '' ? $server['region'] : 'FragCity Community') ?>
                                                 </span>
                                                 <?php if ($status === 'online'): ?>
+                                                    <button
+                                                        type="button"
+                                                        class="sl-players-btn"
+                                                        data-sl-players
+                                                        data-server-id="<?= $escapeServerValue($server['id']) ?>"
+                                                        data-server-name="<?= $escapeServerValue($server['name']) ?>"
+                                                        data-server-address="<?= $escapeServerValue($server['address']) ?>"
+                                                        aria-label="دیدن بازیکنان <?= $escapeServerValue($server['name']) ?>"
+                                                    >
+                                                        <i class="fa-solid fa-users" aria-hidden="true"></i>
+                                                        دیدن بازیکنان
+                                                        <span><?= (int)$server['players'] ?></span>
+                                                    </button>
                                                     <a class="sl-connect-btn" href="<?= $escapeServerValue($server['connect_url']) ?>">
                                                         اتصال <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                                                     </a>
                                                 <?php else: ?>
+                                                    <button type="button" class="sl-players-btn" disabled title="سرور آنلاین نیست">
+                                                        <i class="fa-solid fa-users" aria-hidden="true"></i>
+                                                        دیدن بازیکنان
+                                                    </button>
                                                     <span class="sl-connect-disabled">در دسترس نیست</span>
                                                 <?php endif; ?>
                                             </div>
@@ -423,6 +441,73 @@ $statusLabels = [
                 <span><i class="fa-solid fa-check" aria-hidden="true"></i> Player count</span>
                 <span><i class="fa-solid fa-check" aria-hidden="true"></i> Cache & timeout</span>
             </div>
+        </section>
+    </div>
+
+    <div class="sl-player-modal" id="slPlayerModal" aria-hidden="true" hidden>
+        <button type="button" class="sl-player-modal-backdrop" data-sl-modal-dismiss aria-label="بستن پنجره"></button>
+        <section
+            class="sl-player-modal-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="slPlayerModalTitle"
+            aria-describedby="slPlayerModalMeta"
+            tabindex="-1"
+        >
+            <header class="sl-player-modal-header">
+                <div class="sl-player-modal-heading">
+                    <span class="sl-section-kicker">LIVE A2S_PLAYER</span>
+                    <h3 id="slPlayerModalTitle">بازیکنان سرور</h3>
+                    <p id="slPlayerModalMeta"></p>
+                </div>
+                <div class="sl-player-modal-actions">
+                    <span class="sl-player-count" id="slPlayerModalCount">—</span>
+                    <button type="button" class="sl-player-modal-close" data-sl-modal-dismiss aria-label="بستن">
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="sl-player-modal-content">
+                <div class="sl-player-loading" id="slPlayerLoading" hidden>
+                    <span class="sl-player-spinner" aria-hidden="true"></span>
+                    <strong>در حال دریافت بازیکنان...</strong>
+                    <small>درخواست زنده A2S_PLAYER به سرور ارسال می‌شود.</small>
+                </div>
+
+                <div class="sl-player-error" id="slPlayerError" role="alert" hidden>
+                    <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                    <strong>دریافت اطلاعات بازیکنان ناموفق بود</strong>
+                    <span id="slPlayerErrorMessage">سرور فعلاً به درخواست Query پاسخ نمی‌دهد.</span>
+                    <button type="button" id="slPlayerRetry">تلاش دوباره</button>
+                </div>
+
+                <div class="sl-player-empty" id="slPlayerEmpty" hidden>
+                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                    <strong>بازیکنی در سرور پیدا نشد</strong>
+                    <span>پاسخ A2S_PLAYER خالی بود.</span>
+                </div>
+
+                <div class="sl-player-table-wrap" id="slPlayerTableWrap" hidden>
+                    <table class="sl-player-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">اسم</th>
+                                <th scope="col">استیم آیدی</th>
+                                <th scope="col">مدت اتصال</th>
+                                <th scope="col">امتیاز</th>
+                                <th scope="col">لول FACEIT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="slPlayerTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <footer class="sl-player-modal-footer">
+                <span><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> منبع اطلاعات: A2S_PLAYER</span>
+                <span>اطلاعات در لحظه‌ی باز کردن مودال Query می‌شوند.</span>
+            </footer>
         </section>
     </div>
 
