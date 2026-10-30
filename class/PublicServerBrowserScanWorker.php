@@ -9,9 +9,9 @@ declare(strict_types=1);
  */
 final class PublicServerBrowserScanWorker
 {
-    private PublicServerBrowserScanRepository $repository;
+    private PublicServerBrowserScanStoreInterface $repository;
 
-    public function __construct(PublicServerBrowserScanRepository $repository)
+    public function __construct(PublicServerBrowserScanStoreInterface $repository)
     {
         $this->repository = $repository;
     }
