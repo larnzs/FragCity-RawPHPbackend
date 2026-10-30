@@ -7,11 +7,15 @@
     const body = document.body;
     const siteHeader = document.getElementById('siteHeader');
     let scrollTicking = false;
+    let lastScrollTop = Math.max(
+        window.scrollY || 0,
+        document.documentElement.scrollTop || 0
+    );
 
     /*
-     * Toggle a lightweight state only when crossing the threshold.
-     * The CSS deliberately avoids backdrop-filter animation here,
-     * which can cause sticky headers to flicker on some browsers.
+     * At the top, the header is transparent. Scrolling down adds a
+     * translucent background; scrolling up removes it immediately.
+     * Keep this lightweight to avoid sticky-header flicker.
      */
     function updateHeaderScrollState() {
         if (!siteHeader) {
@@ -24,12 +28,19 @@
             document.documentElement.scrollTop || 0
         );
 
-        if (scrollTop > 12) {
+        if (scrollTop <= 1) {
+            siteHeader.classList.remove('is-scrolled', 'is-scroll-down');
+        } else {
             siteHeader.classList.add('is-scrolled');
-        } else if (scrollTop <= 1) {
-            siteHeader.classList.remove('is-scrolled');
+
+            if (scrollTop > lastScrollTop + 1) {
+                siteHeader.classList.add('is-scroll-down');
+            } else if (scrollTop < lastScrollTop - 1) {
+                siteHeader.classList.remove('is-scroll-down');
+            }
         }
 
+        lastScrollTop = scrollTop;
         scrollTicking = false;
     }
 
