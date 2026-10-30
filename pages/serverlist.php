@@ -113,7 +113,7 @@ $onlineServers = array_values(array_filter(
 $totalPlayers = array_sum(array_column($onlineServers, 'players'));
 $uniqueMaps = array_values(array_unique(array_map(
     static fn (array $server): string => $server['map'],
-    $serverRows
+    $onlineServers
 )));
 $serverGroups = [];
 foreach ($serverRows as $server) {
