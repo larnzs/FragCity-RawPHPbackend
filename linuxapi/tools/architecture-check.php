@@ -54,6 +54,8 @@ try {
     $publicPage = $read('pages/serverlist.php');
     $publicRepository = $read('class/PublicServerBrowserRepository.php');
     $publicScanner = $read('class/PublicServerBrowserA2SScanner.php');
+    $publicScanRepository = $read('class/PublicServerBrowserScanRepository.php');
+    $publicScanWorker = $read('class/PublicServerBrowserScanWorker.php');
     $publicWorker = $read('tools/refresh-public-server-browser.php');
     $publicUdpTest = $read('tools/test-public-server-browser-udp.php');
     $publicMigration = $read('database/migrations/20261030_create_public_server_browser_tables.sql');
@@ -111,24 +113,52 @@ $check(
     str_contains($publicScanner, 'stream_socket_client')
         && str_contains($publicScanner, 'stream_select')
         && str_contains($publicScanner, 'Source Engine Query')
-        && str_contains($publicScanner, '"\xFF\xFF\xFF\xFF\x41"')
-        && str_contains($publicScanner, '"\xFF\xFF\xFF\xFF\x49"')
+        && str_contains($publicScanner, '"\\xFF\\xFF\\xFF\\xFF\\x41"')
+        && str_contains($publicScanner, '"\\xFF\\xFF\\xFF\\xFF\\x49"')
         && str_contains($publicScanner, 'count($ports) > 128')
-        && str_contains($publicWorker, '$scanner->queryBatch($host, $ports)')
-        && str_contains($publicWorker, '(int)$info[\'app_id\'] === 730')
+        && str_contains($publicScanWorker, '$scanner->queryBatch($host, $ports)')
+        && str_contains($publicScanWorker, "(int)($info['app_id'] ?? 0) === 730")
 );
 
 $check(
-    'Public scanner Cron is CLI-only, locked, resumable and limited to 256 ports per run',
+    'Public scan database operations and batch orchestration are modular',
+    str_contains($publicScanRepository, 'ensureTargetInventory')
+        && str_contains($publicScanRepository, 'getDuePorts')
+        && str_contains($publicScanRepository, 'saveResult')
+        && str_contains($publicScanWorker, 'ensureTargetInventory')
+        && str_contains($publicScanWorker, 'getDuePorts')
+        && str_contains($publicScanWorker, 'saveResult')
+        && str_contains($publicScanWorker, 'array_chunk($dueRows, $batchSize)')
+        && str_contains($publicScanRepository, 'GET_LOCK')
+        && str_contains($publicScanRepository, 'RELEASE_LOCK')
+        && !str_contains($publicWorker, 'INSERT IGNORE INTO public_server_scan_ports')
+        && !str_contains($publicWorker, 'UPDATE public_server_scan_ports')
+);
+
+$check(
+    'Portable CLI runner supports environment-specific settings and resource limits',
     str_contains($publicWorker, "PHP_SAPI !== 'cli'")
-        && str_contains($publicWorker, "GET_LOCK('fragcity_public_server_browser_scan', 0)")
-        && str_contains($publicWorker, '$maxPerRun = 256')
-        && str_contains($publicWorker, '$batchSize = 32')
-        && str_contains($publicWorker, 'COALESCE(:server_name, server_name)')
-        && str_contains($publicWorker, 'COALESCE(:app_id, app_id)')
-        && str_contains($publicWorker, 'next_query_at')
-        && str_contains($publicWorker, 'retry_offline_seconds')
-        && str_contains($publicWorker, "RELEASE_LOCK('fragcity_public_server_browser_scan')")
+        && str_contains($publicWorker, 'FRAGCITY_SERVER_BROWSER_DB_PROFILE')
+        && str_contains($publicWorker, 'FRAGCITY_SERVER_BROWSER_MAX_PER_RUN')
+        && str_contains($publicWorker, 'FRAGCITY_SERVER_BROWSER_BATCH_SIZE')
+        && str_contains($publicWorker, 'FRAGCITY_SERVER_BROWSER_TIME_LIMIT')
+        && str_contains($publicWorker, 'PDO::getAvailableDrivers()')
+        && str_contains($publicWorker, 'stream_socket_client')
+        && str_contains($publicWorker, 'stream_select')
+);
+
+$check(
+    'Public scanner Cron is CLI-only and delegates bounded scanning to the worker service',
+    str_contains($publicWorker, "PHP_SAPI !== 'cli'")
+        && str_contains($publicWorker, 'new PublicServerBrowserScanRepository($pdo)')
+        && str_contains($publicWorker, 'new PublicServerBrowserScanWorker($repository)')
+        && str_contains($publicWorker, '$worker->run($maxPortsPerRun, $batchSize)')
+        && str_contains($publicScanWorker, '$maxPortsPerRun = max(1, min(4096, $maxPortsPerRun))')
+        && str_contains($publicScanWorker, '$batchSize = max(1, min(128, $batchSize))')
+        && str_contains($publicScanRepository, 'COALESCE(:server_name, server_name)')
+        && str_contains($publicScanRepository, 'COALESCE(:app_id, app_id)')
+        && str_contains($publicScanRepository, 'next_query_at')
+        && str_contains($publicScanRepository, 'retry_offline_seconds')
 );
 
 $check(
