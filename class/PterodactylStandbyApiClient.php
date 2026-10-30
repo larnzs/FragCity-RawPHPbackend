@@ -81,6 +81,7 @@ final class PterodactylStandbyApiClient
         $curlError = curl_errno($handle);
         $curlErrorText = curl_error($handle);
         $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        $contentType = (string)(curl_getinfo($handle, CURLINFO_CONTENT_TYPE) ?: '');
         $handle = null;
 
         if ($response === false || $curlError !== 0) {
@@ -95,7 +96,29 @@ final class PterodactylStandbyApiClient
 
         $decoded = json_decode((string)$response, true);
         if (!is_array($decoded) || json_last_error() !== JSON_ERROR_NONE) {
-            error_log('[FragCity] Pterodactyl Standby API returned invalid JSON; HTTP=' . $status);
+            // Keep diagnostics useful without logging an untrusted response body.
+            // A reverse-proxy HTML 404/502 page is the most common reason this
+            // integration receives non-JSON despite a successful TCP/TLS request.
+            $trimmedResponse = ltrim((string)$response, "\\xEF\\xBB\\xBF \\t\\r\\n");
+            $firstByte = $trimmedResponse !== '' ? $trimmedResponse[0] : '';
+            $bodyFormat = $firstByte === '<'
+                ? 'html-or-xml'
+                : ($firstByte === '' ? 'empty' : 'non-json-text');
+            $safeContentType = preg_replace('/[^A-Za-z0-9+._\\/-]/', '', $contentType) ?? '';
+            error_log(
+                '[FragCity] Pterodactyl Standby API returned invalid JSON; HTTP=' . $status
+                . '; content_type=' . substr($safeContentType, 0, 80)
+                . '; body_format=' . $bodyFormat
+                . '; json_error=' . json_last_error_msg()
+            );
+            if (PHP_SAPI === 'cli') {
+                throw new RuntimeException(
+                    'Pterodactyl Standby API returned an invalid response (HTTP ' . $status
+                    . '; content-type=' . ($safeContentType !== '' ? $safeContentType : 'unknown')
+                    . '; body-format=' . $bodyFormat
+                    . '; JSON error=' . json_last_error_msg() . ').'
+                );
+            }
             throw new RuntimeException('Pterodactyl Standby API returned an invalid response.');
         }
 
