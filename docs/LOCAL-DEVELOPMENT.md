@@ -51,21 +51,20 @@ copy settings\settings.example.json settings\settings.json
 
 ### Public Server Browser محلی
 
-برای تست Server Browser با دیتابیس محلی Laragon، پس از واردکردن dump اصلی، Migration زیر را یک‌بار روی دیتابیس محلی اجرا کن:
+Server Browser فعال از طریق Integration امضاشدهٔ Pterodactyl Standby به Linux API متصل می‌شود؛ آن صفحه از دیتابیس محلی برای اسکن بازه‌ای پورت استفاده نمی‌کند و برای مسیر فعال به Migration یا Cron اسکنر قدیمی نیاز ندارد.
 
-~~~powershell
-mysql -u root kyonxcbt_fragcity_services < database/migrations/20261030_create_public_server_browser_tables.sql
-~~~
+1. در `settings/settings.json`، کلید `integrations.pterodactyl_standby_api` را با مقدارهای خصوصی همان محیط Merge کن.
+2. Linux API باید با بلوک `pterodactyl_standby` در `/etc/fragcity-api/config.php` فعال و تنظیم شده باشد.
+3. تست مستقیم Allocationهای فعلی را روی Linux API host اجرا کن:
 
-سپس دسترسی user محلی را با GRANTهای جدید در `tools/laragon-site-db-user.sql` به دو جدول scanner اضافه کن. تست UDP را فقط از همان محیطی اجرا کن که قرار است Worker در آن اجرا شود؛ موفقیت در Laragon ثابت نمی‌کند UDP خروجی از هاست اشتراکی نیز مجاز است.
+   ~~~bash
+   php bin/pterodactyl-standby-test-a2s.php 27085 29000 29001
+   ~~~
 
-Worker را می‌توان برای تست دستی با PHP CLI اجرا کرد:
+4. برای تست درخواست end-to-end از Laragon، `PterodactylStandbyRepository` را از PHP CLI اجرا کن یا صفحهٔ Server Browser را باز کن. موفقیت تست A2S از Linux به‌تنهایی ارتباط هاست سایت تا Linux API را ثابت نمی‌کند.
+5. Cache به‌صورت on-demand و با TTL پیش‌فرض ۱۰ ثانیه تازه می‌شود؛ Cron لازم نیست.
 
-~~~powershell
-php tools/refresh-public-server-browser.php
-~~~
-
-در Production همین Worker با Cron هاست اشتراکی اجرا می‌شود. مراحل کامل و تست UDP از خود هاست در `docs/PUBLIC-SERVER-SCANNER.md` آمده است.
+فایل‌ها و جدول‌های اسکنر دیتابیسی قدیمی فقط برای rollback/reference حفظ شده‌اند. `tools/refresh-public-server-browser.php` را به‌عنوان منبع فعال زمان‌بندی نکن و تا تصمیم جداگانه برای پاک‌سازی، جدول‌های قدیمی را حذف نکن. راهنمای فعال در `docs/PTERODACTYL-STANDBY-API.md` است.
 
 ## 4. استفاده از updater روزمره
 
