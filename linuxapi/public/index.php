@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /**
  * FragCity Linux API v1.
- * Active routes: WeaponPaints and the Pterodactyl Standby snapshot.
+ * Active routes: WeaponPaints, on-demand Pterodactyl Server Browser, and Pterodactyl Monitoring.
  * Legacy Windows-Agent routes are retired.
  * Only this file under public/ is routed by Nginx. Runtime settings are kept
  * outside the app and outside Git, normally at /etc/fragcity-api/config.php.
