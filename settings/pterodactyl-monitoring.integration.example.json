@@ -1,6 +1,8 @@
 {
+  "_comment": "Merge this fragment into integrations in the private website settings/settings.json. This is a separate HMAC identity from WeaponPaints and Server Browser.",
   "integrations": {
     "pterodactyl_monitoring_api": {
+      "_comment": "Admin-only node/server resource monitoring API. base_url must be the HTTPS origin only (no /v1 path). The shared_secret must exactly match pterodactyl_monitoring.shared_secret in /etc/fragcity-api/config.php.",
       "base_url": "https://api.fragcity.ir",
       "shared_secret": "REPLACE_WITH_THE_MATCHING_PTERODACTYL_MONITORING_SECRET"
     }
