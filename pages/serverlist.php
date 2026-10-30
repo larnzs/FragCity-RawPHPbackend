@@ -213,6 +213,17 @@ $statusLabels = [
                         </button>
                     </div>
 
+                    <div class="sl-view-switch" role="group" aria-label="نحوه نمایش سرورها">
+                        <button type="button" class="sl-view-button active" data-sl-view-option="list" aria-pressed="true" title="نمایش لیستی">
+                            <i class="fa-solid fa-list" aria-hidden="true"></i>
+                            <span>لیستی</span>
+                        </button>
+                        <button type="button" class="sl-view-button" data-sl-view-option="grid" aria-pressed="false" title="نمایش کارت‌ها">
+                            <i class="fa-solid fa-grip" aria-hidden="true"></i>
+                            <span>کارت‌ها</span>
+                        </button>
+                    </div>
+
                     <label class="sl-search" for="slSearchInput">
                         <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         <input id="slSearchInput" type="search" autocomplete="off" placeholder="جستجوی نام سرور یا نقشه..." <?= $serverRows === [] ? 'disabled' : '' ?>>
@@ -262,7 +273,7 @@ $statusLabels = [
                 </div>
             </div>
 
-            <div class="sl-server-list" id="serverList">
+            <div class="sl-server-list" id="serverList" data-sl-view="list">
                 <?php if ($serverRows !== []): ?>
                     <?php foreach ($serverGroups as $groupName => $groupServers): ?>
                         <section class="sl-server-group" data-sl-group>
