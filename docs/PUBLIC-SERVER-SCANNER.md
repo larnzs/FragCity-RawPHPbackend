@@ -4,7 +4,7 @@
 
 ## Legacy architecture
 
-The public Server Browser is intentionally independent from Pterodactyl and from the Linux WeaponPaints API.
+This retired database-scanner implementation is independent from Pterodactyl and from the Linux WeaponPaints API. It is not used by the active public Server Browser, which now uses the signed Pterodactyl Standby API.
 
 1. `public_server_scan_targets` stores an approved IPv4 address and inclusive port range.
 2. `public_server_scan_ports` stores one scan state per port, including the last A2S result and the next retry time.
