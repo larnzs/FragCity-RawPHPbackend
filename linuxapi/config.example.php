@@ -62,7 +62,7 @@ return [
         // Optional path override for host disk sampling. Empty uses the system.data path returned by Wings.
         'host_metrics_disk_path' => '',
         'pterodactyl' => [
-            'base_url' => 'https://server1.fragcity.ir', // Panel origin only; no /api path.
+            'base_url' => 'https://panel.fragcity.ir', // Panel origin only; no /api path.
             // Read-only Application API token. It must be able to read Node records/config and server records.
             // Never copy this token to the website settings or browser.
             'application_api_key' => 'REPLACE_WITH_READ_ONLY_APPLICATION_API_TOKEN',
@@ -87,6 +87,7 @@ return [
      *
      * The Linux API discovers servers through Pterodactyl Application API, selects
      * their DEFAULT game Allocations and queries those exact UDP ports with A2S_INFO.
+ * Player details are queried on-demand with A2S_PLAYER after a visitor opens a server modal.
      * No arbitrary port-range scan and no Cron job are used by the active browser.
      * The current discovery implementation is intentionally single-Node.
      */
@@ -112,7 +113,7 @@ return [
         'max_servers' => 40,        // Upper-bounded by discovery (1–100).
         'region' => '',             // Optional display metadata; does not affect discovery.
         'pterodactyl' => [
-            'base_url' => 'https://server1.fragcity.ir', // Pterodactyl Panel origin only.
+            'base_url' => 'https://panel.fragcity.ir', // Pterodactyl Panel origin only.
             // Read-only Application API token. It needs Servers: Read and Allocations: Read
             // so the API can resolve each server's primary Allocation ID and port.
             // It may be shared with Monitoring if permissions cover both; HMAC secrets stay separate.
