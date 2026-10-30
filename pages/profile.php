@@ -135,8 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
         };
 
         $displayName = $cleanProfileText($readProfileField('username'));
-        $emailInput = strtolower($readProfileField('email'));
-        $email = $emailInput !== '' ? $emailInput : null;
+        $email = strtolower($readProfileField('email'));
         $phone = preg_replace('/[\\s()-]+/', '', $readProfileField('phone')) ?? '';
 
         if (
@@ -147,15 +146,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
             profileRespond('یک نام کاربری معتبر وارد کنید.', 422);
         }
 
-        // Email remains optional, matching the existing FragCity registration flow.
         if (
-            $email !== null
-            && (
-                strlen($email) > 254
-                || filter_var($email, FILTER_VALIDATE_EMAIL) === false
-            )
+            $email === ''
+            || strlen($email) > 254
+            || filter_var($email, FILTER_VALIDATE_EMAIL) === false
         ) {
-            profileRespond('نشانی ایمیل معتبر وارد کنید یا فیلد آن را خالی بگذارید.', 422);
+            profileRespond('وارد کردن یک نشانی ایمیل معتبر الزامی است.', 422);
         }
 
         if (!preg_match('/^09[0-9]{9}$/D', $phone)) {
@@ -586,8 +582,8 @@ if ($steamid64 !== '' && isset($pdo) && $pdo instanceof PDO) {
     }
 }
 
-// Only required existing account fields count toward completion; email is optional.
-$profileSettingsFields = ['username', 'phone'];
+// All three existing account fields are required to complete profile settings.
+$profileSettingsFields = ['username', 'email', 'phone'];
 $profileSettingsCompleted = 0;
 foreach ($profileSettingsFields as $profileSettingsField) {
     if (trim((string)($profileAccountSettings[$profileSettingsField] ?? '')) !== '') {
@@ -910,7 +906,7 @@ if (!function_exists('formatPlaytime')) {
                     </label>
 
                     <label class="profile-settings-field" for="profileEmail">
-                        <span>ایمیل <em>اختیاری</em></span>
+                        <span>ایمیل <b>*</b></span>
                         <input
                             id="profileEmail"
                             type="email"
@@ -919,6 +915,7 @@ if (!function_exists('formatPlaytime')) {
                             placeholder="name@example.com"
                             autocomplete="email"
                             maxlength="254"
+                            required
                         >
                     </label>
 
@@ -941,7 +938,7 @@ if (!function_exists('formatPlaytime')) {
                 </div>
 
                 <div class="profile-settings-form__footer">
-                    <span class="profile-settings-required-note"><b>*</b> نام کاربری و شماره موبایل ضروری‌اند؛ ایمیل اختیاری است.</span>
+                    <span class="profile-settings-required-note"><b>*</b> نام کاربری، ایمیل و شماره موبایل همگی ضروری‌اند.</span>
                     <button type="submit" class="profile-settings-submit" id="profileSettingsSave">
                         <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
                         ذخیره اطلاعات
