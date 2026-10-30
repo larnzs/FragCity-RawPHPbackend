@@ -1667,3 +1667,72 @@ body.mobile-menu-open {
         transition: none !important;
     }
 }
+
+/* Scroll-direction header behavior: clear at top/up, 50% black while moving down. */
+.shock-header,
+.shock-header.is-scrolled {
+    background: transparent;
+    border-bottom-color: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.shock-header.is-scroll-down {
+    background: rgba(13, 13, 13, 0.5);
+    border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Logged-in account trigger blends into the header instead of looking like a card. */
+.shock-header #shockUserDropdown .frag-user-trigger,
+.shock-header #shockUserDropdown .frag-user-trigger:hover,
+.shock-header #shockUserDropdown .frag-user-trigger:focus-visible,
+.shock-header #shockUserDropdown.open .frag-user-trigger {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+}
+
+.shock-header #shockUserDropdown .frag-user-trigger:hover,
+.shock-header #shockUserDropdown.open .frag-user-trigger {
+    background: rgba(249, 115, 22, 0.055);
+}
+
+.shock-header #shockUserDropdown .frag-user-trigger:focus-visible {
+    outline: 2px solid rgba(249, 115, 22, 0.7);
+    outline-offset: 2px;
+}
+
+.shock-header #shockUserDropdown .frag-avatar {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    border: 1px solid rgba(249, 115, 22, 0.34);
+    box-shadow: none;
+}
+
+.shock-header #shockUserDropdown .frag-user-trigger {
+    min-height: 48px;
+    padding: 0.25rem 0.45rem 0.25rem 0.85rem;
+}
+
+@media (max-width: 700px) {
+    .shock-header #shockUserDropdown .frag-avatar {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+
+    .shock-header #shockUserDropdown .frag-user-trigger {
+        min-height: 44px;
+        padding: 0.2rem 0.35rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-header,
+    .shock-header.is-scrolled {
+        transition: none;
+    }
+}
