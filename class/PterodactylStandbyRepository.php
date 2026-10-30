@@ -33,6 +33,25 @@ final class PterodactylStandbyRepository
         ];
     }
 
+    /**
+     * Fetch one server's live A2S_PLAYER records through the signed Linux API.
+     *
+     * @return array{server_id:string,server_name:string,player_count:int,players:array,fetched_at:string}
+     */
+    public function getPlayers(string $serverId): array
+    {
+        $data = $this->api->getPlayers($serverId);
+        $players = is_array($data['players'] ?? null) ? $data['players'] : [];
+
+        return [
+            'server_id' => (string)($data['server_id'] ?? $serverId),
+            'server_name' => is_string($data['server_name'] ?? null) ? $data['server_name'] : '',
+            'player_count' => max(0, (int)($data['player_count'] ?? count($players))),
+            'players' => $players,
+            'fetched_at' => is_string($data['fetched_at'] ?? null) ? $data['fetched_at'] : gmdate('c'),
+        ];
+    }
+
     public function getServers(): array
     {
         return $this->getSnapshot()['servers'];
