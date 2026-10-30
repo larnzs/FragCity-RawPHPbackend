@@ -8,10 +8,11 @@ The public Server Browser is intentionally independent from Pterodactyl and from
 2. `public_server_scan_ports` stores one scan state per port, including the last A2S result and the next retry time.
 3. `class/PublicServerBrowserA2SScanner.php` handles the Source A2S_INFO UDP protocol and response parsing.
 4. `class/PublicServerBrowserScanRepository.php` owns scanner-table SQL, inventory creation, retry scheduling and persistence.
-5. `class/PublicServerBrowserScanWorker.php` orchestrates bounded batches without depending on the website UI or bootstrap.
-6. `tools/refresh-public-server-browser.php` is a thin CLI entrypoint. It loads the environment settings, creates PDO and runs the worker from Cron.
-7. `class/PublicServerBrowserRepository.php` reads only recent AppID 730 results for the public page.
-8. The page does not query UDP, Pterodactyl, or a separate API when visitors load it.
+5. `class/PublicServerBrowserScanStoreInterface.php` defines the storage contract; `PublicServerBrowserScanRepository.php` is its MySQL/MariaDB implementation.
+6. `class/PublicServerBrowserScanWorker.php` orchestrates bounded batches without depending on the website UI or bootstrap.
+7. `tools/refresh-public-server-browser.php` is a thin CLI entrypoint. It loads the environment settings, creates PDO and runs the worker from Cron.
+8. `class/PublicServerBrowserRepository.php` reads only recent AppID 730 results for the public page.
+9. The page does not query UDP, Pterodactyl, or a separate API when visitors load it.
 
 The currently seeded target is:
 
