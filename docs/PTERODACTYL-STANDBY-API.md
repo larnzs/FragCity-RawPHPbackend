@@ -133,6 +133,14 @@ php linuxapi/bin/pterodactyl-standby-test-a2s.php 27085 29000 29001
 
 Then open index.php?page=servers_vps (or the existing Server Browser route). The first request after cache expiry fetches the Pterodactyl server list and A2S data; requests within the following 10 seconds reuse that snapshot. Refreshing the page after 10 seconds triggers a new on-demand discovery.
 
+If the website CLI reports an invalid/non-JSON response, first test the exact Nginx route without credentials. A plain GET is deliberately rejected by the PHP API with JSON HTTP 405 when the route reaches the front controller:
+
+~~~bash
+curl -i https://api.fragcity.ir/v1/pterodactyl-standby
+~~~
+
+Expected route-reached response: `HTTP 405` with `Content-Type: application/json` and `{"success":false,"error":"method_not_allowed"}`. An HTML/plain 404 usually means the live TLS vhost is missing the exact `location = /v1/pterodactyl-standby` block or the request reached a different vhost. An HTML 502 indicates a PHP-FPM/upstream problem. Inspect the active config with `sudo nginx -T`, confirm the location exists in the `api.fragcity.ir` 443 server block, then run `sudo nginx -t && sudo systemctl reload nginx` after a correction.
+
 Expected initial servers for the configured Node are the three known CS2 Allocations on 27085, 29000 and 29001; each must return AppID 730 to appear online. Offline, suspended, uninstalled, invalid or non-CS2 allocations are not shown as online.
 
 ## Troubleshooting
