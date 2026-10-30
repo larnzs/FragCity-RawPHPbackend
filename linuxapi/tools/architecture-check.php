@@ -47,6 +47,14 @@ try {
     $settingsLoader = $read('settings/loader.php');
     $settingsRaw = $read('settings/settings.example.json');
     $settings = json_decode($settingsRaw, true, 512, JSON_THROW_ON_ERROR);
+    $serverBrowserApiClient = $read('class/FragCityServerBrowserApiClient.php');
+    $serverBrowserRepository = $read('class/ServerBrowserRepository.php');
+    $serverBrowserPage = $read('pages/serverlist.php');
+    $serverBrowserDiscovery = $read('linuxapi/src/ServerBrowser/ServerBrowserDiscovery.php');
+    $pterodactylClient = $read('linuxapi/src/ServerBrowser/PterodactylApplicationClient.php');
+    $a2sClient = $read('linuxapi/src/ServerBrowser/A2SInfoQuery.php');
+    $serverBrowserWorker = $read('linuxapi/bin/refresh-server-browser.php');
+    $nginxApi = $read('linuxapi/nginx/fragcity-api-https.conf.example');
 } catch (Throwable $e) {
     fwrite(STDERR, 'FAIL: ' . $e->getMessage() . PHP_EOL);
     exit(2);
@@ -92,6 +100,58 @@ $check(
         && !isset($settings['integrations']['linuxapi_site_bridge'])
         && !isset($settings['databases']['weaponpaints'])
 );
+$check(
+    'Server Browser website client uses a separate signed HTTPS integration',
+    str_contains($serverBrowserApiClient, "integrations.server_browser_api.base_url")
+        && str_contains($serverBrowserApiClient, "integrations.server_browser_api.shared_secret")
+        && str_contains($serverBrowserApiClient, "hash_hmac('sha256'")
+        && str_contains($serverBrowserApiClient, "CURLOPT_SSL_VERIFYPEER => true")
+        && str_contains($serverBrowserApiClient, "CURLOPT_FOLLOWLOCATION => false")
+);
+$check(
+    'Server Browser repository and page never query Pterodactyl or UDP directly',
+    str_contains($serverBrowserRepository, 'new FragCityServerBrowserApiClient()')
+        && !str_contains($serverBrowserRepository, 'new PDO')
+        && !str_contains($serverBrowserRepository, 'stream_socket_client')
+        && str_contains($serverBrowserPage, 'new ServerBrowserRepository()')
+        && !str_contains($serverBrowserPage, 'settings/public-servers.php')
+);
+$check(
+    'Linux Server Browser endpoint uses its own secret and reads the cached snapshot',
+    str_contains($index, "'/v1/server-browser'")
+        && str_contains($index, "$config['server_browser']['shared_secret']")
+        && str_contains($index, 'server_browser_cache_unavailable')
+        && str_contains($index, 'server_browser_cache_invalid')
+);
+$check(
+    'Pterodactyl discovery is read-only and restricted to configured CS2 node/image/Egg allocations',
+    str_contains($pterodactylClient, 'CURLOPT_HTTPGET => true')
+        && str_contains($pterodactylClient, 'Authorization: Bearer ')
+        && str_contains($pterodactylClient, 'allowed_egg_ids')
+        && str_contains($pterodactylClient, 'allowed_docker_images')
+        && str_contains($pterodactylClient, 'is_default')
+        && !str_contains($pterodactylClient, 'CURLOPT_POST => true')
+);
+$check(
+    'A2S queries use explicit allocations, handle challenge responses, and verify CS2 AppID',
+    str_contains($a2sClient, 'Source Engine Query')
+        && str_contains($a2sClient, '"\\xFF\\xFF\\xFF\\xFF\\x41"')
+        && str_contains($serverBrowserDiscovery, '$this->a2s->query($queryHost, $port)')
+        && str_contains($serverBrowserDiscovery, "['app_id'] ?? 0) !== 730")
+        && !str_contains($serverBrowserDiscovery, 'range(')
+);
+$check(
+    'Server Browser worker serializes refreshes and atomically replaces its cache',
+    str_contains($serverBrowserWorker, 'LOCK_EX | LOCK_NB')
+        && str_contains($serverBrowserWorker, 'rename($temporaryFile, $cacheFile)')
+        && str_contains($serverBrowserWorker, "PHP_SAPI !== 'cli'")
+);
+$check(
+    'Active Nginx TLS example routes the exact Server Browser endpoint to the fixed API front controller',
+    str_contains($nginxApi, 'location = /v1/server-browser')
+        && str_contains($nginxApi, 'SCRIPT_FILENAME $document_root/index.php')
+);
+
 $check(
     'Old website Agent connector fails closed without database access',
     str_contains($siteBridge, 'http_response_code(410)')
