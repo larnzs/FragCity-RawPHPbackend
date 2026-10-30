@@ -112,10 +112,113 @@ if (!function_exists('profileSaveJpegBytes')) {
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_key_exists('avatar_data', $_POST))) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_key_exists('avatar_data', $_POST) || (isset($_POST['profile_settings_action']) && $_POST['profile_settings_action'] === 'save'))) {
     $submittedToken = (string)($_SERVER['HTTP_X_PROFILE_CSRF'] ?? '');
     if (!hash_equals($profileCsrfToken, $submittedToken)) profileRespond('درخواست نامعتبر است؛ صفحه را تازه‌سازی کنید.', 400);
     if ($steamid64 === '') profileRespond('شناسه Steam معتبر نیست.', 400);
+
+    if (($_POST['profile_settings_action'] ?? '') === 'save') {
+        if (!isset($pdo) || !$pdo instanceof PDO) {
+            profileRespond('اتصال دیتابیس برای ذخیره تنظیمات حساب در دسترس نیست.', 503);
+        }
+
+        $readProfileField = static function (string $key): string {
+            $value = $_POST[$key] ?? '';
+            return is_string($value) ? trim($value) : '';
+        };
+        $cleanProfileText = static function (string $value): string {
+            $normalized = preg_replace('/\\s+/u', ' ', trim($value));
+            return is_string($normalized) ? $normalized : trim($value);
+        };
+        $profileTextLength = static function (string $value): int {
+            return function_exists('mb_strlen') ? mb_strlen($value, 'UTF-8') : strlen($value);
+        };
+
+        $firstName = $cleanProfileText($readProfileField('first_name'));
+        $lastName = $cleanProfileText($readProfileField('last_name'));
+        $displayName = $cleanProfileText($readProfileField('username'));
+        $email = strtolower($readProfileField('email'));
+        $phone = preg_replace('/[\\s()-]+/', '', $readProfileField('phone')) ?? '';
+
+        foreach ([
+            'نام' => [$firstName, 100],
+            'نام خانوادگی' => [$lastName, 100],
+            'نام نمایشی' => [$displayName, 128],
+        ] as $fieldLabel => [$fieldValue, $maxLength]) {
+            if (
+                $fieldValue === ''
+                || $profileTextLength($fieldValue) > $maxLength
+                || preg_match('/[\\x00-\\x1F\\x7F]/u', $fieldValue)
+            ) {
+                profileRespond($fieldLabel . ' را وارد کنید؛ طول مقدار واردشده معتبر نیست.', 422);
+            }
+        }
+
+        if (
+            $email === ''
+            || strlen($email) > 254
+            || filter_var($email, FILTER_VALIDATE_EMAIL) === false
+        ) {
+            profileRespond('نشانی ایمیل معتبر وارد کنید.', 422);
+        }
+
+        if (!preg_match('/^09[0-9]{9}$/D', $phone)) {
+            profileRespond('شماره موبایل باید به‌صورت 09xxxxxxxxx وارد شود.', 422);
+        }
+
+        try {
+            $accountCheck = $pdo->prepare(
+                'SELECT id FROM users WHERE steamid64 = ? LIMIT 1'
+            );
+            $accountCheck->execute([$steamid64]);
+            if ($accountCheck->fetchColumn() === false) {
+                profileRespond('حساب کاربری در دیتابیس پیدا نشد.', 404);
+            }
+
+            $uniqueChecks = [
+                ['username', $displayName, 'این نام نمایشی قبلاً استفاده شده است.'],
+                ['email', $email, 'این ایمیل قبلاً برای حساب دیگری ثبت شده است.'],
+                ['phone', $phone, 'این شماره موبایل قبلاً برای حساب دیگری ثبت شده است.'],
+            ];
+            foreach ($uniqueChecks as [$column, $value, $message]) {
+                // Column names are fixed in this allow-list; user values remain bound parameters.
+                $duplicate = $pdo->prepare(
+                    "SELECT id FROM users WHERE {$column} = ? AND steamid64 <> ? LIMIT 1"
+                );
+                $duplicate->execute([$value, $steamid64]);
+                if ($duplicate->fetchColumn() !== false) {
+                    profileRespond($message, 409);
+                }
+            }
+
+            $saveSettings = $pdo->prepare(
+                'UPDATE users
+                 SET first_name = ?, last_name = ?, username = ?, email = ?, phone = ?
+                 WHERE steamid64 = ?
+                 LIMIT 1'
+            );
+            $saveSettings->execute([
+                $firstName,
+                $lastName,
+                $displayName,
+                $email,
+                $phone,
+                $steamid64,
+            ]);
+            $_SESSION['username'] = $displayName;
+        } catch (PDOException $e) {
+            error_log('[FragCity] Profile account settings save failed (SQLSTATE ' . $e->getCode() . ').');
+            profileRespond(
+                'ذخیره اطلاعات انجام نشد. بررسی کنید Migration اطلاعات نام روی دیتابیس اجرا شده باشد.',
+                500
+            );
+        } catch (Throwable $e) {
+            error_log('[FragCity] Profile account settings save failed (' . get_class($e) . ').');
+            profileRespond('در ذخیره اطلاعات حساب خطای غیرمنتظره‌ای رخ داد.', 500);
+        }
+
+        profileRespond('اطلاعات حساب با موفقیت ذخیره شد.');
+    }
 
     $avatarsDir = __DIR__ . '/../img/avatars/';
     $bannersDir = __DIR__ . '/../img/banners/';
@@ -457,6 +560,39 @@ try {
     $profileInventoryUnavailable = true;
 }
 
+// Account settings are read from the website users table; never from the WeaponPaints database.
+$profileAccountSettings = [];
+$profileAccountSettingsReady = false;
+if ($steamid64 !== '' && isset($pdo) && $pdo instanceof PDO) {
+    try {
+        $accountSettingsStatement = $pdo->prepare(
+            'SELECT username, first_name, last_name, email, phone
+             FROM users WHERE steamid64 = ? LIMIT 1'
+        );
+        $accountSettingsStatement->execute([$steamid64]);
+        $accountSettingsRow = $accountSettingsStatement->fetch(PDO::FETCH_ASSOC);
+        if (is_array($accountSettingsRow)) {
+            $profileAccountSettings = $accountSettingsRow;
+            $profileAccountSettingsReady = true;
+        }
+    } catch (Throwable $accountSettingsError) {
+        // The page remains usable until the account-name migration is applied.
+        error_log('[FragCity] Profile account settings are unavailable; check the user-name migration.');
+    }
+}
+
+$profileSettingsFields = ['first_name', 'last_name', 'username', 'email', 'phone'];
+$profileSettingsCompleted = 0;
+foreach ($profileSettingsFields as $profileSettingsField) {
+    if (trim((string)($profileAccountSettings[$profileSettingsField] ?? '')) !== '') {
+        ++$profileSettingsCompleted;
+    }
+}
+$profileSettingsTotal = count($profileSettingsFields);
+$profileSettingsProgress = $profileSettingsTotal > 0
+    ? (int)round(($profileSettingsCompleted / $profileSettingsTotal) * 100)
+    : 0;
+
 if (!function_exists('formatPlaytime')) {
     function formatPlaytime($seconds) {
         $hours = floor($seconds / 3600);
@@ -707,6 +843,133 @@ if (!function_exists('formatPlaytime')) {
                 </div>
             <?php endif; ?>
         </div>
+    </section>
+
+    <section class="profile-settings-card" aria-labelledby="profileSettingsTitle">
+        <div class="profile-settings-card__topline">
+            <div class="profile-settings-card__brand">
+                <span class="profile-settings-card__icon" aria-hidden="true">
+                    <i class="fa-solid fa-user-gear"></i>
+                </span>
+                <div class="profile-settings-card__title-wrap">
+                    <span class="profile-settings-card__eyebrow">ACCOUNT SETTINGS</span>
+                    <h2 id="profileSettingsTitle">تنظیمات حساب</h2>
+                    <p>اطلاعات تماس و مشخصات حساب FragCity خود را تکمیل و مدیریت کنید.</p>
+                </div>
+            </div>
+            <?php if ($profileAccountSettingsReady): ?>
+                <span class="profile-settings-progress-label <?= $profileSettingsCompleted === $profileSettingsTotal ? 'is-complete' : 'is-incomplete' ?>">
+                    <?= number_format($profileSettingsCompleted) ?> از <?= number_format($profileSettingsTotal) ?> تکمیل‌شده
+                </span>
+            <?php endif; ?>
+        </div>
+
+        <?php if (!$profileAccountSettingsReady): ?>
+            <div class="profile-settings-unavailable" role="status">
+                <i class="fa-solid fa-database" aria-hidden="true"></i>
+                <div>
+                    <strong>تنظیمات حساب هنوز فعال نشده است</strong>
+                    <p>ابتدا Migration فایل <code>20261030_add_user_name_fields.sql</code> را روی دیتابیس سایت اجرا کنید.</p>
+                </div>
+            </div>
+        <?php else: ?>
+            <div class="profile-settings-progress" aria-label="درصد تکمیل اطلاعات حساب">
+                <span style="width: <?= $profileSettingsProgress ?>%"></span>
+            </div>
+
+            <?php if ($profileSettingsCompleted < $profileSettingsTotal): ?>
+                <p class="profile-settings-hint">
+                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                    برای تکمیل پروفایل، فیلدهای خالی را وارد کنید. اطلاعات شما در حساب FragCity ذخیره می‌شود.
+                </p>
+            <?php endif; ?>
+
+            <form id="profileSettingsForm" class="profile-settings-form" method="post" novalidate>
+                <input type="hidden" name="profile_settings_action" value="save">
+
+                <div class="profile-settings-fields">
+                    <label class="profile-settings-field" for="profileFirstName">
+                        <span>نام <b>*</b></span>
+                        <input
+                            id="profileFirstName"
+                            type="text"
+                            name="first_name"
+                            value="<?= htmlspecialchars((string)($profileAccountSettings['first_name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                            placeholder="نام"
+                            autocomplete="given-name"
+                            maxlength="100"
+                            required
+                        >
+                    </label>
+
+                    <label class="profile-settings-field" for="profileLastName">
+                        <span>نام خانوادگی <b>*</b></span>
+                        <input
+                            id="profileLastName"
+                            type="text"
+                            name="last_name"
+                            value="<?= htmlspecialchars((string)($profileAccountSettings['last_name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                            placeholder="نام خانوادگی"
+                            autocomplete="family-name"
+                            maxlength="100"
+                            required
+                        >
+                    </label>
+
+                    <label class="profile-settings-field" for="profileDisplayName">
+                        <span>نام نمایشی <b>*</b></span>
+                        <input
+                            id="profileDisplayName"
+                            type="text"
+                            name="username"
+                            value="<?= htmlspecialchars((string)($profileAccountSettings['username'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                            placeholder="نامی که در FragCity نمایش داده می‌شود"
+                            autocomplete="nickname"
+                            maxlength="128"
+                            required
+                        >
+                    </label>
+
+                    <label class="profile-settings-field" for="profileEmail">
+                        <span>ایمیل <b>*</b></span>
+                        <input
+                            id="profileEmail"
+                            type="email"
+                            name="email"
+                            value="<?= htmlspecialchars((string)($profileAccountSettings['email'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                            placeholder="name@example.com"
+                            autocomplete="email"
+                            maxlength="254"
+                            required
+                        >
+                    </label>
+
+                    <label class="profile-settings-field" for="profilePhone">
+                        <span>شماره موبایل <b>*</b></span>
+                        <input
+                            id="profilePhone"
+                            type="tel"
+                            name="phone"
+                            value="<?= htmlspecialchars((string)($profileAccountSettings['phone'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                            placeholder="09xxxxxxxxx"
+                            autocomplete="tel"
+                            inputmode="numeric"
+                            pattern="09[0-9]{9}"
+                            maxlength="11"
+                            required
+                        >
+                    </label>
+                </div>
+
+                <div class="profile-settings-form__footer">
+                    <span class="profile-settings-required-note"><b>*</b> تکمیل همه فیلدها ضروری است.</span>
+                    <button type="submit" class="profile-settings-submit" id="profileSettingsSave">
+                        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                        ذخیره اطلاعات
+                    </button>
+                </div>
+            </form>
+        <?php endif; ?>
     </section>
 
     <!-- مودال برش آواتار -->
