@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS public_server_scan_ports (
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_public_server_scan_port (target_id, port),
-    KEY idx_public_server_scan_due (next_query_at, target_id),
+    KEY idx_public_server_scan_due (target_id, next_query_at, port),
     KEY idx_public_server_scan_online (status, target_id, port),
     CONSTRAINT fk_public_server_scan_ports_target
         FOREIGN KEY (target_id) REFERENCES public_server_scan_targets (id)
