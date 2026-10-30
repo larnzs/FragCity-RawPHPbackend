@@ -22,4 +22,27 @@ return [
         'password' => 'REPLACE_WITH_A_UNIQUE_DATABASE_PASSWORD',
         'charset' => 'utf8mb4',
     ],
+
+    // Server Browser credentials are independent from the WeaponPaints HMAC key.
+    // Keep the Pterodactyl Application API key and this shared secret on Linux only.
+    'server_browser' => [
+        'enabled' => false,
+        'shared_secret' => 'REPLACE_WITH_A_SEPARATE_64_CHARACTER_HEX_SECRET',
+        'cache_file' => '/var/cache/fragcity-api/server-browser.json',
+        'cache_max_age_seconds' => 180,
+        'public_connect_host' => '85.185.40.85',
+        'query_host' => '192.168.2.3',
+        'query_timeout_ms' => 1500,
+        'max_servers' => 40,
+        'region' => '',
+        'pterodactyl' => [
+            'base_url' => 'https://server1.fragcity.ir',
+            'application_api_key' => 'REPLACE_WITH_READ_ONLY_APPLICATION_API_KEY',
+            'node_id' => 0,
+            'allowed_egg_ids' => [],
+            'allowed_docker_images' => [
+                'ghcr.io/k4ryuu/cs2-egg-go',
+            ],
+        ],
+    ],
 ];
