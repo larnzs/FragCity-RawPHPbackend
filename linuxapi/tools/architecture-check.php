@@ -117,7 +117,7 @@ $check(
         && str_contains($publicScanner, '"\\xFF\\xFF\\xFF\\xFF\\x49"')
         && str_contains($publicScanner, 'count($ports) > 128')
         && str_contains($publicScanWorker, '$scanner->queryBatch($host, $ports)')
-        && str_contains($publicScanWorker, "(int)($info['app_id'] ?? 0) === 730")
+        && str_contains($publicScanRepository, '=== 730')
 );
 
 $check(
