@@ -54,6 +54,7 @@ try {
     $publicPage = $read('pages/serverlist.php');
     $publicRepository = $read('class/PublicServerBrowserRepository.php');
     $publicScanner = $read('class/PublicServerBrowserA2SScanner.php');
+    $publicScanStoreInterface = $read('class/PublicServerBrowserScanStoreInterface.php');
     $publicScanRepository = $read('class/PublicServerBrowserScanRepository.php');
     $publicScanWorker = $read('class/PublicServerBrowserScanWorker.php');
     $publicWorker = $read('tools/refresh-public-server-browser.php');
@@ -121,10 +122,13 @@ $check(
 );
 
 $check(
-    'Public scan database operations and batch orchestration are modular',
-    str_contains($publicScanRepository, 'ensureTargetInventory')
+    'Public scan protocol, storage contract, PDO repository and batch worker are modular',
+    str_contains($publicScanStoreInterface, 'interface PublicServerBrowserScanStoreInterface')
+        && str_contains($publicScanRepository, 'implements PublicServerBrowserScanStoreInterface')
+        && str_contains($publicScanRepository, 'ensureTargetInventory')
         && str_contains($publicScanRepository, 'getDuePorts')
         && str_contains($publicScanRepository, 'saveResult')
+        && str_contains($publicScanWorker, 'PublicServerBrowserScanStoreInterface $repository')
         && str_contains($publicScanWorker, 'ensureTargetInventory')
         && str_contains($publicScanWorker, 'getDuePorts')
         && str_contains($publicScanWorker, 'saveResult')
