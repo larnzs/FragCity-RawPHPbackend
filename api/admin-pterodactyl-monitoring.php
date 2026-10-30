@@ -33,6 +33,9 @@ if (($_SESSION['user_logged_in'] ?? false) !== true
     $respond(403, ['success' => false, 'error' => 'admin_access_required']);
 }
 
+// Release the session lock before making upstream Panel/Wings requests.
+session_write_close();
+
 require_once dirname(__DIR__) . '/settings/loader.php';
 require_once dirname(__DIR__) . '/class/PterodactylMonitoringRepository.php';
 
