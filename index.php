@@ -597,7 +597,7 @@ $pageAssetsJson = json_encode(
 );
 
 $currentPageAssets =
-    $pageAssets[$page]
+    ($page === 'servers' ? ($pageAssets['servers_vps'] ?? null) : ($pageAssets[$page] ?? null))
     ?? [
         'css' => [],
         'js' => [],
@@ -605,6 +605,7 @@ $currentPageAssets =
 
 $pageFile = match ($page) {
     'skins' => __DIR__ . '/pages/weaponpaints.php',
+    'servers' => __DIR__ . '/pages/serverlist.php',
     'servers_vps' => __DIR__ . '/pages/serverlist.php',
     'adminprofile' => __DIR__ . '/panels/cs2/index.php',
     default => __DIR__ . '/pages/' . $page . '.php',
