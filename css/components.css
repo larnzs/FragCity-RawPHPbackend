@@ -357,3 +357,29 @@
         transform: none !important;
     }
 }
+
+
+@media (prefers-reduced-motion: reduce) {
+    .fc-surface,
+    .fc-card,
+    .fc-button,
+    .fc-icon-button,
+    .fc-input,
+    .fc-select,
+    .fc-textarea,
+    .fc-badge,
+    .fc-button > i,
+    .fc-button > svg,
+    .fc-icon-button > i,
+    .fc-icon-button > svg {
+        transition: none !important;
+    }
+
+    .fc-card--interactive:hover,
+    .fc-button:hover,
+    .fc-icon-button:hover,
+    .fc-button:active,
+    .fc-icon-button:active {
+        transform: none !important;
+    }
+}
