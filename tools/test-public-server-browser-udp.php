@@ -43,22 +43,29 @@ $ports = array_values(array_unique($ports));
 require_once dirname(__DIR__) . '/settings/loader.php';
 require_once dirname(__DIR__) . '/class/PublicServerBrowserA2SScanner.php';
 
+$scannerSettings = fragcity_settings('public_server_scanner', []);
+if (!is_array($scannerSettings)) {
+    $scannerSettings = [];
+}
 $indexSettings = fragcity_settings('files.index', []);
 $defaultProfile = is_array($indexSettings)
     ? trim((string)($indexSettings['database_profile'] ?? 'main'))
     : 'main';
+$configuredProfile = $scannerSettings['database_profile'] ?? $defaultProfile;
 $environmentProfile = getenv('FRAGCITY_SERVER_BROWSER_DB_PROFILE');
 $profile = is_string($environmentProfile) && trim($environmentProfile) !== ''
     ? trim($environmentProfile)
-    : $defaultProfile;
+    : trim((string)$configuredProfile);
 $pdo = fragcity_create_pdo($profile !== '' ? $profile : 'main');
 
 if (!$pdo instanceof PDO) {
     fwrite(STDERR, "FAIL: could not connect to the configured website database.\n");
     exit(2);
 }
-if (!function_exists('stream_socket_client') || !function_exists('stream_select')) {
-    fwrite(STDERR, "FAIL: PHP UDP stream functions are unavailable.\n");
+if (!function_exists('stream_socket_client')
+    || !function_exists('stream_select')
+    || !function_exists('hrtime')) {
+    fwrite(STDERR, "FAIL: PHP UDP stream functions or hrtime are unavailable.\n");
     exit(2);
 }
 
