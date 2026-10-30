@@ -30,10 +30,13 @@
 
 - `public_server_scan_targets`: IP، بازه پورت و سیاست Query هر مقصد.
 - `public_server_scan_ports`: وضعیت و آخرین نتیجهٔ A2S برای هر پورت.
-- Worker زمان‌بندی‌شده: `tools/refresh-public-server-browser.php`.
+- پروتکل A2S: `class/PublicServerBrowserA2SScanner.php`.
+- Repository عملیات اسکن: `class/PublicServerBrowserScanRepository.php`.
+- Orchestrator پردازش batchها: `class/PublicServerBrowserScanWorker.php`.
+- ورودی CLI/Cron: `tools/refresh-public-server-browser.php`.
 - Repository خواندن صفحه: `class/PublicServerBrowserRepository.php`.
 
-تنظیمات جداگانه یا Secret جدید در `settings.json` لازم نیست؛ Worker و صفحه از همان اتصال PDO اصلی استفاده می‌کنند. جزئیات Migration و Cron هاست اشتراکی در `docs/PUBLIC-SERVER-SCANNER.md` است.
+تنظیم اتصال از `settings/settings.json` می‌آید. برای اجرای Worker روی ماشین دیگری می‌توان مسیر JSON را با `FRAGCITY_SETTINGS_FILE`، پروفایل دیتابیس را با `FRAGCITY_SERVER_BROWSER_DB_PROFILE` و اندازهٔ batch/تعداد پورت هر اجرا را با environment variableهای مستندشده override کرد. ماشین اجراکننده باید هم به MySQL/MariaDB سایت و هم به UDP مقصد دسترسی داشته باشد؛ صرفاً PHP بودن هاست کافی نیست. جزئیات در `docs/PUBLIC-SERVER-SCANNER.md` است.
 
 کدهای آزمایشی Pterodactyl با نام `Pterodactyl Standby` نگهداری می‌شوند و مسیر فعال Server Browser به آن‌ها وابسته نیست.
 
