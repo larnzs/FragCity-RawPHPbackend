@@ -34,13 +34,13 @@ Back up `/etc/fragcity-api/config.php` first, then merge the following block int
     'shared_secret' => 'A_SEPARATE_64_CHARACTER_HEX_SECRET',
     'max_servers' => 100,
     // Set only when this Linux API process runs on the same machine as that Wings node.
-    'local_node_id' => YOUR_NODE_ID,
+    'local_node_id' => 1, // Replace 1 with the actual numeric Pterodactyl node ID.
     // Optional override; otherwise uses the node configuration's system.data path.
     'host_metrics_disk_path' => '',
     'pterodactyl' => [
         'base_url' => 'https://server1.fragcity.ir',
         'application_api_key' => 'READ_ONLY_APPLICATION_API_KEY',
-        'allowed_node_ids' => [YOUR_NODE_ID],
+        'allowed_node_ids' => [1], // Replace 1 with the actual numeric Pterodactyl node ID.
         'allowed_egg_ids' => [],
         'allowed_docker_images' => [
             'ghcr.io/k4ryuu/cs2-egg-go',
