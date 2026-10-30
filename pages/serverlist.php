@@ -25,6 +25,13 @@ $escapeServerValue = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 };
 
+$lowerServerValue = static function ($value): string {
+    $value = (string) $value;
+    return function_exists('mb_strtolower')
+        ? mb_strtolower($value, 'UTF-8')
+        : strtolower($value);
+};
+
 $serverRows = [];
 foreach ($serverInventory as $entry) {
     if (!is_array($entry)) {
@@ -231,7 +238,7 @@ $statusLabels = [
                             <select id="slModeFilter" <?= $serverRows === [] ? 'disabled' : '' ?>>
                                 <option value="">همه حالت‌ها</option>
                                 <?php foreach (array_keys($serverGroups) as $modeName): ?>
-                                    <option value="<?= $escapeServerValue(mb_strtolower($modeName, 'UTF-8')) ?>"><?= $escapeServerValue($modeName) ?></option>
+                                    <option value="<?= $escapeServerValue($lowerServerValue($modeName)) ?>"><?= $escapeServerValue($modeName) ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
@@ -288,9 +295,9 @@ $statusLabels = [
                                     $capacity = $server['max_players'] > 0
                                         ? min(100, (int) round(($server['players'] / $server['max_players']) * 100))
                                         : 0;
-                                    $modeSearch = mb_strtolower($server['mode'], 'UTF-8');
-                                    $nameSearch = mb_strtolower($server['name'], 'UTF-8');
-                                    $mapSearch = mb_strtolower($server['map'], 'UTF-8');
+                                    $modeSearch = $lowerServerValue($server['mode']);
+                                    $nameSearch = $lowerServerValue($server['name']);
+                                    $mapSearch = $lowerServerValue($server['map']);
                                     ?>
                                     <article
                                         class="sl-server-card"
