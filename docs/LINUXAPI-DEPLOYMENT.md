@@ -50,6 +50,8 @@ Only explicit Allocation ports are queried; visitor-controlled hosts/ports and b
 
 The website receives only sanitized fields. Keep the Pterodactyl Application API token on Linux; it must never be placed in website settings or browser JavaScript.
 
+For the Server Browser integration, the Application API key needs **Servers: Read** and **Allocations: Read**. The primary game port is selected by matching the server record's `allocation` ID with the included Allocation record's `id`; the Application API response must include the `allocations` relationship.
+
 ### Pterodactyl Monitoring
 
 The admin-only CS2 panel calls the website's authenticated endpoint, which sends a signed request to Linux API. Linux reads Pterodactyl Node/server data and Wings resource counters, then returns a sanitized snapshot. The Application API token and dynamically retrieved Wings tokens remain on Linux. Monitoring is on-demand and the browser refreshes while the admin page is open; no Cron is required.
@@ -99,6 +101,7 @@ php -l class/PterodactylMonitoringApiClient.php
 php -l class/PterodactylMonitoringRepository.php
 php -l linuxapi/public/index.php
 php -l linuxapi/config.example.php
+php linuxapi/tests/pterodactyl-primary-allocation-test.php
 php linuxapi/tools/architecture-check.php
 ```
 
