@@ -1223,6 +1223,12 @@
     color: #86EFAC;
 }
 
+.profile-fullscreen .profile-settings-progress-label.is-incomplete {
+    border-color: rgba(249, 115, 22, 0.22);
+    background: rgba(249, 115, 22, 0.06);
+    color: #FB923C;
+}
+
 .profile-fullscreen .profile-settings-progress {
     height: 4px;
     margin: 0.9rem 0 0;
@@ -1296,9 +1302,14 @@
     font: inherit;
     font-size: 0.76rem;
     font-weight: 500;
-    direction: auto;
     text-align: right;
     transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.profile-fullscreen .profile-settings-field input[type="email"],
+.profile-fullscreen .profile-settings-field input[type="tel"] {
+    direction: ltr;
+    text-align: left;
 }
 
 .profile-fullscreen .profile-settings-field input::placeholder {
