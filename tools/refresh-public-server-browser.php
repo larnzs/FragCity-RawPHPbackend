@@ -14,6 +14,7 @@ if (PHP_SAPI !== 'cli') {
 
 require_once dirname(__DIR__) . '/settings/loader.php';
 require_once dirname(__DIR__) . '/class/PublicServerBrowserA2SScanner.php';
+require_once dirname(__DIR__) . '/class/PublicServerBrowserScanStoreInterface.php';
 require_once dirname(__DIR__) . '/class/PublicServerBrowserScanRepository.php';
 require_once dirname(__DIR__) . '/class/PublicServerBrowserScanWorker.php';
 
