@@ -1,6 +1,8 @@
-# Public CS2 Server Browser — Database Scanner
+# Legacy Public CS2 Server Browser — Database Scanner
 
-## Active architecture
+> **Deprecated as the active source.** The public Server Browser now uses the Pterodactyl Application API and on-demand A2S queries through the Linux API. No range scan or Cron job is required. Keep these files and tables for rollback/reference, but do not enable this scanner Cron. See [PTERODACTYL-STANDBY-API.md](PTERODACTYL-STANDBY-API.md) for the active flow.
+
+## Legacy architecture
 
 The public Server Browser is intentionally independent from Pterodactyl and from the Linux WeaponPaints API.
 
@@ -231,6 +233,6 @@ The worker automatically creates per-port rows for a new or extended range. To s
 
 If you change the target range, the worker inserts missing rows. Old port rows outside the current configured range remain in the database but are ignored by both the worker and public page.
 
-## Pterodactyl Standby
+## Active Pterodactyl Server Browser
 
-The previous Pterodactyl Application API integration has been preserved separately under the Pterodactyl Standby names and is not part of the active scanner. See `docs/PTERODACTYL-STANDBY-API.md`. No Pterodactyl API key or Linux API secret is required for the active public Server Browser.
+The active public Server Browser now uses the Pterodactyl Application API and the on-demand A2S snapshot path. See `docs/PTERODACTYL-STANDBY-API.md`. The website requires its signed Pterodactyl Standby integration fragment; the Pterodactyl Application API key remains on the Linux API host only.
