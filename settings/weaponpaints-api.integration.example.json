@@ -1,0 +1,10 @@
+{
+  "_comment": "Merge this fragment into integrations in the private settings/settings.json. It is valid JSON; _comment is documentation metadata ignored by the application.",
+  "integrations": {
+    "weaponpaints_api": {
+      "_comment": "Signed HTTPS client for the Linux WeaponPaints endpoint. Match this secret to the top-level shared_secret in /etc/fragcity-api/config.php. It must not be reused for either Pterodactyl integration.",
+      "base_url": "https://api.fragcity.ir",
+      "shared_secret": "REPLACE_WITH_WEAPONPAINTS_LINUX_API_SECRET"
+    }
+  }
+}
