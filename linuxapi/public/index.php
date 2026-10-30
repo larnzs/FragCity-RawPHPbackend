@@ -531,38 +531,30 @@ try {
             apiRespond(503, ['success' => false, 'error' => 'pterodactyl_standby_disabled']);
         }
 
-        $cacheFile = trim((string)($serverConfig['cache_file'] ?? ''));
-        if ($cacheFile === '' || !is_file($cacheFile) || !is_readable($cacheFile)) {
-            apiRespond(503, ['success' => false, 'error' => 'pterodactyl_standby_cache_unavailable']);
+        try {
+            require_once __DIR__ . '/../src/PterodactylStandby/PterodactylStandbyDiscovery.php';
+            require_once __DIR__ . '/../src/PterodactylStandby/PterodactylStandbySnapshotCache.php';
+
+            $discovery = new PterodactylStandbyDiscovery($config);
+            $cache = new PterodactylStandbySnapshotCache($serverConfig);
+            $snapshot = $cache->getOrRefresh(
+                static fn(): array => $discovery->discover()
+            );
+
+            apiRespond(200, [
+                'success' => true,
+                'data' => $snapshot,
+            ]);
+        } catch (Throwable $e) {
+            error_log(
+                '[FragCity API] Pterodactyl Standby live discovery failed; type='
+                . get_class($e)
+            );
+            apiRespond(503, [
+                'success' => false,
+                'error' => 'pterodactyl_standby_unavailable',
+            ]);
         }
-
-        $cacheRaw = file_get_contents($cacheFile);
-        $snapshot = is_string($cacheRaw) ? json_decode($cacheRaw, true) : null;
-        if (!is_array($snapshot) || !is_array($snapshot['servers'] ?? null)) {
-            error_log('[FragCity API] Pterodactyl Standby cache is invalid.');
-            apiRespond(503, ['success' => false, 'error' => 'pterodactyl_standby_cache_invalid']);
-        }
-
-        $generatedAt = is_string($snapshot['generated_at'] ?? null)
-            ? $snapshot['generated_at']
-            : '';
-        $generatedTimestamp = $generatedAt !== '' ? strtotime($generatedAt) : false;
-        if ($generatedTimestamp === false) {
-            apiRespond(503, ['success' => false, 'error' => 'pterodactyl_standby_cache_invalid']);
-        }
-
-        $cacheAge = max(0, time() - $generatedTimestamp);
-        $maxCacheAge = max(30, min(3600, (int)($serverConfig['cache_max_age_seconds'] ?? 180)));
-
-        apiRespond(200, [
-            'success' => true,
-            'data' => [
-                'generated_at' => $generatedAt,
-                'cache_age_seconds' => $cacheAge,
-                'stale' => $cacheAge > $maxCacheAge,
-                'servers' => array_values($snapshot['servers']),
-            ],
-        ]);
     }
 
     if ($action === 'ping_db') {
