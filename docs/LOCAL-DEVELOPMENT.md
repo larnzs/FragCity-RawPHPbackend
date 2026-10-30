@@ -57,7 +57,7 @@ copy settings\settings.example.json settings\settings.json
 mysql -u root kyonxcbt_fragcity_services < database/migrations/20261030_create_public_server_browser_tables.sql
 ~~~
 
-سپس دسترسی user محلی را با GRANTهای جدید در \`tools/laragon-site-db-user.sql\` به دو جدول scanner اضافه کن. تست UDP را فقط از همان محیطی اجرا کن که قرار است Worker در آن اجرا شود؛ موفقیت در Laragon ثابت نمی‌کند UDP خروجی از هاست اشتراکی نیز مجاز است.
+سپس دسترسی user محلی را با GRANTهای جدید در `tools/laragon-site-db-user.sql` به دو جدول scanner اضافه کن. تست UDP را فقط از همان محیطی اجرا کن که قرار است Worker در آن اجرا شود؛ موفقیت در Laragon ثابت نمی‌کند UDP خروجی از هاست اشتراکی نیز مجاز است.
 
 Worker را می‌توان برای تست دستی با PHP CLI اجرا کرد:
 
@@ -65,7 +65,7 @@ Worker را می‌توان برای تست دستی با PHP CLI اجرا کر�
 php tools/refresh-public-server-browser.php
 ~~~
 
-در Production همین Worker با Cron هاست اشتراکی اجرا می‌شود. مراحل کامل و تست UDP از خود هاست در \`docs/PUBLIC-SERVER-SCANNER.md\` آمده است.
+در Production همین Worker با Cron هاست اشتراکی اجرا می‌شود. مراحل کامل و تست UDP از خود هاست در `docs/PUBLIC-SERVER-SCANNER.md` آمده است.
 
 ## 4. استفاده از updater روزمره
 
