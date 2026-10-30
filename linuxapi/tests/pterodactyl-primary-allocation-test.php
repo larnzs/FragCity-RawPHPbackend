@@ -28,12 +28,10 @@ $privateValues = [
 
 foreach ($privateValues as $propertyName => $value) {
     $property = $reflection->getProperty($propertyName);
-    $property->setAccessible(true);
     $property->setValue($client, $value);
 }
 
 $mapCandidate = $reflection->getMethod('toCandidate');
-$mapCandidate->setAccessible(true);
 
 $serverAttributes = [
     'id' => 123,
