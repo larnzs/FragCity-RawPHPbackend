@@ -1,0 +1,16 @@
+[Unit]
+Description=Refresh FragCity Pterodactyl Standby snapshot
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/fragcity-api
+ExecStart=/usr/bin/php /var/www/fragcity-api/bin/pterodactyl-standby-refresh.php
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/cache/fragcity-api
