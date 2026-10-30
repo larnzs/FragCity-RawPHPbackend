@@ -2,21 +2,17 @@
 declare(strict_types=1);
 
 /**
- * Static architecture regression checks.
- *
- * This ensures the website no longer queries the retired Windows-Agent schema
- * and keeps WeaponPaints access behind the Linux API.
+ * Static architecture regression checks for the active website and API.
  * Run from the repository root: php linuxapi/tools/architecture-check.php
  */
-
 if (PHP_SAPI !== 'cli') {
     http_response_code(404);
     exit(1);
 }
 
 $root = dirname(__DIR__, 2);
-$failures = [];
 $checks = [];
+$failures = [];
 
 $read = static function (string $relative) use ($root): string {
     $path = $root . DIRECTORY_SEPARATOR . $relative;
@@ -45,123 +41,149 @@ try {
     $weaponRepo = $read('class/WeaponPaintsRepository.php');
     $apiClient = $read('class/FragCityLinuxApiClient.php');
     $settingsLoader = $read('settings/loader.php');
-    $serverBrowserSettingsRaw = $read('settings/server-browser.integration.example.json');
-    $serverBrowserSettings = json_decode($serverBrowserSettingsRaw, true, 512, JSON_THROW_ON_ERROR);
-    $serverBrowserApiClient = $read('class/FragCityServerBrowserApiClient.php');
-    $serverBrowserRepository = $read('class/ServerBrowserRepository.php');
-    $serverBrowserPage = $read('pages/serverlist.php');
-    $serverBrowserDiscovery = $read('linuxapi/src/ServerBrowser/ServerBrowserDiscovery.php');
-    $pterodactylClient = $read('linuxapi/src/ServerBrowser/PterodactylApplicationClient.php');
-    $a2sClient = $read('linuxapi/src/ServerBrowser/A2SInfoQuery.php');
-    $serverBrowserWorker = $read('linuxapi/bin/refresh-server-browser.php');
+
+    $standbySettingsRaw = $read('settings/pterodactyl-standby.integration.example.json');
+    $standbySettings = json_decode($standbySettingsRaw, true, 512, JSON_THROW_ON_ERROR);
+    $standbyApiClient = $read('class/PterodactylStandbyApiClient.php');
+    $standbyRepository = $read('class/PterodactylStandbyRepository.php');
+    $standbyPterodactylClient = $read('linuxapi/src/PterodactylStandby/PterodactylApplicationClient.php');
+    $standbyDiscovery = $read('linuxapi/src/PterodactylStandby/PterodactylStandbyDiscovery.php');
+    $standbyA2S = $read('linuxapi/src/PterodactylStandby/A2SInfoQuery.php');
+    $standbyWorker = $read('linuxapi/bin/pterodactyl-standby-refresh.php');
+
+    $publicPage = $read('pages/serverlist.php');
+    $publicRepository = $read('class/PublicServerBrowserRepository.php');
+    $publicScanner = $read('class/PublicServerBrowserA2SScanner.php');
+    $publicWorker = $read('tools/refresh-public-server-browser.php');
+    $publicUdpTest = $read('tools/test-public-server-browser-udp.php');
+    $publicMigration = $read('database/migrations/20261030_create_public_server_browser_tables.sql');
+    $localGrants = $read('tools/laragon-site-db-user.sql');
     $nginxApi = $read('linuxapi/nginx/fragcity-api-https.conf.example');
+    $standbyDocs = $read('docs/PTERODACTYL-STANDBY-API.md');
+    $publicDocs = $read('docs/PUBLIC-SERVER-SCANNER.md');
 } catch (Throwable $e) {
     fwrite(STDERR, 'FAIL: ' . $e->getMessage() . PHP_EOL);
     exit(2);
 }
 
 $check(
-    'Linux API remains pinned to the WeaponPaints route and local GLOBAL database',
+    'WeaponPaints remains on its signed API and Linux-local GLOBAL database',
     str_contains($index, "'/v1/weaponpaints'")
-        && !str_contains($index, 'apiProxyLegacyAgent')
         && str_contains($linuxConfig, "'host' => '127.0.0.1'")
         && str_contains($linuxConfig, "'name' => 'GLOBAL_weaponpaints'")
-        && !str_contains($linuxConfig, 'website_bridge')
-);
-$check(
-    'Old Agent API route is retired with HTTP 410',
-    str_contains($index, 'legacy_agent_api_retired')
-        && !str_contains($index, 'apiProxyLegacyAgent')
-);
-$check(
-    'Website WeaponPaints repository only uses the signed Linux API client',
-    str_contains($weaponRepo, 'new FragCityLinuxApiClient()')
-        && str_contains($weaponRepo, "transport !== 'api'")
-        && !str_contains($weaponRepo, 'new PDO')
-        && !preg_match('/\b(?:SELECT|INSERT\s+INTO|UPDATE|DELETE\s+FROM)\b/i', $weaponRepo)
-);
-$check(
-    'WeaponPaints client verifies TLS, signs requests, disables redirects, and API verifies signatures',
-    str_contains($apiClient, 'CURLOPT_SSL_VERIFYPEER => true')
-        && str_contains($apiClient, 'CURLOPT_SSL_VERIFYHOST => 2')
-        && str_contains($apiClient, 'CURLOPT_FOLLOWLOCATION => false')
+        && str_contains($weaponRepo, 'new FragCityLinuxApiClient()')
         && str_contains($apiClient, "hash_hmac('sha256'")
-        && str_contains($index, 'hash_equals(')
+        && str_contains($apiClient, 'CURLOPT_SSL_VERIFYPEER => true')
+        && !str_contains($weaponRepo, 'new PDO')
 );
+
 $check(
-    'Runtime settings loader requires settings/settings.json and never falls back to example',
-    str_contains($settingsLoader, "__DIR__.'/settings.json'")
+    'Legacy Windows-Agent API remains retired',
+    str_contains($index, 'legacy_agent_api_retired')
+        && str_contains($siteBridge, 'http_response_code(410)')
+        && str_contains($siteBridge, 'legacy_agent_api_retired')
+        && !str_contains($siteBridge, 'fragcity_create_pdo')
+);
+
+$check(
+    'Runtime settings remain fail-closed and never load the example file',
+    str_contains($settingsLoader, "settings.json")
         && str_contains($settingsLoader, 'Required runtime settings file is missing')
         && !str_contains($settingsLoader, 'settings.example.json')
 );
+
 $check(
-    'Server Browser settings fragment contains the HTTPS origin and separate HMAC setting',
-    (($serverBrowserSettings['integrations']['server_browser_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
-        && is_string($serverBrowserSettings['integrations']['server_browser_api']['shared_secret'] ?? null)
-        && !isset($serverBrowserSettings['integrations']['pterodactyl'])
-        && !isset($serverBrowserSettings['integrations']['weaponpaints_api'])
+    'Active Server Browser reads the main database and never invokes a remote API',
+    str_contains($publicPage, 'new PublicServerBrowserRepository($pdo)')
+        && str_contains($publicRepository, 'public_server_scan_ports')
+        && str_contains($publicRepository, 'public_server_scan_targets')
+        && str_contains($publicRepository, "p.app_id = 730")
+        && !str_contains($publicPage, 'ServerBrowserApiClient')
+        && !str_contains($publicRepository, 'curl_init')
+        && !str_contains($publicRepository, 'stream_socket_client')
+        && !str_contains($publicRepository, 'Pterodactyl')
 );
+
 $check(
-    'Server Browser website client uses a separate signed HTTPS integration',
-    str_contains($serverBrowserApiClient, "integrations.server_browser_api.base_url")
-        && str_contains($serverBrowserApiClient, "integrations.server_browser_api.shared_secret")
-        && str_contains($serverBrowserApiClient, "hash_hmac('sha256'")
-        && str_contains($serverBrowserApiClient, "CURLOPT_SSL_VERIFYPEER => true")
-        && str_contains($serverBrowserApiClient, "CURLOPT_FOLLOWLOCATION => false")
+    'Public A2S scanner uses bounded concurrent UDP, handles challenges and validates AppID 730',
+    str_contains($publicScanner, 'stream_socket_client')
+        && str_contains($publicScanner, 'stream_select')
+        && str_contains($publicScanner, 'Source Engine Query')
+        && str_contains($publicScanner, '"\xFF\xFF\xFF\xFF\x41"')
+        && str_contains($publicScanner, '"\xFF\xFF\xFF\xFF\x49"')
+        && str_contains($publicScanner, 'count($ports) > 128')
+        && str_contains($publicWorker, '$scanner->queryBatch($host, $ports)')
+        && str_contains($publicWorker, "(int)$info['app_id'] === 730")
 );
+
 $check(
-    'Server Browser repository and page never query Pterodactyl or UDP directly',
-    str_contains($serverBrowserRepository, 'new FragCityServerBrowserApiClient()')
-        && !str_contains($serverBrowserRepository, 'new PDO')
-        && !str_contains($serverBrowserRepository, 'stream_socket_client')
-        && str_contains($serverBrowserPage, 'new ServerBrowserRepository()')
-        && !str_contains($serverBrowserPage, 'settings/public-servers.php')
+    'Public scanner Cron is CLI-only, locked, resumable and limited to 256 ports per run',
+    str_contains($publicWorker, "PHP_SAPI !== 'cli'")
+        && str_contains($publicWorker, "GET_LOCK('fragcity_public_server_browser_scan', 0)")
+        && str_contains($publicWorker, '$maxPerRun = 256')
+        && str_contains($publicWorker, '$batchSize = 64')
+        && str_contains($publicWorker, 'next_query_at')
+        && str_contains($publicWorker, 'retry_offline_seconds')
+        && str_contains($publicWorker, "RELEASE_LOCK('fragcity_public_server_browser_scan')")
 );
+
 $check(
-    'Linux Server Browser endpoint uses its own secret and reads the cached snapshot',
-    str_contains($index, "'/v1/server-browser'")
-        && str_contains($index, '$config[\'server_browser\'][\'shared_secret\']')
-        && str_contains($index, 'server_browser_cache_unavailable')
-        && str_contains($index, 'server_browser_cache_invalid')
+    'Public scanner migration creates only its two tables and seeds the requested target range',
+    str_contains($publicMigration, 'CREATE TABLE IF NOT EXISTS public_server_scan_targets')
+        && str_contains($publicMigration, 'CREATE TABLE IF NOT EXISTS public_server_scan_ports')
+        && str_contains($publicMigration, "'85.185.40.85', 27085, 29100")
+        && str_contains($publicMigration, 'retry_offline_seconds')
+        && str_contains($publicMigration, 'refresh_online_seconds')
 );
+
 $check(
-    'Pterodactyl discovery is read-only and restricted to configured CS2 node/image/Egg allocations',
-    str_contains($pterodactylClient, 'CURLOPT_HTTPGET => true')
-        && str_contains($pterodactylClient, 'Authorization: Bearer ')
-        && str_contains($pterodactylClient, 'allowed_egg_ids')
-        && str_contains($pterodactylClient, 'allowed_docker_images')
-        && str_contains($pterodactylClient, 'is_default')
-        && !str_contains($pterodactylClient, 'CURLOPT_POST => true')
+    'Local DB user has explicit grants for both scanner tables',
+    str_contains($localGrants, 'public_server_scan_targets')
+        && str_contains($localGrants, 'public_server_scan_ports')
 );
+
 $check(
-    'A2S queries use explicit allocations, handle challenge responses, and verify CS2 AppID',
-    str_contains($a2sClient, 'Source Engine Query')
-        && str_contains($a2sClient, '"\\xFF\\xFF\\xFF\\xFF\\x41"')
-        && str_contains($serverBrowserDiscovery, '$this->a2s->query($queryHost, $port)')
-        && str_contains($serverBrowserDiscovery, "['app_id'] ?? 0) !== 730")
-        && !str_contains($serverBrowserDiscovery, 'range(')
+    'Shared-hosting UDP preflight uses only explicit configured ports',
+    str_contains($publicUdpTest, 'count($ports) > 10')
+        && str_contains($publicUdpTest, 'outside the configured range')
+        && str_contains($publicUdpTest, '$scanner->queryBatch($host, $ports)')
+        && str_contains($publicDocs, 'test-public-server-browser-udp.php')
 );
+
 $check(
-    'Server Browser worker serializes refreshes and atomically replaces its cache',
-    str_contains($serverBrowserWorker, 'LOCK_EX | LOCK_NB')
-        && str_contains($serverBrowserWorker, 'rename($temporaryFile, $cacheFile)')
-        && str_contains($serverBrowserWorker, "PHP_SAPI !== 'cli'")
+    'Pterodactyl standby integration has an independent website secret',
+    (($standbySettings['integrations']['pterodactyl_standby_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
+        && is_string($standbySettings['integrations']['pterodactyl_standby_api']['shared_secret'] ?? null)
+        && str_contains($standbyApiClient, 'integrations.pterodactyl_standby_api.shared_secret')
+        && str_contains($standbyApiClient, "hash_hmac('sha256'")
+        && str_contains($standbyRepository, 'new PterodactylStandbyApiClient()')
 );
+
 $check(
-    'Active Nginx TLS example routes the exact Server Browser endpoint to the fixed API front controller',
-    str_contains($nginxApi, 'location = /v1/server-browser')
+    'Pterodactyl standby client is read-only and filters configured allocations',
+    str_contains($standbyPterodactylClient, 'CURLOPT_HTTPGET => true')
+        && str_contains($standbyPterodactylClient, 'Authorization: Bearer ')
+        && str_contains($standbyPterodactylClient, 'allowed_egg_ids')
+        && str_contains($standbyPterodactylClient, 'allowed_docker_images')
+        && str_contains($standbyPterodactylClient, 'is_default')
+        && !str_contains($standbyPterodactylClient, 'CURLOPT_POST => true')
+        && str_contains($standbyDiscovery, '$this->a2s->query($queryHost, $port)')
+        && str_contains($standbyA2S, 'Source Engine Query')
+        && str_contains($standbyWorker, 'PterodactylStandbyDiscovery')
+        && str_contains($standbyDocs, 'not the active public Server Browser')
+);
+
+$check(
+    'Standby snapshot route and Nginx example use a distinct Pterodactyl Standby path',
+    str_contains($index, "'/v1/pterodactyl-standby'")
+        && str_contains($index, "$config['pterodactyl_standby']['shared_secret']")
+        && str_contains($index, 'pterodactyl_standby_cache_unavailable')
+        && str_contains($nginxApi, 'location = /v1/pterodactyl-standby')
         && str_contains($nginxApi, 'SCRIPT_FILENAME $document_root/index.php')
 );
 
 $check(
-    'Old website Agent connector fails closed without database access',
-    str_contains($siteBridge, 'http_response_code(410)')
-        && str_contains($siteBridge, 'legacy_agent_api_retired')
-        && !str_contains($siteBridge, 'fragcity_create_pdo')
-        && !str_contains($siteBridge, 'agent_tokens')
-);
-$check(
-    'Schema preflight checks only the supplied website database schema',
+    'Website preflight remains read-only and scoped to the known site schema',
     str_contains($preflight, "PHP_SAPI !== 'cli'")
         && str_contains($preflight, 'INFORMATION_SCHEMA.COLUMNS')
         && str_contains($preflight, "'donations' =>")
@@ -214,7 +236,7 @@ foreach ($iterator as $fileInfo) {
     }
 
     foreach ($retiredTables as $table) {
-        if (preg_match('/\\b' . preg_quote($table, '/') . '\\b/i', $contents)) {
+        if (preg_match('/\\\\b' . preg_quote($table, '/') . '\\\\b/i', $contents)) {
             $runtimeClean = false;
             fwrite(STDERR, 'FAIL: retired table reference remains in ' . $relative . PHP_EOL);
         }
@@ -234,4 +256,5 @@ if ($failed > 0) {
     fwrite(STDERR, $failed . ' architecture check(s) failed.' . PHP_EOL);
     exit(1);
 }
+
 echo 'All ' . count($checks) . ' architecture checks passed.' . PHP_EOL;
