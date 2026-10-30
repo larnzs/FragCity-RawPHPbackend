@@ -92,15 +92,23 @@ try {
         if ((int)($inventory['total'] ?? 0) !== $expected
             || (int)($inventory['min_port'] ?? 0) !== $portStart
             || (int)($inventory['max_port'] ?? 0) !== $portEnd) {
-            $insert = $pdo->prepare(
-                'INSERT IGNORE INTO public_server_scan_ports (target_id, port, status)
-                 VALUES (:target_id, :port, "pending")'
-            );
-            for ($port = $portStart; $port <= $portEnd; ++$port) {
-                $insert->execute([
-                    ':target_id' => $targetId,
-                    ':port' => $port,
-                ]);
+            foreach (array_chunk(range($portStart, $portEnd), 250) as $missingPortBatch) {
+                $valueSql = [];
+                $parameters = [];
+
+                foreach ($missingPortBatch as $offset => $port) {
+                    $targetParameter = ':target_' . $offset;
+                    $portParameter = ':port_' . $offset;
+                    $valueSql[] = '(' . $targetParameter . ', ' . $portParameter . ', "pending")';
+                    $parameters[$targetParameter] = $targetId;
+                    $parameters[$portParameter] = $port;
+                }
+
+                $insert = $pdo->prepare(
+                    'INSERT IGNORE INTO public_server_scan_ports (target_id, port, status)
+                     VALUES ' . implode(', ', $valueSql)
+                );
+                $insert->execute($parameters);
             }
         }
 
