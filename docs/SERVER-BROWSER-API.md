@@ -134,7 +134,17 @@ The timer refreshes the snapshot every 30 seconds. A refresh lock prevents overl
 
 ## Validation
 
-1. Run the worker manually; expected output starts with `PASS: refreshed N CS2 allocation(s)`.
+Before configuring the Pterodactyl token, test the PHP A2S implementation itself against the three known internal ports. After deploying the new source files, run:
+
+~~~bash
+sudo -u www-data php /var/www/fragcity-api/bin/test-a2s.php 27085 29000 29001
+~~~
+
+The test reads only `server_browser.query_host` from the Linux runtime config and queries only the explicitly supplied ports (maximum ten). It does not need the Pterodactyl Application API key and does not scan a range. Each response must identify AppID 730.
+
+Then:
+
+1. Run the discovery worker manually; expected output starts with `PASS: refreshed N CS2 allocation(s)`.
 2. Confirm the JSON cache contains the discovered server list, and that each online server has `app_id=730` in the query result before it is published as online.
 3. Use the website's signed client with a read-only smoke test to call `list_servers`.
 4. Open the Server Browser locally in Laragon. It should display the same cached snapshot as the production website.
