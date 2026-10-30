@@ -134,32 +134,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
             return function_exists('mb_strlen') ? mb_strlen($value, 'UTF-8') : strlen($value);
         };
 
-        $firstName = $cleanProfileText($readProfileField('first_name'));
-        $lastName = $cleanProfileText($readProfileField('last_name'));
         $displayName = $cleanProfileText($readProfileField('username'));
-        $email = strtolower($readProfileField('email'));
+        $emailInput = strtolower($readProfileField('email'));
+        $email = $emailInput !== '' ? $emailInput : null;
         $phone = preg_replace('/[\\s()-]+/', '', $readProfileField('phone')) ?? '';
 
-        foreach ([
-            'نام' => [$firstName, 100],
-            'نام خانوادگی' => [$lastName, 100],
-            'نام نمایشی' => [$displayName, 128],
-        ] as $fieldLabel => [$fieldValue, $maxLength]) {
-            if (
-                $fieldValue === ''
-                || $profileTextLength($fieldValue) > $maxLength
-                || preg_match('/[\\x00-\\x1F\\x7F]/u', $fieldValue)
-            ) {
-                profileRespond($fieldLabel . ' را وارد کنید؛ طول مقدار واردشده معتبر نیست.', 422);
-            }
+        if (
+            $displayName === ''
+            || $profileTextLength($displayName) > 128
+            || preg_match('/[\\x00-\\x1F\\x7F]/u', $displayName)
+        ) {
+            profileRespond('یک نام کاربری معتبر وارد کنید.', 422);
         }
 
+        // Email remains optional, matching the existing FragCity registration flow.
         if (
-            $email === ''
-            || strlen($email) > 254
-            || filter_var($email, FILTER_VALIDATE_EMAIL) === false
+            $email !== null
+            && (
+                strlen($email) > 254
+                || filter_var($email, FILTER_VALIDATE_EMAIL) === false
+            )
         ) {
-            profileRespond('نشانی ایمیل معتبر وارد کنید.', 422);
+            profileRespond('نشانی ایمیل معتبر وارد کنید یا فیلد آن را خالی بگذارید.', 422);
         }
 
         if (!preg_match('/^09[0-9]{9}$/D', $phone)) {
@@ -177,11 +173,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
             }
 
             $uniqueChecks = [
-                ['username', $displayName, 'این نام نمایشی قبلاً استفاده شده است.'],
+                ['username', $displayName, 'این نام کاربری قبلاً استفاده شده است.'],
                 ['email', $email, 'این ایمیل قبلاً برای حساب دیگری ثبت شده است.'],
                 ['phone', $phone, 'این شماره موبایل قبلاً برای حساب دیگری ثبت شده است.'],
             ];
             foreach ($uniqueChecks as [$column, $value, $message]) {
+                // An empty email is stored as NULL and does not participate in uniqueness checks.
+                if ($value === null || $value === '') {
+                    continue;
+                }
+
                 $currentValue = trim((string)($accountRow[$column] ?? ''));
                 if (strcasecmp($currentValue, (string)$value) === 0) {
                     continue;
@@ -199,13 +200,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
 
             $saveSettings = $pdo->prepare(
                 'UPDATE users
-                 SET first_name = ?, last_name = ?, username = ?, email = ?, phone = ?
+                 SET username = ?, email = ?, phone = ?
                  WHERE steamid64 = ?
                  LIMIT 1'
             );
             $saveSettings->execute([
-                $firstName,
-                $lastName,
                 $displayName,
                 $email,
                 $phone,
@@ -215,7 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
         } catch (PDOException $e) {
             error_log('[FragCity] Profile account settings save failed (SQLSTATE ' . $e->getCode() . ').');
             profileRespond(
-                'ذخیره اطلاعات انجام نشد. بررسی کنید Migration اطلاعات نام روی دیتابیس اجرا شده باشد.',
+                'ذخیره اطلاعات انجام نشد. اتصال دیتابیس و ساختار جدول users را بررسی کنید.',
                 500
             );
         } catch (Throwable $e) {
@@ -572,7 +571,7 @@ $profileAccountSettingsReady = false;
 if ($steamid64 !== '' && isset($pdo) && $pdo instanceof PDO) {
     try {
         $accountSettingsStatement = $pdo->prepare(
-            'SELECT username, first_name, last_name, email, phone
+            'SELECT username, email, phone
              FROM users WHERE steamid64 = ? LIMIT 1'
         );
         $accountSettingsStatement->execute([$steamid64]);
@@ -582,12 +581,13 @@ if ($steamid64 !== '' && isset($pdo) && $pdo instanceof PDO) {
             $profileAccountSettingsReady = true;
         }
     } catch (Throwable $accountSettingsError) {
-        // The page remains usable until the account-name migration is applied.
-        error_log('[FragCity] Profile account settings are unavailable; check the user-name migration.');
+        // The rest of the profile remains available if the website users query fails.
+        error_log('[FragCity] Profile account settings could not be loaded from users.');
     }
 }
 
-$profileSettingsFields = ['first_name', 'last_name', 'username', 'email', 'phone'];
+// Only required existing account fields count toward completion; email is optional.
+$profileSettingsFields = ['username', 'phone'];
 $profileSettingsCompleted = 0;
 foreach ($profileSettingsFields as $profileSettingsField) {
     if (trim((string)($profileAccountSettings[$profileSettingsField] ?? '')) !== '') {
@@ -865,7 +865,7 @@ if (!function_exists('formatPlaytime')) {
             </div>
             <?php if ($profileAccountSettingsReady): ?>
                 <span class="profile-settings-progress-label <?= $profileSettingsCompleted === $profileSettingsTotal ? 'is-complete' : 'is-incomplete' ?>">
-                    <?= number_format($profileSettingsCompleted) ?> از <?= number_format($profileSettingsTotal) ?> تکمیل‌شده
+                    <?= number_format($profileSettingsCompleted) ?> از <?= number_format($profileSettingsTotal) ?> فیلد ضروری
                 </span>
             <?php endif; ?>
         </div>
@@ -875,7 +875,7 @@ if (!function_exists('formatPlaytime')) {
                 <i class="fa-solid fa-database" aria-hidden="true"></i>
                 <div>
                     <strong>تنظیمات حساب هنوز فعال نشده است</strong>
-                    <p>ابتدا Migration فایل <code>20261030_add_user_name_fields.sql</code> را روی دیتابیس سایت اجرا کنید.</p>
+                    <p>اطلاعات حساب از جدول users خوانده نشد. اتصال دیتابیس سایت را بررسی کنید.</p>
                 </div>
             </div>
         <?php else: ?>
@@ -894,34 +894,6 @@ if (!function_exists('formatPlaytime')) {
                 <input type="hidden" name="profile_settings_action" value="save">
 
                 <div class="profile-settings-fields">
-                    <label class="profile-settings-field" for="profileFirstName">
-                        <span>نام <b>*</b></span>
-                        <input
-                            id="profileFirstName"
-                            type="text"
-                            name="first_name"
-                            value="<?= htmlspecialchars((string)($profileAccountSettings['first_name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
-                            placeholder="نام"
-                            autocomplete="given-name"
-                            maxlength="100"
-                            required
-                        >
-                    </label>
-
-                    <label class="profile-settings-field" for="profileLastName">
-                        <span>نام خانوادگی <b>*</b></span>
-                        <input
-                            id="profileLastName"
-                            type="text"
-                            name="last_name"
-                            value="<?= htmlspecialchars((string)($profileAccountSettings['last_name'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
-                            placeholder="نام خانوادگی"
-                            autocomplete="family-name"
-                            maxlength="100"
-                            required
-                        >
-                    </label>
-
                     <label class="profile-settings-field" for="profileDisplayName">
                         <span>نام کاربری <b>*</b></span>
                         <input
@@ -938,7 +910,7 @@ if (!function_exists('formatPlaytime')) {
                     </label>
 
                     <label class="profile-settings-field" for="profileEmail">
-                        <span>ایمیل <b>*</b></span>
+                        <span>ایمیل <em>اختیاری</em></span>
                         <input
                             id="profileEmail"
                             type="email"
@@ -947,7 +919,6 @@ if (!function_exists('formatPlaytime')) {
                             placeholder="name@example.com"
                             autocomplete="email"
                             maxlength="254"
-                            required
                         >
                     </label>
 
@@ -970,7 +941,7 @@ if (!function_exists('formatPlaytime')) {
                 </div>
 
                 <div class="profile-settings-form__footer">
-                    <span class="profile-settings-required-note"><b>*</b> تکمیل همه فیلدها ضروری است.</span>
+                    <span class="profile-settings-required-note"><b>*</b> نام کاربری و شماره موبایل ضروری‌اند؛ ایمیل اختیاری است.</span>
                     <button type="submit" class="profile-settings-submit" id="profileSettingsSave">
                         <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
                         ذخیره اطلاعات
