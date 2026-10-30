@@ -10,7 +10,6 @@ require_once __DIR__ . '/PterodactylApplicationClient.php';
  */
 final class FragCityServerBrowserDiscovery
 {
-    private array $config;
     private array $serverConfig;
     private FragCityPterodactylApplicationClient $pterodactyl;
     private FragCityA2SInfoQuery $a2s;
@@ -29,7 +28,6 @@ final class FragCityServerBrowserDiscovery
             ? $serverConfig['pterodactyl']
             : [];
 
-        $this->config = $config;
         $this->serverConfig = $serverConfig;
         $this->pterodactyl = new FragCityPterodactylApplicationClient($pteroConfig);
         $this->a2s = new FragCityA2SInfoQuery((int)($serverConfig['query_timeout_ms'] ?? 1500));
@@ -43,10 +41,10 @@ final class FragCityServerBrowserDiscovery
             $candidates = array_slice($candidates, 0, $maxServers);
         }
 
-        $publicHost = trim((string)($this->serverConfig['public_connect_host'] ?? ''));
-        if (!$this->isValidHost($publicHost)) {
-            throw new RuntimeException('server_browser.public_connect_host is invalid.');
-        }
+        $defaultPublicHost = trim((string)($this->serverConfig['public_connect_host'] ?? ''));
+        $nodePublicHosts = is_array($this->serverConfig['node_public_connect_hosts'] ?? null)
+            ? $this->serverConfig['node_public_connect_hosts']
+            : [];
 
         $defaultQueryHost = trim((string)($this->serverConfig['query_host'] ?? ''));
         $nodeQueryHosts = is_array($this->serverConfig['node_query_hosts'] ?? null)
@@ -57,7 +55,12 @@ final class FragCityServerBrowserDiscovery
         $rows = [];
         foreach ($candidates as $candidate) {
             $nodeId = (int)$candidate['node_id'];
+            $publicHost = trim((string)($nodePublicHosts[(string)$nodeId] ?? $defaultPublicHost));
             $queryHost = trim((string)($nodeQueryHosts[(string)$nodeId] ?? $defaultQueryHost));
+
+            if (!$this->isValidHost($publicHost)) {
+                throw new RuntimeException('A valid public connect host is required for node ' . $nodeId . '.');
+            }
             if (filter_var($queryHost, FILTER_VALIDATE_IP) === false) {
                 throw new RuntimeException('A valid internal query host is required for node ' . $nodeId . '.');
             }
@@ -106,8 +109,12 @@ final class FragCityServerBrowserDiscovery
                     $row['vac'] = (bool)($info['vac'] ?? false);
                     $row['password'] = (bool)($info['password'] ?? false);
                 } catch (Throwable $e) {
-                    // A failed query marks only this allocation offline. The worker
-                    // keeps the rest of the server inventory and continues.
+                    // A failed query marks only this allocation offline. Log the
+                    // allocation and exception type, never the Pterodactyl token.
+                    error_log(
+                        '[FragCity ServerBrowser] A2S query failed for allocation '
+                        . (int)$candidate['allocation_id'] . '; type=' . get_class($e)
+                    );
                 }
             }
 
@@ -130,7 +137,9 @@ final class FragCityServerBrowserDiscovery
         if (preg_match('/\bmode\s*[:=]\s*([^|,\r\n]+)/iu', $name, $matches) === 1) {
             $mode = trim((string)$matches[1]);
             if ($mode !== '') {
-                return mb_substr($mode, 0, 80, 'UTF-8');
+                return function_exists('mb_substr')
+                    ? mb_substr($mode, 0, 80, 'UTF-8')
+                    : substr($mode, 0, 80);
             }
         }
 
