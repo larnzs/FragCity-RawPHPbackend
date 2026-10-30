@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../settings/loader.php';
 
-/** Signed website client for the on-demand Pterodactyl/A2S public server snapshot. */
+/** Signed website client for the on-demand Pterodactyl/A2S server browser API. */
 final class PterodactylStandbyApiClient
 {
     private string $baseUrl;
@@ -40,7 +40,28 @@ final class PterodactylStandbyApiClient
 
     public function getSnapshot(): array
     {
-        $payload = ['action' => 'list_servers'];
+        return $this->signedPost(['action' => 'list_servers']);
+    }
+
+    /**
+     * Query the public player list for a server identifier from the current
+     * sanitized Server Browser snapshot. The website never sends a host or port.
+     */
+    public function getPlayers(string $serverId): array
+    {
+        $serverId = strtolower(trim($serverId));
+        if (!preg_match('/^[a-f0-9]{16}$/D', $serverId)) {
+            throw new InvalidArgumentException('Invalid public server identifier.');
+        }
+
+        return $this->signedPost([
+            'action' => 'get_players',
+            'server_id' => $serverId,
+        ]);
+    }
+
+    private function signedPost(array $payload): array
+    {
         $rawBody = json_encode(
             $payload,
             JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
@@ -82,7 +103,7 @@ final class PterodactylStandbyApiClient
         $curlErrorText = curl_error($handle);
         $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
         $contentType = (string)(curl_getinfo($handle, CURLINFO_CONTENT_TYPE) ?: '');
-        $handle = null;
+        curl_close($handle);
 
         if ($response === false || $curlError !== 0) {
             error_log('[FragCity] Pterodactyl Standby API transport failed; cURL code=' . $curlError);
@@ -96,9 +117,6 @@ final class PterodactylStandbyApiClient
 
         $decoded = json_decode((string)$response, true);
         if (!is_array($decoded) || json_last_error() !== JSON_ERROR_NONE) {
-            // Keep diagnostics useful without logging an untrusted response body.
-            // A reverse-proxy HTML 404/502 page is the most common reason this
-            // integration receives non-JSON despite a successful TCP/TLS request.
             $trimmedResponse = ltrim((string)$response, "\xEF\xBB\xBF \t\r\n");
             $firstByte = $trimmedResponse !== '' ? $trimmedResponse[0] : '';
             $bodyFormat = $firstByte === '<'
