@@ -168,7 +168,8 @@ final class FragCityPterodactylApplicationClient
         }
 
         $uuid = trim((string)($attributes['uuid'] ?? ''));
-        if ($uuid === '') {
+        $identifier = strtolower(trim((string)($attributes['identifier'] ?? '')));
+        if ($uuid === '' || !preg_match('/^[a-z0-9]{8}$/D', $identifier)) {
             return null;
         }
 
@@ -178,6 +179,7 @@ final class FragCityPterodactylApplicationClient
 
         return [
             'server_uuid' => $uuid,
+            'server_identifier' => $identifier,
             'server_name' => trim((string)($attributes['name'] ?? 'CS2 Community Server')),
             'server_id' => (int)($attributes['id'] ?? 0),
             'node_id' => $nodeId,
