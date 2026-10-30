@@ -66,6 +66,20 @@ CS2 plugin containers
 
 API از HMAC-SHA256، زمان درخواست، nonce ضد replay، TLS validation، prepared statements و action allowlist استفاده می‌کند. نام جدول یا SQL دلخواه از طرف وب‌سایت ارسال نمی‌شود.
 
+### Server Browser
+
+جریان دادهٔ Server Browser از Pterodactyl تا وب‌سایت:
+
+- Worker زمان‌بندی‌شده روی Linux با Application API فقط‌خواندنی Pterodactyl، سرورهای CS2 و Allocation پیش‌فرض هرکدام را پیدا می‌کند.
+- A2S_INFO فقط از IP داخلی نود و روی پورت Allocation مشخص اجرا می‌شود؛ اسکن بازهٔ پورت نداریم.
+- Snapshot به‌صورت اتمیک در `/var/cache/fragcity-api/server-browser.json` ذخیره می‌شود.
+- وب‌سایت با `class/FragCityServerBrowserApiClient.php` و `class/ServerBrowserRepository.php` از Route امضاشدهٔ `POST /v1/server-browser` Snapshot را می‌خواند.
+- Secret این Integration با WeaponPaints متفاوت است. Pterodactyl Application API Key فقط در `/etc/fragcity-api/config.php` قرار می‌گیرد.
+- Laragon و Production هر دو از `integrations.server_browser_api.base_url` و Secret خصوصی همان Integration استفاده می‌کنند.
+- مرورگر بازدیدکننده نه UDP Query می‌فرستد و نه به Pterodactyl متصل می‌شود.
+
+جزئیات پیکربندی و Deploy در `docs/SERVER-BROWSER-API.md` آمده است.
+
 ## 2. وضعیت Agent ویندوزی قدیمی
 
 API قدیمی Agent/InstanceMaker بازنشسته شده است. `/v1/agent/*` از Linux API پاسخ HTTP 410 می‌گیرد و `api/internal_agent_bridge.php` نیز تنها پاسخ بازنشستگی می‌دهد؛ هیچ‌کدام به جدول‌های سایت وصل نمی‌شوند. schema اضافه‌ای برای nonce/throttle این bridge دیگر لازم نیست و نباید `linuxapi/site-bridge-schema.sql` قدیمی اجرا شود.
