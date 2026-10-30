@@ -66,6 +66,15 @@ html.fc-motion-ready [data-fc-reveal].is-visible {
     will-change: auto;
 }
 
+
+/* Restore card hover after the reveal transition has completed. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    html.fc-motion-ready [data-fc-reveal].is-visible.fc-motion-interactive:hover:not([aria-disabled="true"]) {
+        transform: translateY(-2px);
+        box-shadow: var(--fc-shadow-md);
+    }
+}
+
 /* Keep AJAX departures short and page arrivals slightly more expressive. */
 .content-fader {
     transition:
