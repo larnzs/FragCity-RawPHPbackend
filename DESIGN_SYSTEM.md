@@ -1,6 +1,6 @@
 # FragCity Design System
 
-The shared design system is an opt-in foundation for new and gradually refactored pages. It does not merge page CSS/JS into one bundle and does not overwrite existing page-specific styles.
+The shared design system is a site-wide foundation for new and existing pages. Its motion controller automatically enhances existing page components without requiring their markup to be rewritten. It does not merge page CSS/JS into one bundle and does not overwrite existing page-specific styles.
 
 ## Global asset order
 
@@ -12,7 +12,7 @@ Loaded by `index.php` on every route:
 4. `css/motion.css` — reusable animation classes and reveal transitions.
 5. Route-specific CSS — loaded after the shared foundation and kept in each page's own file.
 
-The global JavaScript controller is `js/motion.js`. Page-specific JavaScript continues to load through the existing `$pageAssets` router.
+The global JavaScript controller is `js/motion.js`. It applies page entrance animation, viewport reveals to known page cards and sections, shared hover motion to interactive cards, and watches AJAX-inserted content. Standard links and form controls receive a consistent transition contract. Page-specific JavaScript continues to load through the existing `$pageAssets` router.
 
 ## Design tokens
 
@@ -63,9 +63,9 @@ For scroll-triggered reveals, add a direction to the element:
 
 Supported directions are `up`, `down`, `left`, `right`, and `fade`. Delay is optional and capped at 1200ms.
 
-The controller automatically initializes the first page and listens for the existing `content-loaded` event after AJAX navigation. For content inserted by other scripts, call `FragCityMotion.refresh(container)`.
+The controller automatically initializes every route, listens for the existing `content-loaded` event after AJAX navigation, and observes content inserted into `#contentFader`. For content inserted elsewhere, call `FragCityMotion.refresh(container)`. Existing components are detected by their page classes; no class-by-class migration is required.
 
-All reveal effects respect `prefers-reduced-motion`; without IntersectionObserver, content is shown immediately rather than hidden.
+All reveal and hover effects respect `prefers-reduced-motion`; without IntersectionObserver, content is shown immediately rather than hidden. Reveal delays are capped and staggered in small groups to avoid slowing long grids.
 
 ## Adoption rule
 
