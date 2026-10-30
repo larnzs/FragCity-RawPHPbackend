@@ -26,3 +26,23 @@ uses the signed HTTPS API. Do not expose the shared secret in browser JavaScript
 `settings/settings.json` is intentionally ignored by Git. A private repository is
 not a secure secret store: credentials accidentally committed remain in Git history
 and may be copied to clones, logs, backups, or automation systems.
+
+
+## Public Server Browser API
+
+The website reads the public CS2 server snapshot through the signed Linux API, the same way WeaponPaints does. Merge the following block into the existing private \`settings/settings.json\`:
+
+~~~json
+{
+  "integrations": {
+    "server_browser_api": {
+      "base_url": "https://api.fragcity.ir",
+      "shared_secret": "THE_MATCHING_SERVER_BROWSER_HMAC_SECRET"
+    }
+  }
+}
+~~~
+
+The matching value belongs in \`/etc/fragcity-api/config.php\` under \`server_browser.shared_secret\`. It must be a separate key from \`shared_secret\` used by WeaponPaints. The partial fragment is also available in \`settings/server-browser.integration.example.json\`.
+
+This works from Laragon and from the production web host because both use the same HTTPS API origin. The secret remains PHP-side and must never be added to browser JavaScript.
