@@ -51,14 +51,16 @@ On cPanel/shared hosting, the database user usually already has privileges over 
 Defaults in the migration:
 
 - A2S timeout: 1,500 ms per port.
-- Maximum batch size: 64 concurrent UDP requests.
+- Maximum batch size: 32 concurrent UDP requests.
 - Maximum scheduled work: 256 ports per Cron invocation.
 - Online CS2 server: refresh after 90 seconds.
 - Timeout, invalid response or non-CS2 application: retry after 3,600 seconds (one hour).
 
 For the full range of 2,016 ports, the worker processes at most 256 per invocation. With a one-minute Cron schedule, the initial pass takes approximately eight invocations. A slower schedule (for example every five minutes) takes longer to discover the first complete range, but does not change the retry policy.
 
-These are bounded batches; the worker does not open 2,016 sockets at once. A MySQL advisory lock prevents overlapping Cron processes. Each response must parse as a valid Source A2S_INFO packet and report AppID 730 before it is shown as an online CS2 server.
+These are bounded batches; the worker does not open 2,016 sockets at once. A MySQL advisory lock prevents overlapping Cron processes. Each response must parse as a valid Source A2S_INFO packet and report AppID 730 before it is shown as a CS2 server.
+
+Previously discovered servers remain visible with an Offline status for up to 10 minutes after their last query. After that, they are hidden until a fresh result arrives. This prevents a stopped Cron Job from leaving stale servers visible indefinitely, while the per-port retry schedule still waits one hour before retrying an unresponsive port.
 
 ## PHP syntax and architecture checks
 
