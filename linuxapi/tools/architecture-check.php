@@ -51,6 +51,22 @@ try {
     $standbyA2S = $read('linuxapi/src/PterodactylStandby/A2SInfoQuery.php');
     $standbyWorker = $read('linuxapi/bin/pterodactyl-standby-refresh.php');
 
+    $monitoringPanelClient = $read('linuxapi/src/PterodactylMonitoring/PterodactylMonitoringPanelClient.php');
+    $monitoringWingsClient = $read('linuxapi/src/PterodactylMonitoring/WingsMonitoringClient.php');
+    $monitoringHostMetrics = $read('linuxapi/src/PterodactylMonitoring/PterodactylHostMetrics.php');
+    $monitoringService = $read('linuxapi/src/PterodactylMonitoring/PterodactylMonitoringService.php');
+    $monitoringSiteClient = $read('class/PterodactylMonitoringApiClient.php');
+    $monitoringSiteRepository = $read('class/PterodactylMonitoringRepository.php');
+    $monitoringSiteEndpoint = $read('api/admin-pterodactyl-monitoring.php');
+    $monitoringPage = $read('panels/cs2/monitoring.php');
+    $monitoringSidebar = $read('panels/cs2/sidebar.php');
+    $monitoringPanelRouter = $read('panels/cs2/index.php');
+    $monitoringJavascript = $read('panels/cs2/js/monitoring.js');
+    $monitoringCss = $read('panels/cs2/css/monitoring.css');
+    $monitoringSettingsRaw = $read('settings/pterodactyl-monitoring.integration.example.json');
+    $monitoringSettings = json_decode($monitoringSettingsRaw, true, 512, JSON_THROW_ON_ERROR);
+    $monitoringDocs = $read('docs/PTERODACTYL-MONITORING.md');
+
     $publicPage = $read('pages/serverlist.php');
     $publicRepository = $read('class/PublicServerBrowserRepository.php');
     $publicScanner = $read('class/PublicServerBrowserA2SScanner.php');
@@ -190,6 +206,88 @@ $check(
         && str_contains($publicUdpTest, 'outside the configured range')
         && str_contains($publicUdpTest, '$scanner->queryBatch($host, $ports)')
         && str_contains($publicDocs, 'test-public-server-browser-udp.php')
+);
+
+$check(
+    'Pterodactyl Monitoring is a distinct signed, on-demand Linux API route',
+    str_contains($index, "'/v1/pterodactyl-monitoring'")
+        && str_contains($index, '$config[\'pterodactyl_monitoring\'][\'shared_secret\']')
+        && str_contains($index, "action !== 'get_snapshot'")
+        && str_contains($index, 'new PterodactylMonitoringService($config)')
+        && str_contains($linuxConfig, "'pterodactyl_monitoring' =>")
+        && str_contains($linuxConfig, "'enabled' => false")
+        && str_contains($nginxApi, 'location = /v1/pterodactyl-monitoring')
+);
+
+$check(
+    'Pterodactyl monitoring Application client is read-only and explicitly allowlists nodes and CS2 servers',
+    str_contains($monitoringPanelClient, 'CURLOPT_HTTPGET => true')
+        && str_contains($monitoringPanelClient, 'Authorization: Bearer ')
+        && str_contains($monitoringPanelClient, '/api/application/nodes/')
+        && str_contains($monitoringPanelClient, '/configuration')
+        && str_contains($monitoringPanelClient, 'allowed_node_ids')
+        && str_contains($monitoringPanelClient, 'allowed_egg_ids')
+        && str_contains($monitoringPanelClient, 'allowed_docker_images')
+        && !str_contains($monitoringPanelClient, 'CURLOPT_POST => true')
+);
+
+$check(
+    'Wings monitoring client reads system and server resources with protected bearer auth',
+    str_contains($monitoringWingsClient, 'Authorization: Bearer ')
+        && str_contains($monitoringWingsClient, '/api/system?v=2')
+        && str_contains($monitoringWingsClient, '/api/servers')
+        && str_contains($monitoringWingsClient, 'isPrivateHost')
+        && str_contains($monitoringWingsClient, 'CURLOPT_SSL_VERIFYPEER => true')
+        && !str_contains($monitoringWingsClient, 'CURLOPT_POST => true')
+);
+
+$check(
+    'Host CPU/RAM/disk sampling is attached only to the explicitly configured local node',
+    str_contains($monitoringHostMetrics, '/proc/stat')
+        && str_contains($monitoringHostMetrics, '/proc/meminfo')
+        && str_contains($monitoringHostMetrics, 'disk_total_space')
+        && str_contains($monitoringHostMetrics, 'disk_free_space')
+        && str_contains($monitoringService, '$localNodeId > 0 && $localNodeId === $nodeId')
+        && str_contains($monitoringService, 'host_metrics')
+);
+
+$check(
+    'Pterodactyl monitoring service returns sanitized node and CS2 container metrics',
+    str_contains($monitoringService, 'getNodeWingsConfiguration')
+        && str_contains($monitoringService, 'getSystemInformation')
+        && str_contains($monitoringService, 'getServers()')
+        && str_contains($monitoringService, 'memory_bytes')
+        && str_contains($monitoringService, 'cpu_absolute')
+        && str_contains($monitoringService, 'disk_bytes')
+        && str_contains($monitoringService, 'network_rx_bytes')
+        && !str_contains($monitoringService, 'application_api_key')
+);
+
+$check(
+    'Website monitoring endpoint and panel are admin-only and keep Pterodactyl secrets server-side',
+    str_contains($monitoringSiteClient, 'integrations.pterodactyl_monitoring_api.shared_secret')
+        && str_contains($monitoringSiteClient, '/v1/pterodactyl-monitoring')
+        && str_contains($monitoringSiteRepository, 'new PterodactylMonitoringApiClient()')
+        && str_contains($monitoringSiteEndpoint, "\$_SESSION['role']")
+        && str_contains($monitoringSiteEndpoint, "!== 'admin'")
+        && str_contains($monitoringSiteEndpoint, 'session_write_close()')
+        && str_contains($monitoringPage, "\$_SESSION['role']")
+        && str_contains($monitoringPage, "!== 'admin'")
+        && str_contains($monitoringPage, 'data-endpoint="/api/admin-pterodactyl-monitoring.php"')
+        && !str_contains($monitoringJavascript, 'application_api_key')
+        && !str_contains($monitoringJavascript, 'shared_secret')
+);
+
+$check(
+    'Monitoring page is reachable from the admin panel and refreshes without Cron',
+    str_contains($monitoringSidebar, "'monitoring'")
+        && str_contains($monitoringSidebar, 'monitoring.php')
+        && str_contains($monitoringPanelRouter, "'monitoring' =>")
+        && str_contains($monitoringJavascript, 'setInterval')
+        && str_contains($monitoringJavascript, '15000')
+        && str_contains($monitoringCss, '.fc-monitor-node-card')
+        && str_contains($monitoringDocs, 'No Cron job')
+        && (($monitoringSettings['integrations']['pterodactyl_monitoring_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
 );
 
 $check(
