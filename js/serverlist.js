@@ -116,7 +116,8 @@
                 group.hidden = groupVisible === 0;
             });
 
-            if (noMatch) noMatch.hidden = visible !== 0;
+            const totalCards = getCards().length;
+            if (noMatch) noMatch.hidden = totalCards === 0 || visible !== 0;
             if (resultsLabel) resultsLabel.textContent = 'نمایش ' + visible + ' سرور';
         }
 
