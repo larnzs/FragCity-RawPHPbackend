@@ -45,6 +45,11 @@ foreach ($serverInventory as $entry) {
         FILTER_VALIDATE_INT,
         ['options' => ['min_range' => 1, 'max_range' => 65535]]
     );
+    $queryPort = filter_var(
+        $entry['query_port'] ?? ($entry['game_port'] ?? null),
+        FILTER_VALIDATE_INT,
+        ['options' => ['min_range' => 1, 'max_range' => 65535]]
+    );
 
     $validIpv4 = filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
     $validIpv6 = filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
@@ -53,7 +58,7 @@ foreach ($serverInventory as $entry) {
         $host
     );
 
-    if ($name === '' || (!$validIpv4 && !$validIpv6 && !$validHostname) || $gamePort === false) {
+    if ($name === '' || (!$validIpv4 && !$validIpv6 && !$validHostname) || $gamePort === false || $queryPort === false) {
         continue;
     }
 
@@ -84,6 +89,7 @@ foreach ($serverInventory as $entry) {
         'name' => $name,
         'host' => $host,
         'game_port' => (int) $gamePort,
+        'query_port' => (int) $queryPort,
         'address' => $address,
         'connect_url' => 'steam://connect/' . $connectHost . ':' . $gamePort,
         'mode' => $mode,
