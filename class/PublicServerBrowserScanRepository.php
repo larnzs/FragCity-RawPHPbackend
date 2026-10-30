@@ -79,7 +79,7 @@ final class PublicServerBrowserScanRepository
             foreach ($portBatch as $offset => $port) {
                 $targetParameter = ':target_' . $offset;
                 $portParameter = ':port_' . $offset;
-                $valueSql[] = '(' . $targetParameter . ', ' . $portParameter . ', "pending")';
+                $valueSql[] = '(' . $targetParameter . ', ' . $portParameter . ", 'pending')";
                 $parameters[$targetParameter] = $targetId;
                 $parameters[$portParameter] = $port;
             }
