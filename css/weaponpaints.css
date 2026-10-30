@@ -8371,3 +8371,381 @@ body > .wp-modal .selection-meta,
         transition: none !important;
     }
 }
+
+
+/* =========================================================
+   44. Final FragCity profile.css alignment
+   Graphite surfaces, quiet neutral borders and one orange accent.
+   This is intentionally the final override layer so earlier
+   component-specific styles cannot reintroduce blue shaders.
+========================================================= */
+:root {
+    --wp-bg: #0D0D0D;
+    --wp-bg-deep: #0D0D0D;
+    --wp-surface: #111111;
+    --wp-surface-2: #141414;
+    --wp-surface-3: #191919;
+    --wp-surface-hover: #191919;
+    --wp-border: #292929;
+    --wp-border-strong: rgba(249, 115, 22, .42);
+    --wp-text: #F5F5F5;
+    --wp-text-soft: #D4D4D4;
+    --wp-text-muted: #929292;
+    --wp-text-dim: #686868;
+    --wp-blue: #F97316;
+    --wp-blue-soft: #FB923C;
+    --wp-blue-deep: #EA580C;
+    --wp-cyan: #FB923C;
+    --wp-green: #22C55E;
+    --wp-red: #EF4444;
+    --wp-gold: #F97316;
+    --wp-shadow: none;
+    --wp-shadow-soft: none;
+}
+
+.wp-app,
+body:has(.wp-app) > .wp-modal {
+    --wp-bg: #0D0D0D;
+    --wp-surface: #111111;
+    --wp-surface-2: #141414;
+    --wp-surface-3: #191919;
+    --wp-surface-hover: #191919;
+    --wp-border: #292929;
+    --wp-border-strong: rgba(249, 115, 22, .42);
+    --wp-text: #F5F5F5;
+    --wp-text-soft: #D4D4D4;
+    --wp-text-muted: #929292;
+    --wp-text-dim: #686868;
+    --wp-blue: #F97316;
+    --wp-blue-soft: #FB923C;
+    --wp-blue-deep: #EA580C;
+    --wp-cyan: #FB923C;
+    --wp-green: #22C55E;
+    --wp-red: #EF4444;
+    --wp-gold: #F97316;
+}
+
+/* Main item cards: grey border at rest, orange only on hover/focus. */
+.wp-app .wp-card,
+.wp-app .wp-saved-paint-card {
+    border: 1px solid #292929 !important;
+    border-radius: 12px !important;
+    background: #111111 !important;
+    color: #F5F5F5 !important;
+    box-shadow: none !important;
+}
+
+.wp-app .wp-card:hover,
+.wp-app .wp-card:focus-visible,
+.wp-app .wp-card--clickable:focus-visible,
+.wp-app .wp-saved-paint-card:hover,
+.wp-app .wp-saved-paint-card:focus-within {
+    border-color: #F97316 !important;
+    background: #141414 !important;
+    box-shadow: none !important;
+    outline: none;
+}
+
+.wp-app .wp-card-glow,
+.wp-app .wp-card-media::before {
+    display: none !important;
+    content: none !important;
+    background: none !important;
+    filter: none !important;
+}
+
+.wp-app .wp-card-media,
+.wp-app .wp-card-content {
+    background: transparent !important;
+}
+
+.wp-app .wp-card-title,
+.wp-app .wp-card-content h3,
+.wp-app .wp-card-content h4 {
+    color: #F5F5F5 !important;
+    text-shadow: none !important;
+}
+
+.wp-app .wp-card-subtitle,
+.wp-app .wp-card-description,
+.wp-app .wp-card-meta {
+    color: #929292 !important;
+}
+
+/* Neutral controls and modal shell, matching the profile surface stack. */
+body:has(.wp-app) > .wp-modal .modal-content {
+    border: 1px solid #292929 !important;
+    border-radius: 14px !important;
+    background: #111111 !important;
+    color: #F5F5F5 !important;
+    box-shadow: 0 18px 44px rgba(0, 0, 0, .36) !important;
+}
+
+body:has(.wp-app) > .wp-modal .modal-header,
+body:has(.wp-app) > .wp-modal .wp-modal-header,
+body:has(.wp-app) > #skinModal .wp-modal-header--weapon,
+body:has(.wp-app) > #stickerModal .wp-modal-header--weapon,
+body:has(.wp-app) > #keychainModal .wp-modal-header--weapon {
+    border-bottom: 1px solid #292929 !important;
+    background: #111111 !important;
+    box-shadow: none !important;
+}
+
+body:has(.wp-app) > .wp-modal .modal-body,
+body:has(.wp-app) > .wp-modal .wp-modal-body {
+    background: #0D0D0D !important;
+    color: #D4D4D4 !important;
+}
+
+body:has(.wp-app) > .wp-modal .wp-modal-icon-tile {
+    border: 1px solid rgba(249, 115, 22, .24) !important;
+    background: rgba(249, 115, 22, .08) !important;
+    color: #F97316 !important;
+    box-shadow: none !important;
+}
+
+body:has(.wp-app) > .wp-modal .wp-modal-title,
+body:has(.wp-app) > .wp-modal .wp-modal-title-wrap h5 {
+    color: #F5F5F5 !important;
+    text-shadow: none !important;
+}
+
+body:has(.wp-app) > .wp-modal .wp-modal-eyebrow {
+    color: #F97316 !important;
+}
+
+/* Skin modal: Wear, Seed, Name Tag and StatTrak share the same orange treatment. */
+#skinModalBody .wp-skin-controls {
+    border-color: #292929 !important;
+    background: #111111 !important;
+    scrollbar-color: #414141 transparent;
+}
+
+#skinModalBody .wp-skin-controls > .wp-setting-card,
+#skinModalBody .wp-skin-controls > .wp-setting-card--wear,
+#skinModalBody .wp-skin-controls > .wp-setting-card--seed,
+#skinModalBody .wp-skin-controls > .wp-setting-card--nametag,
+#skinModalBody .wp-skin-controls > .wp-setting-card--stattrak {
+    --setting-accent: #F97316;
+    --setting-line: rgba(249, 115, 22, .24);
+    --setting-fill: rgba(249, 115, 22, .07);
+    border: 1px solid #292929 !important;
+    border-radius: 10px !important;
+    background: #141414 !important;
+    box-shadow: none !important;
+}
+
+#skinModalBody .wp-setting-icon {
+    color: #FB923C !important;
+    background: rgba(249, 115, 22, .09) !important;
+    border: 1px solid rgba(249, 115, 22, .22) !important;
+    box-shadow: none !important;
+}
+
+#skinModalBody .wp-setting-title,
+#skinModalBody .wp-setting-card .settings-option-content strong {
+    color: #F5F5F5 !important;
+}
+
+#skinModalBody .wp-setting-card .wp-control-value,
+#skinModalBody .wp-setting-card .settings-option-content small {
+    color: #929292 !important;
+}
+
+#skinModalBody .wp-setting-card .wp-control-input,
+#skinModalBody .wp-skin-controls .wp-control-input,
+body:has(.wp-app) > .wp-modal .wp-control-input,
+body:has(.wp-app) > .wp-modal .wp-addon-search {
+    border: 1px solid #303030 !important;
+    border-radius: 8px !important;
+    background: #111111 !important;
+    color: #F5F5F5 !important;
+    box-shadow: none !important;
+}
+
+#skinModalBody .wp-setting-card .wp-control-input:focus,
+#skinModalBody .wp-skin-controls .wp-control-input:focus,
+body:has(.wp-app) > .wp-modal .wp-control-input:focus,
+body:has(.wp-app) > .wp-modal .wp-addon-search:focus {
+    border-color: rgba(249, 115, 22, .58) !important;
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, .09) !important;
+}
+
+/* StatTrak switch and native range/checkbox accents use FragCity orange. */
+#skinModalBody .wp-setting-card--stattrak input[type="checkbox"],
+#skinModalBody input[type="range"],
+#skinModalBody input[type="number"] {
+    accent-color: #F97316 !important;
+}
+
+#skinModalBody .wp-setting-card--stattrak .settings-switch {
+    border: 1px solid #414141 !important;
+    background: #292929 !important;
+    box-shadow: none !important;
+}
+
+#skinModalBody .wp-setting-card--stattrak input[type="checkbox"]:checked + .settings-switch {
+    border-color: #F97316 !important;
+    background: #F97316 !important;
+}
+
+#skinModalBody .wp-setting-card--stattrak .settings-switch > span {
+    background: #929292 !important;
+}
+
+#skinModalBody .wp-setting-card--stattrak input[type="checkbox"]:checked + .settings-switch > span {
+    background: #FFFFFF !important;
+}
+
+/* Stickers and keychains: remove blue/yellow gradients and use one restrained accent. */
+#skinModalBody .wp-skin-controls > .wp-addon-control-card {
+    --addon-accent: #F97316;
+    border: 1px solid #292929 !important;
+    border-radius: 10px !important;
+    background: #141414 !important;
+    box-shadow: none !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label > span:first-child {
+    color: #E5E5E5 !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label > span:first-child > i {
+    color: #FB923C !important;
+    background: rgba(249, 115, 22, .09) !important;
+    border: 1px solid rgba(249, 115, 22, .22) !important;
+    box-shadow: none !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-control-card > .wp-control-label .wp-control-value {
+    color: #929292 !important;
+    background: #191919 !important;
+    border: 1px solid #292929 !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn,
+#skinModalBody .wp-skin-controls .wp-addon-btn.is-empty,
+#skinModalBody .wp-skin-controls .wp-addon-btn.has-sticker,
+#skinModalBody .wp-skin-controls .wp-addon-btn.wp-keychain-slot,
+#skinModalBody .wp-skin-controls .wp-addon-btn.wp-keychain-slot.has-keychain {
+    --slot-accent: #F97316;
+    border: 1px solid #292929 !important;
+    border-radius: 9px !important;
+    background: #111111 !important;
+    color: #D4D4D4 !important;
+    box-shadow: none !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn.has-sticker,
+#skinModalBody .wp-skin-controls .wp-addon-btn.wp-keychain-slot.has-keychain {
+    border-color: rgba(249, 115, 22, .38) !important;
+    background: rgba(249, 115, 22, .07) !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn:hover,
+#skinModalBody .wp-skin-controls .wp-addon-btn:focus-visible {
+    border-color: #F97316 !important;
+    background: rgba(249, 115, 22, .10) !important;
+    color: #FB923C !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-sticker-slot::before {
+    color: #FB923C !important;
+    background: rgba(249, 115, 22, .10) !important;
+    border: 1px solid rgba(249, 115, 22, .22) !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn > .wp-addon-empty-icon,
+#skinModalBody .wp-skin-controls .wp-addon-btn.wp-keychain-slot > .wp-addon-empty-icon {
+    color: #FB923C !important;
+    background: rgba(249, 115, 22, .08) !important;
+    border: 1px solid rgba(249, 115, 22, .20) !important;
+}
+
+#skinModalBody .wp-skin-controls .wp-addon-btn > span:last-child,
+#skinModalBody .wp-skin-controls .wp-addon-btn.is-empty > span:last-child {
+    color: #B3B3B3 !important;
+}
+
+/* The sticker/keychain picker uses the same neutral card and orange selection state. */
+body:has(.wp-app) > #stickerModal .wp-addon-card,
+body:has(.wp-app) > #keychainModal .wp-addon-card,
+body:has(.wp-app) > #stickerModal .wp-control-card,
+body:has(.wp-app) > #keychainModal .wp-control-card {
+    border: 1px solid #292929 !important;
+    border-radius: 10px !important;
+    background: #141414 !important;
+    color: #E5E5E5 !important;
+    box-shadow: none !important;
+}
+
+body:has(.wp-app) > #stickerModal .wp-addon-card:hover,
+body:has(.wp-app) > #keychainModal .wp-addon-card:hover {
+    border-color: #F97316 !important;
+    background: #191919 !important;
+    box-shadow: none !important;
+    transform: translateY(-1px);
+}
+
+body:has(.wp-app) > #stickerModal .wp-addon-card.is-selected,
+body:has(.wp-app) > #keychainModal .wp-addon-card.is-selected {
+    border-color: #F97316 !important;
+    background: rgba(249, 115, 22, .08) !important;
+    box-shadow: none !important;
+}
+
+body:has(.wp-app) > #stickerModal .wp-addon-search:focus,
+body:has(.wp-app) > #keychainModal .wp-addon-search:focus {
+    border-color: rgba(249, 115, 22, .58) !important;
+    box-shadow: 0 0 0 2px rgba(249, 115, 22, .09) !important;
+}
+
+/* Both inline and floating page numbers use quiet grey + orange active state. */
+.wp-app .wp-page-btn,
+.wp-app .wp-pagination .page-link,
+body:has(.wp-app) > #wpFloatingPagination .wp-page-btn {
+    border: 1px solid #292929 !important;
+    border-radius: 8px !important;
+    background: #111111 !important;
+    color: #929292 !important;
+    box-shadow: none !important;
+}
+
+.wp-app .wp-page-btn:hover,
+.wp-app .wp-page-btn:focus-visible,
+.wp-app .wp-pagination .page-link:hover,
+body:has(.wp-app) > #wpFloatingPagination .wp-page-btn:hover,
+body:has(.wp-app) > #wpFloatingPagination .wp-page-btn:focus-visible {
+    border-color: #F97316 !important;
+    background: rgba(249, 115, 22, .08) !important;
+    color: #FB923C !important;
+    box-shadow: none !important;
+    outline: none;
+}
+
+.wp-app .wp-page-btn.is-active,
+.wp-app .wp-pagination .page-item.active .page-link,
+body:has(.wp-app) > #wpFloatingPagination .wp-page-btn.is-active {
+    border-color: rgba(249, 115, 22, .52) !important;
+    background: rgba(249, 115, 22, .13) !important;
+    color: #F97316 !important;
+    box-shadow: none !important;
+}
+
+/* Modal and floating scrollbars stay graphite; their focus color is orange. */
+#skinModalBody .wp-skin-controls,
+body:has(.wp-app) > .wp-modal .wp-modal-body,
+body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating {
+    scrollbar-color: #414141 transparent !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating::-webkit-scrollbar-thumb {
+    background: #414141 !important;
+}
+
+.wp-toast--info {
+    border-color: rgba(249, 115, 22, .32) !important;
+}
