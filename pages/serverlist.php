@@ -2,29 +2,24 @@
 /**
  * Public CS2 server browser.
  *
- * The website only reads the signed, cached Server Browser API snapshot.
- * Pterodactyl discovery and UDP A2S queries run on the Linux API host.
+ * The active scanner writes A2S results to the site's main database from a
+ * scheduled CLI Cron Job. This page performs read-only SQL only.
  */
 if (!defined('FRAGCITY_INDEX_RENDER')) {
     header('Location: /index.php?page=servers_vps', true, 303);
     exit;
 }
 
-require_once dirname(__DIR__) . '/class/ServerBrowserRepository.php';
+require_once dirname(__DIR__) . '/class/PublicServerBrowserRepository.php';
 
 $serverInventory = [];
-$serverSnapshot = [
-    'generated_at' => null,
-    'cache_age_seconds' => null,
-    'stale' => false,
-];
 
 try {
-    $serverRepository = new ServerBrowserRepository();
-    $serverSnapshot = $serverRepository->getSnapshot();
-    $serverInventory = $serverSnapshot['servers'];
+    if ($pdo instanceof PDO) {
+        $serverInventory = (new PublicServerBrowserRepository($pdo))->getServers();
+    }
 } catch (Throwable $e) {
-    error_log('[FragCity] Public Server Browser API is unavailable: ' . get_class($e));
+    error_log('[FragCity] Public Server Browser database read failed: ' . get_class($e));
 }
 
 $escapeServerValue = static function ($value): string {
