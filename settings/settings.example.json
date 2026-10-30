@@ -1,0 +1,247 @@
+{
+  "_comment": "FRAGCITY WEBSITE RUNTIME TEMPLATE. Copy this file once to settings/settings.json and edit that private copy. This tracked example contains placeholders only. The application ignores every _comment field; these fields are readable inline notes while keeping the file valid JSON.",
+  "app": {
+    "_comment": "General website runtime behavior. Keep a different settings/settings.json for Laragon and Production.",
+    "environment": "local",
+    "timezone": "UTC",
+    "site_base_url": "http://fragcity.test",
+    "debug": false
+  },
+  "databases": {
+    "_comment": "Website database profiles only. Do not add GLOBAL_weaponpaints here: WeaponPaints is reached only through the signed Linux API. The extends setting inherits another profile, while name can select a separate schema.",
+    "main": {
+      "_comment": "Main FragCity website DB. Use local Laragon credentials here; configure the shared-hosting Production credentials only in that host's private runtime file. Prefer a least-privilege DB user rather than root.",
+      "driver": "mysql",
+      "host": "127.0.0.1",
+      "port": 3306,
+      "name": "kyonxcbt_fragcity_services",
+      "username": "",
+      "password": "",
+      "charset": "utf8mb4"
+    },
+    "plugin_sync": {
+      "_comment": "Optional separate schema for plugin synchronization. Leave name empty until the schema and permissions are intentionally provisioned.",
+      "extends": "main",
+      "name": ""
+    },
+    "legacy_services": {
+      "_comment": "Compatibility profile for older site pages. This currently inherits main; change it only if a separate legacy schema is deliberately maintained.",
+      "extends": "main"
+    },
+    "ranks_plugin": {
+      "_comment": "Optional Ranks plugin database. Leave name empty to avoid accidentally pointing the plugin at the website DB.",
+      "extends": "main",
+      "name": ""
+    },
+    "simpleadmin_plugin": {
+      "_comment": "Optional SimpleAdmin plugin database. Leave name empty until its schema and restricted credentials are configured.",
+      "extends": "main",
+      "name": ""
+    }
+  },
+  "integrations": {
+    "_comment": "Server-side integrations. Never expose any API secret or Steam/ZarinPal credential to browser JavaScript or commit real values.",
+    "steam": {
+      "_comment": "Steam OpenID / Steam Web API integration used by login and profile features.",
+      "api_key": "REPLACE_WITH_STEAM_WEB_API_KEY",
+      "domain_name": "fragcity.test",
+      "logout_page": "",
+      "login_page": ""
+    },
+    "zarinpal": {
+      "_comment": "Payment gateway settings. Keep merchant_id empty in local development and never test real payment flows unintentionally.",
+      "merchant_id": "",
+      "request_url": "https://payment.zarinpal.com/pg/v4/payment/request.json",
+      "verify_url": "https://payment.zarinpal.com/pg/v4/payment/verify.json",
+      "startpay_base_url": "https://payment.zarinpal.com/pg/StartPay/"
+    },
+    "weaponpaints_api": {
+      "_comment": "Signed Linux API for WeaponPaints. Its secret matches the root shared_secret in /etc/fragcity-api/config.php. This is separate from both Pterodactyl secrets.",
+      "base_url": "https://api.fragcity.ir",
+      "shared_secret": "REPLACE_WITH_WEAPONPAINTS_LINUX_API_SECRET"
+    },
+    "pterodactyl_standby_api": {
+      "_comment": "Signed Linux API for the public CS2 Server Browser (Pterodactyl inventory + A2S_INFO). Its secret matches pterodactyl_standby.shared_secret in the Linux runtime config.",
+      "base_url": "https://api.fragcity.ir",
+      "shared_secret": "REPLACE_WITH_PTERODACTYL_STANDBY_SECRET"
+    },
+    "pterodactyl_monitoring_api": {
+      "_comment": "Signed Linux API for the admin-only Pterodactyl/Wings monitoring page. Its secret matches pterodactyl_monitoring.shared_secret on Linux and must be unique.",
+      "base_url": "https://api.fragcity.ir",
+      "shared_secret": "REPLACE_WITH_PTERODACTYL_MONITORING_SECRET"
+    }
+  },
+  "files": {
+    "_comment": "Per-page and per-class settings. database_profile values refer to keys under databases above; do not put passwords or API tokens in this section.",
+    "index": {
+      "_comment": "Primary website bootstrap database profile.",
+      "database_profile": "main"
+    },
+    "class.config": {
+      "_comment": "WeaponPaints catalogue language, appearance and local asset paths.",
+      "skin_language": "skins_en",
+      "web_style_dark": true,
+      "site_base": "/",
+      "images": {
+        "_comment": "Paths are relative to the website document root. Keep the local img/weapon assets in the repository.",
+        "default_glove_t": "img/weapon/glove_default_t.png",
+        "default_glove_ct": "img/weapon/glove_default_ct.png",
+        "base_skins": "img/skins/",
+        "base_weapons": "img/weapon/",
+        "base_agents": "img/"
+      }
+    },
+    "class.customer_db": {
+      "_comment": "CustomerDB uses the selected website DB profile.",
+      "database_profile": "main"
+    },
+    "steam.steam_login": {
+      "_comment": "Steam login route destinations and database ownership.",
+      "database_profile": "main",
+      "login_page": "/index.php?page=login",
+      "registration_complete_page": "/index.php?page=register&steam=1",
+      "dashboard_page": "/index.php"
+    },
+    "pages.zarinpal.wallet_request": {
+      "_comment": "Website DB profile used to create a wallet payment request.",
+      "database_profile": "main"
+    },
+    "pages.zarinpal.wallet_callback": {
+      "_comment": "Website DB profile used to verify and apply a wallet payment callback.",
+      "database_profile": "main"
+    },
+    "pages.zarinpal.buyserver_request": {
+      "_comment": "Website DB profile for the legacy buy-server payment request page. This does not enable server provisioning by itself.",
+      "database_profile": "main"
+    },
+    "pages.zarinpal.buyserver_callback": {
+      "_comment": "Website DB profile for the legacy buy-server payment callback. Keep server purchase disabled until the new Pterodactyl billing lifecycle is implemented.",
+      "database_profile": "main"
+    },
+    "panels.cs2.config": {
+      "_comment": "CS2 admin panel language and supported server configuration files.",
+      "database_profile": "main",
+      "default_language": "fa",
+      "allowed_languages": [
+        "fa",
+        "en"
+      ],
+      "all_configs": [
+        "1v1.cfg",
+        "45.cfg",
+        "aim.cfg",
+        "awp.cfg",
+        "battle.cfg",
+        "bhop.cfg",
+        "br.cfg",
+        "Casual-1.6.cfg",
+        "casual.cfg",
+        "casuala.cfg",
+        "casualw.cfg",
+        "comp.cfg",
+        "course.cfg",
+        "ctf.cfg",
+        "deathmatch.cfg",
+        "deathrun.cfg",
+        "dm-valve.cfg",
+        "dm.cfg",
+        "executes.cfg",
+        "gamemode_armsrace.cfg",
+        "gamemode_casual.cfg",
+        "gamemode_competitive.cfg",
+        "gamemode_competitive2v2.cfg",
+        "gamemode_competitive2v2_offline.cfg",
+        "gamemode_competitive_offline.cfg",
+        "gamemode_competitive_short.cfg",
+        "gamemode_competitive_tmm.cfg",
+        "gamemode_cooperative.cfg",
+        "gamemode_coopmission.cfg",
+        "gamemode_custom.cfg",
+        "gamemode_deathmatch.cfg",
+        "gamemode_deathmatch_short.cfg",
+        "gamemode_deathmatch_tmm.cfg",
+        "gamemode_demolition.cfg",
+        "gamemode_dm_freeforall.cfg",
+        "gamemode_new_user_training.cfg",
+        "gamemode_retakecasual.cfg",
+        "gamemode_teamdeathmatch.cfg",
+        "gamemode_workshop.cfg",
+        "gg.cfg",
+        "hns.cfg",
+        "kz.cfg",
+        "minigames.cfg",
+        "mods.cfg",
+        "oitc.cfg",
+        "prac.cfg",
+        "practice.cfg",
+        "prefire.cfg",
+        "retake.cfg",
+        "scoutzknivez.cfg",
+        "soccer.cfg",
+        "surf.cfg",
+        "wingman.cfg"
+      ]
+    },
+    "panels.cs2.settings": {
+      "_comment": "CS2 admin-panel language and preference persistence.",
+      "default_language": "fa",
+      "allowed_languages": [
+        "fa",
+        "en"
+      ],
+      "preference_storage": "browser"
+    },
+    "pages.buyserveropen": {
+      "_comment": "Website DB profile used by the public buy-server information page. This page is not a Pterodactyl provisioning API.",
+      "database_profile": "main"
+    },
+    "pages.serverlist": {
+      "_comment": "Retained page DB profile setting for compatibility. The active Server Browser now obtains server data from pterodactyl_standby_api, not a database port-range scanner.",
+      "database_profile": "main"
+    },
+    "pages.vip": {
+      "_comment": "Website DB profile for VIP status and purchase records.",
+      "database_profile": "main"
+    },
+    "pages.forgot_password": {
+      "_comment": "Compatibility database profile for password-reset requests. Keep aligned with the users table actually used by the site.",
+      "database_profile": "legacy_services"
+    },
+    "pages.reset_password": {
+      "_comment": "Compatibility database profile for password-reset completion.",
+      "database_profile": "legacy_services"
+    },
+    "tst.index": {
+      "_comment": "Database profile used by the optional TST page.",
+      "database_profile": "main"
+    },
+    "database.ranks_plugin": {
+      "_comment": "Database profile for the Ranks plugin adapter.",
+      "database_profile": "ranks_plugin"
+    },
+    "database.simpleadmin_plugin": {
+      "_comment": "Database profile for the SimpleAdmin plugin adapter.",
+      "database_profile": "simpleadmin_plugin"
+    },
+    "database.weaponpaints_plugin": {
+      "_comment": "WeaponPaints is API-only. Keep transport set to api; do not add a direct DB profile for GLOBAL_weaponpaints.",
+      "transport": "api"
+    },
+    "panels.cs2.overview": {
+      "_comment": "Website DB profile for CS2 panel overview data.",
+      "database_profile": "main"
+    },
+    "panels.cs2.players": {
+      "_comment": "Website DB profile for CS2 player data.",
+      "database_profile": "main"
+    },
+    "panels.cs2.servers": {
+      "_comment": "Website DB profile for the CS2 panel's server catalogue. Live node monitoring is a separate signed Linux API integration.",
+      "database_profile": "main"
+    },
+    "pages.support": {
+      "_comment": "Website DB profile for support tickets and replies.",
+      "database_profile": "main"
+    }
+  }
+}
