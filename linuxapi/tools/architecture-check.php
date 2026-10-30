@@ -381,7 +381,7 @@ $check(
 $check(
     'Player queries resolve an opaque server ID to an allowlisted Pterodactyl primary Allocation',
     str_contains($standbyDiscovery, 'public function queryPlayers(string $serverId)')
-        && str_contains($standbyDiscovery, "hash('sha256', (string)$candidate['server_uuid'] . ':' . (int)$candidate['allocation_id'])")
+        && str_contains($standbyDiscovery, "hash('sha256', (string)\$candidate['server_uuid'] . ':' . (int)\$candidate['allocation_id'])")
         && str_contains($standbyDiscovery, '$this->a2sPlayers->query($queryHost, $port)')
         && str_contains($standbyDiscovery, 'node_query_hosts')
         && !str_contains($standbyDiscovery, "\$_GET")
@@ -389,7 +389,7 @@ $check(
 
 $check(
     'Player-list action uses the existing signed Standby route and validates the server identifier',
-    str_contains($index, "$action === 'get_players'")
+    str_contains($index, "\$action === 'get_players'")
         && str_contains($index, "'invalid_server_id'")
         && str_contains($index, '$discovery->queryPlayers($serverId)')
         && str_contains($standbyApiClient, "'action' => 'get_players'")
