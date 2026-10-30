@@ -132,58 +132,7 @@ $statusLabels = [
 ?>
 
 <section class="serverlist-page" id="fragcityServerBrowser" dir="rtl">
-    <div class="sl-intro-screen" id="slIntroScreen" role="status" aria-label="FragCity Counter-Strike 2 Community Servers">
-        <div class="sl-intro-noise" aria-hidden="true"></div>
-        <div class="sl-intro-content">
-            <div class="sl-intro-emblem" aria-hidden="true">
-                <span class="sl-intro-emblem-ring"></span>
-                <span class="sl-intro-emblem-core">FC</span>
-            </div>
-            <span class="sl-intro-kicker">COUNTER-STRIKE 2 COMMUNITY</span>
-            <h1>FRAGCITY<span>.</span></h1>
-            <p>Find your next match.</p>
-            <div class="sl-intro-progress" aria-hidden="true"><span></span></div>
-        </div>
-        <span class="sl-intro-footer">PUBLIC SERVER DIRECTORY <i class="fa-solid fa-satellite-dish" aria-hidden="true"></i></span>
-    </div>
-
     <div class="sl-page-shell">
-        <div class="sl-directory-layout">
-            <aside class="sl-directory-aside" aria-label="معرفی و آمار FragCity">
-                <header class="sl-hero">
-            <div class="sl-hero-copy">
-                <div class="sl-eyebrow">
-                    <span class="sl-eyebrow-mark"></span>
-                    FRAGCITY <span>/</span> CS2 COMMUNITY
-                </div>
-                <h1>سرور بعدی‌ات رو پیدا کن<span>.</span></h1>
-                <p>سرورهای کامیونیتی FragCity را ببین، وضعیت و نقشه را بررسی کن و مستقیم وارد بازی شو.</p>
-
-                <div class="sl-hero-actions">
-                    <a class="sl-primary-action" href="#slBrowserControls">
-                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                        جستجوی سرورها
-                    </a>
-                    <span class="sl-query-state">
-                        <span class="sl-query-state-dot"></span>
-                        اتصال A2S در مرحله راه‌اندازی
-                    </span>
-                </div>
-            </div>
-
-            <div class="sl-hero-art" aria-hidden="true">
-                <div class="sl-art-grid"></div>
-                <div class="sl-art-ring sl-art-ring-one"></div>
-                <div class="sl-art-ring sl-art-ring-two"></div>
-                <div class="sl-art-center">
-                    <span>CS2</span>
-                    <i class="fa-solid fa-crosshairs"></i>
-                </div>
-                <div class="sl-art-tag sl-art-tag-top">COMMUNITY</div>
-                <div class="sl-art-tag sl-art-tag-bottom">FIND YOUR MATCH</div>
-            </div>
-        </header>
-
         <section class="sl-overview" aria-label="آمار سرورها">
             <article class="sl-overview-card" data-fc-reveal="up">
                 <span class="sl-overview-icon sl-icon-orange"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
@@ -218,7 +167,6 @@ $statusLabels = [
                 <span class="sl-overview-hint">MAPS</span>
             </article>
                 </section>
-            </aside>
 
             <section class="sl-browser" id="slBrowserControls">
             <div class="sl-section-heading">
@@ -434,7 +382,6 @@ $statusLabels = [
                 <button type="button" id="slClearFilters">پاک‌کردن فیلترها</button>
             </div>
             </section>
-        </div>
 
         <section class="sl-query-explainer" data-fc-reveal="up">
             <div class="sl-query-explainer-icon"><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i></div>
