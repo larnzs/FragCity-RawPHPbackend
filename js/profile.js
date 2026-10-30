@@ -174,7 +174,57 @@
             .profileInitialized = '1';
 
         setBanner(root);
-        setXpProgress(root);
+        setXpProgress(root);
+
+        const profileSettingsForm = root.querySelector('#profileSettingsForm');
+        if (profileSettingsForm && profileSettingsForm.dataset.bound !== '1') {
+            profileSettingsForm.dataset.bound = '1';
+            profileSettingsForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                if (!profileSettingsForm.checkValidity()) {
+                    profileSettingsForm.reportValidity();
+                    return;
+                }
+
+                const submitButton = profileSettingsForm.querySelector('#profileSettingsSave');
+                const originalButtonContent = submitButton ? submitButton.innerHTML : '';
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> در حال ذخیره...';
+                }
+
+                fetch('?page=profile', {
+                    method: 'POST',
+                    body: new FormData(profileSettingsForm),
+                    headers: {
+                        'X-Profile-CSRF': root.dataset.profileCsrf || ''
+                    }
+                })
+                    .then(async function (response) {
+                        const message = await response.text();
+                        if (!response.ok) {
+                            throw new Error(message || 'ذخیره اطلاعات حساب ناموفق بود.');
+                        }
+                        return message;
+                    })
+                    .then(function (message) {
+                        showToast(message || 'اطلاعات حساب با موفقیت ذخیره شد.', 'success');
+                        window.setTimeout(function () {
+                            window.location.reload();
+                        }, 700);
+                    })
+                    .catch(function (error) {
+                        showToast(error && error.message ? error.message : 'خطا در ارتباط با سرور.', 'error');
+                    })
+                    .finally(function () {
+                        if (submitButton) {
+                            submitButton.disabled = false;
+                            submitButton.innerHTML = originalButtonContent;
+                        }
+                    });
+            });
+        }
 
         const uploadBannerBtn =
             root.querySelector(
