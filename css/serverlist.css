@@ -1356,3 +1356,23 @@ body.site-body:has(#fragcityServerBrowser) .site-footer {
     background: #0D0D0D;
     color: #F5F5F5;
 }
+
+
+/* Warn only when the last successful Pterodactyl/A2S snapshot is being served. */
+.sl-snapshot-stale {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 16px;
+    padding: 10px 13px;
+    border: 1px solid rgba(249, 115, 22, .22);
+    border-radius: 10px;
+    background: rgba(249, 115, 22, .055);
+    color: #e9b48e;
+    font-size: 11px;
+    line-height: 1.8;
+}
+.sl-snapshot-stale i {
+    flex: 0 0 auto;
+    color: #F97316;
+}
