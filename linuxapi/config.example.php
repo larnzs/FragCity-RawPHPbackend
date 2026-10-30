@@ -23,12 +23,12 @@ return [
         'charset' => 'utf8mb4',
     ],
 
-    // Server Browser credentials are independent from the WeaponPaints HMAC key.
+    // Pterodactyl Standby credentials are independent from the WeaponPaints HMAC key.
     // Keep the Pterodactyl Application API key and this shared secret on Linux only.
-    'server_browser' => [
+    'pterodactyl_standby' => [
         'enabled' => false,
         'shared_secret' => 'REPLACE_WITH_A_SEPARATE_64_CHARACTER_HEX_SECRET',
-        'cache_file' => '/var/cache/fragcity-api/server-browser.json',
+        'cache_file' => '/var/cache/fragcity-api/pterodactyl-standby.json',
         'cache_max_age_seconds' => 180,
         'public_connect_host' => '85.185.40.85',
         'query_host' => '192.168.2.3',
