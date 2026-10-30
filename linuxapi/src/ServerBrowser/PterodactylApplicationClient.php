@@ -73,7 +73,7 @@ final class FragCityPterodactylApplicationClient
             $query = http_build_query([
                 'per_page' => $perPage,
                 'page' => $page,
-                'include' => 'allocations,egg,node',
+                'include' => 'allocations',
             ], '', '&', PHP_QUERY_RFC3986);
 
             $payload = $this->get('/api/application/servers?' . $query);
