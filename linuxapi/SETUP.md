@@ -9,7 +9,7 @@ This is the repeatable setup guide for the files in this directory. Follow it on
 - The Linux API must never open a MySQL connection to `kyonxcbt_fragcity_services`, receive its credentials, or expose MariaDB port 3306.
 - **Windows Agent API:** retired. `/v1/agent/*` returns HTTP 410; `api/internal_agent_bridge.php` is a fail-closed retired endpoint. Do not configure `website_bridge`, set `integrations.linuxapi_site_bridge`, create bridge-specific tables, or execute the former `site-bridge-schema.sql`.
 - The old Agent/instance-maker tables (including `agent_tokens`, `agent_nodes`, `pending_servers`, `registered_servers`, `server_ports`, `server_configs`, and related queue/runtime tables) are not in the active website schema and must not be re-created for this migration.
-- Server purchase and old server-management screens remain disabled until a new integration with the Pterodactyl API and a clear billing/source-of-truth contract is implemented.
+- Read-only Pterodactyl integrations now support the public Server Browser (Application API + A2S) and admin Monitoring (Application API + Wings). Customer server provisioning, lifecycle controls, purchase/renewal and wallet billing remain disabled until a separate write-capable management workflow and a clear order/status source-of-truth contract are implemented.
 - The C# `WebAPIClient` repository is reference-only for understanding old contracts; no C# code is changed by this work.
 
 ## FragCity database target
