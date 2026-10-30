@@ -923,7 +923,7 @@ if (!function_exists('formatPlaytime')) {
                     </label>
 
                     <label class="profile-settings-field" for="profileDisplayName">
-                        <span>نام کاربری / نام نمایشی <b>*</b></span>
+                        <span>نام کاربری <b>*</b></span>
                         <input
                             id="profileDisplayName"
                             type="text"
@@ -934,7 +934,7 @@ if (!function_exists('formatPlaytime')) {
                             maxlength="128"
                             required
                         >
-                        <small>این نام در سایت نمایش داده می‌شود و برای ورود با نام کاربری هم استفاده می‌شود.</small>
+                        <small>این نام کاربری در بخش‌های سایت نمایش داده می‌شود و برای ورود هم قابل استفاده است.</small>
                     </label>
 
                     <label class="profile-settings-field" for="profileEmail">
