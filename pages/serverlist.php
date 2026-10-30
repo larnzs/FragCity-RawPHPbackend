@@ -249,7 +249,7 @@ $statusLabels = [
                             <select id="slMapFilter" <?= $serverRows === [] ? 'disabled' : '' ?>>
                                 <option value="">همه نقشه‌ها</option>
                                 <?php foreach ($uniqueMaps as $mapName): ?>
-                                    <option value="<?= $escapeServerValue(mb_strtolower($mapName, 'UTF-8')) ?>"><?= $escapeServerValue($mapName) ?></option>
+                                    <option value="<?= $escapeServerValue($lowerServerValue($mapName)) ?>"><?= $escapeServerValue($mapName) ?></option>
                                 <?php endforeach; ?>
                             </select>
                             <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
