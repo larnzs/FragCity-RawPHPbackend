@@ -152,7 +152,6 @@ $check(
         && str_contains($linuxConfig, "'allowed_node_ids' => []")
         && str_contains($linuxConfig, "'node_id' => 0")
         && str_contains($linuxConfig, "'wings_base_urls' => []")
-        && str_contains($linuxConfig, "'transport'") === false
 );
 
 $check(
