@@ -54,6 +54,11 @@ try {
     $standbyPterodactylClient = $read('linuxapi/src/PterodactylStandby/PterodactylApplicationClient.php');
     $standbyDiscovery = $read('linuxapi/src/PterodactylStandby/PterodactylStandbyDiscovery.php');
     $standbyA2S = $read('linuxapi/src/PterodactylStandby/A2SInfoQuery.php');
+    $standbyA2SPlayers = $read('linuxapi/src/PterodactylStandby/A2SPlayerQuery.php');
+    $standbyA2SPlayersTest = $read('linuxapi/tests/a2s-player-query-test.php');
+    $standbySitePlayersEndpoint = $read('api/public-server-players.php');
+    $standbyBrowserJavascript = $read('js/serverlist.js');
+    $standbyBrowserCss = $read('css/serverlist.css');
     $standbyCache = $read('linuxapi/src/PterodactylStandby/PterodactylStandbySnapshotCache.php');
     $standbyA2STest = $read('linuxapi/bin/pterodactyl-standby-test-a2s.php');
     $standbyAllocationTest = $read('linuxapi/tests/pterodactyl-primary-allocation-test.php');
@@ -359,6 +364,71 @@ $check(
         && str_contains($standbyAllocationTest, "'allocation' => 77")
         && str_contains($standbyAllocationTest, 'primary Allocation was selected')
         && str_contains($standbyDocs, 'does not require Cron')
+);
+
+$check(
+    'A2S_PLAYER parser reads names, signed scores and connection durations without fabricating Steam IDs',
+    str_contains($standbyA2SPlayers, "\\xFF\\xFF\\xFF\\xFF\\x55")
+        && str_contains($standbyA2SPlayers, "\\xFF\\xFF\\xFF\\xFF\\x44")
+        && str_contains($standbyA2SPlayers, "unpack('gvalue'")
+        && str_contains($standbyA2SPlayers, "'connected_seconds'")
+        && str_contains($standbyA2SPlayers, "'steam_id' => null")
+        && str_contains($standbyA2SPlayers, 'parseResponse')
+        && str_contains($standbyA2SPlayersTest, 'Signed negative score is parsed')
+        && str_contains($standbyA2SPlayersTest, 'SteamID is not fabricated')
+);
+
+$check(
+    'Player queries resolve an opaque server ID to an allowlisted Pterodactyl primary Allocation',
+    str_contains($standbyDiscovery, 'public function queryPlayers(string $serverId)')
+        && str_contains($standbyDiscovery, "hash('sha256', (string)$candidate['server_uuid'] . ':' . (int)$candidate['allocation_id'])")
+        && str_contains($standbyDiscovery, '$this->a2sPlayers->query($queryHost, $port)')
+        && str_contains($standbyDiscovery, 'node_query_hosts')
+        && !str_contains($standbyDiscovery, "\$_GET")
+);
+
+$check(
+    'Player-list action uses the existing signed Standby route and validates the server identifier',
+    str_contains($index, "$action === 'get_players'")
+        && str_contains($index, "'invalid_server_id'")
+        && str_contains($index, '$discovery->queryPlayers($serverId)')
+        && str_contains($standbyApiClient, "'action' => 'get_players'")
+        && str_contains($standbyApiClient, 'hash_hmac')
+        && str_contains($standbyRepository, 'getPlayers(string $serverId)')
+);
+
+$check(
+    'Public player AJAX endpoint is read-only, same-origin constrained and never accepts a host or port',
+    str_contains($standbySitePlayersEndpoint, "REQUEST_METHOD")
+        && str_contains($standbySitePlayersEndpoint, 'HTTP_SEC_FETCH_SITE')
+        && str_contains($standbySitePlayersEndpoint, "['server_id']")
+        && str_contains($standbySitePlayersEndpoint, 'PterodactylStandbyRepository')
+        && !str_contains($standbySitePlayersEndpoint, "['host']")
+        && !str_contains($standbySitePlayersEndpoint, "['port']")
+);
+
+$check(
+    'Server Browser exposes player controls and modal columns in the requested order',
+    str_contains($publicPage, 'data-sl-players')
+        && str_contains($publicPage, 'id="slPlayerModal"')
+        && str_contains($publicPage, 'اسم</th>')
+        && str_contains($publicPage, 'استیم آیدی</th>')
+        && str_contains($publicPage, 'مدت اتصال</th>')
+        && str_contains($publicPage, 'امتیاز</th>')
+        && str_contains($publicPage, 'لول FACEIT</th>')
+        && str_contains($standbyBrowserJavascript, '/api/public-server-players.php?server_id=')
+        && str_contains($standbyBrowserJavascript, 'connected_seconds')
+        && str_contains($standbyBrowserJavascript, 'faceit_level')
+        && str_contains($standbyBrowserCss, '.sl-player-modal-panel')
+        && str_contains($standbyBrowserCss, '.sl-players-btn')
+);
+
+$check(
+    'Runtime example and standby deployment documentation use the verified Pterodactyl Panel origin',
+    str_contains($linuxConfig, "'base_url' => 'https://panel.fragcity.ir'")
+        && str_contains($standbyDocs, "'base_url' => 'https://panel.fragcity.ir'")
+        && str_contains($standbyDocs, 'A2S_PLAYER')
+        && str_contains($standbyDocs, 'does not return SteamID')
 );
 
 $check(
