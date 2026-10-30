@@ -287,3 +287,73 @@
         box-shadow: none;
     }
 }
+
+
+/* Shared component micro-interactions */
+.fc-surface {
+    transition:
+        border-color var(--fc-duration-normal) ease,
+        background-color var(--fc-duration-normal) ease,
+        box-shadow var(--fc-duration-normal) ease;
+}
+.fc-card {
+    transition:
+        transform var(--fc-duration-normal) var(--fc-ease-standard),
+        border-color var(--fc-duration-normal) ease,
+        background-color var(--fc-duration-normal) ease,
+        box-shadow var(--fc-duration-normal) ease;
+}
+@media (hover: hover) {
+    .fc-card--interactive:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--fc-shadow-md);
+    }
+}
+.fc-button,
+.fc-icon-button {
+    transition:
+        color var(--fc-duration-fast) ease,
+        background-color var(--fc-duration-fast) ease,
+        border-color var(--fc-duration-fast) ease,
+        box-shadow var(--fc-duration-fast) ease,
+        transform var(--fc-duration-fast) var(--fc-ease-standard),
+        filter var(--fc-duration-fast) ease;
+}
+.fc-button > i,
+.fc-button > svg,
+.fc-icon-button > i,
+.fc-icon-button > svg {
+    transition: transform var(--fc-duration-fast) var(--fc-ease-standard);
+}
+@media (hover: hover) {
+    .fc-button:hover:not(:disabled):not([aria-disabled="true"]) { transform: translateY(-2px); }
+    .fc-button:hover:not(:disabled):not([aria-disabled="true"]) > i,
+    .fc-button:hover:not(:disabled):not([aria-disabled="true"]) > svg { transform: translateX(-2px); }
+    .fc-icon-button:hover:not(:disabled):not([aria-disabled="true"]) { transform: translateY(-2px); }
+}
+.fc-button:active:not(:disabled),
+.fc-icon-button:active:not(:disabled) { transform: translateY(0) scale(0.98); }
+.fc-input,
+.fc-select,
+.fc-textarea {
+    transition:
+        border-color var(--fc-duration-fast) ease,
+        background-color var(--fc-duration-fast) ease,
+        box-shadow var(--fc-duration-fast) ease,
+        transform var(--fc-duration-fast) ease;
+}
+.fc-badge {
+    transition:
+        color var(--fc-duration-fast) ease,
+        border-color var(--fc-duration-fast) ease,
+        background-color var(--fc-duration-fast) ease;
+}
+@media (prefers-reduced-motion: reduce) {
+    .fc-surface,.fc-card,.fc-button,.fc-icon-button,.fc-input,.fc-select,.fc-textarea,.fc-badge,
+    .fc-button > i,.fc-button > svg,.fc-icon-button > i,.fc-icon-button > svg {
+        transition: none !important;
+    }
+    .fc-card--interactive:hover,.fc-button:hover,.fc-icon-button:hover,.fc-button:active,.fc-icon-button:active {
+        transform: none !important;
+    }
+}
