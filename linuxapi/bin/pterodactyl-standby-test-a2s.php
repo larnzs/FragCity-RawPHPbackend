@@ -2,42 +2,15 @@
 declare(strict_types=1);
 
 /**
- * CLI-only test for the PHP A2S implementation.
- *
- * Uses only the internal query_host from runtime config and explicit ports
- * passed by the operator. It never scans a port range.
- *
- * Usage:
- *   php linuxapi/bin/test-a2s.php 27085 29000 29001
+ * Explicit A2S batch preflight for configured Pterodactyl allocations.
+ * Run on the Linux API host:
+ * php linuxapi/bin/pterodactyl-standby-test-a2s.php 27085 29000 29001
  */
 if (PHP_SAPI !== 'cli') {
     http_response_code(404);
     exit(1);
 }
 
-$ports = array_slice($argv, 1);
-if ($ports === [] || count($ports) > 10) {
-    fwrite(STDERR, "Usage: php linuxapi/bin/test-a2s.php PORT [PORT ...] (1-10 explicit ports)\n");
-    exit(2);
-}
-
-$validatedPorts = [];
-foreach ($ports as $portText) {
-    if (!is_string($portText) || !preg_match('/^[0-9]{1,5}$/D', $portText)) {
-        fwrite(STDERR, "FAIL: every port must be an explicit integer between 1 and 65535.\n");
-        exit(2);
-    }
-
-    $port = (int)$portText;
-    if ($port < 1 || $port > 65535) {
-        fwrite(STDERR, "FAIL: port is out of range: " . $portText . "\n");
-        exit(2);
-    }
-
-    $validatedPorts[] = $port;
-}
-
-$validatedPorts = array_values(array_unique($validatedPorts));
 $configPath = getenv('FRAGCITY_API_CONFIG') ?: '/etc/fragcity-api/config.php';
 if (!is_file($configPath) || !is_readable($configPath)) {
     fwrite(STDERR, "FAIL: runtime config is missing or unreadable.\n");
@@ -46,45 +19,75 @@ if (!is_file($configPath) || !is_readable($configPath)) {
 
 try {
     $config = require $configPath;
-    $serverConfig = is_array($config) && is_array($config['pterodactyl_standby'] ?? null)
+    if (!is_array($config)) {
+        throw new RuntimeException('Runtime config must return an array.');
+    }
+
+    $serverConfig = is_array($config['pterodactyl_standby'] ?? null)
         ? $config['pterodactyl_standby']
         : [];
     $host = trim((string)($serverConfig['query_host'] ?? ''));
-
     if (filter_var($host, FILTER_VALIDATE_IP) === false) {
         throw new RuntimeException('pterodactyl_standby.query_host must be a valid internal IP address.');
     }
 
+    $arguments = array_slice($argv, 1);
+    if ($arguments === [] || count($arguments) > 32) {
+        throw new InvalidArgumentException(
+            'Usage: php linuxapi/bin/pterodactyl-standby-test-a2s.php PORT [PORT ...] (1-32 explicit ports)'
+        );
+    }
+
+    $ports = [];
+    foreach ($arguments as $text) {
+        if (!is_string($text) || !preg_match('/^[0-9]{1,5}$/D', $text)) {
+            throw new InvalidArgumentException('Every port must be an explicit integer.');
+        }
+        $port = (int)$text;
+        if ($port < 1 || $port > 65535) {
+            throw new InvalidArgumentException('Port is out of range: ' . $text);
+        }
+        $ports[] = $port;
+    }
+    if (count(array_unique($ports)) !== count($ports)) {
+        throw new InvalidArgumentException('Duplicate ports are not allowed.');
+    }
+
     require_once __DIR__ . '/../src/PterodactylStandby/A2SInfoQuery.php';
     $query = new FragCityA2SInfoQuery((int)($serverConfig['query_timeout_ms'] ?? 1500));
+    $started = microtime(true);
+    $results = $query->queryBatch($host, $ports);
+    $failed = 0;
+
+    foreach ($ports as $port) {
+        $result = $results[$port] ?? [];
+        $info = is_array($result['info'] ?? null) ? $result['info'] : null;
+        if ($info === null || (int)($info['app_id'] ?? 0) !== 730) {
+            ++$failed;
+            $reason = is_string($result['error'] ?? null)
+                ? $result['error']
+                : 'A2S response is not a valid CS2 AppID 730 response.';
+            echo '[ ' . $port . ' ] A2S FAIL: ' . $reason . PHP_EOL;
+            continue;
+        }
+
+        echo '[ ' . $port . ' ] A2S PASS' . PHP_EOL;
+        echo '  Name: ' . (string)($info['name'] ?? '') . PHP_EOL;
+        echo '  Map: ' . (string)($info['map'] ?? '') . PHP_EOL;
+        echo '  Players: ' . (int)($info['players'] ?? 0) . '/' . (int)($info['max_players'] ?? 0) . PHP_EOL;
+        echo '  AppID: 730' . PHP_EOL;
+        echo '  Query RTT: ' . number_format((float)($info['query_rtt_ms'] ?? 0), 2) . ' ms' . PHP_EOL;
+    }
+
+    $elapsed = round((microtime(true) - $started) * 1000, 2);
+    if ($failed > 0) {
+        fwrite(STDERR, $failed . ' of ' . count($ports) . ' A2S query(s) failed.' . PHP_EOL);
+        exit(1);
+    }
+
+    echo 'PASS: all ' . count($ports) . ' explicit allocations succeeded in '
+        . number_format($elapsed, 2) . ' ms total.' . PHP_EOL;
 } catch (Throwable $e) {
     fwrite(STDERR, 'FAIL: ' . $e->getMessage() . PHP_EOL);
     exit(2);
 }
-
-$failed = 0;
-foreach ($validatedPorts as $port) {
-    try {
-        $info = $query->query($host, $port);
-        if ((int)($info['app_id'] ?? 0) !== 730) {
-            throw new RuntimeException('The A2S response AppID is not 730.');
-        }
-
-        echo '[ ' . $port . " ] A2S PASS\n";
-        echo '  Name: ' . (string)$info['name'] . "\n";
-        echo '  Map: ' . (string)$info['map'] . "\n";
-        echo '  Players: ' . (int)$info['players'] . '/' . (int)$info['max_players'] . "\n";
-        echo '  AppID: ' . (int)$info['app_id'] . "\n";
-        echo '  Query RTT: ' . number_format((float)$info['query_rtt_ms'], 2) . " ms\n";
-    } catch (Throwable $e) {
-        ++$failed;
-        echo '[ ' . $port . ' ] A2S FAIL: ' . $e->getMessage() . "\n";
-    }
-}
-
-if ($failed > 0) {
-    fwrite(STDERR, $failed . ' A2S query(s) failed.' . PHP_EOL);
-    exit(1);
-}
-
-echo 'PASS: all ' . count($validatedPorts) . ' explicit A2S query(s) succeeded.' . PHP_EOL;
