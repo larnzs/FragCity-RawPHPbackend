@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS public_server_scan_targets (
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     UNIQUE KEY uq_public_server_scan_target (host, port_start, port_end),
-    KEY idx_public_server_scan_targets_enabled (enabled),
+    KEY idx_public_server_scan_targets_enabled (enabled)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS public_server_scan_ports (
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS public_server_scan_ports (
     KEY idx_public_server_scan_online (status, target_id, port),
     CONSTRAINT fk_public_server_scan_ports_target
         FOREIGN KEY (target_id) REFERENCES public_server_scan_targets (id)
-        ON DELETE CASCADE,
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 INSERT IGNORE INTO public_server_scan_targets
