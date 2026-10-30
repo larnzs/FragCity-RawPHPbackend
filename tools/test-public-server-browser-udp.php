@@ -44,9 +44,13 @@ require_once dirname(__DIR__) . '/settings/loader.php';
 require_once dirname(__DIR__) . '/class/PublicServerBrowserA2SScanner.php';
 
 $indexSettings = fragcity_settings('files.index', []);
-$profile = is_array($indexSettings)
+$defaultProfile = is_array($indexSettings)
     ? trim((string)($indexSettings['database_profile'] ?? 'main'))
     : 'main';
+$environmentProfile = getenv('FRAGCITY_SERVER_BROWSER_DB_PROFILE');
+$profile = is_string($environmentProfile) && trim($environmentProfile) !== ''
+    ? trim($environmentProfile)
+    : $defaultProfile;
 $pdo = fragcity_create_pdo($profile !== '' ? $profile : 'main');
 
 if (!$pdo instanceof PDO) {
