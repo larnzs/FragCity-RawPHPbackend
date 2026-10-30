@@ -520,15 +520,44 @@ try {
     }
 
     if ($isPterodactylStandbyRequest) {
-        if ($action !== 'list_servers') {
-            apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
-        }
-
         $serverConfig = is_array($config['pterodactyl_standby'] ?? null)
             ? $config['pterodactyl_standby']
             : [];
         if (empty($serverConfig['enabled'])) {
             apiRespond(503, ['success' => false, 'error' => 'pterodactyl_standby_disabled']);
+        }
+
+        if ($action === 'get_players') {
+            $serverId = $body['server_id'] ?? null;
+            if (!is_string($serverId) || !preg_match('/^[a-f0-9]{16}$/Di', $serverId)) {
+                apiRespond(400, ['success' => false, 'error' => 'invalid_server_id']);
+            }
+
+            try {
+                require_once __DIR__ . '/../src/PterodactylStandby/PterodactylStandbyDiscovery.php';
+                $discovery = new PterodactylStandbyDiscovery($config);
+                apiRespond(200, [
+                    'success' => true,
+                    'data' => $discovery->queryPlayers($serverId),
+                ]);
+            } catch (OutOfBoundsException $e) {
+                apiRespond(404, ['success' => false, 'error' => 'server_not_found']);
+            } catch (Throwable $e) {
+                $detail = preg_replace('/[\\r\\n]+/', ' ', $e->getMessage()) ?? '';
+                error_log(
+                    '[FragCity API] Pterodactyl Standby player query failed; type='
+                    . get_class($e)
+                    . '; detail=' . substr($detail, 0, 180)
+                );
+                apiRespond(503, [
+                    'success' => false,
+                    'error' => 'pterodactyl_players_unavailable',
+                ]);
+            }
+        }
+
+        if ($action !== 'list_servers') {
+            apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
         }
 
         try {
