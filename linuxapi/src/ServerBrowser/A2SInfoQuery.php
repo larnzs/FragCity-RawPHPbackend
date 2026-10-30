@@ -99,7 +99,7 @@ final class FragCityA2SInfoQuery
         $folder = $this->readCString($data, $offset);
         $game = $this->readCString($data, $offset);
 
-        if (strlen($data) < $offset + 5) {
+        if (strlen($data) < $offset + 9) {
             throw new RuntimeException('A2S response is missing player metadata.');
         }
 
