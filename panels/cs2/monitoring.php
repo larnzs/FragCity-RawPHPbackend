@@ -139,8 +139,8 @@ $page_title = $is_fa ? 'مانیتورینگ سرورها' : 'Server Monitoring'
                 <footer class="fc-monitoring-footnote">
                     <i class="fa-solid fa-circle-info"></i>
                     <?= $is_fa
-                        ? 'اطلاعات Node از Wings API و مصرف کانتینرها از آمار لحظه‌ای Docker در Wings دریافت می‌شود. CPU نمایش‌داده‌شده در کارت Node مجموع مصرف سرورهای CS2 مجاز است، نه کل مصرف سیستم‌عامل.'
-                        : 'Node information comes from Wings. Container metrics are live Docker statistics. Node CPU is the sum for allowlisted CS2 containers, not total host CPU usage.' ?>
+                        ? 'اطلاعات پایه Node و آمار کانتینرها از Wings دریافت می‌شود. اگر local_node_id تنظیم شده باشد، CPU/RAM/Disk واقعی میزبان نیز از سیستم‌عامل خوانده می‌شود؛ در غیر این صورت CPU و Disk به‌صورت مجموع سرورهای CS2 مجاز نمایش داده می‌شوند.'
+                        : 'Node details and container metrics come from Wings. When local_node_id is configured, host CPU/RAM/disk are read from the local OS; otherwise CPU and disk show allowlisted CS2 container totals.' ?>
                 </footer>
 
                 <div class="fc-monitoring-error" id="fcMonitoringError" hidden role="alert"></div>
