@@ -1677,27 +1677,18 @@
             if (empty) {
                 empty.hidden = visibleCurrentCount > 0;
                 empty.querySelector('strong').textContent = `No already selected items in ${inventoryCategoryLabels[allowed]}.`;
-                empty.querySelector('span').textContent = 'Switch to Selecting skins to browse and choose another item.';
+                empty.querySelector('span').textContent = 'Your saved items in this category will appear here.';
             }
         }
 
         if (runSearch) applyGlobalSearch();
     }
 
-    function syncTopLevelView(tabId = getCurrentActiveTab()) {
-        const isInventory = tabId === 'tab-inventory';
-        const mode = isInventory ? 'inventory' : 'selecting';
-        document.querySelectorAll('[data-wp-category-nav]').forEach(nav => {
-            nav.hidden = nav.dataset.wpCategoryNav !== mode;
-        });
-        document.querySelectorAll('[data-wp-mode-target]').forEach(button => {
-            const active = button.dataset.wpModeTarget === mode;
-            button.classList.toggle('is-active', active);
-            button.setAttribute('aria-pressed', active ? 'true' : 'false');
-        });
-        applyInventoryCategoryFilter(state.currentInventoryCategory, false);
+    function syncTopLevelView() {
+        // Inventory is a normal tab in the unified navigation; always show its full saved loadout.
+        state.currentInventoryCategory = 'all';
+        applyInventoryCategoryFilter('all', false);
     }
-
 
 
     const floatingClientPages = new Map();
@@ -3202,46 +3193,7 @@
 
         }
 
-        document.querySelectorAll('[data-wp-mode-target]').forEach(button => {
-            if (button.dataset.wpModeBound === '1') return;
-            button.dataset.wpModeBound = '1';
-            button.addEventListener('click', event => {
-                event.preventDefault();
-                const requestedMode = button.dataset.wpModeTarget;
-                const currentTab = getCurrentActiveTab();
-                if (requestedMode === 'inventory') {
-                    // Clicking Already selected always returns to the complete
-                    // Inventory rather than leaving an old category filter active.
-                    state.currentInventoryCategory = 'all';
-                    applyInventoryCategoryFilter('all', false);
-                    activateMainTab('tab-inventory', true);
-                    return;
-                }
-                const selectionTabs = [
-                    'tab-skins', 'tab-rifles', 'tab-smg', 'tab-heavy',
-                    'tab-pistol', 'tab-sniper', 'tab-knives', 'tab-gloves',
-                    'tab-agents', 'tab-music', 'tab-pins'
-                ];
-                activateMainTab(selectionTabs.includes(currentTab) ? currentTab : 'tab-skins', true);
-            });
-        });
-
-        document.querySelectorAll('[data-wp-inventory-filter]').forEach(button => {
-            if (button.dataset.wpInventoryFilterBound === '1') return;
-            button.dataset.wpInventoryFilterBound = '1';
-            button.addEventListener('click', event => {
-                event.preventDefault();
-                applyInventoryCategoryFilter(button.dataset.wpInventoryFilter || 'all', true);
-                const url = getCurrentUrl();
-                url.searchParams.set('inventory_category', state.currentInventoryCategory);
-                window.history.replaceState(
-                    { ...(window.history.state || {}), inventoryCategory: state.currentInventoryCategory },
-                    '',
-                    url.toString()
-                );
-            });
-        });
-
+        // Inventory and selectable categories now share the same tab row.
 
         const tabButtons =
             dom.mainTabs.querySelectorAll(
