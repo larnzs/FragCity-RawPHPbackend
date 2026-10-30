@@ -119,19 +119,24 @@ sudo install -o root -g root -m 0644 \
   /etc/systemd/system/fragcity-server-browser-refresh.timer
 
 sudo systemctl daemon-reload
-sudo systemctl enable --now fragcity-server-browser-refresh.timer
 ~~~
 
-Run one manual refresh and inspect its output before enabling the timer:
+Run one manual refresh first. Do not enable the timer until this succeeds and the JSON cache has been inspected:
 
 ~~~bash
 sudo -u www-data php /var/www/fragcity-api/bin/refresh-server-browser.php
-sudo systemctl status fragcity-server-browser-refresh.timer --no-pager
-sudo journalctl -u fragcity-server-browser-refresh.service -n 30 --no-pager
 sudo ls -l /var/cache/fragcity-api/server-browser.json
 ~~~
 
-The timer refreshes the snapshot every 30 seconds. A refresh lock prevents overlapping workers. A temporary file plus atomic rename preserves the previous valid snapshot if a refresh fails.
+After the manual run succeeds, enable the 30-second timer and inspect its status/log:
+
+~~~bash
+sudo systemctl enable --now fragcity-server-browser-refresh.timer
+sudo systemctl status fragcity-server-browser-refresh.timer --no-pager
+sudo journalctl -u fragcity-server-browser-refresh.service -n 30 --no-pager
+~~~
+
+A refresh lock prevents overlapping workers. A temporary file plus atomic rename preserves the previous valid snapshot if a refresh fails.
 
 ## Validation
 
