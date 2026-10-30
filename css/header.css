@@ -1668,7 +1668,7 @@ body.mobile-menu-open {
     }
 }
 
-/* Scroll-direction header behavior: clear at top/up, 50% black while moving down. */
+/* Scroll-direction header behavior: clear at top/up, 85% opaque black while moving down. */
 .shock-header,
 .shock-header.is-scrolled {
     background: transparent;
@@ -1680,7 +1680,7 @@ body.mobile-menu-open {
 }
 
 .shock-header.is-scroll-down {
-    background: rgba(13, 13, 13, 0.5);
+    background: rgba(13, 13, 13, 0.85);
     border-bottom-color: rgba(255, 255, 255, 0.06);
 }
 
