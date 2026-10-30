@@ -21,6 +21,7 @@ final class PublicServerBrowserRepository
                 t.host,
                 t.region,
                 p.port,
+                p.status,
                 p.server_name,
                 p.map_name,
                 p.players,
