@@ -1530,6 +1530,7 @@ body.site-body:has(#fragcityServerBrowser) .site-footer {
 
     .sl-view-switch {
         order: 2;
+        align-self: flex-start;
     }
 
     .sl-search {
