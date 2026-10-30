@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 /**
  * FragCity Linux API v1.
- * Active product API: WeaponPaints only. Legacy Windows-Agent routes are retired.
+ * Active routes: WeaponPaints and the cached public Server Browser.
+ * Legacy Windows-Agent routes are retired.
  * Only this file under public/ is routed by Nginx. Runtime settings are kept
  * outside the app and outside Git, normally at /etc/fragcity-api/config.php.
  */
