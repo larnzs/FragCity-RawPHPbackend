@@ -10,6 +10,7 @@ final class FragCityPterodactylApplicationClient
     private string $baseUrl;
     private string $apiKey;
     private int $nodeId;
+    private int $maxServers;
     private array $allowedEggIds;
     private array $allowedImages;
 
@@ -38,6 +39,7 @@ final class FragCityPterodactylApplicationClient
         if ($this->nodeId < 1) {
             throw new RuntimeException('Pterodactyl node_id must be configured.');
         }
+        $this->maxServers = max(1, min(100, (int)($config['max_servers'] ?? 40)));
 
         $this->allowedEggIds = array_values(array_filter(
             array_map('intval', is_array($config['allowed_egg_ids'] ?? null) ? $config['allowed_egg_ids'] : []),
@@ -87,6 +89,9 @@ final class FragCityPterodactylApplicationClient
                 $candidate = $this->toCandidate($attributes);
                 if ($candidate !== null) {
                     $results[] = $candidate;
+                    if (count($results) >= $this->maxServers) {
+                        break 2;
+                    }
                 }
             }
 
