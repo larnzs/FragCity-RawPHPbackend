@@ -139,12 +139,30 @@ final class FragCityPterodactylApplicationClient
             return null;
         }
 
+        // Application API server records expose the primary Allocation ID in
+        // attributes.allocation. The Application API AllocationTransformer does
+        // not provide the Client API's is_default flag, so match the IDs instead.
+        $primaryAllocationId = filter_var(
+            $attributes['allocation'] ?? null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+        if ($primaryAllocationId === false) {
+            return null;
+        }
+
         $relationships = is_array($attributes['relationships'] ?? null)
             ? $attributes['relationships']
             : [];
-        $allocationData = $relationships['allocations']['data'] ?? [];
+        $allocationRelationship = $relationships['allocations'] ?? null;
+        $allocationData = is_array($allocationRelationship)
+            ? ($allocationRelationship['data'] ?? null)
+            : null;
+
         if (!is_array($allocationData)) {
-            return null;
+            throw new RuntimeException(
+                'Pterodactyl Application API did not return allocations; grant the API key read access to Allocations.'
+            );
         }
 
         $defaultAllocation = null;
@@ -152,14 +170,22 @@ final class FragCityPterodactylApplicationClient
             $allocationAttributes = is_array($allocation['attributes'] ?? null)
                 ? $allocation['attributes']
                 : [];
-            if (!empty($allocationAttributes['is_default'])) {
+            $allocationId = filter_var(
+                $allocationAttributes['id'] ?? null,
+                FILTER_VALIDATE_INT,
+                ['options' => ['min_range' => 1]]
+            );
+
+            if ($allocationId !== false && (int)$allocationId === (int)$primaryAllocationId) {
                 $defaultAllocation = $allocationAttributes;
                 break;
             }
         }
 
         if ($defaultAllocation === null) {
-            return null;
+            throw new RuntimeException(
+                'Pterodactyl did not return the server primary Allocation; verify Allocations read permission and the server allocation.'
+            );
         }
 
         $port = filter_var(
