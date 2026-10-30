@@ -38,7 +38,6 @@ final class PterodactylHostMetrics
             'disk_total_bytes' => $disk['total'],
             'disk_used_bytes' => $disk['used'],
             'disk_free_bytes' => $disk['free'],
-            'disk_path_label' => $disk['path_label'],
         ];
     }
 
@@ -88,21 +87,21 @@ final class PterodactylHostMetrics
         return ['total' => $total, 'used' => $used, 'available' => $available];
     }
 
-    /** @return array{total:?int,used:?int,free:?int,path_label:string} */
+    /** @return array{total:?int,used:?int,free:?int} */
     private function readDisk(string $path): array
     {
         $path = trim($path);
         if ($path === '' || !is_dir($path)) {
-            return ['total' => null, 'used' => null, 'free' => null, 'path_label' => 'unavailable'];
+            return ['total' => null, 'used' => null, 'free' => null];
         }
 
         $total = @disk_total_space($path);
         $free = @disk_free_space($path);
         if (!is_float($total) && !is_int($total)) {
-            return ['total' => null, 'used' => null, 'free' => null, 'path_label' => $path];
+            return ['total' => null, 'used' => null, 'free' => null];
         }
         if (!is_float($free) && !is_int($free)) {
-            return ['total' => (int)$total, 'used' => null, 'free' => null, 'path_label' => $path];
+            return ['total' => (int)$total, 'used' => null, 'free' => null];
         }
 
         $totalBytes = max(0, (int)$total);
@@ -112,7 +111,6 @@ final class PterodactylHostMetrics
             'total' => $totalBytes,
             'used' => max(0, $totalBytes - $freeBytes),
             'free' => $freeBytes,
-            'path_label' => $path,
         ];
     }
 }
