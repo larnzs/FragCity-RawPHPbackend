@@ -29,7 +29,7 @@
         '.faq-item','.warning-card','.mode-grid > *','.command-grid > *',
         '.command-grid-2 > *','.matchzy-card','.admin-guide-card',
         '.vip-page .info-section','.vip-page .feature-panel','.skins-page-shell',
-        '.auth-container','.support-header','.support-tabs','.support-tab','.support-card',
+        '.support-card',
         '.ticket-create-card','.ticket-list-card','.social-item','.ticket-row',
         '.about-page .section-title','.about-page .about-text','.value-item',
         '.vip-xp-card','.vip-levels-card','.feature-card','.servers-card','.panel-card',
