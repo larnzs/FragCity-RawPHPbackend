@@ -49,6 +49,8 @@ try {
     $standbyPterodactylClient = $read('linuxapi/src/PterodactylStandby/PterodactylApplicationClient.php');
     $standbyDiscovery = $read('linuxapi/src/PterodactylStandby/PterodactylStandbyDiscovery.php');
     $standbyA2S = $read('linuxapi/src/PterodactylStandby/A2SInfoQuery.php');
+    $standbyCache = $read('linuxapi/src/PterodactylStandby/PterodactylStandbySnapshotCache.php');
+    $standbyA2STest = $read('linuxapi/bin/pterodactyl-standby-test-a2s.php');
     $standbyWorker = $read('linuxapi/bin/pterodactyl-standby-refresh.php');
 
     $monitoringPanelClient = $read('linuxapi/src/PterodactylMonitoring/PterodactylMonitoringPanelClient.php');
@@ -112,17 +114,13 @@ $check(
 );
 
 $check(
-    'Active Server Browser reads the main database and never invokes a remote API',
-    str_contains($publicPage, 'new PublicServerBrowserRepository($pdo)')
-        && str_contains($publicRepository, 'public_server_scan_ports')
-        && str_contains($publicRepository, 'public_server_scan_targets')
-        && str_contains($publicRepository, "p.app_id = 730")
-        && str_contains($publicRepository, "p.status")
-        && str_contains($publicRepository, "INTERVAL 10 MINUTE")
-        && !str_contains($publicPage, 'ServerBrowserApiClient')
-        && !str_contains($publicRepository, 'curl_init')
-        && !str_contains($publicRepository, 'stream_socket_client')
-        && !str_contains($publicRepository, 'Pterodactyl')
+    'Active Server Browser uses the signed Pterodactyl API and no longer reads the range-scanner tables',
+    str_contains($publicPage, 'new PterodactylStandbyRepository()')
+        && str_contains($publicPage, 'Pterodactyl Server Browser API read failed')
+        && str_contains($standbyRepository, 'new PterodactylStandbyApiClient()')
+        && str_contains($standbyApiClient, "hash_hmac('sha256'")
+        && str_contains($publicPage, '$serverSnapshot')
+        && !str_contains($publicPage, 'PublicServerBrowserRepository')
 );
 
 $check(
@@ -300,24 +298,29 @@ $check(
 );
 
 $check(
-    'Pterodactyl standby client is read-only and filters configured allocations',
+    'Pterodactyl standby client is read-only and filters configured default allocations',
     str_contains($standbyPterodactylClient, 'CURLOPT_HTTPGET => true')
         && str_contains($standbyPterodactylClient, 'Authorization: Bearer ')
         && str_contains($standbyPterodactylClient, 'allowed_egg_ids')
         && str_contains($standbyPterodactylClient, 'allowed_docker_images')
         && str_contains($standbyPterodactylClient, 'is_default')
         && !str_contains($standbyPterodactylClient, 'CURLOPT_POST => true')
-        && str_contains($standbyDiscovery, '$this->a2s->query($queryHost, $port)')
+        && str_contains($standbyDiscovery, '$this->a2s->queryBatch')
+        && str_contains($standbyA2S, 'queryBatch')
+        && str_contains($standbyA2S, 'stream_select')
         && str_contains($standbyA2S, 'Source Engine Query')
-        && str_contains($standbyWorker, 'PterodactylStandbyDiscovery')
-        && str_contains($standbyDocs, 'not the active public Server Browser')
+        && str_contains($standbyCache, 'getOrRefresh')
+        && str_contains($standbyCache, 'cache_ttl_seconds')
+        && str_contains($standbyA2STest, 'queryBatch')
+        && str_contains($standbyDocs, 'does not require Cron')
 );
 
 $check(
     'Standby snapshot route and Nginx example use a distinct Pterodactyl Standby path',
     str_contains($index, "'/v1/pterodactyl-standby'")
         && str_contains($index, '$config[\'pterodactyl_standby\'][\'shared_secret\']')
-        && str_contains($index, 'pterodactyl_standby_cache_unavailable')
+        && str_contains($index, 'new PterodactylStandbySnapshotCache($serverConfig)')
+        && str_contains($index, 'getOrRefresh')
         && str_contains($nginxApi, 'location = /v1/pterodactyl-standby')
         && str_contains($nginxApi, 'SCRIPT_FILENAME $document_root/index.php')
 );
