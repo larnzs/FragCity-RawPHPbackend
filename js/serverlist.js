@@ -1,606 +1,251 @@
+/*
+ * FragCity Public Server Browser
+ * Client-side filtering only. Server status/player data comes from the
+ * server-side inventory/A2S integration, never from arbitrary browser queries.
+ */
 (function () {
     'use strict';
 
-    function initServerList() {
-        const list = document.getElementById('serverList');
-        if (!list || list.dataset.slReady === '1') return;
-        list.dataset.slReady = '1';
+    if (window.FragCityServerBrowser) {
+        window.FragCityServerBrowser.init();
+        return;
+    }
 
-        const pillsWrap = document.getElementById('slFilterPills');
-        const searchInput = document.getElementById('slSearchInput');
-        const noMatch = document.getElementById('slNoMatch');
-        const sortMenu = document.getElementById('slSortMenu');
-        const sortLabel = document.getElementById('slSortLabel');
+    function normalize(value) {
+        return String(value || '').trim().toLocaleLowerCase();
+    }
 
-        const modal = document.getElementById('slInfoModal');
-        const modalTitle = document.getElementById('slModalTitle');
-        const modalMap = document.getElementById('slModalMap');
-        const modalPlayersCount = document.getElementById('slModalPlayersCount');
-        const modalIp = document.getElementById('slModalIp');
-        const modalCopy = document.getElementById('slModalCopy');
-        const modalPlay = document.getElementById('slModalPlay');
-        const modalNode = document.getElementById('slModalNode');
-        const modalPing = document.getElementById('slModalPing');
-        const modalVac = document.getElementById('slModalVac');
-        const modalLock = document.getElementById('slModalLock');
-        const modalPlayers = document.getElementById('slModalPlayers');
-        const modalPlayersState = document.getElementById('slModalPlayersState');
+    function init() {
+        const root = document.getElementById('fragcityServerBrowser');
+        if (!root || root.dataset.slReady === '1') return;
+        root.dataset.slReady = '1';
 
-        let currentFilter = 'all';
-        let currentSort = 'default';
-        let activeCard = null;
-        let playerRequestToken = 0;
+        const list = root.querySelector('#serverList');
+        const pills = root.querySelector('#slFilterPills');
+        const search = root.querySelector('#slSearchInput');
+        const modeSelect = root.querySelector('#slModeFilter');
+        const mapSelect = root.querySelector('#slMapFilter');
+        const sortSelect = root.querySelector('#slSortSelect');
+        const noMatch = root.querySelector('#slNoMatch');
+        const resultsLabel = root.querySelector('#slResultsLabel');
+        const clearButton = root.querySelector('#slClearFilters');
+        const toast = root.querySelector('#slToast');
 
-        const sortLabels = {
-            'default': 'پیش‌فرض',
-            'players-desc': 'بازیکن بیشتر',
-            'players-asc': 'بازیکن کمتر',
-            'ping-asc': 'پینگ کمتر',
-            'ping-desc': 'پینگ بیشتر',
-            'name-asc': 'نام (الف تا ی)'
+        if (!list) return;
+
+        let statusFilter = 'all';
+        let toastTimer = 0;
+
+        const getCards = function () {
+            return Array.from(list.querySelectorAll('[data-sl-card]'));
         };
 
-        function getRows() {
-            return Array.from(list.querySelectorAll('.server-row'));
+        function showToast(message) {
+            if (!toast) return;
+            toast.textContent = message;
+            toast.classList.add('is-visible');
+            window.clearTimeout(toastTimer);
+            toastTimer = window.setTimeout(function () {
+                toast.classList.remove('is-visible');
+            }, 1700);
         }
 
-        function getGroups() {
-            return Array.from(list.querySelectorAll('.sl-server-group'));
-        }
+        function compareCards(a, b) {
+            const sort = sortSelect ? sortSelect.value : 'default';
 
-        function escapeHtml(value) {
-            return String(value ?? '').replace(/[<>&"']/g, function (c) {
-                return {
-                    '<': '&lt;',
-                    '>': '&gt;',
-                    '&': '&amp;',
-                    '"': '&quot;',
-                    "'": '&#039;'
-                }[c];
-            });
-        }
-
-        function getNumber(row, attr) {
-            return parseInt(row.getAttribute(attr) || '0', 10);
-        }
-
-        function applyFilterAndSearch() {
-            const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
-            let visibleCount = 0;
-
-            getGroups().forEach(function (group) {
-                let groupVisibleCount = 0;
-
-                group.querySelectorAll('.server-row').forEach(function (row) {
-                    const matchesStatus =
-                        currentFilter === 'all' ||
-                        row.getAttribute('data-status') === currentFilter;
-
-                    const name = (row.getAttribute('data-name') || '').toLowerCase();
-                    const map = (row.getAttribute('data-map') || '').toLowerCase();
-
-                    const matchesSearch =
-                        query === '' ||
-                        name.indexOf(query) !== -1 ||
-                        map.indexOf(query) !== -1;
-
-                    const visible = matchesStatus && matchesSearch;
-
-                    row.style.display = visible ? '' : 'none';
-
-                    if (visible) {
-                        groupVisibleCount++;
-                        visibleCount++;
-                    }
-                });
-
-                group.style.display = groupVisibleCount > 0 ? '' : 'none';
-            });
-
-            if (noMatch) {
-                noMatch.style.display = visibleCount === 0 ? '' : 'none';
+            if (sort === 'players-desc') {
+                return Number(b.dataset.players || 0) - Number(a.dataset.players || 0);
             }
-        }
 
-        function compareRows(a, b) {
-            switch (currentSort) {
-                case 'players-desc':
-                    return getNumber(b, 'data-players') - getNumber(a, 'data-players');
-
-                case 'players-asc':
-                    return getNumber(a, 'data-players') - getNumber(b, 'data-players');
-
-                case 'ping-asc':
-                    return getNumber(a, 'data-ping') - getNumber(b, 'data-ping');
-
-                case 'ping-desc':
-                    return getNumber(b, 'data-ping') - getNumber(a, 'data-ping');
-
-                case 'name-asc':
-                    return (a.getAttribute('data-name') || '').localeCompare(
-                        b.getAttribute('data-name') || '',
-                        'fa'
-                    );
-
-                default:
-                    return 0;
+            if (sort === 'query-asc') {
+                const aValue = a.dataset.query === '' ? Number.POSITIVE_INFINITY : Number(a.dataset.query);
+                const bValue = b.dataset.query === '' ? Number.POSITIVE_INFINITY : Number(b.dataset.query);
+                return aValue - bValue;
             }
+
+            if (sort === 'name-asc') {
+                return (a.dataset.name || '').localeCompare(b.dataset.name || '', 'fa');
+            }
+
+            return 0;
         }
 
         function applySort() {
-            if (currentSort === 'default') return;
-
-            getGroups().forEach(function (group) {
-                const grid = group.querySelector('.sl-group-grid');
+            if (!sortSelect) return;
+            list.querySelectorAll('[data-sl-group]').forEach(function (group) {
+                const grid = group.querySelector('.sl-server-grid');
                 if (!grid) return;
-
-                const rows = Array.from(grid.querySelectorAll('.server-row'));
-
-                rows.sort(compareRows);
-
-                rows.forEach(function (row) {
-                    grid.appendChild(row);
-                });
+                Array.from(grid.querySelectorAll('[data-sl-card]'))
+                    .sort(compareCards)
+                    .forEach(function (card) {
+                        grid.appendChild(card);
+                    });
             });
         }
 
-        function formatCount(players, maxPlayers) {
-            return String(players) + ' : ' + String(maxPlayers);
-        }
+        function applyFilters() {
+            const query = normalize(search ? search.value : '');
+            const mode = normalize(modeSelect ? modeSelect.value : '');
+            const map = normalize(mapSelect ? mapSelect.value : '');
+            let visible = 0;
 
-        function closeInfoModal() {
-            if (!modal) return;
+            list.querySelectorAll('[data-sl-group]').forEach(function (group) {
+                let groupVisible = 0;
 
-            modal.classList.remove('open');
-            modal.setAttribute('aria-hidden', 'true');
-            document.body.classList.remove('sl-modal-open');
+                group.querySelectorAll('[data-sl-card]').forEach(function (card) {
+                    const statusMatch = statusFilter === 'all' || card.dataset.status === statusFilter;
+                    const modeMatch = mode === '' || normalize(card.dataset.mode) === mode;
+                    const mapMatch = map === '' || normalize(card.dataset.map) === map;
+                    const searchText = [
+                        card.dataset.name,
+                        card.dataset.map,
+                        card.dataset.mode,
+                        card.dataset.address
+                    ].map(normalize).join(' ');
 
-            playerRequestToken++;
-            activeCard = null;
-        }
+                    const searchMatch = query === '' || searchText.includes(query);
+                    const isVisible = statusMatch && modeMatch && mapMatch && searchMatch;
 
-        function renderPlayers(players, token) {
-            if (token !== playerRequestToken || !modalPlayers) return;
-
-            if (!Array.isArray(players) || players.length === 0) {
-                modalPlayersState.textContent = 'خالی';
-
-                modalPlayers.innerHTML =
-                    '<div class="sl-modal-empty">بازیکنی آنلاین نیست.</div>';
-
-                return;
-            }
-
-            modalPlayersState.textContent = players.length + ' بازیکن';
-
-            const html = players.map(function (player) {
-                const name = escapeHtml(player.Name || 'Unknown');
-                const score = Number(player.Score ?? 0);
-                const duration = escapeHtml(
-                    player.DurationFormatted || '-'
-                );
-
-                return '<div class="sl-modal-player">' +
-                    '<span class="sl-modal-player-name">' +
-                    name +
-                    '</span>' +
-
-                    '<span class="sl-modal-player-info">' +
-                    '<strong>' + score + '</strong>' +
-                    ' · ' +
-                    duration +
-                    '</span>' +
-
-                    '</div>';
-            }).join('');
-
-            modalPlayers.innerHTML =
-                '<div class="sl-modal-player-grid">' +
-                html +
-                '</div>';
-        }
-
-        function loadPlayers(card) {
-            if (!card || !modalPlayers) return;
-
-            const token = ++playerRequestToken;
-
-            const ip = card.getAttribute('data-ip') || '';
-            const port = card.getAttribute('data-port') || '';
-
-            modalPlayersState.textContent = 'در حال دریافت...';
-
-            modalPlayers.innerHTML =
-                '<div class="sl-modal-loading">' +
-                '<i class="fas fa-spinner fa-spin"></i> ' +
-                'در حال دریافت بازیکنان...' +
-                '</div>';
-
-            fetch(
-                '/pages/serverlist.php?ajax=1&action=players&ip=' +
-                    encodeURIComponent(ip) +
-                    '&port=' +
-                    encodeURIComponent(port),
-                {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    credentials: 'same-origin'
-                }
-            )
-                .then(function (response) {
-                    if (!response.ok) {
-                        throw new Error('request failed');
+                    card.hidden = !isVisible;
+                    if (isVisible) {
+                        groupVisible++;
+                        visible++;
                     }
-
-                    return response.json();
-                })
-                .then(function (players) {
-                    if (players && players.error) {
-                        throw new Error(players.error);
-                    }
-
-                    renderPlayers(players, token);
-                })
-                .catch(function () {
-                    if (token !== playerRequestToken) return;
-
-                    modalPlayersState.textContent = 'خطا';
-
-                    modalPlayers.innerHTML =
-                        '<div class="sl-modal-error">' +
-                        'خطا در دریافت اطلاعات بازیکنان.' +
-                        '</div>';
                 });
+
+                group.hidden = groupVisible === 0;
+            });
+
+            if (noMatch) noMatch.hidden = visible !== 0;
+            if (resultsLabel) resultsLabel.textContent = 'نمایش ' + visible + ' سرور';
         }
 
-        function openInfoModal(card) {
-            if (!modal || !card) return;
+        if (pills) {
+            pills.addEventListener('click', function (event) {
+                const button = event.target.closest('[data-sl-filter]');
+                if (!button) return;
 
-            activeCard = card;
-
-            const name =
-                card.getAttribute('data-name') || 'Server';
-
-            const map =
-                card.getAttribute('data-map') || 'Other';
-
-            const ip =
-                card.getAttribute('data-ip') || '';
-
-            const port =
-                card.getAttribute('data-port') || '';
-
-            const players =
-                getNumber(card, 'data-players');
-
-            const maxPlayers =
-                getNumber(card, 'data-max-players');
-
-            modalTitle.textContent = name;
-
-            modalMap.textContent = map;
-
-            modalPlayersCount.textContent =
-                formatCount(players, maxPlayers);
-
-            modalIp.textContent =
-                ip + ':' + port;
-
-            modalNode.textContent =
-                card.querySelector('.sl-node')?.textContent.trim() || '-';
-
-            modalPing.textContent =
-                card.querySelector('.sl-ping')?.textContent.trim() || '---';
-
-            const status =
-                card.getAttribute('data-status') || '';
-
-            const vac =
-                card.getAttribute('data-vac') === '1';
-
-            const locked =
-                card.getAttribute('data-locked') === '1';
-
-            modalVac.textContent =
-                status === 'Running'
-                    ? (vac ? 'فعال' : 'غیرفعال')
-                    : '-';
-
-            modalLock.textContent =
-                status === 'Running'
-                    ? (locked ? 'Private' : 'Public')
-                    : '-';
-
-            const joinBtn =
-                card.querySelector('.sl-join-btn');
-
-            if (joinBtn) {
-                modalPlay.href =
-                    joinBtn.getAttribute('href') || '#';
-
-                modalPlay.style.display = '';
-            } else {
-                modalPlay.href = '#';
-                modalPlay.style.display = 'none';
-            }
-
-            modal.classList.add('open');
-
-            modal.setAttribute(
-                'aria-hidden',
-                'false'
-            );
-
-            document.body.classList.add(
-                'sl-modal-open'
-            );
-
-            if (status === 'Running') {
-                loadPlayers(card);
-            } else {
-                playerRequestToken++;
-
-                modalPlayersState.textContent =
-                    'آفلاین';
-
-                modalPlayers.innerHTML =
-                    '<div class="sl-modal-empty">' +
-                    'این سرور در حال حاضر در دسترس نیست.' +
-                    '</div>';
-            }
-        }
-
-        // ---- Filter pills ----
-        if (pillsWrap) {
-            pillsWrap.addEventListener('click', function (event) {
-                const pill =
-                    event.target.closest('.sl-pill');
-
-                if (!pill) return;
-
-                pillsWrap
-                    .querySelectorAll('.sl-pill')
-                    .forEach(function (p) {
-                        p.classList.remove('active');
-                    });
-
-                pill.classList.add('active');
-
-                currentFilter =
-                    pill.getAttribute('data-sl-filter') ||
-                    'all';
-
-                applyFilterAndSearch();
+                statusFilter = button.dataset.slFilter || 'all';
+                pills.querySelectorAll('[data-sl-filter]').forEach(function (pill) {
+                    const active = pill === button;
+                    pill.classList.toggle('active', active);
+                    pill.setAttribute('aria-pressed', active ? 'true' : 'false');
+                });
+                applyFilters();
             });
         }
 
-        // ---- Search ----
-        if (searchInput) {
-            searchInput.addEventListener(
-                'input',
-                applyFilterAndSearch
-            );
+        [search, modeSelect, mapSelect].forEach(function (control) {
+            if (!control) return;
+            control.addEventListener(control === search ? 'input' : 'change', applyFilters);
+        });
+
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function () {
+                applySort();
+                applyFilters();
+            });
         }
 
-        // ---- Sort dropdown ----
-        if (sortMenu) {
-            sortMenu.addEventListener('click', function (event) {
-                const option =
-                    event.target.closest('[data-sl-sort]');
+        if (clearButton) {
+            clearButton.addEventListener('click', function () {
+                statusFilter = 'all';
+                if (search) search.value = '';
+                if (modeSelect) modeSelect.value = '';
+                if (mapSelect) mapSelect.value = '';
+                if (sortSelect) sortSelect.value = 'default';
 
-                if (!option) return;
-
-                currentSort =
-                    option.getAttribute('data-sl-sort') ||
-                    'default';
-
-                sortMenu
-                    .querySelectorAll('[data-sl-sort]')
-                    .forEach(function (btn) {
-                        btn.classList.toggle(
-                            'active',
-                            btn === option
-                        );
+                if (pills) {
+                    pills.querySelectorAll('[data-sl-filter]').forEach(function (pill) {
+                        const active = pill.dataset.slFilter === 'all';
+                        pill.classList.toggle('active', active);
+                        pill.setAttribute('aria-pressed', active ? 'true' : 'false');
                     });
-
-                if (sortLabel) {
-                    sortLabel.textContent =
-                        sortLabels[currentSort] ||
-                        sortLabels.default;
                 }
 
                 applySort();
-                applyFilterAndSearch();
-
-                const dropdown =
-                    sortMenu.closest('.frag-dropdown');
-
-                if (dropdown) {
-                    dropdown.classList.remove('open');
-                }
+                applyFilters();
             });
         }
 
-        // ---- List actions ----
         list.addEventListener('click', function (event) {
-            const copyBtn =
-                event.target.closest('.sl-copy-btn');
+            const copyButton = event.target.closest('[data-sl-copy]');
+            if (!copyButton) return;
 
-            if (copyBtn) {
-                event.preventDefault();
-                event.stopPropagation();
+            const address = copyButton.getAttribute('data-sl-copy') || '';
+            if (!address) return;
 
-                const ip =
-                    copyBtn.getAttribute('data-ip') || '';
-
-                const done = function () {
-                    copyBtn.classList.add('copied');
-
-                    const original =
-                        copyBtn.innerHTML;
-
-                    copyBtn.innerHTML =
-                        '<i class="fas fa-check"></i>';
-
-                    setTimeout(function () {
-                        copyBtn.classList.remove('copied');
-                        copyBtn.innerHTML = original;
-                    }, 1200);
-                };
-
-                if (
-                    navigator.clipboard &&
-                    window.isSecureContext
-                ) {
-                    navigator.clipboard
-                        .writeText(ip)
-                        .then(done)
-                        .catch(function () {});
-                } else {
-                    const temp =
-                        document.createElement('textarea');
-
-                    temp.value = ip;
-                    temp.style.position = 'fixed';
-                    temp.style.opacity = '0';
-
-                    document.body.appendChild(temp);
-
-                    temp.select();
-
-                    try {
-                        document.execCommand('copy');
-                        done();
-                    } catch (e) {
-                        // ignore
-                    }
-
-                    temp.remove();
+            function copied() {
+                copyButton.classList.add('is-copied');
+                const icon = copyButton.querySelector('i');
+                if (icon) {
+                    icon.classList.remove('fa-copy');
+                    icon.classList.add('fa-check');
                 }
+                showToast('آدرس سرور کپی شد');
+                window.setTimeout(function () {
+                    copyButton.classList.remove('is-copied');
+                    if (icon) {
+                        icon.classList.remove('fa-check');
+                        icon.classList.add('fa-copy');
+                    }
+                }, 1300);
+            }
 
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(address).then(copied).catch(function () {
+                    showToast('کپی آدرس انجام نشد');
+                });
                 return;
             }
 
-            const infoBtn =
-                event.target.closest('[data-sl-open-info]');
+            const temporaryInput = document.createElement('textarea');
+            temporaryInput.value = address;
+            temporaryInput.setAttribute('readonly', '');
+            temporaryInput.style.position = 'fixed';
+            temporaryInput.style.opacity = '0';
+            document.body.appendChild(temporaryInput);
+            temporaryInput.select();
 
-            if (infoBtn) {
-                event.preventDefault();
-                event.stopPropagation();
-
-                const card =
-                    infoBtn.closest('.server-row');
-
-                openInfoModal(card);
-
-                return;
-            }
-
-            const stopCard =
-                event.target.closest('[data-sl-stop-card]');
-
-            if (stopCard) {
-                event.stopPropagation();
-                return;
-            }
-
-            const card =
-                event.target.closest('.server-row');
-
-            if (card) {
-                openInfoModal(card);
+            try {
+                const success = document.execCommand('copy');
+                if (success) copied();
+                else showToast('کپی آدرس انجام نشد');
+            } catch (error) {
+                showToast('کپی آدرس انجام نشد');
+            } finally {
+                temporaryInput.remove();
             }
         });
 
-        // ---- Modal actions ----
-        if (modal) {
-            modal.addEventListener('click', function (event) {
-                if (
-                    event.target.closest(
-                        '[data-sl-close-info]'
-                    )
-                ) {
-                    closeInfoModal();
-                }
+        root.querySelectorAll('a[href="#slBrowserControls"]').forEach(function (link) {
+            link.addEventListener('click', function (event) {
+                const target = root.querySelector('#slBrowserControls');
+                if (!target) return;
+                event.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             });
-        }
-
-        document.addEventListener('keydown', function (event) {
-            if (
-                event.key === 'Escape' &&
-                modal &&
-                modal.classList.contains('open')
-            ) {
-                closeInfoModal();
-            }
         });
 
-        if (modalCopy) {
-            modalCopy.addEventListener('click', function () {
-                if (!activeCard) return;
-
-                const ip =
-                    (activeCard.getAttribute('data-ip') || '') +
-                    ':' +
-                    (activeCard.getAttribute('data-port') || '');
-
-                const done = function () {
-                    const original =
-                        modalCopy.innerHTML;
-
-                    modalCopy.innerHTML =
-                        '<i class="fas fa-check"></i>';
-
-                    setTimeout(function () {
-                        modalCopy.innerHTML = original;
-                    }, 1100);
-                };
-
-                if (
-                    navigator.clipboard &&
-                    window.isSecureContext
-                ) {
-                    navigator.clipboard
-                        .writeText(ip)
-                        .then(done)
-                        .catch(function () {});
-                } else {
-                    const temp =
-                        document.createElement('textarea');
-
-                    temp.value = ip;
-
-                    document.body.appendChild(temp);
-
-                    temp.select();
-
-                    try {
-                        document.execCommand('copy');
-                        done();
-                    } catch (e) {
-                        // ignore
-                    }
-
-                    temp.remove();
-                }
+        if (search) {
+            root.addEventListener('keydown', function (event) {
+                if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
+                const target = event.target;
+                if (target && /INPUT|TEXTAREA|SELECT/.test(target.tagName)) return;
+                event.preventDefault();
+                search.focus();
             });
         }
 
-        applyFilterAndSearch();
+        applySort();
+        applyFilters();
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener(
-            'DOMContentLoaded',
-            initServerList
-        );
-    } else {
-        initServerList();
-    }
+    window.FragCityServerBrowser = { init: init };
+    document.addEventListener('DOMContentLoaded', init);
+    window.addEventListener('content-loaded', init);
 
-    window.addEventListener(
-        'content-loaded',
-        initServerList
-    );
+    if (document.readyState !== 'loading') {
+        init();
+    }
 })();
