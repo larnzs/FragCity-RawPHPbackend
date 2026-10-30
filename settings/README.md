@@ -28,21 +28,15 @@ not a secure secret store: credentials accidentally committed remain in Git hist
 and may be copied to clones, logs, backups, or automation systems.
 
 
-## Public Server Browser API
+## Public CS2 Server Browser
 
-The website reads the public CS2 server snapshot through the signed Linux API, the same way WeaponPaints does. Merge the following block into the existing private \`settings/settings.json\`:
+The active public Server Browser uses the main website database. It does not require a new API URL, HMAC secret or Pterodactyl token in \`settings/settings.json\`.
 
-~~~json
-{
-  "integrations": {
-    "server_browser_api": {
-      "base_url": "https://api.fragcity.ir",
-      "shared_secret": "THE_MATCHING_SERVER_BROWSER_HMAC_SECRET"
-    }
-  }
-}
-~~~
+- Scanner targets and per-port results are stored in \`public_server_scan_targets\` and \`public_server_scan_ports\`.
+- The scheduled CLI job is \`tools/refresh-public-server-browser.php\`.
+- The public page reads results through \`class/PublicServerBrowserRepository.php\`.
+- The Cron Job and PHP website use the existing \`files.index.database_profile\` / \`databases.main\` connection.
 
-The matching value belongs in \`/etc/fragcity-api/config.php\` under \`server_browser.shared_secret\`. It must be a separate key from \`shared_secret\` used by WeaponPaints. The partial fragment is also available in \`settings/server-browser.integration.example.json\`.
+See \`docs/PUBLIC-SERVER-SCANNER.md\` for the database migration, UDP preflight and shared-hosting Cron setup.
 
-This works from Laragon and from the production web host because both use the same HTTPS API origin. The secret remains PHP-side and must never be added to browser JavaScript.
+The separate Pterodactyl API experiment is preserved under \`Pterodactyl Standby\`; it is not required to display public servers.
