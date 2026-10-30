@@ -3,7 +3,7 @@
  * Copy to /etc/fragcity-api/config.php on the Linux node.
  * Never commit the runtime config.
  *
- * This service exposes the WeaponPaints API and a cached public Server Browser.
+ * This service exposes WeaponPaints and an optional Pterodactyl Standby snapshot route.
  * Website account, wallet, support, and payment data stay in the website DB;
  * the Linux API must not connect to that database.
  */
