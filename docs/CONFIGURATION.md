@@ -26,20 +26,22 @@
 
 ### Server Browser
 
-فهرست عمومی CS2 از طریق دو جدول در دیتابیس اصلی سایت مدیریت می‌شود:
+فهرست عمومی CS2 اکنون از Pterodactyl Application API و A2S_INFO به‌صورت on-demand استفاده می‌کند:
 
-- `public_server_scan_targets`: IP، بازه پورت و سیاست Query هر مقصد.
-- `public_server_scan_ports`: وضعیت و آخرین نتیجهٔ A2S برای هر پورت.
-- پروتکل A2S: `class/PublicServerBrowserA2SScanner.php`.
-- قرارداد ذخیره‌سازی: `class/PublicServerBrowserScanStoreInterface.php`.
-- Repository عملیات اسکن: `class/PublicServerBrowserScanRepository.php` (پیاده‌سازی PDO/MySQL).
-- Orchestrator پردازش batchها: `class/PublicServerBrowserScanWorker.php`.
-- ورودی CLI/Cron: `tools/refresh-public-server-browser.php`.
-- Repository خواندن صفحه: `class/PublicServerBrowserRepository.php`.
+- وب‌سایت: `class/PterodactylStandbyApiClient.php` و `class/PterodactylStandbyRepository.php`.
+- صفحهٔ عمومی: `pages/serverlist.php`.
+- مسیر امضاشدهٔ Linux API: `POST /v1/pterodactyl-standby`.
+- کش کوتاه و on-demand: `linuxapi/src/PterodactylStandby/PterodactylStandbySnapshotCache.php`.
+- کشف سرورها از Pterodactyl: `linuxapi/src/PterodactylStandby/PterodactylStandbyDiscovery.php`.
+- کوئری هم‌زمان A2S: `linuxapi/src/PterodactylStandby/A2SInfoQuery.php`.
 
-تنظیم اتصال از `settings/settings.json` می‌آید. برای اجرای Worker روی ماشین دیگری می‌توان مسیر JSON را با `FRAGCITY_SETTINGS_FILE`، پروفایل دیتابیس را با `FRAGCITY_SERVER_BROWSER_DB_PROFILE` و اندازهٔ batch/تعداد پورت هر اجرا را با environment variableهای مستندشده override کرد. ماشین اجراکننده باید هم به MySQL/MariaDB سایت و هم به UDP مقصد دسترسی داشته باشد؛ صرفاً PHP بودن هاست کافی نیست. جزئیات در `docs/PUBLIC-SERVER-SCANNER.md` است.
+وب‌سایت سرورها را از API می‌گیرد؛ Linux API با Application API فقط سرورهای مجاز و Default Allocation آن‌ها را پیدا می‌کند و روی همان پورت‌ها A2S می‌فرستد. درخواست‌های A2S موازی‌اند و فقط روی Allocationهای ثبت‌شده اجرا می‌شوند؛ هیچ بازهٔ پورت عمومی اسکن نمی‌شود.
 
-کدهای آزمایشی Pterodactyl با نام `Pterodactyl Standby` برای snapshot قدیمی باقی مانده‌اند. ماژول جدید Monitoring مستقل است:
+در `settings/settings.json` فقط `integrations.pterodactyl_standby_api.base_url` و HMAC secret مربوطه قرار می‌گیرد. Application API token فقط در `/etc/fragcity-api/config.php` روی Linux نگهداری می‌شود. Cache به‌طور پیش‌فرض ۱۰ ثانیه است و با درخواست وب‌سایت تازه می‌شود؛ Cron لازم نیست. جزئیات در `docs/PTERODACTYL-STANDBY-API.md` است.
+
+اسکنر دیتابیسی قبلی در فایل‌ها و جداول باقی مانده، اما دیگر منبع فعال Server Browser نیست؛ Cron آن را فعال نکن و جداولش را فعلاً حذف نکن.
+
+ماژول Monitoring مستقل از Server Browser است:
 
 - صفحهٔ ادمین: `panels/cs2/monitoring.php` (فقط نقش `admin`).
 - endpoint داخلی سایت: `api/admin-pterodactyl-monitoring.php`.
