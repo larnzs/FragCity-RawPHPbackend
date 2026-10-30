@@ -99,7 +99,7 @@ final class PterodactylStandbyApiClient
             // Keep diagnostics useful without logging an untrusted response body.
             // A reverse-proxy HTML 404/502 page is the most common reason this
             // integration receives non-JSON despite a successful TCP/TLS request.
-            $trimmedResponse = ltrim((string)$response, "\\xEF\\xBB\\xBF \\t\\r\\n");
+            $trimmedResponse = ltrim((string)$response, "\xEF\xBB\xBF \t\r\n");
             $firstByte = $trimmedResponse !== '' ? $trimmedResponse[0] : '';
             $bodyFormat = $firstByte === '<'
                 ? 'html-or-xml'
