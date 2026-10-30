@@ -31,4 +31,10 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON `kyonxcbt_fragcity_services`.`wallet_tra
 GRANT SELECT, INSERT, UPDATE, DELETE ON `kyonxcbt_fragcity_services`.`withdraw_requests`
   TO 'fragcity_site_local'@'127.0.0.1';
 
+-- Public Server Browser scanner tables (shared-hosting / Laragon cron).
+GRANT SELECT, INSERT, UPDATE, DELETE ON `kyonxcbt_fragcity_services`.`public_server_scan_targets`
+  TO 'fragcity_site_local'@'127.0.0.1';
+GRANT SELECT, INSERT, UPDATE, DELETE ON `kyonxcbt_fragcity_services`.`public_server_scan_ports`
+  TO 'fragcity_site_local'@'127.0.0.1';
+
 FLUSH PRIVILEGES;
