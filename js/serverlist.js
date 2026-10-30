@@ -15,9 +15,44 @@
         return String(value || '').trim().toLocaleLowerCase();
     }
 
+    function runIntro(root) {
+        const intro = root.querySelector('#slIntroScreen');
+        if (!intro || intro.dataset.introStarted === '1') return;
+
+        intro.dataset.introStarted = '1';
+
+        const reduceMotion = window.matchMedia &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (reduceMotion) {
+            intro.remove();
+            return;
+        }
+
+        document.body.classList.add('sl-intro-active');
+
+        window.setTimeout(function () {
+            if (!intro.isConnected) {
+                document.body.classList.remove('sl-intro-active');
+                return;
+            }
+
+            intro.classList.add('is-leaving');
+
+            window.setTimeout(function () {
+                intro.remove();
+                document.body.classList.remove('sl-intro-active');
+            }, 740);
+        }, 3000);
+    }
+
     function init() {
         const root = document.getElementById('fragcityServerBrowser');
-        if (!root || root.dataset.slReady === '1') return;
+        if (!root) return;
+
+        runIntro(root);
+
+        if (root.dataset.slReady === '1') return;
         root.dataset.slReady = '1';
 
         const list = root.querySelector('#serverList');
