@@ -30,17 +30,24 @@ and may be copied to clones, logs, backups, or automation systems.
 
 ## Public CS2 Server Browser
 
-The active public Server Browser uses the main website database. It does not require a new API URL, HMAC secret or Pterodactyl token in `settings/settings.json`.
+The active public Server Browser obtains the CS2 server inventory through the signed Pterodactyl Standby API. Merge `settings/pterodactyl-standby.integration.example.json` into the private `settings/settings.json`:
 
-- Scanner targets and per-port results are stored in `public_server_scan_targets` and `public_server_scan_ports`.
-- The scheduled CLI job is `tools/refresh-public-server-browser.php`.
-- The public page reads results through `class/PublicServerBrowserRepository.php`.
-- The Cron Job and PHP website use the existing `files.index.database_profile` / `databases.main` connection. A separate runner can select its profile with `FRAGCITY_SERVER_BROWSER_DB_PROFILE`; its runtime JSON path can be supplied with `FRAGCITY_SETTINGS_FILE`.
-- The A2S parser, storage interface, PDO scanner-table repository and batch worker are separate classes. Per-host workload settings can be overridden with `FRAGCITY_SERVER_BROWSER_MAX_PER_RUN`, `FRAGCITY_SERVER_BROWSER_BATCH_SIZE` and `FRAGCITY_SERVER_BROWSER_TIME_LIMIT`.
+~~~json
+{
+  "integrations": {
+    "pterodactyl_standby_api": {
+      "base_url": "https://api.fragcity.ir",
+      "shared_secret": "MATCH_THE_LINUX_PTERODACTYL_STANDBY_SECRET"
+    }
+  }
+}
+~~~
 
-See `docs/PUBLIC-SERVER-SCANNER.md` for the database migration, runtime requirements, environment overrides, UDP preflight and portable Cron setup. Any runner still needs outbound UDP permission and database reachability; hosting-provider firewall restrictions cannot be bypassed by the PHP module.
+The Pterodactyl Application API key stays in `/etc/fragcity-api/config.php` on Linux and must never be placed in website settings or browser JavaScript. The Linux API reads the configured Pterodactyl Node and CS2 Egg/Docker image allowlist, selects each server's default Allocation, and performs concurrent A2S_INFO queries.
 
-The separate Pterodactyl API experiment is preserved under `Pterodactyl Standby`; it is not required to display public servers.
+The API refreshes its short cache (10 seconds by default) when a website request arrives. No Cron Job or manual port-range scan is needed. The legacy database scanner files and tables are retained for rollback only; do not schedule `tools/refresh-public-server-browser.php`.
+
+See `docs/PTERODACTYL-STANDBY-API.md` for runtime config, cache permissions, deployment and validation. The admin resource dashboard is a separate integration documented in `docs/PTERODACTYL-MONITORING.md`.
 
 ## Pterodactyl Monitoring
 
