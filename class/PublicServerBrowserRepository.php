@@ -34,8 +34,9 @@ final class PublicServerBrowserRepository
                 ON t.id = p.target_id
             WHERE t.enabled = 1
               AND p.port BETWEEN t.port_start AND t.port_end
-              AND p.status = "online"
               AND p.app_id = 730
+              AND p.last_seen_online_at IS NOT NULL
+              AND p.last_queried_at >= (UTC_TIMESTAMP() - INTERVAL 10 MINUTE)
             ORDER BY p.players DESC, p.server_name ASC, t.host ASC, p.port ASC
         ';
 
@@ -66,7 +67,7 @@ final class PublicServerBrowserRepository
                 'query_port' => $port,
                 'mode' => $mode,
                 'map' => trim((string)($row['map_name'] ?? '')) ?: 'Unknown',
-                'status' => 'online',
+                'status' => (string)($row['status'] ?? '') === 'online' ? 'online' : 'offline',
                 'players' => max(0, (int)$row['players']),
                 'max_players' => max(0, (int)$row['max_players']),
                 'query_rtt_ms' => $row['query_rtt_ms'] !== null
