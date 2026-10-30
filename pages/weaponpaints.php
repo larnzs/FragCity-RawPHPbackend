@@ -797,9 +797,7 @@ $team = $teamParam === 'both'
 $currentTab = normalizeTabSelection(
     (string)($_GET['tab'] ?? 'tab-inventory')
 );
-$inventoryCategory = normalizeInventoryCategory(
-    (string)($_GET['inventory_category'] ?? 'all')
-);
+$inventoryCategory = 'all'; // The unified navigation opens the full saved inventory.
 
 // Agents are team-specific. If a stale URL requests BOTH while opening
 // this tab, use T as the deterministic single-team fallback.
@@ -1273,30 +1271,6 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
     <header class="wp-header">
 
-        <div class="wp-view-mode-switcher" role="group" aria-label="Weapon paints view">
-            <button
-                type="button"
-                class="wp-mode-tab <?= $currentTab === 'tab-inventory' ? 'is-active' : '' ?>"
-                data-wp-mode-target="inventory"
-                aria-pressed="<?= $currentTab === 'tab-inventory' ? 'true' : 'false' ?>"
-            >
-                <i class="fas fa-box-open" aria-hidden="true"></i>
-                <span>Already selected</span>
-            </button>
-
-            <button
-                type="button"
-                class="wp-mode-tab <?= $currentTab !== 'tab-inventory' ? 'is-active' : '' ?>"
-                data-wp-mode-target="selecting"
-                aria-pressed="<?= $currentTab !== 'tab-inventory' ? 'true' : 'false' ?>"
-            >
-                <i class="fas fa-paint-brush" aria-hidden="true"></i>
-                <span>Selecting skins</span>
-            </button>
-        </div>
-
-        <!-- Categories are shared visually but show saved inventory or selectable catalogue by mode. -->
-
         <nav
             class="wp-tabs"
             id="mainTabs"
@@ -1304,133 +1278,28 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
         >
 
             <div
-                class="wp-category-switcher wp-category-switcher--inventory"
-                data-wp-category-nav="inventory"
-                aria-label="Already selected categories"
-                <?= $currentTab !== 'tab-inventory' ? 'hidden' : '' ?>
+                class="wp-category-switcher wp-category-switcher--unified"
+                aria-label="Inventory and weapon categories"
             >
-                <button
-                    type="button"
-                    class="wp-tab <?= $inventoryCategory === 'rifles' ? 'is-active' : '' ?>"
-                    title="Rifles"
-                    aria-label="Rifles"
-                    aria-pressed="<?= $inventoryCategory === 'rifles' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="rifles"
-                >
-                    <i class="fas fa-crosshairs" aria-hidden="true"></i>
-                </button>
 
                 <button
                     type="button"
-                    class="wp-tab <?= $inventoryCategory === 'smg' ? 'is-active' : '' ?>"
-                    title="SMG"
-                    aria-label="SMG"
-                    aria-pressed="<?= $inventoryCategory === 'smg' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="smg"
+                    class="wp-tab <?= $currentTab === 'tab-inventory' ? 'is-active' : '' ?>"
+                    title="Inventory"
+                    aria-label="Inventory"
+                    aria-selected="<?= $currentTab === 'tab-inventory' ? 'true' : 'false' ?>"
+                    data-bs-toggle="tab"
+                    data-bs-target="#tab-inventory"
                 >
-                    <i class="fas fa-bolt" aria-hidden="true"></i>
+                    <i class="fas fa-box-open" aria-hidden="true"></i>
                 </button>
 
-                <button
-                    type="button"
-                    class="wp-tab <?= $inventoryCategory === 'heavy' ? 'is-active' : '' ?>"
-                    title="Heavy Guns"
-                    aria-label="Heavy Guns"
-                    aria-pressed="<?= $inventoryCategory === 'heavy' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="heavy"
-                >
-                    <i class="fas fa-fire" aria-hidden="true"></i>
-                </button>
-
-                <button
-                    type="button"
-                    class="wp-tab <?= $inventoryCategory === 'pistol' ? 'is-active' : '' ?>"
-                    title="Pistols"
-                    aria-label="Pistols"
-                    aria-pressed="<?= $inventoryCategory === 'pistol' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="pistol"
-                >
-                    <i class="fas fa-gun" aria-hidden="true"></i>
-                </button>
-
-                <button
-                    type="button"
-                    class="wp-tab <?= $inventoryCategory === 'sniper' ? 'is-active' : '' ?>"
-                    title="Snipers"
-                    aria-label="Snipers"
-                    aria-pressed="<?= $inventoryCategory === 'sniper' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="sniper"
-                >
-                    <i class="fas fa-binoculars" aria-hidden="true"></i>
-                </button>
-
-                <button
-                    type="button"
-                    class="wp-tab <?= $inventoryCategory === 'knives' ? 'is-active' : '' ?>"
-                    title="Knives"
-                    aria-label="Knives"
-                    aria-pressed="<?= $inventoryCategory === 'knives' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="knives"
-                >
-                    <i class="fas fa-cutlery" aria-hidden="true"></i>
-                </button>
-
-                <button
-                    type="button"
-                    class="wp-tab <?= $inventoryCategory === 'gloves' ? 'is-active' : '' ?>"
-                    title="Gloves"
-                    aria-label="Gloves"
-                    aria-pressed="<?= $inventoryCategory === 'gloves' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="gloves"
-                >
-                    <i class="fas fa-hand-paper" aria-hidden="true"></i>
-                </button>
-
-                <button
-                    type="button"
-                    class="wp-tab <?= $inventoryCategory === 'agents' ? 'is-active' : '' ?>"
-                    title="Agents"
-                    aria-label="Agents"
-                    aria-pressed="<?= $inventoryCategory === 'agents' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="agents"
-                >
-                    <i class="fas fa-user-secret" aria-hidden="true"></i>
-                </button>
-
-                <button
-                    type="button"
-                    class="wp-tab <?= $inventoryCategory === 'music' ? 'is-active' : '' ?>"
-                    title="Music"
-                    aria-label="Music"
-                    aria-pressed="<?= $inventoryCategory === 'music' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="music"
-                >
-                    <i class="fas fa-music" aria-hidden="true"></i>
-                </button>
-
-                <button
-                    type="button"
-                    class="wp-tab <?= $inventoryCategory === 'pins' ? 'is-active' : '' ?>"
-                    title="Pins"
-                    aria-label="Pins"
-                    aria-pressed="<?= $inventoryCategory === 'pins' ? 'true' : 'false' ?>"
-                    data-wp-inventory-filter="pins"
-                >
-                    <i class="fas fa-thumbtack" aria-hidden="true"></i>
-                </button>
-            </div>
-
-            <div
-                class="wp-category-switcher wp-category-switcher--selecting"
-                data-wp-category-nav="selecting"
-                aria-label="Skin selection categories"
-                <?= $currentTab === 'tab-inventory' ? 'hidden' : '' ?>
-            >
                 <button
                     type="button"
                     class="wp-tab <?= $currentTab === 'tab-skins' ? 'is-active' : '' ?>"
                     title="All Skins"
                     aria-label="All Skins"
+                    aria-selected="<?= $currentTab === 'tab-skins' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-skins"
                 >
@@ -1442,6 +1311,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     class="wp-tab <?= $currentTab === 'tab-rifles' ? 'is-active' : '' ?>"
                     title="Rifles"
                     aria-label="Rifles"
+                    aria-selected="<?= $currentTab === 'tab-rifles' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-rifles"
                 >
@@ -1453,6 +1323,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     class="wp-tab <?= $currentTab === 'tab-smg' ? 'is-active' : '' ?>"
                     title="SMG"
                     aria-label="SMG"
+                    aria-selected="<?= $currentTab === 'tab-smg' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-smg"
                 >
@@ -1464,6 +1335,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     class="wp-tab <?= $currentTab === 'tab-heavy' ? 'is-active' : '' ?>"
                     title="Heavy Guns"
                     aria-label="Heavy Guns"
+                    aria-selected="<?= $currentTab === 'tab-heavy' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-heavy"
                 >
@@ -1475,6 +1347,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     class="wp-tab <?= $currentTab === 'tab-pistol' ? 'is-active' : '' ?>"
                     title="Pistols"
                     aria-label="Pistols"
+                    aria-selected="<?= $currentTab === 'tab-pistol' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-pistol"
                 >
@@ -1486,6 +1359,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     class="wp-tab <?= $currentTab === 'tab-sniper' ? 'is-active' : '' ?>"
                     title="Snipers"
                     aria-label="Snipers"
+                    aria-selected="<?= $currentTab === 'tab-sniper' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-sniper"
                 >
@@ -1497,6 +1371,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     class="wp-tab <?= $currentTab === 'tab-knives' ? 'is-active' : '' ?>"
                     title="Knives"
                     aria-label="Knives"
+                    aria-selected="<?= $currentTab === 'tab-knives' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-knives"
                 >
@@ -1508,6 +1383,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     class="wp-tab <?= $currentTab === 'tab-gloves' ? 'is-active' : '' ?>"
                     title="Gloves"
                     aria-label="Gloves"
+                    aria-selected="<?= $currentTab === 'tab-gloves' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-gloves"
                 >
@@ -1519,6 +1395,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     class="wp-tab <?= $currentTab === 'tab-agents' ? 'is-active' : '' ?>"
                     title="Agents"
                     aria-label="Agents"
+                    aria-selected="<?= $currentTab === 'tab-agents' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-agents"
                 >
@@ -1530,6 +1407,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     class="wp-tab <?= $currentTab === 'tab-music' ? 'is-active' : '' ?>"
                     title="Music"
                     aria-label="Music"
+                    aria-selected="<?= $currentTab === 'tab-music' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-music"
                 >
@@ -1541,6 +1419,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     class="wp-tab <?= $currentTab === 'tab-pins' ? 'is-active' : '' ?>"
                     title="Pins"
                     aria-label="Pins"
+                    aria-selected="<?= $currentTab === 'tab-pins' ? 'true' : 'false' ?>"
                     data-bs-toggle="tab"
                     data-bs-target="#tab-pins"
                 >
@@ -1605,6 +1484,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
             </div>
 
         </nav>
+
 
     </header>
 
