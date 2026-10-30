@@ -1,6 +1,8 @@
 {
+  "_comment": "Merge this fragment into integrations in the private website settings/settings.json. Keep the Pterodactyl Application API token on Linux only; this file contains only the website-to-Linux HMAC secret.",
   "integrations": {
     "pterodactyl_standby_api": {
+      "_comment": "Public CS2 Server Browser API. base_url must be the HTTPS origin only (no /v1 path). The shared_secret must exactly match pterodactyl_standby.shared_secret in /etc/fragcity-api/config.php.",
       "base_url": "https://api.fragcity.ir",
       "shared_secret": "REPLACE_WITH_THE_MATCHING_PTERODACTYL_STANDBY_SECRET"
     }
