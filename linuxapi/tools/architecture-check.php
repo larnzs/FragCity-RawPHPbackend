@@ -162,12 +162,15 @@ $check(
 );
 
 $check(
-    'Public scanner migration creates only its two tables and seeds the requested target range',
+    'Public scanner migration is MariaDB-compatible and seeds the requested target range',
     str_contains($publicMigration, 'CREATE TABLE IF NOT EXISTS public_server_scan_targets')
         && str_contains($publicMigration, 'CREATE TABLE IF NOT EXISTS public_server_scan_ports')
         && str_contains($publicMigration, "'85.185.40.85', 27085, 29100")
         && str_contains($publicMigration, 'retry_offline_seconds')
         && str_contains($publicMigration, 'refresh_online_seconds')
+        && !preg_match('/\\bCHECK\\s*\\(/i', $publicMigration)
+        && str_contains($publicScanWorker, 'FILTER_VALIDATE_IP')
+        && str_contains($publicScanWorker, '($portEnd - $portStart) > 4095')
 );
 
 $check(
