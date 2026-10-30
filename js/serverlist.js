@@ -32,11 +32,23 @@
         const resultsLabel = root.querySelector('#slResultsLabel');
         const clearButton = root.querySelector('#slClearFilters');
         const toast = root.querySelector('#slToast');
+        const viewButtons = Array.from(root.querySelectorAll('[data-sl-view-option]'));
 
         if (!list) return;
 
         let statusFilter = 'all';
         let toastTimer = 0;
+
+        function setView(view) {
+            const nextView = view === 'grid' ? 'grid' : 'list';
+            list.dataset.slView = nextView;
+
+            viewButtons.forEach(function (button) {
+                const active = button.dataset.slViewOption === nextView;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+        }
 
         const getCards = function () {
             return Array.from(list.querySelectorAll('[data-sl-card]'));
@@ -121,6 +133,15 @@
             const totalCards = getCards().length;
             if (noMatch) noMatch.hidden = totalCards === 0 || visible !== 0;
             if (resultsLabel) resultsLabel.textContent = 'نمایش ' + visible + ' سرور';
+        }
+
+        if (viewButtons.length) {
+            setView(list.dataset.slView);
+            viewButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    setView(button.dataset.slViewOption);
+                });
+            });
         }
 
         if (pills) {
