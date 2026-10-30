@@ -1,6 +1,6 @@
 # FragCity — Database & API
 
-> وضعیت فعلی: وب‌سایت و Linux API دو Integration مستقل برای WeaponPaints و Server Browser دارند. دیتابیس اصلی سایت شامل همان ده جدول اعلام‌شده است؛ دیتابیس `GLOBAL_weaponpaints` همچنان روی Debian قرار دارد و فقط از طریق Linux API دسترسی داده می‌شود.
+> وضعیت فعلی: WeaponPaints از Linux API استفاده می‌کند؛ Server Browser عمومی از دو جدول عملیاتی در دیتابیس اصلی سایت و Cron Job استفاده می‌کند. دیتابیس `GLOBAL_weaponpaints` همچنان روی Debian قرار دارد و فقط از طریق Linux API دسترسی داده می‌شود.
 
 ## 1. مسیرهای داده
 
@@ -70,14 +70,14 @@ API از HMAC-SHA256، زمان درخواست، nonce ضد replay، TLS validat
 
 Server Browser فعال برخلاف WeaponPaints نیازی به Linux API جداگانه ندارد:
 
-- \`public_server_scan_targets\` نگهدارندهٔ IP و بازهٔ پورت مجاز است.
-- \`public_server_scan_ports\` وضعیت هر پورت، نتیجهٔ A2S و زمان Query بعدی را نگه می‌دارد.
-- Worker زمان‌بندی‌شدهٔ \`tools/refresh-public-server-browser.php\` از طریق UDP و در batchهای محدود Query می‌گیرد.
-- صفحهٔ سایت فقط \`class/PublicServerBrowserRepository.php\` را برای خواندن رکوردهای آنلاین استفاده می‌کند.
+- `public_server_scan_targets` نگهدارندهٔ IP و بازهٔ پورت مجاز است.
+- `public_server_scan_ports` وضعیت هر پورت، نتیجهٔ A2S و زمان Query بعدی را نگه می‌دارد.
+- Worker زمان‌بندی‌شدهٔ `tools/refresh-public-server-browser.php` از طریق UDP و در batchهای محدود Query می‌گیرد.
+- صفحهٔ سایت فقط `class/PublicServerBrowserRepository.php` را برای خواندن رکوردهای آنلاین استفاده می‌کند.
 - هیچ درخواست UDP یا اسکن پورت هنگام بازدید کاربر اجرا نمی‌شود.
 - پورت‌های بدون پاسخ تا یک ساعت دوباره Query نمی‌شوند؛ سرورهای معتبر آنلاین با فاصلهٔ کوتاه‌تری به‌روزرسانی می‌شوند.
 
-Migration و راه‌اندازی Cron در \`docs/PUBLIC-SERVER-SCANNER.md\` مستند شده است. بخش مستقل Pterodactyl برای استفادهٔ احتمالی آینده با نام Pterodactyl Standby نگهداری می‌شود.
+Migration و راه‌اندازی Cron در `docs/PUBLIC-SERVER-SCANNER.md` مستند شده است. بخش مستقل Pterodactyl برای استفادهٔ احتمالی آینده با نام Pterodactyl Standby نگهداری می‌شود.
 
 ## 2. وضعیت Agent ویندوزی قدیمی
 
