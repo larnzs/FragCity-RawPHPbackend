@@ -26,16 +26,16 @@
 
 ### Server Browser
 
-فهرست سرورهای عمومی نیز Integration مستقل دارد:
+فهرست عمومی CS2 از طریق دو جدول در دیتابیس اصلی سایت مدیریت می‌شود:
 
-- `integrations.server_browser_api.base_url`: آدرس HTTPS سرویس Linux API، معمولاً `https://api.fragcity.ir`.
-- `integrations.server_browser_api.shared_secret`: کلید HMAC مستقل Server Browser؛ با Secret مربوط به WeaponPaints یکی نباشد.
-- Client سایت: `class/FragCityServerBrowserApiClient.php`.
-- Repository سایت: `class/ServerBrowserRepository.php`.
+- \`public_server_scan_targets\`: IP، بازه پورت و سیاست Query هر مقصد.
+- \`public_server_scan_ports\`: وضعیت و آخرین نتیجهٔ A2S برای هر پورت.
+- Worker زمان‌بندی‌شده: \`tools/refresh-public-server-browser.php\`.
+- Repository خواندن صفحه: \`class/PublicServerBrowserRepository.php\`.
 
-این بخش را از `settings/server-browser.integration.example.json` در فایل خصوصی `settings/settings.json` ادغام کن؛ کل فایل تنظیمات را جایگزین نکن. Laragon و Production می‌توانند از همین API استفاده کنند. هیچ Pterodactyl token یا UDP query از مرورگر بازدیدکننده انجام نمی‌شود.
+تنظیمات جداگانه یا Secret جدید در \`settings.json\` لازم نیست؛ Worker و صفحه از همان اتصال PDO اصلی استفاده می‌کنند. جزئیات Migration و Cron هاست اشتراکی در \`docs/PUBLIC-SERVER-SCANNER.md\` است.
 
-در Linux، Worker زمان‌بندی‌شده با Application API پنل، Allocationهای سرورهای مجاز را پیدا می‌کند، A2S را از مسیر داخلی می‌پرسد و Snapshot را Cache می‌کند. IP داخلی Query و IP عمومی اتصال مستقل‌اند. جزئیات نصب در `docs/SERVER-BROWSER-API.md` آمده است.
+کدهای آزمایشی Pterodactyl با نام \`Pterodactyl Standby\` نگهداری می‌شوند و مسیر فعال Server Browser به آن‌ها وابسته نیست.
 
 ### قابلیت‌های سرور
 
