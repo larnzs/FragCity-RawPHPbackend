@@ -4,25 +4,25 @@
 
 The website consumes only the signed HTTPS endpoint:
 
-- Website-side client: \`class/FragCityServerBrowserApiClient.php\`
-- Website-side repository: \`class/ServerBrowserRepository.php\`
-- Linux API endpoint: \`POST /v1/server-browser\`
-- Discovery worker: \`linuxapi/bin/refresh-server-browser.php\`
-- Cached snapshot: \`/var/cache/fragcity-api/server-browser.json\`
+- Website-side client: `class/FragCityServerBrowserApiClient.php`
+- Website-side repository: `class/ServerBrowserRepository.php`
+- Linux API endpoint: `POST /v1/server-browser`
+- Discovery worker: `linuxapi/bin/refresh-server-browser.php`
+- Cached snapshot: `/var/cache/fragcity-api/server-browser.json`
 
 The refresh worker uses the Pterodactyl 1.x Application API to enumerate servers and their assigned allocations. It restricts discovery to the configured node and configured CS2 Egg IDs or Docker image allowlist. Only the default allocation of each matching server is queried. A2S_INFO is sent over UDP to the configured internal query address; it is never sent by the website visitor's browser.
 
 The public connect address is deliberately configured separately from the internal query address. For the current node, the known values are:
 
-- Internal A2S host: \`192.168.2.3\`
-- Public connect host: \`85.185.40.85\`
+- Internal A2S host: `192.168.2.3`
+- Public connect host: `85.185.40.85`
 - Query/game port: the server's default Pterodactyl allocation port
 
 No arbitrary port range is scanned. A successful A2S response must identify AppID 730 before the server is shown as online.
 
 ## Website runtime settings
 
-Merge this fragment into the existing private \`settings/settings.json\`; do not replace the entire settings file:
+Merge this fragment into the existing private `settings/settings.json`; do not replace the entire settings file:
 
 ~~~json
 {
@@ -39,7 +39,7 @@ Keep the value private. It is used by PHP on the website host and must never be 
 
 ## Linux runtime configuration
 
-Merge the following block into the existing \`/etc/fragcity-api/config.php\` return array. Do not replace the existing \`shared_secret\` or \`database\` sections used by WeaponPaints.
+Merge the following block into the existing `/etc/fragcity-api/config.php` return array. Do not replace the existing `shared_secret` or `database` sections used by WeaponPaints.
 
 ~~~php
 'server_browser' => [
@@ -66,22 +66,47 @@ Merge the following block into the existing \`/etc/fragcity-api/config.php\` ret
 
 Important configuration notes:
 
-- Generate a new independent HMAC secret with \`openssl rand -hex 32\`. The website value and Linux value must match. Do not reuse the WeaponPaints key.
+- Generate a new independent HMAC secret with `openssl rand -hex 32`. The website value and Linux value must match. Do not reuse the WeaponPaints key.
 - Create a Pterodactyl Application API key with only the read permissions required to list servers. Do not grant server create, update, delete, power, or user-management permissions.
-- Set \`node_id\` to the numeric ID of the node hosting these CS2 containers. The sample value is a placeholder.
+- Set `node_id` to the numeric ID of the node hosting these CS2 containers. The sample value is a placeholder.
 - The Docker image allowlist is based on the configured CS2 Egg image. If the Application API reports a different image string, add the verified image or the exact Egg ID to the allowlist.
-- For additional nodes, configure \`node_query_hosts\` as a map from numeric node ID to the IP bound by Docker for that node. Keep public connect hosts separate if nodes use different public addresses.
+- For additional nodes, configure `node_query_hosts` as a map from numeric node ID to the IP bound by Docker for that node. Keep public connect hosts separate if nodes use different public addresses.
 - The endpoint's HMAC key is separate from WeaponPaints. The current Linux API still uses its existing nonce table for request replay protection.
+
+## Active Nginx vhost
+
+The tracked Nginx examples include the new exact route, but the active server config is not changed by a Git pull. Before testing the API, add this location inside the existing TLS server block in /etc/nginx/sites-available/fragcity-api.conf:
+
+~~~nginx
+location = /v1/server-browser {
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+    fastcgi_param SCRIPT_NAME /index.php;
+    fastcgi_param HTTP_X_FRAGCITY_TIMESTAMP $http_x_fragcity_timestamp;
+    fastcgi_param HTTP_X_FRAGCITY_NONCE $http_x_fragcity_nonce;
+    fastcgi_param HTTP_X_FRAGCITY_SIGNATURE $http_x_fragcity_signature;
+    fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+}
+~~~
+
+Then validate and reload:
+
+~~~bash
+sudo nginx -t
+sudo systemctl reload nginx
+~~~
+
+Do not replace the entire active API vhost, and do not modify the Pterodactyl Panel vhost.
 
 ## Cache directory and worker
 
-The worker and PHP-FPM both run as \`www-data\` on the current setup. Create the cache directory:
+The worker and PHP-FPM both run as `www-data` on the current setup. Create the cache directory:
 
 ~~~bash
 sudo install -d -o www-data -g www-data -m 0750 /var/cache/fragcity-api
 ~~~
 
-After deploying the repository's updated \`linuxapi/\` directory to \`/var/www/fragcity-api/\`, install the systemd examples:
+After deploying the repository's updated `linuxapi/` directory to `/var/www/fragcity-api/`, install the systemd examples:
 
 ~~~bash
 sudo install -o root -g root -m 0644 \
@@ -109,9 +134,9 @@ The timer refreshes the snapshot every 30 seconds. A refresh lock prevents overl
 
 ## Validation
 
-1. Run the worker manually; expected output starts with \`PASS: refreshed N CS2 allocation(s)\`.
-2. Confirm the JSON cache contains the discovered server list, and that each online server has \`app_id=730\` in the query result before it is published as online.
-3. Use the website's signed client with a read-only smoke test to call \`list_servers\`.
+1. Run the worker manually; expected output starts with `PASS: refreshed N CS2 allocation(s)`.
+2. Confirm the JSON cache contains the discovered server list, and that each online server has `app_id=730` in the query result before it is published as online.
+3. Use the website's signed client with a read-only smoke test to call `list_servers`.
 4. Open the Server Browser locally in Laragon. It should display the same cached snapshot as the production website.
 5. Check the website PHP error log if the API call fails. Check the systemd journal if discovery fails.
 
