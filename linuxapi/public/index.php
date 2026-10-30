@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 /**
  * FragCity Linux API v1.
- * Active routes: WeaponPaints and the cached public Server Browser.
+ * Active routes: WeaponPaints and the Pterodactyl Standby snapshot.
  * Legacy Windows-Agent routes are retired.
  * Only this file under public/ is routed by Nginx. Runtime settings are kept
  * outside the app and outside Git, normally at /etc/fragcity-api/config.php.
@@ -371,9 +371,9 @@ if ($method === 'GET' && $path === '/health') {
 if (str_starts_with($path, '/v1/agent/')) {
     apiRespond(410, ['status' => 'error', 'message' => 'legacy_agent_api_retired']);
 }
-$isServerBrowserRequest = $path === '/v1/server-browser';
+$isPterodactylStandbyRequest = $path === '/v1/pterodactyl-standby';
 $isWeaponPaintsRequest = $path === '/v1/weaponpaints';
-if (!$isServerBrowserRequest && !$isWeaponPaintsRequest) {
+if (!$isPterodactylStandbyRequest && !$isWeaponPaintsRequest) {
     apiRespond(404, ['success' => false, 'error' => 'not_found']);
 }
 if ($method !== 'POST') {
@@ -400,8 +400,8 @@ try {
 
 $secret = '';
 if (is_array($config)) {
-    $secret = $isServerBrowserRequest
-        ? (string)($config['server_browser']['shared_secret'] ?? '')
+    $secret = $isPterodactylStandbyRequest
+        ? (string)($config['pterodactyl_standby']['shared_secret'] ?? '')
         : (string)($config['shared_secret'] ?? '');
 }
 if (!preg_match('/^[a-f0-9]{64,128}$/D', $secret)) {
@@ -486,28 +486,28 @@ try {
         throw new InvalidArgumentException('Invalid action.');
     }
 
-    if ($isServerBrowserRequest) {
+    if ($isPterodactylStandbyRequest) {
         if ($action !== 'list_servers') {
             apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
         }
 
-        $serverConfig = is_array($config['server_browser'] ?? null)
-            ? $config['server_browser']
+        $serverConfig = is_array($config['pterodactyl_standby'] ?? null)
+            ? $config['pterodactyl_standby']
             : [];
         if (empty($serverConfig['enabled'])) {
-            apiRespond(503, ['success' => false, 'error' => 'server_browser_disabled']);
+            apiRespond(503, ['success' => false, 'error' => 'pterodactyl_standby_disabled']);
         }
 
         $cacheFile = trim((string)($serverConfig['cache_file'] ?? ''));
         if ($cacheFile === '' || !is_file($cacheFile) || !is_readable($cacheFile)) {
-            apiRespond(503, ['success' => false, 'error' => 'server_browser_cache_unavailable']);
+            apiRespond(503, ['success' => false, 'error' => 'pterodactyl_standby_cache_unavailable']);
         }
 
         $cacheRaw = file_get_contents($cacheFile);
         $snapshot = is_string($cacheRaw) ? json_decode($cacheRaw, true) : null;
         if (!is_array($snapshot) || !is_array($snapshot['servers'] ?? null)) {
-            error_log('[FragCity API] Server Browser cache is invalid.');
-            apiRespond(503, ['success' => false, 'error' => 'server_browser_cache_invalid']);
+            error_log('[FragCity API] Pterodactyl Standby cache is invalid.');
+            apiRespond(503, ['success' => false, 'error' => 'pterodactyl_standby_cache_invalid']);
         }
 
         $generatedAt = is_string($snapshot['generated_at'] ?? null)
@@ -515,7 +515,7 @@ try {
             : '';
         $generatedTimestamp = $generatedAt !== '' ? strtotime($generatedAt) : false;
         if ($generatedTimestamp === false) {
-            apiRespond(503, ['success' => false, 'error' => 'server_browser_cache_invalid']);
+            apiRespond(503, ['success' => false, 'error' => 'pterodactyl_standby_cache_invalid']);
         }
 
         $cacheAge = max(0, time() - $generatedTimestamp);
