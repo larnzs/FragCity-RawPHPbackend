@@ -31,6 +31,10 @@ return [
         'enabled' => false,
         'shared_secret' => 'REPLACE_WITH_A_SEPARATE_64_CHARACTER_HEX_SECRET',
         'max_servers' => 100,
+        // Set this only when fragcity-api runs on the same Linux machine as the given Wings node.
+        // Enables real host CPU/RAM/disk values from /proc and the configured data filesystem.
+        'local_node_id' => 0,
+        'host_metrics_disk_path' => '',
         // Explicit node IDs only. Leave empty until the real Pterodactyl node ID is known.
         'pterodactyl' => [
             'base_url' => 'https://server1.fragcity.ir',
