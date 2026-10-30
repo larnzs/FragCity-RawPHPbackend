@@ -101,7 +101,7 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 ## ۹. کنترل قبل از اجرا
 
 ```powershell
-php -r "$j=json_decode(file_get_contents('settings/settings.example.json'),true); if(!is_array($j)) {fwrite(STDERR,json_last_error_msg().PHP_EOL); exit(1);} echo 'Valid website settings example'.PHP_EOL;"
+php -r '$j=json_decode(file_get_contents("settings/settings.example.json"),true); if(!is_array($j)) {fwrite(STDERR,json_last_error_msg().PHP_EOL); exit(1);} echo "Valid website settings example".PHP_EOL;'
 php -l linuxapi/config.example.php
 php linuxapi/tools/architecture-check.php
 ```
