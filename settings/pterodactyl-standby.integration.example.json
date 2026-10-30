@@ -1,0 +1,8 @@
+{
+  "integrations": {
+    "pterodactyl_standby_api": {
+      "base_url": "https://api.fragcity.ir",
+      "shared_secret": "REPLACE_WITH_THE_MATCHING_PTERODACTYL_STANDBY_SECRET"
+    }
+  }
+}
