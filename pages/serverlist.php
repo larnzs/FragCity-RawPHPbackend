@@ -368,12 +368,12 @@ $statusLabels = [
                 </div>
                 <span class="sl-empty-kicker">SERVER DIRECTORY</span>
                 <h3>سرورها در حال آماده‌سازی‌اند</h3>
-                <p>بعد از ثبت سرورهای عمومی و اتصال A2S، اطلاعات زندهٔ نقشه، بازیکنان، ظرفیت و وضعیت هر سرور اینجا نمایش داده می‌شود.</p>
+                <p>پس از اجرای اولین Cron و شناسایی سرورهای فعال، نقشه، بازیکنان، ظرفیت و زمان پاسخ A2S اینجا نمایش داده می‌شود.</p>
                 <div class="sl-empty-status">
                     <span class="sl-empty-status-dot"></span>
-                    در انتظار اتصال A2S
+                    در انتظار اولین اسکن
                 </div>
-                <small>فعلاً هیچ IP یا آمار آزمایشی نمایش داده نمی‌شود.</small>
+                <small>فقط سرورهای تأییدشده با AppID 730 نمایش داده می‌شوند.</small>
             </div>
 
             <div class="sl-no-match" id="slNoMatch" hidden>
