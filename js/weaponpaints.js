@@ -4780,219 +4780,110 @@
         loadMoreId,
         ariaLabel
     ) {
-        if (!modalBody) {
-            return;
-        }
+        if (!modalBody) return;
 
+        // Match Select Paint: move metadata and search into the modal header.
         const headerTools = document.getElementById(headerToolsId);
-        const toolbar = modalBody.querySelector('.wp-addon-toolbar');
+        const toolbar = modalBody.querySelector('.wp-selection-toolbar');
 
         if (headerTools && toolbar) {
+            const toolbarInfo = toolbar.querySelector('.wp-selection-toolbar-info');
+            const toolbarSearch = toolbar.querySelector('.wp-selection-search');
             headerTools.replaceChildren();
-            toolbar.setAttribute('aria-label', ariaLabel);
-            headerTools.appendChild(toolbar);
+            headerTools.setAttribute('aria-label', ariaLabel);
+            if (toolbarInfo) headerTools.appendChild(toolbarInfo);
+            if (toolbarSearch) headerTools.appendChild(toolbarSearch);
+            toolbar.remove();
         }
 
         const grid = modalBody.querySelector('[id="' + gridId + '"]');
         const loadMore = modalBody.querySelector('[id="' + loadMoreId + '"]');
-        const propertiesCard = modalBody.querySelector('.wp-control-card');
+        const propertiesPane = modalBody.querySelector('.wp-addon-properties');
+        const listPane = modalBody.querySelector('.wp-addon-list-pane');
+        const scrollPane = modalBody.querySelector('.wp-addon-grid-scroll');
+        const workspace = modalBody.querySelector('.wp-addon-workspace');
         const footer = modalBody.querySelector('.selection-footer');
 
-        if (!grid || !loadMore || !propertiesCard || !footer) {
-            return;
-        }
+        if (!grid || !loadMore || !propertiesPane || !listPane || !scrollPane || !workspace || !footer) return;
 
-        const workspace = document.createElement('div');
-        workspace.className = 'wp-addon-workspace';
-
-        const propertiesPane = document.createElement('aside');
-        propertiesPane.className = 'wp-addon-properties';
         propertiesPane.setAttribute('aria-label', ariaLabel + ' properties');
-
-        const listPane = document.createElement('section');
-        listPane.className = 'wp-addon-list-pane';
         listPane.setAttribute('aria-label', ariaLabel + ' choices');
-
-        propertiesPane.appendChild(propertiesCard);
-        listPane.appendChild(grid);
+        scrollPane.appendChild(grid);
         listPane.appendChild(loadMore);
-        workspace.appendChild(propertiesPane);
-        workspace.appendChild(listPane);
-
-        modalBody.insertBefore(workspace, footer);
     }
 
 
-    function renderStickerModal() {
+        function renderStickerModal() {
+        if (!dom.stickerModalBody) return;
 
-        if (
-            !dom.stickerModalBody
-        ) {
+        const current = getStickerFormState();
+        const stickerCount = Object.keys(stickersData || {}).length;
+        const rawWear = Number.parseFloat(current.wear);
+        const wearPercent = Number.isFinite(rawWear)
+            ? Math.max(0, Math.min(100, Math.round(rawWear * 1000) / 10))
+            : 0.1;
 
-            return;
+        state.stickerPage = 0;
+        state.stickerFilter = '';
 
-        }
-
-
-        const current =
-            getStickerFormState();
-
-
-        state.stickerPage =
-            0;
-
-
-        state.stickerFilter =
-            '';
-
-
-        dom.stickerModalBody.innerHTML = `
-
-            <div class="wp-addon-toolbar">
-
-                <div class="wp-selection-toolbar-info">
-
-                    <span class="wp-meta-pill">
-
-                        <i class="fas fa-sticky-note"></i>
-
-                        Sticker
-
-                    </span>
-
-                </div>
-
-
-                <input
-                    type="search"
-                    id="stickerSearchInput"
-                    class="wp-addon-search"
-                    placeholder="جستجوی استیکر..."
-                    autocomplete="off"
-                >
-
-            </div>
-
-
-            <div
-                class="wp-addon-grid"
-                id="stickerGrid"
-            ></div>
-
-
-            <button
-                type="button"
-                class="wp-btn wp-btn--secondary"
-                id="stickerLoadMore"
-                hidden
-            >
-
-                <i class="fas fa-plus"></i>
-
-                نمایش بیشتر
-
-            </button>
-
-
-            <div class="wp-control-card">
-
-                <div class="wp-control-label">
-
-                    <span>
-                        Sticker Properties
-                    </span>
-
-                    <span class="wp-control-value">
-                        Advanced
-                    </span>
-
-                </div>
-
-
-                <div class="wp-skin-controls">
-
-
-                    <input
-                        type="number"
-                        id="stickerWear"
-                        class="wp-control-input"
-                        min="0"
-                        max="1"
-                        step="0.001"
-                        value="${escapeHtml(
-                            current.wear
-                        )}"
-                        placeholder="Wear"
-                    >
-
-
-                    <input
-                        type="number"
-                        id="stickerX"
-                        class="wp-control-input"
-                        value="${escapeHtml(
-                            current.x
-                        )}"
-                        placeholder="X"
-                    >
-
-
-                    <input
-                        type="number"
-                        id="stickerY"
-                        class="wp-control-input"
-                        value="${escapeHtml(
-                            current.y
-                        )}"
-                        placeholder="Y"
-                    >
-
-
-                    <input
-                        type="number"
-                        id="stickerScale"
-                        class="wp-control-input"
-                        step="0.01"
-                        value="${escapeHtml(
-                            current.scale
-                        )}"
-                        placeholder="Scale"
-                    >
-
-
-                    <input
-                        type="number"
-                        id="stickerRotate"
-                        class="wp-control-input"
-                        value="${escapeHtml(
-                            current.rotate
-                        )}"
-                        placeholder="Rotate"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <div class="selection-footer">
-
-                <button
-                    type="button"
-                    class="wp-btn wp-btn--primary"
-                    id="applyStickerButton"
-                >
-
-                    <i class="fas fa-check"></i>
-
-                    اعمال Sticker
-
-                </button>
-
-            </div>
-
-        `;
-
+        dom.stickerModalBody.innerHTML = [
+            '<div class="wp-selection-toolbar">',
+                '<div class="wp-selection-toolbar-info">',
+                    '<span class="wp-meta-pill"><i class="fas fa-sticky-note"></i> Sticker</span>',
+                    '<span class="wp-meta-pill"><i class="fas fa-layer-group"></i> ' + stickerCount + ' Stickers</span>',
+                '</div>',
+                '<div class="wp-selection-search">',
+                    '<input type="search" id="stickerSearchInput" class="wp-addon-search" placeholder="جستجوی استیکر..." autocomplete="off">',
+                '</div>',
+            '</div>',
+            '<div class="wp-addon-workspace">',
+                '<aside class="wp-addon-properties" aria-label="Sticker properties">',
+                    '<div class="wp-control-card wp-addon-settings-card">',
+                        '<div class="wp-control-label">',
+                            '<span>Sticker Properties</span>',
+                            '<span class="wp-control-value">Slot ' + (Number(state.currentStickerSlot) + 1) + '</span>',
+                        '</div>',
+                        '<div class="wp-addon-settings-grid">',
+                            '<div class="wp-setting-card wp-setting-card--wear wp-addon-setting--wide">',
+                                '<div class="wp-setting-heading">',
+                                    '<span class="wp-setting-icon" aria-hidden="true"><i class="fas fa-tint"></i></span>',
+                                    '<div class="wp-setting-heading-copy">',
+                                        '<label class="wp-setting-title" for="stickerWear">Sticker Wear</label>',
+                                        '<span class="wp-control-value" id="stickerWearValue">' + wearPercent.toFixed(1) + '%</span>',
+                                    '</div>',
+                                '</div>',
+                                '<input type="range" id="stickerWear" class="wp-range wp-addon-wear-range" min="0" max="100" step="0.1" value="' + wearPercent + '" aria-label="Sticker Wear, 0 to 100 percent">',
+                                '<div class="wp-addon-range-scale"><span>0%</span><span>100%</span></div>',
+                            '</div>',
+                            '<label class="wp-addon-field" for="stickerX">',
+                                '<span class="wp-setting-title">Position X</span>',
+                                '<input type="number" id="stickerX" class="wp-control-input" step="0.01" value="' + escapeHtml(current.x) + '" placeholder="X">',
+                            '</label>',
+                            '<label class="wp-addon-field" for="stickerY">',
+                                '<span class="wp-setting-title">Position Y</span>',
+                                '<input type="number" id="stickerY" class="wp-control-input" step="0.01" value="' + escapeHtml(current.y) + '" placeholder="Y">',
+                            '</label>',
+                            '<label class="wp-addon-field" for="stickerScale">',
+                                '<span class="wp-setting-title">Scale</span>',
+                                '<input type="number" id="stickerScale" class="wp-control-input" step="0.01" min="0.01" value="' + escapeHtml(current.scale) + '" placeholder="Scale">',
+                            '</label>',
+                            '<label class="wp-addon-field" for="stickerRotate">',
+                                '<span class="wp-setting-title">Rotation</span>',
+                                '<input type="number" id="stickerRotate" class="wp-control-input" step="1" value="' + escapeHtml(current.rotate) + '" placeholder="Degrees">',
+                            '</label>',
+                        '</div>',
+                        '<p class="wp-addon-settings-hint"><i class="fas fa-info-circle" aria-hidden="true"></i> Position and rotation values are available here; live preview support will be refined later.</p>',
+                    '</div>',
+                '</aside>',
+                '<section class="wp-addon-list-pane" aria-label="Sticker choices">',
+                    '<div class="wp-skin-grid-scroll wp-addon-grid-scroll"><div class="wp-addon-grid" id="stickerGrid"></div></div>',
+                    '<button type="button" class="wp-btn wp-btn--secondary" id="stickerLoadMore" hidden><i class="fas fa-plus"></i> نمایش بیشتر</button>',
+                '</section>',
+            '</div>',
+            '<div class="selection-footer">',
+                '<button type="button" class="wp-btn wp-btn--primary" id="applyStickerButton"><i class="fas fa-check"></i> اعمال Sticker</button>',
+            '</div>'
+        ].join('\n');
 
         prepareAddonModalLayout(
             dom.stickerModalBody,
@@ -5004,11 +4895,10 @@
 
         renderStickerPage(false);
         bindStickerModalEvents();
-
     }
 
 
-    function getFilteredStickerIds() {
+        function getFilteredStickerIds() {
 
         const ids =
             Object.keys(
@@ -5379,6 +5269,15 @@
         }
 
 
+        const wearInput = document.getElementById('stickerWear');
+        const wearValue = document.getElementById('stickerWearValue');
+        if (wearInput && wearValue) {
+            wearInput.addEventListener('input', () => {
+                const value = Number(wearInput.value);
+                wearValue.textContent = (Number.isFinite(value) ? value : 0).toFixed(1) + '%';
+            });
+        }
+
         const applyButton =
             document.getElementById(
                 'applyStickerButton'
@@ -5441,13 +5340,17 @@
         );
 
 
+        const stickerWearPercent = Number(
+            document.getElementById('stickerWear')?.value ?? 0.1
+        );
+        const stickerWearValue = Number.isFinite(stickerWearPercent)
+            ? Math.max(0, Math.min(100, stickerWearPercent)) / 100
+            : 0.001;
+
         setFormValue(
             form,
-            `sticker[${slot}][wear]`,
-            document.getElementById(
-                'stickerWear'
-            )?.value ||
-            '0.001'
+            'sticker[' + slot + '][wear]',
+            stickerWearValue.toFixed(3)
         );
 
 
@@ -5673,159 +5576,61 @@
 
 
     function renderKeychainModal() {
+        if (!dom.keychainModalBody) return;
 
-        if (
-            !dom.keychainModalBody
-        ) {
+        const current = getKeychainFormState();
+        const keychainCount = Object.keys(keychainsData || {}).length;
 
-            return;
+        state.keychainPage = 0;
+        state.keychainFilter = '';
 
-        }
-
-
-        const current =
-            getKeychainFormState();
-
-
-        state.keychainPage =
-            0;
-
-
-        state.keychainFilter =
-            '';
-
-
-        dom.keychainModalBody.innerHTML = `
-
-            <div class="wp-addon-toolbar">
-
-                <div class="wp-selection-toolbar-info">
-
-                    <span class="wp-meta-pill">
-
-                        <i class="fas fa-key"></i>
-
-                        Keychain
-
-                    </span>
-
-                </div>
-
-
-                <input
-                    type="search"
-                    id="keychainSearchInput"
-                    class="wp-addon-search"
-                    placeholder="جستجوی جاکلیدی..."
-                    autocomplete="off"
-                >
-
-            </div>
-
-
-            <div
-                class="wp-addon-grid"
-                id="keychainGrid"
-            ></div>
-
-
-            <button
-                type="button"
-                class="wp-btn wp-btn--secondary"
-                id="keychainLoadMore"
-                hidden
-            >
-
-                <i class="fas fa-plus"></i>
-
-                نمایش بیشتر
-
-            </button>
-
-
-            <div class="wp-control-card">
-
-                <div class="wp-control-label">
-
-                    <span>
-                        Keychain Properties
-                    </span>
-
-                    <span class="wp-control-value">
-                        Advanced
-                    </span>
-
-                </div>
-
-
-                <div class="wp-skin-controls">
-
-                    <input
-                        type="number"
-                        id="keychainSeed"
-                        class="wp-control-input"
-                        value="${escapeHtml(
-                            current.seed
-                        )}"
-                        placeholder="Seed"
-                    >
-
-
-                    <input
-                        type="number"
-                        id="keychainX"
-                        class="wp-control-input"
-                        value="${escapeHtml(
-                            current.x
-                        )}"
-                        placeholder="X"
-                    >
-
-
-                    <input
-                        type="number"
-                        id="keychainY"
-                        class="wp-control-input"
-                        value="${escapeHtml(
-                            current.y
-                        )}"
-                        placeholder="Y"
-                    >
-
-
-                    <input
-                        type="number"
-                        id="keychainZ"
-                        class="wp-control-input"
-                        value="${escapeHtml(
-                            current.z
-                        )}"
-                        placeholder="Z"
-                    >
-
-                </div>
-
-            </div>
-
-
-            <div class="selection-footer">
-
-                <button
-                    type="button"
-                    class="wp-btn wp-btn--primary"
-                    id="applyKeychainButton"
-                >
-
-                    <i class="fas fa-check"></i>
-
-                    اعمال Keychain
-
-                </button>
-
-            </div>
-
-        `;
-
+        dom.keychainModalBody.innerHTML = [
+            '<div class="wp-selection-toolbar">',
+                '<div class="wp-selection-toolbar-info">',
+                    '<span class="wp-meta-pill"><i class="fas fa-key"></i> Keychain</span>',
+                    '<span class="wp-meta-pill"><i class="fas fa-layer-group"></i> ' + keychainCount + ' Keychains</span>',
+                '</div>',
+                '<div class="wp-selection-search">',
+                    '<input type="search" id="keychainSearchInput" class="wp-addon-search" placeholder="جستجوی جاکلیدی..." autocomplete="off">',
+                '</div>',
+            '</div>',
+            '<div class="wp-addon-workspace">',
+                '<aside class="wp-addon-properties" aria-label="Keychain properties">',
+                    '<div class="wp-control-card wp-addon-settings-card">',
+                        '<div class="wp-control-label">',
+                            '<span>Keychain Properties</span>',
+                            '<span class="wp-control-value">Position</span>',
+                        '</div>',
+                        '<div class="wp-addon-settings-grid">',
+                            '<label class="wp-addon-field" for="keychainSeed">',
+                                '<span class="wp-setting-title">Seed</span>',
+                                '<input type="number" id="keychainSeed" class="wp-control-input" value="' + escapeHtml(current.seed) + '" placeholder="Seed">',
+                            '</label>',
+                            '<label class="wp-addon-field" for="keychainX">',
+                                '<span class="wp-setting-title">Position X</span>',
+                                '<input type="number" id="keychainX" class="wp-control-input" step="0.01" value="' + escapeHtml(current.x) + '" placeholder="X">',
+                            '</label>',
+                            '<label class="wp-addon-field" for="keychainY">',
+                                '<span class="wp-setting-title">Position Y</span>',
+                                '<input type="number" id="keychainY" class="wp-control-input" step="0.01" value="' + escapeHtml(current.y) + '" placeholder="Y">',
+                            '</label>',
+                            '<label class="wp-addon-field" for="keychainZ">',
+                                '<span class="wp-setting-title">Position Z</span>',
+                                '<input type="number" id="keychainZ" class="wp-control-input" step="0.01" value="' + escapeHtml(current.z) + '" placeholder="Z">',
+                            '</label>',
+                        '</div>',
+                        '<p class="wp-addon-settings-hint"><i class="fas fa-info-circle" aria-hidden="true"></i> تنظیمات Seed و موقعیت در این پنل قرار دارند.</p>',
+                    '</div>',
+                '</aside>',
+                '<section class="wp-addon-list-pane" aria-label="Keychain choices">',
+                    '<div class="wp-skin-grid-scroll wp-addon-grid-scroll"><div class="wp-addon-grid" id="keychainGrid"></div></div>',
+                    '<button type="button" class="wp-btn wp-btn--secondary" id="keychainLoadMore" hidden><i class="fas fa-plus"></i> نمایش بیشتر</button>',
+                '</section>',
+            '</div>',
+            '<div class="selection-footer">',
+                '<button type="button" class="wp-btn wp-btn--primary" id="applyKeychainButton"><i class="fas fa-check"></i> اعمال Keychain</button>',
+            '</div>'
+        ].join('\n');
 
         prepareAddonModalLayout(
             dom.keychainModalBody,
@@ -5837,11 +5642,10 @@
 
         renderKeychainPage(false);
         bindKeychainModalEvents();
-
     }
 
 
-    function getFilteredKeychainIds() {
+        function getFilteredKeychainIds() {
 
         const ids =
             Object.keys(
