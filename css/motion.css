@@ -1,0 +1,106 @@
+/*
+ * FragCity Motion System
+ * Reusable opt-in transitions and reveal animations.
+ */
+
+.fc-motion-fade-in {
+    animation: fc-fade-in var(--fc-duration-enter) var(--fc-ease-standard) both;
+}
+
+.fc-motion-rise-in {
+    animation: fc-rise-in var(--fc-duration-enter) var(--fc-ease-emphasized) both;
+}
+
+.fc-motion-scale-in {
+    animation: fc-scale-in var(--fc-duration-slow) var(--fc-ease-emphasized) both;
+}
+
+.fc-motion-hover-lift {
+    transition: transform var(--fc-duration-normal) var(--fc-ease-standard);
+}
+
+@media (hover: hover) {
+    .fc-motion-hover-lift:hover {
+        transform: translateY(-3px);
+    }
+}
+
+html.fc-motion-ready [data-fc-reveal] {
+    opacity: 0;
+    transition:
+        opacity var(--fc-duration-enter) var(--fc-ease-standard) var(--fc-reveal-delay, 0ms),
+        transform var(--fc-duration-enter) var(--fc-ease-emphasized) var(--fc-reveal-delay, 0ms);
+    will-change: opacity, transform;
+}
+
+html.fc-motion-ready [data-fc-reveal="up"] {
+    transform: translateY(18px);
+}
+
+html.fc-motion-ready [data-fc-reveal="down"] {
+    transform: translateY(-18px);
+}
+
+html.fc-motion-ready [data-fc-reveal="left"] {
+    transform: translateX(18px);
+}
+
+html.fc-motion-ready [data-fc-reveal="right"] {
+    transform: translateX(-18px);
+}
+
+html.fc-motion-ready [data-fc-reveal="fade"] {
+    transform: none;
+}
+
+html.fc-motion-ready [data-fc-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+}
+
+@keyframes fc-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fc-rise-in {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fc-scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fc-motion-fade-in,
+    .fc-motion-rise-in,
+    .fc-motion-scale-in {
+        animation: none !important;
+    }
+
+    .fc-motion-hover-lift {
+        transition: none !important;
+    }
+
+    html.fc-motion-ready [data-fc-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        transition: none !important;
+        will-change: auto;
+    }
+}
