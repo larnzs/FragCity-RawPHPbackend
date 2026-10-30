@@ -47,6 +47,9 @@ $sidebarTranslations = [
         'overview' =>
             'نمای کلی',
 
+        'monitoring' =>
+            'مانیتورینگ',
+
         'servers' =>
             'سرورها',
 
@@ -90,6 +93,9 @@ $sidebarTranslations = [
 
         'overview' =>
             'Overview',
+
+        'monitoring' =>
+            'Monitoring',
 
         'servers' =>
             'Servers',
@@ -180,6 +186,21 @@ $sidebarItems = [
         'active_pages' => [
             'overview',
             'dashboard'
+        ]
+    ],
+
+    [
+        'key' =>
+            'monitoring',
+
+        'href' =>
+            'monitoring.php',
+
+        'icon' =>
+            'fa-solid fa-chart-line',
+
+        'active_pages' => [
+            'monitoring'
         ]
     ],
 
@@ -462,6 +483,11 @@ function panelSidebarEscape($value)
 
 
             <?php
+
+            if ($sidebarItem['key'] === 'monitoring'
+                && (string)($_SESSION['role'] ?? '') !== 'admin') {
+                continue;
+            }
 
             $itemKey =
                 $sidebarItem['key'];
