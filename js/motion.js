@@ -14,7 +14,7 @@
         : null;
     const reducedMotion = Boolean(reducedMotionQuery && reducedMotionQuery.matches);
 
-    root.classList.add('fc-motion-enabled');
+    root.classList.add('fc-motion-enabled', 'fc-motion-ready');
 
     const revealSelector = [
         '.profile-hero','.profile-identity-strip','.profile-progress-item',
