@@ -1,0 +1,8 @@
+{
+  "integrations": {
+    "server_browser_api": {
+      "base_url": "https://api.fragcity.ir",
+      "shared_secret": "REPLACE_WITH_THE_MATCHING_SERVER_BROWSER_SHARED_SECRET"
+    }
+  }
+}
