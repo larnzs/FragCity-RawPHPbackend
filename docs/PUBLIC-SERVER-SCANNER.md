@@ -83,7 +83,20 @@ Each runner needs all of the following:
 
 The runner can be on a different machine from the website and game server. In that case, its host must be allowed to connect to the website's MySQL/MariaDB server. Restrict remote database access to the runner's fixed IP where possible; do not expose MySQL to the public internet. If the database provider only permits connections from the website account itself, run the Cron on that same hosting account.
 
-The runtime settings file is selected through the existing `FRAGCITY_SETTINGS_FILE` environment variable. The runner also supports these optional per-host overrides:
+The runtime settings file is selected through the existing `FRAGCITY_SETTINGS_FILE` environment variable. The runner also reads an optional `public_server_scanner` object from that JSON file:
+
+~~~json
+{
+  "public_server_scanner": {
+    "database_profile": "main",
+    "max_ports_per_run": 256,
+    "batch_size": 32,
+    "time_limit_seconds": 30
+  }
+}
+~~~
+
+Environment variables shown below override the matching JSON values and are useful when the same code is deployed to multiple hosts with different resource limits. The database profile can also be overridden per runner.
 
 | Environment variable | Default | Purpose |
 |---|---:|---|
