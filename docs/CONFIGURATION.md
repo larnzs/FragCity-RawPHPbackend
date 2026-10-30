@@ -24,6 +24,19 @@
 
 دیتابیس `GLOBAL_weaponpaints` روی سرور Linux قرار دارد. وب‌سایت با `class/FragCityLinuxApiClient.php` و `class/WeaponPaintsRepository.php` از طریق `https://api.fragcity.ir/v1/weaponpaints` درخواست امضاشده می‌فرستد. در `settings.json` نباید پروفایل اتصال مستقیم `weaponpaints` یا نام دیتابیس قدیمی `kyonxcbt_weaponpaints_plugin` تعریف شود.
 
+### Server Browser
+
+فهرست سرورهای عمومی نیز Integration مستقل دارد:
+
+- `integrations.server_browser_api.base_url`: آدرس HTTPS سرویس Linux API، معمولاً `https://api.fragcity.ir`.
+- `integrations.server_browser_api.shared_secret`: کلید HMAC مستقل Server Browser؛ با Secret مربوط به WeaponPaints یکی نباشد.
+- Client سایت: `class/FragCityServerBrowserApiClient.php`.
+- Repository سایت: `class/ServerBrowserRepository.php`.
+
+این بخش را از `settings/server-browser.integration.example.json` در فایل خصوصی `settings/settings.json` ادغام کن؛ کل فایل تنظیمات را جایگزین نکن. Laragon و Production می‌توانند از همین API استفاده کنند. هیچ Pterodactyl token یا UDP query از مرورگر بازدیدکننده انجام نمی‌شود.
+
+در Linux، Worker زمان‌بندی‌شده با Application API پنل، Allocationهای سرورهای مجاز را پیدا می‌کند، A2S را از مسیر داخلی می‌پرسد و Snapshot را Cache می‌کند. IP داخلی Query و IP عمومی اتصال مستقل‌اند. جزئیات نصب در `docs/SERVER-BROWSER-API.md` آمده است.
+
 ### قابلیت‌های سرور
 
 جداولی مانند `agent_tokens`, `agent_nodes`, `pending_servers`, `registered_servers`, `server_ports`, `agent_commands` و `server_configs` مربوط به سیستم قدیمی Windows Agent بودند و در schema جاری وجود ندارند. endpointهای قدیمی Agent با HTTP 410 بازنشسته شده‌اند. خرید و مدیریت سرور تا تکمیل اتصال جدید به Pterodactyl، عمداً غیرفعال است و نباید پرداخت/کسر کیف پول یا query به جدول‌های قدیمی انجام دهد.
