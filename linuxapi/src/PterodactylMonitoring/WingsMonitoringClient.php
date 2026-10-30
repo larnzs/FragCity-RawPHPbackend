@@ -107,20 +107,34 @@ final class FragCityWingsMonitoringClient
 
     private function isPrivateHost(string $host): bool
     {
-        $host = trim($host, '[]');
-        if (strtolower($host) === 'localhost') {
+        $host = strtolower(trim($host, '[]'));
+        if ($host === 'localhost') {
             return true;
         }
 
-        $ip = filter_var($host, FILTER_VALIDATE_IP);
-        if ($ip === false) {
+        $packed = @inet_pton($host);
+        if (!is_string($packed)) {
             return false;
         }
 
-        return filter_var(
-            $ip,
-            FILTER_VALIDATE_IP,
-            FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
-        ) === false;
+        if (strlen($packed) === 4) {
+            $a = ord($packed[0]);
+            $b = ord($packed[1]);
+
+            return $a === 10
+                || $a === 127
+                || ($a === 192 && $b === 168)
+                || ($a === 172 && $b >= 16 && $b <= 31)
+                || ($a === 169 && $b === 254);
+        }
+
+        // IPv6 loopback, unique-local (fc00::/7), and link-local (fe80::/10).
+        $first = ord($packed[0]);
+        $second = ord($packed[1]);
+        $isLoopback = $packed === str_repeat("\x00", 15) . "\x01";
+        $isUniqueLocal = ($first & 0xFE) === 0xFC;
+        $isLinkLocal = $first === 0xFE && ($second & 0xC0) === 0x80;
+
+        return $isLoopback || $isUniqueLocal || $isLinkLocal;
     }
 }
