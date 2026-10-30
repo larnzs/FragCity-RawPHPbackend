@@ -1,0 +1,12 @@
+[Unit]
+Description=Refresh FragCity public CS2 Server Browser every 30 seconds
+
+[Timer]
+OnBootSec=20s
+OnUnitActiveSec=30s
+AccuracySec=5s
+Persistent=true
+Unit=fragcity-server-browser-refresh.service
+
+[Install]
+WantedBy=timers.target
