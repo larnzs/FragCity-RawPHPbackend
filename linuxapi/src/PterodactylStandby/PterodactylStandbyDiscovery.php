@@ -5,8 +5,9 @@ require_once __DIR__ . '/A2SInfoQuery.php';
 require_once __DIR__ . '/PterodactylApplicationClient.php';
 
 /**
- * Joins Pterodactyl's allocation inventory with live A2S_INFO responses.
- * The public website never triggers discovery or performs UDP requests.
+ * Joins explicitly allowlisted Pterodactyl allocations with live A2S_INFO.
+ * Every query target comes from the server's default allocation; no port-range
+ * scan or visitor-supplied host/port is accepted.
  */
 final class PterodactylStandbyDiscovery
 {
@@ -33,19 +34,17 @@ final class PterodactylStandbyDiscovery
         $this->a2s = new FragCityA2SInfoQuery((int)($serverConfig['query_timeout_ms'] ?? 1500));
     }
 
+    /** @return array<int, array<string, mixed>> */
     public function discover(): array
     {
         $candidates = $this->pterodactyl->listCs2Servers();
         $maxServers = max(1, min(100, (int)($this->serverConfig['max_servers'] ?? 40)));
-        if (count($candidates) > $maxServers) {
-            $candidates = array_slice($candidates, 0, $maxServers);
-        }
+        $candidates = array_slice($candidates, 0, $maxServers);
 
         $defaultPublicHost = trim((string)($this->serverConfig['public_connect_host'] ?? ''));
         $nodePublicHosts = is_array($this->serverConfig['node_public_connect_hosts'] ?? null)
             ? $this->serverConfig['node_public_connect_hosts']
             : [];
-
         $defaultQueryHost = trim((string)($this->serverConfig['query_host'] ?? ''));
         $nodeQueryHosts = is_array($this->serverConfig['node_query_hosts'] ?? null)
             ? $this->serverConfig['node_query_hosts']
@@ -53,6 +52,8 @@ final class PterodactylStandbyDiscovery
         $region = trim((string)($this->serverConfig['region'] ?? ''));
 
         $rows = [];
+        $queryGroups = [];
+
         foreach ($candidates as $candidate) {
             $nodeId = (int)$candidate['node_id'];
             $publicHost = trim((string)($nodePublicHosts[(string)$nodeId] ?? $defaultPublicHost));
@@ -66,7 +67,8 @@ final class PterodactylStandbyDiscovery
             }
 
             $port = (int)$candidate['game_port'];
-            $row = [
+            $rowIndex = count($rows);
+            $rows[] = [
                 'id' => substr(hash('sha256', $candidate['server_uuid'] . ':' . $candidate['allocation_id']), 0, 16),
                 'name' => $candidate['server_name'] !== '' ? $candidate['server_name'] : 'CS2 Community Server',
                 'host' => $publicHost,
@@ -85,40 +87,70 @@ final class PterodactylStandbyDiscovery
             ];
 
             if (!$candidate['suspended'] && $candidate['installed']) {
+                $queryGroups[$queryHost][] = [
+                    'row_index' => $rowIndex,
+                    'allocation_id' => (int)$candidate['allocation_id'],
+                    'port' => $port,
+                ];
+            }
+        }
+
+        // Query only Pterodactyl's explicit default allocations. Concurrent
+        // UDP queries keep the total request bounded by one A2S timeout per batch.
+        foreach ($queryGroups as $queryHost => $allocations) {
+            foreach (array_chunk($allocations, 32) as $allocationBatch) {
+                $ports = array_map(
+                    static fn(array $allocation): int => (int)$allocation['port'],
+                    $allocationBatch
+                );
+
                 try {
-                    $info = $this->a2s->query($queryHost, $port);
-                    if ((int)($info['app_id'] ?? 0) !== 730) {
-                        throw new RuntimeException('Allocation did not answer as Counter-Strike 2.');
+                    $results = $this->a2s->queryBatch((string)$queryHost, $ports);
+                } catch (Throwable $e) {
+                    error_log(
+                        '[FragCity ServerBrowser] A2S batch failed; type=' . get_class($e)
+                    );
+                    continue;
+                }
+
+                foreach ($allocationBatch as $allocation) {
+                    $port = (int)$allocation['port'];
+                    $result = $results[$port] ?? [];
+                    $info = is_array($result['info'] ?? null) ? $result['info'] : null;
+
+                    if ($info === null || (int)($info['app_id'] ?? 0) !== 730) {
+                        if (is_string($result['error'] ?? null)) {
+                            error_log(
+                                '[FragCity ServerBrowser] A2S query failed for allocation '
+                                . (int)$allocation['allocation_id']
+                                . '; reason=' . substr($result['error'], 0, 80)
+                            );
+                        }
+                        continue;
                     }
 
+                    $rowIndex = (int)$allocation['row_index'];
                     $name = trim((string)($info['name'] ?? ''));
-                    $row['name'] = $name !== '' ? $name : $row['name'];
-                    $row['mode'] = $this->extractMode($row['name']);
-                    $row['map'] = trim((string)($info['map'] ?? '')) ?: 'Unknown';
-                    $row['status'] = 'online';
-                    $row['players'] = max(0, (int)($info['players'] ?? 0));
-                    $row['max_players'] = max(0, (int)($info['max_players'] ?? 0));
-                    if ($row['max_players'] > 0) {
-                        $row['players'] = min($row['players'], $row['max_players']);
-                    } else {
-                        $row['players'] = 0;
-                    }
-                    $row['query_rtt_ms'] = isset($info['query_rtt_ms'])
+                    $maxPlayers = max(0, (int)($info['max_players'] ?? 0));
+                    $players = max(0, (int)($info['players'] ?? 0));
+
+                    $rows[$rowIndex]['name'] = $name !== ''
+                        ? $name
+                        : $rows[$rowIndex]['name'];
+                    $rows[$rowIndex]['mode'] = $this->extractMode($rows[$rowIndex]['name']);
+                    $rows[$rowIndex]['map'] = trim((string)($info['map'] ?? '')) ?: 'Unknown';
+                    $rows[$rowIndex]['status'] = 'online';
+                    $rows[$rowIndex]['players'] = $maxPlayers > 0
+                        ? min($players, $maxPlayers)
+                        : 0;
+                    $rows[$rowIndex]['max_players'] = $maxPlayers;
+                    $rows[$rowIndex]['query_rtt_ms'] = isset($info['query_rtt_ms'])
                         ? round(max(0, (float)$info['query_rtt_ms']), 2)
                         : null;
-                    $row['vac'] = (bool)($info['vac'] ?? false);
-                    $row['password'] = (bool)($info['password'] ?? false);
-                } catch (Throwable $e) {
-                    // A failed query marks only this allocation offline. Log the
-                    // allocation and exception type, never the Pterodactyl token.
-                    error_log(
-                        '[FragCity ServerBrowser] A2S query failed for allocation '
-                        . (int)$candidate['allocation_id'] . '; type=' . get_class($e)
-                    );
+                    $rows[$rowIndex]['vac'] = (bool)($info['vac'] ?? false);
+                    $rows[$rowIndex]['password'] = (bool)($info['password'] ?? false);
                 }
             }
-
-            $rows[] = $row;
         }
 
         usort($rows, static function (array $left, array $right): int {
