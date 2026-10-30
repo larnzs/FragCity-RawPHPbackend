@@ -28,6 +28,7 @@ final class PterodactylStandbyDiscovery
         $pteroConfig = is_array($serverConfig['pterodactyl'] ?? null)
             ? $serverConfig['pterodactyl']
             : [];
+        $pteroConfig['max_servers'] = max(1, min(100, (int)($serverConfig['max_servers'] ?? 40)));
 
         $this->serverConfig = $serverConfig;
         $this->pterodactyl = new FragCityPterodactylApplicationClient($pteroConfig);
