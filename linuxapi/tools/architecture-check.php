@@ -142,6 +142,7 @@ $check(
 $check(
     'Portable CLI runner supports environment-specific settings and resource limits',
     str_contains($publicWorker, "PHP_SAPI !== 'cli'")
+        && str_contains($settingsLoader, 'FRAGCITY_SETTINGS_FILE')
         && str_contains($publicWorker, 'FRAGCITY_SERVER_BROWSER_DB_PROFILE')
         && str_contains($publicWorker, 'FRAGCITY_SERVER_BROWSER_MAX_PER_RUN')
         && str_contains($publicWorker, 'FRAGCITY_SERVER_BROWSER_BATCH_SIZE')
