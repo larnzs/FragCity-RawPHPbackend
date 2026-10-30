@@ -90,9 +90,7 @@ try {
     exit(2);
 }
 
-if ($timeLimitSeconds > 0) {
-    @set_time_limit($timeLimitSeconds);
-}
+@set_time_limit($timeLimitSeconds);
 
 if (!class_exists(PDO::class)
     || !in_array('mysql', PDO::getAvailableDrivers(), true)) {
