@@ -57,7 +57,10 @@ return [
         'enabled' => false,
         'shared_secret' => 'REPLACE_WITH_A_SEPARATE_64_CHARACTER_HEX_SECRET',
         'cache_file' => '/var/cache/fragcity-api/pterodactyl-standby.json',
-        'cache_max_age_seconds' => 180,
+        // On-demand response cache: first website request after TTL refreshes Pterodactyl + A2S.
+        'cache_ttl_seconds' => 10,
+        // During an upstream outage, keep the last good snapshot for at most this many seconds.
+        'cache_max_stale_seconds' => 180,
         'public_connect_host' => '85.185.40.85',
         'query_host' => '192.168.2.3',
         // Optional overrides keyed by numeric Pterodactyl node ID:
