@@ -119,7 +119,7 @@ $check(
 $check(
     'Linux Server Browser endpoint uses its own secret and reads the cached snapshot',
     str_contains($index, "'/v1/server-browser'")
-        && str_contains($index, "$config['server_browser']['shared_secret']")
+        && str_contains($index, '$config[\'server_browser\'][\'shared_secret\']')
         && str_contains($index, 'server_browser_cache_unavailable')
         && str_contains($index, 'server_browser_cache_invalid')
 );
