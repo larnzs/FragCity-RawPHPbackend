@@ -2,8 +2,11 @@
 declare(strict_types=1);
 
 /**
- * Minimal, bounded Source A2S_INFO client for known Pterodactyl allocations.
- * It does not scan ports: callers must provide an explicit host and port.
+ * Source A2S_INFO client for explicitly supplied Pterodactyl allocations.
+ *
+ * queryBatch() sends one UDP request per allocation before waiting for any
+ * reply, so a batch is bounded by one response timeout rather than the sum
+ * of every server timeout. This class never scans arbitrary port ranges.
  */
 final class FragCityA2SInfoQuery
 {
@@ -16,74 +19,213 @@ final class FragCityA2SInfoQuery
 
     public function query(string $host, int $port): array
     {
-        if (filter_var($host, FILTER_VALIDATE_IP) === false) {
-            throw new InvalidArgumentException('A2S query host must be an IP address.');
-        }
-        if ($port < 1 || $port > 65535) {
-            throw new InvalidArgumentException('A2S query port is out of range.');
-        }
+        $results = $this->queryBatch($host, [$port]);
+        $result = $results[$port] ?? null;
 
-        $urlHost = str_contains($host, ':') ? '[' . $host . ']' : $host;
-        $errno = 0;
-        $error = '';
-        $timeout = $this->timeoutMs / 1000;
-        $socket = @stream_socket_client(
-            'udp://' . $urlHost . ':' . $port,
-            $errno,
-            $error,
-            $timeout,
-            STREAM_CLIENT_CONNECT
-        );
-
-        if (!is_resource($socket)) {
-            throw new RuntimeException('Could not open A2S UDP socket; code=' . $errno);
+        if (!is_array($result) || !is_array($result['info'] ?? null)) {
+            $error = is_array($result) && is_string($result['error'] ?? null)
+                ? $result['error']
+                : 'A2S query returned no result.';
+            throw new RuntimeException($error);
         }
 
-        $seconds = intdiv($this->timeoutMs, 1000);
-        $microseconds = ($this->timeoutMs % 1000) * 1000;
-        stream_set_timeout($socket, $seconds, $microseconds);
-
-        $packet = "\xFF\xFF\xFF\xFF\x54Source Engine Query\x00";
-        $started = hrtime(true);
-
-        try {
-            $response = $this->exchange($socket, $packet);
-            if (substr($response, 0, 5) === "\xFF\xFF\xFF\xFF\x41") {
-                if (strlen($response) < 9) {
-                    throw new RuntimeException('A2S challenge response is incomplete.');
-                }
-
-                $response = $this->exchange($socket, $packet . substr($response, 5, 4));
-            }
-
-            $elapsedMs = (hrtime(true) - $started) / 1000000;
-            $parsed = $this->parseInfoResponse($response);
-            $parsed['query_rtt_ms'] = round($elapsedMs, 2);
-
-            return $parsed;
-        } finally {
-            fclose($socket);
-        }
+        return $result['info'];
     }
 
     /**
-     * @param resource $socket
+     * Query only the supplied ports concurrently.
+     *
+     * @param array<int, int> $ports
+     * @return array<int, array{info?:array<string,mixed>,error?:string}>
      */
-    private function exchange($socket, string $packet): string
+    public function queryBatch(string $host, array $ports): array
     {
-        $written = @fwrite($socket, $packet);
-        if ($written !== strlen($packet)) {
-            throw new RuntimeException('Could not send complete A2S request.');
+        if (filter_var($host, FILTER_VALIDATE_IP) === false) {
+            throw new InvalidArgumentException('A2S query host must be an IP address.');
+        }
+        if ($ports === [] || count($ports) > 128) {
+            throw new InvalidArgumentException('A2S batch must contain between 1 and 128 explicit ports.');
         }
 
-        $response = @fread($socket, 65535);
-        $metadata = stream_get_meta_data($socket);
-
-        if (!is_string($response) || $response === '' || !empty($metadata['timed_out'])) {
-            throw new RuntimeException('A2S query timed out.');
+        $validatedPorts = [];
+        foreach ($ports as $portValue) {
+            $port = filter_var(
+                $portValue,
+                FILTER_VALIDATE_INT,
+                ['options' => ['min_range' => 1, 'max_range' => 65535]]
+            );
+            if ($port === false) {
+                throw new InvalidArgumentException('A2S query port is out of range.');
+            }
+            $validatedPorts[] = (int)$port;
+        }
+        if (count(array_unique($validatedPorts)) !== count($validatedPorts)) {
+            throw new InvalidArgumentException('A2S batch contains duplicate ports.');
         }
 
-        return $response;
+        $urlHost = str_contains($host, ':') ? '[' . $host . ']' : $host;
+        $packet = "\xFF\xFF\xFF\xFF\x54Source Engine Query\x00";
+        $timeoutSeconds = $this->timeoutMs / 1000;
+        $states = [];
+        $results = [];
+
+        foreach ($validatedPorts as $port) {
+            $errno = 0;
+            $error = '';
+            $socket = @stream_socket_client(
+                'udp://' . $urlHost . ':' . $port,
+                $errno,
+                $error,
+                $timeoutSeconds,
+                STREAM_CLIENT_CONNECT
+            );
+
+            if (!is_resource($socket)) {
+                $results[$port] = ['error' => 'A2S UDP socket could not be opened; code=' . $errno];
+                continue;
+            }
+
+            stream_set_blocking($socket, false);
+            $written = @fwrite($socket, $packet);
+            if ($written !== strlen($packet)) {
+                fclose($socket);
+                $results[$port] = ['error' => 'A2S request could not be sent completely.'];
+                continue;
+            }
+
+            $resourceId = get_resource_id($socket);
+            $states[$resourceId] = [
+                'port' => $port,
+                'socket' => $socket,
+                'started_ns' => hrtime(true),
+                'deadline' => microtime(true) + $timeoutSeconds,
+                'challenged' => false,
+            ];
+        }
+
+        while ($states !== []) {
+            $now = microtime(true);
+            $readSockets = [];
+            $resourceToState = [];
+            $nextDeadline = null;
+
+            foreach ($states as $resourceId => $state) {
+                if ($state['deadline'] <= $now) {
+                    $port = (int)$state['port'];
+                    fclose($state['socket']);
+                    unset($states[$resourceId]);
+                    $results[$port] = ['error' => 'A2S query timed out.'];
+                    continue;
+                }
+
+                $readSockets[] = $state['socket'];
+                $resourceToState[$resourceId] = true;
+                $nextDeadline = $nextDeadline === null
+                    ? $state['deadline']
+                    : min($nextDeadline, $state['deadline']);
+            }
+
+            if ($states === []) {
+                break;
+            }
+
+            $waitSeconds = max(0.0, ($nextDeadline ?? microtime(true)) - microtime(true));
+            $seconds = (int)floor($waitSeconds);
+            $microseconds = (int)min(999999, floor(($waitSeconds - $seconds) * 1000000));
+            $writeSockets = [];
+            $exceptSockets = [];
+
+            $ready = @stream_select(
+                $readSockets,
+                $writeSockets,
+                $exceptSockets,
+                $seconds,
+                $microseconds
+            );
+
+            if ($ready === false) {
+                foreach ($states as $state) {
+                    $port = (int)$state['port'];
+                    fclose($state['socket']);
+                    $results[$port] = ['error' => 'A2S socket selection failed.'];
+                }
+                $states = [];
+                break;
+            }
+
+            if ($ready === 0) {
+                continue;
+            }
+
+            foreach ($readSockets as $socket) {
+                if (!is_resource($socket)) {
+                    continue;
+                }
+
+                $resourceId = get_resource_id($socket);
+                if (!isset($states[$resourceId])) {
+                    continue;
+                }
+
+                $response = @fread($socket, 65535);
+                if (!is_string($response) || $response === '') {
+                    continue;
+                }
+
+                $state = $states[$resourceId];
+                $port = (int)$state['port'];
+
+                if (substr($response, 0, 5) === "\xFF\xFF\xFF\xFF\x41") {
+                    if (strlen($response) < 9) {
+                        fclose($socket);
+                        unset($states[$resourceId]);
+                        $results[$port] = ['error' => 'A2S challenge response is incomplete.'];
+                        continue;
+                    }
+                    if ($state['challenged']) {
+                        fclose($socket);
+                        unset($states[$resourceId]);
+                        $results[$port] = ['error' => 'A2S server repeated its challenge response.'];
+                        continue;
+                    }
+
+                    $challengePacket = $packet . substr($response, 5, 4);
+                    $written = @fwrite($socket, $challengePacket);
+                    if ($written !== strlen($challengePacket)) {
+                        fclose($socket);
+                        unset($states[$resourceId]);
+                        $results[$port] = ['error' => 'A2S challenge request could not be sent.'];
+                        continue;
+                    }
+
+                    $states[$resourceId]['challenged'] = true;
+                    $states[$resourceId]['deadline'] = microtime(true) + $timeoutSeconds;
+                    continue;
+                }
+
+                try {
+                    $info = $this->parseInfoResponse($response);
+                    $info['query_rtt_ms'] = round(
+                        max(0, (hrtime(true) - (int)$state['started_ns']) / 1000000),
+                        2
+                    );
+                    $results[$port] = ['info' => $info];
+                } catch (Throwable $e) {
+                    $results[$port] = ['error' => $e->getMessage()];
+                }
+
+                fclose($socket);
+                unset($states[$resourceId]);
+            }
+        }
+
+        foreach ($validatedPorts as $port) {
+            if (!isset($results[$port])) {
+                $results[$port] = ['error' => 'A2S query returned no result.'];
+            }
+        }
+
+        return $results;
     }
 
     private function parseInfoResponse(string $data): array
