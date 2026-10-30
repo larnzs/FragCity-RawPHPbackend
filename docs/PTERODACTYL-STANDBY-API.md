@@ -11,6 +11,7 @@ This is the active source for the public CS2 Server Browser. It discovers CS2 se
 5. The Application API client restricts discovery to one configured Node and an explicit CS2 Egg ID and/or Docker image allowlist. It reads each CS2 server's default Allocation (the configured game port). It never accepts a host or port supplied by the website visitor.
 6. FragCityA2SInfoQuery::queryBatch() sends concurrent UDP A2S_INFO requests to those Allocation ports at the configured internal query_host. It handles A2S challenge responses and verifies AppID 730.
 7. The Linux API returns sanitized name, map, players, capacity, VAC, password and Query RTT fields. The public page displays the public connect host/port, not the private query host.
+8. When a visitor clicks **دیدن بازیکنان**, the website calls `api/public-server-players.php`. The website endpoint signs an `action=get_players` request to the same Linux route. The Linux API resolves the opaque server ID back to an allowlisted Pterodactyl server and its primary Allocation, then performs one on-demand A2S_PLAYER query to the configured internal query host. No visitor-supplied host or port is accepted.
 
 The request cache is refreshed only when a website request arrives after the TTL. It uses an atomic JSON write and a file lock so simultaneous visitors do not trigger duplicate refreshes. If upstream Pterodactyl/A2S is temporarily unavailable, the last good snapshot can be served as stale for up to 180 seconds. No scheduled job is needed.
 
@@ -20,10 +21,12 @@ The request cache is refreshed only when a website request arrives after the TTL
 |---|---|
 | Website signed API client | class/PterodactylStandbyApiClient.php |
 | Website repository | class/PterodactylStandbyRepository.php |
+| Public player-list AJAX endpoint | api/public-server-players.php |
 | Active public page | pages/serverlist.php |
 | Linux API route | POST /v1/pterodactyl-standby |
 | Read-only Pterodactyl Application API | linuxapi/src/PterodactylStandby/PterodactylApplicationClient.php |
 | A2S_INFO parser + concurrent UDP batch | linuxapi/src/PterodactylStandby/A2SInfoQuery.php |
+| On-demand A2S_PLAYER query + binary parser | linuxapi/src/PterodactylStandby/A2SPlayerQuery.php |
 | Pterodactyl/A2S discovery | linuxapi/src/PterodactylStandby/PterodactylStandbyDiscovery.php |
 | On-demand short cache | linuxapi/src/PterodactylStandby/PterodactylStandbySnapshotCache.php |
 | Optional manual cache warm-up | linuxapi/bin/pterodactyl-standby-refresh.php |
@@ -55,7 +58,7 @@ Merge this block into /etc/fragcity-api/config.php. Preserve the existing Weapon
     'region' => '',
 
     'pterodactyl' => [
-        'base_url' => 'https://server1.fragcity.ir',
+        'base_url' => 'https://panel.fragcity.ir',
         'application_api_key' => 'READ_ONLY_APPLICATION_API_KEY',
         'node_id' => 1, // Replace 1 with the actual numeric node ID.
         'allowed_egg_ids' => [],
@@ -114,14 +117,17 @@ From the repository root in Laragon:
 
 ~~~powershell
 php -l linuxapi/src/PterodactylStandby/A2SInfoQuery.php
+php -l linuxapi/src/PterodactylStandby/A2SPlayerQuery.php
 php -l linuxapi/src/PterodactylStandby/PterodactylApplicationClient.php
 php -l linuxapi/src/PterodactylStandby/PterodactylStandbyDiscovery.php
 php -l linuxapi/src/PterodactylStandby/PterodactylStandbySnapshotCache.php
 php -l linuxapi/public/index.php
 php -l class/PterodactylStandbyApiClient.php
 php -l class/PterodactylStandbyRepository.php
+php -l api/public-server-players.php
 php -l pages/serverlist.php
 php linuxapi/tests/pterodactyl-primary-allocation-test.php
+php linuxapi/tests/a2s-player-query-test.php
 php linuxapi/tools/architecture-check.php
 ~~~
 
@@ -155,4 +161,4 @@ Expected initial servers for the configured Node are the three known CS2 Allocat
 
 ## Scope of this step
 
-This step solves Pterodactyl-backed CS2 server discovery and A2S_INFO for the public server list. It does not yet implement A2S_PLAYER, per-player detail, RCON, game-server lifecycle controls, or Pterodactyl resource monitoring. Those remain separate follow-on work.
+This step now also supports on-demand A2S_PLAYER details in the public Server Browser modal: player name, score and connected duration. The Source A2S_PLAYER protocol does not return SteamID, so the SteamID column intentionally remains unavailable until a trusted CS2 server-side plugin supplies it. FACEIT level remains pending until the separate FACEIT API integration is implemented. RCON and game-server lifecycle controls remain out of scope.
