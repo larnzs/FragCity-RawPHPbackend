@@ -1,8 +1,8 @@
 -- Laragon-only local site DB account.
 -- Replace the placeholder in BOTH statements with the same unique strong password,
 -- then place that same password in settings/settings.json -> databases.main.password.
--- This grants access only to the ten approved website tables. It does not grant
--- access to GLOBAL_weaponpaints; the website reaches that service through HTTPS API.
+-- This grants access to the ten core website tables plus the two public Server Browser scanner tables.
+-- It does not grant access to GLOBAL_weaponpaints; WeaponPaints remains behind its HTTPS API.
 
 CREATE USER IF NOT EXISTS 'fragcity_site_local'@'127.0.0.1'
   IDENTIFIED BY 'REPLACE_WITH_A_UNIQUE_HEX_PASSWORD';
