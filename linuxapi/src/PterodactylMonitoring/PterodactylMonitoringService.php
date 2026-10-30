@@ -11,13 +11,11 @@ require_once __DIR__ . '/PterodactylHostMetrics.php';
  */
 final class PterodactylMonitoringService
 {
-    private array $config;
     private array $monitorConfig;
     private FragCityPterodactylMonitoringPanelClient $panel;
 
     public function __construct(array $config)
     {
-        $this->config = $config;
         $monitorConfig = is_array($config['pterodactyl_monitoring'] ?? null)
             ? $config['pterodactyl_monitoring']
             : [];
@@ -282,6 +280,10 @@ final class PterodactylMonitoringService
         $network = is_array($utilization['network'] ?? null)
             ? $utilization['network']
             : [];
+        $memoryLimit = (int)($utilization['memory_limit_bytes'] ?? 0);
+        if ($memoryLimit <= 0) {
+            $memoryLimit = (int)$candidate['limits']['memory_mb'] * 1024 * 1024;
+        }
 
         return [
             'id' => (int)$candidate['id'],
@@ -294,11 +296,7 @@ final class PterodactylMonitoringService
             'installed' => (bool)$candidate['installed'],
             'cpu_absolute' => max(0, (float)($utilization['cpu_absolute'] ?? 0)),
             'memory_bytes' => max(0, (int)($utilization['memory_bytes'] ?? 0)),
-            'memory_limit_bytes' => max(
-                0,
-                (int)($utilization['memory_limit_bytes'] ?? 0)
-                    ?: ((int)$candidate['limits']['memory_mb'] * 1024 * 1024)
-            ),
+            'memory_limit_bytes' => max(0, $memoryLimit),
             'disk_bytes' => max(0, (int)($utilization['disk_bytes'] ?? 0)),
             'disk_limit_bytes' => max(0, (int)$candidate['limits']['disk_mb'] * 1024 * 1024),
             'cpu_limit_percent' => max(0, (float)$candidate['limits']['cpu_percent']),
