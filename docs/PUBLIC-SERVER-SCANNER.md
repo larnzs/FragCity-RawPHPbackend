@@ -6,9 +6,12 @@ The public Server Browser is intentionally independent from Pterodactyl and from
 
 1. `public_server_scan_targets` stores an approved IPv4 address and inclusive port range.
 2. `public_server_scan_ports` stores one scan state per port, including the last A2S result and the next retry time.
-3. `tools/refresh-public-server-browser.php` runs from the shared host's PHP CLI Cron Job. It queries configured ports in bounded concurrent UDP batches and writes results to the website database.
-4. `class/PublicServerBrowserRepository.php` reads only online AppID 730 results for the public page.
-5. The page does not query UDP, Pterodactyl, or a separate API when visitors load it.
+3. `class/PublicServerBrowserA2SScanner.php` handles the Source A2S_INFO UDP protocol and response parsing.
+4. `class/PublicServerBrowserScanRepository.php` owns scanner-table SQL, inventory creation, retry scheduling and persistence.
+5. `class/PublicServerBrowserScanWorker.php` orchestrates bounded batches without depending on the website UI or bootstrap.
+6. `tools/refresh-public-server-browser.php` is a thin CLI entrypoint. It loads the environment settings, creates PDO and runs the worker from Cron.
+7. `class/PublicServerBrowserRepository.php` reads only recent AppID 730 results for the public page.
+8. The page does not query UDP, Pterodactyl, or a separate API when visitors load it.
 
 The currently seeded target is:
 
@@ -62,12 +65,54 @@ These are bounded batches; the worker does not open 2,016 sockets at once. A MyS
 
 Previously discovered servers remain visible with an Offline status for up to 10 minutes after their last query. After that, they are hidden until a fresh result arrives. This prevents a stopped Cron Job from leaving stale servers visible indefinitely, while the per-port retry schedule still waits one hour before retrying an unresponsive port.
 
+## Portable runtime and host-specific configuration
+
+The scanner is split into reusable PHP classes and does not require Laragon, Debian, Pterodactyl, or a specific hosting company. The same CLI worker can run on cPanel/shared hosting, a VPS, or another Linux/Windows PHP CLI environment.
+
+Each runner needs all of the following:
+
+- PHP CLI (PHP 8.x recommended for the FragCity application).
+- PDO with the `pdo_mysql` driver and credentials for the website database.
+- PHP UDP stream support: `stream_socket_client`, `stream_select` and `hrtime`.
+- Outbound UDP access from the runner to every explicitly configured target IP/port.
+- A Cron/scheduler that can execute the PHP CLI command.
+- A copy of the required FragCity files and a private runtime settings JSON file.
+
+The runner can be on a different machine from the website and game server. In that case, its host must be allowed to connect to the website's MySQL/MariaDB server. Restrict remote database access to the runner's fixed IP where possible; do not expose MySQL to the public internet. If the database provider only permits connections from the website account itself, run the Cron on that same hosting account.
+
+The runtime settings file is selected through the existing `FRAGCITY_SETTINGS_FILE` environment variable. The runner also supports these optional per-host overrides:
+
+| Environment variable | Default | Purpose |
+|---|---:|---|
+| `FRAGCITY_SERVER_BROWSER_DB_PROFILE` | `files.index.database_profile`, or `main` | Select a database profile from the runtime settings JSON |
+| `FRAGCITY_SERVER_BROWSER_MAX_PER_RUN` | `256` | Maximum ports processed per Cron invocation (1–4096) |
+| `FRAGCITY_SERVER_BROWSER_BATCH_SIZE` | `32` | Concurrent A2S queries per batch (1–128) |
+| `FRAGCITY_SERVER_BROWSER_TIME_LIMIT` | `25` | PHP execution limit in seconds; use `0` to disable the PHP-level limit (0–300) |
+
+Example environment for a low-resource shared host:
+
+~~~bash
+export FRAGCITY_SETTINGS_FILE="/home/ACCOUNT/private/fragcity-settings.json"
+export FRAGCITY_SERVER_BROWSER_DB_PROFILE="main"
+export FRAGCITY_SERVER_BROWSER_MAX_PER_RUN="128"
+export FRAGCITY_SERVER_BROWSER_BATCH_SIZE="16"
+export FRAGCITY_SERVER_BROWSER_TIME_LIMIT="25"
+
+php /home/ACCOUNT/fragcity/tools/refresh-public-server-browser.php
+~~~
+
+Keep the settings JSON outside the public web root when possible. Do not commit it or place database credentials in the Cron command itself. Environment overrides are for operational tuning only; approved target IPs and port ranges remain in `public_server_scan_targets`.
+
+**Important network limitation:** no code can force a hosting provider to permit outbound UDP. Run the UDP preflight from the exact PHP CLI environment and host that will execute Cron. A passing test from Laragon or a VPS does not prove that a different shared host can send UDP.
+
 ## PHP syntax and architecture checks
 
 From the repository root, run:
 
 ~~~powershell
 php -l class/PublicServerBrowserA2SScanner.php
+php -l class/PublicServerBrowserScanRepository.php
+php -l class/PublicServerBrowserScanWorker.php
 php -l class/PublicServerBrowserRepository.php
 php -l tools/refresh-public-server-browser.php
 php -l tools/test-public-server-browser-udp.php
@@ -80,7 +125,7 @@ These are static/syntax checks. They do not prove the shared host can send UDP; 
 
 The PHP runtime that runs the Cron Job must permit outbound UDP streams and `stream_select`. A local Laragon test does not prove the shared host permits UDP.
 
-After running the migration and deploying the latest repository, execute this from the **shared hosting Terminal/SSH**, not from Laragon:
+After running the migration and deploying the latest repository, execute this from the **same host and PHP CLI runtime that will run Cron** (for example, the cPanel Terminal), not from a different machine:
 
 ~~~bash
 php tools/test-public-server-browser-udp.php 85.185.40.85 27085 29000 29001
