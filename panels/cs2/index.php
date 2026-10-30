@@ -17,6 +17,11 @@ $allowedPages = [
         'default' => true
     ],
 
+    'monitoring' => [
+        'file' => 'monitoring.php',
+        'default' => false
+    ],
+
     'servers' => [
         'file' => 'servers.php',
         'default' => false
