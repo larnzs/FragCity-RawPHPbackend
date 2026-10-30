@@ -1,6 +1,6 @@
 # FragCity — راهنمای تنظیمات محیطی
 
-> وضعیت معماری در ۲۷ اکتبر ۲۰۲۶: دیتابیس اصلی سایت شامل فقط ده جدول اعلام‌شده است. API قدیمی Agent/InstanceMaker ویندوزی و جدول‌های وابسته به آن دیگر بخشی از مسیر فعال سایت نیستند.
+> دیتابیس اصلی سایت شامل ده جدول اصلی وب‌سایت است؛ Migration مربوط به Server Browser دو جدول عملیاتی جداگانه نیز به همین دیتابیس اضافه می‌کند. API قدیمی Agent/InstanceMaker ویندوزی و جدول‌های وابسته به آن دیگر بخشی از مسیر فعال سایت نیستند.
 
 ## ۱. فایل‌های تنظیمات
 
@@ -28,14 +28,14 @@
 
 فهرست عمومی CS2 از طریق دو جدول در دیتابیس اصلی سایت مدیریت می‌شود:
 
-- \`public_server_scan_targets\`: IP، بازه پورت و سیاست Query هر مقصد.
-- \`public_server_scan_ports\`: وضعیت و آخرین نتیجهٔ A2S برای هر پورت.
-- Worker زمان‌بندی‌شده: \`tools/refresh-public-server-browser.php\`.
-- Repository خواندن صفحه: \`class/PublicServerBrowserRepository.php\`.
+- `public_server_scan_targets`: IP، بازه پورت و سیاست Query هر مقصد.
+- `public_server_scan_ports`: وضعیت و آخرین نتیجهٔ A2S برای هر پورت.
+- Worker زمان‌بندی‌شده: `tools/refresh-public-server-browser.php`.
+- Repository خواندن صفحه: `class/PublicServerBrowserRepository.php`.
 
-تنظیمات جداگانه یا Secret جدید در \`settings.json\` لازم نیست؛ Worker و صفحه از همان اتصال PDO اصلی استفاده می‌کنند. جزئیات Migration و Cron هاست اشتراکی در \`docs/PUBLIC-SERVER-SCANNER.md\` است.
+تنظیمات جداگانه یا Secret جدید در `settings.json` لازم نیست؛ Worker و صفحه از همان اتصال PDO اصلی استفاده می‌کنند. جزئیات Migration و Cron هاست اشتراکی در `docs/PUBLIC-SERVER-SCANNER.md` است.
 
-کدهای آزمایشی Pterodactyl با نام \`Pterodactyl Standby\` نگهداری می‌شوند و مسیر فعال Server Browser به آن‌ها وابسته نیست.
+کدهای آزمایشی Pterodactyl با نام `Pterodactyl Standby` نگهداری می‌شوند و مسیر فعال Server Browser به آن‌ها وابسته نیست.
 
 ### قابلیت‌های سرور
 
