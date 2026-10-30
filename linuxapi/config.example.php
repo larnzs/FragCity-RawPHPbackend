@@ -3,7 +3,7 @@
  * Copy to /etc/fragcity-api/config.php on the Linux node.
  * Never commit the runtime config.
  *
- * This service exposes WeaponPaints and an optional Pterodactyl Standby snapshot route.
+ * This service exposes WeaponPaints, optional Pterodactyl Standby compatibility, and on-demand Pterodactyl Monitoring.
  * Website account, wallet, support, and payment data stay in the website DB;
  * the Linux API must not connect to that database.
  */
@@ -21,6 +21,30 @@ return [
         'username' => 'fragcity_weaponpaints_api',
         'password' => 'REPLACE_WITH_A_UNIQUE_DATABASE_PASSWORD',
         'charset' => 'utf8mb4',
+    ],
+
+    // Active on-demand monitoring. All secrets stay on the Linux API host.
+    // Use a read-only Pterodactyl Application API token with access to the selected
+    // nodes, node configuration, and server records. Wings tokens are fetched from
+    // the Pterodactyl node configuration endpoint at request time and never returned.
+    'pterodactyl_monitoring' => [
+        'enabled' => false,
+        'shared_secret' => 'REPLACE_WITH_A_SEPARATE_64_CHARACTER_HEX_SECRET',
+        'max_servers' => 100,
+        // Explicit node IDs only. Leave empty until the real Pterodactyl node ID is known.
+        'pterodactyl' => [
+            'base_url' => 'https://server1.fragcity.ir',
+            'application_api_key' => 'REPLACE_WITH_READ_ONLY_APPLICATION_API_KEY',
+            'allowed_node_ids' => [],
+            'allowed_egg_ids' => [],
+            'allowed_docker_images' => [
+                'ghcr.io/k4ryuu/cs2-egg-go',
+            ],
+        ],
+        // Optional Wings URL overrides keyed by node ID.
+        // Prefer HTTPS. HTTP is accepted only for loopback/private IPs, e.g.:
+        // 'wings_base_urls' => [1 => 'http://127.0.0.1:8080'],
+        'wings_base_urls' => [],
     ],
 
     // Pterodactyl Standby credentials are independent from the WeaponPaints HMAC key.
