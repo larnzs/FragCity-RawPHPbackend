@@ -546,9 +546,11 @@ try {
                 'data' => $snapshot,
             ]);
         } catch (Throwable $e) {
+            $detail = preg_replace('/[\\r\\n]+/', ' ', $e->getMessage()) ?? '';
             error_log(
                 '[FragCity API] Pterodactyl Standby live discovery failed; type='
                 . get_class($e)
+                . '; detail=' . substr($detail, 0, 180)
             );
             apiRespond(503, [
                 'success' => false,
