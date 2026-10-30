@@ -66,19 +66,18 @@ CS2 plugin containers
 
 API از HMAC-SHA256، زمان درخواست، nonce ضد replay، TLS validation، prepared statements و action allowlist استفاده می‌کند. نام جدول یا SQL دلخواه از طرف وب‌سایت ارسال نمی‌شود.
 
-### Server Browser
+### Server Browser عمومی
 
-جریان دادهٔ Server Browser از Pterodactyl تا وب‌سایت:
+Server Browser فعال برخلاف WeaponPaints نیازی به Linux API جداگانه ندارد:
 
-- Worker زمان‌بندی‌شده روی Linux با Application API فقط‌خواندنی Pterodactyl، سرورهای CS2 و Allocation پیش‌فرض هرکدام را پیدا می‌کند.
-- A2S_INFO فقط از IP داخلی نود و روی پورت Allocation مشخص اجرا می‌شود؛ اسکن بازهٔ پورت نداریم.
-- Snapshot به‌صورت اتمیک در `/var/cache/fragcity-api/server-browser.json` ذخیره می‌شود.
-- وب‌سایت با `class/FragCityServerBrowserApiClient.php` و `class/ServerBrowserRepository.php` از Route امضاشدهٔ `POST /v1/server-browser` Snapshot را می‌خواند.
-- Secret این Integration با WeaponPaints متفاوت است. Pterodactyl Application API Key فقط در `/etc/fragcity-api/config.php` قرار می‌گیرد.
-- Laragon و Production هر دو از `integrations.server_browser_api.base_url` و Secret خصوصی همان Integration استفاده می‌کنند.
-- مرورگر بازدیدکننده نه UDP Query می‌فرستد و نه به Pterodactyl متصل می‌شود.
+- \`public_server_scan_targets\` نگهدارندهٔ IP و بازهٔ پورت مجاز است.
+- \`public_server_scan_ports\` وضعیت هر پورت، نتیجهٔ A2S و زمان Query بعدی را نگه می‌دارد.
+- Worker زمان‌بندی‌شدهٔ \`tools/refresh-public-server-browser.php\` از طریق UDP و در batchهای محدود Query می‌گیرد.
+- صفحهٔ سایت فقط \`class/PublicServerBrowserRepository.php\` را برای خواندن رکوردهای آنلاین استفاده می‌کند.
+- هیچ درخواست UDP یا اسکن پورت هنگام بازدید کاربر اجرا نمی‌شود.
+- پورت‌های بدون پاسخ تا یک ساعت دوباره Query نمی‌شوند؛ سرورهای معتبر آنلاین با فاصلهٔ کوتاه‌تری به‌روزرسانی می‌شوند.
 
-جزئیات پیکربندی و Deploy در `docs/SERVER-BROWSER-API.md` آمده است.
+Migration و راه‌اندازی Cron در \`docs/PUBLIC-SERVER-SCANNER.md\` مستند شده است. بخش مستقل Pterodactyl برای استفادهٔ احتمالی آینده با نام Pterodactyl Standby نگهداری می‌شود.
 
 ## 2. وضعیت Agent ویندوزی قدیمی
 
