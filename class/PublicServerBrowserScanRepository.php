@@ -7,7 +7,7 @@ declare(strict_types=1);
  * This class contains no UDP/network code and can be reused by any CLI runner
  * that has PDO access to the website's MySQL/MariaDB database.
  */
-final class PublicServerBrowserScanRepository
+final class PublicServerBrowserScanRepository implements PublicServerBrowserScanStoreInterface
 {
     private PDO $pdo;
     private ?PDOStatement $updateStatement = null;
