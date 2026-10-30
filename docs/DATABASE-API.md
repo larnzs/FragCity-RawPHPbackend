@@ -1,6 +1,6 @@
 # FragCity — Database & API
 
-> وضعیت فعلی: وب‌سایت و API WeaponPaints دو مسیر مستقل دارند. دیتابیس اصلی سایت شامل همان ده جدول اعلام‌شده است؛ دیتابیس `GLOBAL_weaponpaints` همچنان روی Debian قرار دارد و فقط از طریق Linux API دسترسی داده می‌شود.
+> وضعیت فعلی: وب‌سایت و Linux API دو Integration مستقل برای WeaponPaints و Server Browser دارند. دیتابیس اصلی سایت شامل همان ده جدول اعلام‌شده است؛ دیتابیس `GLOBAL_weaponpaints` همچنان روی Debian قرار دارد و فقط از طریق Linux API دسترسی داده می‌شود.
 
 ## 1. مسیرهای داده
 
