@@ -99,12 +99,26 @@
     const renderNode = (node) => {
         const system = node.system || {};
         const allocation = node.allocation || {};
+        const host = node.host_metrics || {};
         const cs2 = node.cs2 || {};
         const resources = cs2.resources || {};
-        const memoryCapacity = Number(system.memory_total_bytes || allocation.memory_capacity_bytes || 0);
-        const diskCapacity = Number(allocation.disk_capacity_bytes || 0);
-        const memoryUsed = Number(resources.memory_bytes || 0);
-        const diskUsed = Number(resources.disk_bytes || 0);
+        const hostCpuAvailable = host.cpu_usage_percent !== null && host.cpu_usage_percent !== undefined;
+        const hostMemoryAvailable = Number(host.memory_total_bytes || 0) > 0
+            && host.memory_used_bytes !== null && host.memory_used_bytes !== undefined;
+        const hostDiskAvailable = Number(host.disk_total_bytes || 0) > 0
+            && host.disk_used_bytes !== null && host.disk_used_bytes !== undefined;
+        const memoryCapacity = Number(hostMemoryAvailable
+            ? host.memory_total_bytes
+            : (system.memory_total_bytes || allocation.memory_capacity_bytes || 0));
+        const diskCapacity = Number(hostDiskAvailable
+            ? host.disk_total_bytes
+            : (allocation.disk_capacity_bytes || 0));
+        const memoryUsed = Number(hostMemoryAvailable ? host.memory_used_bytes : (resources.memory_bytes || 0));
+        const diskUsed = Number(hostDiskAvailable ? host.disk_used_bytes : (resources.disk_bytes || 0));
+        const cpuValue = hostCpuAvailable ? Number(host.cpu_usage_percent) : Number(resources.cpu_absolute || 0);
+        const cpuLabel = hostCpuAvailable ? 'Host CPU' : 'CS2 CPU (sum)';
+        const memoryLabel = hostMemoryAvailable ? 'Host RAM' : 'CS2 RAM / Node RAM';
+        const diskLabel = hostDiskAvailable ? 'Host Disk' : 'CS2 Disk / Node allocation';
         const state = statusClass(node.status);
 
         const systemTags = [
@@ -131,21 +145,21 @@
                 <div class="fc-monitor-node-metrics">
                     <div>
                         <div class="fc-monitor-metric-line">
-                            <span>CS2 CPU</span>
-                            <strong>${cpu(resources.cpu_absolute)}</strong>
+                            <span>${cpuLabel}</span>
+                            <strong>${cpu(cpuValue)}</strong>
                         </div>
-                        ${progress(resources.cpu_absolute, Math.max(100, Number(system.cpu_threads || 1) * 100), 'blue')}
+                        ${progress(cpuValue, hostCpuAvailable ? 100 : Math.max(100, Number(system.cpu_threads || 1) * 100), 'blue')}
                     </div>
                     <div>
                         <div class="fc-monitor-metric-line">
-                            <span>CS2 RAM / Node RAM</span>
+                            <span>${memoryLabel}</span>
                             <strong>${bytes(memoryUsed)} / ${bytes(memoryCapacity)}</strong>
                         </div>
                         ${progress(memoryUsed, memoryCapacity, 'green')}
                     </div>
                     <div>
                         <div class="fc-monitor-metric-line">
-                            <span>CS2 Disk / Node allocation</span>
+                            <span>${diskLabel}</span>
                             <strong>${bytes(diskUsed)} / ${diskCapacity > 0 ? bytes(diskCapacity) : 'Unlimited'}</strong>
                         </div>
                         ${diskCapacity > 0 ? progress(diskUsed, diskCapacity) : progress(0, 0)}
@@ -154,6 +168,8 @@
                 <div class="fc-monitor-node-footer">
                     <span><i class="fa-brands fa-docker"></i> Docker: ${escapeHtml(containers)}</span>
                     <span><i class="fa-solid fa-gamepad"></i> CS2: ${number(cs2.servers_running || 0)} / ${number(cs2.servers_total || 0)}</span>
+                    <span><i class="fa-solid fa-memory"></i> CS2 RAM: ${bytes(resources.memory_bytes || 0)}</span>
+                    <span><i class="fa-solid fa-hard-drive"></i> CS2 Disk: ${bytes(resources.disk_bytes || 0)}</span>
                     <span><i class="fa-solid fa-network-wired"></i> Daemon: ${number(node.daemon_port || 8080)}</span>
                 </div>
                 ${node.error ? `<div class="fc-monitor-node-error">${escapeHtml(node.error)}</div>` : ''}
