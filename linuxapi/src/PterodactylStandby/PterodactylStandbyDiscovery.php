@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/A2SInfoQuery.php';
+require_once __DIR__ . '/A2SPlayerQuery.php';
 require_once __DIR__ . '/PterodactylApplicationClient.php';
 
 /**
@@ -14,6 +15,7 @@ final class PterodactylStandbyDiscovery
     private array $serverConfig;
     private FragCityPterodactylApplicationClient $pterodactyl;
     private FragCityA2SInfoQuery $a2s;
+    private FragCityA2SPlayerQuery $a2sPlayers;
 
     public function __construct(array $config)
     {
@@ -33,6 +35,7 @@ final class PterodactylStandbyDiscovery
         $this->serverConfig = $serverConfig;
         $this->pterodactyl = new FragCityPterodactylApplicationClient($pteroConfig);
         $this->a2s = new FragCityA2SInfoQuery((int)($serverConfig['query_timeout_ms'] ?? 1500));
+        $this->a2sPlayers = new FragCityA2SPlayerQuery((int)($serverConfig['query_timeout_ms'] ?? 1500));
     }
 
     /** @return array<int, array<string, mixed>> */
@@ -163,6 +166,64 @@ final class PterodactylStandbyDiscovery
         });
 
         return $rows;
+    }
+
+    /**
+     * Query players only for a server ID previously derived from an allowlisted
+     * Pterodactyl server and its primary Allocation. Visitor-supplied hosts/ports
+     * are never accepted.
+     *
+     * @return array{server_id:string,server_name:string,player_count:int,players:array,fetched_at:string}
+     */
+    public function queryPlayers(string $serverId): array
+    {
+        $serverId = strtolower(trim($serverId));
+        if (!preg_match('/^[a-f0-9]{16}$/D', $serverId)) {
+            throw new InvalidArgumentException('Invalid public server identifier.');
+        }
+
+        $candidateMatch = null;
+        foreach ($this->pterodactyl->listCs2Servers() as $candidate) {
+            $candidateId = substr(
+                hash('sha256', (string)$candidate['server_uuid'] . ':' . (int)$candidate['allocation_id']),
+                0,
+                16
+            );
+
+            if (hash_equals($candidateId, $serverId)) {
+                $candidateMatch = $candidate;
+                break;
+            }
+        }
+
+        if (!is_array($candidateMatch)) {
+            throw new OutOfBoundsException('Server is no longer in the configured CS2 allowlist.');
+        }
+        if (!empty($candidateMatch['suspended']) || empty($candidateMatch['installed'])) {
+            throw new RuntimeException('The selected CS2 server is suspended or not installed.');
+        }
+
+        $nodeId = (int)$candidateMatch['node_id'];
+        $nodeQueryHosts = is_array($this->serverConfig['node_query_hosts'] ?? null)
+            ? $this->serverConfig['node_query_hosts']
+            : [];
+        $queryHost = trim((string)($nodeQueryHosts[(string)$nodeId] ?? $this->serverConfig['query_host'] ?? ''));
+
+        if (filter_var($queryHost, FILTER_VALIDATE_IP) === false) {
+            throw new RuntimeException('A valid internal query host is not configured for the selected Node.');
+        }
+
+        $port = (int)$candidateMatch['game_port'];
+        $players = $this->a2sPlayers->query($queryHost, $port);
+        $serverName = trim((string)($candidateMatch['server_name'] ?? ''));
+
+        return [
+            'server_id' => $serverId,
+            'server_name' => $serverName !== '' ? $serverName : 'CS2 Community Server',
+            'player_count' => count($players),
+            'players' => $players,
+            'fetched_at' => gmdate('c'),
+        ];
     }
 
     private function extractMode(string $name): string
