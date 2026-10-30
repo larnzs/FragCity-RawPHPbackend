@@ -168,10 +168,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
 
         try {
             $accountCheck = $pdo->prepare(
-                'SELECT id FROM users WHERE steamid64 = ? LIMIT 1'
+                'SELECT id, username, email, phone FROM users WHERE steamid64 = ? LIMIT 1'
             );
             $accountCheck->execute([$steamid64]);
-            if ($accountCheck->fetchColumn() === false) {
+            $accountRow = $accountCheck->fetch(PDO::FETCH_ASSOC);
+            if (!is_array($accountRow)) {
                 profileRespond('حساب کاربری در دیتابیس پیدا نشد.', 404);
             }
 
@@ -181,6 +182,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
                 ['phone', $phone, 'این شماره موبایل قبلاً برای حساب دیگری ثبت شده است.'],
             ];
             foreach ($uniqueChecks as [$column, $value, $message]) {
+                $currentValue = trim((string)($accountRow[$column] ?? ''));
+                if (strcasecmp($currentValue, (string)$value) === 0) {
+                    continue;
+                }
+
                 // Column names are fixed in this allow-list; user values remain bound parameters.
                 $duplicate = $pdo->prepare(
                     "SELECT id FROM users WHERE {$column} = ? AND steamid64 <> ? LIMIT 1"
