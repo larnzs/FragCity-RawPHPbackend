@@ -370,7 +370,9 @@ if ($method === 'GET' && $path === '/health') {
 if (str_starts_with($path, '/v1/agent/')) {
     apiRespond(410, ['status' => 'error', 'message' => 'legacy_agent_api_retired']);
 }
-if ($path !== '/v1/weaponpaints') {
+$isServerBrowserRequest = $path === '/v1/server-browser';
+$isWeaponPaintsRequest = $path === '/v1/weaponpaints';
+if (!$isServerBrowserRequest && !$isWeaponPaintsRequest) {
     apiRespond(404, ['success' => false, 'error' => 'not_found']);
 }
 if ($method !== 'POST') {
@@ -395,9 +397,14 @@ try {
     apiRespond(503, ['success' => false, 'error' => 'service_not_configured']);
 }
 
-$secret = is_array($config) ? (string)($config['shared_secret'] ?? '') : '';
+$secret = '';
+if (is_array($config)) {
+    $secret = $isServerBrowserRequest
+        ? (string)($config['server_browser']['shared_secret'] ?? '')
+        : (string)($config['shared_secret'] ?? '');
+}
 if (!preg_match('/^[a-f0-9]{64,128}$/D', $secret)) {
-    error_log('[FragCity API] shared_secret missing/invalid.');
+    error_log('[FragCity API] Endpoint shared secret missing/invalid.');
     apiRespond(503, ['success' => false, 'error' => 'service_not_configured']);
 }
 
@@ -476,6 +483,52 @@ try {
     $action = $body['action'] ?? '';
     if (!is_string($action)) {
         throw new InvalidArgumentException('Invalid action.');
+    }
+
+    if ($isServerBrowserRequest) {
+        if ($action !== 'list_servers') {
+            apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
+        }
+
+        $serverConfig = is_array($config['server_browser'] ?? null)
+            ? $config['server_browser']
+            : [];
+        if (empty($serverConfig['enabled'])) {
+            apiRespond(503, ['success' => false, 'error' => 'server_browser_disabled']);
+        }
+
+        $cacheFile = trim((string)($serverConfig['cache_file'] ?? ''));
+        if ($cacheFile === '' || !is_file($cacheFile) || !is_readable($cacheFile)) {
+            apiRespond(503, ['success' => false, 'error' => 'server_browser_cache_unavailable']);
+        }
+
+        $cacheRaw = file_get_contents($cacheFile);
+        $snapshot = is_string($cacheRaw) ? json_decode($cacheRaw, true) : null;
+        if (!is_array($snapshot) || !is_array($snapshot['servers'] ?? null)) {
+            error_log('[FragCity API] Server Browser cache is invalid.');
+            apiRespond(503, ['success' => false, 'error' => 'server_browser_cache_invalid']);
+        }
+
+        $generatedAt = is_string($snapshot['generated_at'] ?? null)
+            ? $snapshot['generated_at']
+            : '';
+        $generatedTimestamp = $generatedAt !== '' ? strtotime($generatedAt) : false;
+        if ($generatedTimestamp === false) {
+            apiRespond(503, ['success' => false, 'error' => 'server_browser_cache_invalid']);
+        }
+
+        $cacheAge = max(0, time() - $generatedTimestamp);
+        $maxCacheAge = max(30, min(3600, (int)($serverConfig['cache_max_age_seconds'] ?? 180)));
+
+        apiRespond(200, [
+            'success' => true,
+            'data' => [
+                'generated_at' => $generatedAt,
+                'cache_age_seconds' => $cacheAge,
+                'stale' => $cacheAge > $maxCacheAge,
+                'servers' => array_values($snapshot['servers']),
+            ],
+        ]);
     }
 
     if ($action === 'ping_db') {
