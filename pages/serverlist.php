@@ -190,6 +190,14 @@ $statusLabels = [
                     <span>سرور در فهرست</span>
                 </div>
             </div>
+            <?php if ($serverSnapshotStale): ?>
+                <div class="sl-snapshot-stale" role="status">
+                    <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+                    اتصال به منبع زنده موقتاً ناموفق بود؛ آخرین اطلاعات موفق
+                    <?= $serverSnapshotAge !== null ? ' (' . $serverSnapshotAge . ' ثانیه قبل)' : '' ?>
+                    نمایش داده می‌شود.
+                </div>
+            <?php endif; ?>
 
             <div class="sl-filter-panel" data-fc-reveal="up">
                 <div class="sl-filter-top">
