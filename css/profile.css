@@ -1284,6 +1284,13 @@
     gap: 0.25rem;
 }
 
+.profile-fullscreen .profile-settings-field small {
+    color: #777777;
+    font-size: 0.59rem;
+    font-weight: 450;
+    line-height: 1.55;
+}
+
 .profile-fullscreen .profile-settings-field > span b,
 .profile-fullscreen .profile-settings-required-note b {
     color: var(--profile-accent);
