@@ -60,9 +60,7 @@ CREATE TABLE IF NOT EXISTS public_server_scan_ports (
         CHECK (port BETWEEN 1 AND 65535)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO public_server_scan_targets
+INSERT IGNORE INTO public_server_scan_targets
     (host, port_start, port_end, region, enabled)
 VALUES
-    ('85.185.40.85', 27085, 29100, '', 1)
-ON DUPLICATE KEY UPDATE
-    host = VALUES(host);
+    ('85.185.40.85', 27085, 29100, '', 1);
