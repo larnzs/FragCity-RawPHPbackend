@@ -62,7 +62,7 @@ If Wings SSL is disabled, do not send the Wings token to a public HTTP hostname.
 
 ~~~php
 'wings_base_urls' => [
-    YOUR_NODE_ID => 'http://127.0.0.1:8080',
+    1 => 'http://127.0.0.1:8080', // Replace 1 with the actual numeric Pterodactyl node ID.
 ],
 ~~~
 
