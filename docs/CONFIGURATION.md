@@ -39,7 +39,15 @@
 
 تنظیم اتصال از `settings/settings.json` می‌آید. برای اجرای Worker روی ماشین دیگری می‌توان مسیر JSON را با `FRAGCITY_SETTINGS_FILE`، پروفایل دیتابیس را با `FRAGCITY_SERVER_BROWSER_DB_PROFILE` و اندازهٔ batch/تعداد پورت هر اجرا را با environment variableهای مستندشده override کرد. ماشین اجراکننده باید هم به MySQL/MariaDB سایت و هم به UDP مقصد دسترسی داشته باشد؛ صرفاً PHP بودن هاست کافی نیست. جزئیات در `docs/PUBLIC-SERVER-SCANNER.md` است.
 
-کدهای آزمایشی Pterodactyl با نام `Pterodactyl Standby` نگهداری می‌شوند و مسیر فعال Server Browser به آن‌ها وابسته نیست.
+کدهای آزمایشی Pterodactyl با نام `Pterodactyl Standby` برای snapshot قدیمی باقی مانده‌اند. ماژول جدید Monitoring مستقل است:
+
+- صفحهٔ ادمین: `panels/cs2/monitoring.php` (فقط نقش `admin`).
+- endpoint داخلی سایت: `api/admin-pterodactyl-monitoring.php`.
+- کلاینت امضاشدهٔ سایت: `class/PterodactylMonitoringApiClient.php`.
+- route لینوکس: `POST /v1/pterodactyl-monitoring`.
+- سرویس خواندن Node/Server از Pterodactyl و Wings: `linuxapi/src/PterodactylMonitoring/`.
+
+این صفحه هر ۱۵ ثانیه، فقط هنگام باز بودن، اطلاعات زنده می‌گیرد و به Cron نیاز ندارد. Application API token و Wings token فقط روی Linux نگهداری می‌شوند. راهنمای کامل در `docs/PTERODACTYL-MONITORING.md` است.
 
 ### قابلیت‌های سرور
 
