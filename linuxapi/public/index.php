@@ -372,8 +372,9 @@ if (str_starts_with($path, '/v1/agent/')) {
     apiRespond(410, ['status' => 'error', 'message' => 'legacy_agent_api_retired']);
 }
 $isPterodactylStandbyRequest = $path === '/v1/pterodactyl-standby';
+$isPterodactylMonitoringRequest = $path === '/v1/pterodactyl-monitoring';
 $isWeaponPaintsRequest = $path === '/v1/weaponpaints';
-if (!$isPterodactylStandbyRequest && !$isWeaponPaintsRequest) {
+if (!$isPterodactylStandbyRequest && !$isPterodactylMonitoringRequest && !$isWeaponPaintsRequest) {
     apiRespond(404, ['success' => false, 'error' => 'not_found']);
 }
 if ($method !== 'POST') {
@@ -400,9 +401,13 @@ try {
 
 $secret = '';
 if (is_array($config)) {
-    $secret = $isPterodactylStandbyRequest
-        ? (string)($config['pterodactyl_standby']['shared_secret'] ?? '')
-        : (string)($config['shared_secret'] ?? '');
+    if ($isPterodactylStandbyRequest) {
+        $secret = (string)($config['pterodactyl_standby']['shared_secret'] ?? '');
+    } elseif ($isPterodactylMonitoringRequest) {
+        $secret = (string)($config['pterodactyl_monitoring']['shared_secret'] ?? '');
+    } else {
+        $secret = (string)($config['shared_secret'] ?? '');
+    }
 }
 if (!preg_match('/^[a-f0-9]{64,128}$/D', $secret)) {
     error_log('[FragCity API] Endpoint shared secret missing/invalid.');
@@ -484,6 +489,34 @@ try {
     $action = $body['action'] ?? '';
     if (!is_string($action)) {
         throw new InvalidArgumentException('Invalid action.');
+    }
+
+    if ($isPterodactylMonitoringRequest) {
+        if ($action !== 'get_snapshot') {
+            apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
+        }
+
+        $monitoringConfig = is_array($config['pterodactyl_monitoring'] ?? null)
+            ? $config['pterodactyl_monitoring']
+            : [];
+        if (empty($monitoringConfig['enabled'])) {
+            apiRespond(503, ['success' => false, 'error' => 'pterodactyl_monitoring_disabled']);
+        }
+
+        try {
+            require_once __DIR__ . '/../src/PterodactylMonitoring/PterodactylMonitoringService.php';
+            $monitoring = new PterodactylMonitoringService($config);
+            apiRespond(200, [
+                'success' => true,
+                'data' => $monitoring->snapshot(),
+            ]);
+        } catch (Throwable $e) {
+            error_log(
+                '[FragCity API] Pterodactyl monitoring failed; type=' . get_class($e)
+                . '; code=' . $e->getCode()
+            );
+            apiRespond(503, ['success' => false, 'error' => 'pterodactyl_monitoring_unavailable']);
+        }
     }
 
     if ($isPterodactylStandbyRequest) {
