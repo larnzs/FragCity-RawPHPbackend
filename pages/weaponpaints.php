@@ -3254,7 +3254,7 @@ foreach ($skinInventory as $inventoryEntry) {
     aria-hidden="true"
 >
 
-    <div class="modal-dialog modal-xl selection-modal-dialog">
+    <div class="modal-dialog modal-xl skin-modal-dialog">
 
         <div class="modal-content bg-site-dark">
 
@@ -3264,7 +3264,6 @@ foreach ($skinInventory as $inventoryEntry) {
                     <span class="wp-modal-icon-tile" aria-hidden="true"><i class="fas fa-sticky-note"></i></span>
                     <div class="wp-modal-title-wrap">
                         <span class="wp-modal-eyebrow">Weapon Customization</span>
-                        <h5 class="wp-modal-title">Select Sticker</h5>
                     </div>
                 </div>
 
@@ -3299,7 +3298,7 @@ foreach ($skinInventory as $inventoryEntry) {
     aria-hidden="true"
 >
 
-    <div class="modal-dialog modal-xl selection-modal-dialog">
+    <div class="modal-dialog modal-xl skin-modal-dialog">
 
         <div class="modal-content bg-site-dark">
 
@@ -3309,7 +3308,6 @@ foreach ($skinInventory as $inventoryEntry) {
                     <span class="wp-modal-icon-tile" aria-hidden="true"><i class="fas fa-key"></i></span>
                     <div class="wp-modal-title-wrap">
                         <span class="wp-modal-eyebrow">Weapon Customization</span>
-                        <h5 class="wp-modal-title">Select Keychain</h5>
                     </div>
                 </div>
 
