@@ -2,23 +2,29 @@
 /**
  * Public CS2 server browser.
  *
- * The retired Windows-Agent catalog is intentionally not queried here.
- * Public server inventory can be supplied by settings/public-servers.php
- * (runtime-only, not tracked by Git). Live A2S values will be connected
- * to this view in the next integration step.
+ * The website only reads the signed, cached Server Browser API snapshot.
+ * Pterodactyl discovery and UDP A2S queries run on the Linux API host.
  */
 if (!defined('FRAGCITY_INDEX_RENDER')) {
     header('Location: /index.php?page=servers_vps', true, 303);
     exit;
 }
 
-$serverInventoryPath = dirname(__DIR__) . '/settings/public-servers.php';
-$serverInventory = is_file($serverInventoryPath)
-    ? require $serverInventoryPath
-    : [];
+require_once dirname(__DIR__) . '/class/ServerBrowserRepository.php';
 
-if (!is_array($serverInventory)) {
-    $serverInventory = [];
+$serverInventory = [];
+$serverSnapshot = [
+    'generated_at' => null,
+    'cache_age_seconds' => null,
+    'stale' => false,
+];
+
+try {
+    $serverRepository = new ServerBrowserRepository();
+    $serverSnapshot = $serverRepository->getSnapshot();
+    $serverInventory = $serverSnapshot['servers'];
+} catch (Throwable $e) {
+    error_log('[FragCity] Public Server Browser API is unavailable: ' . get_class($e));
 }
 
 $escapeServerValue = static function ($value): string {
@@ -81,7 +87,7 @@ foreach ($serverInventory as $entry) {
     $mode = trim((string) ($entry['mode'] ?? 'Community')) ?: 'Community';
     $map = trim((string) ($entry['map'] ?? 'Unknown')) ?: 'Unknown';
     $queryRtt = isset($entry['query_rtt_ms']) && is_numeric($entry['query_rtt_ms'])
-        ? max(0, (int) $entry['query_rtt_ms'])
+        ? round(max(0, (float) $entry['query_rtt_ms']), 2)
         : null;
 
     $serverRows[] = [
