@@ -59,7 +59,7 @@ try {
     )->fetchAll(PDO::FETCH_ASSOC);
 
     $maxPerRun = 256;
-    $batchSize = 64;
+    $batchSize = 32;
 
     foreach ($targets as $target) {
         $targetId = (int)$target['id'];
