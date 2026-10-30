@@ -45,8 +45,8 @@ try {
     $weaponRepo = $read('class/WeaponPaintsRepository.php');
     $apiClient = $read('class/FragCityLinuxApiClient.php');
     $settingsLoader = $read('settings/loader.php');
-    $settingsRaw = $read('settings/settings.example.json');
-    $settings = json_decode($settingsRaw, true, 512, JSON_THROW_ON_ERROR);
+    $serverBrowserSettingsRaw = $read('settings/server-browser.integration.example.json');
+    $serverBrowserSettings = json_decode($serverBrowserSettingsRaw, true, 512, JSON_THROW_ON_ERROR);
     $serverBrowserApiClient = $read('class/FragCityServerBrowserApiClient.php');
     $serverBrowserRepository = $read('class/ServerBrowserRepository.php');
     $serverBrowserPage = $read('pages/serverlist.php');
@@ -95,10 +95,11 @@ $check(
         && !str_contains($settingsLoader, 'settings.example.json')
 );
 $check(
-    'Settings sample defaults WeaponPaints to API transport and contains no site bridge secret',
-    (($settings['files']['database.weaponpaints_plugin']['transport'] ?? null) === 'api')
-        && !isset($settings['integrations']['linuxapi_site_bridge'])
-        && !isset($settings['databases']['weaponpaints'])
+    'Server Browser settings fragment contains the HTTPS origin and separate HMAC setting',
+    (($serverBrowserSettings['integrations']['server_browser_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
+        && is_string($serverBrowserSettings['integrations']['server_browser_api']['shared_secret'] ?? null)
+        && !isset($serverBrowserSettings['integrations']['pterodactyl'])
+        && !isset($serverBrowserSettings['integrations']['weaponpaints_api'])
 );
 $check(
     'Server Browser website client uses a separate signed HTTPS integration',
