@@ -30,13 +30,13 @@ and may be copied to clones, logs, backups, or automation systems.
 
 ## Public CS2 Server Browser
 
-The active public Server Browser uses the main website database. It does not require a new API URL, HMAC secret or Pterodactyl token in \`settings/settings.json\`.
+The active public Server Browser uses the main website database. It does not require a new API URL, HMAC secret or Pterodactyl token in `settings/settings.json`.
 
-- Scanner targets and per-port results are stored in \`public_server_scan_targets\` and \`public_server_scan_ports\`.
-- The scheduled CLI job is \`tools/refresh-public-server-browser.php\`.
-- The public page reads results through \`class/PublicServerBrowserRepository.php\`.
-- The Cron Job and PHP website use the existing \`files.index.database_profile\` / \`databases.main\` connection.
+- Scanner targets and per-port results are stored in `public_server_scan_targets` and `public_server_scan_ports`.
+- The scheduled CLI job is `tools/refresh-public-server-browser.php`.
+- The public page reads results through `class/PublicServerBrowserRepository.php`.
+- The Cron Job and PHP website use the existing `files.index.database_profile` / `databases.main` connection.
 
-See \`docs/PUBLIC-SERVER-SCANNER.md\` for the database migration, UDP preflight and shared-hosting Cron setup.
+See `docs/PUBLIC-SERVER-SCANNER.md` for the database migration, UDP preflight and shared-hosting Cron setup.
 
-The separate Pterodactyl API experiment is preserved under \`Pterodactyl Standby\`; it is not required to display public servers.
+The separate Pterodactyl API experiment is preserved under `Pterodactyl Standby`; it is not required to display public servers.
