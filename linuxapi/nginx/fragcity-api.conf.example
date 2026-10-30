@@ -23,9 +23,9 @@ server {
         fastcgi_pass unix:/run/php/php8.3-fpm.sock;
     }
 
-    # Legacy Agent endpoints terminate in the Linux API gateway, which proxies
-    # signed HTTPS requests to the shared-host website connector. No site MySQL is
-    # exposed to this server. PHP still routes only to the fixed index.php script.
+    # Retired Agent compatibility path. The PHP gateway returns HTTP 410;
+    # it no longer proxies requests or connects to the website database.
+    # Keep the fixed front-controller target; do not expose arbitrary PHP files.
     location ^~ /v1/agent/ {
         client_max_body_size 64k;
         include fastcgi_params;
@@ -50,6 +50,19 @@ server {
     }
 
     location = /v1/pterodactyl-standby {
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root/index.php;
+        fastcgi_param SCRIPT_NAME /index.php;
+        fastcgi_param HTTP_X_FRAGCITY_TIMESTAMP $http_x_fragcity_timestamp;
+        fastcgi_param HTTP_X_FRAGCITY_NONCE $http_x_fragcity_nonce;
+        fastcgi_param HTTP_X_FRAGCITY_SIGNATURE $http_x_fragcity_signature;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+    }
+
+    # Signed, server-side Pterodactyl/Wings monitoring API.
+    # This route accepts POST only at the PHP front controller; the browser calls
+    # the website's admin endpoint, never this Linux API route directly.
+    location = /v1/pterodactyl-monitoring {
         include fastcgi_params;
         fastcgi_param SCRIPT_FILENAME $document_root/index.php;
         fastcgi_param SCRIPT_NAME /index.php;
