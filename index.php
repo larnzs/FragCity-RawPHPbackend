@@ -637,6 +637,12 @@ $pageFile = match ($page) {
         referrerpolicy="no-referrer"
     >
 
+    <!-- Shared design tokens: load before all site and page styles -->
+    <link
+        rel="stylesheet"
+        href="/css/design-tokens.css?v=<?= htmlspecialchars(asset_version(__DIR__ . '/css/design-tokens.css'), ENT_QUOTES, 'UTF-8') ?>"
+    >
+
     <!-- Global site styles -->
     <link
         rel="stylesheet"
@@ -651,6 +657,16 @@ $pageFile = match ($page) {
     <link
         rel="stylesheet"
         href="/css/footer.css?v=<?= htmlspecialchars(asset_version(__DIR__ . '/css/footer.css'), ENT_QUOTES, 'UTF-8') ?>"
+    >
+
+    <!-- Shared component primitives and motion utilities -->
+    <link
+        rel="stylesheet"
+        href="/css/components.css?v=<?= htmlspecialchars(asset_version(__DIR__ . '/css/components.css'), ENT_QUOTES, 'UTF-8') ?>"
+    >
+    <link
+        rel="stylesheet"
+        href="/css/motion.css?v=<?= htmlspecialchars(asset_version(__DIR__ . '/css/motion.css'), ENT_QUOTES, 'UTF-8') ?>"
     >
 
     <?php foreach ($currentPageAssets['css'] as $pageCss): ?>
@@ -770,6 +786,10 @@ window.FragCityCurrentPage = <?= json_encode(
         ENT_QUOTES,
         'UTF-8'
     ) ?>"
+></script>
+
+<script
+    src="/js/motion.js?v=<?= htmlspecialchars(asset_version(__DIR__ . '/js/motion.js'), ENT_QUOTES, 'UTF-8') ?>"
 ></script>
 
 <?php foreach ($currentPageAssets['js'] as $pageJs): ?>
