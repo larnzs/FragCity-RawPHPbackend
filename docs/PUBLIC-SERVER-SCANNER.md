@@ -39,6 +39,8 @@ The migration creates:
 
 It also inserts the initial target `85.185.40.85:27085-29100`. Re-running the migration does not replace the existing target's enable switch or retry settings.
 
+The migration intentionally avoids SQL `CHECK` constraints so it can be imported through a wider range of MariaDB/phpMyAdmin versions. The worker validates IPv4 targets, port ranges and scan limits in PHP before opening UDP sockets; timeout/retry settings are also clamped in the worker.
+
 The first scheduled worker run creates the 2,016 per-port state rows. No manual IP/port row insertion is needed.
 
 ### Database permissions
@@ -87,7 +89,7 @@ The runtime settings file is selected through the existing `FRAGCITY_SETTINGS_FI
 | `FRAGCITY_SERVER_BROWSER_DB_PROFILE` | `files.index.database_profile`, or `main` | Select a database profile from the runtime settings JSON |
 | `FRAGCITY_SERVER_BROWSER_MAX_PER_RUN` | `256` | Maximum ports processed per Cron invocation (1–4096) |
 | `FRAGCITY_SERVER_BROWSER_BATCH_SIZE` | `32` | Concurrent A2S queries per batch (1–128) |
-| `FRAGCITY_SERVER_BROWSER_TIME_LIMIT` | `25` | PHP execution limit in seconds; use `0` to disable the PHP-level limit (0–300) |
+| `FRAGCITY_SERVER_BROWSER_TIME_LIMIT` | `30` | PHP execution limit in seconds; use `0` to disable the PHP-level limit (0–300) |
 
 Example environment for a low-resource shared host:
 
@@ -95,7 +97,7 @@ Example environment for a low-resource shared host:
 export FRAGCITY_SETTINGS_FILE="/home/ACCOUNT/private/fragcity-settings.json"
 export FRAGCITY_SERVER_BROWSER_DB_PROFILE="main"
 export FRAGCITY_SERVER_BROWSER_MAX_PER_RUN="128"
-export FRAGCITY_SERVER_BROWSER_BATCH_SIZE="16"
+export FRAGCITY_SERVER_BROWSER_BATCH_SIZE="32"
 export FRAGCITY_SERVER_BROWSER_TIME_LIMIT="25"
 
 php /home/ACCOUNT/fragcity/tools/refresh-public-server-browser.php
