@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../ServerBrowser/A2SInfoQuery.php';
+require_once __DIR__ . '/A2SInfoQuery.php';
 require_once __DIR__ . '/PterodactylApplicationClient.php';
 
 /**
