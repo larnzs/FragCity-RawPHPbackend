@@ -31,7 +31,8 @@
 - `public_server_scan_targets`: IP، بازه پورت و سیاست Query هر مقصد.
 - `public_server_scan_ports`: وضعیت و آخرین نتیجهٔ A2S برای هر پورت.
 - پروتکل A2S: `class/PublicServerBrowserA2SScanner.php`.
-- Repository عملیات اسکن: `class/PublicServerBrowserScanRepository.php`.
+- قرارداد ذخیره‌سازی: `class/PublicServerBrowserScanStoreInterface.php`.
+- Repository عملیات اسکن: `class/PublicServerBrowserScanRepository.php` (پیاده‌سازی PDO/MySQL).
 - Orchestrator پردازش batchها: `class/PublicServerBrowserScanWorker.php`.
 - ورودی CLI/Cron: `tools/refresh-public-server-browser.php`.
 - Repository خواندن صفحه: `class/PublicServerBrowserRepository.php`.
