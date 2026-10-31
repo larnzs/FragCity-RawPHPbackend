@@ -486,7 +486,7 @@ $check(
         && str_contains($siteHeaderMarkup, 'id="shockUserDropdown"')
         && str_contains($siteHeaderStylesheet, 'flex-direction: row-reverse !important;')
         && str_contains($siteHeaderStylesheet, '.shock-header.is-scroll-down')
-        && str_contains($siteHeaderStylesheet, 'rgba(34, 34, 34, .98)')
+        && str_contains($siteHeaderStylesheet, 'background: #0D0D0D !important;')
         && str_contains($headerJavascript, "siteHeader.classList.add('is-scrolled', 'is-scroll-down')")
         && !str_contains($headerJavascript, "remove('is-scroll-down')")
 );
