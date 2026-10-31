@@ -180,7 +180,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                         <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> ثبت دقیق زمان ورودی</span>
                     </div>
                 </div>
-                <div class="home-tick-visual" aria-label="128 Tick">
+                <div class="home-tick-visual" aria-label="64 Tick with Sub-tick">
                     <span class="home-tick-ring home-tick-ring-one"></span>
                     <span class="home-tick-ring home-tick-ring-two"></span>
                     <div class="home-tick-value"><strong>64</strong><span>TICK + SUB-TICK</span></div>
