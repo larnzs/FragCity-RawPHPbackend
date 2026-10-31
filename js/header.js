@@ -392,7 +392,11 @@
 
         if (restoreFocus !== false && authLoginReturnFocus instanceof HTMLElement
             && authLoginReturnFocus.isConnected) {
-            authLoginReturnFocus.focus();
+            if (mobileNav && mobileNav.contains(authLoginReturnFocus) && mobileOpen) {
+                mobileOpen.focus();
+            } else {
+                authLoginReturnFocus.focus();
+            }
         }
         authLoginReturnFocus = null;
     }
