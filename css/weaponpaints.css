@@ -10670,20 +10670,34 @@ html.fc-no-animation .wp-app .wp-saved-paint-card::after {
 .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg,
 .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-fallback {
     display: block;
-    flex: 0 0 20px;
-    width: 20px;
-    min-width: 20px;
-    height: 20px;
-    min-height: 20px;
+    flex: 0 0 42px;
+    width: 42px;
+    min-width: 42px;
+    height: 26px;
+    min-height: 26px;
     margin: 0;
     object-fit: contain;
     object-position: center;
 }
 
 .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-fallback {
+    flex-basis: 20px;
+    width: 20px;
+    min-width: 20px;
+    height: 20px;
+    min-height: 20px;
     color: currentColor;
     font-size: 1rem;
     line-height: 20px;
+}
+
+.wp-app .wp-header .wp-team-switcher .wp-team-btn-svg {
+    display: block;
+    flex: 0 0 21px;
+    width: 21px;
+    height: 21px;
+    object-fit: contain;
+    object-position: center;
 }
 
 .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-label {
