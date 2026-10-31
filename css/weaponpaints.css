@@ -9586,3 +9586,389 @@ body:has(.wp-app) > .wp-modal .wp-mobile-modal-tabs {
         box-sizing: border-box !important;
     }
 }
+
+
+/* =========================================================
+   Final shared dimensions: CT / BOTH / T and the search control
+========================================================= */
+.wp-app .wp-header .wp-team-switcher {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: stretch;
+    gap: 3px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    padding: 4px !important;
+    box-sizing: border-box !important;
+    flex: 0 0 auto;
+}
+
+.wp-app .wp-header .wp-team-switcher .wp-team-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 1 1 0;
+    min-width: 0 !important;
+    width: auto;
+    height: 38px !important;
+    min-height: 38px !important;
+    margin: 0 !important;
+    padding: 0 10px !important;
+    box-sizing: border-box !important;
+    line-height: 1 !important;
+    white-space: nowrap;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-search-wrap {
+    display: flex !important;
+    align-items: center !important;
+    position: relative;
+    flex: 1 1 360px;
+    min-width: 0;
+    max-width: 520px;
+    height: 48px !important;
+    min-height: 48px !important;
+    box-sizing: border-box !important;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-search-wrap .wp-search {
+    display: block;
+    width: 100%;
+    height: 46px !important;
+    min-height: 46px !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    line-height: 1.2 !important;
+}
+
+@media (max-width: 760px) {
+    .wp-app .wp-header .wp-tabs {
+        display: grid !important;
+        grid-template-columns: minmax(116px, .88fr) minmax(0, 1.12fr) !important;
+        grid-template-areas:
+            "team search"
+            "categories categories" !important;
+        align-items: center !important;
+        gap: 7px !important;
+        overflow: visible !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher {
+        grid-area: team !important;
+        width: 100%;
+        height: 44px !important;
+        min-height: 44px !important;
+        gap: 2px !important;
+        padding: 3px !important;
+        border-radius: 10px !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn {
+        height: 36px !important;
+        min-height: 36px !important;
+        padding: 0 4px !important;
+        gap: 4px;
+        font-size: .66rem !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-search-wrap {
+        grid-area: search !important;
+        width: 100% !important;
+        max-width: none !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        flex: 0 0 auto !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-search-wrap .wp-search {
+        height: 42px !important;
+        min-height: 42px !important;
+        padding-inline: 11px 34px !important;
+        font-size: .72rem !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-category-switcher--unified {
+        grid-area: categories !important;
+    }
+}
+
+/* Sticker and Keychain now use the same frame, spacing and gallery proportions
+   as Select Paint. This is deliberately shared across all three dialogs. */
+body > #skinModal .wp-modal-content,
+body > #stickerModal .modal-content,
+body > #keychainModal .modal-content {
+    overflow: hidden;
+    border: 1px solid #292929 !important;
+    border-radius: 18px !important;
+    background: #111111 !important;
+    color: #F5F5F5 !important;
+    box-shadow: 0 28px 80px rgba(0, 0, 0, .48) !important;
+}
+
+body > #skinModal .wp-modal-header--weapon,
+body > #stickerModal .wp-modal-header--weapon,
+body > #keychainModal .wp-modal-header--weapon {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    padding: 13px 16px !important;
+    border-bottom: 1px solid #292929 !important;
+    background: #151515 !important;
+}
+
+body > #stickerModal .wp-modal-header-tools,
+body > #keychainModal .wp-modal-header-tools {
+    display: flex;
+    flex: 1 1 auto;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 9px;
+    min-width: 0;
+}
+
+body > #stickerModal .wp-modal-header-tools .wp-selection-toolbar-info,
+body > #keychainModal .wp-modal-header-tools .wp-selection-toolbar-info {
+    display: flex;
+    flex: 0 1 auto;
+    align-items: center;
+    gap: 6px !important;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+body > #stickerModal .wp-modal-header-tools .wp-selection-search,
+body > #keychainModal .wp-modal-header-tools .wp-selection-search {
+    display: flex;
+    flex: 1 1 220px;
+    align-items: center;
+    min-width: 120px;
+    max-width: 300px;
+    margin-inline-start: auto;
+}
+
+body > #stickerModal .wp-modal-header-tools .wp-addon-search,
+body > #keychainModal .wp-modal-header-tools .wp-addon-search {
+    width: 100% !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    margin: 0 !important;
+    padding: 0 11px !important;
+    border: 1px solid #303030 !important;
+    border-radius: 8px !important;
+    background: #0D0D0D !important;
+    color: #F5F5F5 !important;
+    box-shadow: none !important;
+    font-size: .72rem !important;
+}
+
+body > #stickerModal .wp-modal-body,
+body > #keychainModal .wp-modal-body {
+    display: flex !important;
+    flex-direction: column;
+    gap: 9px;
+    min-width: 0;
+    min-height: 0;
+    padding: 12px !important;
+    background: #0D0D0D !important;
+}
+
+body > #stickerModal .wp-addon-workspace,
+body > #keychainModal .wp-addon-workspace {
+    display: grid !important;
+    grid-template-columns: minmax(260px, 280px) minmax(0, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr);
+    gap: 9px !important;
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden !important;
+    direction: ltr;
+}
+
+body > #stickerModal .wp-addon-properties,
+body > #keychainModal .wp-addon-properties {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    max-height: none !important;
+    padding: 7px !important;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid rgba(255,255,255,.09) !important;
+    border-radius: 11px !important;
+    background: #111111 !important;
+    direction: rtl;
+}
+
+body > #stickerModal .wp-addon-list-pane,
+body > #keychainModal .wp-addon-list-pane {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.09) !important;
+    border-radius: 11px !important;
+    background: #111111 !important;
+}
+
+body > #stickerModal .wp-addon-grid-scroll,
+body > #keychainModal .wp-addon-grid-scroll {
+    flex: 1 1 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    padding: 8px !important;
+    overflow-x: hidden;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+}
+
+body > #stickerModal .wp-addon-grid,
+body > #keychainModal .wp-addon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)) !important;
+    align-content: start;
+    gap: 9px !important;
+    width: 100%;
+    min-width: 0;
+}
+
+body > #stickerModal .wp-addon-settings-card,
+body > #keychainModal .wp-addon-settings-card {
+    flex: 0 0 auto;
+    width: 100%;
+    padding: 9px !important;
+    border: 1px solid #292929 !important;
+    border-radius: 10px !important;
+    background: #141414 !important;
+    box-shadow: none !important;
+}
+
+body > #stickerModal .wp-addon-field,
+body > #keychainModal .wp-addon-field {
+    border-color: #292929 !important;
+    border-radius: 9px !important;
+    background: #111111 !important;
+}
+
+body > #stickerModal .wp-addon-field .wp-control-input,
+body > #keychainModal .wp-addon-field .wp-control-input {
+    height: 34px !important;
+    min-height: 34px !important;
+    border-color: #303030 !important;
+    border-radius: 8px !important;
+    background: #0D0D0D !important;
+    color: #F5F5F5 !important;
+}
+
+body > #stickerModal .selection-footer,
+body > #keychainModal .selection-footer {
+    flex: 0 0 auto;
+    margin: 0 !important;
+    padding: 9px 0 0 !important;
+    border-top: 1px solid #292929 !important;
+}
+
+body > #stickerModal .selection-footer .wp-btn,
+body > #keychainModal .selection-footer .wp-btn {
+    min-height: 40px;
+    border-radius: 9px;
+}
+
+@media (max-width: 1100px) {
+    body > #stickerModal .wp-addon-workspace,
+    body > #keychainModal .wp-addon-workspace {
+        grid-template-columns: minmax(240px, 280px) minmax(0, 1fr) !important;
+    }
+}
+
+@media (max-width: 720px) {
+    body > #stickerModal .modal-dialog,
+    body > #keychainModal .modal-dialog {
+        width: calc(100vw - 16px) !important;
+        height: calc(100dvh - 16px) !important;
+        max-height: calc(100dvh - 16px) !important;
+        margin: 0 auto !important;
+    }
+
+    body > #stickerModal .wp-modal-header--weapon,
+    body > #keychainModal .wp-modal-header--weapon {
+        flex-wrap: wrap;
+        padding: 10px 11px !important;
+        gap: 7px;
+    }
+
+    body > #stickerModal .wp-modal-header-tools,
+    body > #keychainModal .wp-modal-header-tools {
+        flex: 1 1 100%;
+        width: 100%;
+        order: 3;
+        flex-wrap: wrap;
+        overflow: visible;
+    }
+
+    body > #stickerModal .wp-modal-header-tools .wp-selection-toolbar-info,
+    body > #keychainModal .wp-modal-header-tools .wp-selection-toolbar-info {
+        flex: 1 1 100%;
+        flex-wrap: wrap;
+        white-space: normal;
+    }
+
+    body > #stickerModal .wp-modal-header-tools .wp-selection-search,
+    body > #keychainModal .wp-modal-header-tools .wp-selection-search {
+        flex: 1 1 100%;
+        max-width: none;
+        min-width: 0;
+        margin: 0;
+    }
+
+    body > #stickerModal .wp-addon-workspace,
+    body > #keychainModal .wp-addon-workspace {
+        display: block !important;
+        flex: 1 1 auto !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+    }
+
+    body > #stickerModal .wp-addon-workspace > [data-wp-mobile-panel],
+    body > #keychainModal .wp-addon-workspace > [data-wp-mobile-panel] {
+        display: none !important;
+    }
+
+    body > #stickerModal .wp-addon-workspace > .wp-addon-list-pane.is-mobile-active,
+    body > #keychainModal .wp-addon-workspace > .wp-addon-list-pane.is-mobile-active {
+        display: flex !important;
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    body > #stickerModal .wp-addon-workspace > .wp-addon-properties.is-mobile-active,
+    body > #keychainModal .wp-addon-workspace > .wp-addon-properties.is-mobile-active {
+        display: flex !important;
+        width: 100%;
+        height: 100%;
+        max-height: none !important;
+        min-width: 0;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto !important;
+    }
+
+    body > #stickerModal .wp-addon-grid,
+    body > #keychainModal .wp-addon-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 7px !important;
+    }
+}
