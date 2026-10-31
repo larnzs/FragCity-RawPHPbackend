@@ -3771,3 +3771,58 @@ html.fc-no-animation .sl-player-modal-backdrop {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
+
+
+/* Final alignment fixes: keep each FACEIT icon centered under its own header. */
+.sl-player-table th.sl-player-faceit-heading,
+.sl-player-table td.sl-player-faceit {
+    width: 116px;
+    min-width: 116px;
+    padding-inline: 10px;
+    text-align: center !important;
+    vertical-align: middle;
+}
+
+.sl-player-table th.sl-player-faceit-heading {
+    white-space: nowrap;
+}
+
+.sl-player-table td.sl-player-faceit .sl-faceit-level-icon {
+    display: block;
+    margin-inline: auto;
+}
+
+/* The hidden attribute must win over the row's flex display declaration. */
+.sl-faceit-average-row[hidden] {
+    display: none !important;
+}
+
+/* Grid cards use the same explicit vertical flow, with FACEIT as the final row. */
+#serverList[data-sl-view="grid"] .sl-card-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+        "heading"
+        "address"
+        "metrics"
+        "capacity"
+        "footer"
+        "faceit";
+    align-items: stretch;
+    align-content: start;
+    row-gap: 0;
+}
+
+#serverList[data-sl-view="grid"] .sl-card-heading { grid-area: heading; }
+#serverList[data-sl-view="grid"] .sl-card-address { grid-area: address; }
+#serverList[data-sl-view="grid"] .sl-card-metrics { grid-area: metrics; }
+#serverList[data-sl-view="grid"] .sl-capacity { grid-area: capacity; }
+#serverList[data-sl-view="grid"] .sl-card-footer { grid-area: footer; }
+#serverList[data-sl-view="grid"] .sl-faceit-average-row {
+    grid-area: faceit;
+    width: 100%;
+    min-height: 36px;
+    justify-content: flex-start;
+    margin-top: 9px;
+    padding-top: 8px;
+}
