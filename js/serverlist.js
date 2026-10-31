@@ -48,7 +48,7 @@
 
         if (!list) return;
 
-        let statusFilter = 'all';
+        let statusFilter = 'online';
         let toastTimer = 0;
         let activePlayerButton = null;
         let playerRequestController = null;
@@ -375,7 +375,7 @@
 
         if (clearButton) {
             clearButton.addEventListener('click', function () {
-                statusFilter = 'all';
+                statusFilter = 'online';
                 if (search) search.value = '';
                 if (modeSelect) modeSelect.value = '';
                 if (mapSelect) mapSelect.value = '';
@@ -383,7 +383,7 @@
 
                 if (pills) {
                     pills.querySelectorAll('[data-sl-filter]').forEach(function (pill) {
-                        const active = pill.dataset.slFilter === 'all';
+                        const active = pill.dataset.slFilter === 'online';
                         pill.classList.toggle('active', active);
                         pill.setAttribute('aria-pressed', active ? 'true' : 'false');
                     });
