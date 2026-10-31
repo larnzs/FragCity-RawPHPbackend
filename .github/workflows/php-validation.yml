@@ -20,6 +20,9 @@ jobs:
           extensions: curl, pdo_mysql, mbstring
           coverage: none
 
+      - name: Validate Server Browser JavaScript syntax
+        run: node --check js/serverlist.js
+
       - name: Lint every PHP source file
         run: |
           set -eu
