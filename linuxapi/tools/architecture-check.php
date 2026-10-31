@@ -60,6 +60,7 @@ try {
     $serverListStylesheet = $read('css/serverlist.css');
     $siteHeaderMarkup = $read('includes/header.php');
     $siteHeaderStylesheet = $read('css/header.css');
+    $headerJavascript = $read('js/header.js');
     $websiteIndex = $read('index.php');
     $testHarnessIndex = $read('tst/index.php');
     $standbyPterodactylClient = $read('linuxapi/src/PterodactylStandby/PterodactylApplicationClient.php');
@@ -458,23 +459,44 @@ $check(
 );
 
 $check(
-    'Server Browser desaturates offline cards and labels the server-side A2S RTT honestly',
+    'Server Browser desaturates offline cards and does not mislabel server-side RTT as visitor ping',
     str_contains($serverListPage, "sl-server-card--offline")
-        && str_contains($serverListPage, "sl-metric--query-rtt")
+        && str_contains($serverListPage, "sl-metric--client-ping")
         && str_contains($serverListPage, "fa-signal")
-        && str_contains($serverListPage, "A2S RTT")
-        && str_contains($serverListPage, "پینگ واقعی اینترنت بازیکن نیست")
+        && str_contains($serverListPage, "Ping شما")
+        && str_contains($serverListPage, "data-sl-client-ping")
+        && str_contains($serverListPage, "مرورگر به‌تنهایی نمی‌تواند UDP")
+        && !str_contains($serverListPage, "A2S RTT")
         && str_contains($serverListStylesheet, '.sl-server-card[data-status="offline"]')
         && str_contains($serverListStylesheet, 'filter: grayscale(1) saturate(0);')
 );
 
 $check(
-    'Mobile header places the hamburger at the right of the profile and darkens on scroll down',
+    'Server Browser defaults to Online and does not sort the visitor by A2S RTT',
+    str_contains($serverListPage, 'data-sl-filter="online" aria-pressed="true"')
+        && str_contains($standbyBrowserJavascript, "let statusFilter = 'online';")
+        && str_contains($standbyBrowserJavascript, "statusFilter = 'online';")
+        && !str_contains($serverListPage, 'query-asc')
+        && !str_contains($standbyBrowserJavascript, 'query-asc')
+);
+
+$check(
+    'Mobile header places the hamburger to the right of the profile and stays graphite-filled until page top',
     str_contains($siteHeaderMarkup, 'id="mobileNavOpen"')
         && str_contains($siteHeaderMarkup, 'id="shockUserDropdown"')
         && str_contains($siteHeaderStylesheet, 'flex-direction: row-reverse !important;')
         && str_contains($siteHeaderStylesheet, '.shock-header.is-scroll-down')
-        && str_contains($siteHeaderStylesheet, 'rgba(7, 7, 7, .97)')
+        && str_contains($siteHeaderStylesheet, 'rgba(34, 34, 34, .98)')
+        && str_contains($headerJavascript, "siteHeader.classList.add('is-scrolled', 'is-scroll-down')")
+        && !str_contains($headerJavascript, "remove('is-scroll-down')")
+);
+
+$check(
+    'WeaponPaints category active states share the FragCity orange and mobile team/search controls align',
+    str_contains($weaponPaintsStylesheet, '.wp-category-switcher--unified > .wp-tab[data-bs-target].is-active')
+        && str_contains($weaponPaintsStylesheet, 'background: rgba(249, 115, 22, .12) !important;')
+        && str_contains($weaponPaintsStylesheet, 'height: 42px !important;')
+        && str_contains($weaponPaintsStylesheet, '.wp-team-btn')
 );
 
 $check(
