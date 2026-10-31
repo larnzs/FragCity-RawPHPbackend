@@ -19,7 +19,7 @@
         const root = document.getElementById('fragcityServerBrowser');
         if (!root) return;
 
-        const faceitIconBase = String(root.dataset.faceitIconBase || '/img/icons/faceit/')
+        const faceitIconBase = String(root.dataset.faceitIconBase || '/img/faceit/')
             .replace(/\/?$/, '/');
         const faceitIconVersion = String(root.dataset.faceitIconVersion || '1');
 
