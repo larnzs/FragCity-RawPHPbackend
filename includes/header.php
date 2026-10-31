@@ -282,7 +282,10 @@ $mobileNavItems = [
             <?php else: ?>
                 <a href="?page=login"
                    class="frag-login-btn <?= $isPageActive(['login', 'register']) ?>"
-                   data-ajax-nav data-slug="login">
+                   data-auth-modal-open
+                   aria-haspopup="dialog"
+                   aria-controls="fcLoginModal"
+                   aria-expanded="false">
                     <i class="fas fa-user-lock" aria-hidden="true"></i>
                     <span>ورود / ثبت‌نام</span>
                 </a>
@@ -334,10 +337,43 @@ $mobileNavItems = [
                 <span>خروج</span>
             </a>
         <?php else: ?>
-            <a href="?page=login" class="mobile-nav-link <?= $isPageActive(['login', 'register']) ?>" data-ajax-nav data-slug="login">
+            <a href="?page=login"
+               class="mobile-nav-link <?= $isPageActive(['login', 'register']) ?>"
+               data-auth-modal-open
+               aria-haspopup="dialog"
+               aria-controls="fcLoginModal"
+               aria-expanded="false">
                 <i class="fas fa-user-lock" aria-hidden="true"></i>
                 <span>ورود / ثبت‌نام</span>
             </a>
         <?php endif; ?>
     </div>
 </nav>
+
+<?php if (!$isLoggedIn): ?>
+    <div class="fc-auth-modal" id="fcLoginModal" aria-hidden="true" hidden>
+        <div class="fc-auth-modal__backdrop" data-auth-modal-close></div>
+        <section
+            class="fc-auth-modal__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-label="ورود به حساب FragCity"
+            tabindex="-1"
+        >
+            <button
+                type="button"
+                class="fc-auth-modal__close"
+                data-auth-modal-close
+                aria-label="بستن پنجره ورود"
+            >
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <div class="fc-auth-modal__content" id="fcLoginModalContent">
+                <div class="fc-auth-modal__loading" role="status">
+                    <span class="fc-auth-modal__spinner" aria-hidden="true"></span>
+                    <span>در حال آماده‌سازی فرم ورود...</span>
+                </div>
+            </div>
+        </section>
+    </div>
+<?php endif; ?>
