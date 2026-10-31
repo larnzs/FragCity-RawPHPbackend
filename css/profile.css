@@ -1473,3 +1473,146 @@
         transition: none !important;
     }
 }
+
+
+/* ==========================================================================
+   Frosted glass refresh — account identity and account settings only.
+   The weapon/loadout inventory section intentionally keeps its own styling.
+   ========================================================================== */
+
+.profile-fullscreen .profile-hero,
+.profile-fullscreen .profile-settings-card {
+    border-color: rgba(255, 255, 255, 0.085);
+    background:
+        radial-gradient(ellipse at 8% 0%, rgba(249, 115, 22, 0.075), transparent 46%),
+        linear-gradient(135deg, rgba(27, 27, 27, 0.82), rgba(13, 13, 13, 0.74));
+    box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    -webkit-backdrop-filter: blur(18px) saturate(125%);
+    backdrop-filter: blur(18px) saturate(125%);
+}
+
+.profile-fullscreen .profile-hero {
+    border-bottom-color: rgba(255, 255, 255, 0.085);
+}
+
+.profile-fullscreen .profile-identity-id,
+.profile-fullscreen .profile-steam-chip,
+.profile-fullscreen .profile-steam-link {
+    border-color: rgba(255, 255, 255, 0.09);
+    background: rgba(255, 255, 255, 0.035);
+    -webkit-backdrop-filter: blur(12px) saturate(120%);
+    backdrop-filter: blur(12px) saturate(120%);
+}
+
+.profile-fullscreen .profile-identity-id > i,
+.profile-fullscreen .profile-steam-chip > i {
+    display: inline-grid;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    place-items: center;
+    border: 1px solid rgba(249, 115, 22, 0.16);
+    border-radius: 5px;
+    background: rgba(249, 115, 22, 0.085);
+    color: #FDBA74;
+    font-size: 0.68rem;
+}
+
+.profile-fullscreen .profile-steam-chip .profile-steam-status__dot {
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border: 0;
+    border-radius: 50%;
+    background: #737373;
+}
+
+.profile-fullscreen .profile-steam-status[data-state="1"] .profile-steam-status__dot {
+    background: var(--profile-green);
+}
+
+.profile-fullscreen .upload-btn {
+    border-color: rgba(255, 255, 255, 0.14);
+    background: rgba(13, 13, 13, 0.58);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.24);
+    -webkit-backdrop-filter: blur(16px) saturate(125%);
+    backdrop-filter: blur(16px) saturate(125%);
+}
+
+.profile-fullscreen .upload-btn:hover,
+.profile-fullscreen .upload-btn:focus-visible {
+    background: rgba(30, 30, 30, 0.72);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+}
+
+.profile-fullscreen .profile-settings-card {
+    border-radius: 16px;
+}
+
+.profile-fullscreen .profile-settings-card__icon {
+    border-color: rgba(249, 115, 22, 0.24);
+    background: linear-gradient(145deg, rgba(249, 115, 22, 0.16), rgba(249, 115, 22, 0.055));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.055);
+}
+
+.profile-fullscreen .profile-settings-progress-label {
+    border-color: rgba(255, 255, 255, 0.095);
+    background: rgba(255, 255, 255, 0.035);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+}
+
+.profile-fullscreen .profile-settings-field input {
+    border-color: rgba(255, 255, 255, 0.105);
+    background: rgba(8, 8, 8, 0.58);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.profile-fullscreen .profile-settings-field input:focus {
+    background: rgba(17, 17, 17, 0.76);
+}
+
+.profile-fullscreen .profile-settings-hint > i,
+.profile-fullscreen .profile-settings-unavailable > i {
+    display: inline-grid;
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    place-items: center;
+    border: 1px solid rgba(249, 115, 22, 0.16);
+    border-radius: 6px;
+    background: rgba(249, 115, 22, 0.08);
+}
+
+@media (max-width: 520px) {
+    .profile-fullscreen .profile-settings-card {
+        border-radius: 13px;
+    }
+
+    .profile-fullscreen .profile-hero {
+        -webkit-backdrop-filter: blur(14px) saturate(120%);
+        backdrop-filter: blur(14px) saturate(120%);
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .profile-fullscreen .profile-hero,
+    .profile-fullscreen .profile-settings-card,
+    .profile-fullscreen .profile-identity-id,
+    .profile-fullscreen .profile-steam-chip,
+    .profile-fullscreen .profile-steam-link,
+    .profile-fullscreen .upload-btn,
+    .profile-fullscreen .profile-settings-progress-label,
+    .profile-fullscreen .profile-settings-field input {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    .profile-fullscreen .profile-hero,
+    .profile-fullscreen .profile-settings-card {
+        background: #151515;
+    }
+}
