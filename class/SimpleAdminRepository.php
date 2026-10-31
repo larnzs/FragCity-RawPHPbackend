@@ -16,48 +16,69 @@ final class SimpleAdminRepository
 
     /**
      * Resolve A2S player names to SteamID64 without requesting or exposing IPs.
+     * Identical live names are deliberately marked ambiguous instead of
+     * assigning the same historical identity to multiple connected players.
      *
      * @param array<int|string, mixed> $players
      * @return array<int|string, mixed>
      */
     public function resolvePlayers(array $players): array
     {
-        $names = [];
+        $nameCounts = [];
+        $namesByKey = [];
+
         foreach ($players as $player) {
-            if (!is_array($player) || self::normalizeSteamId($player['steam_id'] ?? null) !== null) {
+            if (!is_array($player)) {
                 continue;
             }
 
             $name = trim((string)($player['name'] ?? ''));
-            if ($name !== '') {
-                $names[$name] = $name;
-            }
-        }
-
-        if ($names === []) {
-            return $players;
-        }
-
-        $data = $this->api->request([
-            'action' => 'resolve_player_names',
-            'names' => array_values($names),
-        ], '/v1/simpleadmin');
-
-        $matches = [];
-        foreach (($data['matches'] ?? []) as $match) {
-            if (!is_array($match) || !is_string($match['name'] ?? null)) {
+            if ($name === '') {
                 continue;
             }
 
-            $name = $match['name'];
-            $status = is_string($match['status'] ?? null) ? $match['status'] : 'not_found';
-            $steamId = self::normalizeSteamId($match['steam_id'] ?? null);
-            $matches[$name] = ($status === 'resolved' && $steamId !== null)
-                ? ['steam_id' => $steamId, 'status' => 'resolved']
-                : [
-                    'steam_id' => null,
-                    'status' => in_array($status, ['ambiguous', 'not_found'], true) ? $status : 'not_found',
-                ];
+            $key = self::normalizePlayerNameKey($name);
+            $nameCounts[$key] = ($nameCounts[$key] ?? 0) + 1;
+
+            if (self::normalizeSteamId($player['steam_id'] ?? null) === null
+                && self::isSafeLookupName($name)) {
+                $namesByKey[$key] = $name;
+            }
+        }
+
+        // A2S names are not unique identifiers. Do not ask SimpleAdmin to
+        // resolve a name that is shared by two live players on this server.
+        foreach ($nameCounts as $key => $count) {
+            if ($count > 1) {
+                unset($namesByKey[$key]);
+            }
+        }
+
+        $matchesByKey = [];
+        if ($namesByKey !== []) {
+            $data = $this->api->request([
+                'action' => 'resolve_player_names',
+                'names' => array_values($namesByKey),
+            ], '/v1/simpleadmin');
+
+            foreach (($data['matches'] ?? []) as $match) {
+                if (!is_array($match) || !is_string($match['name'] ?? null)) {
+                    continue;
+                }
+
+                $key = self::normalizePlayerNameKey($match['name']);
+                $status = is_string($match['status'] ?? null) ? $match['status'] : 'not_found';
+                $steamId = self::normalizeSteamId($match['steam_id'] ?? null);
+
+                $matchesByKey[$key] = ($status === 'resolved' && $steamId !== null)
+                    ? ['steam_id' => $steamId, 'status' => 'resolved']
+                    : [
+                        'steam_id' => null,
+                        'status' => in_array($status, ['ambiguous', 'not_found'], true)
+                            ? $status
+                            : 'not_found',
+                    ];
+            }
         }
 
         foreach ($players as $index => $player) {
@@ -71,7 +92,22 @@ final class SimpleAdminRepository
             }
 
             $name = trim((string)($player['name'] ?? ''));
-            $match = $matches[$name] ?? ['steam_id' => null, 'status' => 'not_found'];
+            if ($name === '') {
+                $match = ['steam_id' => null, 'status' => 'not_found'];
+            } else {
+                $key = self::normalizePlayerNameKey($name);
+                if (($nameCounts[$key] ?? 0) > 1) {
+                    $match = ['steam_id' => null, 'status' => 'ambiguous'];
+                } elseif (!self::isSafeLookupName($name)) {
+                    $match = ['steam_id' => null, 'status' => 'not_found'];
+                } else {
+                    $match = $matchesByKey[$key] ?? [
+                        'steam_id' => null,
+                        'status' => 'not_found',
+                    ];
+                }
+            }
+
             $players[$index]['steam_id'] = $match['steam_id'];
             $players[$index]['steam_id_status'] = $match['status'];
         }
@@ -117,6 +153,28 @@ final class SimpleAdminRepository
             'per_page' => max(1, (int)$data['per_page']),
             'total_pages' => max(1, (int)$data['total_pages']),
         ];
+    }
+
+    private static function isSafeLookupName(string $name): bool
+    {
+        return preg_match('//u', $name) === 1
+            && !str_contains($name, "\0")
+            && mb_strlen($name, 'UTF-8') <= 64;
+    }
+
+    private static function normalizePlayerNameKey(string $name): string
+    {
+        $name = trim($name);
+        if (class_exists('Normalizer')) {
+            $normalized = Normalizer::normalize($name, Normalizer::FORM_C);
+            if (is_string($normalized)) {
+                $name = $normalized;
+            }
+        }
+
+        return function_exists('mb_strtolower')
+            ? mb_strtolower($name, 'UTF-8')
+            : strtolower($name);
     }
 
     private static function normalizeSteamId(mixed $value): ?string
