@@ -567,7 +567,7 @@ $faceitIconVersion = function_exists('asset_version')
                                 <th scope="col">استیم آیدی</th>
                                 <th scope="col">مدت اتصال</th>
                                 <th scope="col">امتیاز</th>
-                                <th scope="col">لول FACEIT</th>
+                                <th scope="col" class="sl-player-faceit-heading">لول FACEIT</th>
                             </tr>
                         </thead>
                         <tbody id="slPlayerTableBody"></tbody>
