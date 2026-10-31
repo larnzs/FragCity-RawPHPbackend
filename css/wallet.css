@@ -682,3 +682,16 @@ body.withdraw-modal-open {
         grid-template-columns: 1fr;
     }
 }
+
+/* Wallet content follows the same clearance below the overlay header. */
+.wallet-page {
+    padding-top: calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap, 28px));
+    padding-bottom: var(--fc-page-safe-bottom, 64px);
+}
+
+@media (max-width: 700px) {
+    .wallet-page {
+        padding-top: calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px));
+        padding-bottom: var(--fc-page-safe-bottom, 44px);
+    }
+}
