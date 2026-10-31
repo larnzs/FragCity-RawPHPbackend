@@ -7,7 +7,7 @@ declare(strict_types=1);
  * SimpleAdmin may apply a permanent display name from sa_renames after the
  * connecting player's original name has already been captured for
  * sa_players_ips. Resolve those forced display names first, then fall back
- * to the historical names table. The IP/address column is never selected.
+ * to the historical names table. No network identifier is fetched.
  */
 final class SimpleAdminPlayerLookup
 {
