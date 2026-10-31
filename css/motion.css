@@ -117,3 +117,48 @@ html.fc-motion-ready [data-fc-reveal].is-visible {
     }
     .content-fader.fade-out { opacity: 1; transform: none; pointer-events: auto; }
 }
+
+
+/* Persistent performance mode. Keep controls and content usable while removing
+   animation, transitions, blur filters and expensive decorative shadows. */
+html.fc-no-animation,
+html.fc-no-animation * ,
+html.fc-no-animation *::before,
+html.fc-no-animation *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+    will-change: auto !important;
+}
+
+html.fc-no-animation *,
+html.fc-no-animation *::before,
+html.fc-no-animation *::after {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    filter: none !important;
+    box-shadow: none !important;
+}
+
+html.fc-no-animation [data-fc-reveal],
+html.fc-no-animation [data-fc-reveal].is-visible,
+html.fc-no-animation .fc-motion-page-enter,
+html.fc-no-animation .content-fader.fade-out {
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto !important;
+}
+
+html.fc-no-animation .fc-motion-interactive:hover,
+html.fc-no-animation .fc-motion-interactive:active,
+html.fc-no-animation .fc-motion-hover-lift:hover {
+    transform: none !important;
+}
+
+html.fc-no-animation .sl-art-ring,
+html.fc-no-animation .sl-art-ring-two,
+html.fc-no-animation .leaderboard-page *,
+html.fc-no-animation .banlist-page * {
+    animation: none !important;
+    transition: none !important;
+}
