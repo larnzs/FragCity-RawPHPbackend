@@ -2034,3 +2034,9 @@
         transform: none;
     }
 }
+
+/* The landing page remains full-bleed at the top but does not collide with
+   the shared footer after its final section. */
+.site-body .main-content.main-content--home {
+    padding-bottom: var(--fc-page-safe-bottom, 64px) !important;
+}
