@@ -273,14 +273,7 @@
                  * اسکرول داخل صفحه به ابتدای جدول برگردد.
                  */
 
-                tableWrapper.scrollIntoView(
-                    {
-                        behavior: document.documentElement.classList.contains('fc-no-animation') ? 'auto' : 'smooth',
-
-                        block:
-                            'start'
-                    }
-                );
+                // Deliberately preserve the current scroll position after a tab swap.
 
 
             } catch (

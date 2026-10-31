@@ -1,54 +1,39 @@
 <?php
 require_once __DIR__ . '/../settings/loader.php';
-// pages/vip.php
-$steamid64 = $_SESSION['steamid'] ?? '';
+
+$steamid64 = (string) ($_SESSION['steamid'] ?? '');
 $isLoggedIn = isset($_SESSION['user_logged_in']);
-
 $userVip = ['vip_level' => 0, 'vip_expire' => null];
-$userXp = 0;
 
-if ($isLoggedIn) {
+$vipSettings = fragcity_settings('files.pages.vip', []);
+$vipProfile = (string) ($vipSettings['database_profile'] ?? 'main');
+$vipPurchaseCatalog = is_array($vipSettings['purchase_catalog'] ?? null)
+    ? $vipSettings['purchase_catalog']
+    : [];
+$vipPurchasePackages = is_array($vipPurchaseCatalog['packages'] ?? null)
+    ? $vipPurchaseCatalog['packages']
+    : [];
+$vipCurrency = (string) ($vipPurchaseCatalog['currency'] ?? 'تومان');
+
+if ($isLoggedIn && $steamid64 !== '') {
     try {
-        // دریافت وضعیت VIP از دیتابیس سایت
-        $vipSettings=fragcity_settings('files.pages.vip',array());
-        $vipProfile=isset($vipSettings['database_profile'])?$vipSettings['database_profile']:'main';
-        $pdo=fragcity_create_pdo($vipProfile);
-        if(!$pdo)throw new PDOException('Database unavailable or not configured.');
-        $stmt = $pdo->prepare("SELECT vip_level, vip_expire FROM users WHERE steamid64 = ?");
+        $pdo = fragcity_create_pdo($vipProfile);
+        if (!$pdo) {
+            throw new PDOException('VIP database is unavailable.');
+        }
+
+        $stmt = $pdo->prepare(
+            'SELECT vip_level, vip_expire FROM users WHERE steamid64 = ? LIMIT 1'
+        );
         $stmt->execute([$steamid64]);
         $userVip = $stmt->fetch(PDO::FETCH_ASSOC) ?: $userVip;
-
-        // دریافت XP از دیتابیس ranks_plugin روی VPS
-        require_once __DIR__ . '/../database/kyonxcbt_ranks_plugin.php';
-        $db = new RemoteRanksDatabase();
-
-        // تبدیل SteamID64 به فرمت STEAM_1:... (مطابق ساختار lvl_base)
-        function steamid64_to_steamid($steamid64) {
-            $accountId = $steamid64 - 76561197960265728;
-            $y = floor($accountId / 2);
-            $v = $accountId % 2;
-            return "STEAM_1:{$v}:{$y}";
-        }
-        $steamFormatted = steamid64_to_steamid($steamid64);
-
-        // کوئری با bind parameter
-        $sql = "SELECT value FROM lvl_base WHERE steam = :steam LIMIT 1";
-        $bindings = [':steam' => $steamFormatted];
-        $xpResult = $db->select($sql, $bindings);
-        $userXp = isset($xpResult[0]['value']) ? (int)$xpResult[0]['value'] : 0;
-
-    } catch (Exception $e) {
-        $userXp = 0;
+    } catch (Throwable $e) {
+        error_log('[FragCity VIP storefront] ' . $e->getMessage());
     }
 }
 
 $vipNames = [0 => 'ندارد', 1 => 'برنزی', 2 => 'نقره‌ای', 3 => 'طلایی', 4 => 'پلاتینیوم', 5 => 'امرالد', 6 => 'دایموند'];
-$vipIcons = [0=>'',1=>'medal',2=>'medal',3=>'crown',4=>'gem',5=>'leaf',6=>'gem'];
-$vipActive = ($userVip && $userVip['vip_expire'] && new DateTime($userVip['vip_expire']) > new DateTime());
-
-$maxXp = 5000; // بیشترین XP قابل انتظار
-$xpPercent = $maxXp > 0 ? min(100, round(($userXp / $maxXp) * 100)) : 0;
-
+// بیشترین XP قابل انتظار
 $vipLevels = [
     1 => ['name' => 'برنزی', 'fa_icon' => 'fas fa-medal', 'color' => '#cd7f32', 'gradient' => 'linear-gradient(135deg, #cd7f32, #a0522d)'],
     2 => ['name' => 'نقره‌ای', 'fa_icon' => 'fas fa-medal', 'color' => '#c0c0c0', 'gradient' => 'linear-gradient(135deg, #c0c0c0, #808080)'],
@@ -150,66 +135,182 @@ $vipFeaturesData = [
         ['icon' => 'fas fa-tag', 'title' => 'تگ', 'desc' => 'VIP : DIAMOND']
     ]
 ];
-?>
 
+$vipCurrentLevel = max(0, (int) ($userVip['vip_level'] ?? 0));
+$vipActive = false;
+$vipExpiryLabel = '—';
+
+if (!empty($userVip['vip_expire'])) {
+    try {
+        $vipExpiry = new DateTimeImmutable((string) $userVip['vip_expire']);
+        $vipActive = $vipExpiry > new DateTimeImmutable('now');
+        $vipExpiryLabel = $vipExpiry->format('Y/m/d H:i');
+        if (!$vipActive) {
+            $vipExpiryLabel .= ' · منقضی شده';
+        }
+    } catch (Throwable $e) {
+        $vipExpiryLabel = 'نامشخص';
+    }
+}
+
+$vipHasActiveMembership = $vipActive && $vipCurrentLevel > 0;
+$vipCurrentName = $vipNames[$vipCurrentLevel] ?? 'نامشخص';
+$vipCurrentStatus = !$isLoggedIn
+    ? 'برای مشاهده وضعیت وارد شوید'
+    : ($vipHasActiveMembership ? 'اشتراک فعال' : 'بدون اشتراک فعال');
+?>
 <link rel="stylesheet" href="css/pages-base.css">
 <link rel="stylesheet" href="css/vip.css">
-<div class="vip-page">
-    <header class="vip-hero">
-        <div class="vip-hero-mark" aria-hidden="true"><i class="fas fa-crown"></i></div>
-        <div class="vip-hero-copy">
-            <span class="vip-hero-eyebrow">FRAGCITY MEMBERSHIP</span>
-            <h1 class="vip-hero-title">سطوح VIP فرگ‌سیتی</h1>
-            <p class="vip-hero-description">سطح‌های عضویت و قابلیت‌های هر رتبه را بررسی کنید.</p>
+
+<main class="vip-page" id="vipStorefront">
+    <header class="vip-store-hero">
+        <div class="vip-store-hero-icon" aria-hidden="true"><i class="fas fa-crown"></i></div>
+        <div class="vip-store-hero-copy">
+            <span class="vip-store-eyebrow">FRAGCITY MEMBERSHIP STORE</span>
+            <h1>خرید VIP فرگ‌سیتی</h1>
+            <p>سطح موردنظرت را انتخاب کن و قابلیت‌های هر پلن را با هم مقایسه کن.</p>
+        </div>
+        <div class="vip-store-hero-aside">
+            <i class="fas fa-shield-halved" aria-hidden="true"></i>
+            <span>۶ سطح عضویت</span>
         </div>
     </header>
-    <!-- نوار XP -->
-    <div class="vip-xp-card">
-        <div class="vip-xp-header">
-            <h3 class="vip-xp-title"><i class="fas fa-star"></i> تجربه شما (XP)</h3>
-            <button type="button" id="syncVipButton" class="vip-sync-btn">
-                <i class="fas fa-sync-alt"></i> بروزرسانی وضعیت VIP
-            </button>
+
+    <section class="vip-current-strip" aria-label="وضعیت اشتراک فعلی">
+        <div class="vip-current-icon" aria-hidden="true"><i class="fas fa-id-badge"></i></div>
+        <div class="vip-current-copy">
+            <span>وضعیت اشتراک شما</span>
+            <strong><?= htmlspecialchars($vipCurrentName, ENT_QUOTES, 'UTF-8') ?></strong>
         </div>
-        <div class="vip-xp-meta">
-            <span><?= number_format($userXp) ?> XP</span>
-            <span>حداکثر XP: <?= number_format($maxXp) ?></span>
+        <span class="vip-current-state <?= $vipHasActiveMembership ? 'is-active' : 'is-inactive' ?>">
+            <i class="fas <?= $vipHasActiveMembership ? 'fa-circle-check' : 'fa-circle-info' ?>" aria-hidden="true"></i>
+            <?= htmlspecialchars($vipCurrentStatus, ENT_QUOTES, 'UTF-8') ?>
+        </span>
+        <div class="vip-current-expiry">
+            <span>اعتبار تا</span>
+            <strong><?= htmlspecialchars($vipHasActiveMembership ? $vipExpiryLabel : '—', ENT_QUOTES, 'UTF-8') ?></strong>
         </div>
-        <div class="vip-xp-bar">
-            <div class="vip-xp-fill" data-xp-percent="<?= (int)$xpPercent ?>"></div>
+    </section>
+
+    <div class="vip-catalog-heading">
+        <div>
+            <span class="vip-store-eyebrow">CHOOSE YOUR TIER</span>
+            <h2>پلن‌های VIP</h2>
+            <p>با انتخاب هر سطح، تمام قابلیت‌های همان سطح را مشاهده می‌کنی.</p>
         </div>
-        <div class="vip-xp-footer">
-            <span><i class="fas fa-medal"></i> وضعیت فعلی: <strong class="vip-current-level"><?= $isLoggedIn ? $vipNames[$userVip['vip_level']??0] : 'وارد شوید' ?></strong></span>
-            <span id="syncResult" class="vip-sync-result"></span>
-        </div>
+        <a class="vip-wallet-shortcut" href="?page=wallet" data-ajax-nav data-slug="wallet">
+            <i class="fas fa-wallet" aria-hidden="true"></i>
+            کیف پول و شارژ حساب
+        </a>
     </div>
 
-    <!-- تب‌ها و ویژگی‌ها -->
-    <div class="info-section vip-levels-card">
-        <div class="vip-levels-list" role="tablist" aria-label="انتخاب سطح VIP">
-            <?php foreach ($vipLevels as $lvl => $data): ?>
-                <button type="button" id="vip-level-tab-<?= $lvl ?>" role="tab" aria-selected="<?= ($lvl === 1) ? 'true' : 'false' ?>" aria-controls="panel-level-<?= $lvl ?>" class="vip-level-tab <?= ($lvl === 1) ? 'selected' : '' ?>" data-level="<?= $lvl ?>" data-color="<?= htmlspecialchars($data['color'], ENT_QUOTES, 'UTF-8') ?>" data-gradient="<?= htmlspecialchars($data['gradient'], ENT_QUOTES, 'UTF-8') ?>">
-                    <span class="level-badge"><i class="<?= $data['fa_icon'] ?>"></i></span>
-                    <span class="level-name"><?= $data['name'] ?></span>
-                </button>
-            <?php endforeach; ?>
-        </div>
-        <div id="featuresContainer" class="features-container">
-            <?php foreach ($vipLevels as $lvl => $data): ?>
-                <div class="feature-panel <?= ($lvl === 1) ? 'is-active' : '' ?>" id="panel-level-<?= $lvl ?>" role="tabpanel" aria-labelledby="vip-level-tab-<?= $lvl ?>" data-level="<?= $lvl ?>" data-color="<?= htmlspecialchars($data['color'], ENT_QUOTES, 'UTF-8') ?>" <?= ($lvl === 1) ? '' : 'hidden' ?>>
-                    <h3 class="feature-panel-title"><i class="<?= $data['fa_icon'] ?>"></i> <?= $data['name'] ?></h3>
-                    <p class="feature-panel-subtitle">ویژگی‌های این سطح:</p>
-                    <div class="feature-grid">
-                        <?php foreach ($vipFeaturesData[$lvl] as $f): ?>
-                            <div class="feature-card" data-color="<?= htmlspecialchars($data['color'], ENT_QUOTES, 'UTF-8') ?>">
-                                <div class="feature-icon"><i class="<?= $f['icon'] ?>"></i></div>
-                                <div class="feature-text"><span class="feature-title"><?= $f['title'] ?></span><br><?= $f['desc'] ?></div>
-                            </div>
-                        <?php endforeach; ?>
+    <section class="vip-plans-grid" aria-label="پلن‌های قابل انتخاب VIP">
+        <?php foreach ($vipLevels as $lvl => $tier): ?>
+            <?php
+                $package = is_array($vipPurchasePackages[(string) $lvl] ?? null)
+                    ? $vipPurchasePackages[(string) $lvl]
+                    : [];
+                $rawPrice = $package['price_toman'] ?? null;
+                $rawDuration = $package['duration_days'] ?? null;
+                $tierPrice = is_numeric($rawPrice) && (int) $rawPrice > 0
+                    ? (int) $rawPrice
+                    : null;
+                $tierDuration = is_numeric($rawDuration) && (int) $rawDuration > 0
+                    ? (int) $rawDuration
+                    : null;
+                $tierPriceLabel = $tierPrice !== null
+                    ? number_format($tierPrice) . ' ' . $vipCurrency
+                    : 'قیمت تعیین نشده';
+                $tierDurationLabel = $tierDuration !== null
+                    ? number_format($tierDuration) . ' روز'
+                    : 'مدت اشتراک مشخص نشده';
+                $isCurrentTier = $vipHasActiveMembership && $vipCurrentLevel === (int) $lvl;
+            ?>
+            <article
+                class="vip-plan-card<?= $isCurrentTier ? ' is-current' : '' ?>"
+                data-vip-plan
+                data-level="<?= (int) $lvl ?>"
+                data-vip-name="<?= htmlspecialchars($tier['name'], ENT_QUOTES, 'UTF-8') ?>"
+                data-price-label="<?= htmlspecialchars($tierPriceLabel, ENT_QUOTES, 'UTF-8') ?>"
+                data-duration-label="<?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?>"
+                style="--vip-tier-color: <?= htmlspecialchars($tier['color'], ENT_QUOTES, 'UTF-8') ?>;"
+            >
+                <div class="vip-plan-topline">
+                    <span class="vip-plan-index">FRAGCITY / VIP 0<?= (int) $lvl ?></span>
+                    <?php if ($isCurrentTier): ?>
+                        <span class="vip-plan-current"><i class="fas fa-check"></i> پلن فعلی</span>
+                    <?php elseif ($lvl === 3): ?>
+                        <span class="vip-plan-popular"><i class="fas fa-fire"></i> محبوب</span>
+                    <?php endif; ?>
+                </div>
+
+                <div class="vip-plan-title-row">
+                    <span class="vip-tier-emblem">
+                        <i class="<?= htmlspecialchars($tier['fa_icon'], ENT_QUOTES, 'UTF-8') ?>"></i>
+                    </span>
+                    <div>
+                        <h3><?= htmlspecialchars($tier['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+                        <span>VIP TIER <?= (int) $lvl ?></span>
                     </div>
                 </div>
-            <?php endforeach; ?>
+
+                <div class="vip-plan-price">
+                    <span>قیمت پلن</span>
+                    <strong><?= htmlspecialchars($tierPriceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                    <small><?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?></small>
+                </div>
+
+                <div class="vip-plan-features-heading">
+                    <strong>قابلیت‌های این سطح</strong>
+                    <span><?= count($vipFeaturesData[$lvl] ?? []) ?> قابلیت</span>
+                </div>
+
+                <ul class="vip-plan-features">
+                    <?php foreach ($vipFeaturesData[$lvl] as $feature): ?>
+                        <li>
+                            <span class="vip-feature-icon" aria-hidden="true">
+                                <i class="<?= htmlspecialchars($feature['icon'], ENT_QUOTES, 'UTF-8') ?>"></i>
+                            </span>
+                            <span class="vip-feature-copy">
+                                <strong><?= htmlspecialchars($feature['title'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                <small><?= htmlspecialchars($feature['desc'], ENT_QUOTES, 'UTF-8') ?></small>
+                            </span>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+
+                <button type="button" class="vip-plan-select" data-vip-select aria-pressed="false">
+                    انتخاب این سطح
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                </button>
+            </article>
+        <?php endforeach; ?>
+    </section>
+
+    <aside class="vip-checkout-bar" aria-label="خلاصه پلن انتخاب‌شده">
+        <div class="vip-checkout-selection">
+            <span class="vip-checkout-label">
+                <i class="fas fa-bag-shopping" aria-hidden="true"></i>
+                پلن انتخاب‌شده
+            </span>
+            <strong id="vipSelectedName">برنزی</strong>
+            <small id="vipSelectedMeta">قیمت تعیین نشده · مدت اشتراک مشخص نشده</small>
         </div>
-    </div>
-</div>
+        <div class="vip-checkout-actions">
+            <button type="button" class="vip-checkout-button" disabled>
+                خرید آنلاین به‌زودی فعال می‌شود
+                <i class="fas fa-lock" aria-hidden="true"></i>
+            </button>
+            <a href="?page=wallet" data-ajax-nav data-slug="wallet" class="vip-checkout-wallet">
+                <i class="fas fa-wallet" aria-hidden="true"></i>
+                کیف پول
+            </a>
+        </div>
+    </aside>
+
+    <p class="vip-checkout-note">
+        کاتالوگ و انتخاب سطح آماده است؛ پرداخت مستقیم VIP هنوز فعال نشده، چون مسیر امن خرید، کسر موجودی و اعمال خودکار اشتراک روی سرور بازی در نسخه فعلی وجود ندارد.
+    </p>
+</main>
+
 <script src="js/vip.js" defer></script>

@@ -3528,3 +3528,170 @@ body.site-body:has(.serverlist-page) .main-content {
         padding-bottom: var(--fc-page-safe-bottom, 44px) !important;
     }
 }
+
+
+/* Compact grid cards. */
+#serverList[data-sl-view="grid"] .sl-card-cover { min-height:92px; padding:9px 11px; }
+#serverList[data-sl-view="grid"] .sl-card-content { padding:10px 11px; }
+#serverList[data-sl-view="grid"] .sl-card-address { margin-top:8px; padding:5px 7px; }
+#serverList[data-sl-view="grid"] .sl-card-metrics { gap:5px; margin-top:8px; }
+#serverList[data-sl-view="grid"] .sl-metric { padding:6px 5px; }
+#serverList[data-sl-view="grid"] .sl-metric > span { margin-bottom:3px; font-size:.52rem; }
+#serverList[data-sl-view="grid"] .sl-metric > strong { font-size:.65rem; }
+#serverList[data-sl-view="grid"] .sl-capacity { margin-top:8px; }
+#serverList[data-sl-view="grid"] .sl-card-footer { gap:6px; margin-top:9px; padding-top:8px; }
+
+/* Desktop list is one short strip with all important data on a single line. */
+#serverList[data-sl-view="list"] .sl-server-card {
+    min-height:96px;
+    grid-template-columns:92px minmax(0,1fr);
+    border-radius:12px;
+}
+#serverList[data-sl-view="list"] .sl-card-cover {
+    height:100%;
+    min-height:96px;
+    padding:8px;
+}
+#serverList[data-sl-view="list"] .sl-cover-topline { font-size:.48rem; }
+#serverList[data-sl-view="list"] .sl-cover-map-name { font-size:.94rem; }
+#serverList[data-sl-view="list"] .sl-cover-crosshair { font-size:1.7rem; opacity:.45; }
+#serverList[data-sl-view="list"] .sl-card-content {
+    display:grid;
+    grid-template-columns:minmax(135px,1.05fr) minmax(125px,.92fr) minmax(205px,1.45fr) minmax(95px,.7fr) minmax(185px,1.1fr);
+    grid-template-areas:"heading address metrics capacity footer";
+    align-items:center;
+    align-content:center;
+    gap:0 10px;
+    padding:8px 11px;
+}
+#serverList[data-sl-view="list"] .sl-card-heading { grid-area:heading; min-width:0; }
+#serverList[data-sl-view="list"] .sl-card-heading .sl-status-badge { padding:3px 5px; font-size:.52rem; }
+#serverList[data-sl-view="list"] .sl-card-title-wrap h4 { font-size:.72rem; }
+#serverList[data-sl-view="list"] .sl-card-mode { margin-top:2px; font-size:.55rem; }
+#serverList[data-sl-view="list"] .sl-card-address { grid-area:address; min-width:0; margin:0; padding:5px 6px; }
+#serverList[data-sl-view="list"] .sl-card-address code { font-size:.57rem; }
+#serverList[data-sl-view="list"] .sl-copy-btn { width:23px; height:22px; flex-basis:23px; }
+#serverList[data-sl-view="list"] .sl-card-metrics { grid-area:metrics; min-width:0; gap:4px; margin:0; }
+#serverList[data-sl-view="list"] .sl-metric { padding:5px 4px; border-radius:6px; }
+#serverList[data-sl-view="list"] .sl-metric > span { gap:3px; margin-bottom:2px; font-size:.49rem; }
+#serverList[data-sl-view="list"] .sl-metric > strong { font-size:.62rem; }
+#serverList[data-sl-view="list"] .sl-capacity { grid-area:capacity; min-width:0; margin:0; }
+#serverList[data-sl-view="list"] .sl-capacity-label { font-size:.56rem; }
+#serverList[data-sl-view="list"] .sl-card-footer {
+    grid-area:footer;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    flex-wrap:nowrap;
+    gap:5px;
+    min-width:0;
+    margin:0;
+    padding:0;
+    border:0;
+}
+#serverList[data-sl-view="list"] .sl-region { display:none; }
+
+/* RTL flex order places Connect on the right and View Players on its left. */
+.sl-card-footer { direction:rtl; }
+.sl-card-footer .sl-region { order:0; }
+.sl-card-footer .sl-connect-btn,
+.sl-card-footer .sl-connect-disabled { order:1; }
+.sl-card-footer .sl-players-btn { order:2; }
+
+#serverList[data-sl-view="list"] .sl-connect-btn,
+#serverList[data-sl-view="list"] .sl-connect-disabled,
+#serverList[data-sl-view="list"] .sl-players-btn {
+    min-width:0;
+    min-height:29px;
+    padding:5px 7px;
+    gap:5px;
+    border-radius:7px;
+    font-size:.58rem;
+}
+#serverList[data-sl-view="list"] .sl-players-btn > span { min-width:15px; padding:1px 3px; font-size:.54rem; }
+
+@media(max-width:1280px) and (min-width:761px) {
+    #serverList[data-sl-view="list"] .sl-server-card { grid-template-columns:82px minmax(0,1fr); min-height:100px; }
+    #serverList[data-sl-view="list"] .sl-card-cover { min-height:100px; }
+    #serverList[data-sl-view="list"] .sl-card-content {
+        grid-template-columns:minmax(135px,1fr) minmax(130px,.95fr) minmax(185px,1.2fr);
+        grid-template-areas:"heading address footer" "metrics metrics capacity";
+        gap:6px 9px;
+        padding:8px 10px;
+    }
+}
+@media(max-width:760px) {
+    #serverList[data-sl-view="list"] .sl-server-card { min-height:0; grid-template-columns:76px minmax(0,1fr); }
+    #serverList[data-sl-view="list"] .sl-card-cover { min-height:100%; padding:8px 6px; }
+    #serverList[data-sl-view="list"] .sl-card-content {
+        grid-template-columns:minmax(0,1fr);
+        grid-template-areas:"heading" "address" "metrics" "capacity" "footer";
+        gap:7px;
+        padding:9px;
+    }
+    #serverList[data-sl-view="list"] .sl-card-footer {
+        flex-wrap:wrap;
+        gap:6px;
+        padding-top:6px;
+        border-top:1px solid rgba(255,255,255,.05);
+    }
+    #serverList[data-sl-view="list"] .sl-region { display:none; }
+    #serverList[data-sl-view="list"] .sl-connect-btn,
+    #serverList[data-sl-view="list"] .sl-connect-disabled,
+    #serverList[data-sl-view="list"] .sl-players-btn { min-height:30px; font-size:.61rem; }
+}
+
+/* Portal modal: viewport-fixed backdrop, strong blur, and enter/exit motion. */
+.sl-player-modal {
+    z-index:9998;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .24s ease,visibility 0s linear .24s;
+}
+.sl-player-modal.is-open {
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transition:opacity .24s ease,visibility 0s linear 0s;
+}
+.sl-player-modal.is-closing {
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .22s ease,visibility 0s linear .22s;
+}
+.sl-player-modal-backdrop {
+    background:rgba(5,5,5,.62);
+    -webkit-backdrop-filter:blur(13px) saturate(115%);
+    backdrop-filter:blur(13px) saturate(115%);
+}
+.sl-player-modal-panel {
+    opacity:0;
+    transform:translateY(22px) scale(.965);
+    transform-origin:center;
+    transition:opacity .22s ease,transform .28s cubic-bezier(.2,.8,.2,1);
+}
+.sl-player-modal.is-open .sl-player-modal-panel {
+    opacity:1;
+    transform:translateY(0) scale(1);
+    transition-delay:.025s;
+}
+.sl-player-modal.is-closing .sl-player-modal-panel {
+    opacity:0;
+    transform:translateY(12px) scale(.985);
+    transition-delay:0s;
+}
+html.fc-no-animation .sl-player-modal,
+html.fc-no-animation .sl-player-modal-panel,
+html.fc-no-animation .sl-player-modal-backdrop {
+    transition:none!important;
+    animation:none!important;
+    transform:none!important;
+}
+@media(prefers-reduced-motion:reduce) {
+    .sl-player-modal,.sl-player-modal-panel,.sl-player-modal-backdrop {
+        transition:none!important;
+        animation:none!important;
+    }
+}

@@ -128,7 +128,37 @@
     },
     "pages.vip": {
       "_comment": "Website DB profile for VIP status and purchase records.",
-      "database_profile": "main"
+      "database_profile": "main",
+      "purchase_catalog": {
+        "_comment": "VIP storefront display metadata only. Keep checkout disabled until secure wallet purchase and game-server entitlement delivery are implemented.",
+        "currency": "تومان",
+        "packages": {
+          "1": {
+            "price_toman": null,
+            "duration_days": null
+          },
+          "2": {
+            "price_toman": null,
+            "duration_days": null
+          },
+          "3": {
+            "price_toman": null,
+            "duration_days": null
+          },
+          "4": {
+            "price_toman": null,
+            "duration_days": null
+          },
+          "5": {
+            "price_toman": null,
+            "duration_days": null
+          },
+          "6": {
+            "price_toman": null,
+            "duration_days": null
+          }
+        }
+      }
     },
     "pages.forgot_password": {
       "_comment": "Compatibility database profile for password-reset requests. Keep aligned with the users table actually used by the site.",

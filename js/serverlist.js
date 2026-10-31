@@ -48,8 +48,16 @@
 
         if (!list) return;
 
+        // A transformed #contentFader creates a containing block for fixed descendants.
+        // Portal the dialog to body so it covers the viewport, not the page wrapper.
+        if (playerModal && playerModal.parentElement !== document.body) {
+            document.body.appendChild(playerModal);
+        }
+
         let statusFilter = 'online';
         let toastTimer = 0;
+        let modalCloseTimer = 0;
+        let modalIsClosing = false;
         let activePlayerButton = null;
         let playerRequestController = null;
         let playerRequestSequence = 0;
@@ -146,8 +154,23 @@
             setPlayerModalSection('table');
         }
 
+        function finishPlayerModalClose() {
+            if (!playerModal) return;
+            window.clearTimeout(modalCloseTimer);
+            playerModal.hidden = true;
+            playerModal.classList.remove('is-open', 'is-closing');
+            playerModal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('sl-player-modal-open');
+            modalIsClosing = false;
+
+            if (activePlayerButton && document.contains(activePlayerButton)) {
+                activePlayerButton.focus();
+            }
+            activePlayerButton = null;
+        }
+
         function closePlayerModal() {
-            if (!playerModal || playerModal.hidden) return;
+            if (!playerModal || playerModal.hidden || modalIsClosing) return;
 
             ++playerRequestSequence;
             if (playerRequestController) {
@@ -155,14 +178,17 @@
                 playerRequestController = null;
             }
 
-            playerModal.hidden = true;
             playerModal.setAttribute('aria-hidden', 'true');
-            document.body.classList.remove('sl-player-modal-open');
-
-            if (activePlayerButton && document.contains(activePlayerButton)) {
-                activePlayerButton.focus();
+            if (document.documentElement.classList.contains('fc-no-animation')) {
+                finishPlayerModalClose();
+                return;
             }
-            activePlayerButton = null;
+
+            modalIsClosing = true;
+            playerModal.classList.remove('is-open');
+            playerModal.classList.add('is-closing');
+            window.clearTimeout(modalCloseTimer);
+            modalCloseTimer = window.setTimeout(finishPlayerModalClose, 270);
         }
 
         async function loadPlayers(serverId, forceRefresh) {
@@ -248,10 +274,18 @@
             if (playerTableBody) playerTableBody.replaceChildren();
             setPlayerModalSection('loading');
 
+            window.clearTimeout(modalCloseTimer);
+            modalIsClosing = false;
+            playerModal.classList.remove('is-closing', 'is-open');
             playerModal.hidden = false;
             playerModal.setAttribute('aria-hidden', 'false');
             document.body.classList.add('sl-player-modal-open');
-            if (playerModalPanel) playerModalPanel.focus();
+
+            void playerModal.offsetWidth;
+            window.requestAnimationFrame(function () {
+                if (!playerModal.hidden) playerModal.classList.add('is-open');
+                if (playerModalPanel) playerModalPanel.focus();
+            });
 
             loadPlayers(serverId, false);
         }
@@ -452,6 +486,20 @@
             });
         }
 
+        function cleanupPlayerModalPortal() {
+            if (root.isConnected) return;
+            ++playerRequestSequence;
+            if (playerRequestController) {
+                playerRequestController.abort();
+                playerRequestController = null;
+            }
+            window.clearTimeout(modalCloseTimer);
+            if (playerModal) playerModal.remove();
+            document.body.classList.remove('sl-player-modal-open');
+            window.removeEventListener('content-loaded', cleanupPlayerModalPortal);
+        }
+        window.addEventListener('content-loaded', cleanupPlayerModalPortal);
+
         if (playerRetry) {
             playerRetry.addEventListener('click', function () {
                 const serverId = activePlayerButton ? String(activePlayerButton.dataset.serverId || '') : '';
@@ -459,13 +507,14 @@
             });
         }
 
-        root.addEventListener('keydown', function (event) {
+        document.addEventListener('keydown', function (event) {
             if (event.key === 'Escape' && playerModal && !playerModal.hidden) {
                 event.preventDefault();
                 closePlayerModal();
-                return;
             }
+        });
 
+        root.addEventListener('keydown', function (event) {
             if (event.key !== '/' || event.ctrlKey || event.metaKey || event.altKey) return;
             const target = event.target;
             if (target && /INPUT|TEXTAREA|SELECT|BUTTON/.test(target.tagName)) return;
