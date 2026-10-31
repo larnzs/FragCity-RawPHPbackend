@@ -8,9 +8,9 @@ $pageTitle = "لیست محرومیت‌ها | FragCity";
 $isLoggedIn = (($_SESSION['user_logged_in'] ?? false) === true);
 $isAdmin = $isLoggedIn && (string)($_SESSION['role'] ?? '') === 'admin';
 
-// insmanager is a database permission, not a browser/session-provided flag.
+// insmaster is a database permission, not a browser/session-provided flag.
 // Resolve it against the authenticated SteamID on every request and fail closed.
-$isInsManager = false;
+$isInsMaster = false;
 $viewerSteamId64 = trim((string)($_SESSION['steamid'] ?? ''));
 
 if (
@@ -21,20 +21,20 @@ if (
 ) {
     try {
         $permissionStatement = $pdo->prepare(
-            'SELECT insmanager FROM users WHERE steamid64 = ? LIMIT 1'
+            'SELECT insmaster FROM users WHERE steamid64 = ? LIMIT 1'
         );
         $permissionStatement->execute([$viewerSteamId64]);
-        $isInsManager = (int)$permissionStatement->fetchColumn() === 1;
+        $isInsMaster = (int)$permissionStatement->fetchColumn() === 1;
     } catch (Throwable $permissionError) {
         error_log(
-            '[FragCity] Ban List insmanager permission lookup failed (SQLSTATE '
+            '[FragCity] Ban List insmaster permission lookup failed (SQLSTATE '
             . (string)$permissionError->getCode() . ').'
         );
     }
 }
 
 // Keep existing administrator access while allowing explicitly flagged managers.
-$canViewPlayerIps = $isAdmin || $isInsManager;
+$canViewPlayerIps = $isAdmin || $isInsMaster;
 $showSensitiveData = $canViewPlayerIps;
 
 $type = is_string($_GET['type'] ?? null) ? $_GET['type'] : 'bans';
