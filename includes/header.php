@@ -134,9 +134,14 @@ if (!is_array($steamUrlParts) || strtolower((string)($steamUrlParts['scheme'] ??
     $headerSteamProfileUrl = '';
 }
 
+// Keep the two most-used destinations visible at the top of the mobile drawer.
 $mobileNavItems = [
     ['servers_vps', 'لیست سرورها', 'fa-server', ['servers_vps', 'servers']],
     ['skins', 'انتخاب اسکین', 'fa-palette', ['skins', 'skins_vps']],
+];
+
+// The remaining destinations live under the same "More" grouping as desktop.
+$mobileMoreNavItems = [
     ['buyserveropen', 'خرید سرور', 'fa-shopping-cart', ['buyserveropen', 'buyserver']],
     ['launcher', 'دانلود لانچر', 'fa-download', ['launcher']],
     ['leaderboard', 'لیدربورد', 'fa-trophy', ['leaderboard', 'leaderboard_vps']],
@@ -351,6 +356,25 @@ $mobileNavItems = [
                 <span><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></span>
             </a>
         <?php endforeach; ?>
+
+        <details class="mobile-nav-more" <?= $isPageActive($morePages) !== '' ? 'open' : '' ?>>
+            <summary class="mobile-nav-link mobile-nav-more-toggle <?= $isPageActive($morePages) ?>">
+                <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
+                <span>بیشتر</span>
+                <i class="fas fa-chevron-down mobile-nav-more-arrow" aria-hidden="true"></i>
+            </summary>
+            <div class="mobile-nav-more-menu">
+                <?php foreach ($mobileMoreNavItems as [$slug, $label, $icon, $activePages]): ?>
+                    <a href="?page=<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>"
+                       class="mobile-nav-link <?= $isPageActive($activePages) ?>"
+                       data-ajax-nav
+                       data-slug="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
+                        <i class="fas <?= htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
+                        <span><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></span>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </details>
 
         <?php if ($isLoggedIn): ?>
             <a href="?page=profile" class="mobile-nav-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
