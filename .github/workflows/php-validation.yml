@@ -23,15 +23,39 @@ jobs:
       - name: Validate Server Browser JavaScript syntax
         run: node --check js/serverlist.js
 
-      - name: Verify FACEIT level SVG assets
+      - name: Validate FACEIT SVG XML and internal references
         run: |
-          set -eu
-          for level in $(seq 0 11); do
-            asset="img/icons/faceit/${level}.svg"
-            test -s "$asset"
-            grep -q '<svg' "$asset"
-          done
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          import xml.etree.ElementTree as ET
 
+          svg_namespace = "{http://www.w3.org/2000/svg}"
+          for level in range(12):
+              path = Path(f"img/icons/faceit/{level}.svg")
+              root = ET.parse(path).getroot()
+              if root.tag != f"{svg_namespace}svg":
+                  raise SystemExit(f"{path}: root element is not SVG")
+              if root.attrib.get("viewBox") != "0 0 24 24":
+                  raise SystemExit(f"{path}: missing or unexpected viewBox")
+              if root.attrib.get("width") != "24" or root.attrib.get("height") != "24":
+                  raise SystemExit(f"{path}: explicit 24x24 dimensions are required")
+
+              ids = {element.attrib["id"] for element in root.iter() if "id" in element.attrib}
+              for element in root.iter():
+                  for attribute, value in element.attrib.items():
+                      for reference in re.findall(r"url\\(#([^)]+)\\)", value):
+                          if reference not in ids:
+                              raise SystemExit(f"{path}: unresolved SVG reference #{reference}")
+                      if attribute.endswith("href") and value.startswith("#") and value[1:] not in ids:
+                          raise SystemExit(f"{path}: unresolved SVG href {value}")
+
+              source = path.read_text(encoding="utf-8")
+              if "class=" in source or "size=" in source:
+                  raise SystemExit(f"{path}: framework-specific attributes remain")
+
+              print(f"{path}: valid")
+          PY
       - name: Lint every PHP source file
         run: |
           set -eu
