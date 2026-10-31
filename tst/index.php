@@ -284,7 +284,6 @@ $allowedPages = [
     'login',
     'register',
     'profile',
-    'adminprofile',
     'vip',
     'leaderboard',
     'forgot_password',
@@ -322,7 +321,6 @@ $isLoggedIn =
 $protectedPages = [
     'skins',
     'skins_vps',
-    'adminprofile',
     'profile',
 ];
 
