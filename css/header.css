@@ -1926,3 +1926,49 @@ body.mobile-menu-open {
         max-width: 124px;
     }
 }
+
+
+/* Direction-aware sticky header:
+   top = transparent, scrolling down = translucent graphite,
+   scrolling up = clear again. */
+.shock-header:not(.is-scroll-down):not(.is-scroll-up) {
+    background: rgba(13, 13, 13, 0) !important;
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.shock-header.is-scroll-down {
+    background: rgba(13, 13, 13, .52) !important;
+    border-bottom-color: rgba(255, 255, 255, .09) !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .22) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    backdrop-filter: blur(16px) !important;
+}
+
+.shock-header.is-scroll-up {
+    background: rgba(13, 13, 13, 0) !important;
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.shock-header,
+.shock-header.is-scroll-down,
+.shock-header.is-scroll-up {
+    transition:
+        background-color 220ms ease,
+        border-color 220ms ease,
+        box-shadow 220ms ease,
+        backdrop-filter 220ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-header,
+    .shock-header.is-scroll-down,
+    .shock-header.is-scroll-up {
+        transition: none !important;
+    }
+}
