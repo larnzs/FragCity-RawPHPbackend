@@ -1649,3 +1649,8 @@ body.site-body:has(.leaderboard-page) .main-content {
         border-radius: 10px;
     }
 }
+
+/* Keep the redesigned directory page clear of the footer at every breakpoint. */
+.leaderboard-page {
+    padding-bottom: var(--fc-page-safe-bottom, 56px) !important;
+}
