@@ -110,6 +110,14 @@
             return cell;
         }
 
+        function faceitIconUrl(level) {
+            const safeLevel = Math.min(11, Math.max(0, Math.trunc(Number(level) || 0)));
+            return faceitIconBase
+                + encodeURIComponent(String(safeLevel))
+                + '.svg?v='
+                + encodeURIComponent(faceitIconVersion);
+        }
+
         function createFaceitLevelIcon(level) {
             const icon = document.createElement('img');
             icon.className = 'sl-faceit-level-icon';
@@ -119,14 +127,11 @@
             icon.loading = 'eager';
             icon.decoding = 'async';
             icon.setAttribute('draggable', 'false');
-            icon.src = faceitIconBase + encodeURIComponent(String(level)) + '.svg?v=' + encodeURIComponent(faceitIconVersion);
+            icon.src = faceitIconUrl(level);
 
+            // Never replace a failed image with text or a badge.
             icon.addEventListener('error', function () {
-                const fallback = document.createElement('span');
-                fallback.className = 'sl-faceit-level-icon-fallback';
-                fallback.textContent = 'L' + level;
-                fallback.setAttribute('aria-label', 'FACEIT Level ' + level);
-                icon.replaceWith(fallback);
+                icon.remove();
             }, { once: true });
 
             return icon;
@@ -161,22 +166,29 @@
             });
 
             if (levels.length === 0) {
-                output.textContent = '—';
+                output.removeAttribute('src');
                 output.dataset.averageState = 'empty';
-                output.title = players.length === 0
-                    ? 'در حال حاضر بازیکنی آنلاین نیست.'
-                    : 'بازیکن آنلاین دارای FACEIT Level معتبر پیدا نشد.';
+                output.dataset.averageValue = '';
+                output.style.visibility = 'hidden';
                 return;
             }
 
             const average = levels.reduce(function (total, level) {
                 return total + level;
             }, 0) / levels.length;
+            const iconLevel = Math.min(10, Math.max(1, Math.floor(average + 0.5)));
 
-            output.textContent = average.toFixed(1);
+            output.src = faceitIconUrl(iconLevel);
+            output.alt = 'Average FACEIT level icon';
             output.dataset.averageState = 'ready';
-            output.title = 'میانگین ' + average.toFixed(2) + ' از ' + levels.length
-                + ' بازیکن دارای Level معتبر، از مجموع ' + players.length + ' بازیکن آنلاین';
+            output.dataset.averageValue = average.toFixed(2);
+            output.dataset.averageLevel = String(iconLevel);
+            output.setAttribute(
+                'aria-label',
+                'Average FACEIT level ' + average.toFixed(2)
+                    + ', represented by level ' + iconLevel + ' icon'
+            );
+            output.style.visibility = 'visible';
         }
 
         function renderPlayers(payload) {
@@ -220,53 +232,14 @@
                 const faceitCell = document.createElement('td');
                 faceitCell.className = 'sl-player-faceit';
                 const level = Number(player.faceit_level);
+
                 if (Number.isInteger(level) && level >= 1 && level <= 10) {
-                    const levelBadge = document.createElement('span');
-                    levelBadge.className = 'sl-faceit-level-badge';
-                    levelBadge.title = 'FACEIT Level ' + level;
-                    levelBadge.setAttribute('aria-label', 'FACEIT Level ' + level);
-
-                    levelBadge.appendChild(createFaceitLevelIcon(level));
-                    faceitCell.appendChild(levelBadge);
-                } else {
-                    const pending = document.createElement('span');
-                    pending.className = 'sl-faceit-pending';
-                    const faceitStatus = String(player.faceit_status || 'unknown');
-                    const faceitStatusLabels = {
-                        steam_id_missing: 'SteamID موجود نیست',
-                        not_found: 'SteamID پیدا نشد',
-                        ambiguous: 'نام تکراری است',
-                        simpleadmin_unavailable: 'SimpleAdmin در دسترس نیست',
-                        api_not_configured: 'FACEIT API تنظیم نشده',
-                        profile_not_found: 'اکانت FACEIT پیدا نشد',
-                        no_cs2_profile: 'پروفایل CS2 ندارد',
-                        unranked: 'بدون Level',
-                        api_unavailable: 'FACEIT API در دسترس نیست'
-                    };
-
-                    if (faceitStatus === 'unranked') {
-                        const unrankedBadge = document.createElement('span');
-                        unrankedBadge.className = 'sl-faceit-level-badge sl-faceit-level-badge--unranked';
-                        const unrankedIcon = createFaceitLevelIcon(0);
-                        unrankedIcon.alt = 'FACEIT unranked';
-                        unrankedBadge.appendChild(unrankedIcon);
-                        const unrankedLabel = document.createElement('span');
-                        unrankedLabel.textContent = faceitStatusLabels.unranked;
-                        unrankedBadge.appendChild(unrankedLabel);
-                        faceitCell.appendChild(unrankedBadge);
-                    } else {
-                        pending.textContent = faceitStatusLabels[faceitStatus] || 'نامشخص';
-                        pending.dataset.faceitState = faceitStatus;
-                        if (faceitStatus === 'ambiguous') {
-                            pending.title = 'این نام به چند SteamID در SimpleAdmin اشاره می‌کند؛ Level نمایش داده نمی‌شود.';
-                        } else if (faceitStatus === 'simpleadmin_unavailable') {
-                            pending.title = 'سرویس جست‌وجوی SimpleAdmin موقتاً در دسترس نیست.';
-                        } else if (faceitStatus === 'api_unavailable') {
-                            pending.title = 'دریافت رتبه از FACEIT موقتاً ناموفق بود؛ فهرست بازیکنان همچنان در دسترس است.';
-                        }
-                        faceitCell.appendChild(pending);
-                    }
+                    faceitCell.appendChild(createFaceitLevelIcon(level));
+                } else if (String(player.faceit_status || '') === 'unranked') {
+                    faceitCell.appendChild(createFaceitLevelIcon(0));
                 }
+                // Missing/unavailable FACEIT profiles stay visually empty:
+                // no status text, badge, background, or replacement label.
                 row.appendChild(faceitCell);
                 if (playerTableBody) playerTableBody.appendChild(row);
             });
@@ -446,9 +419,9 @@
                         ? button.closest('[data-sl-card]').querySelector('[data-sl-faceit-average]')
                         : null;
                     if (output) {
-                        output.textContent = '…';
+                        output.removeAttribute('src');
                         output.dataset.averageState = 'loading';
-                        output.title = 'در حال دریافت Level بازیکنان آنلاین';
+                        output.style.visibility = 'hidden';
                     }
 
                     try {
@@ -456,9 +429,9 @@
                         updateCardFaceitAverage(button, data);
                     } catch (error) {
                         if (output) {
-                            output.textContent = '—';
+                            output.removeAttribute('src');
                             output.dataset.averageState = 'unavailable';
-                            output.title = 'دریافت میانگین FACEIT در حال حاضر ممکن نیست.';
+                            output.style.visibility = 'hidden';
                         }
                     }
                 }
