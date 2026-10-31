@@ -9207,11 +9207,21 @@ body > #keychainModal .wp-addon-none-icon {
    and two-panel modal navigation.
 ========================================================= */
 
-/* The site header remains above this bar; the WeaponPaints controls
-   stick immediately beneath it instead of disappearing behind it. */
+/* The global site header is outside .main-content. Keep the page as the
+   vertical scroll owner so this sticky toolbar can follow the viewport. */
+body:has(.wp-app) {
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+}
+
+body:has(.wp-app) .main-content {
+    overflow-x: visible !important;
+    overflow-y: visible !important;
+}
+
 .wp-app .wp-header {
     position: sticky !important;
-    top: 0 !important;
+    top: 76px !important;
     z-index: 1040 !important;
     background: rgba(13, 13, 13, .97) !important;
     border-bottom: 1px solid #292929 !important;
