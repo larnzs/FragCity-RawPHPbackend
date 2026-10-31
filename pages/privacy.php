@@ -1,8 +1,7 @@
 <?php
 // pages/privacy.php
 ?>
-<link rel="stylesheet" href="css/pages-base.css">
-<link rel="stylesheet" href="css/privacy.css">
+
 
 <div class="privacy-page">
     <div class="privacy-hero">
@@ -132,4 +131,4 @@
         </div>
     </div>
 </div>
-<script src="js/privacy.js" defer></script>
+
