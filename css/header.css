@@ -2389,3 +2389,16 @@ body.fc-auth-modal-open {
         transition: none !important;
     }
 }
+
+
+@media (min-width: 1101px) and (max-width: 1320px) {
+    .shock-header .fc-motion-toggle {
+        width: 38px;
+        min-width: 38px;
+        padding: 0;
+    }
+
+    .shock-header .fc-motion-toggle__label {
+        display: none;
+    }
+}
