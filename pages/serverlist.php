@@ -202,10 +202,10 @@ $statusLabels = [
             <div class="sl-filter-panel" data-fc-reveal="up">
                 <div class="sl-filter-top">
                     <div class="sl-filter-pills" id="slFilterPills" role="group" aria-label="فیلتر وضعیت">
-                        <button type="button" class="sl-filter-pill active" data-sl-filter="all" aria-pressed="true">
+                        <button type="button" class="sl-filter-pill" data-sl-filter="all" aria-pressed="false">
                             همه <span><?= count($serverRows) ?></span>
                         </button>
-                        <button type="button" class="sl-filter-pill" data-sl-filter="online" aria-pressed="false">
+                        <button type="button" class="sl-filter-pill active" data-sl-filter="online" aria-pressed="true">
                             <i class="fa-solid fa-circle" aria-hidden="true"></i> آنلاین <span><?= count($onlineServers) ?></span>
                         </button>
                         <button type="button" class="sl-filter-pill" data-sl-filter="offline" aria-pressed="false">
@@ -347,12 +347,12 @@ $statusLabels = [
                                                     <strong><?= $server['status'] === 'online' ? $server['players'] . ' / ' . $server['max_players'] : '—' ?></strong>
                                                 </div>
                                                 <div
-                                                    class="sl-metric sl-metric--query-rtt"
-                                                    title="A2S RTT از زیرساخت FragCity تا سرور بازی اندازه‌گیری می‌شود؛ پینگ واقعی اینترنت بازیکن نیست."
-                                                    aria-label="زمان پاسخ A2S از سرور FragCity"
+                                                    class="sl-metric sl-metric--client-ping"
+                                                    title="پینگ واقعی بازدیدکننده هنوز از مرورگر قابل اندازه‌گیری نیست؛ برای این مقدار به ابزار کلاینت/ارتباط UDP سازگار نیاز داریم."
+                                                    aria-label="پینگ شما تا سرور؛ فعلاً در دسترس نیست"
                                                 >
-                                                    <span><i class="fa-solid fa-signal" aria-hidden="true"></i> A2S RTT</span>
-                                                    <strong dir="ltr"><?= $server['query_rtt_ms'] !== null ? $server['query_rtt_ms'] . ' ms' : '—' ?></strong>
+                                                    <span><i class="fa-solid fa-signal" aria-hidden="true"></i> Ping شما</span>
+                                                    <strong dir="ltr" data-sl-client-ping>—</strong>
                                                 </div>
                                                 <div class="sl-metric">
                                                     <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> VAC</span>
@@ -438,7 +438,7 @@ $statusLabels = [
             <div>
                 <span class="sl-section-kicker">LIVE SERVER DATA</span>
                 <h2>اطلاعات زنده با A2S</h2>
-                <p>وضعیت آنلاین، نقشه و ظرفیت بازیکنان با A2S دریافت می‌شود. عدد A2S RTT زمان رفت‌وبرگشت Query از زیرساخت FragCity تا سرور بازی است، نه پینگ واقعی اینترنت بازیکن.</p>
+                <p>وضعیت آنلاین، نقشه و ظرفیت بازیکنان با A2S دریافت می‌شود. پینگ واقعی شما تا هر سرور در مرحلهٔ بعد با یک روش کلاینت‌محور اضافه می‌شود؛ مرورگر به‌تنهایی نمی‌تواند UDP پورت بازی را Query کند.</p>
             </div>
             <div class="sl-query-checklist">
                 <span><i class="fa-solid fa-check" aria-hidden="true"></i> A2S_INFO</span>
