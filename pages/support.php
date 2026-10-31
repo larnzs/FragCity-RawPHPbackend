@@ -69,8 +69,7 @@ if ($isLoggedIn && $pdo) {
 $activeTab = $_GET['tab'] ?? 'contact';
 ?>
 
-<link rel="stylesheet" href="css/pages-base.css">
-<link rel="stylesheet" href="css/support.css">
+
 <div class="support-page">
     <div class="support-header">
         <h1>مرکز پشتیبانی <span class="glow-text">Frag City</span></h1>
@@ -220,4 +219,4 @@ $activeTab = $_GET['tab'] ?? 'contact';
         </div>
     <?php endif; ?>
 </div>
-<script src="js/support.js" defer></script>
+
