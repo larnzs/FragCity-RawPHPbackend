@@ -509,12 +509,15 @@ try {
         $simpleDatabase = is_array($simpleAdminConfig['database'] ?? null)
             ? $simpleAdminConfig['database']
             : [];
-        $simpleHost = trim((string)($simpleDatabase['host'] ?? '127.0.0.1'));
-        $simplePort = (int)($simpleDatabase['port'] ?? 3306);
-        $simpleName = trim((string)($simpleDatabase['name'] ?? ''));
-        $simpleUser = trim((string)($simpleDatabase['username'] ?? ''));
-        $simplePass = (string)($simpleDatabase['password'] ?? '');
-        $simpleCharset = (string)($simpleDatabase['charset'] ?? 'utf8mb4');
+
+        // Reuse the same existing Plugin DB account already used for the
+        // WeaponPaints connection. Only the target schema changes.
+        $simpleHost = trim((string)($dbConfig['host'] ?? '127.0.0.1'));
+        $simplePort = (int)($dbConfig['port'] ?? 3306);
+        $simpleName = trim((string)($simpleDatabase['name'] ?? 'GLOBAL_simpleadmin'));
+        $simpleUser = trim((string)($dbConfig['username'] ?? ''));
+        $simplePass = (string)($dbConfig['password'] ?? '');
+        $simpleCharset = (string)($dbConfig['charset'] ?? 'utf8mb4');
 
         if ($simpleHost === '' || $simplePort < 1 || $simplePort > 65535
             || !preg_match('/^[A-Za-z0-9_]+$/D', $simpleName)

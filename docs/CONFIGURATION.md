@@ -64,7 +64,7 @@ Exampleهای جزئی:
 
 ### ۴.۲. SimpleAdmin Player Identity API
 
-سرویس `POST /v1/simpleadmin` روی Linux API فقط برای تبدیل نام فعلی بازیکنان A2S به SteamID64 استفاده می‌شود. این مسیر از همان HMAC Secret ریشه‌ای WeaponPaints استفاده می‌کند، اما به دیتابیس جداگانهٔ `GLOBAL_simpleadmin` و یک حساب MariaDB فقط‌خواندنی وصل می‌شود. این API فقط ستون‌های `name`, `steamid` و `used_at` از جدول `sa_players_ips` را می‌خواند و هرگز ستون `address` یا IP را Query یا به وب‌سایت ارسال نمی‌کند.
+سرویس `POST /v1/simpleadmin` روی Linux API فقط برای تبدیل نام فعلی بازیکنان A2S به SteamID64 استفاده می‌شود. این مسیر از همان HMAC Secret ریشه‌ای WeaponPaints استفاده می‌کند و با همان اکانت دیتابیسی Plugin که در بخش `database` فایل Runtime لینوکس تنظیم شده به دیتابیس `GLOBAL_simpleadmin` وصل می‌شود؛ یوزر یا پسورد جدیدی ساخته یا تعریف نمی‌شود. این API فقط ستون‌های `name`, `steamid` و `used_at` از جدول `sa_players_ips` را می‌خواند و هرگز ستون `address` یا IP را Query یا به وب‌سایت ارسال نمی‌کند.
 
 پیش‌نیازها:
 - Migration شمارهٔ 013 باید اجرا شده باشد تا ستون `sa_players_ips.name` وجود داشته باشد.
@@ -76,18 +76,16 @@ ALTER TABLE sa_players_ips
     ADD INDEX idx_sa_players_ips_name_steamid_used_at (name, steamid, used_at);
 ```
 
-حساب API فقط‌خواندنی را با حداقل دسترسی بساز و Host را با اتصال واقعی Linux API هماهنگ کن:
+به همان کاربر دیتابیسی موجودی که در `database.username` و `database.password` فایل `/etc/fragcity-api/config.php` برای Pluginها تنظیم شده، فقط دسترسی ستونی لازم را روی جدول SimpleAdmin بده. دستور زیر را با نام کاربر و Host واقعی همان حساب جایگزین کن؛ **دستور CREATE USER اجرا نکن**:
 
 ```sql
-CREATE USER 'fragcity_simpleadmin_api'@'127.0.0.1'
-    IDENTIFIED BY 'REPLACE_WITH_A_UNIQUE_LONG_PASSWORD';
 GRANT SELECT (steamid, name, used_at)
     ON GLOBAL_simpleadmin.sa_players_ips
-    TO 'fragcity_simpleadmin_api'@'127.0.0.1';
+    TO 'EXISTING_PLUGINS_DB_USER'@'127.0.0.1';
 FLUSH PRIVILEGES;
 ```
 
-در `/etc/fragcity-api/config.php` فقط بلوک `simpleadmin` را از `linuxapi/config.example.php` Merge کن؛ فایل Runtime را کامل overwrite نکن. بعد از قراردادن credentialهای واقعی، `enabled` را روی `true` بگذار.
+اگر Host حساب فعلی با `127.0.0.1` متفاوت است، همان Host ثبت‌شده در MariaDB را استفاده کن. در `/etc/fragcity-api/config.php` فقط بلوک `simpleadmin` را از `linuxapi/config.example.php` Merge کن؛ این بلوک فقط نام دیتابیس را تعیین می‌کند و credential را از تنظیمات دیتابیس موجود به ارث می‌برد. فایل Runtime را کامل overwrite نکن. پس از بررسی دسترسی و ایندکس، `enabled` را روی `true` بگذار.
 
 Resolver فقط وقتی نام دقیقاً به یک SteamID یکتا برسد آن را برمی‌گرداند. اگر نام به چند SteamID تعلق داشته باشد، وضعیت `ambiguous` می‌دهد تا رتبهٔ FACEIT به فرد اشتباه نسبت داده نشود. درخواست‌های FACEIT همچنان از PHP روی هاست اشتراکی و با کلید `integrations.faceit_api.api_key` انجام می‌شوند؛ Linux API هیچ درخواست FACEIT ارسال نمی‌کند.
 
@@ -118,7 +116,7 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 نمونهٔ کامل PHP در `linuxapi/config.example.php` است. آن را فقط برای نصب تازه به `/etc/fragcity-api/config.php` کپی کن. برای سرور موجود، بلوک‌های جدید را Merge کن؛ جایگزین‌کردن کل فایل باعث از بین‌رفتن Database password و Secretهای فعلی می‌شود.
 
 - ریشهٔ `shared_secret`: مشترک بین WeaponPaints و SimpleAdmin.
-- `simpleadmin.database`: اتصال فقط‌خواندنی به `GLOBAL_simpleadmin`.
+- `simpleadmin.database.name`: نام دیتابیس `GLOBAL_simpleadmin`؛ Username، Password، Host و Port از همان Plugin DB connection موجود در `database` استفاده می‌شوند.
 - `pterodactyl_standby.shared_secret`: مخصوص Server Browser.
 - `pterodactyl_monitoring.shared_secret`: مخصوص Monitoring.
 - `pterodactyl_standby.pterodactyl.application_api_key` و `pterodactyl_monitoring.pterodactyl.application_api_key`: توکن Application API فقط‌خواندنی Pterodactyl؛ فقط روی Linux.

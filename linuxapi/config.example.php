@@ -29,9 +29,10 @@ return [
     'shared_secret' => 'REPLACE_WITH_WEAPONPAINTS_64_HEX_SECRET',
 
     /*
-     * Linux-local database used by CS2 WeaponPaints containers.
-     * It also stores fragcity_api_nonces for replay protection on signed API calls.
-     * Use the limited fragcity_weaponpaints_api account, not MariaDB root.
+     * Linux-local WeaponPaints database and API nonce store.
+     * The existing Plugin database account configured below is also reused for
+     * the read-only GLOBAL_simpleadmin lookup. Grant it only the extra columns
+     * required on sa_players_ips; do not create a second DB user.
      * Keep TCP/3306 private; the API should use the local listener.
      */
     'database' => [
@@ -52,14 +53,11 @@ return [
      * should have column-level SELECT grants for those three fields only.
      */
     'simpleadmin' => [
-        'enabled' => false, // Enable only after the DB, migration and read-only account are verified.
+        'enabled' => false, // Enable only after DB/table permissions and the index are verified.
+        // Reuses the existing Plugin DB account from the root 'database' settings above.
+        // Only the target schema differs; no additional username/password are needed.
         'database' => [
-            'host' => '127.0.0.1',
-            'port' => 3306,
             'name' => 'GLOBAL_simpleadmin',
-            'username' => 'fragcity_simpleadmin_api',
-            'password' => 'REPLACE_WITH_A_UNIQUE_READ_ONLY_DATABASE_PASSWORD',
-            'charset' => 'utf8mb4',
         ],
     ],
 
