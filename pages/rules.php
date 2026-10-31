@@ -1,8 +1,7 @@
 <?php
 // pages/rules.php - قوانین و مقررات رسمی
 ?>
-<link rel="stylesheet" href="css/pages-base.css">
-<link rel="stylesheet" href="css/rules.css">
+
 
 <div class="rules-page">
     <div class="rules-hero">
@@ -119,4 +118,4 @@
         </div>
     </div>
 </div>
-<script src="js/rules.js" defer></script>
+
