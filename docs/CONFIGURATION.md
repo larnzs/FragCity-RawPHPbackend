@@ -36,6 +36,7 @@ Exampleهای جزئی:
 - `settings/weaponpaints-api.integration.example.json`
 - `settings/pterodactyl-standby.integration.example.json`
 - `settings/pterodactyl-monitoring.integration.example.json`
+- `settings/faceit-api.integration.example.json`
 
 ## ۳. مرز دیتابیس‌ها
 
@@ -54,6 +55,12 @@ Exampleهای جزئی:
 ## ۴. Pterodactyl Server Browser
 
 فهرست عمومی سرورها از `PterodactylStandbyRepository` و مسیر امضاشدهٔ `POST /v1/pterodactyl-standby` استفاده می‌کند. Linux API با Application API فقط سرورهای مجاز و Default Allocation را پیدا می‌کند و روی همان پورت‌ها A2S_INFO می‌فرستد. اسکن بازه‌ای پورت و Cron برای مسیر فعال لازم نیست. Cache به‌صورت on-demand و با TTL پیش‌فرض ۱۰ ثانیه تازه می‌شود. پیاده‌سازی فعلی Standby تک‌Node است.
+
+### ۴.۱. FACEIT Data API
+
+`integrations.faceit_api.api_key` یک کلید **Server-side** از FACEIT Developer Portal است. کلید فقط در فایل خصوصی `settings/settings.json` قرار می‌گیرد و هرگز به مرورگر یا Linux API ارسال نمی‌شود. سایت برای هر SteamID64 معتبر از مسیر `GET https://open.faceit.com/data/v4/players?game=cs2&game_player_id=...` استفاده می‌کند و Level را از `games.cs2.skill_level` می‌خواند. نتیجه‌ها در Cache خصوصی موقت سرور نگهداری می‌شوند تا برای هر بازیکن در هر بار بازشدن مودال درخواست تکراری ارسال نشود.
+
+**محدودیت فعلی SteamID:** خود پروتکل `A2S_PLAYER` شناسه Steam برنمی‌گرداند و `linuxapi/src/PterodactylStandby/A2SPlayerQuery.php` فعلاً مقدار `steam_id` را `null` می‌گذارد. بنابراین رتبه FACEIT زمانی برای هر ردیف نمایش داده می‌شود که یک افزونه معتبر سمت سرور، SteamID64 بازیکن را به دادهٔ Player List اضافه کند. در نبود SteamID، نام بازیکن به‌تنهایی برای اتصال به حساب FACEIT استفاده نمی‌شود.
 
 ## ۵. Pterodactyl Monitoring
 

@@ -144,7 +144,22 @@
                 } else {
                     const pending = document.createElement('span');
                     pending.className = 'sl-faceit-pending';
-                    pending.textContent = 'در انتظار API';
+                    const faceitStatus = String(player.faceit_status || 'unknown');
+                    const faceitStatusLabels = {
+                        steam_id_missing: 'شناسه Steam ندارد',
+                        api_not_configured: 'API تنظیم نشده',
+                        profile_not_found: 'اکانت FACEIT پیدا نشد',
+                        no_cs2_profile: 'پروفایل CS2 ندارد',
+                        unranked: 'بدون Level',
+                        api_unavailable: 'API در دسترس نیست'
+                    };
+                    pending.textContent = faceitStatusLabels[faceitStatus] || 'نامشخص';
+                    pending.dataset.faceitState = faceitStatus;
+                    if (faceitStatus === 'steam_id_missing') {
+                        pending.title = 'A2S_PLAYER شناسه Steam را ارائه نمی‌کند؛ برای اتصال حساب FACEIT به افزونه معتبر سمت سرور نیاز است.';
+                    } else if (faceitStatus === 'api_unavailable') {
+                        pending.title = 'دریافت رتبه از FACEIT موقتاً ناموفق بود؛ فهرست بازیکنان همچنان در دسترس است.';
+                    }
                     faceitCell.appendChild(pending);
                 }
                 row.appendChild(faceitCell);

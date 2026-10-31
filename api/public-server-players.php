@@ -38,9 +38,27 @@ if (!preg_match('/^[a-f0-9]{16}$/D', $serverId)) {
 }
 
 require_once dirname(__DIR__) . '/class/PterodactylStandbyRepository.php';
+require_once dirname(__DIR__) . '/class/FaceitApiClient.php';
 
 try {
     $players = (new PterodactylStandbyRepository())->getPlayers($serverId);
+
+    // FACEIT is an optional enrichment. A temporary FACEIT outage must never
+    // prevent the A2S player list from being displayed.
+    try {
+        $players['players'] = (new FaceitApiClient())->enrichPlayers(
+            is_array($players['players'] ?? null) ? $players['players'] : []
+        );
+    } catch (Throwable $faceitError) {
+        error_log('[FragCity] FACEIT player enrichment failed: ' . get_class($faceitError));
+        foreach (($players['players'] ?? []) as $playerIndex => $player) {
+            if (is_array($player)) {
+                $players['players'][$playerIndex]['faceit_level'] = null;
+                $players['players'][$playerIndex]['faceit_status'] = 'api_unavailable';
+            }
+        }
+    }
+
     $respond(200, [
         'success' => true,
         'data' => $players,

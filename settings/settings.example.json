@@ -48,6 +48,10 @@
       "logout_page": "",
       "login_page": ""
     },
+    "faceit_api": {
+      "_comment": "FACEIT Data API server-side key. Used only by PHP to resolve public CS2 player profiles by SteamID64; never expose this key to JavaScript.",
+      "api_key": "REPLACE_WITH_FACEIT_SERVER_SIDE_API_KEY"
+    },
     "zarinpal": {
       "_comment": "Payment gateway settings. Keep merchant_id empty in local development and never test real payment flows unintentionally.",
       "merchant_id": "",

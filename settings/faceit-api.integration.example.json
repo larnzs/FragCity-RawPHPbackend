@@ -1,0 +1,9 @@
+{
+  "_comment": "Merge this fragment into integrations in the private website settings/settings.json. This is a FACEIT Data API key for server-side PHP use only; never put it in JavaScript or the public website source.",
+  "integrations": {
+    "faceit_api": {
+      "_comment": "Create a Server-side API key in the FACEIT Developer Portal. The website uses it to look up CS2 public player data by SteamID64. Keep the real value only in settings/settings.json.",
+      "api_key": "REPLACE_WITH_FACEIT_SERVER_SIDE_API_KEY"
+    }
+  }
+}

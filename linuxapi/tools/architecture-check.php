@@ -78,6 +78,9 @@ try {
     $standbyA2SPlayers = $read('linuxapi/src/PterodactylStandby/A2SPlayerQuery.php');
     $standbyA2SPlayersTest = $read('linuxapi/tests/a2s-player-query-test.php');
     $standbySitePlayersEndpoint = $read('api/public-server-players.php');
+    $faceitApiClient = $read('class/FaceitApiClient.php');
+    $faceitSettingsRaw = $read('settings/faceit-api.integration.example.json');
+    $faceitSettings = json_decode($faceitSettingsRaw, true, 512, JSON_THROW_ON_ERROR);
     $standbyBrowserJavascript = $read('js/serverlist.js');
     $standbyBrowserCss = $read('css/serverlist.css');
     $standbyCache = $read('linuxapi/src/PterodactylStandby/PterodactylStandbySnapshotCache.php');
@@ -190,6 +193,7 @@ $check(
         && is_string($websiteSettings['integrations']['weaponpaints_api']['shared_secret'] ?? null)
         && is_string($websiteSettings['integrations']['pterodactyl_standby_api']['shared_secret'] ?? null)
         && is_string($websiteSettings['integrations']['pterodactyl_monitoring_api']['shared_secret'] ?? null)
+        && is_string($websiteSettings['integrations']['faceit_api']['api_key'] ?? null)
 );
 
 $check(
@@ -200,6 +204,8 @@ $check(
         && str_contains((string)($standbySettings['integrations']['pterodactyl_standby_api']['_comment'] ?? ''), 'pterodactyl_standby.shared_secret')
         && (($monitoringSettings['integrations']['pterodactyl_monitoring_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
         && str_contains((string)($monitoringSettings['integrations']['pterodactyl_monitoring_api']['_comment'] ?? ''), 'pterodactyl_monitoring.shared_secret')
+        && is_string($faceitSettings['integrations']['faceit_api']['api_key'] ?? null)
+        && str_contains((string)($faceitSettings['integrations']['faceit_api']['_comment'] ?? ''), 'Server-side')
 );
 
 $check(
@@ -212,6 +218,17 @@ $check(
         && str_contains($linuxConfig, "'allowed_node_ids' => []")
         && str_contains($linuxConfig, "'node_id' => 0")
         && str_contains($linuxConfig, "'wings_base_urls' => []")
+);
+
+$check(
+    'FACEIT levels are resolved server-side from SteamID64 and do not block the A2S player list',
+    str_contains($faceitApiClient, 'Authorization: Bearer ')
+        && str_contains($faceitApiClient, "'game' => 'cs2'")
+        && str_contains($faceitApiClient, "'game_player_id' =>")
+        && str_contains($faceitApiClient, "['skill_level']")
+        && str_contains($standbySitePlayersEndpoint, 'new FaceitApiClient()')
+        && str_contains($standbyBrowserJavascript, 'steam_id_missing')
+        && !str_contains($standbyBrowserJavascript, 'api_key')
 );
 
 $check(
