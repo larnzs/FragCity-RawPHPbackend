@@ -20,6 +20,37 @@ $indexProfile=isset($indexSettings['database_profile'])?$indexSettings['database
 $pdo=fragcity_create_pdo($indexProfile);
 
 /* =========================================================
+ | Explicit Remember-Me Restoration
+ ========================================================== */
+require_once __DIR__ . '/class/RememberMeService.php';
+
+$activeSteamId = (
+    isset($_SESSION['user_logged_in']) &&
+    $_SESSION['user_logged_in'] === true
+)
+    ? (string) ($_SESSION['steamid'] ?? '')
+    : null;
+
+$rememberedUser = $pdo instanceof PDO
+    ? RememberMeService::restore($pdo, $activeSteamId)
+    : null;
+
+if ($activeSteamId === null && is_array($rememberedUser)) {
+    session_regenerate_id(true);
+
+    $_SESSION['user_logged_in'] = true;
+    $_SESSION['steamid'] = (string) ($rememberedUser['steamid64'] ?? '');
+    $_SESSION['username'] = !empty($rememberedUser['username'])
+        ? (string) $rememberedUser['username']
+        : (string) ($rememberedUser['steamid64'] ?? '');
+    $_SESSION['role'] = !empty($rememberedUser['role'])
+        ? (string) $rememberedUser['role']
+        : 'user';
+    $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
+    $authCsrfToken = $_SESSION['auth_csrf_token'];
+}
+
+/* =========================================================
  | Helpers
  ========================================================== */
 if (!function_exists('steamid64_to_steam')) {
@@ -100,6 +131,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
 
     $authAction = (string) $_POST['auth_action'];
 
+    /* ------------------------- Logout ------------------------- */
+    if ($authAction === 'logout') {
+        if ($pdo instanceof PDO) {
+            RememberMeService::revokeCurrent($pdo);
+        } else {
+            RememberMeService::clearCookie();
+        }
+
+        $_SESSION = [];
+
+        if (ini_get('session.use_cookies')) {
+            $params = session_get_cookie_params();
+            setcookie(session_name(), '', [
+                'expires' => time() - 42000,
+                'path' => $params['path'] ?? '/',
+                'domain' => $params['domain'] ?? '',
+                'secure' => (bool) ($params['secure'] ?? false),
+                'httponly' => (bool) ($params['httponly'] ?? true),
+                'samesite' => $params['samesite'] ?? 'Lax',
+            ]);
+        }
+
+        session_destroy();
+        header('Location: index.php', true, 303);
+        exit;
+    }
+
     /* ------------------------- Login ------------------------- */
     if ($authAction === 'login') {
         $loginId = trim((string) ($_POST['login_id'] ?? ''));
@@ -148,6 +206,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
             $_SESSION['role'] = !empty($user['role'])
                 ? (string) $user['role']
                 : 'user';
+
+            RememberMeService::apply(
+                $pdo,
+                (string) ($user['steamid64'] ?? ''),
+                (string) ($_POST['remember_me'] ?? '') === '1'
+            );
 
             $redirect = safe_local_redirect(
                 $_SESSION['login_return_url'] ?? '',
@@ -297,6 +361,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                 : $steamid;
             $_SESSION['role'] = 'user';
 
+            if ($isSteamRegister) {
+                RememberMeService::apply(
+                    $pdo,
+                    $steamid,
+                    !empty($_SESSION['remember_login_requested'])
+                );
+            }
+
+            unset($_SESSION['remember_login_requested']);
             unset($_SESSION['steam_temp']);
             unset($_SESSION['login_return_url']);
 
@@ -306,32 +379,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
 
         redirect_back();
     }
-}
-
-/* =========================================================
- | Logout
- ========================================================== */
-if (isset($_GET['logout'])) {
-    $_SESSION = [];
-
-    if (ini_get('session.use_cookies')) {
-        $params = session_get_cookie_params();
-
-        setcookie(
-            session_name(),
-            '',
-            time() - 42000,
-            $params['path'],
-            $params['domain'],
-            $params['secure'],
-            $params['httponly']
-        );
-    }
-
-    session_destroy();
-
-    header('Location: index.php', true, 303);
-    exit;
 }
 
 /* =========================================================
