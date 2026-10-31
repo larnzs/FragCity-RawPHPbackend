@@ -223,7 +223,7 @@ $statusLabels = [
                 </section>
 
             <section class="sl-browser" id="slBrowserControls">
-            <div class="sl-section-heading">
+            <div class="sl-section-heading" data-fc-reveal="up">
                 <div>
                     <span class="sl-section-kicker">SERVER DIRECTORY</span>
                     <h2>سرورهای پابلیک</h2>
