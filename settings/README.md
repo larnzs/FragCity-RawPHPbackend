@@ -36,7 +36,7 @@ The complete template documents these sections:
 | `integrations.weaponpaints_api` | Signed Linux WeaponPaints API client |
 | `integrations.pterodactyl_standby_api` | Signed Server Browser API client |
 | `integrations.pterodactyl_monitoring_api` | Signed admin Monitoring API client |
-| `files` | Per-page, panel, class and plugin behavior/settings |
+| `files` | Per-page, class and plugin behavior/settings |
 
 Every database profile referenced by `files.*.database_profile` must exist under `databases`. A profile with an empty schema name is intentionally unconfigured. Do not configure a website-side `databases.weaponpaints` connection: the site must never connect directly to the Linux WeaponPaints database.
 
