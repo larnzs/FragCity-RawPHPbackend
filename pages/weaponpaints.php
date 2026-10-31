@@ -1332,7 +1332,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 >
                     <img
                         class="wp-tab-svg"
-                        src="/img/weaponpaintsicons/rifles.svg"
+                        src="/img/weaponpaintsicons/ak47.svg"
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1374,7 +1374,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 >
                     <img
                         class="wp-tab-svg"
-                        src="/img/weaponpaintsicons/heavy.svg"
+                        src="/img/weaponpaintsicons/m249.svg"
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1395,7 +1395,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 >
                     <img
                         class="wp-tab-svg"
-                        src="/img/weaponpaintsicons/pistols.svg"
+                        src="/img/weaponpaintsicons/usp_silencer.svg"
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1416,7 +1416,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 >
                     <img
                         class="wp-tab-svg"
-                        src="/img/weaponpaintsicons/snipers.svg"
+                        src="/img/weaponpaintsicons/awp.svg"
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1437,7 +1437,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 >
                     <img
                         class="wp-tab-svg"
-                        src="/img/weaponpaintsicons/knives.svg"
+                        src="/img/weaponpaintsicons/knife_m9_bayonet.svg"
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1479,7 +1479,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 >
                     <img
                         class="wp-tab-svg"
-                        src="/img/weaponpaintsicons/agents.svg"
+                        src="/img/weaponpaintsicons/agent.svg"
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1500,7 +1500,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 >
                     <img
                         class="wp-tab-svg"
-                        src="/img/weaponpaintsicons/music.svg"
+                        src="/img/weaponpaintsicons/music_kit.svg"
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1521,7 +1521,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 >
                     <img
                         class="wp-tab-svg"
-                        src="/img/weaponpaintsicons/pins.svg"
+                        src="/img/weaponpaintsicons/pin.svg"
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1561,7 +1561,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-team="2"
                     data-wp-team="2"
                 >
-                    <i class="fas fa-bullseye"></i>
+                    <img class="wp-team-btn-svg" src="/img/weaponpaintsicons/t_char_bg.svg" alt="" aria-hidden="true" loading="eager">
                     <span>T</span>
                 </a>
 
@@ -1581,7 +1581,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-team="3"
                     data-wp-team="3"
                 >
-                    <i class="fas fa-shield-halved"></i>
+                    <img class="wp-team-btn-svg" src="/img/weaponpaintsicons/ct_char_bg.svg" alt="" aria-hidden="true" loading="eager">
                     <span>CT</span>
                 </a>
 
