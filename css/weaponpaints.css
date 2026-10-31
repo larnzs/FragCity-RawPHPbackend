@@ -11031,7 +11031,14 @@ body > .modal-backdrop.show {
         font-size: .66rem;
     }
 
-    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg,
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg {
+        flex-basis: 34px;
+        width: 34px;
+        min-width: 34px;
+        height: 20px;
+        min-height: 20px;
+    }
+
     .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-fallback {
         flex-basis: 18px;
         width: 18px;
