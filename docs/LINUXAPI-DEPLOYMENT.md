@@ -54,7 +54,7 @@ For the Server Browser integration, the Application API key needs **Servers: Rea
 
 ### Pterodactyl Monitoring
 
-The admin-only CS2 panel calls the website's authenticated endpoint, which sends a signed request to Linux API. Linux reads Pterodactyl Node/server data and Wings resource counters, then returns a sanitized snapshot. The Application API token and dynamically retrieved Wings tokens remain on Linux. Monitoring is on-demand and the browser refreshes while the admin page is open; no Cron is required.
+The website retains an admin-only authenticated endpoint for read-only monitoring. The legacy CS2 dashboard UI and the `panels/` directory have been removed; no browser monitoring page is shipped. The endpoint can still sign a request to Linux API, which reads Pterodactyl Node/server data and Wings resource counters and returns a sanitized snapshot. Application API and Wings tokens remain on Linux. The backend route is on-demand and does not require Cron.
 
 ## Private Linux configuration and permissions
 
