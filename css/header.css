@@ -2509,3 +2509,35 @@ body.fc-auth-modal-open {
  .shock-header .frag-login-btn i{font-size:1.05rem}
  .shock-header .action-icon-btn,.shock-header .fc-motion-toggle,.shock-header .shock-mobile-toggle{width:36px;min-width:36px;flex-basis:36px}
 }
+
+/* Logout actions inside the account information menu and mobile drawer. */
+.frag-drop-logout-form,
+.mobile-nav-logout-form {
+    width: 100%;
+    margin: 0;
+}
+
+button.frag-drop-link.logout {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: right;
+    cursor: pointer;
+}
+
+button.frag-drop-link.logout:focus-visible,
+button.mobile-nav-link.logout-link:focus-visible {
+    outline: 2px solid rgba(249, 115, 22, .72);
+    outline-offset: -2px;
+}
+
+button.mobile-nav-link.logout-link {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    text-align: right;
+    cursor: pointer;
+}
