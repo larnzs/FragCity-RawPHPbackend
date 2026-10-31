@@ -1844,3 +1844,47 @@ body.mobile-menu-open {
         backdrop-filter: none;
     }
 }
+
+
+
+/* Mobile order: hamburger on the far right, profile immediately to its left. */
+@media (max-width: 1100px) {
+    .shock-user-area-wrapper {
+        flex-direction: row-reverse !important;
+        direction: rtl;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .shock-mobile-toggle {
+        order: 2;
+        flex: 0 0 auto;
+    }
+
+    .shock-user-area-wrapper > .frag-user-area,
+    .shock-user-area-wrapper > .frag-login-btn {
+        order: 1;
+    }
+}
+
+/* Give the scroll-down state a clearly deeper, near-black surface. */
+.shock-header.is-scroll-down {
+    background: rgba(7, 7, 7, .97) !important;
+    border-bottom-color: rgba(255, 255, 255, .085) !important;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, .48) !important;
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+}
+
+.shock-header.is-scroll-down .shock-mobile-toggle {
+    border-color: rgba(255, 255, 255, .11);
+    background: rgba(20, 20, 20, .82);
+    color: #F5F5F5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-header.is-scroll-down {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
