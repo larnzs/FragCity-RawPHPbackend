@@ -45,6 +45,10 @@
     }
 
     window.addEventListener('scroll', function () {
+        if (document.documentElement.classList.contains('fc-no-animation')) {
+            updateHeaderScrollState();
+            return;
+        }
         if (scrollTicking) return;
         scrollTicking = true;
         window.requestAnimationFrame(updateHeaderScrollState);
@@ -781,10 +785,6 @@
             localStorage.setItem(motionPreferenceKey, enabled ? '1' : '0');
         } catch (error) {
             /* The visual mode still works for the current page when storage is unavailable. */
-        }
-
-        if (window.FragCityMotion && typeof window.FragCityMotion.setNoAnimation === 'function') {
-            window.FragCityMotion.setNoAnimation(enabled);
         }
 
         window.dispatchEvent(new CustomEvent('fc-no-animation-change', {
