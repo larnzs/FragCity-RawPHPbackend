@@ -202,6 +202,16 @@ $mobileNavItems = [
         </nav>
 
         <div class="shock-user-area-wrapper">
+            <button
+                type="button"
+                class="fc-motion-toggle"
+                data-motion-toggle
+                aria-pressed="false"
+                title="حالت بدون انیمیشن"
+            >
+                <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
+                <span class="fc-motion-toggle__label">بدون انیمیشن</span>
+            </button>
             <?php if ($isLoggedIn): ?>
                 <div class="frag-user-area">
                     <div class="frag-dropdown" id="shockUserDropdown">
@@ -317,6 +327,16 @@ $mobileNavItems = [
     </div>
 
     <div class="mobile-nav-links">
+        <button
+            type="button"
+            class="mobile-nav-link fc-motion-toggle-mobile"
+            data-motion-toggle
+            aria-pressed="false"
+        >
+            <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
+            <span class="fc-motion-toggle__label">حالت بدون انیمیشن</span>
+            <span class="fc-motion-toggle__state" aria-hidden="true"></span>
+        </button>
         <?php foreach ($mobileNavItems as [$slug, $label, $icon, $activePages]): ?>
             <a href="?page=<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>"
                class="mobile-nav-link <?= $isPageActive($activePages) ?>"
