@@ -466,7 +466,7 @@ $check(
     str_contains($serverListPage, "sl-server-card--offline")
         && str_contains($serverListPage, "sl-metric--query-rtt")
         && str_contains($serverListPage, "fa-signal")
-        && str_contains($serverListPage, "A2S Ping")
+        && str_contains($serverListPage, "A2S RTT")
         && str_contains($serverListPage, "پینگ واقعی اینترنت بازیکن نیست")
         && str_contains($serverListStylesheet, '.sl-server-card[data-status="offline"]')
         && str_contains($serverListStylesheet, 'filter: grayscale(1) saturate(0);')
