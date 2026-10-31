@@ -9972,3 +9972,261 @@ body > #keychainModal .selection-footer .wp-btn {
         gap: 7px !important;
     }
 }
+
+
+/* =========================================================
+   Server List-inspired motion and interaction layer
+   Translated for the WeaponPaints workspace and its orange/graphite theme.
+========================================================= */
+
+.wp-app {
+    position: relative;
+    isolation: isolate;
+    background:
+        radial-gradient(ellipse at 10% 0%, rgba(249, 115, 22, .075), transparent 36%),
+        radial-gradient(ellipse at 92% 13%, rgba(255, 179, 71, .045), transparent 32%),
+        #0D0D0D !important;
+}
+
+.wp-app::before {
+    display: block !important;
+    content: "" !important;
+    position: absolute;
+    z-index: 0;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 500px;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 18% 8%, rgba(249, 115, 22, .12), transparent 46%),
+        radial-gradient(ellipse at 82% 18%, rgba(255, 179, 71, .065), transparent 42%);
+    opacity: .62;
+    transform: translate3d(0, 0, 0);
+    animation: wpAtmosphereDrift 17s ease-in-out infinite alternate;
+}
+
+.wp-app > .wp-header,
+.wp-app > .wp-main {
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes wpAtmosphereDrift {
+    from {
+        opacity: .42;
+        transform: translate3d(-.5%, 0, 0) scale(1);
+    }
+    to {
+        opacity: .72;
+        transform: translate3d(.5%, 7px, 0) scale(1.025);
+    }
+}
+
+/* Frosted top rail, similar to the Server List control surfaces. */
+.wp-app .wp-header {
+    border-bottom-color: rgba(249, 115, 22, .17) !important;
+    background: linear-gradient(
+        180deg,
+        rgba(20, 20, 20, .94),
+        rgba(13, 13, 13, .88)
+    ) !important;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .20) !important;
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    backdrop-filter: blur(14px) saturate(120%);
+}
+
+.wp-app .wp-section-head {
+    position: relative;
+    border-bottom-color: rgba(255, 255, 255, .075);
+}
+
+.wp-app .wp-section-head::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    width: min(180px, 38%);
+    height: 2px;
+    border-radius: 99px;
+    background: linear-gradient(90deg, rgba(249, 115, 22, 0), #F97316);
+    box-shadow: 0 0 14px rgba(249, 115, 22, .24);
+    opacity: .82;
+    pointer-events: none;
+}
+
+/* Category, team and search controls receive the same quick feedback as
+   the Server List filters without changing their dimensions or behavior. */
+.wp-app .wp-header .wp-category-switcher--unified > .wp-tab {
+    transition:
+        transform 220ms cubic-bezier(.2, .75, .25, 1),
+        color 180ms ease,
+        background-color 180ms ease,
+        border-color 180ms ease,
+        box-shadow 220ms ease !important;
+}
+
+.wp-app .wp-header .wp-category-switcher--unified > .wp-tab:hover,
+.wp-app .wp-header .wp-category-switcher--unified > .wp-tab:focus-visible {
+    transform: translateY(-2px) !important;
+    border-color: rgba(249, 115, 22, .36) !important;
+    background: rgba(249, 115, 22, .09) !important;
+    box-shadow: 0 7px 18px rgba(249, 115, 22, .09) !important;
+}
+
+.wp-app .wp-header .wp-category-switcher--unified > .wp-tab.is-active,
+.wp-app .wp-header .wp-category-switcher--unified > .wp-tab.active {
+    box-shadow:
+        0 5px 16px rgba(249, 115, 22, .11),
+        inset 0 1px 0 rgba(255, 255, 255, .045) !important;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn {
+    transition:
+        transform 200ms cubic-bezier(.2, .75, .25, 1),
+        color 160ms ease,
+        background-color 160ms ease,
+        border-color 160ms ease,
+        box-shadow 200ms ease !important;
+}
+
+.wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn:hover,
+.wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn:focus-visible {
+    transform: translateY(-1px) !important;
+    border-color: rgba(249, 115, 22, .30) !important;
+    box-shadow: 0 5px 14px rgba(249, 115, 22, .08) !important;
+}
+
+.wp-app .wp-header .wp-search-wrap {
+    transition:
+        border-color 200ms ease,
+        background-color 200ms ease,
+        box-shadow 220ms ease !important;
+}
+
+.wp-app .wp-header .wp-search-wrap:focus-within {
+    border-color: rgba(249, 115, 22, .58) !important;
+    box-shadow:
+        0 0 0 3px rgba(249, 115, 22, .09),
+        0 9px 22px rgba(0, 0, 0, .20) !important;
+}
+
+/* Card lift and warm rim glow: same interaction language as server cards. */
+.wp-app .wp-card,
+.wp-app .wp-saved-paint-card {
+    transform: translateY(0);
+    transition:
+        transform 280ms cubic-bezier(.2, .75, .25, 1),
+        border-color 240ms ease,
+        background-color 240ms ease,
+        box-shadow 280ms ease !important;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .wp-app .wp-card:hover,
+    .wp-app .wp-card:focus-visible,
+    .wp-app .wp-card--clickable:focus-visible,
+    .wp-app .wp-saved-paint-card:hover,
+    .wp-app .wp-saved-paint-card:focus-within {
+        transform: translateY(-4px) !important;
+        border-color: rgba(249, 115, 22, .62) !important;
+        background: linear-gradient(145deg, #191817, #111111) !important;
+        box-shadow:
+            0 18px 42px rgba(0, 0, 0, .32),
+            0 7px 26px rgba(249, 115, 22, .095),
+            inset 0 1px 0 rgba(255, 255, 255, .055) !important;
+    }
+
+    .wp-app .wp-card:hover .wp-card-image,
+    .wp-app .wp-card:focus-visible .wp-card-image,
+    .wp-app .wp-saved-paint-card:hover .wp-card-media img {
+        transform: scale(1.045);
+        filter: drop-shadow(0 10px 12px rgba(0, 0, 0, .28));
+    }
+}
+
+.wp-app .wp-card-image,
+.wp-app .wp-saved-paint-card .wp-card-media img {
+    transition:
+        transform 300ms cubic-bezier(.2, .75, .25, 1),
+        filter 300ms ease !important;
+}
+
+/* Selection panels, add-on tiles and controls use the same response. */
+.wp-app .wp-control-card,
+body > .wp-modal .selection-card,
+body > .wp-modal .wp-addon-card {
+    transition:
+        transform 240ms cubic-bezier(.2, .75, .25, 1),
+        border-color 220ms ease,
+        background-color 220ms ease,
+        box-shadow 240ms ease !important;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .wp-app .wp-control-card:hover,
+    body > .wp-modal .selection-card:hover,
+    body > .wp-modal .wp-addon-card:hover {
+        transform: translateY(-3px) !important;
+        border-color: rgba(249, 115, 22, .48) !important;
+        box-shadow:
+            0 13px 30px rgba(0, 0, 0, .28),
+            0 5px 20px rgba(249, 115, 22, .075) !important;
+    }
+}
+
+/* Buttons and pagination get a small lift, not a distracting bounce. */
+.wp-app .wp-btn,
+.wp-app .wp-page-btn {
+    transition:
+        transform 200ms cubic-bezier(.2, .75, .25, 1),
+        color 180ms ease,
+        background-color 180ms ease,
+        border-color 180ms ease,
+        box-shadow 220ms ease !important;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .wp-app .wp-btn:hover:not(:disabled),
+    .wp-app .wp-page-btn:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 20px rgba(249, 115, 22, .12) !important;
+    }
+}
+
+.wp-app .wp-page-btn.is-active,
+.wp-app .wp-page-btn.active {
+    border-color: rgba(249, 115, 22, .44);
+    box-shadow:
+        0 5px 16px rgba(249, 115, 22, .10),
+        inset 0 1px 0 rgba(255, 255, 255, .045);
+}
+
+/* Keep the workspace responsive and respect OS / FragCity performance modes. */
+@media (prefers-reduced-motion: reduce) {
+    .wp-app::before {
+        animation: none !important;
+        transform: none !important;
+    }
+
+    .wp-app .wp-card,
+    .wp-app .wp-saved-paint-card,
+    .wp-app .wp-card-image,
+    .wp-app .wp-tab,
+    .wp-app .wp-team-btn,
+    .wp-app .wp-btn,
+    .wp-app .wp-page-btn,
+    .wp-app .wp-control-card,
+    body > .wp-modal .selection-card,
+    body > .wp-modal .wp-addon-card {
+        transition: none !important;
+    }
+
+    .wp-app .wp-card:hover,
+    .wp-app .wp-saved-paint-card:hover,
+    .wp-app .wp-control-card:hover,
+    body > .wp-modal .selection-card:hover,
+    body > .wp-modal .wp-addon-card:hover {
+        transform: none !important;
+    }
+}
