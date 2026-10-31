@@ -62,6 +62,7 @@ try {
     $siteHeaderMarkup = $read('includes/header.php');
     $siteHeaderStylesheet = $read('css/header.css');
     $headerJavascript = $read('js/header.js');
+    $motionController = $read('js/motion.js');
     $websiteIndex = $read('index.php');
     $testHarnessIndex = $read('tst/index.php');
     $footerMarkup = $read('includes/footer.php');
@@ -607,6 +608,35 @@ $check(
         && is_file($root . '/pages/launcher.php')
         && is_file($root . '/pages/serverlist.php')
         && is_file($root . '/pages/weaponpaints.php')
+);
+
+$check(
+    'WeaponPaints inherits the Server List reveal, ambient, hover, selection and low-motion effects',
+    str_contains($weaponPaintsStylesheet, 'Server List motion parity')
+        && str_contains($weaponPaintsStylesheet, 'wpAmbientOrbit')
+        && str_contains($weaponPaintsStylesheet, 'wpHeaderAccent')
+        && str_contains($weaponPaintsStylesheet, '.wp-app .wp-card::after')
+        && str_contains($weaponPaintsStylesheet, 'wpSelectionGlow')
+        && str_contains($weaponPaintsStylesheet, '.wp-app .wp-empty-icon::after')
+        && str_contains($weaponPaintsStylesheet, 'html.fc-no-animation .wp-app::after')
+        && str_contains($motionController, "'.wp-app .wp-item'")
+        && str_contains($motionController, "'.wp-app .wp-empty-state'")
+        && str_contains($motionController, 'IntersectionObserver')
+);
+
+$check(
+    'Desktop and mobile navigation prioritize Server List and Skin Selection, with secondary links under More',
+    str_contains($siteHeaderMarkup, 'data-slug="servers_vps"')
+        && str_contains($siteHeaderMarkup, 'data-slug="skins"')
+        && str_contains($siteHeaderMarkup, 'id="shockMoreDropdown"')
+        && str_contains($siteHeaderMarkup, '$mobileMoreNavItems = [')
+        && str_contains($siteHeaderMarkup, '<details class="mobile-nav-more"')
+        && str_contains($siteHeaderMarkup, '<summary class="mobile-nav-link mobile-nav-more-toggle')
+        && str_contains($siteHeaderMarkup, "['buyserveropen', 'خرید سرور'")
+        && str_contains($siteHeaderMarkup, 'mobile-nav-more-menu')
+        && str_contains($siteHeaderStylesheet, '.mobile-nav-more[open] .mobile-nav-more-arrow')
+        && str_contains($siteHeaderMarkup, "['servers_vps', 'لیست سرورها'")
+        && str_contains($siteHeaderMarkup, "['skins', 'انتخاب اسکین'")
 );
 
 $check(
