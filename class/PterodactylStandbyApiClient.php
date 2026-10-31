@@ -104,8 +104,8 @@ final class PterodactylStandbyApiClient
         $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
         $contentType = (string)(curl_getinfo($handle, CURLINFO_CONTENT_TYPE) ?: '');
 
-        // PHP 8.5 deprecates curl_close(): CurlHandle objects are released
-        // automatically when their last reference is destroyed.
+        // PHP 8.5 no longer needs an explicit cURL close call:
+        // CurlHandle objects are released when their last reference is destroyed.
         unset($handle);
 
         if ($response === false || $curlError !== 0) {
