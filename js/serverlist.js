@@ -229,8 +229,7 @@
         function closePlayerModal() {
             if (!playerModal || playerModal.hidden || modalIsClosing) return;
 
-            // Keep an in-flight request alive after closing the modal.
-            // Its response can warm the cache for the next open.
+            // Keep in-flight prefetch requests alive so their responses can warm the cache.
             ++playerRequestSequence;
 
             playerModal.setAttribute('aria-hidden', 'true');
@@ -243,7 +242,10 @@
             playerModal.classList.remove('is-open');
             playerModal.classList.add('is-closing');
             window.clearTimeout(modalCloseTimer);
-            modalCloseTimer = window.setTimeout(finishPlayerModa        async function fetchPlayersData(serverId, forceRefresh) {
+            modalCloseTimer = window.setTimeout(finishPlayerModalClose, 270);
+        }
+
+        async function fetchPlayersData(serverId, forceRefresh) {
             const cacheEntry = playerCache.get(serverId);
             if (!forceRefresh && cacheEntry && Date.now() - cacheEntry.savedAt < PLAYER_CACHE_TTL_MS) {
                 return cacheEntry.data;
@@ -258,6 +260,7 @@
             }
 
             const controller = new AbortController();
+            const requestEntry = { promise: null, controller: controller };
             const promise = (async function () {
                 const response = await fetch(
                     '/api/public-server-players.php?server_id=' + encodeURIComponent(serverId),
@@ -288,8 +291,7 @@
                 playerCache.set(serverId, { data: result.data, savedAt: Date.now() });
                 return result.data;
             })();
-
-            const requestEntry = { promise: promise, controller: controller };
+            requestEntry.promise = promise;
             playerRequests.set(serverId, requestEntry);
 
             try {
@@ -341,13 +343,10 @@
             if (cacheEntry && Date.now() - cacheEntry.savedAt < PLAYER_CACHE_TTL_MS) return;
             if (playerRequests.has(serverId)) return;
 
-            // The request starts on hover/focus, before the player modal is opened.
+            // Start fetching on hover/focus, before the player modal is opened.
             void fetchPlayersData(serverId, false).catch(function () {
-                // Prefetch is intentionally silent; opening the modal shows any error.
+                // Prefetch is silent; opening the modal displays any request error.
             });
-        }
-
-            }
         }
 
         function openPlayerModal(button) {
