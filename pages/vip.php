@@ -204,6 +204,14 @@ $vipCurrentStatus = !$isLoggedIn
         </a>
     </div>
 
+    <aside class="vip-competitive-note" role="note">
+        <span class="vip-competitive-note-icon" aria-hidden="true"><i class="fas fa-scale-balanced"></i></span>
+        <span>
+            <strong>حفظ تعادل رقابتی سرورها</strong>
+            <small>برای تجربه‌ای رقابتی و منصفانه، قابلیت‌های VIP هنگام فعال بودن مودهای Competitive، Wingman، Deathmatch و سایر مودهای رقابتی غیرفعال هستند.</small>
+        </span>
+    </aside>
+
     <section class="vip-plans-grid" aria-label="پلن‌های قابل انتخاب VIP">
         <?php foreach ($vipLevels as $lvl => $tier): ?>
             <?php

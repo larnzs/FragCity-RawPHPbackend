@@ -2483,3 +2483,29 @@ body.fc-auth-modal-open {
         transition: none !important;
     }
 }
+
+
+/* One measured height and aligned baselines for every header action. */
+.shock-header .frag-login-btn,.shock-header .action-icon-btn,.shock-header .fc-motion-toggle,.shock-header .shock-mobile-toggle,.shock-header .frag-user-trigger{
+ box-sizing:border-box;min-height:40px;height:40px;
+}
+.shock-header .frag-login-btn{
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ flex:0 0 auto;min-width:132px;padding:0 13px;border-radius:9px;
+ font-size:.73rem;font-weight:800;line-height:1;white-space:nowrap;
+}
+.shock-header .frag-login-btn i{font-size:1.08rem;line-height:1}
+.shock-header .frag-login-btn span{line-height:1}
+.shock-header .action-icon-btn{flex:0 0 40px;width:40px;height:40px;padding:0}
+.shock-header .fc-motion-toggle{width:40px;min-width:40px;min-height:40px;height:40px;flex:0 0 40px}
+.shock-header .shock-mobile-toggle{width:40px;min-width:40px;height:40px;flex:0 0 40px;padding:0}
+.mobile-nav-link.mobile-steam-login-link{min-height:44px;border:1px solid rgba(249,115,22,.2);border-radius:9px;background:rgba(249,115,22,.075);color:#FDBA74}
+.mobile-nav-link.mobile-steam-login-link i{color:#F97316;font-size:1.05rem}
+.mobile-nav-link.mobile-steam-login-link:hover,.mobile-nav-link.mobile-steam-login-link:focus-visible{border-color:rgba(249,115,22,.42);background:rgba(249,115,22,.12);color:#FFD0A5}
+@media(max-width:700px){
+ .shock-header .frag-login-btn,.shock-header .action-icon-btn,.shock-header .fc-motion-toggle,.shock-header .shock-mobile-toggle,.shock-header .frag-user-trigger{min-height:36px;height:36px}
+ .shock-header .frag-login-btn{width:36px;min-width:36px;max-width:36px;flex:0 0 36px;padding:0;gap:0}
+ .shock-header .frag-login-btn span{display:none}
+ .shock-header .frag-login-btn i{font-size:1.05rem}
+ .shock-header .action-icon-btn,.shock-header .fc-motion-toggle,.shock-header .shock-mobile-toggle{width:36px;min-width:36px;flex-basis:36px}
+}

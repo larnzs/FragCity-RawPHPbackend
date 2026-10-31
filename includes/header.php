@@ -296,8 +296,8 @@ $mobileNavItems = [
                    aria-haspopup="dialog"
                    aria-controls="fcLoginModal"
                    aria-expanded="false">
-                    <i class="fas fa-user-lock" aria-hidden="true"></i>
-                    <span>ورود / ثبت‌نام</span>
+                    <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                    <span>ورود با استیم</span>
                 </a>
             <?php endif; ?>
 
@@ -358,13 +358,13 @@ $mobileNavItems = [
             </a>
         <?php else: ?>
             <a href="?page=login"
-               class="mobile-nav-link <?= $isPageActive(['login', 'register']) ?>"
+               class="mobile-nav-link mobile-steam-login-link <?= $isPageActive(['login', 'register']) ?>"
                data-auth-modal-open
                aria-haspopup="dialog"
                aria-controls="fcLoginModal"
                aria-expanded="false">
-                <i class="fas fa-user-lock" aria-hidden="true"></i>
-                <span>ورود / ثبت‌نام</span>
+                <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                <span>ورود با استیم</span>
             </a>
         <?php endif; ?>
     </div>
