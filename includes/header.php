@@ -204,13 +204,13 @@ $mobileNavItems = [
         <div class="shock-user-area-wrapper">
             <button
                 type="button"
-                class="fc-motion-toggle" aria-label="No Animation Mode"
+                class="fc-motion-toggle" aria-label="Performance Mode"
                 data-motion-toggle
                 aria-pressed="false"
                 title="حالت بدون انیمیشن"
             >
                 <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
-                <span class="fc-motion-toggle__label">No Animation Mode</span>
+                <span class="fc-motion-toggle__label">Performance Mode</span>
             </button>
             <?php if ($isLoggedIn): ?>
                 <div class="frag-user-area">
@@ -329,12 +329,12 @@ $mobileNavItems = [
     <div class="mobile-nav-links">
         <button
             type="button"
-            class="mobile-nav-link fc-motion-toggle-mobile" aria-label="No Animation Mode"
+            class="mobile-nav-link fc-motion-toggle-mobile" aria-label="Performance Mode"
             data-motion-toggle
             aria-pressed="false"
         >
             <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
-            <span class="fc-motion-toggle__label">No Animation Mode</span>
+            <span class="fc-motion-toggle__label">Performance Mode</span>
             <span class="fc-motion-toggle__state" aria-hidden="true"></span>
         </button>
         <?php foreach ($mobileNavItems as [$slug, $label, $icon, $activePages]): ?>
