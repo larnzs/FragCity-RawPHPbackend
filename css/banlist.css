@@ -985,3 +985,8 @@ body.site-body:has(.banlist-page) .main-content {
     background: #EA580C;
     color: #FFFFFF;
 }
+
+/* Keep the moderation directory clear of the footer at every breakpoint. */
+.banlist-page {
+    padding-bottom: var(--fc-page-safe-bottom, 56px) !important;
+}
