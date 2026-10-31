@@ -11099,3 +11099,14 @@ html.fc-no-animation .wp-app .wp-main .tab-content > .tab-pane {
     filter: none !important;
     transform: none !important;
 }
+
+/* Layer the entering pane above the outgoing pane while they share a grid cell. */
+.wp-app .wp-main .tab-content > .tab-pane.wp-tab-entering {
+    position: relative;
+    z-index: 2;
+}
+
+.wp-app .wp-main .tab-content > .tab-pane.wp-tab-exiting {
+    position: relative;
+    z-index: 1;
+}
