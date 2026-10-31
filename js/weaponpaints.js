@@ -68,6 +68,9 @@
                 config.currentTab || 'tab-inventory'
             ),
 
+        tabTransitionToken:
+            0,
+
         currentInventoryCategory:
             String(
                 config.currentInventoryCategory || 'all'
@@ -2901,8 +2904,8 @@
 
         const currentUrl = getCurrentUrl();
 
-        dom.mainTabs
-            .querySelectorAll('.wp-team-switcher a[data-wp-team]')
+        document
+            .querySelectorAll('.wp-app .wp-team-switcher a[data-wp-team]')
             .forEach(link => {
                 const team = String(
                     link.dataset.wpTeam ||
@@ -2991,9 +2994,9 @@
 
     function syncAgentTeamSwitcher(tabId = getCurrentActiveTab()) {
         const isAgentsTab = tabId === 'tab-agents';
-        const bothButton = dom.mainTabs
-            ? dom.mainTabs.querySelector('.wp-team-btn--both')
-            : null;
+        const bothButton = document.querySelector(
+            '.wp-app .wp-team-switcher .wp-team-btn--both'
+        );
 
         if (bothButton) {
             bothButton.classList.toggle('is-disabled', isAgentsTab);
@@ -3020,8 +3023,8 @@
             );
         }
 
-        if (dom.mainTabs) {
-            dom.mainTabs.querySelectorAll('.wp-team-switcher .wp-team-btn').forEach(link => {
+        if (document.querySelector('.wp-app .wp-team-switcher')) {
+            document.querySelectorAll('.wp-app .wp-team-switcher .wp-team-btn').forEach(link => {
                 const team = String(link.dataset.wpTeam || link.dataset.team || '');
                 link.classList.toggle('is-active', team === state.currentTeamParam);
             });
@@ -3058,114 +3061,111 @@
         tabId,
         updateUrl = true
     ) {
-
-        if (
-            !dom.mainTabs ||
-            !tabId
-        ) {
+        if (!dom.mainTabs || !tabId) {
             return false;
         }
 
-        const targetPane =
-            document.getElementById(tabId);
-
-        if (
-            !targetPane ||
-            !targetPane.classList.contains('tab-pane')
-        ) {
+        const targetPane = document.getElementById(tabId);
+        if (!targetPane || !targetPane.classList.contains('tab-pane')) {
             return false;
         }
 
+        const panes = Array.from(
+            document.querySelectorAll('.wp-main .tab-content > .tab-pane')
+        );
         const previousPane =
-            document.querySelector(
-                '.wp-main .tab-content > .tab-pane.show.active'
-            );
+            panes.find(pane => (
+                pane.id === state.currentActiveTab &&
+                pane.classList.contains('active')
+            )) ||
+            panes.find(pane => (
+                pane.classList.contains('show') &&
+                pane.classList.contains('active')
+            )) ||
+            null;
 
-        const tabButtons =
-            dom.mainTabs.querySelectorAll(
-                '[data-bs-target], [data-target]'
-            );
+        const tabButtons = Array.from(
+            dom.mainTabs.querySelectorAll('[data-bs-target], [data-target]')
+        );
+        const previousIndex = previousPane
+            ? tabButtons.findIndex(button => (
+                (button.getAttribute('data-bs-target') || button.getAttribute('data-target') || '').replace(/^#/, '') === previousPane.id
+            ))
+            : -1;
+        const targetIndex = tabButtons.findIndex(button => (
+            (button.getAttribute('data-bs-target') || button.getAttribute('data-target') || '').replace(/^#/, '') === tabId
+        ));
+        const direction = previousIndex < 0 || targetIndex >= previousIndex ? 1 : -1;
+        const transitionToken = ++state.tabTransitionToken;
 
         tabButtons.forEach(button => {
-
             const targetSelector =
                 button.getAttribute('data-bs-target') ||
                 button.getAttribute('data-target') ||
                 '';
+            const buttonTargetId = targetSelector.replace(/^#/, '');
+            const isActive = buttonTargetId === tabId;
 
-            const buttonTargetId =
-                targetSelector.replace(/^#/, '');
-
-            const isActive =
-                buttonTargetId === tabId;
-
-            button.classList.toggle(
-                'is-active',
-                isActive
-            );
-
-            button.classList.toggle(
-                'active',
-                isActive
-            );
-
-            button.setAttribute(
-                'aria-selected',
-                isActive ? 'true' : 'false'
-            );
+            button.classList.toggle('is-active', isActive);
+            button.classList.toggle('active', isActive);
+            button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            button.setAttribute('aria-current', isActive ? 'page' : 'false');
 
             if (isActive) {
                 button.removeAttribute('tabindex');
             } else {
                 button.setAttribute('tabindex', '-1');
             }
-
         });
 
-        document
-            .querySelectorAll(
-                '.wp-main .tab-content > .tab-pane'
-            )
-            .forEach(pane => {
+        panes.forEach(pane => {
+            window.clearTimeout(pane.__wpTabExitTimer);
+            window.clearTimeout(pane.__wpTabAnimationTimer);
 
-                const isActive =
-                    pane.id === tabId;
+            if (pane === targetPane) {
+                return;
+            }
 
-                if (!isActive) {
-                    pane.classList.remove(
-                        'show',
-                        'active',
-                        'wp-tab-entering'
-                    );
+            if (pane === previousPane) {
+                pane.style.setProperty('--wp-tab-direction', String(direction));
+                pane.classList.remove('wp-tab-entering');
+                pane.classList.add('wp-tab-exiting');
+
+                pane.__wpTabExitTimer = window.setTimeout(() => {
+                    if (state.tabTransitionToken !== transitionToken) {
+                        return;
+                    }
+
+                    pane.classList.remove('show', 'active', 'wp-tab-exiting', 'wp-tab-entering');
                     pane.style.display = 'none';
-                }
+                    pane.style.removeProperty('--wp-tab-direction');
+                }, 230);
 
-            });
+                return;
+            }
+
+            pane.classList.remove('show', 'active', 'wp-tab-entering', 'wp-tab-exiting');
+            pane.style.display = 'none';
+            pane.style.removeProperty('--wp-tab-direction');
+        });
 
         targetPane.style.display = '';
+        targetPane.classList.remove('wp-tab-exiting');
+        targetPane.style.setProperty('--wp-tab-direction', String(direction));
         targetPane.classList.add('active');
 
-        // Force a reflow so the enter animation reliably runs after every tab switch.
+        // Reflow ensures every switch gets a fresh directional entrance.
         void targetPane.offsetWidth;
 
-        targetPane.classList.add(
-            'show',
-            'wp-tab-entering'
-        );
+        targetPane.classList.add('show', 'wp-tab-entering');
+        targetPane.__wpTabAnimationTimer = window.setTimeout(() => {
+            if (state.tabTransitionToken !== transitionToken) {
+                return;
+            }
 
-        window.clearTimeout(
-            targetPane.__wpTabAnimationTimer
-        );
-
-        targetPane.__wpTabAnimationTimer =
-            window.setTimeout(
-                () => {
-                    targetPane.classList.remove(
-                        'wp-tab-entering'
-                    );
-                },
-                460
-            );
+            targetPane.classList.remove('wp-tab-entering');
+            targetPane.style.removeProperty('--wp-tab-direction');
+        }, 520);
 
         state.currentActiveTab = tabId;
         syncTopLevelView(tabId);
@@ -3179,9 +3179,7 @@
         }
 
         return true;
-
     }
-
 
     function bindMainTabs() {
 
@@ -3193,7 +3191,7 @@
 
         }
 
-        // Inventory and selectable categories now share the same tab row.
+        // The category buttons live in the vertical sidebar; team controls live in the toolbar.
 
         const tabButtons =
             dom.mainTabs.querySelectorAll(
@@ -3266,34 +3264,31 @@
         );
 
 
-        if (dom.mainTabs.dataset.wpTeamSwitcherBound !== '1') {
-            dom.mainTabs.addEventListener(
-                'click',
-                event => {
-                    const target = event.target instanceof Element
-                        ? event.target
-                        : event.target && event.target.parentElement;
-                    const teamLink = target
-                        ? target.closest('.wp-team-switcher a[data-wp-team]')
-                        : null;
+        const teamSwitcher = document.querySelector('.wp-app .wp-team-switcher');
+        if (teamSwitcher && teamSwitcher.dataset.wpTeamSwitcherBound !== '1') {
+            teamSwitcher.addEventListener('click', event => {
+                const target = event.target instanceof Element
+                    ? event.target
+                    : event.target && event.target.parentElement;
+                const teamLink = target
+                    ? target.closest('a[data-wp-team]')
+                    : null;
 
-                    if (!teamLink || !dom.mainTabs.contains(teamLink)) {
-                        return;
-                    }
+                if (!teamLink || !teamSwitcher.contains(teamLink)) {
+                    return;
+                }
 
-                    const team = teamLink.dataset.wpTeam || teamLink.dataset.team;
-                    if (!['2', '3', 'both'].includes(String(team))) {
-                        return;
-                    }
+                const team = teamLink.dataset.wpTeam || teamLink.dataset.team;
+                if (!['2', '3', 'both'].includes(String(team))) {
+                    return;
+                }
 
-                    event.preventDefault();
-                    event.stopPropagation();
-                    window.changeTeam(team);
-                },
-                true
-            );
+                event.preventDefault();
+                event.stopPropagation();
+                window.changeTeam(team);
+            }, true);
 
-            dom.mainTabs.dataset.wpTeamSwitcherBound = '1';
+            teamSwitcher.dataset.wpTeamSwitcherBound = '1';
         }
 
         const initialTab =
