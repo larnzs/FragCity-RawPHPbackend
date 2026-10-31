@@ -3211,3 +3211,9 @@ body.sl-player-modal-open {
         transform: none !important;
     }
 }
+
+@media (max-width: 760px) {
+    .sl-hero-art {
+        display: grid;
+    }
+}
