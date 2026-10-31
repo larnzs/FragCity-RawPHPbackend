@@ -1736,3 +1736,111 @@ body.mobile-menu-open {
         transition: none;
     }
 }
+
+
+
+/* Mobile header refinements: keep the profile dropdown inside the viewport. */
+@media (max-width: 520px) {
+    .shock-container {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        padding-inline: 12px;
+    }
+
+    .shock-brand,
+    .shock-logo-link,
+    .shock-user-area-wrapper,
+    .frag-user-area,
+    #shockUserDropdown {
+        min-width: 0;
+    }
+
+    .shock-user-area-wrapper {
+        max-width: 100%;
+        gap: 6px;
+    }
+
+    /* The profile trigger sits on the right in RTL; pin the menu to that edge. */
+    #shockUserDropdown .frag-dropdown-menu {
+        position: absolute;
+        top: calc(100% + 9px);
+        right: 0;
+        left: auto;
+        width: min(370px, calc(100vw - 24px));
+        min-width: 0;
+        max-width: calc(100vw - 24px);
+        box-sizing: border-box;
+        transform-origin: top right;
+    }
+
+    #shockUserDropdown .frag-drop-header--profile {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+
+/* Keep the hamburger visually light and transparent over the clear header. */
+.shock-header .shock-mobile-toggle {
+    border-color: transparent;
+    background: transparent;
+    color: #E5E5E5;
+    box-shadow: none;
+}
+
+.shock-header .shock-mobile-toggle:hover,
+.shock-header .shock-mobile-toggle:active {
+    border-color: rgba(249, 115, 22, 0.18);
+    background: rgba(249, 115, 22, 0.075);
+    color: #FFB347;
+    box-shadow: none;
+    transform: none;
+}
+
+.shock-header .shock-mobile-toggle:focus-visible {
+    border-color: rgba(249, 115, 22, 0.36);
+    outline: 2px solid rgba(255, 179, 71, 0.7);
+    outline-offset: 2px;
+    background: rgba(249, 115, 22, 0.07);
+}
+
+.shock-header.is-scroll-down {
+    background: rgba(13, 13, 13, 0.58);
+    border-bottom-color: rgba(255, 255, 255, 0.075);
+    box-shadow: 0 9px 26px rgba(0, 0, 0, 0.28);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+}
+
+.shock-header.is-scroll-down .shock-mobile-toggle {
+    border-color: rgba(255, 255, 255, 0.09);
+    background: rgba(13, 13, 13, 0.28);
+}
+
+@media (max-width: 380px) {
+    .shock-container {
+        gap: 7px;
+        padding-inline: 9px;
+    }
+
+    .shock-logo-img {
+        max-width: 124px;
+    }
+
+    .shock-user-area-wrapper {
+        gap: 5px;
+    }
+
+    .shock-header #shockUserDropdown .frag-user-trigger {
+        padding-inline: 4px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-header.is-scroll-down {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+}
