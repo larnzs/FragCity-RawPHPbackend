@@ -509,18 +509,30 @@ $check(
 );
 
 $check(
-    'Footer routes use canonical page slugs and every linked destination has a real page',
+    'Footer shows only active public destinations and hides the deferred support/legal pages',
     str_contains($footerMarkup, 'index.php?page=servers_vps')
         && str_contains($footerMarkup, 'data-slug="servers_vps"')
         && str_contains($footerMarkup, 'index.php?page=skins')
         && str_contains($footerMarkup, 'index.php?page=launcher')
-        && str_contains($footerMarkup, 'index.php?page=support')
-        && str_contains($footerMarkup, 'index.php?page=usermanual')
-        && str_contains($footerMarkup, 'index.php?page=rules')
-        && str_contains($footerMarkup, 'index.php?page=privacy')
+        && !str_contains($footerMarkup, 'page=support')
+        && !str_contains($footerMarkup, 'page=usermanual')
+        && !str_contains($footerMarkup, 'page=rules')
+        && !str_contains($footerMarkup, 'page=privacy')
+        && !str_contains($footerMarkup, 'راهنما و پشتیبانی')
         && is_file($root . '/pages/launcher.php')
         && is_file($root . '/pages/serverlist.php')
         && is_file($root . '/pages/weaponpaints.php')
+);
+
+$check(
+    'Header desktop and responsive navigation hide deferred support/manual/legal pages',
+    !str_contains($siteHeaderMarkup, 'page=support')
+        && !str_contains($siteHeaderMarkup, 'page=usermanual')
+        && !str_contains($siteHeaderMarkup, 'page=rules')
+        && !str_contains($siteHeaderMarkup, 'page=privacy')
+        && !str_contains($siteHeaderMarkup, "'usermanual', 'راهنمای کاربر'")
+        && str_contains($siteHeaderMarkup, "['launcher', 'دانلود لانچر'")
+        && str_contains($siteHeaderMarkup, "['leaderboard', 'لیدربورد'")
 );
 
 $check(
