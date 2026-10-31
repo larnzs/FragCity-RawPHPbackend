@@ -1872,15 +1872,14 @@ body.mobile-menu-open {
 }
 
 
-/* Persistent graphite header: only the document top is transparent. */
+/* Match the supplied FragCity page background exactly while scrolled. */
 .shock-header.is-scrolled,
 .shock-header.is-scroll-down {
-    background:
-        linear-gradient(180deg, rgba(34, 34, 34, .98), rgba(23, 23, 23, .97)) !important;
-    border-bottom-color: rgba(255, 255, 255, .10) !important;
-    box-shadow: 0 12px 34px rgba(0, 0, 0, .34) !important;
-    -webkit-backdrop-filter: blur(18px);
-    backdrop-filter: blur(18px);
+    background: #0D0D0D !important;
+    border-bottom-color: rgba(255, 255, 255, .08) !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .28) !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
     transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
