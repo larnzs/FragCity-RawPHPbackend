@@ -154,14 +154,6 @@
       "_comment": "WeaponPaints is API-only. Keep transport set to api; do not add a direct DB profile for GLOBAL_weaponpaints.",
       "transport": "api"
     },
-    "panels.cs2.overview": {
-      "_comment": "Website DB profile for CS2 panel overview data.",
-      "database_profile": "main"
-    },
-    "panels.cs2.players": {
-      "_comment": "Website DB profile for CS2 player data.",
-      "database_profile": "main"
-    },
     "pages.support": {
       "_comment": "Website DB profile for support tickets and replies.",
       "database_profile": "main"
