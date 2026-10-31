@@ -67,7 +67,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                         <span><i class="fa-solid fa-rotate" aria-hidden="true"></i> CENTRAL GAME UPDATES</span>
                     </div>
                 </div>
-                <div class="home-visual-float home-visual-float-top"><strong>128</strong><span>TICK READY</span></div>
+                <div class="home-visual-float home-visual-float-top"><strong>64</strong><span>TICK / SEC</span></div>
                 <div class="home-visual-float home-visual-float-bottom"><strong>+25</strong><span>GAME MODES</span></div>
                 <div class="home-visual-glow" aria-hidden="true"></div>
             </div>
@@ -75,7 +75,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
 
         <section class="home-proof-strip" aria-label="ویژگی‌های کلیدی سرورهای FragCity" data-fc-reveal="up">
             <div class="home-proof-item"><strong>+25</strong><span>گیم‌مود و محتوای متنوع</span></div>
-            <div class="home-proof-item"><strong>128 <small>Tick</small></strong><span>پیکربندی مناسب بازی رقابتی</span></div>
+            <div class="home-proof-item"><strong>64 <small>Tick/s</small></strong><span>چرخه‌ی ۶۴ تیک در ثانیه در CS2</span></div>
             <div class="home-proof-item"><strong>زیر ۱ دقیقه</strong><span>هماهنگ‌سازی آپدیت فایل‌های مرکزی</span></div>
             <div class="home-proof-item"><strong>Dedicated</strong><span>منابع اختصاصی برای هر سرور</span></div>
         </section>
@@ -167,22 +167,23 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
         <section class="home-section home-tick-section" data-fc-reveal="up">
             <div class="home-tick-panel">
                 <div class="home-tick-copy">
-                    <span class="home-kicker">04 / RESPONSIVENESS</span>
-                    <h2>برای هر میلی‌ثانیه اهمیت قائل باش.</h2>
+                    <span class="home-kicker">04 / SUB-TICK INPUT TIMING</span>
+                    <h2>زمان‌بندی دقیق ورودی‌ها با Sub-tick.</h2>
                     <p>
-                        سرورهای 128 Tick با تمرکز بر پاسخ‌گویی سریع و ثبت دقیق‌تر ورودی‌ها
-                        پیکربندی شده‌اند؛ تا تجربه‌ی بازی رقابتی، روان و قابل‌اتکاتری داشته باشی.
+                        CS2 با چرخه‌ی ۶۴ تیک در ثانیه و معماری Sub-tick کار می‌کند.
+                        زمان دقیق شلیک، حرکت و پرتاب درون هر بازه‌ی تیک ثبت می‌شود؛
+                        بنابراین ورودی بازیکن فقط به مرز تیک بعدی وابسته نیست.
                     </p>
                     <div class="home-tick-tags">
-                        <span><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> 128 Tick</span>
-                        <span><i class="fa-solid fa-crosshairs" aria-hidden="true"></i> رجیستر دقیق‌تر</span>
-                        <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> مناسب بازی رقابتی</span>
+                        <span><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> 64 Tick / sec</span>
+                        <span><i class="fa-solid fa-crosshairs" aria-hidden="true"></i> Sub-tick timing</span>
+                        <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> ثبت دقیق زمان ورودی</span>
                     </div>
                 </div>
                 <div class="home-tick-visual" aria-label="128 Tick">
                     <span class="home-tick-ring home-tick-ring-one"></span>
                     <span class="home-tick-ring home-tick-ring-two"></span>
-                    <div class="home-tick-value"><strong>128</strong><span>TICK</span></div>
+                    <div class="home-tick-value"><strong>64</strong><span>TICK + SUB-TICK</span></div>
                     <span class="home-tick-side-label">SERVER RATE</span>
                 </div>
             </div>
