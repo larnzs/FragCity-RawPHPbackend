@@ -748,6 +748,61 @@
 
     setActiveLink(window.FragCityCurrentPage || slugFromUrl(window.location.href));
 
+    /* Persistent performance mode: remove non-essential visual motion/effects. */
+    const motionPreferenceKey = 'fragcity:no-animation-mode';
+
+    function syncMotionToggleButtons() {
+        const enabled = document.documentElement.classList.contains('fc-no-animation');
+        document.querySelectorAll('[data-motion-toggle]').forEach(function (button) {
+            button.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+            button.classList.toggle('is-active', enabled);
+            button.title = enabled
+                ? 'حالت بدون انیمیشن فعال است؛ برای بازگشت کلیک کنید'
+                : 'فعال‌سازی حالت بدون انیمیشن';
+            const label = button.querySelector('.fc-motion-toggle__label');
+            if (label) {
+                label.textContent = enabled ? 'حالت سریع: روشن' : 'بدون انیمیشن';
+            }
+            const state = button.querySelector('.fc-motion-toggle__state');
+            if (state) state.textContent = enabled ? 'روشن' : 'خاموش';
+            const icon = button.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-gauge-high', !enabled);
+                icon.classList.toggle('fa-bolt', enabled);
+            }
+        });
+    }
+
+    function setNoAnimationMode(enabled) {
+        const root = document.documentElement;
+        root.classList.toggle('fc-no-animation', enabled);
+
+        try {
+            localStorage.setItem(motionPreferenceKey, enabled ? '1' : '0');
+        } catch (error) {
+            /* The visual mode still works for the current page when storage is unavailable. */
+        }
+
+        if (window.FragCityMotion && typeof window.FragCityMotion.setNoAnimation === 'function') {
+            window.FragCityMotion.setNoAnimation(enabled);
+        }
+
+        window.dispatchEvent(new CustomEvent('fc-no-animation-change', {
+            detail: { enabled: enabled }
+        }));
+        syncMotionToggleButtons();
+    }
+
+    document.addEventListener('click', function (event) {
+        const toggle = event.target.closest('[data-motion-toggle]');
+        if (!toggle) return;
+        event.preventDefault();
+        setNoAnimationMode(!document.documentElement.classList.contains('fc-no-animation'));
+    });
+
+    window.addEventListener('fc-motion-mode-ready', syncMotionToggleButtons);
+    syncMotionToggleButtons();
+
     if (window.FragCityOpenLoginModal) {
         openAuthLoginModal();
     }
