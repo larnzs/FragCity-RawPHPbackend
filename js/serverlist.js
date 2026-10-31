@@ -19,6 +19,10 @@
         const root = document.getElementById('fragcityServerBrowser');
         if (!root) return;
 
+        const faceitIconBase = String(root.dataset.faceitIconBase || '/img/icons/faceit/')
+            .replace(/\/?$/, '/');
+        const faceitIconVersion = String(root.dataset.faceitIconVersion || '1');
+
         if (root.dataset.slReady === '1') return;
         root.dataset.slReady = '1';
 
@@ -106,6 +110,75 @@
             return cell;
         }
 
+        function createFaceitLevelIcon(level) {
+            const icon = document.createElement('img');
+            icon.className = 'sl-faceit-level-icon';
+            icon.alt = 'FACEIT Level ' + level;
+            icon.width = 30;
+            icon.height = 30;
+            icon.loading = 'eager';
+            icon.decoding = 'async';
+            icon.setAttribute('draggable', 'false');
+            icon.src = faceitIconBase + encodeURIComponent(String(level)) + '.svg?v=' + encodeURIComponent(faceitIconVersion);
+
+            icon.addEventListener('error', function () {
+                const fallback = document.createElement('span');
+                fallback.className = 'sl-faceit-level-icon-fallback';
+                fallback.textContent = 'L' + level;
+                fallback.setAttribute('aria-label', 'FACEIT Level ' + level);
+                icon.replaceWith(fallback);
+            }, { once: true });
+
+            return icon;
+        }
+
+        function updateCardFaceitAverage(button, payload) {
+            const card = button ? button.closest('[data-sl-card]') : null;
+            const output = card ? card.querySelector('[data-sl-faceit-average]') : null;
+            if (!output) return;
+
+            const players = Array.isArray(payload && payload.players) ? payload.players : [];
+            const seenPlayers = new Set();
+            const levels = [];
+
+            players.forEach(function (player, index) {
+                if (!player || typeof player !== 'object') return;
+
+                const level = Number(player.faceit_level);
+                if (!Number.isInteger(level) || level < 1 || level > 10) return;
+
+                const steamId = String(player.steam_id || '').trim();
+                const slot = player.index !== undefined && player.index !== null
+                    ? String(player.index)
+                    : '';
+                const key = steamId
+                    ? 'steam:' + steamId
+                    : (slot !== '' ? 'slot:' + slot : 'row:' + index);
+
+                if (seenPlayers.has(key)) return;
+                seenPlayers.add(key);
+                levels.push(level);
+            });
+
+            if (levels.length === 0) {
+                output.textContent = '—';
+                output.dataset.averageState = 'empty';
+                output.title = players.length === 0
+                    ? 'در حال حاضر بازیکنی آنلاین نیست.'
+                    : 'بازیکن آنلاین دارای FACEIT Level معتبر پیدا نشد.';
+                return;
+            }
+
+            const average = levels.reduce(function (total, level) {
+                return total + level;
+            }, 0) / levels.length;
+
+            output.textContent = average.toFixed(1);
+            output.dataset.averageState = 'ready';
+            output.title = 'میانگین ' + average.toFixed(2) + ' از ' + levels.length
+                + ' بازیکن دارای Level معتبر، از مجموع ' + players.length + ' بازیکن آنلاین';
+        }
+
         function renderPlayers(payload) {
             const players = Array.isArray(payload.players) ? payload.players : [];
             if (playerTableBody) playerTableBody.replaceChildren();
@@ -153,13 +226,7 @@
                     levelBadge.title = 'FACEIT Level ' + level;
                     levelBadge.setAttribute('aria-label', 'FACEIT Level ' + level);
 
-                    const levelIcon = document.createElement('img');
-                    levelIcon.className = 'sl-faceit-level-icon';
-                    levelIcon.src = '/img/icons/faceit/' + level + '.svg';
-                    levelIcon.alt = 'FACEIT Level ' + level;
-                    levelIcon.loading = 'lazy';
-                    levelIcon.decoding = 'async';
-                    levelBadge.appendChild(levelIcon);
+                    levelBadge.appendChild(createFaceitLevelIcon(level));
                     faceitCell.appendChild(levelBadge);
                 } else {
                     const pending = document.createElement('span');
@@ -180,12 +247,8 @@
                     if (faceitStatus === 'unranked') {
                         const unrankedBadge = document.createElement('span');
                         unrankedBadge.className = 'sl-faceit-level-badge sl-faceit-level-badge--unranked';
-                        const unrankedIcon = document.createElement('img');
-                        unrankedIcon.className = 'sl-faceit-level-icon';
-                        unrankedIcon.src = '/img/icons/faceit/0.svg';
+                        const unrankedIcon = createFaceitLevelIcon(0);
                         unrankedIcon.alt = 'FACEIT unranked';
-                        unrankedIcon.loading = 'lazy';
-                        unrankedIcon.decoding = 'async';
                         unrankedBadge.appendChild(unrankedIcon);
                         const unrankedLabel = document.createElement('span');
                         unrankedLabel.textContent = faceitStatusLabels.unranked;
@@ -319,6 +382,10 @@
             try {
                 const data = await fetchPlayersData(serverId, forceRefresh);
                 if (requestSequence !== playerRequestSequence || playerModal.hidden) return;
+                updateCardFaceitAverage(
+                    activePlayerButton,
+                    data
+                );
                 renderPlayers(data);
             } catch (error) {
                 if (error && error.name === 'AbortError') return;
@@ -340,13 +407,64 @@
             if (!/^[a-f0-9]{16}$/.test(serverId)) return;
 
             const cacheEntry = playerCache.get(serverId);
-            if (cacheEntry && Date.now() - cacheEntry.savedAt < PLAYER_CACHE_TTL_MS) return;
+            if (cacheEntry && Date.now() - cacheEntry.savedAt < PLAYER_CACHE_TTL_MS) {
+                if (cacheEntry.data) updateCardFaceitAverage(button, cacheEntry.data);
+                return;
+            }
             if (playerRequests.has(serverId)) return;
 
             // Start fetching on hover/focus, before the player modal is opened.
-            void fetchPlayersData(serverId, false).catch(function () {
+            void fetchPlayersData(serverId, false).then(function (data) {
+                updateCardFaceitAverage(button, data);
+            }).catch(function () {
                 // Prefetch is silent; opening the modal displays any request error.
             });
+        }
+
+        async function hydrateServerFaceitAverages() {
+            const buttons = Array.from(list.querySelectorAll('[data-sl-players]:not(:disabled)'));
+            if (buttons.length === 0) return;
+
+            let nextIndex = 0;
+            const concurrency = Math.min(2, buttons.length);
+
+            async function worker() {
+                while (nextIndex < buttons.length) {
+                    const button = buttons[nextIndex++];
+                    if (!button || !button.isConnected) continue;
+
+                    const serverId = String(button.dataset.serverId || '').toLowerCase();
+                    if (!/^[a-f0-9]{16}$/.test(serverId)) continue;
+
+                    const cacheEntry = playerCache.get(serverId);
+                    if (cacheEntry && Date.now() - cacheEntry.savedAt < PLAYER_CACHE_TTL_MS) {
+                        updateCardFaceitAverage(button, cacheEntry.data);
+                        continue;
+                    }
+
+                    const output = button.closest('[data-sl-card]')
+                        ? button.closest('[data-sl-card]').querySelector('[data-sl-faceit-average]')
+                        : null;
+                    if (output) {
+                        output.textContent = '…';
+                        output.dataset.averageState = 'loading';
+                        output.title = 'در حال دریافت Level بازیکنان آنلاین';
+                    }
+
+                    try {
+                        const data = await fetchPlayersData(serverId, false);
+                        updateCardFaceitAverage(button, data);
+                    } catch (error) {
+                        if (output) {
+                            output.textContent = '—';
+                            output.dataset.averageState = 'unavailable';
+                            output.title = 'دریافت میانگین FACEIT در حال حاضر ممکن نیست.';
+                        }
+                    }
+                }
+            }
+
+            await Promise.all(Array.from({ length: concurrency }, worker));
         }
 
         function openPlayerModal(button) {
@@ -635,6 +753,10 @@
 
         applySort();
         applyFilters();
+
+        // Populate each card average in the background with a small request pool.
+        // The same payload cache is reused when a visitor opens that server's player modal.
+        void hydrateServerFaceitAverages();
     }
 
     window.FragCityServerBrowser = { init: init };
