@@ -490,14 +490,18 @@ $check(
 );
 
 $check(
-    'Mobile header places the hamburger to the right of the profile and stays graphite-filled until page top',
+    'Mobile header keeps its layout and frosted glass while scrolling in either direction',
     str_contains($siteHeaderMarkup, 'id="mobileNavOpen"')
         && str_contains($siteHeaderMarkup, 'id="shockUserDropdown"')
         && str_contains($siteHeaderStylesheet, 'flex-direction: row-reverse !important;')
+        && str_contains($siteHeaderStylesheet, '.shock-header.is-scroll-up')
         && str_contains($siteHeaderStylesheet, '.shock-header.is-scroll-down')
-        && str_contains($siteHeaderStylesheet, 'background: #0D0D0D !important;')
-        && str_contains($headerJavascript, "siteHeader.classList.add('is-scrolled', 'is-scroll-down')")
-        && !str_contains($headerJavascript, "remove('is-scroll-down')")
+        && str_contains($siteHeaderStylesheet, 'background: rgba(13, 13, 13, .58) !important;')
+        && str_contains($siteHeaderStylesheet, 'backdrop-filter: blur(18px) saturate(125%) !important;')
+        && str_contains($siteHeaderStylesheet, '.shock-header:not(.is-scroll-down):not(.is-scroll-up):not(.is-scrolled)')
+        && str_contains($headerJavascript, "siteHeader.classList.add('is-scrolled')")
+        && str_contains($headerJavascript, "siteHeader.classList.remove('is-scroll-down')")
+        && str_contains($headerJavascript, "siteHeader.classList.remove('is-scroll-up')")
 );
 
 $check(
@@ -562,9 +566,15 @@ $check(
 );
 
 $check(
-    'Footer trust badges have a fixed square image viewport',
-    str_contains($footerStylesheet, 'width: 54px !important;')
-        && str_contains($footerStylesheet, 'height: 54px !important;')
+    'Footer trust badges use fixed square containers while preserving image aspect ratios',
+    str_contains($footerStylesheet, '.enamad-badge,')
+        && str_contains($footerStylesheet, '.zarinpal-box')
+        && str_contains($footerStylesheet, 'width: 64px;')
+        && str_contains($footerStylesheet, 'height: 64px;')
+        && str_contains($footerStylesheet, 'width: auto !important;')
+        && str_contains($footerStylesheet, 'height: auto !important;')
+        && str_contains($footerStylesheet, 'max-width: 52px !important;')
+        && str_contains($footerStylesheet, 'max-height: 52px !important;')
         && str_contains($footerStylesheet, 'object-fit: contain !important;')
 );
 
