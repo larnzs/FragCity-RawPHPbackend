@@ -63,6 +63,15 @@ try {
     $headerJavascript = $read('js/header.js');
     $websiteIndex = $read('index.php');
     $testHarnessIndex = $read('tst/index.php');
+    $footerMarkup = $read('includes/footer.php');
+    $footerStylesheet = $read('css/footer.css');
+    $launcherPage = $read('pages/launcher.php');
+    $launcherStylesheet = $read('css/launcher.css');
+    $supportPage = $read('pages/support.php');
+    $userManualPage = $read('pages/usermanual.php');
+    $rulesPage = $read('pages/rules.php');
+    $privacyPage = $read('pages/privacy.php');
+    $aboutPage = $read('pages/about.php');
     $standbyPterodactylClient = $read('linuxapi/src/PterodactylStandby/PterodactylApplicationClient.php');
     $standbyDiscovery = $read('linuxapi/src/PterodactylStandby/PterodactylStandbyDiscovery.php');
     $standbyA2S = $read('linuxapi/src/PterodactylStandby/A2SInfoQuery.php');
@@ -497,6 +506,87 @@ $check(
         && str_contains($weaponPaintsStylesheet, 'background: rgba(249, 115, 22, .12) !important;')
         && str_contains($weaponPaintsStylesheet, 'height: 42px !important;')
         && str_contains($weaponPaintsStylesheet, '.wp-team-btn')
+);
+
+$check(
+    'Footer routes use canonical page slugs and every linked destination has a real page',
+    str_contains($footerMarkup, 'index.php?page=servers_vps')
+        && str_contains($footerMarkup, 'data-slug="servers_vps"')
+        && str_contains($footerMarkup, 'index.php?page=skins')
+        && str_contains($footerMarkup, 'index.php?page=launcher')
+        && str_contains($footerMarkup, 'index.php?page=support')
+        && str_contains($footerMarkup, 'index.php?page=usermanual')
+        && str_contains($footerMarkup, 'index.php?page=rules')
+        && str_contains($footerMarkup, 'index.php?page=privacy')
+        && is_file($root . '/pages/launcher.php')
+        && is_file($root . '/pages/serverlist.php')
+        && is_file($root . '/pages/weaponpaints.php')
+);
+
+$check(
+    'Footer and legacy route aliases load their canonical page CSS/JS through the AJAX asset registry',
+    str_contains($websiteIndex, "'support' => [")
+        && str_contains($websiteIndex, "'usermanual' => [")
+        && str_contains($websiteIndex, "'rules' => [")
+        && str_contains($websiteIndex, "'privacy' => [")
+        && str_contains($websiteIndex, "'about' => [")
+        && str_contains($websiteIndex, "'launcher' => [")
+        && str_contains($websiteIndex, "'servers' => 'servers_vps'")
+        && str_contains($websiteIndex, "'skins_vps' => 'skins'")
+        && str_contains($headerJavascript, "servers: 'servers_vps'")
+        && str_contains($headerJavascript, "skins_vps: 'skins'")
+        && !str_contains($supportPage, '<link rel="stylesheet"')
+        && !str_contains($supportPage, '<script src="js/support.js"')
+        && !str_contains($userManualPage, '<link rel="stylesheet"')
+        && !str_contains($userManualPage, '<script src="js/usermanual.js"')
+        && !str_contains($rulesPage, '<link rel="stylesheet"')
+        && !str_contains($rulesPage, '<script src="js/rules.js"')
+        && !str_contains($privacyPage, '<link rel="stylesheet"')
+        && !str_contains($privacyPage, '<script src="js/privacy.js"')
+        && !str_contains($aboutPage, '<link rel="stylesheet"')
+        && !str_contains($aboutPage, '<script src="js/about.js"')
+        && str_contains($launcherPage, 'در حال آماده‌سازی')
+        && str_contains($launcherStylesheet, '.launcher-page')
+);
+
+$check(
+    'Footer trust badges have a fixed square image viewport',
+    str_contains($footerStylesheet, 'width: 54px !important;')
+        && str_contains($footerStylesheet, 'height: 54px !important;')
+        && str_contains($footerStylesheet, 'object-fit: contain !important;')
+);
+
+$check(
+    'Responsive header uses the tracked logoresponsive asset without replacing the desktop logo',
+    str_contains($siteHeaderMarkup, '<picture class="shock-logo-picture">')
+        && str_contains($siteHeaderMarkup, 'srcset="/img/logoresponsive.png"')
+        && str_contains($siteHeaderMarkup, 'assets/images/logo/main.png')
+        && is_file($root . '/img/logoresponsive.png')
+        && str_contains($siteHeaderStylesheet, '.shock-logo-picture')
+);
+
+$check(
+    'WeaponPaints team switcher and search input have aligned outer dimensions',
+    str_contains($weaponPaintsStylesheet, '.wp-app .wp-header .wp-team-switcher')
+        && str_contains($weaponPaintsStylesheet, 'height: 48px !important;')
+        && str_contains($weaponPaintsStylesheet, 'height: 38px !important;')
+        && str_contains($weaponPaintsStylesheet, '.wp-app .wp-header .wp-tabs > .wp-search-wrap')
+        && str_contains($weaponPaintsStylesheet, 'height: 46px !important;')
+        && str_contains($weaponPaintsStylesheet, 'grid-template-areas:')
+);
+
+$check(
+    'Sticker and Keychain modal frames, search headers, split panes and mobile tabs match Paint selection',
+    str_contains($weaponPaintsStylesheet, 'body > #skinModal .modal-content,')
+        && str_contains($weaponPaintsStylesheet, 'body > #stickerModal .modal-content,')
+        && str_contains($weaponPaintsStylesheet, 'body > #keychainModal .modal-content')
+        && str_contains($weaponPaintsStylesheet, 'grid-template-columns: minmax(260px, 280px) minmax(0, 1fr) !important;')
+        && str_contains($weaponPaintsStylesheet, 'body > #stickerModal .wp-modal-header-tools')
+        && str_contains($weaponPaintsStylesheet, 'body > #keychainModal .wp-modal-header-tools')
+        && str_contains($weaponPaintsStylesheet, '.wp-addon-list-pane.is-mobile-active')
+        && str_contains($weaponPaintsStylesheet, '.wp-addon-properties.is-mobile-active')
+        && str_contains($weaponPaintsJavascript, "label: selectionLabel")
+        && str_contains($weaponPaintsJavascript, "label: 'افزودن ویژگی‌ها'")
 );
 
 $check(
