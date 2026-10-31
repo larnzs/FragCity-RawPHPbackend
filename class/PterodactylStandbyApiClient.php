@@ -103,7 +103,10 @@ final class PterodactylStandbyApiClient
         $curlErrorText = curl_error($handle);
         $status = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
         $contentType = (string)(curl_getinfo($handle, CURLINFO_CONTENT_TYPE) ?: '');
-        curl_close($handle);
+
+        // PHP 8.5 deprecates curl_close(): CurlHandle objects are released
+        // automatically when their last reference is destroyed.
+        unset($handle);
 
         if ($response === false || $curlError !== 0) {
             error_log('[FragCity] Pterodactyl Standby API transport failed; cURL code=' . $curlError);
