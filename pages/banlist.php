@@ -592,7 +592,7 @@ function banlistBuildUrl(array $params = []): string
         margin: 18px 0 16px;
         padding: 14px 16px;
         background: rgba(11, 18, 32, 0.88);
-        border: 1px solid rgba(51, 65, 85, 0.68);
+        border: 1px solid rgba(48, 48, 48, 0.68);
         border-radius: 20px;
         box-shadow: 0 14px 34px rgba(2, 6, 23, 0.18);
     }
@@ -609,15 +609,15 @@ function banlistBuildUrl(array $params = []): string
         height: 48px;
         padding: 0 14px;
         border-radius: 13px;
-        background: #0b1220;
-        border: 1px solid #263653;
+        background: #111111;
+        border: 1px solid #303030;
         color: #f8fafc;
         font: inherit;
         outline: none;
     }
     .banlist-search-input:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14);
+        border-color: #F97316;
+        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.14);
     }
     .banlist-search-btn,
     .banlist-clear-btn,
@@ -630,8 +630,8 @@ function banlistBuildUrl(array $params = []): string
         height: 44px;
         padding: 0 14px;
         border-radius: 13px;
-        border: 1px solid #263653;
-        background: #0b1220;
+        border: 1px solid #303030;
+        background: #111111;
         color: #cbd5e1;
         text-decoration: none;
         font-size: 0.86rem;
@@ -642,8 +642,8 @@ function banlistBuildUrl(array $params = []): string
     .banlist-clear-btn:hover,
     .ban-page-btn:hover,
     .ban-size-btn:hover {
-        border-color: rgba(59, 130, 246, 0.48);
-        background: rgba(15, 23, 42, 0.96);
+        border-color: rgba(249, 115, 22, 0.48);
+        background: rgba(23, 23, 23, 0.96);
         color: #fff;
     }
     .banlist-page-size {
@@ -659,8 +659,8 @@ function banlistBuildUrl(array $params = []): string
         font-weight: 700;
     }
     .ban-size-btn.active {
-        border-color: rgba(96, 165, 250, 0.42);
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.10), rgba(15, 23, 42, 0.96));
+        border-color: rgba(249, 115, 22, 0.42);
+        background: linear-gradient(135deg, rgba(249, 115, 22, 0.10), rgba(23, 23, 23, 0.96));
         color: #f8fafc;
     }
     .banlist-footer-controls {
@@ -671,7 +671,7 @@ function banlistBuildUrl(array $params = []): string
         align-items: center;
         margin-top: 16px;
         padding: 14px 0 0;
-        border-top: 1px solid rgba(51, 65, 85, 0.55);
+        border-top: 1px solid rgba(48, 48, 48, 0.55);
     }
     .banlist-range {
         color: #94a3b8;
@@ -685,8 +685,8 @@ function banlistBuildUrl(array $params = []): string
         justify-content: flex-end;
     }
     .ban-page-btn.active {
-        border-color: rgba(96, 165, 250, 0.42);
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.10), rgba(15, 23, 42, 0.96));
+        border-color: rgba(249, 115, 22, 0.42);
+        background: linear-gradient(135deg, rgba(249, 115, 22, 0.10), rgba(23, 23, 23, 0.96));
         color: #f8fafc;
     }
     .ban-page-btn.disabled {
@@ -699,9 +699,9 @@ function banlistBuildUrl(array $params = []): string
         gap: 8px;
     }
     .ban-tab.active {
-        background: rgba(37, 99, 235, 0.14) !important;
-        color: #60a5fa !important;
-        border-color: rgba(96, 165, 250, 0.30) !important;
+        background: rgba(194, 65, 12, 0.14) !important;
+        color: #FB923C !important;
+        border-color: rgba(249, 115, 22, 0.30) !important;
     }
     @media (max-width: 768px) {
         .banlist-toolbar,
