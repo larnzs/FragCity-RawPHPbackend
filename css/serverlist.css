@@ -3217,3 +3217,62 @@ body.sl-player-modal-open {
         display: grid;
     }
 }
+
+
+/* Full-bleed server browser canvas: no outer side/bottom gutters. */
+body.site-body:has(.serverlist-page),
+body.site-body:has(.serverlist-page) .app-container,
+body.site-body:has(.serverlist-page) .main-content,
+body.site-body:has(.serverlist-page) .content-fader {
+    background: #0D0D0D !important;
+}
+
+body.site-body:has(.serverlist-page) .main-content {
+    padding: 0 !important;
+}
+
+.serverlist-page {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    padding: clamp(88px, 8vw, 108px) 0 0;
+    overflow: clip;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(249, 115, 22, .09), transparent 36%),
+        #0D0D0D;
+}
+
+.sl-page-shell {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sl-hero {
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+}
+
+@media (max-width: 760px) {
+    .serverlist-page {
+        padding-top: 82px;
+        padding-bottom: 0;
+    }
+
+    .sl-page-shell {
+        width: 100%;
+        max-width: none;
+    }
+
+    .sl-hero {
+        border-radius: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .sl-page-shell {
+        width: 100%;
+    }
+}
