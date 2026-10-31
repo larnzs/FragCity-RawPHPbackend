@@ -2541,3 +2541,59 @@ button.mobile-nav-link.logout-link {
     text-align: right;
     cursor: pointer;
 }
+
+/* Keep the mobile drawer aligned with the desktop "More" navigation. */
+.mobile-nav-more {
+    width: 100%;
+}
+
+.mobile-nav-more > summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.mobile-nav-more > summary::-webkit-details-marker {
+    display: none;
+}
+
+.mobile-nav-more-toggle {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    font: inherit;
+    text-align: right;
+}
+
+.mobile-nav-more-toggle .mobile-nav-more-arrow {
+    width: auto;
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+    color: #929292;
+    transition: transform 180ms ease, color 180ms ease;
+}
+
+.mobile-nav-more[open] .mobile-nav-more-arrow {
+    transform: rotate(180deg);
+    color: var(--header-orange);
+}
+
+.mobile-nav-more-menu {
+    display: grid;
+    gap: 4px;
+    margin: 4px 13px 8px 0;
+    padding-inline-end: 11px;
+    border-inline-end: 1px solid rgba(249, 115, 22, .24);
+}
+
+.mobile-nav-more-menu .mobile-nav-link {
+    min-height: 42px;
+    padding: 8px 11px;
+    border-radius: 9px;
+    font-size: .86rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mobile-nav-more-toggle .mobile-nav-more-arrow {
+        transition: none;
+    }
+}
