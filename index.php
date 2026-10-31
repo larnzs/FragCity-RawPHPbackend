@@ -590,6 +590,63 @@ $pageAssets = [
             ),
         ],
     ],
+
+    'about' => [
+        'css' => [
+            '/css/pages-base.css?v=' . asset_version(__DIR__ . '/css/pages-base.css'),
+            '/css/about.css?v=' . asset_version(__DIR__ . '/css/about.css'),
+        ],
+        'js' => [
+            '/js/about.js?v=' . asset_version(__DIR__ . '/js/about.js'),
+        ],
+    ],
+
+    'support' => [
+        'css' => [
+            '/css/pages-base.css?v=' . asset_version(__DIR__ . '/css/pages-base.css'),
+            '/css/support.css?v=' . asset_version(__DIR__ . '/css/support.css'),
+        ],
+        'js' => [
+            '/js/support.js?v=' . asset_version(__DIR__ . '/js/support.js'),
+        ],
+    ],
+
+    'usermanual' => [
+        'css' => [
+            '/css/pages-base.css?v=' . asset_version(__DIR__ . '/css/pages-base.css'),
+            '/css/usermanual.css?v=' . asset_version(__DIR__ . '/css/usermanual.css'),
+        ],
+        'js' => [
+            '/js/usermanual.js?v=' . asset_version(__DIR__ . '/js/usermanual.js'),
+        ],
+    ],
+
+    'rules' => [
+        'css' => [
+            '/css/pages-base.css?v=' . asset_version(__DIR__ . '/css/pages-base.css'),
+            '/css/rules.css?v=' . asset_version(__DIR__ . '/css/rules.css'),
+        ],
+        'js' => [
+            '/js/rules.js?v=' . asset_version(__DIR__ . '/js/rules.js'),
+        ],
+    ],
+
+    'privacy' => [
+        'css' => [
+            '/css/pages-base.css?v=' . asset_version(__DIR__ . '/css/pages-base.css'),
+            '/css/privacy.css?v=' . asset_version(__DIR__ . '/css/privacy.css'),
+        ],
+        'js' => [
+            '/js/privacy.js?v=' . asset_version(__DIR__ . '/js/privacy.js'),
+        ],
+    ],
+
+    'launcher' => [
+        'css' => [
+            '/css/launcher.css?v=' . asset_version(__DIR__ . '/css/launcher.css'),
+        ],
+        'js' => [],
+    ],
 ];
 
 $pageAssetsJson = json_encode(
@@ -603,17 +660,23 @@ $pageAssetsJson = json_encode(
     JSON_INVALID_UTF8_SUBSTITUTE
 );
 
-$currentPageAssets =
-    ($page === 'servers' ? ($pageAssets['servers_vps'] ?? null) : ($pageAssets[$page] ?? null))
-    ?? [
-        'css' => [],
-        'js' => [],
-    ];
+// Keep older public route aliases mapped to the same canonical page assets.
+$assetPage = match ($page) {
+    'servers' => 'servers_vps',
+    'skins_vps' => 'skins',
+    'leaderboard_vps' => 'leaderboard',
+    default => $page,
+};
+
+$currentPageAssets = $pageAssets[$assetPage] ?? [
+    'css' => [],
+    'js' => [],
+];
 
 $pageFile = match ($page) {
-    'skins' => __DIR__ . '/pages/weaponpaints.php',
-    'servers' => __DIR__ . '/pages/serverlist.php',
-    'servers_vps' => __DIR__ . '/pages/serverlist.php',
+    'skins', 'skins_vps' => __DIR__ . '/pages/weaponpaints.php',
+    'servers', 'servers_vps' => __DIR__ . '/pages/serverlist.php',
+    'leaderboard_vps' => __DIR__ . '/pages/leaderboard.php',
     default => __DIR__ . '/pages/' . $page . '.php',
 };
 
