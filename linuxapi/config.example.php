@@ -30,9 +30,9 @@ return [
 
     /*
      * Linux-local WeaponPaints database and API nonce store.
-     * The existing Plugin database account configured below is also reused for
-     * the read-only GLOBAL_simpleadmin lookup. Grant it only the extra columns
-     * required on sa_players_ips; do not create a second DB user.
+     * The same existing Plugin DB account configured below is reused for the
+     * read-only GLOBAL_simpleadmin schema. It needs schema-wide SELECT on
+     * GLOBAL_simpleadmin.*; no second DB user or write privileges are required.
      * Keep TCP/3306 private; the API should use the local listener.
      */
     'database' => [
@@ -45,15 +45,24 @@ return [
     ],
 
     /*
-     * Read-only SimpleAdmin player-name lookup:
+     * Read-only SimpleAdmin data integration:
      * POST /v1/simpleadmin, authenticated with the root shared_secret above.
      *
-     * This service reads ONLY steamid, name and used_at from sa_players_ips.
-     * It never selects or returns the stored IP column. The limited DB account
-     * should have column-level SELECT grants for those three fields only.
+     * The integration is intended for the full GLOBAL_simpleadmin schema:
+     * Ban List datasets (bans/unbans, mutes/unmutes, warns), player identity
+     * and player history. The API must expose only purpose-built allowlisted
+     * actions and selected fields, never arbitrary SQL or raw table dumps.
+     *
+     * Currently implemented action: resolve_player_names. That resolver reads
+     * only name, steamid and used_at from sa_players_ips; it never selects or
+     * returns the stored address. The Ban List page must be migrated to a
+     * dedicated read-only API action before its old direct-DB profile is removed.
+     *
+     * Reuses the root Plugin DB account with schema-wide SELECT on
+     * GLOBAL_simpleadmin.*. No INSERT, UPDATE or DELETE privileges are needed.
      */
     'simpleadmin' => [
-        'enabled' => false, // Enable only after DB/table permissions and the index are verified.
+        'enabled' => false, // Enable after schema-wide SELECT permissions and the identity index are verified.
         // Reuses the existing Plugin DB account from the root 'database' settings above.
         // Only the target schema differs; no additional username/password are needed.
         'database' => [

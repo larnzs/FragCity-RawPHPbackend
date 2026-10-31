@@ -62,11 +62,15 @@ Exampleهای جزئی:
 
 **تأمین SteamID:** پروتکل `A2S_PLAYER` شناسه Steam برنمی‌گرداند؛ بنابراین نام فعلی هر بازیکن با جدول `sa_players_ips` در دیتابیس SimpleAdmin تطبیق داده می‌شود. فقط وقتی تطبیق دقیق به یک SteamID64 یکتا برسد، FACEIT Query انجام می‌شود. نام‌های تکراری یا پیدا‌نشده بدون رتبه باقی می‌مانند؛ IP بازیکنان خوانده یا منتقل نمی‌شود.
 
-### ۴.۲. SimpleAdmin Player Identity API
+### ۴.۲. SimpleAdmin Read-only Data API
 
-سرویس `POST /v1/simpleadmin` روی Linux API فقط برای تبدیل نام فعلی بازیکنان A2S به SteamID64 استفاده می‌شود. این مسیر از همان HMAC Secret ریشه‌ای WeaponPaints استفاده می‌کند و با همان اکانت دیتابیسی Plugin که در بخش `database` فایل Runtime لینوکس تنظیم شده به دیتابیس `GLOBAL_simpleadmin` وصل می‌شود؛ یوزر یا پسورد جدیدی ساخته یا تعریف نمی‌شود. این API فقط ستون‌های `name`, `steamid` و `used_at` از جدول `sa_players_ips` را می‌خواند و هرگز ستون `address` یا IP را Query یا به وب‌سایت ارسال نمی‌کند.
+سرویس `POST /v1/simpleadmin` روی Linux API با HMAC Secret ریشه‌ای WeaponPaints احراز هویت می‌شود و از همان اکانت دیتابیسی Plugin که در بخش `database` فایل Runtime لینوکس تنظیم شده برای اتصال به `GLOBAL_simpleadmin` استفاده می‌کند؛ هیچ یوزر یا پسورد جدیدی ساخته یا تعریف نمی‌شود.
 
-پیش‌نیازها:
+**دامنهٔ دسترسی دیتابیس، کل Schema است، نه فقط جدول IPها.** صفحه Ban List به جدول‌های `sa_bans`, `sa_unbans`, `sa_mutes`, `sa_unmutes` و `sa_warns` نیاز دارد و اطلاعات هویتی/تاریخچه بازیکن نیز از جدول‌هایی مثل `sa_players_ips` و `sa_renames` خوانده می‌شود. بنابراین کاربر Plugin به دسترسی خواندن روی تمام جدول‌های `GLOBAL_simpleadmin` نیاز دارد. این به معنی ارائهٔ دسترسی SQL خام به وب‌سایت نیست: Linux API باید فقط actionهای مشخص و allowlist‌شده را اجرا کند و فیلدهای لازم هر خروجی را برگرداند؛ هیچ عملیات نوشتن لازم نیست.
+
+در وضعیت فعلی، action پیاده‌سازی‌شده در مسیر SimpleAdmin فقط `resolve_player_names` است. این resolver برای تبدیل نام A2S به SteamID64 فقط ستون‌های `name`, `steamid` و `used_at` از `sa_players_ips` را می‌خواند و ستون `address` را Query یا به سایت ارسال نمی‌کند. صفحه فعلی Ban List هنوز از پروفایل قدیمی اتصال مستقیم سایت استفاده می‌کند؛ باید پیش از حذف آن پروفایل، action خواندنی Ban List به Linux API اضافه و صفحه به آن منتقل شود.
+
+پیش‌نیازهای resolver:
 - Migration شمارهٔ 013 باید اجرا شده باشد تا ستون `sa_players_ips.name` وجود داشته باشد.
 - Migration شمارهٔ 015 باید اجرا شده باشد تا SteamIDها در قالب BIGINT ذخیره شوند.
 - ایندکس جست‌وجوی نام را یک‌بار روی دیتابیس `GLOBAL_simpleadmin` بساز. پیش از اجرا با `SHOW INDEX FROM sa_players_ips` بررسی کن که از قبل وجود نداشته باشد:
@@ -76,19 +80,21 @@ ALTER TABLE sa_players_ips
     ADD INDEX idx_sa_players_ips_name_steamid_used_at (name, steamid, used_at);
 ```
 
-به همان کاربر دیتابیسی موجودی که در `database.username` و `database.password` فایل `/etc/fragcity-api/config.php` برای Pluginها تنظیم شده، فقط دسترسی ستونی لازم را روی جدول SimpleAdmin بده. دستور زیر را با نام کاربر و Host واقعی همان حساب جایگزین کن؛ **دستور CREATE USER اجرا نکن**:
+به همان کاربر دیتابیسی موجودی که در `database.username` و `database.password` فایل `/etc/fragcity-api/config.php` برای Pluginها تنظیم شده، دسترسی خواندن روی کل Schema بده. نام کاربر و Host را دقیقاً مطابق حساب موجود MariaDB جایگزین کن؛ **دستور CREATE USER اجرا نکن**:
 
 ```sql
-GRANT SELECT (steamid, name, used_at)
-    ON GLOBAL_simpleadmin.sa_players_ips
-    TO 'EXISTING_PLUGINS_DB_USER'@'127.0.0.1';
+GRANT SELECT ON GLOBAL_simpleadmin.*
+    TO 'EXISTING_PLUGINS_DB_USER'@'EXACT_DB_HOST';
 FLUSH PRIVILEGES;
 ```
 
-اگر Host حساب فعلی با `127.0.0.1` متفاوت است، همان Host ثبت‌شده در MariaDB را استفاده کن. در `/etc/fragcity-api/config.php` فقط بلوک `simpleadmin` را از `linuxapi/config.example.php` Merge کن؛ این بلوک فقط نام دیتابیس را تعیین می‌کند و credential را از تنظیمات دیتابیس موجود به ارث می‌برد. فایل Runtime را کامل overwrite نکن. پس از بررسی دسترسی و ایندکس، `enabled` را روی `true` بگذار.
+از `ALL PRIVILEGES` استفاده نکن؛ این Integration فقط به `SELECT` روی `GLOBAL_simpleadmin.*` نیاز دارد و نباید امکان تغییر Banها، کاربران یا تنظیمات SimpleAdmin را از طریق حساب سایت داشته باشد. Host باید دقیقاً با Host حساب موجود منطبق باشد، مثل `localhost` یا `127.0.0.1`؛ این دو را یکی فرض نکن.
 
-Resolver فقط وقتی نام دقیقاً به یک SteamID یکتا برسد آن را برمی‌گرداند. اگر نام به چند SteamID تعلق داشته باشد، وضعیت `ambiguous` می‌دهد تا رتبهٔ FACEIT به فرد اشتباه نسبت داده نشود. درخواست‌های FACEIT همچنان از PHP روی هاست اشتراکی و با کلید `integrations.faceit_api.api_key` انجام می‌شوند؛ Linux API هیچ درخواست FACEIT ارسال نمی‌کند.
+در `/etc/fragcity-api/config.php` فقط بلوک `simpleadmin` را از `linuxapi/config.example.php` Merge کن؛ این بلوک فقط نام دیتابیس را تعیین می‌کند و credential را از تنظیمات دیتابیس موجود به ارث می‌برد. فایل Runtime را کامل overwrite نکن. پس از بررسی مجوز و ایندکس، `enabled` را روی `true` بگذار.
 
+**حفاظت از IP بازیکنان:** مسیر عمومی Ban List نباید ستون‌های `player_ip` یا `address` را به بازدیدکنندگان عادی نمایش دهد. اگر ابزار IP history لازم است، آن را فقط پشت دسترسی admin نگه دار و از پاسخ عمومی حذف کن.
+
+Resolver فقط وقتی نام دقیقاً به یک SteamID یکتا برسد آن را برمی‌گرداند. اگر نام به چند SteamID تعلق داشته باشد، وضعیت `ambiguous` می‌دهد تا رتبهٔ FACEIT به فرد اشتباه نسبت داده نشود. خود Level از دیتابیس SimpleAdmin نمی‌آید: بعد از resolve شدن SteamID، درخواست FACEIT از PHP روی هاست اشتراکی و با کلید `integrations.faceit_api.api_key` انجام می‌شود؛ Linux API هیچ درخواست FACEIT ارسال نمی‌کند.
 ## ۵. Pterodactyl Monitoring
 
 مسیر read-only مانیتورینگ Pterodactyl از طریق endpoint امضاشدهٔ سایت و Linux API موجود است و فقط نقش admin به آن دسترسی دارد. داشبورد قدیمی CS2 و پوشهٔ `panels/` حذف شده‌اند؛ هیچ صفحهٔ مدیریتی برای این قابلیت در سایت باقی نمانده است. Application API token و Wings token به مرورگر ارسال نمی‌شوند و Secret مانیتورینگ مستقل است.

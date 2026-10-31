@@ -81,6 +81,7 @@ try {
     $standbySitePlayersEndpoint = $read('api/public-server-players.php');
     $simpleAdminSiteRepository = $read('class/SimpleAdminRepository.php');
     $simpleAdminLookup = $read('linuxapi/src/SimpleAdmin/SimpleAdminPlayerLookup.php');
+    $simpleAdminDocs = $read('docs/CONFIGURATION.md');
     $simpleAdminMigration = $read('linuxapi/migrations/20261031_simpleadmin_player_lookup.sql');
     $faceitApiClient = $read('class/FaceitApiClient.php');
     $faceitSettingsRaw = $read('settings/faceit-api.integration.example.json');
@@ -225,7 +226,7 @@ $check(
 );
 
 $check(
-    'SimpleAdmin resolves exact names to unique SteamIDs through the shared WeaponPaints HMAC route without reading IPs',
+    'SimpleAdmin reuses the existing Plugin DB account with schema-wide read-only access while the identity resolver never reads IPs',
     str_contains($simpleAdminSiteRepository, "'/v1/simpleadmin'")
         && str_contains($simpleAdminSiteRepository, 'resolve_player_names')
         && str_contains($linuxApiClient, 'Unsupported Linux API path.')
@@ -235,9 +236,14 @@ $check(
         && str_contains($simpleAdminLookup, 'ambiguous')
         && !str_contains($simpleAdminLookup, 'address')
         && str_contains($linuxConfig, "'GLOBAL_simpleadmin'")
-        && str_contains($linuxConfig, "Reuses the existing Plugin DB account")
+        && str_contains($linuxConfig, "Reuses the root Plugin DB account")
+        && str_contains($linuxConfig, "schema-wide SELECT on")
+        && !str_contains($linuxConfig, 'column-level SELECT')
         && !str_contains($linuxConfig, "'fragcity_simpleadmin_api'")
         && !str_contains($linuxConfig, "'REPLACE_WITH_A_UNIQUE_READ_ONLY_DATABASE_PASSWORD'")
+        && str_contains($simpleAdminDocs, 'GRANT SELECT ON GLOBAL_simpleadmin.*')
+        && str_contains($simpleAdminDocs, 'EXACT_DB_HOST')
+        && str_contains($simpleAdminDocs, 'Ban List page')
         && str_contains($simpleAdminMigration, 'idx_sa_players_ips_name_steamid_used_at')
         && str_contains($standbySitePlayersEndpoint, 'new SimpleAdminRepository()')
         && str_contains($standbySitePlayersEndpoint, 'new FaceitApiClient()')
