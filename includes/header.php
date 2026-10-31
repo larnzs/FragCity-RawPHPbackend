@@ -8,6 +8,7 @@ $isLoggedIn = $isLoggedIn ?? isset($_SESSION['user_logged_in']);
 $displayName = $displayName ?? ($_SESSION['username'] ?? '');
 $displaySteamID = $displaySteamID ?? ($_SESSION['steamid'] ?? '');
 $current_page = $current_page ?? 'home';
+$headerCsrfToken = (string) ($authCsrfToken ?? ($_SESSION['auth_csrf_token'] ?? ''));
 
 if (!function_exists('getUserAvatarHeader')) {
     function getUserAvatarHeader(string $steamid): string
@@ -282,9 +283,13 @@ $mobileNavItems = [
                                 <span>کیف پول شما</span>
                             </a>
                             <div class="frag-drop-divider"></div>
-                            <a href="?logout=1" class="frag-drop-link logout">
-                                <i class="fas fa-sign-out-alt"></i><span>خروج از حساب</span>
-                            </a>
+                            <form action="index.php" method="post" class="frag-drop-logout-form">
+                                <input type="hidden" name="auth_action" value="logout">
+                                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($headerCsrfToken, ENT_QUOTES, 'UTF-8') ?>">
+                                <button type="submit" class="frag-drop-link logout">
+                                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i><span>خروج از حساب</span>
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -352,10 +357,14 @@ $mobileNavItems = [
                 <i class="fas fa-user-circle" aria-hidden="true"></i>
                 <span><?= htmlspecialchars((string) $displayName, ENT_QUOTES, 'UTF-8') ?></span>
             </a>
-            <a href="?logout=1" class="mobile-nav-link logout-link">
-                <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
-                <span>خروج</span>
-            </a>
+            <form action="index.php" method="post" class="mobile-nav-logout-form">
+                <input type="hidden" name="auth_action" value="logout">
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($headerCsrfToken, ENT_QUOTES, 'UTF-8') ?>">
+                <button type="submit" class="mobile-nav-link logout-link">
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                    <span>خروج</span>
+                </button>
+            </form>
         <?php else: ?>
             <a href="?page=login"
                class="mobile-nav-link mobile-steam-login-link <?= $isPageActive(['login', 'register']) ?>"
