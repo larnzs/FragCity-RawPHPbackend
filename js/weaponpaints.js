@@ -4820,7 +4820,8 @@
 
             panel.dataset.wpMobilePanel = definition.key;
             if (!panel.id) {
-                panel.id = 'wp-mobile-' + definition.key + '-' + Math.random().toString(36).slice(2, 8);
+                const modalId = String(modalBody.id || 'weaponpaints-modal').replace(/[^a-z0-9_-]/gi, '-');
+                panel.id = 'wp-mobile-' + modalId + '-' + definition.key;
             }
 
             const button = document.createElement('button');
