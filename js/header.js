@@ -7,10 +7,9 @@
     const body = document.body;
     const siteHeader = document.getElementById('siteHeader');
     let scrollTicking = false;
-    let lastScrollTop = Math.max(
-        window.scrollY || 0,
-        document.documentElement.scrollTop || 0
-    );
+    // Apply the dark header after only a few pixels so it reacts immediately on touch screens.
+    const HEADER_SCROLL_THRESHOLD = 4;
+    let lastScrollTop = 0;
 
     /*
      * At the top, the header is transparent. Scrolling down adds a
@@ -28,14 +27,15 @@
             document.documentElement.scrollTop || 0
         );
 
-        if (scrollTop <= 1) {
+        if (scrollTop <= HEADER_SCROLL_THRESHOLD) {
             siteHeader.classList.remove('is-scrolled', 'is-scroll-down');
         } else {
             siteHeader.classList.add('is-scrolled');
 
-            if (scrollTop > lastScrollTop + 1) {
+            if (scrollTop > lastScrollTop + 0.5) {
                 siteHeader.classList.add('is-scroll-down');
-            } else if (scrollTop < lastScrollTop - 1) {
+            } else if (scrollTop < lastScrollTop - 0.5) {
+                // Preserve the transparent-on-scroll-up behavior.
                 siteHeader.classList.remove('is-scroll-down');
             }
         }
