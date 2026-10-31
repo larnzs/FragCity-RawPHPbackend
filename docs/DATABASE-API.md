@@ -82,7 +82,7 @@ Server Browser فعال از مسیر امضاشدهٔ Pterodactyl Standby در 
 
 ### Pterodactyl Monitoring
 
-صفحهٔ ادمین `panels/cs2/monitoring.php` از مسیر امضاشدهٔ `POST /v1/pterodactyl-monitoring` استفاده می‌کند. Linux API اطلاعات Node و سرورهای allowlist‌شده را از Pterodactyl و Wings می‌گیرد و فقط snapshot پاک‌سازی‌شده را برمی‌گرداند. این مسیر با Standby و WeaponPaints Secret مستقل دارد؛ Application API token و Wings token فقط روی Linux نگهداری می‌شوند. Monitoring فقط خواندنی و on-demand است و به Cron احتیاج ندارد. راهنما: `docs/PTERODACTYL-MONITORING.md`.
+endpoint امضاشدهٔ admin-only برای مانیتورینگ read-only از مسیر `POST /v1/pterodactyl-monitoring` استفاده می‌کند. Linux API اطلاعات Node و سرورهای allowlist‌شده را از Pterodactyl و Wings می‌گیرد و فقط snapshot پاک‌سازی‌شده را برمی‌گرداند. داشبورد وب `panels/` حذف شده است و UI برای این قابلیت ارائه نمی‌شود؛ backend فقط برای ابزارهای مجاز آینده نگه داشته شده است. Application API token و Wings token فقط روی Linux می‌مانند. راهنما: `docs/PTERODACTYL-MONITORING.md`.
 
 ## 2. وضعیت Agent ویندوزی قدیمی
 
