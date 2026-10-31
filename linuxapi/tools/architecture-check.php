@@ -290,7 +290,7 @@ $check(
         && str_contains($faceitApiClient, "['skill_level']")
         && str_contains($standbySitePlayersEndpoint, 'new FaceitApiClient()')
         && str_contains($standbyBrowserJavascript, 'simpleadmin_unavailable')
-        && str_contains($standbyBrowserJavascript, '/img/icons/faceit/')
+        && str_contains($standbyBrowserJavascript, '/img/faceit/')
         && str_contains($standbyBrowserCss, '.sl-faceit-level-icon')
         && !str_contains($standbyBrowserJavascript, 'api_key')
 );
