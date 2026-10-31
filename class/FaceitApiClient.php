@@ -80,7 +80,18 @@ final class FaceitApiClient
 
             $steamId = self::normalizeSteamId($player['steam_id'] ?? null);
             if ($steamId === null) {
-                $profile = self::emptyProfile('steam_id_missing');
+                $identityStatus = (string)($player['steam_id_status'] ?? 'steam_id_missing');
+                $allowedIdentityStatuses = [
+                    'steam_id_missing',
+                    'not_found',
+                    'ambiguous',
+                    'simpleadmin_unavailable',
+                ];
+                $profile = self::emptyProfile(
+                    in_array($identityStatus, $allowedIdentityStatuses, true)
+                        ? $identityStatus
+                        : 'steam_id_missing'
+                );
             } elseif ($this->apiKey === '') {
                 $profile = self::emptyProfile('api_not_configured');
             } else {

@@ -36,8 +36,11 @@ final class FragCityLinuxApiClient
         $this->secret = $secret;
     }
 
-    public function request(array $payload): array
+    public function request(array $payload, string $path = '/v1/weaponpaints'): array
     {
+        if (!in_array($path, ['/v1/weaponpaints', '/v1/simpleadmin'], true)) {
+            throw new InvalidArgumentException('Unsupported Linux API path.');
+        }
         try {
             $rawBody = json_encode(
                 $payload,
@@ -49,7 +52,6 @@ final class FragCityLinuxApiClient
 
         $timestamp = (string)time();
         $nonce = bin2hex(random_bytes(32));
-        $path = '/v1/weaponpaints';
         $canonical = $timestamp . "\n" . $nonce . "\nPOST\n" . $path . "\n" . hash('sha256', $rawBody);
         $signature = hash_hmac('sha256', $canonical, $this->secret);
 

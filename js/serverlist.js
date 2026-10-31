@@ -119,15 +119,25 @@
                 const row = document.createElement('tr');
 
                 appendPlayerCell(row, String(player.name || 'Unknown'), 'sl-player-name');
+                const steamStatus = String(player.steam_id_status || 'not_found');
+                const steamStatusLabels = {
+                    not_found: 'SteamID پیدا نشد',
+                    ambiguous: 'نام تکراری است',
+                    simpleadmin_unavailable: 'SimpleAdmin در دسترس نیست'
+                };
                 const steamCell = appendPlayerCell(
                     row,
-                    player.steam_id ? String(player.steam_id) : 'نیازمند افزونه CS2',
+                    player.steam_id ? String(player.steam_id) : (steamStatusLabels[steamStatus] || 'نامشخص'),
                     'sl-player-steamid',
-                    'ltr'
+                    player.steam_id ? 'ltr' : null
                 );
                 if (!player.steam_id) {
                     steamCell.classList.add('sl-player-unavailable');
-                    steamCell.title = 'A2S_PLAYER شناسه Steam را ارائه نمی‌کند؛ این مقدار با افزونه سمت سرور تکمیل می‌شود.';
+                    steamCell.title = steamStatus === 'ambiguous'
+                        ? 'این نام در SimpleAdmin به بیش از یک SteamID تعلق دارد؛ برای جلوگیری از نمایش رتبهٔ اشتباه، Level نمایش داده نمی‌شود.'
+                        : (steamStatus === 'simpleadmin_unavailable'
+                            ? 'سرویس جست‌وجوی SimpleAdmin موقتاً در دسترس نیست.'
+                            : 'برای این نام، SteamID یکتایی در سابقهٔ SimpleAdmin پیدا نشد.');
                 }
 
                 appendPlayerCell(row, formatPlayerDuration(player.connected_seconds), 'sl-player-duration');
@@ -139,28 +149,59 @@
                 if (Number.isInteger(level) && level >= 1 && level <= 10) {
                     const levelBadge = document.createElement('span');
                     levelBadge.className = 'sl-faceit-level-badge';
-                    levelBadge.textContent = 'LVL ' + level;
+                    levelBadge.title = 'FACEIT Level ' + level;
+                    levelBadge.setAttribute('aria-label', 'FACEIT Level ' + level);
+
+                    const levelIcon = document.createElement('img');
+                    levelIcon.className = 'sl-faceit-level-icon';
+                    levelIcon.src = '/img/icons/faceit/' + level + '.svg';
+                    levelIcon.alt = 'FACEIT Level ' + level;
+                    levelIcon.loading = 'lazy';
+                    levelIcon.decoding = 'async';
+                    levelBadge.appendChild(levelIcon);
                     faceitCell.appendChild(levelBadge);
                 } else {
                     const pending = document.createElement('span');
                     pending.className = 'sl-faceit-pending';
                     const faceitStatus = String(player.faceit_status || 'unknown');
                     const faceitStatusLabels = {
-                        steam_id_missing: 'شناسه Steam ندارد',
-                        api_not_configured: 'API تنظیم نشده',
+                        steam_id_missing: 'SteamID موجود نیست',
+                        not_found: 'SteamID پیدا نشد',
+                        ambiguous: 'نام تکراری است',
+                        simpleadmin_unavailable: 'SimpleAdmin در دسترس نیست',
+                        api_not_configured: 'FACEIT API تنظیم نشده',
                         profile_not_found: 'اکانت FACEIT پیدا نشد',
                         no_cs2_profile: 'پروفایل CS2 ندارد',
                         unranked: 'بدون Level',
-                        api_unavailable: 'API در دسترس نیست'
+                        api_unavailable: 'FACEIT API در دسترس نیست'
                     };
-                    pending.textContent = faceitStatusLabels[faceitStatus] || 'نامشخص';
-                    pending.dataset.faceitState = faceitStatus;
-                    if (faceitStatus === 'steam_id_missing') {
-                        pending.title = 'A2S_PLAYER شناسه Steam را ارائه نمی‌کند؛ برای اتصال حساب FACEIT به افزونه معتبر سمت سرور نیاز است.';
-                    } else if (faceitStatus === 'api_unavailable') {
-                        pending.title = 'دریافت رتبه از FACEIT موقتاً ناموفق بود؛ فهرست بازیکنان همچنان در دسترس است.';
+
+                    if (faceitStatus === 'unranked') {
+                        const unrankedBadge = document.createElement('span');
+                        unrankedBadge.className = 'sl-faceit-level-badge sl-faceit-level-badge--unranked';
+                        const unrankedIcon = document.createElement('img');
+                        unrankedIcon.className = 'sl-faceit-level-icon';
+                        unrankedIcon.src = '/img/icons/faceit/0.svg';
+                        unrankedIcon.alt = 'FACEIT unranked';
+                        unrankedIcon.loading = 'lazy';
+                        unrankedIcon.decoding = 'async';
+                        unrankedBadge.appendChild(unrankedIcon);
+                        const unrankedLabel = document.createElement('span');
+                        unrankedLabel.textContent = faceitStatusLabels.unranked;
+                        unrankedBadge.appendChild(unrankedLabel);
+                        faceitCell.appendChild(unrankedBadge);
+                    } else {
+                        pending.textContent = faceitStatusLabels[faceitStatus] || 'نامشخص';
+                        pending.dataset.faceitState = faceitStatus;
+                        if (faceitStatus === 'ambiguous') {
+                            pending.title = 'این نام به چند SteamID در SimpleAdmin اشاره می‌کند؛ Level نمایش داده نمی‌شود.';
+                        } else if (faceitStatus === 'simpleadmin_unavailable') {
+                            pending.title = 'سرویس جست‌وجوی SimpleAdmin موقتاً در دسترس نیست.';
+                        } else if (faceitStatus === 'api_unavailable') {
+                            pending.title = 'دریافت رتبه از FACEIT موقتاً ناموفق بود؛ فهرست بازیکنان همچنان در دسترس است.';
+                        }
+                        faceitCell.appendChild(pending);
                     }
-                    faceitCell.appendChild(pending);
                 }
                 row.appendChild(faceitCell);
                 if (playerTableBody) playerTableBody.appendChild(row);

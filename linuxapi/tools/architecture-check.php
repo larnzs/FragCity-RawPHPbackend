@@ -55,6 +55,7 @@ try {
     $standbySettingsRaw = $read('settings/pterodactyl-standby.integration.example.json');
     $standbySettings = json_decode($standbySettingsRaw, true, 512, JSON_THROW_ON_ERROR);
     $standbyApiClient = $read('class/PterodactylStandbyApiClient.php');
+    $linuxApiClient = $read('class/FragCityLinuxApiClient.php');
     $standbyRepository = $read('class/PterodactylStandbyRepository.php');
     $serverListPage = $read('pages/serverlist.php');
     $serverListStylesheet = $read('css/serverlist.css');
@@ -78,6 +79,9 @@ try {
     $standbyA2SPlayers = $read('linuxapi/src/PterodactylStandby/A2SPlayerQuery.php');
     $standbyA2SPlayersTest = $read('linuxapi/tests/a2s-player-query-test.php');
     $standbySitePlayersEndpoint = $read('api/public-server-players.php');
+    $simpleAdminSiteRepository = $read('class/SimpleAdminRepository.php');
+    $simpleAdminLookup = $read('linuxapi/src/SimpleAdmin/SimpleAdminPlayerLookup.php');
+    $simpleAdminMigration = $read('linuxapi/migrations/20261031_simpleadmin_player_lookup.sql');
     $faceitApiClient = $read('class/FaceitApiClient.php');
     $faceitSettingsRaw = $read('settings/faceit-api.integration.example.json');
     $faceitSettings = json_decode($faceitSettingsRaw, true, 512, JSON_THROW_ON_ERROR);
@@ -221,13 +225,31 @@ $check(
 );
 
 $check(
+    'SimpleAdmin resolves exact names to unique SteamIDs through the shared WeaponPaints HMAC route without reading IPs',
+    str_contains($simpleAdminSiteRepository, "'/v1/simpleadmin'")
+        && str_contains($simpleAdminSiteRepository, 'resolve_player_names')
+        && str_contains($linuxApiClient, 'Unsupported Linux API path.')
+        && str_contains($simpleAdminLookup, 'FROM sa_players_ips')
+        && str_contains($simpleAdminLookup, 'BINARY name')
+        && str_contains($simpleAdminLookup, 'CAST(steamid AS CHAR)')
+        && str_contains($simpleAdminLookup, 'ambiguous')
+        && !str_contains($simpleAdminLookup, 'address')
+        && str_contains($linuxConfig, "'GLOBAL_simpleadmin'")
+        && str_contains($simpleAdminMigration, 'idx_sa_players_ips_name_steamid_used_at')
+        && str_contains($standbySitePlayersEndpoint, 'new SimpleAdminRepository()')
+        && str_contains($standbySitePlayersEndpoint, 'new FaceitApiClient()')
+);
+
+$check(
     'FACEIT levels are resolved server-side from SteamID64 and do not block the A2S player list',
     str_contains($faceitApiClient, 'Authorization: Bearer ')
         && str_contains($faceitApiClient, "'game' => 'cs2'")
         && str_contains($faceitApiClient, "'game_player_id' =>")
         && str_contains($faceitApiClient, "['skill_level']")
         && str_contains($standbySitePlayersEndpoint, 'new FaceitApiClient()')
-        && str_contains($standbyBrowserJavascript, 'steam_id_missing')
+        && str_contains($standbyBrowserJavascript, 'simpleadmin_unavailable')
+        && str_contains($standbyBrowserJavascript, '/img/icons/faceit/')
+        && str_contains($standbyBrowserCss, '.sl-faceit-level-icon')
         && !str_contains($standbyBrowserJavascript, 'api_key')
 );
 

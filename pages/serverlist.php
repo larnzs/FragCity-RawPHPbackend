@@ -521,7 +521,7 @@ $statusLabels = [
                 <div class="sl-player-loading" id="slPlayerLoading" hidden>
                     <span class="sl-player-spinner" aria-hidden="true"></span>
                     <strong>در حال دریافت بازیکنان و رتبه FACEIT...</strong>
-                    <small>اطلاعات A2S_PLAYER و سطح FACEIT بازیکنان دارای SteamID بررسی می‌شود.</small>
+                    <small>نام‌های A2S با SimpleAdmin به SteamID متصل می‌شوند و سپس سطح FACEIT بررسی می‌شود.</small>
                 </div>
 
                 <div class="sl-player-error" id="slPlayerError" role="alert" hidden>
@@ -554,7 +554,7 @@ $statusLabels = [
             </div>
 
             <footer class="sl-player-modal-footer">
-                <span><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> منابع: A2S_PLAYER + FACEIT Data API</span>
+                <span><i class="fa-solid fa-satellite-dish" aria-hidden="true"></i> منابع: A2S_PLAYER + SimpleAdmin + FACEIT</span>
                 <span>اطلاعات در لحظه‌ی باز کردن مودال Query می‌شوند.</span>
             </footer>
         </section>

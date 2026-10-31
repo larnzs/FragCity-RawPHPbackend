@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 /**
  * FragCity Linux API v1.
- * Active routes: WeaponPaints, on-demand Pterodactyl Server Browser, and Pterodactyl Monitoring.
+ * Active routes: WeaponPaints, read-only SimpleAdmin lookup, on-demand Pterodactyl Server Browser,
+ * and Pterodactyl Monitoring. FACEIT requests stay on the shared-hosting website.
  * Legacy Windows-Agent routes are retired.
  * Only this file under public/ is routed by Nginx. Runtime settings are kept
  * outside the app and outside Git, normally at /etc/fragcity-api/config.php.
@@ -374,7 +375,9 @@ if (str_starts_with($path, '/v1/agent/')) {
 $isPterodactylStandbyRequest = $path === '/v1/pterodactyl-standby';
 $isPterodactylMonitoringRequest = $path === '/v1/pterodactyl-monitoring';
 $isWeaponPaintsRequest = $path === '/v1/weaponpaints';
-if (!$isPterodactylStandbyRequest && !$isPterodactylMonitoringRequest && !$isWeaponPaintsRequest) {
+$isSimpleAdminRequest = $path === '/v1/simpleadmin';
+if (!$isPterodactylStandbyRequest && !$isPterodactylMonitoringRequest
+    && !$isWeaponPaintsRequest && !$isSimpleAdminRequest) {
     apiRespond(404, ['success' => false, 'error' => 'not_found']);
 }
 if ($method !== 'POST') {
@@ -489,6 +492,64 @@ try {
     $action = $body['action'] ?? '';
     if (!is_string($action)) {
         throw new InvalidArgumentException('Invalid action.');
+    }
+
+    if ($isSimpleAdminRequest) {
+        if ($action !== 'resolve_player_names') {
+            apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
+        }
+
+        $simpleAdminConfig = is_array($config['simpleadmin'] ?? null)
+            ? $config['simpleadmin']
+            : [];
+        if (empty($simpleAdminConfig['enabled'])) {
+            apiRespond(503, ['success' => false, 'error' => 'simpleadmin_disabled']);
+        }
+
+        $simpleDatabase = is_array($simpleAdminConfig['database'] ?? null)
+            ? $simpleAdminConfig['database']
+            : [];
+        $simpleHost = trim((string)($simpleDatabase['host'] ?? '127.0.0.1'));
+        $simplePort = (int)($simpleDatabase['port'] ?? 3306);
+        $simpleName = trim((string)($simpleDatabase['name'] ?? ''));
+        $simpleUser = trim((string)($simpleDatabase['username'] ?? ''));
+        $simplePass = (string)($simpleDatabase['password'] ?? '');
+        $simpleCharset = (string)($simpleDatabase['charset'] ?? 'utf8mb4');
+
+        if ($simpleHost === '' || $simplePort < 1 || $simplePort > 65535
+            || !preg_match('/^[A-Za-z0-9_]+$/D', $simpleName)
+            || $simpleUser === ''
+            || !preg_match('/^[A-Za-z0-9_]+$/D', $simpleCharset)) {
+            apiRespond(503, ['success' => false, 'error' => 'simpleadmin_not_configured']);
+        }
+
+        try {
+            $simplePdo = new PDO(
+                'mysql:host=' . $simpleHost . ';port=' . $simplePort
+                    . ';dbname=' . $simpleName . ';charset=' . $simpleCharset,
+                $simpleUser,
+                $simplePass,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ]
+            );
+
+            require_once __DIR__ . '/../src/SimpleAdmin/SimpleAdminPlayerLookup.php';
+            $lookup = new SimpleAdminPlayerLookup($simplePdo);
+            apiRespond(200, [
+                'success' => true,
+                'data' => [
+                    'matches' => $lookup->resolveNames($body['names'] ?? null),
+                ],
+            ]);
+        } catch (InvalidArgumentException $e) {
+            apiRespond(400, ['success' => false, 'error' => 'invalid_player_names']);
+        } catch (Throwable $e) {
+            error_log('[FragCity API] SimpleAdmin player lookup failed; type=' . get_class($e));
+            apiRespond(503, ['success' => false, 'error' => 'simpleadmin_unavailable']);
+        }
     }
 
     if ($isPterodactylMonitoringRequest) {

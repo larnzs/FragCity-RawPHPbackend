@@ -38,13 +38,27 @@ if (!preg_match('/^[a-f0-9]{16}$/D', $serverId)) {
 }
 
 require_once dirname(__DIR__) . '/class/PterodactylStandbyRepository.php';
+require_once dirname(__DIR__) . '/class/SimpleAdminRepository.php';
 require_once dirname(__DIR__) . '/class/FaceitApiClient.php';
 
 try {
     $players = (new PterodactylStandbyRepository())->getPlayers($serverId);
 
-    // FACEIT is an optional enrichment. A temporary FACEIT outage must never
-    // prevent the A2S player list from being displayed.
+    try {
+        $players['players'] = (new SimpleAdminRepository())->resolvePlayers(
+            is_array($players['players'] ?? null) ? $players['players'] : []
+        );
+    } catch (Throwable $simpleAdminError) {
+        error_log('[FragCity] SimpleAdmin player lookup failed: ' . get_class($simpleAdminError));
+        foreach (($players['players'] ?? []) as $playerIndex => $player) {
+            if (is_array($player) && empty($player['steam_id'])) {
+                $players['players'][$playerIndex]['steam_id'] = null;
+                $players['players'][$playerIndex]['steam_id_status'] = 'simpleadmin_unavailable';
+            }
+        }
+    }
+
+    // FACEIT profile requests execute on this shared-hosting website only.
     try {
         $players['players'] = (new FaceitApiClient())->enrichPlayers(
             is_array($players['players'] ?? null) ? $players['players'] : []

@@ -1997,10 +1997,28 @@ body.sl-player-modal-open {
 }
 
 .sl-faceit-level-badge {
+    min-width: 36px;
+    min-height: 34px;
+    gap: 7px;
+    padding: 3px 7px;
     border-color: rgba(255,179,71,.22);
     background: rgba(255,179,71,.09);
     color: #ffc27f;
     font-family: var(--fc-font-mono);
+}
+
+.sl-faceit-level-icon {
+    display: block;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    object-fit: contain;
+}
+
+.sl-faceit-level-badge--unranked {
+    border-color: rgba(255,255,255,.08);
+    background: rgba(255,255,255,.035);
+    color: #9a9a9a;
 }
 
 .sl-player-modal-footer {

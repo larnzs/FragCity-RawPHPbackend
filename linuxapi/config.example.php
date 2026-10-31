@@ -11,19 +11,20 @@ declare(strict_types=1);
  * PHP-FPM (www-data) needs READ access to the private file but must not be able
  * to write it. Never place this file below the public document root or commit it.
  *
- * This Linux API owns the WeaponPaints service connection and the server-side
- * Pterodactyl integrations. It must never connect to the FragCity website DB
+ * This Linux API owns the WeaponPaints service and the read-only SimpleAdmin lookup,
+ * plus the server-side Pterodactyl integrations. It must never connect to the FragCity website DB
  * (kyonxcbt_fragcity_services) or receive the website's database credentials.
  */
 return [
     /*
-     * WeaponPaints endpoint authentication:
-     * POST /v1/weaponpaints
+     * Shared endpoint authentication:
+     * POST /v1/weaponpaints and POST /v1/simpleadmin
      *
-     * Generate a separate 64-character lowercase hex key with:
+     * Generate a 64-character lowercase hex key with:
      *   openssl rand -hex 32
      * Put the matching value in the website's integrations.weaponpaints_api.shared_secret.
-     * This key is NOT the Standby or Monitoring key.
+     * WeaponPaints and the read-only SimpleAdmin lookup intentionally share this key.
+     * Pterodactyl Standby and Monitoring keep their own independent HMAC keys.
      */
     'shared_secret' => 'REPLACE_WITH_WEAPONPAINTS_64_HEX_SECRET',
 
@@ -40,6 +41,26 @@ return [
         'username' => 'fragcity_weaponpaints_api',
         'password' => 'REPLACE_WITH_THE_EXISTING_UNIQUE_DATABASE_PASSWORD',
         'charset' => 'utf8mb4',
+    ],
+
+    /*
+     * Read-only SimpleAdmin player-name lookup:
+     * POST /v1/simpleadmin, authenticated with the root shared_secret above.
+     *
+     * This service reads ONLY steamid, name and used_at from sa_players_ips.
+     * It never selects or returns the stored IP column. The limited DB account
+     * should have column-level SELECT grants for those three fields only.
+     */
+    'simpleadmin' => [
+        'enabled' => false, // Enable only after the DB, migration and read-only account are verified.
+        'database' => [
+            'host' => '127.0.0.1',
+            'port' => 3306,
+            'name' => 'GLOBAL_simpleadmin',
+            'username' => 'fragcity_simpleadmin_api',
+            'password' => 'REPLACE_WITH_A_UNIQUE_READ_ONLY_DATABASE_PASSWORD',
+            'charset' => 'utf8mb4',
+        ],
     ],
 
     /*

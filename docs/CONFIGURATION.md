@@ -15,11 +15,11 @@ JSON کامنت استاندارد ندارد؛ برای همین Example کام
 
 ## ۲. Integrationهای Website ↔ Linux API
 
-هر Integration یک آدرس HTTPS و یک HMAC Secret مستقل دارد. `base_url` فقط Origin است؛ مسیر `/v1/...` را به آن اضافه نکن.
+`base_url` فقط Origin است؛ مسیر `/v1/...` را به آن اضافه نکن. WeaponPaints و SimpleAdmin عمداً از یک HMAC Secret مشترک استفاده می‌کنند؛ کلیدهای Pterodactyl جدا می‌مانند.
 
 | تنظیم وب‌سایت | Secret متناظر در Linux | مسیر |
 |---|---|---|
-| `integrations.weaponpaints_api` | ریشهٔ `shared_secret` | `POST /v1/weaponpaints` |
+| `integrations.weaponpaints_api` | ریشهٔ `shared_secret` مشترک | `POST /v1/weaponpaints` و `POST /v1/simpleadmin` |
 | `integrations.pterodactyl_standby_api` | `pterodactyl_standby.shared_secret` | `POST /v1/pterodactyl-standby` |
 | `integrations.pterodactyl_monitoring_api` | `pterodactyl_monitoring.shared_secret` | `POST /v1/pterodactyl-monitoring` |
 
@@ -29,7 +29,7 @@ JSON کامنت استاندارد ندارد؛ برای همین Example کام
 openssl rand -hex 32
 ```
 
-هر مقدار را فقط در دو جای متناظر خودش قرار بده. Secret مربوط به WeaponPaints را با Standby یا Monitoring یکی نکن. Pterodactyl Application API token و Wings token فقط در فایل Runtime لینوکس هستند؛ هیچ‌وقت آن‌ها را در تنظیمات سایت یا JavaScript قرار نده.
+مقدار `integrations.weaponpaints_api.shared_secret` را با `shared_secret` ریشهٔ فایل Linux یکسان نگه دار؛ همین کلید برای دو مسیر WeaponPaints و SimpleAdmin استفاده می‌شود. آن را با Standby یا Monitoring یکی نکن. Pterodactyl Application API token و Wings token فقط در فایل Runtime لینوکس هستند؛ هیچ‌وقت آن‌ها را در تنظیمات سایت یا JavaScript قرار نده.
 
 Exampleهای جزئی:
 
@@ -60,7 +60,36 @@ Exampleهای جزئی:
 
 `integrations.faceit_api.api_key` یک کلید **Server-side** از FACEIT Developer Portal است. کلید فقط در فایل خصوصی `settings/settings.json` قرار می‌گیرد و هرگز به مرورگر یا Linux API ارسال نمی‌شود. سایت برای هر SteamID64 معتبر از مسیر `GET https://open.faceit.com/data/v4/players?game=cs2&game_player_id=...` استفاده می‌کند و Level را از `games.cs2.skill_level` می‌خواند. نتیجه‌ها در Cache خصوصی موقت سرور نگهداری می‌شوند تا برای هر بازیکن در هر بار بازشدن مودال درخواست تکراری ارسال نشود.
 
-**محدودیت فعلی SteamID:** خود پروتکل `A2S_PLAYER` شناسه Steam برنمی‌گرداند و `linuxapi/src/PterodactylStandby/A2SPlayerQuery.php` فعلاً مقدار `steam_id` را `null` می‌گذارد. بنابراین رتبه FACEIT زمانی برای هر ردیف نمایش داده می‌شود که یک افزونه معتبر سمت سرور، SteamID64 بازیکن را به دادهٔ Player List اضافه کند. در نبود SteamID، نام بازیکن به‌تنهایی برای اتصال به حساب FACEIT استفاده نمی‌شود.
+**تأمین SteamID:** پروتکل `A2S_PLAYER` شناسه Steam برنمی‌گرداند؛ بنابراین نام فعلی هر بازیکن با جدول `sa_players_ips` در دیتابیس SimpleAdmin تطبیق داده می‌شود. فقط وقتی تطبیق دقیق به یک SteamID64 یکتا برسد، FACEIT Query انجام می‌شود. نام‌های تکراری یا پیدا‌نشده بدون رتبه باقی می‌مانند؛ IP بازیکنان خوانده یا منتقل نمی‌شود.
+
+### ۴.۲. SimpleAdmin Player Identity API
+
+سرویس `POST /v1/simpleadmin` روی Linux API فقط برای تبدیل نام فعلی بازیکنان A2S به SteamID64 استفاده می‌شود. این مسیر از همان HMAC Secret ریشه‌ای WeaponPaints استفاده می‌کند، اما به دیتابیس جداگانهٔ `GLOBAL_simpleadmin` و یک حساب MariaDB فقط‌خواندنی وصل می‌شود. این API فقط ستون‌های `name`, `steamid` و `used_at` از جدول `sa_players_ips` را می‌خواند و هرگز ستون `address` یا IP را Query یا به وب‌سایت ارسال نمی‌کند.
+
+پیش‌نیازها:
+- Migration شمارهٔ 013 باید اجرا شده باشد تا ستون `sa_players_ips.name` وجود داشته باشد.
+- Migration شمارهٔ 015 باید اجرا شده باشد تا SteamIDها در قالب BIGINT ذخیره شوند.
+- ایندکس جست‌وجوی نام را یک‌بار روی دیتابیس `GLOBAL_simpleadmin` بساز. پیش از اجرا با `SHOW INDEX FROM sa_players_ips` بررسی کن که از قبل وجود نداشته باشد:
+
+```sql
+ALTER TABLE sa_players_ips
+    ADD INDEX idx_sa_players_ips_name_steamid_used_at (name, steamid, used_at);
+```
+
+حساب API فقط‌خواندنی را با حداقل دسترسی بساز و Host را با اتصال واقعی Linux API هماهنگ کن:
+
+```sql
+CREATE USER 'fragcity_simpleadmin_api'@'127.0.0.1'
+    IDENTIFIED BY 'REPLACE_WITH_A_UNIQUE_LONG_PASSWORD';
+GRANT SELECT (steamid, name, used_at)
+    ON GLOBAL_simpleadmin.sa_players_ips
+    TO 'fragcity_simpleadmin_api'@'127.0.0.1';
+FLUSH PRIVILEGES;
+```
+
+در `/etc/fragcity-api/config.php` فقط بلوک `simpleadmin` را از `linuxapi/config.example.php` Merge کن؛ فایل Runtime را کامل overwrite نکن. بعد از قراردادن credentialهای واقعی، `enabled` را روی `true` بگذار.
+
+Resolver فقط وقتی نام دقیقاً به یک SteamID یکتا برسد آن را برمی‌گرداند. اگر نام به چند SteamID تعلق داشته باشد، وضعیت `ambiguous` می‌دهد تا رتبهٔ FACEIT به فرد اشتباه نسبت داده نشود. درخواست‌های FACEIT همچنان از PHP روی هاست اشتراکی و با کلید `integrations.faceit_api.api_key` انجام می‌شوند؛ Linux API هیچ درخواست FACEIT ارسال نمی‌کند.
 
 ## ۵. Pterodactyl Monitoring
 
@@ -88,7 +117,8 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 
 نمونهٔ کامل PHP در `linuxapi/config.example.php` است. آن را فقط برای نصب تازه به `/etc/fragcity-api/config.php` کپی کن. برای سرور موجود، بلوک‌های جدید را Merge کن؛ جایگزین‌کردن کل فایل باعث از بین‌رفتن Database password و Secretهای فعلی می‌شود.
 
-- `shared_secret`: مخصوص WeaponPaints.
+- ریشهٔ `shared_secret`: مشترک بین WeaponPaints و SimpleAdmin.
+- `simpleadmin.database`: اتصال فقط‌خواندنی به `GLOBAL_simpleadmin`.
 - `pterodactyl_standby.shared_secret`: مخصوص Server Browser.
 - `pterodactyl_monitoring.shared_secret`: مخصوص Monitoring.
 - `pterodactyl_standby.pterodactyl.application_api_key` و `pterodactyl_monitoring.pterodactyl.application_api_key`: توکن Application API فقط‌خواندنی Pterodactyl؛ فقط روی Linux.
