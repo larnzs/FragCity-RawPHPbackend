@@ -62,6 +62,10 @@
     const mobileClose = document.getElementById('mobileNavClose');
 
     const pageAssets = window.FragCityPageAssets || {};
+    const authLoginModal = document.getElementById('fcLoginModal');
+    const authLoginModalContent = document.getElementById('fcLoginModalContent');
+    let authLoginReturnFocus = null;
+    let authLoginOpenPromise = null;
 
     function getDropdownTrigger(dropdown) {
         return dropdown.querySelector(':scope > button, :scope > a');
@@ -256,12 +260,299 @@
         });
     }
 
-    async function loadPageScripts(slug) {
-        const scripts = pageAssetList(slug, 'js');
-        for (const src of scripts) {
-            await loadScript(src);
-        }
+    async function ensureAuthLoginAssets() {
+        const styles = pageAssetList('login', 'css');
+
+        await Promise.all(styles.map(function (href) {
+            const absoluteHref = new URL(href, window.location.href).href;
+            const existing = Array.from(
+                document.querySelectorAll('link[rel="stylesheet"]')
+            ).find(function (link) {
+                return link.href === absoluteHref;
+            });
+
+            if (existing) return Promise.resolve();
+
+            return new Promise(function (resolve, reject) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = href;
+                link.setAttribute('data-page-style', '');
+                link.onload = resolve;
+                link.onerror = reject;
+                document.head.appendChild(link);
+            });
+        }));
+
+        await loadPageScripts('login');
     }
+
+    function releaseAuthLoginStyles() {
+        const activeSlug = window.FragCityCurrentPage || 'home';
+        const activeStyles = new Set(pageAssetList(activeSlug, 'css'));
+        const loginStyles = new Set(pageAssetList('login', 'css'));
+
+        document.querySelectorAll('link[data-page-style]').forEach(function (link) {
+            const href = link.getAttribute('href');
+            if (loginStyles.has(href) && !activeStyles.has(href)) {
+                link.remove();
+            }
+        });
+    }
+
+    function renderAuthLoginFragment(html) {
+        if (!authLoginModalContent) {
+            throw new Error('Login modal content container not found');
+        }
+
+        const parsed = new DOMParser().parseFromString(html, 'text/html');
+        const authPage = parsed.querySelector('.auth-page');
+        if (!authPage) {
+            throw new Error('Login form fragment was not returned');
+        }
+
+        authPage.classList.add('auth-page--modal');
+        const form = authPage.querySelector('#loginForm');
+        if (form) {
+            form.setAttribute('action', '?page=login&auth_modal=1');
+        }
+
+        authLoginModalContent.replaceChildren(authPage);
+
+        if (typeof window.initAuthPages === 'function') {
+            window.initAuthPages();
+        }
+
+        window.dispatchEvent(new CustomEvent('content-loaded', {
+            detail: { page: 'login-modal' }
+        }));
+    }
+
+    function showAuthLoginLoadError() {
+        if (!authLoginModalContent) return;
+
+        const message = document.createElement('div');
+        message.className = 'fc-auth-modal__loading';
+        message.setAttribute('role', 'alert');
+        message.textContent = 'بارگذاری فرم ورود انجام نشد. اتصال اینترنت را بررسی و دوباره تلاش کنید.';
+        authLoginModalContent.replaceChildren(message);
+    }
+
+    async function fetchAuthLoginFragment() {
+        const requestUrl = new URL('?page=login&auth_modal=1', window.location.href);
+        const currentUrl = new URL(window.location.href);
+
+        // A protected-page redirect already stored its intended destination in
+        // the session. Otherwise, return the user to the page they opened login from.
+        if (currentUrl.searchParams.get('page') !== 'login') {
+            requestUrl.searchParams.set(
+                'return_to',
+                currentUrl.pathname + currentUrl.search
+            );
+        }
+
+        const response = await fetch(requestUrl.href, {
+            credentials: 'same-origin',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        });
+
+        if (!response.ok) {
+            throw new Error('Login form request failed: HTTP ' + response.status);
+        }
+
+        renderAuthLoginFragment(await response.text());
+    }
+
+    function updateAuthLoginTriggerState(open) {
+        document.querySelectorAll('[data-auth-modal-open]').forEach(function (trigger) {
+            trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+    }
+
+    function closeAuthLoginModal(restoreFocus) {
+        if (!authLoginModal || authLoginModal.hidden) return;
+
+        authLoginModal.hidden = true;
+        authLoginModal.setAttribute('aria-hidden', 'true');
+        body.classList.remove('fc-auth-modal-open');
+        updateAuthLoginTriggerState(false);
+        releaseAuthLoginStyles();
+
+        const currentUrl = new URL(window.location.href);
+        if (currentUrl.searchParams.get('page') === 'login') {
+            currentUrl.searchParams.delete('page');
+            currentUrl.searchParams.delete('auth_modal');
+            currentUrl.searchParams.delete('return_to');
+            const cleanUrl = currentUrl.pathname
+                + (currentUrl.searchParams.toString() ? '?' + currentUrl.searchParams.toString() : '')
+                + currentUrl.hash;
+            window.history.replaceState({}, '', cleanUrl);
+            window.FragCityCurrentPage = 'home';
+            setActiveLink('home');
+        }
+
+        if (restoreFocus !== false && authLoginReturnFocus instanceof HTMLElement
+            && authLoginReturnFocus.isConnected) {
+            authLoginReturnFocus.focus();
+        }
+        authLoginReturnFocus = null;
+    }
+
+    async function openAuthLoginModal(trigger) {
+        if (!authLoginModal || !authLoginModalContent) return;
+        if (!authLoginModal.hidden) return authLoginOpenPromise;
+
+        authLoginReturnFocus = trigger || document.activeElement;
+        closeMobileMenu();
+
+        authLoginModal.hidden = false;
+        authLoginModal.setAttribute('aria-hidden', 'false');
+        body.classList.add('fc-auth-modal-open');
+        updateAuthLoginTriggerState(true);
+
+        const dialog = authLoginModal.querySelector('.fc-auth-modal__dialog');
+        if (dialog) dialog.focus();
+
+        authLoginOpenPromise = (async function () {
+            try {
+                await ensureAuthLoginAssets();
+                await fetchAuthLoginFragment();
+
+                const firstInput = authLoginModalContent.querySelector(
+                    '#loginId, input:not([type="hidden"]), button, a[href]'
+                );
+                if (firstInput) firstInput.focus();
+            } catch (error) {
+                showAuthLoginLoadError();
+            } finally {
+                authLoginOpenPromise = null;
+            }
+        })();
+
+        return authLoginOpenPromise;
+    }
+
+    if (authLoginModal) {
+        authLoginModal.addEventListener('click', function (event) {
+            const closeTrigger = event.target.closest('[data-auth-modal-close]');
+            if (closeTrigger) {
+                event.preventDefault();
+                closeAuthLoginModal(true);
+                return;
+            }
+
+            const pageLink = event.target.closest('a[data-ajax-nav]');
+            if (pageLink) {
+                closeAuthLoginModal(false);
+            }
+        });
+
+        authLoginModal.addEventListener('submit', async function (event) {
+            const form = event.target.closest('#loginForm');
+            if (!form) return;
+
+            event.preventDefault();
+            if (form.dataset.modalSubmitting === '1') return;
+            form.dataset.modalSubmitting = '1';
+
+            const submitButton = form.querySelector('.btn-auth-submit');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.classList.add('is-loading');
+            }
+
+            try {
+                const actionUrl = new URL(
+                    form.getAttribute('action') || '?page=login&auth_modal=1',
+                    window.location.href
+                );
+                actionUrl.searchParams.set('page', 'login');
+                actionUrl.searchParams.set('auth_modal', '1');
+
+                const response = await fetch(actionUrl.href, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    credentials: 'same-origin',
+                    redirect: 'follow',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+
+                const finalUrl = new URL(response.url || actionUrl.href, window.location.href);
+                const isModalResponse = (
+                    finalUrl.searchParams.get('page') === 'login'
+                    && finalUrl.searchParams.get('auth_modal') === '1'
+                );
+
+                if (response.redirected && !isModalResponse) {
+                    window.location.assign(finalUrl.href);
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Login submit failed: HTTP ' + response.status);
+                }
+
+                renderAuthLoginFragment(await response.text());
+                const refreshedInput = authLoginModalContent.querySelector('#loginId');
+                if (refreshedInput) refreshedInput.focus();
+            } catch (error) {
+                showAuthLoginLoadError();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (authLoginModal.hidden) return;
+
+            if (event.key === 'Escape') {
+                event.preventDefault();
+                closeAuthLoginModal(true);
+                return;
+            }
+
+            if (event.key !== 'Tab') return;
+
+            const focusable = Array.from(authLoginModal.querySelectorAll(
+                'a[href], button:not(:disabled), input:not(:disabled), [tabindex]:not([tabindex="-1"])'
+            )).filter(function (element) {
+                return element.offsetParent !== null;
+            });
+
+            if (!focusable.length) {
+                event.preventDefault();
+                return;
+            }
+
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        const trigger = event.target.closest('[data-auth-modal-open]');
+        if (!trigger) return;
+
+        if (
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.ctrlKey ||
+            event.metaKey ||
+            event.shiftKey ||
+            event.altKey
+        ) {
+            return;
+        }
+
+        event.preventDefault();
+        openAuthLoginModal(trigger);
+    });
 
     function runInlineScripts(scripts) {
         scripts.forEach(function (oldScript) {
@@ -343,9 +634,11 @@
              * page even though different content was actually loaded.
              */
             const finalUrl = response.url || url;
-            const finalSlug = response.redirected
+            const requestedFinalSlug = response.redirected
                 ? slugFromUrl(finalUrl)
                 : slug;
+            const shouldOpenLogin = requestedFinalSlug === 'login';
+            const finalSlug = shouldOpenLogin ? 'home' : requestedFinalSlug;
 
             const html = await response.text();
             const documentCopy = new DOMParser().parseFromString(html, 'text/html');
@@ -390,6 +683,10 @@
                     detail: { page: finalSlug }
                 })
             );
+
+            if (shouldOpenLogin) {
+                await openAuthLoginModal();
+            }
         } catch (error) {
             window.location.href = url;
             return;
@@ -447,4 +744,8 @@
     });
 
     setActiveLink(window.FragCityCurrentPage || slugFromUrl(window.location.href));
+
+    if (window.FragCityOpenLoginModal) {
+        openAuthLoginModal();
+    }
 })();
