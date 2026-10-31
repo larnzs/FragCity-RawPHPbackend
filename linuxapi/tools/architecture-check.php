@@ -255,7 +255,7 @@ $check(
         && str_contains($banlistPage, '$_SESSION')
         && str_contains($banlistPage, 'SELECT insmaster FROM users WHERE steamid64 = ? LIMIT 1')
         && str_contains($banlistPage, '$isAdmin || $isInsMaster')
-        && str_contains($banlistPage, "($type === 'playerips' && !$canViewPlayerIps)")
+        && str_contains($banlistPage, '$type === \'playerips\' && !$canViewPlayerIps')
         && str_contains($banlistPage, '$showSensitiveData = $canViewPlayerIps;')
         && str_contains($preflight, "'insmaster'")
         && !str_contains($banlistPage, 'RemoteBanlistDatabase')
