@@ -57,7 +57,7 @@ Exampleهای جزئی:
 
 ## ۵. Pterodactyl Monitoring
 
-صفحهٔ Monitoring در `panels/cs2/monitoring.php` فقط برای ادمین است. سایت از مسیر داخلی خودش درخواست را احراز هویت می‌کند و سپس از Linux API با HMAC درخواست امضاشده می‌فرستد. Linux API اطلاعات Pterodactyl/Wings را جمع می‌کند؛ Application API token و Wings token هرگز به Browser نمی‌رسند. این قابلیت Secret مستقل دارد و به Cron نیاز ندارد.
+مسیر read-only مانیتورینگ Pterodactyl از طریق endpoint امضاشدهٔ سایت و Linux API موجود است و فقط نقش admin به آن دسترسی دارد. داشبورد قدیمی CS2 و پوشهٔ `panels/` حذف شده‌اند؛ هیچ صفحهٔ مدیریتی برای این قابلیت در سایت باقی نمانده است. Application API token و Wings token به مرورگر ارسال نمی‌شوند و Secret مانیتورینگ مستقل است.
 
 ## ۶. تنظیمات محلی Laragon
 
