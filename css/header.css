@@ -2026,3 +2026,247 @@ body.mobile-menu-open {
         transition: none !important;
     }
 }
+
+
+/* ==========================================================================
+   Global authentication modal
+   Login floats above the current route; registration remains a full page.
+   ========================================================================== */
+
+body.fc-auth-modal-open {
+    overflow: hidden;
+}
+
+.fc-auth-modal[hidden] {
+    display: none !important;
+}
+
+.fc-auth-modal {
+    position: fixed;
+    z-index: 12000;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    isolation: isolate;
+}
+
+.fc-auth-modal__backdrop {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.76);
+    -webkit-backdrop-filter: blur(9px) saturate(110%);
+    backdrop-filter: blur(9px) saturate(110%);
+    animation: fc-auth-backdrop-in 180ms ease both;
+}
+
+.fc-auth-modal__dialog {
+    position: relative;
+    width: min(100%, 420px);
+    max-height: min(90vh, 780px);
+    max-height: min(90dvh, 780px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 19px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(249, 115, 22, 0.08), transparent 52%),
+        rgba(13, 13, 13, 0.94);
+    box-shadow:
+        0 32px 100px rgba(0, 0, 0, 0.58),
+        0 0 55px rgba(249, 115, 22, 0.075),
+        inset 0 1px 0 rgba(255, 255, 255, 0.045);
+    -webkit-backdrop-filter: blur(24px) saturate(125%);
+    backdrop-filter: blur(24px) saturate(125%);
+    animation: fc-auth-dialog-in 260ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(249, 115, 22, 0.35) transparent;
+}
+
+.fc-auth-modal__close {
+    position: absolute;
+    z-index: 5;
+    top: 11px;
+    left: 11px;
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.035);
+    color: #A3A3A3;
+    cursor: pointer;
+    transition:
+        color 160ms ease,
+        border-color 160ms ease,
+        background-color 160ms ease,
+        transform 160ms ease;
+}
+
+.fc-auth-modal__close:hover,
+.fc-auth-modal__close:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(249, 115, 22, 0.3);
+    outline: none;
+    background: rgba(249, 115, 22, 0.09);
+    color: #FDBA74;
+}
+
+.fc-auth-modal__content {
+    min-width: 0;
+}
+
+.fc-auth-modal__loading {
+    display: flex;
+    min-height: 260px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: #A3A3A3;
+    font-size: 0.82rem;
+}
+
+.fc-auth-modal__spinner {
+    width: 25px;
+    height: 25px;
+    border: 2px solid rgba(255, 255, 255, 0.12);
+    border-top-color: #F97316;
+    border-radius: 50%;
+    animation: fc-auth-spinner 750ms linear infinite;
+}
+
+.fc-auth-modal__content .auth-page.auth-page--modal {
+    display: block;
+    width: 100%;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+}
+
+.fc-auth-modal__content .auth-page.auth-page--modal::before,
+.fc-auth-modal__content .auth-page.auth-page--modal::after {
+    display: none;
+    content: none;
+}
+
+.fc-auth-modal__content .auth-page--modal .auth-container {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 27px 27px 24px;
+    border: 0;
+    border-radius: 18px;
+    background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    animation: none;
+}
+
+.fc-auth-modal__content .auth-page--modal .auth-logo {
+    margin-bottom: 10px;
+}
+
+.fc-auth-modal__content .auth-page--modal .auth-logo img {
+    width: 62px;
+    height: 62px;
+}
+
+.fc-auth-modal__content .auth-page--modal h2 {
+    padding-inline: 24px;
+    font-size: 1.42rem;
+}
+
+.fc-auth-modal__content .auth-page--modal .auth-subtitle {
+    margin: 5px 0 19px;
+    font-size: 0.82rem;
+}
+
+.fc-auth-modal__content .auth-page--modal .form-group {
+    margin-bottom: 14px;
+}
+
+.fc-auth-modal__content .auth-page--modal .form-group input {
+    height: 47px;
+}
+
+.fc-auth-modal__content .auth-page--modal .btn-auth-submit,
+.fc-auth-modal__content .auth-page--modal .btn-steam-login {
+    min-height: 47px;
+}
+
+.fc-auth-modal__content .auth-page--modal .auth-separator {
+    margin: 18px 0;
+}
+
+.fc-auth-modal__content .auth-page--modal .auth-switch {
+    margin-top: 17px;
+    font-size: 0.8rem;
+}
+
+@keyframes fc-auth-backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fc-auth-dialog-in {
+    from { opacity: 0; transform: translate3d(0, 14px, 0) scale(0.985); }
+    to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@keyframes fc-auth-spinner {
+    to { transform: rotate(360deg); }
+}
+
+@media (max-width: 520px) {
+    .fc-auth-modal {
+        align-items: center;
+        padding: 12px;
+    }
+
+    .fc-auth-modal__dialog {
+        width: min(100%, 420px);
+        max-height: 92vh;
+        max-height: 92dvh;
+        border-radius: 16px;
+    }
+
+    .fc-auth-modal__content .auth-page--modal .auth-container {
+        padding: 24px 19px 20px;
+    }
+
+    .fc-auth-modal__close {
+        top: 9px;
+        left: 9px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fc-auth-modal__backdrop,
+    .fc-auth-modal__dialog,
+    .fc-auth-modal__spinner {
+        animation: none !important;
+    }
+
+    .fc-auth-modal__close {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .fc-auth-modal__backdrop,
+    .fc-auth-modal__dialog {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    .fc-auth-modal__dialog {
+        background: #111111;
+    }
+}
