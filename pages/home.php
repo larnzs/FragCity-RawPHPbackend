@@ -1,7 +1,7 @@
 <?php
 /**
- * FragCity public landing page.
- * Dedicated destination for community discovery and private CS2 hosting.
+ * FragCity brand-first public landing page.
+ * Product panel and Wiki implementation are intentionally out of scope here.
  */
 if (!defined('FRAGCITY_INDEX_RENDER')) {
     header('Location: /index.php', true, 303);
@@ -10,285 +10,344 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
 ?>
 
 <section class="home-landing" dir="rtl" aria-labelledby="homeHeroTitle">
-    <div class="home-atmosphere home-atmosphere-one" aria-hidden="true"></div>
-    <div class="home-atmosphere home-atmosphere-two" aria-hidden="true"></div>
+    <div class="home-background-grid" aria-hidden="true"></div>
+    <div class="home-glow home-glow-one" aria-hidden="true"></div>
+    <div class="home-glow home-glow-two" aria-hidden="true"></div>
+
     <div class="home-shell">
-        <section class="home-hero" data-fc-reveal="up">
+        <!-- HERO -->
+        <section class="home-hero" aria-labelledby="homeHeroTitle">
             <div class="home-hero-copy">
-                <div class="home-eyebrow">
-                    <span class="home-live-dot" aria-hidden="true"></span>
-                    FRAGCITY <span class="home-eyebrow-divider">/</span> GAME SERVER PLATFORM
+                <div class="home-eyebrow" data-fc-reveal="up">
+                    <span class="home-eyebrow-mark"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
+                    <span>FRAGCITY</span>
+                    <span class="home-eyebrow-divider">/</span>
+                    <span>BUILT FOR GAME COMMUNITIES</span>
                 </div>
-                <h1 id="homeHeroTitle">سرور گیم تو، <span>با کنترل کامل.</span></h1>
-                <p class="home-hero-description">
-                    فقط یک سرور بازی نخر؛ زیرساختی داشته باش که بتوانی آن را مدیریت کنی.
-                    از منابع اختصاصی و گیم‌مودهای متنوع تا دسترسی تیمی و بکاپ تنظیمات،
-                    همه‌چیز برای کامیونیتی خودت آماده است.
+
+                <h1 id="homeHeroTitle" data-fc-reveal="up" data-fc-reveal-delay="70">
+                    سرور خودت را بساز؛
+                    <span>کامیونیتی خودت را شکل بده.</span>
+                </h1>
+
+                <p class="home-hero-description" data-fc-reveal="up" data-fc-reveal-delay="140">
+                    FragCity فضایی برای راه‌اندازی سرورهای بازی و رشد کامیونیتی‌های گیمینگ است؛
+                    از اولین قدم برای ساخت سرور تا تجربه‌ای که بازیکن‌ها کنار هم می‌سازند.
                 </p>
-                <div class="home-hero-actions">
+
+                <div class="home-hero-actions" data-fc-reveal="up" data-fc-reveal-delay="210">
                     <a class="home-button home-button-primary" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen">
-                        <span>ساخت سرور اختصاصی</span>
+                        <span>شروع با FragCity</span>
                         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                     </a>
-                    <a class="home-button home-button-secondary" href="/index.php?page=servers_vps" data-ajax-nav data-slug="servers_vps">
-                        <i class="fa-solid fa-server" aria-hidden="true"></i>
-                        <span>مشاهده سرورهای عمومی</span>
+                    <a class="home-button home-button-secondary" href="#home-ecosystem">
+                        <span>آشنایی با سرویس‌ها</span>
+                        <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
                     </a>
                 </div>
-                <div class="home-hero-meta">
-                    <span><i class="fa-solid fa-microchip" aria-hidden="true"></i> زیرساخت Linux + Docker</span>
-                    <span class="home-meta-separator" aria-hidden="true"></span>
-                    <span><i class="fa-solid fa-sliders" aria-hidden="true"></i> مدیریت از پنل اختصاصی</span>
+
+                <div class="home-hero-signals" data-fc-reveal="up" data-fc-reveal-delay="270">
+                    <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> برای دنیای گیمینگ</span>
+                    <span><i class="fa-solid fa-users" aria-hidden="true"></i> با محوریت کامیونیتی</span>
+                    <span><i class="fa-solid fa-layer-group" aria-hidden="true"></i> یک اکوسیستم یکپارچه</span>
                 </div>
             </div>
 
-            <div class="home-hero-visual" aria-label="نمای گرافیکی زیرساخت سرور FragCity">
+            <div class="home-hero-visual" data-fc-reveal="left" aria-label="نمای گرافیکی اکوسیستم FragCity">
+                <div class="home-visual-halo" aria-hidden="true"></div>
+                <div class="home-visual-orbit home-visual-orbit-one" aria-hidden="true"></div>
+                <div class="home-visual-orbit home-visual-orbit-two" aria-hidden="true"></div>
+
                 <div class="home-visual-topline">
-                    <span class="home-visual-status"><i aria-hidden="true"></i> SERVER INFRASTRUCTURE</span>
-                    <span class="home-visual-code">FC / NODE 01</span>
+                    <span class="home-visual-brand">
+                        <span class="home-visual-brand-mark">FC</span>
+                        <span><strong>FRAGCITY</strong><small>YOUR GAMING SPACE</small></span>
+                    </span>
+                    <span class="home-visual-live"><i aria-hidden="true"></i> COMMUNITY PLATFORM</span>
                 </div>
-                <div class="home-server-stack">
-                    <div class="home-server-unit">
-                        <span class="home-server-unit-icon"><i class="fa-brands fa-linux" aria-hidden="true"></i></span>
-                        <span class="home-server-unit-copy">
-                            <strong>Linux Host</strong>
-                            <small>Dedicated game environment</small>
-                        </span>
-                        <span class="home-server-unit-state">ONLINE</span>
+
+                <div class="home-visual-main-card fc-glass-surface">
+                    <div class="home-visual-card-heading">
+                        <span class="home-visual-card-icon"><i class="fa-solid fa-cubes-stacked" aria-hidden="true"></i></span>
+                        <span><small>WELCOME TO</small><strong>YOUR NEXT GAME SPACE</strong></span>
+                        <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
                     </div>
-                    <div class="home-server-connector" aria-hidden="true"><span></span></div>
-                    <div class="home-container-grid">
-                        <div class="home-container-card"><span class="home-container-icon"><i class="fa-brands fa-docker" aria-hidden="true"></i></span><strong>Container 01</strong><small>Server A</small></div>
-                        <div class="home-container-card"><span class="home-container-icon"><i class="fa-brands fa-docker" aria-hidden="true"></i></span><strong>Container 02</strong><small>Server B</small></div>
-                        <div class="home-container-card"><span class="home-container-icon"><i class="fa-brands fa-docker" aria-hidden="true"></i></span><strong>Container 03</strong><small>Server C</small></div>
+
+                    <div class="home-visual-feature">
+                        <div class="home-visual-feature-art">
+                            <span class="home-art-crosshair" aria-hidden="true"></span>
+                            <i class="fa-solid fa-gamepad" aria-hidden="true"></i>
+                            <span class="home-art-orbit" aria-hidden="true"></span>
+                        </div>
+                        <div class="home-visual-feature-copy">
+                            <span class="home-visual-label">MAKE IT YOURS</span>
+                            <strong>فضای بازی، به سبک تو</strong>
+                            <small>از یک سرور شروع کن؛ یک جامعه بساز.</small>
+                        </div>
                     </div>
-                    <div class="home-visual-footer">
-                        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> ISOLATED FILES</span>
-                        <span><i class="fa-solid fa-rotate" aria-hidden="true"></i> CENTRAL GAME UPDATES</span>
+
+                    <div class="home-visual-shortcuts">
+                        <div class="home-visual-shortcut">
+                            <span class="home-shortcut-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
+                            <span><strong>Game Servers</strong><small>سرورهای اختصاصی</small></span>
+                            <i class="fa-solid fa-arrow-up-left" aria-hidden="true"></i>
+                        </div>
+                        <div class="home-visual-shortcut">
+                            <span class="home-shortcut-icon home-shortcut-icon-warm"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+                            <span><strong>Community</strong><small>بازیکن‌ها و کامیونیتی</small></span>
+                            <i class="fa-solid fa-arrow-up-left" aria-hidden="true"></i>
+                        </div>
                     </div>
                 </div>
-                <div class="home-visual-float home-visual-float-top"><strong>64</strong><span>TICK / SEC</span></div>
-                <div class="home-visual-float home-visual-float-bottom"><strong>+25</strong><span>GAME MODES</span></div>
-                <div class="home-visual-glow" aria-hidden="true"></div>
+
+                <div class="home-visual-float home-visual-float-top fc-glass-surface">
+                    <span class="home-float-icon"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
+                    <span><strong>MAKE</strong><small>YOUR SPACE</small></span>
+                </div>
+                <div class="home-visual-float home-visual-float-bottom fc-glass-surface">
+                    <span class="home-float-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+                    <span><strong>PLAY</strong><small>TOGETHER</small></span>
+                </div>
             </div>
         </section>
 
-        <section class="home-proof-strip" aria-label="ویژگی‌های کلیدی سرورهای FragCity" data-fc-reveal="up">
-            <div class="home-proof-item"><strong>+25</strong><span>گیم‌مود و محتوای متنوع</span></div>
-            <div class="home-proof-item"><strong>64 <small>Tick/s</small></strong><span>چرخه‌ی ۶۴ تیک در ثانیه در CS2</span></div>
-            <div class="home-proof-item"><strong>زیر ۱ دقیقه</strong><span>هماهنگ‌سازی آپدیت فایل‌های مرکزی</span></div>
-            <div class="home-proof-item"><strong>Dedicated</strong><span>منابع اختصاصی برای هر سرور</span></div>
-        </section>
+        <div class="home-scroll-cue" aria-hidden="true">
+            <span></span>
+            <small>SCROLL TO EXPLORE</small>
+        </div>
 
-        <section class="home-section home-architecture" id="infrastructure" data-fc-reveal="up">
-            <div class="home-section-heading home-section-heading-split">
-                <div><span class="home-kicker">01 / زیرساخت و معماری</span><h2>هر سرور، محیط مستقل خودش را دارد.</h2></div>
+        <!-- WHAT IS FRAGCITY -->
+        <section class="home-section home-intro-section" id="home-about" aria-labelledby="homeIntroTitle">
+            <div class="home-intro-copy" data-fc-reveal="up">
+                <span class="home-kicker"><span>01</span> / WHAT IS FRAGCITY?</span>
+                <h2 id="homeIntroTitle">فراتر از یک سرور بازی.</h2>
                 <p>
-                    سرورهای FragCity روی Linux و Docker اجرا می‌شوند. فایل‌های هر سرور
-                    از محیط سرورهای دیگر جداست؛ در نتیجه مدیریت و تغییرات هر سرویس،
-                    محدوده‌ی مشخص خودش را دارد.
+                    FragCity با یک ایده شکل گرفته: ساختن فضایی که در آن راه‌اندازی سرور،
+                    مدیریت تجربه‌ی بازی و ارتباط بازیکن‌ها مسیر ساده‌تر و منسجم‌تری داشته باشد.
+                    ما می‌خواهیم ابزارهای موردنیاز یک کامیونیتی، به‌جای پراکنده بودن،
+                    در یک تجربه‌ی واحد کنار هم قرار بگیرند.
                 </p>
+                <a class="home-text-link" href="/index.php?page=about" data-ajax-nav data-slug="about">
+                    بیشتر درباره FragCity
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                </a>
             </div>
-            <div class="home-architecture-panel">
-                <div class="home-architecture-copy">
-                    <span class="home-panel-icon"><i class="fa-solid fa-cubes-stacked" aria-hidden="true"></i></span>
-                    <h3>جداسازی در سطح کانتینر</h3>
-                    <p>
-                        هر سرور در کانتینر اختصاصی خودش اجرا می‌شود و فایل‌های اختصاصی
-                        همان سرور جداگانه نگهداری می‌شوند. این ساختار، مدیریت چند سرور
-                        روی یک Node را منظم‌تر و قابل‌کنترل‌تر می‌کند.
-                    </p>
-                    <div class="home-inline-points">
-                        <span><i class="fa-solid fa-check" aria-hidden="true"></i> محیط اجرایی مستقل</span>
-                        <span><i class="fa-solid fa-check" aria-hidden="true"></i> فایل‌های جداگانه</span>
-                        <span><i class="fa-solid fa-check" aria-hidden="true"></i> مدیریت منابع هر سرویس</span>
-                    </div>
+
+            <div class="home-intro-side" data-fc-reveal="left" data-fc-reveal-delay="100">
+                <div class="home-intro-orbit" aria-hidden="true"></div>
+                <div class="home-intro-mark">FC<span>.</span></div>
+                <div class="home-intro-caption">
+                    <span>ONE PLACE</span>
+                    <strong>FOR YOUR<br>GAME COMMUNITY</strong>
                 </div>
-                <div class="home-architecture-visual" aria-label="ساختار میزبان لینوکس و کانتینرهای مستقل">
-                    <div class="home-architecture-host">
-                        <span class="home-architecture-icon"><i class="fa-brands fa-linux" aria-hidden="true"></i></span>
-                        <span><strong>Linux Node</strong><small>میزبان اصلی</small></span>
-                        <span class="home-host-badge">HOST</span>
-                    </div>
-                    <div class="home-architecture-lines" aria-hidden="true"><i></i><i></i><i></i></div>
-                    <div class="home-architecture-containers">
-                        <div><i class="fa-brands fa-docker" aria-hidden="true"></i><strong>Docker</strong><small>Game Server 01</small></div>
-                        <div><i class="fa-brands fa-docker" aria-hidden="true"></i><strong>Docker</strong><small>Game Server 02</small></div>
-                        <div><i class="fa-brands fa-docker" aria-hidden="true"></i><strong>Docker</strong><small>Game Server 03</small></div>
-                    </div>
-                    <div class="home-architecture-caption"><i class="fa-solid fa-lock" aria-hidden="true"></i> فایل‌های هر سرور در محدوده‌ی خودش</div>
-                </div>
+                <div class="home-intro-side-note"><i class="fa-solid fa-circle-nodes" aria-hidden="true"></i> PLAY · CONNECT · BUILD</div>
             </div>
         </section>
 
-        <section class="home-section home-update-section" data-fc-reveal="up">
-            <div class="home-update-visual" aria-hidden="true">
-                <div class="home-update-orbit"></div>
-                <div class="home-update-core"><i class="fa-solid fa-arrows-rotate"></i></div>
-                <span class="home-update-node home-update-node-one"><i class="fa-brands fa-docker"></i> SERVER 01</span>
-                <span class="home-update-node home-update-node-two"><i class="fa-brands fa-docker"></i> SERVER 02</span>
-                <span class="home-update-node home-update-node-three"><i class="fa-brands fa-docker"></i> SERVER 03</span>
-                <span class="home-update-time"><i class="fa-solid fa-bolt"></i> LESS THAN 1 MIN</span>
+        <!-- BUILT FOR COMMUNITIES -->
+        <section class="home-section home-community-section" id="home-communities" aria-labelledby="homeCommunityTitle">
+            <div class="home-section-heading" data-fc-reveal="up">
+                <span class="home-kicker"><span>02</span> / BUILT FOR COMMUNITIES</span>
+                <h2 id="homeCommunityTitle">برای آدم‌هایی که بازی را دور هم جمع می‌کنند.</h2>
+                <p>چه یک سرور کوچک برای دوستانت بخواهی، چه در حال ساختن یک کامیونیتی باشی، FragCity برای شروع این مسیر طراحی شده است.</p>
             </div>
-            <div class="home-update-copy">
-                <span class="home-kicker">02 / CENTRAL GAME UPDATES</span>
-                <h2>آپدیت بازی، بدون معطلی برای هر سرور.</h2>
-                <p>
-                    فایل‌های مرکزی بازی به‌صورت مشترک مدیریت می‌شوند. وقتی نسخه‌ی بازی
-                    به‌روزرسانی شود، سرورهای شما با فایل‌های مرکزی هماهنگ می‌شوند؛
-                    هدف این ساختار، رساندن آپدیت به سرورها در کمتر از یک دقیقه است.
-                </p>
-                <div class="home-update-highlight"><strong>کمتر از ۶۰ ثانیه</strong><span>زمان هدف برای هماهنگ‌سازی فایل‌های مرکزی بازی</span></div>
-            </div>
-        </section>
 
-        <section class="home-section home-modes-section" data-fc-reveal="up">
-            <div class="home-modes-heading">
-                <span class="home-kicker">03 / GAME MODES & CONTENT</span>
-                <h2>یک سرور؛ بیشتر از یک سبک بازی.</h2>
-                <p>
-                    به بیش از ۲۵ گیم‌مود و مجموعه‌ای از کانتنت‌های مختلف دسترسی داشته باش.
-                    فضای سرورت را مطابق کامیونیتی خودت انتخاب و مدیریت کن.
-                </p>
-            </div>
-            <div class="home-modes-showcase">
-                <div class="home-mode-feature"><span class="home-mode-number">25<span>+</span></span><strong>گیم‌مود و محتوای قابل انتخاب</strong><small>MORE WAYS TO PLAY</small></div>
-                <div class="home-mode-catalog">
-                    <div class="home-mode-tile"><i class="fa-solid fa-crosshairs" aria-hidden="true"></i><span>گیم‌مودهای متنوع</span></div>
-                    <div class="home-mode-tile"><i class="fa-solid fa-map" aria-hidden="true"></i><span>نقشه‌ها و مپ‌ها</span></div>
-                    <div class="home-mode-tile"><i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i><span>پلاگین‌ها</span></div>
-                    <div class="home-mode-tile"><i class="fa-solid fa-gears" aria-hidden="true"></i><span>تنظیمات اختصاصی</span></div>
-                    <div class="home-mode-tile"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><span>کانتنت‌های جانبی</span></div>
-                    <div class="home-mode-tile"><i class="fa-solid fa-rotate" aria-hidden="true"></i><span>تعویض و مدیریت مود</span></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="home-section home-tick-section" data-fc-reveal="up">
-            <div class="home-tick-panel">
-                <div class="home-tick-copy">
-                    <span class="home-kicker">04 / SUB-TICK INPUT TIMING</span>
-                    <h2>زمان‌بندی دقیق ورودی‌ها با Sub-tick.</h2>
-                    <p>
-                        CS2 با چرخه‌ی ۶۴ تیک در ثانیه و معماری Sub-tick کار می‌کند.
-                        زمان دقیق شلیک، حرکت و پرتاب درون هر بازه‌ی تیک ثبت می‌شود؛
-                        بنابراین ورودی بازیکن فقط به مرز تیک بعدی وابسته نیست.
-                    </p>
-                    <div class="home-tick-tags">
-                        <span><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> 64 Tick / sec</span>
-                        <span><i class="fa-solid fa-crosshairs" aria-hidden="true"></i> Sub-tick timing</span>
-                        <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> ثبت دقیق زمان ورودی</span>
-                    </div>
-                </div>
-                <div class="home-tick-visual" aria-label="64 Tick with Sub-tick">
-                    <span class="home-tick-ring home-tick-ring-one"></span>
-                    <span class="home-tick-ring home-tick-ring-two"></span>
-                    <div class="home-tick-value"><strong>64</strong><span>TICK + SUB-TICK</span></div>
-                    <span class="home-tick-side-label">SERVER RATE</span>
-                </div>
-            </div>
-        </section>
-
-        <section class="home-section home-resources-section" data-fc-reveal="up">
-            <div class="home-section-heading">
-                <span class="home-kicker">05 / DEDICATED RESOURCES</span>
-                <h2>منابع سرورت مشخص است؛ سهم خودت را مدیریت کن.</h2>
-                <p>برای هر سرویس، منابع اختصاصی تعریف می‌شود تا ظرفیت سرور بر اساس نیاز و پلن انتخابی‌ات در دسترس باشد.</p>
-            </div>
-            <div class="home-resource-grid">
-                <article class="home-resource-card">
-                    <span class="home-resource-icon"><i class="fa-solid fa-microchip" aria-hidden="true"></i></span>
-                    <span class="home-resource-label">PROCESSING</span>
-                    <h3>CPU اختصاصی</h3>
-                    <p>ظرفیت پردازشی مشخص برای اجرای سرور و پردازش‌های مربوط به آن.</p>
-                    <span class="home-resource-line"><i></i></span>
+            <div class="home-community-grid">
+                <article class="home-community-card fc-glass-surface" data-fc-reveal="up" data-fc-reveal-delay="0">
+                    <div class="home-community-card-top"><span class="home-card-index">01 / SERVER OWNERS</span><span class="home-card-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span></div>
+                    <h3>برای صاحب‌های سرور</h3>
+                    <p>فضای بازی خودت را راه‌اندازی کن و تجربه‌ای بساز که با سبک و نیاز بازیکن‌هایت هماهنگ باشد.</p>
+                    <span class="home-community-card-foot">BUILD YOUR SERVER <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></span>
                 </article>
-                <article class="home-resource-card">
-                    <span class="home-resource-icon"><i class="fa-solid fa-memory" aria-hidden="true"></i></span>
-                    <span class="home-resource-label">MEMORY</span>
-                    <h3>RAM اختصاصی</h3>
-                    <p>مقدار حافظه‌ی مشخص برای اجرای بازی، مودها و پلاگین‌های سرور.</p>
-                    <span class="home-resource-line"><i></i></span>
+
+                <article class="home-community-card fc-glass-surface" data-fc-reveal="up" data-fc-reveal-delay="90">
+                    <div class="home-community-card-top"><span class="home-card-index">02 / FRIEND GROUPS</span><span class="home-card-icon"><i class="fa-solid fa-gamepad" aria-hidden="true"></i></span></div>
+                    <h3>برای گروه‌های دوستانه</h3>
+                    <p>یک فضای اختصاصی برای دورهمی، بازی و ساختن خاطره‌های مشترک با دوستانت داشته باش.</p>
+                    <span class="home-community-card-foot">PLAY TOGETHER <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></span>
                 </article>
-                <article class="home-resource-card">
-                    <span class="home-resource-icon"><i class="fa-solid fa-hard-drive" aria-hidden="true"></i></span>
-                    <span class="home-resource-label">STORAGE</span>
-                    <h3>فضای ذخیره‌سازی</h3>
-                    <p>فضای مشخص برای فایل‌های سرور، تنظیمات و محتوای موردنیاز.</p>
-                    <span class="home-resource-line"><i></i></span>
+
+                <article class="home-community-card fc-glass-surface" data-fc-reveal="up" data-fc-reveal-delay="180">
+                    <div class="home-community-card-top"><span class="home-card-index">03 / COMMUNITY BUILDERS</span><span class="home-card-icon"><i class="fa-solid fa-people-group" aria-hidden="true"></i></span></div>
+                    <h3>برای مدیرهای کامیونیتی</h3>
+                    <p>بازیکن‌ها را کنار هم نگه دار، سرویس‌های کامیونیتی را توسعه بده و برای رشد جمع خودت برنامه داشته باش.</p>
+                    <span class="home-community-card-foot">GROW YOUR COMMUNITY <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></span>
                 </article>
             </div>
         </section>
 
-        <section class="home-section home-control-section" data-fc-reveal="up">
-            <div class="home-section-heading home-section-heading-split">
-                <div><span class="home-kicker">06 / SERVER CONTROL</span><h2>پنل مدیریت، در اختیار خودت.</h2></div>
-                <p>
-                    مدیریت سرور نباید به ارسال تیکت برای هر تغییر کوچک وابسته باشد.
-                    ابزارهای اصلی مدیریت را در پنل خودت در اختیار داشته باش.
-                </p>
+        <!-- OUR ECOSYSTEM -->
+        <section class="home-section home-ecosystem-section" id="home-ecosystem" aria-labelledby="homeEcosystemTitle">
+            <div class="home-section-heading home-section-heading-split" data-fc-reveal="up">
+                <div>
+                    <span class="home-kicker"><span>03</span> / OUR ECOSYSTEM</span>
+                    <h2 id="homeEcosystemTitle">هر چیزی که کامیونیتی‌ات از FragCity می‌خواهد.</h2>
+                </div>
+                <p>از پیدا کردن یک سرور برای بازی تا راه‌اندازی فضای اختصاصی خودت؛ سرویس‌های FragCity در کنار هم یک مسیر کامل‌تر می‌سازند.</p>
             </div>
-            <div class="home-control-grid">
-                <article class="home-control-card">
-                    <div class="home-control-card-top"><span class="home-control-icon"><i class="fa-solid fa-folder-open" aria-hidden="true"></i></span><span class="home-control-index">01 / FILES</span></div>
-                    <h3>مدیریت فایل‌های سرور</h3>
-                    <p>فایل‌های سرور را از طریق پنل مدیریت کن؛ تنظیمات را ویرایش کن و ساختار فایل‌های موردنیازت را در دسترس داشته باش.</p>
-                    <div class="home-file-preview" aria-hidden="true">
-                        <div class="home-file-preview-bar"><span></span><span></span><span></span><small>SERVER FILES</small></div>
-                        <div class="home-file-row"><i class="fa-solid fa-folder"></i><span>addons</span><small>FOLDER</small></div>
-                        <div class="home-file-row"><i class="fa-solid fa-folder"></i><span>cfg</span><small>FOLDER</small></div>
-                        <div class="home-file-row"><i class="fa-solid fa-file-code"></i><span>server.cfg</span><small>CONFIG</small></div>
+
+            <div class="home-ecosystem-grid">
+                <a class="home-ecosystem-card home-ecosystem-card-featured fc-glass-surface" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen" data-fc-reveal="up">
+                    <div class="home-ecosystem-art home-ecosystem-art-server" aria-hidden="true">
+                        <span class="home-ecosystem-art-orbit"></span>
+                        <i class="fa-solid fa-server"></i>
+                        <span class="home-art-node home-art-node-one"></span>
+                        <span class="home-art-node home-art-node-two"></span>
                     </div>
+                    <div class="home-ecosystem-content">
+                        <span class="home-ecosystem-label">HOSTING</span>
+                        <h3>سرورهای اختصاصی بازی</h3>
+                        <p>فضای اختصاصی خودت را برای بازی و کامیونیتی راه‌اندازی کن.</p>
+                        <span class="home-ecosystem-link">مشاهده سرویس <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></span>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-left home-ecosystem-arrow" aria-hidden="true"></i>
+                </a>
+
+                <a class="home-ecosystem-card fc-glass-surface" href="/index.php?page=servers_vps" data-ajax-nav data-slug="servers_vps" data-fc-reveal="up" data-fc-reveal-delay="90">
+                    <div class="home-ecosystem-art home-ecosystem-art-browser" aria-hidden="true">
+                        <span class="home-browser-line"></span><span class="home-browser-line"></span><span class="home-browser-line"></span>
+                        <i class="fa-solid fa-tower-broadcast"></i>
+                    </div>
+                    <div class="home-ecosystem-content">
+                        <span class="home-ecosystem-label">DISCOVER</span>
+                        <h3>سرورهای عمومی</h3>
+                        <p>سرورهای عمومی را پیدا کن و به جمع بازیکن‌ها بپیوند.</p>
+                        <span class="home-ecosystem-link">مشاهده سرورها <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></span>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-left home-ecosystem-arrow" aria-hidden="true"></i>
+                </a>
+
+                <a class="home-ecosystem-card fc-glass-surface" href="/index.php?page=leaderboard" data-ajax-nav data-slug="leaderboard" data-fc-reveal="up" data-fc-reveal-delay="180">
+                    <div class="home-ecosystem-art home-ecosystem-art-community" aria-hidden="true">
+                        <span class="home-community-orbit"></span>
+                        <i class="fa-solid fa-people-group"></i>
+                        <span class="home-community-dot home-community-dot-one"></span>
+                        <span class="home-community-dot home-community-dot-two"></span>
+                        <span class="home-community-dot home-community-dot-three"></span>
+                    </div>
+                    <div class="home-ecosystem-content">
+                        <span class="home-ecosystem-label">COMMUNITY</span>
+                        <h3>تجربه‌ی کامیونیتی</h3>
+                        <p>ابزارهای بازیکن‌محور FragCity را در کنار سرورها تجربه کن.</p>
+                        <span class="home-ecosystem-link">کشف امکانات <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></span>
+                    </div>
+                    <i class="fa-solid fa-arrow-up-left home-ecosystem-arrow" aria-hidden="true"></i>
+                </a>
+            </div>
+        </section>
+
+        <!-- INSIDE FRAGCITY -->
+        <section class="home-section home-inside-section" id="home-inside" aria-labelledby="homeInsideTitle">
+            <div class="home-section-heading" data-fc-reveal="up">
+                <span class="home-kicker"><span>04</span> / INSIDE FRAGCITY</span>
+                <h2 id="homeInsideTitle">تجربه‌ی مدیریت، از یک نقطه.</h2>
+                <p>می‌خواهیم مدیریت سرور و سرویس‌ها تجربه‌ای روشن و قابل‌فهم باشد. این تصویر، پیش‌نمایش مفهومی از جهتی است که برای تجربه‌ی FragCity در نظر گرفته‌ایم.</p>
+            </div>
+
+            <div class="home-dashboard-stage" data-fc-reveal="up" data-fc-reveal-delay="100">
+                <div class="home-dashboard-window fc-glass-surface">
+                    <div class="home-dashboard-sidebar">
+                        <div class="home-dashboard-brand"><span>FC</span><strong>FRAGCITY</strong></div>
+                        <div class="home-dashboard-nav">
+                            <span class="is-active"><i class="fa-solid fa-grid-2" aria-hidden="true"></i> نمای کلی</span>
+                            <span><i class="fa-solid fa-server" aria-hidden="true"></i> سرورهای من</span>
+                            <span><i class="fa-solid fa-users" aria-hidden="true"></i> اعضای تیم</span>
+                            <span><i class="fa-solid fa-gear" aria-hidden="true"></i> تنظیمات</span>
+                        </div>
+                        <div class="home-dashboard-sidebar-bottom"><i class="fa-solid fa-circle-question" aria-hidden="true"></i><span>مرکز راهنما</span></div>
+                    </div>
+                    <div class="home-dashboard-main">
+                        <div class="home-dashboard-topbar">
+                            <span><small>YOUR SPACE</small><strong>نمای کلی سرویس‌ها</strong></span>
+                            <span class="home-dashboard-avatar">FC</span>
+                        </div>
+                        <div class="home-dashboard-welcome">
+                            <span><small>WELCOME TO YOUR CONTROL SPACE</small><strong>همه‌چیز از همین‌جا شروع می‌شود.</strong></span>
+                            <span class="home-dashboard-welcome-icon"><i class="fa-solid fa-shapes" aria-hidden="true"></i></span>
+                        </div>
+                        <div class="home-dashboard-placeholder-grid">
+                            <div class="home-dashboard-placeholder"><span><i class="fa-solid fa-server" aria-hidden="true"></i> سرویس‌های تو</span><strong></strong><small></small></div>
+                            <div class="home-dashboard-placeholder"><span><i class="fa-solid fa-users" aria-hidden="true"></i> اعضای کامیونیتی</span><strong></strong><small></small></div>
+                            <div class="home-dashboard-placeholder home-dashboard-placeholder-wide"><span><i class="fa-solid fa-chart-line" aria-hidden="true"></i> نمای کلی فعالیت</span><div class="home-dashboard-bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+                        </div>
+                        <div class="home-dashboard-bottom-note"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> این بخش، پیش‌نمایش طراحی است؛ جزئیات پنل در مرحله‌ی بعد معرفی می‌شود.</div>
+                    </div>
+                </div>
+                <div class="home-dashboard-glow" aria-hidden="true"></div>
+            </div>
+        </section>
+
+        <!-- HOW IT WORKS -->
+        <section class="home-section home-steps-section" id="home-how-it-works" aria-labelledby="homeStepsTitle">
+            <div class="home-section-heading" data-fc-reveal="up">
+                <span class="home-kicker"><span>05</span> / HOW IT WORKS</span>
+                <h2 id="homeStepsTitle">شروع مسیر، ساده‌تر از چیزی است که فکر می‌کنی.</h2>
+                <p>برای شروع لازم نیست همه‌چیز را از قبل بدانی؛ قدم‌به‌قدم فضای مناسب خودت را انتخاب کن.</p>
+            </div>
+
+            <div class="home-steps-grid">
+                <article class="home-step" data-fc-reveal="up" data-fc-reveal-delay="0">
+                    <span class="home-step-number">01</span>
+                    <span class="home-step-icon"><i class="fa-solid fa-compass" aria-hidden="true"></i></span>
+                    <h3>سرویس مناسب را پیدا کن</h3>
+                    <p>با توجه به سبک بازی و نیاز کامیونیتی‌ات، از بین سرویس‌های FragCity انتخاب کن.</p>
                 </article>
-                <article class="home-control-card">
-                    <div class="home-control-card-top"><span class="home-control-icon"><i class="fa-solid fa-users-gear" aria-hidden="true"></i></span><span class="home-control-index">02 / TEAM ACCESS</span></div>
-                    <h3>دعوت از دوستان با Sub-user</h3>
-                    <p>دوستان یا هم‌تیمی‌هایت را به مدیریت سرور دعوت کن و دسترسی‌های موردنیازشان را جداگانه تعریف کن؛ مدیریت سرور فقط دست یک نفر نیست.</p>
-                    <div class="home-team-preview" aria-hidden="true">
-                        <div class="home-team-avatar"><i class="fa-solid fa-user"></i></div>
-                        <div class="home-team-avatar home-team-avatar-two"><i class="fa-solid fa-user"></i></div>
-                        <div class="home-team-avatar home-team-avatar-three"><i class="fa-solid fa-user"></i></div>
-                        <div class="home-team-add"><i class="fa-solid fa-plus"></i></div>
-                        <span>دعوت و مدیریت اعضای تیم</span>
-                    </div>
+                <article class="home-step" data-fc-reveal="up" data-fc-reveal-delay="100">
+                    <span class="home-step-number">02</span>
+                    <span class="home-step-icon"><i class="fa-solid fa-sliders" aria-hidden="true"></i></span>
+                    <h3>فضای خودت را بساز</h3>
+                    <p>انتخاب‌ها و تنظیمات موردنیازت را مشخص کن و تجربه‌ی بازی‌ات را شکل بده.</p>
+                </article>
+                <article class="home-step" data-fc-reveal="up" data-fc-reveal-delay="200">
+                    <span class="home-step-number">03</span>
+                    <span class="home-step-icon"><i class="fa-solid fa-rocket" aria-hidden="true"></i></span>
+                    <h3>شروع کن و گسترش بده</h3>
+                    <p>بازیکن‌ها را دعوت کن و با بزرگ‌تر شدن کامیونیتی، فضای خودت را توسعه بده.</p>
                 </article>
             </div>
         </section>
 
-        <section class="home-section home-backup-section" data-fc-reveal="up">
-            <div class="home-backup-visual" aria-hidden="true">
-                <div class="home-backup-cloud"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-                <div class="home-backup-orbit"></div>
-                <div class="home-backup-file home-backup-file-one"><i class="fa-solid fa-file-code"></i><span>server.cfg</span><small>CONFIG</small></div>
-                <div class="home-backup-file home-backup-file-two"><i class="fa-solid fa-plug"></i><span>plugins</span><small>ADDONS</small></div>
-                <div class="home-backup-check"><i class="fa-solid fa-check"></i> BACKUP READY</div>
+        <!-- WHY FRAGCITY -->
+        <section class="home-section home-why-section" id="home-why" aria-labelledby="homeWhyTitle">
+            <div class="home-why-intro" data-fc-reveal="up">
+                <span class="home-kicker"><span>06</span> / WHY FRAGCITY?</span>
+                <h2 id="homeWhyTitle">تمرکز روی چیزی که واقعاً مهم است: تجربه‌ی بازی.</h2>
+                <p>زیرساخت مهم است؛ اما در نهایت چیزی که می‌ماند، تجربه‌ای است که برای خودت و کامیونیتی‌ات می‌سازی.</p>
             </div>
-            <div class="home-backup-copy">
-                <span class="home-kicker">07 / BACKUP & RESTORE</span>
-                <h2>تنظیمات و پلاگین‌هایت را حفظ کن.</h2>
-                <p>
-                    از تنظیمات و پلاگین‌های سرور بکاپ بگیر تا نسخه‌ای از پیکربندی
-                    موردعلاقه‌ات داشته باشی. برای تغییرات مهم، یک نقطه‌ی بازگشت مطمئن‌تر بساز.
-                </p>
-                <div class="home-backup-benefits">
-                    <span><i class="fa-solid fa-check-circle" aria-hidden="true"></i> نگهداری نسخه از تنظیمات</span>
-                    <span><i class="fa-solid fa-check-circle" aria-hidden="true"></i> بکاپ از پلاگین‌ها</span>
-                    <span><i class="fa-solid fa-check-circle" aria-hidden="true"></i> آماده برای بازیابی پیکربندی</span>
+            <div class="home-why-list">
+                <div class="home-why-item fc-glass-surface" data-fc-reveal="up" data-fc-reveal-delay="0">
+                    <span class="home-why-icon"><i class="fa-solid fa-fingerprint" aria-hidden="true"></i></span>
+                    <span><strong>فضای مخصوص کامیونیتی تو</strong><small>سرویس و تجربه‌ای که می‌توانی مطابق نیاز جمع خودت شکل بدهی.</small></span>
+                    <span class="home-why-index">01</span>
+                </div>
+                <div class="home-why-item fc-glass-surface" data-fc-reveal="up" data-fc-reveal-delay="80">
+                    <span class="home-why-icon"><i class="fa-solid fa-shapes" aria-hidden="true"></i></span>
+                    <span><strong>سرویس‌ها در کنار هم</strong><small>از سرورهای اختصاصی تا سرورهای عمومی و امکانات کامیونیتی.</small></span>
+                    <span class="home-why-index">02</span>
+                </div>
+                <div class="home-why-item fc-glass-surface" data-fc-reveal="up" data-fc-reveal-delay="160">
+                    <span class="home-why-icon"><i class="fa-solid fa-compass" aria-hidden="true"></i></span>
+                    <span><strong>مسیر روشن برای شروع</strong><small>انتخاب سرویس، ساخت فضای خودت و توسعه‌ی کامیونیتی در یک مسیر مشخص.</small></span>
+                    <span class="home-why-index">03</span>
                 </div>
             </div>
         </section>
 
-        <section class="home-final-cta" data-fc-reveal="up">
+        <!-- FINAL CTA -->
+        <section class="home-final-cta" aria-labelledby="homeFinalTitle" data-fc-reveal="up">
             <div class="home-final-cta-glow" aria-hidden="true"></div>
             <div class="home-final-cta-copy">
-                <span class="home-kicker">YOUR SERVER. YOUR RULES.</span>
-                <h2>کامیونیتی خودت را راه‌اندازی کن.</h2>
-                <p>سرور اختصاصی‌ات را بساز و مدیریت آن را در دست بگیر.</p>
+                <span class="home-kicker"><span>07</span> / READY WHEN YOU ARE</span>
+                <h2 id="homeFinalTitle">جای کامیونیتی تو اینجاست.</h2>
+                <p>از اولین سرور شروع کن و فضایی بساز که بازیکن‌ها دوست داشته باشند به آن برگردند.</p>
             </div>
-            <a class="home-button home-button-primary" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen">
-                <span>شروع ساخت سرور</span>
-                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-            </a>
+            <div class="home-final-cta-actions">
+                <a class="home-button home-button-primary" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen">
+                    <span>شروع با FragCity</span>
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                </a>
+                <a class="home-final-link" href="/index.php?page=servers_vps" data-ajax-nav data-slug="servers_vps">یا سرورهای عمومی را ببین</a>
+            </div>
         </section>
     </div>
 </section>
