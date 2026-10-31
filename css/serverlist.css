@@ -3691,56 +3691,76 @@ html.fc-no-animation .sl-player-modal-backdrop {
 }
 
 
-/* FACEIT levels are represented by standalone SVG artwork only. */
+/* FACEIT average sits in its own footer row at the very bottom of each card. */
 .sl-card-metrics {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.sl-faceit-average-row {
+    grid-area: faceit;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 7px;
+    min-width: 0;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, .055);
+    direction: rtl;
+}
+
+.sl-faceit-average-label {
+    color: #999;
+    font-size: .66rem;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
 }
 
 .sl-faceit-average-icon {
     display: block;
-    justify-self: center;
-    align-self: center;
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    min-height: 32px;
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
     object-fit: contain;
     object-position: center;
     aspect-ratio: 1 / 1;
-    visibility: hidden;
     filter: drop-shadow(0 4px 3px rgba(0, 0, 0, .92));
 }
 
-.sl-faceit-average-icon[data-average-state="ready"] {
-    visibility: visible;
-}
-
 #serverList[data-sl-view="list"] .sl-card-content {
-    grid-template-columns:
-        minmax(135px, 1.05fr)
-        minmax(125px, .92fr)
-        minmax(260px, 1.75fr)
-        minmax(95px, .7fr)
-        minmax(185px, 1.1fr);
+    grid-template-areas:
+        "heading address metrics capacity footer"
+        "faceit faceit faceit faceit faceit";
+    row-gap: 7px;
 }
 
 #serverList[data-sl-view="list"] .sl-card-metrics {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 @media (max-width: 1280px) and (min-width: 761px) {
     #serverList[data-sl-view="list"] .sl-card-content {
-        grid-template-columns:
-            minmax(135px, 1fr)
-            minmax(130px, .95fr)
-            minmax(235px, 1.45fr);
         grid-template-areas:
             "heading address footer"
-            "metrics metrics capacity";
+            "metrics metrics capacity"
+            "faceit faceit faceit";
     }
 }
 
 @media (max-width: 760px) {
+    #serverList[data-sl-view="list"] .sl-card-content {
+        grid-template-areas:
+            "heading"
+            "address"
+            "metrics"
+            "capacity"
+            "footer"
+            "faceit";
+    }
+
     #serverList[data-sl-view="list"] .sl-card-metrics {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
