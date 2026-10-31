@@ -1241,3 +1241,16 @@ body {
         color: #ef4444;
         flex-shrink: 0;
     }
+
+/* Align the purchase page with the shared safe-area rhythm. */
+.buy-server-page {
+    padding-top: calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap, 28px));
+    padding-bottom: var(--fc-page-safe-bottom, 56px);
+}
+
+@media (max-width: 700px) {
+    .buy-server-page {
+        padding-top: calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px));
+        padding-bottom: var(--fc-page-safe-bottom, 44px);
+    }
+}
