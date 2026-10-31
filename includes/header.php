@@ -142,7 +142,6 @@ $mobileNavItems = [
     ['leaderboard', 'لیدربورد', 'fa-trophy', ['leaderboard', 'leaderboard_vps']],
     ['banlist', 'لیست محرومیت‌ها', 'fa-gavel', ['banlist']],
     ['vip', 'VIP', 'fa-crown', ['vip']],
-    ['wallet', 'شارژ کیف پول', 'fa-wallet', ['wallet']],
 ];
 ?>
 
@@ -277,14 +276,6 @@ $mobileNavItems = [
                         </div>
                     </div>
                 </div>
-
-                <a href="?page=wallet"
-                   class="action-icon-btn <?= $isPageActive(['wallet']) ?>"
-                   data-ajax-nav data-slug="wallet"
-                   title="شارژ کیف پول"
-                   aria-label="شارژ کیف پول">
-                    <i class="fas fa-wallet" aria-hidden="true"></i>
-                </a>
 
                 <!-- اصلاح مسیر دکمه پنل ادمینی به پوشه واقعی panels/cs2/index.php -->
                 <div class="frag-dropdown" id="shockAdminPanelDropdown">
