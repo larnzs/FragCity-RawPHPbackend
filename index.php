@@ -748,18 +748,18 @@ $pageFile = match ($page) {
     <?php endforeach; ?>
 </head>
 
-<body class="site-body">
+<body class="site-body<?= $page === 'home' ? ' site-body--home' : '' ?>">
 
 <?php require_once __DIR__ . '/includes/header.php'; ?>
 
 <div class="app-container">
 
     <main
-        class="main-content"
+        class="main-content<?= $page === 'home' ? ' main-content--home' : '' ?>"
         id="mainContent"
     >
         <div
-            class="content-fader"
+            class="content-fader<?= $page === 'home' ? ' content-fader--home' : '' ?>"
             id="contentFader"
         >
 
