@@ -228,14 +228,7 @@ body.mobile-menu-open {
     color: var(--header-red);
 }
 
-/* Admin panel dropdown (game logo entries, e.g. Counter Strike 2) */
-.admin-panel-game-icon {
-    width: 20px;
-    height: 20px;
-    object-fit: contain;
-    border-radius: 4px;
-    flex-shrink: 0;
-}
+
 
 @media (max-width: 1300px) {
     /* Keep the navigation compact before it collapses to the mobile menu. */
