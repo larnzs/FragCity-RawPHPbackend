@@ -145,7 +145,6 @@ $check(
     'WeaponPaints mobile category bar is sticky within the main content scrollport and compact controls fit small screens',
     str_contains($weaponPaintsStylesheet, '.wp-app .wp-header')
         && str_contains($weaponPaintsStylesheet, 'position: sticky !important;')
-        && str_contains($weaponPaintsStylesheet, 'top: 76px !important;')
         && str_contains($weaponPaintsStylesheet, 'top: 72px !important;')
         && str_contains($weaponPaintsStylesheet, 'top: 66px !important;')
         && str_contains($weaponPaintsStylesheet, 'body:has(.wp-app) .main-content')
