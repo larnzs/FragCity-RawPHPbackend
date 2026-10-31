@@ -139,7 +139,7 @@ $statusLabels = [
     'unknown' => 'در انتظار Query',
 ];
 $faceitIconVersion = function_exists('asset_version')
-    ? asset_version(dirname(__DIR__) . '/img/icons/faceit/1.svg')
+    ? asset_version(dirname(__DIR__) . '/img/faceit/6.svg')
     : '1';
 ?>
 
@@ -147,7 +147,7 @@ $faceitIconVersion = function_exists('asset_version')
     class="serverlist-page"
     id="fragcityServerBrowser"
     dir="rtl"
-    data-faceit-icon-base="/img/icons/faceit/"
+    data-faceit-icon-base="/img/faceit/"
     data-faceit-icon-version="<?= $escapeServerValue($faceitIconVersion) ?>"
 >
     <div class="sl-page-shell">
