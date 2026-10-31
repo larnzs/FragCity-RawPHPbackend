@@ -41,6 +41,7 @@ try {
     $weaponRepo = $read('class/WeaponPaintsRepository.php');
     $weaponPaintsUtils = $read('class/utils.php');
     $weaponPaintsPage = $read('pages/weaponpaints.php');
+    $weaponPaintsGlovesIcon = $read('img/weaponpaintsicons/gloves.svg');
     $weaponPaintsJavascript = $read('js/weaponpaints.js');
     $weaponPaintsStylesheet = $read('css/weaponpaints.css');
     $pinCatalog = json_decode($read('data/collectibles_en.json'), true, 512, JSON_THROW_ON_ERROR);
@@ -649,6 +650,11 @@ $check(
         && str_contains($weaponPaintsStylesheet, 'grid-area: team !important;')
         && str_contains($weaponPaintsStylesheet, 'grid-area: search !important;')
         && str_contains($weaponPaintsStylesheet, '.wp-tab-svg[src$="/gloves.svg"]')
+        && str_contains($weaponPaintsStylesheet, '.wp-tab-svg[src$="/agent.svg"]')
+        && str_contains($weaponPaintsStylesheet, '.wp-tab-svg[src$="/music_kit.svg"]')
+        && str_contains($weaponPaintsStylesheet, '.wp-tab-svg[src$="/pin.svg"]')
+        && !str_contains($weaponPaintsGlovesIcon, '#FF3333')
+        && str_contains($weaponPaintsGlovesIcon, '#FFFFFF')
         && str_contains($weaponPaintsJavascript, 'wp-tab-exiting')
         && str_contains($weaponPaintsJavascript, 'tabExitDuration')
         && str_contains($weaponPaintsJavascript, 'const preferredPane = state.currentActiveTab')
