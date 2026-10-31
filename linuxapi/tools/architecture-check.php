@@ -637,6 +637,7 @@ $check(
         && str_contains($weaponPaintsStylesheet, 'flex-direction: column')
         && str_contains($weaponPaintsJavascript, 'wp-tab-exiting')
         && str_contains($weaponPaintsJavascript, 'tabExitDuration')
+        && str_contains($weaponPaintsJavascript, 'const preferredPane = state.currentActiveTab')
         && str_contains($weaponPaintsStylesheet, '@keyframes wpPaneEnterDirectional')
         && str_contains($weaponPaintsStylesheet, '@keyframes wpPaneExitDirectional')
         && is_file($root . '/img/weaponpaintsicons/README.md')
