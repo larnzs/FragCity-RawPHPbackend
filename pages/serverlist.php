@@ -260,7 +260,6 @@ $statusLabels = [
                             <select id="slSortSelect" <?= $serverRows === [] ? 'disabled' : '' ?>>
                                 <option value="default">پیش‌فرض</option>
                                 <option value="players-desc">بازیکن بیشتر</option>
-                                <option value="query-asc">Query سریع‌تر</option>
                                 <option value="name-asc">نام سرور</option>
                             </select>
                             <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
@@ -309,7 +308,6 @@ $statusLabels = [
                                         data-mode="<?= $escapeServerValue($modeSearch) ?>"
                                         data-address="<?= $escapeServerValue($server['address']) ?>"
                                         data-players="<?= $server['players'] ?>"
-                                        data-query="<?= $server['query_rtt_ms'] !== null ? $server['query_rtt_ms'] : '' ?>"
                                         data-fc-interactive
                                     >
                                         <div class="sl-card-cover">
