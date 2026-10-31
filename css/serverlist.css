@@ -2086,3 +2086,36 @@ body.sl-player-modal-open {
         animation-duration: 1.5s;
     }
 }
+
+
+
+/* Offline servers are intentionally subdued in both list and grid views. */
+.sl-server-card.sl-server-card--offline,
+.sl-server-card[data-status="offline"] {
+    filter: grayscale(1) saturate(0);
+    opacity: .78;
+    border-color: rgba(163, 163, 163, .14);
+    background: #151515;
+    box-shadow: none;
+}
+
+.sl-server-card.sl-server-card--offline:hover,
+.sl-server-card[data-status="offline"]:hover {
+    transform: none;
+    border-color: rgba(163, 163, 163, .2);
+    box-shadow: none;
+}
+
+.sl-server-card.sl-server-card--offline .sl-card-cover,
+.sl-server-card[data-status="offline"] .sl-card-cover {
+    background: linear-gradient(135deg, #242424, #171717 58%, #202020);
+}
+
+.sl-server-card.sl-server-card--offline .sl-capacity-track,
+.sl-server-card[data-status="offline"] .sl-capacity-track {
+    background: rgba(255, 255, 255, .045);
+}
+
+.sl-metric--query-rtt > span i {
+    color: #FB923C;
+}
