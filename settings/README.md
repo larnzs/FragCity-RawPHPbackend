@@ -70,7 +70,7 @@ Use `settings/pterodactyl-standby.integration.example.json`. Its secret matches 
 
 ### Pterodactyl Monitoring
 
-Use `settings/pterodactyl-monitoring.integration.example.json`. Its secret matches Linux `pterodactyl_monitoring.shared_secret`. This route backs the admin-only Monitoring panel and reads Pterodactyl/Wings resource data. It is separate from the public Server Browser and WeaponPaints.
+Use `settings/pterodactyl-monitoring.integration.example.json`. Its secret matches Linux `pterodactyl_monitoring.shared_secret`. This signed admin-only endpoint reads Pterodactyl/Wings resource data. The legacy CS2 web panel and its dashboard UI have been removed; the backend route remains available for future authorized tooling. It is separate from the public Server Browser and WeaponPaints.
 
 ## Linux API private configuration
 
