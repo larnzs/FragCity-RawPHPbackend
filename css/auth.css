@@ -28,7 +28,7 @@
     min-height: calc(100vh - 66px);
     margin: -25px;
     padding: 44px 20px;
-    overflow: hidden;
+    overflow-x: clip;
     direction: rtl;
     color: var(--auth-text);
     background:
