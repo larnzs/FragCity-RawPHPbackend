@@ -5,7 +5,7 @@ $error = $_SESSION['auth_error'] ?? '';
 unset($_SESSION['auth_error']);
 ?>
 
-<div class="auth-page">
+<div class="auth-page auth-page--modal">
     <div class="auth-container">
 
         <!-- FragCity Logo -->
@@ -25,7 +25,7 @@ unset($_SESSION['auth_error']);
         <?php endif; ?>
 
         <!-- Login Form -->
-        <form id="loginForm" method="post" action="">
+        <form id="loginForm" method="post" action="?page=login&amp;auth_modal=1">
             <input type="hidden" name="auth_action" value="login">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string) ($authCsrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>">
 
