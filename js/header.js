@@ -761,11 +761,11 @@
             button.setAttribute('aria-pressed', enabled ? 'true' : 'false');
             button.classList.toggle('is-active', enabled);
             button.title = enabled
-                ? 'No Animation Mode is on — click to restore animations'
-                : 'Enable No Animation Mode';
+                ? 'Performance Mode is on — click to restore animations'
+                : 'Enable Performance Mode';
             const label = button.querySelector('.fc-motion-toggle__label');
             if (label) {
-                label.textContent = 'No Animation Mode';
+                label.textContent = 'Performance Mode';
             }
             const state = button.querySelector('.fc-motion-toggle__state');
             if (state) state.textContent = enabled ? 'روشن' : 'خاموش';
