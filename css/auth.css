@@ -874,3 +874,94 @@
         font-size: 0.86rem;
     }
 }
+
+/* Remember-me switch */
+.auth-remember {
+    display: inline-flex;
+    align-items: center;
+    gap: 11px;
+    margin: 1px 0 19px;
+    cursor: pointer;
+    user-select: none;
+    direction: rtl;
+}
+
+.auth-remember > input {
+    position: absolute;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+.auth-remember__switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 25px;
+    padding: 3px;
+    border: 1px solid rgba(255, 255, 255, .16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .10);
+    box-sizing: border-box;
+    transition: background 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.auth-remember__thumb {
+    display: block;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: #D4D4D4;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .35);
+    transform: translateX(0);
+    transition: transform 180ms ease, background 180ms ease;
+}
+
+.auth-remember > input:checked + .auth-remember__switch {
+    border-color: rgba(249, 115, 22, .7);
+    background: rgba(249, 115, 22, .72);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, .09);
+}
+
+.auth-remember > input:checked + .auth-remember__switch .auth-remember__thumb {
+    background: #FFFFFF;
+    transform: translateX(-19px);
+}
+
+.auth-remember > input:focus-visible + .auth-remember__switch {
+    outline: 2px solid rgba(255, 179, 71, .85);
+    outline-offset: 3px;
+}
+
+.auth-remember__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: right;
+    line-height: 1.5;
+}
+
+.auth-remember__text strong {
+    color: #E5E5E5;
+    font-size: .84rem;
+    font-weight: 750;
+}
+
+.auth-remember__text small {
+    color: #888888;
+    font-size: .72rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-remember__switch,
+    .auth-remember__thumb {
+        transition: none !important;
+    }
+}
