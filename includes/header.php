@@ -62,7 +62,7 @@ $isPageActive = static function (array $pages) use ($current_page): string {
     return in_array($current_page, $pages, true) ? 'active' : '';
 };
 
-$morePages = ['skins', 'skins_vps', 'launcher', 'usermanual', 'leaderboard', 'leaderboard_vps', 'banlist', 'vip'];
+$morePages = ['skins', 'skins_vps', 'launcher', 'leaderboard', 'leaderboard_vps', 'banlist', 'vip'];
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
@@ -138,7 +138,6 @@ $mobileNavItems = [
     ['buyserveropen', 'خرید سرور', 'fa-shopping-cart', ['buyserveropen', 'buyserver']],
     ['skins', 'انتخاب اسکین', 'fa-palette', ['skins', 'skins_vps']],
     ['launcher', 'دانلود لانچر', 'fa-download', ['launcher']],
-    ['usermanual', 'راهنمای کاربر', 'fa-book', ['usermanual']],
     ['leaderboard', 'لیدربورد', 'fa-trophy', ['leaderboard', 'leaderboard_vps']],
     ['banlist', 'لیست محرومیت‌ها', 'fa-gavel', ['banlist']],
     ['vip', 'VIP', 'fa-crown', ['vip']],
@@ -188,9 +187,6 @@ $mobileNavItems = [
                     </a>
                     <a href="?page=launcher" class="frag-drop-link <?= $isPageActive(['launcher']) ?>" data-ajax-nav data-slug="launcher">
                         <i class="fas fa-download"></i><span>دانلود لانچر</span>
-                    </a>
-                    <a href="?page=usermanual" class="frag-drop-link <?= $isPageActive(['usermanual']) ?>" data-ajax-nav data-slug="usermanual">
-                        <i class="fas fa-book"></i><span>راهنمای کاربر</span>
                     </a>
                     <a href="?page=leaderboard" class="frag-drop-link <?= $isPageActive(['leaderboard', 'leaderboard_vps']) ?>" data-ajax-nav data-slug="leaderboard">
                         <i class="fas fa-trophy"></i><span>لیدربورد</span>
