@@ -3276,3 +3276,242 @@ body.site-body:has(.serverlist-page) .main-content {
         width: 100%;
     }
 }
+
+
+/* Inset content while keeping the page canvas full-bleed behind the header. */
+.serverlist-page {
+    padding-top: var(--fc-header-overlap-height, 72px) !important;
+}
+
+.sl-page-shell {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1540px;
+    margin: 0 auto;
+    padding-inline: clamp(18px, 2.6vw, 38px);
+}
+
+/* Restore the framed hero now that it sits inside the content gutter. */
+.sl-hero {
+    min-height: 264px;
+    padding: clamp(23px, 3.2vw, 44px);
+    border: 1px solid rgba(249, 115, 22, .18);
+    border-radius: 21px;
+}
+
+.sl-hero h1 {
+    font-size: clamp(1.7rem, 3.1vw, 2.55rem);
+}
+
+.sl-hero-copy > p {
+    font-size: .86rem;
+}
+
+.sl-hero-art {
+    width: min(31%, 315px);
+    min-width: 220px;
+}
+
+.sl-art-center {
+    width: 98px;
+    border-radius: 23px;
+}
+
+.sl-overview {
+    gap: 10px;
+    margin: 14px 0 32px;
+}
+
+.sl-overview-card {
+    min-height: 82px;
+    gap: 11px;
+    padding: 13px;
+    border-radius: 13px;
+}
+
+.sl-overview-icon {
+    width: 39px;
+    height: 39px;
+    flex-basis: 39px;
+    border-radius: 11px;
+    font-size: .92rem;
+}
+
+.sl-overview-copy > span {
+    font-size: .68rem;
+}
+
+.sl-overview-copy > strong {
+    font-size: 1.2rem;
+}
+
+.sl-section-heading {
+    margin-bottom: 15px;
+}
+
+.sl-section-heading h2 {
+    font-size: 1.2rem;
+}
+
+.sl-section-heading p {
+    font-size: .75rem;
+}
+
+.sl-filter-panel {
+    margin-bottom: 21px;
+    padding: 12px;
+    border-radius: 13px;
+}
+
+.sl-filter-pill {
+    min-height: 32px;
+    gap: 6px;
+    padding: 6px 10px;
+    font-size: .68rem;
+}
+
+.sl-search {
+    min-height: 36px;
+}
+
+.sl-select-wrap {
+    min-width: 132px;
+    font-size: .64rem;
+}
+
+.sl-select-wrap select {
+    min-height: 32px;
+    font-size: .67rem;
+}
+
+.sl-server-group {
+    margin-bottom: 22px;
+}
+
+.sl-group-heading {
+    margin-bottom: 10px;
+}
+
+.sl-group-title h3 {
+    font-size: .84rem;
+}
+
+.sl-server-grid {
+    gap: 11px;
+}
+
+.sl-card-cover {
+    min-height: 106px;
+    padding: 10px 12px;
+}
+
+.sl-cover-map-name {
+    font-size: clamp(1.05rem, 1.7vw, 1.42rem);
+}
+
+.sl-card-content {
+    padding: 12px;
+}
+
+.sl-card-title-wrap h4 {
+    font-size: .78rem;
+}
+
+.sl-card-metrics {
+    gap: 6px;
+    margin-top: 9px;
+}
+
+.sl-metric {
+    padding: 7px 6px;
+}
+
+.sl-metric > span {
+    font-size: .55rem;
+}
+
+.sl-metric > strong {
+    font-size: .68rem;
+}
+
+.sl-query-explainer {
+    gap: 14px;
+    margin-top: 24px;
+    padding: 18px;
+    border-radius: 14px;
+}
+
+.sl-query-explainer-icon {
+    width: 43px;
+    height: 43px;
+    flex-basis: 43px;
+}
+
+@media (max-width: 1100px) {
+    .sl-page-shell {
+        padding-inline: 22px;
+    }
+
+    .sl-hero {
+        min-height: 238px;
+    }
+}
+
+@media (max-width: 760px) {
+    .serverlist-page {
+        padding-top: var(--fc-header-overlap-height, 66px) !important;
+    }
+
+    .sl-page-shell {
+        padding-inline: 16px;
+    }
+
+    .sl-hero {
+        min-height: auto;
+        padding: 25px 20px;
+        border-radius: 17px;
+    }
+
+    .sl-hero h1 {
+        font-size: clamp(1.65rem, 7vw, 2.15rem);
+    }
+
+    .sl-hero-art {
+        display: none;
+    }
+
+    .sl-overview {
+        margin-bottom: 27px;
+    }
+
+    .sl-overview-card {
+        min-height: 74px;
+        padding: 10px;
+    }
+
+    .sl-query-explainer {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 560px) {
+    .sl-page-shell {
+        padding-inline: 12px;
+    }
+
+    .sl-hero {
+        padding: 22px 16px;
+    }
+
+    .sl-overview-card {
+        min-height: 70px;
+    }
+
+    .sl-filter-panel {
+        padding: 9px;
+    }
+
+    .sl-card-content {
+        padding: 9px;
+    }
+}
