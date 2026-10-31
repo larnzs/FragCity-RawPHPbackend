@@ -10264,9 +10264,11 @@ html.fc-no-animation body > .wp-modal .wp-addon-card:hover {
     position: absolute;
     z-index: 0;
     top: 170px;
-    left: -230px;
-    width: 440px;
-    height: 440px;
+    left: clamp(12px, 7vw, 90px);
+    width: min(440px, 72vw);
+    height: min(440px, 72vw);
+    min-width: 260px;
+    min-height: 260px;
     border: 1px solid rgba(249, 115, 22, .12);
     border-radius: 50%;
     box-shadow:
@@ -10337,6 +10339,9 @@ html.fc-no-animation body > .wp-modal .wp-addon-card:hover {
     opacity: 0;
     pointer-events: none;
     transform: translateX(125%);
+    transition:
+        transform 760ms cubic-bezier(.18, .72, .28, 1),
+        opacity 220ms ease;
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
