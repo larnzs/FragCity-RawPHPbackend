@@ -625,6 +625,35 @@ $check(
 );
 
 $check(
+    'WeaponPaints category navigation is separated into a right-side vertical SVG rail',
+    str_contains($weaponPaintsPage, '<aside class="wp-sidebar"')
+        && str_contains($weaponPaintsPage, '<nav class="wp-tabs wp-sidebar-tabs" id="mainTabs"')
+        && str_contains($weaponPaintsPage, 'id="wpToolbarControls"')
+        && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/inventory.svg')
+        && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/knives.svg')
+        && str_contains($weaponPaintsPage, 'wp-tab-fallback')
+        && str_contains($weaponPaintsStylesheet, '.wp-app .wp-sidebar-tabs')
+        && str_contains($weaponPaintsStylesheet, 'grid-template-columns: 184px minmax(0, 1fr)')
+        && str_contains($weaponPaintsStylesheet, 'flex-direction: column')
+        && str_contains($weaponPaintsJavascript, 'wp-tab-exiting')
+        && str_contains($weaponPaintsJavascript, 'tabExitDuration')
+        && str_contains($weaponPaintsStylesheet, '@keyframes wpPaneEnterDirectional')
+        && str_contains($weaponPaintsStylesheet, '@keyframes wpPaneExitDirectional')
+        && is_file($root . '/img/weaponpaintsicons/README.md')
+);
+
+$check(
+    'WeaponPaints paint, sticker and keychain modals use Server List glass blur and enter/exit motion',
+    str_contains($weaponPaintsStylesheet, 'blur(13px) saturate(115%)')
+        && str_contains($weaponPaintsStylesheet, 'body > .wp-modal-backdrop[data-wp-modal-backdrop="1"].is-visible')
+        && str_contains($weaponPaintsStylesheet, 'body > .wp-modal.wp-modal-visible .modal-dialog')
+        && str_contains($weaponPaintsStylesheet, 'body > .wp-modal.wp-modal-closing .modal-dialog')
+        && str_contains($weaponPaintsStylesheet, 'translateY(22px) scale(.965)')
+        && str_contains($weaponPaintsJavascript, 'getCustomModalBackdrop')
+        && str_contains($weaponPaintsJavascript, 'wp-modal-closing')
+);
+
+$check(
     'Desktop and mobile navigation prioritize Server List and Skin Selection, with secondary links under More',
     str_contains($siteHeaderMarkup, 'data-slug="servers_vps"')
         && str_contains($siteHeaderMarkup, 'data-slug="skins"')
