@@ -36,12 +36,16 @@
         '.support-card', '.ticket-create-card', '.ticket-list-card', '.social-item', '.ticket-row',
         '.about-page .section-title', '.about-page .about-text', '.value-item',
         '.vip-xp-card', '.vip-levels-card', '.feature-card', '.servers-card', '.panel-card',
-        '.console-card', '.instance-item', '.wp-section-head', '.wp-card', '.selection-card',
-        '.wp-control-card', '.wp-empty-state', '[data-fc-reveal]'
+        '.console-card', '.instance-item',
+        '.wp-app .wp-header', '.wp-app .wp-section-head', '.wp-app .wp-inventory-subhead',
+        '.wp-app .wp-view-mode-switcher', '.wp-app .wp-pagination', '.wp-app .wp-inventory-saved',
+        '.wp-app .wp-card', '.wp-app .selection-card', '.wp-app .wp-control-card',
+        '.wp-app .wp-empty-state', '[data-fc-reveal]'
     ].join(',');
 
     const interactiveSelector = [
-        '.fc-card--interactive', '.wp-card--clickable', '.sl-server-card', '[data-fc-interactive]'
+        '.fc-card--interactive', '.wp-card--clickable', '.wp-saved-paint-card',
+        '.sl-server-card', '[data-fc-interactive]'
     ].join(',');
 
     function motionDisabled() {
