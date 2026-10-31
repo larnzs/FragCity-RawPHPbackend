@@ -2,21 +2,20 @@
     'use strict';
 
     function applyVipColors(root) {
+        // Tier badges retain their bronze/silver/gold identity, while the
+        // page controls and feature UI stay within FragCity orange/amber.
         root.querySelectorAll('.vip-level-tab').forEach(function (tab) {
-            const color = tab.dataset.color || '#3b82f6';
-            const gradient = tab.dataset.gradient || 'linear-gradient(135deg,#2563eb,#3b82f6)';
+            const gradient = tab.dataset.gradient || 'linear-gradient(135deg,#F97316,#FFB347)';
             const badge = tab.querySelector('.level-badge');
             if (badge) badge.style.background = gradient;
         });
 
         root.querySelectorAll('.feature-panel').forEach(function (panel) {
-            const color = panel.dataset.color || '#60a5fa';
-            panel.style.setProperty('--vip-color', color);
+            panel.style.setProperty('--vip-color', '#FFB347');
         });
 
         root.querySelectorAll('.feature-card, .feature-icon, .feature-title').forEach(function (element) {
-            const color = element.closest('.feature-card')?.dataset.color || '#3b82f6';
-            element.style.setProperty('--feature-color', color);
+            element.style.setProperty('--feature-color', '#F97316');
         });
     }
 
@@ -28,7 +27,10 @@
         });
 
         root.querySelectorAll('.vip-level-tab').forEach(function (tab) {
-            tab.classList.toggle('selected', tab.dataset.level === String(level));
+            const active = tab.dataset.level === String(level);
+            tab.classList.toggle('selected', active);
+            tab.setAttribute('aria-selected', active ? 'true' : 'false');
+            tab.tabIndex = active ? 0 : -1;
         });
     }
 
@@ -45,6 +47,11 @@
                 method: 'POST',
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
+
+            if (!resp.ok) {
+                throw new Error('VIP sync request failed with HTTP ' + resp.status);
+            }
+
             const data = await resp.json();
 
             if (data.error) {
@@ -55,7 +62,7 @@
 
             result.classList.add('success');
             result.textContent = `همگام‌سازی موفق! سطح شما: ${data.vip_group} (${data.xp} XP)`;
-            setTimeout(function () {
+            window.setTimeout(function () {
                 window.location.reload();
             }, 1500);
         } catch (error) {
@@ -68,21 +75,33 @@
 
     function initVip() {
         const root = document.querySelector('.vip-page');
-        if (!root) return;
+        if (!root || root.dataset.vipInitialized === '1') return;
+        root.dataset.vipInitialized = '1';
 
         const xpFill = root.querySelector('.vip-xp-fill');
         if (xpFill) {
             const percent = Math.max(0, Math.min(100, Number(xpFill.dataset.xpPercent || 0)));
-            requestAnimationFrame(function () {
+            window.requestAnimationFrame(function () {
                 xpFill.style.width = percent + '%';
             });
         }
 
         applyVipColors(root);
 
-        root.querySelectorAll('.vip-level-tab').forEach(function (tab) {
+        const tabs = Array.from(root.querySelectorAll('.vip-level-tab'));
+        tabs.forEach(function (tab, index) {
             tab.addEventListener('click', function () {
                 selectLevel(root, tab.dataset.level);
+            });
+
+            tab.addEventListener('keydown', function (event) {
+                if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+                event.preventDefault();
+
+                const step = event.key === 'ArrowLeft' ? 1 : -1;
+                const nextIndex = (index + step + tabs.length) % tabs.length;
+                tabs[nextIndex].focus();
+                selectLevel(root, tabs[nextIndex].dataset.level);
             });
         });
 

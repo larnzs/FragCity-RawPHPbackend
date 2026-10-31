@@ -155,6 +155,14 @@ $vipFeaturesData = [
 <link rel="stylesheet" href="css/pages-base.css">
 <link rel="stylesheet" href="css/vip.css">
 <div class="vip-page">
+    <header class="vip-hero">
+        <div class="vip-hero-mark" aria-hidden="true"><i class="fas fa-crown"></i></div>
+        <div class="vip-hero-copy">
+            <span class="vip-hero-eyebrow">FRAGCITY MEMBERSHIP</span>
+            <h1 class="vip-hero-title">سطوح VIP فرگ‌سیتی</h1>
+            <p class="vip-hero-description">سطح‌های عضویت و قابلیت‌های هر رتبه را بررسی کنید.</p>
+        </div>
+    </header>
     <!-- نوار XP -->
     <div class="vip-xp-card">
         <div class="vip-xp-header">
@@ -178,9 +186,9 @@ $vipFeaturesData = [
 
     <!-- تب‌ها و ویژگی‌ها -->
     <div class="info-section vip-levels-card">
-        <div class="vip-levels-list">
+        <div class="vip-levels-list" role="tablist" aria-label="انتخاب سطح VIP">
             <?php foreach ($vipLevels as $lvl => $data): ?>
-                <button type="button" class="vip-level-tab <?= ($lvl === 1) ? 'selected' : '' ?>" data-level="<?= $lvl ?>" data-color="<?= htmlspecialchars($data['color'], ENT_QUOTES, 'UTF-8') ?>" data-gradient="<?= htmlspecialchars($data['gradient'], ENT_QUOTES, 'UTF-8') ?>">
+                <button type="button" id="vip-level-tab-<?= $lvl ?>" role="tab" aria-selected="<?= ($lvl === 1) ? 'true' : 'false' ?>" aria-controls="panel-level-<?= $lvl ?>" class="vip-level-tab <?= ($lvl === 1) ? 'selected' : '' ?>" data-level="<?= $lvl ?>" data-color="<?= htmlspecialchars($data['color'], ENT_QUOTES, 'UTF-8') ?>" data-gradient="<?= htmlspecialchars($data['gradient'], ENT_QUOTES, 'UTF-8') ?>">
                     <span class="level-badge"><i class="<?= $data['fa_icon'] ?>"></i></span>
                     <span class="level-name"><?= $data['name'] ?></span>
                 </button>
@@ -188,7 +196,7 @@ $vipFeaturesData = [
         </div>
         <div id="featuresContainer" class="features-container">
             <?php foreach ($vipLevels as $lvl => $data): ?>
-                <div class="feature-panel <?= ($lvl === 1) ? 'is-active' : '' ?>" id="panel-level-<?= $lvl ?>" data-level="<?= $lvl ?>" data-color="<?= htmlspecialchars($data['color'], ENT_QUOTES, 'UTF-8') ?>" <?= ($lvl === 1) ? '' : 'hidden' ?>>
+                <div class="feature-panel <?= ($lvl === 1) ? 'is-active' : '' ?>" id="panel-level-<?= $lvl ?>" role="tabpanel" aria-labelledby="vip-level-tab-<?= $lvl ?>" data-level="<?= $lvl ?>" data-color="<?= htmlspecialchars($data['color'], ENT_QUOTES, 'UTF-8') ?>" <?= ($lvl === 1) ? '' : 'hidden' ?>>
                     <h3 class="feature-panel-title"><i class="<?= $data['fa_icon'] ?>"></i> <?= $data['name'] ?></h3>
                     <p class="feature-panel-subtitle">ویژگی‌های این سطح:</p>
                     <div class="feature-grid">

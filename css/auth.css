@@ -764,3 +764,113 @@
         background: #090909;
     }
 }
+
+
+/* =========================================================
+   Registration page layout correction
+   Keep the form inside the viewport canvas and reserve the
+   shared FragCity header/footer safe areas without negative
+   margins or oversized page widths.
+========================================================= */
+.auth-page:has(#registerForm) {
+    width: 100%;
+    max-width: 100%;
+    min-height: calc(100svh - var(--fc-header-overlap-height, 72px));
+    margin: 0;
+    padding:
+        calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap, 28px))
+        clamp(16px, 3vw, 32px)
+        var(--fc-page-safe-bottom, 64px);
+    box-sizing: border-box;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-x: clip;
+}
+
+.auth-page:has(#registerForm) .auth-container {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: clamp(24px, 3vw, 34px);
+}
+
+.auth-page:has(#registerForm) .auth-logo {
+    margin-bottom: 12px;
+}
+
+.auth-page:has(#registerForm) .auth-logo img {
+    width: 74px;
+    height: 74px;
+}
+
+.auth-page:has(#registerForm) .auth-subtitle {
+    margin-bottom: 22px;
+}
+
+.auth-page:has(#registerForm) #registerForm .form-group {
+    margin-bottom: 14px;
+}
+
+.auth-page:has(#registerForm) #registerForm .form-group input {
+    height: 50px;
+    min-width: 0;
+}
+
+.auth-page:has(#registerForm) #registerForm .btn-auth-submit {
+    min-height: 50px;
+    margin-top: 3px;
+}
+
+.auth-page:has(#registerForm) .auth-switch {
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .auth-page:has(#registerForm) {
+        padding-top: calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px));
+        padding-right: 16px;
+        padding-left: 16px;
+    }
+
+    .auth-page:has(#registerForm) .auth-container {
+        max-width: 500px;
+        padding: 26px 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-page:has(#registerForm) {
+        width: 100%;
+        min-height: calc(100svh - var(--fc-header-overlap-height, 66px));
+        margin: 0;
+        padding:
+            calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px))
+            12px
+            var(--fc-page-safe-bottom, 44px);
+    }
+
+    .auth-page:has(#registerForm) .auth-container {
+        max-width: 100%;
+        padding: 22px 18px;
+        border-radius: 17px;
+    }
+
+    .auth-page:has(#registerForm) .auth-logo img {
+        width: 66px;
+        height: 66px;
+    }
+
+    .auth-page:has(#registerForm) .auth-subtitle {
+        margin-bottom: 18px;
+        font-size: 0.84rem;
+    }
+
+    .auth-page:has(#registerForm) #registerForm .form-group {
+        margin-bottom: 12px;
+    }
+
+    .auth-page:has(#registerForm) #registerForm .form-group input {
+        height: 47px;
+        font-size: 0.86rem;
+    }
+}
