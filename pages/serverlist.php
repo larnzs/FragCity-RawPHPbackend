@@ -138,9 +138,18 @@ $statusLabels = [
     'starting' => 'در حال راه‌اندازی',
     'unknown' => 'در انتظار Query',
 ];
+$faceitIconVersion = function_exists('asset_version')
+    ? asset_version(dirname(__DIR__) . '/img/icons/faceit/1.svg')
+    : '1';
 ?>
 
-<section class="serverlist-page" id="fragcityServerBrowser" dir="rtl">
+<section
+    class="serverlist-page"
+    id="fragcityServerBrowser"
+    dir="rtl"
+    data-faceit-icon-base="/img/icons/faceit/"
+    data-faceit-icon-version="<?= $escapeServerValue($faceitIconVersion) ?>"
+>
     <div class="sl-page-shell">
         <section class="sl-hero" aria-labelledby="slHeroTitle">
             <div class="sl-hero-copy">
@@ -390,6 +399,13 @@ $statusLabels = [
                                                 <div class="sl-metric sl-player-metric">
                                                     <span><i class="fa-solid fa-users" aria-hidden="true"></i> بازیکنان</span>
                                                     <strong><?= $server['status'] === 'online' ? $server['players'] . ' / ' . $server['max_players'] : '—' ?></strong>
+                                                </div>
+                                                <div
+                                                    class="sl-metric sl-metric--faceit-average"
+                                                    title="میانگین FACEIT فقط از بازیکنان آنلاین دارای Level معتبر محاسبه می‌شود."
+                                                >
+                                                    <span><i class="fa-solid fa-chart-line" aria-hidden="true"></i> AVG FACEIT</span>
+                                                    <strong dir="ltr" data-sl-faceit-average data-average-state="pending">—</strong>
                                                 </div>
                                                 <div
                                                     class="sl-metric sl-metric--client-ping"
