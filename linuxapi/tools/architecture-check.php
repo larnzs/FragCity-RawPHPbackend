@@ -569,12 +569,12 @@ $check(
     'Footer trust badges use fixed square containers while preserving image aspect ratios',
     str_contains($footerStylesheet, '.enamad-badge,')
         && str_contains($footerStylesheet, '.zarinpal-box')
-        && str_contains($footerStylesheet, 'width: 64px;')
-        && str_contains($footerStylesheet, 'height: 64px;')
+        && str_contains($footerStylesheet, 'width: 58px;')
+        && str_contains($footerStylesheet, 'height: 58px;')
         && str_contains($footerStylesheet, 'width: auto !important;')
         && str_contains($footerStylesheet, 'height: auto !important;')
-        && str_contains($footerStylesheet, 'max-width: 52px !important;')
-        && str_contains($footerStylesheet, 'max-height: 52px !important;')
+        && str_contains($footerStylesheet, 'max-width: 46px !important;')
+        && str_contains($footerStylesheet, 'max-height: 46px !important;')
         && str_contains($footerStylesheet, 'object-fit: contain !important;')
 );
 
