@@ -349,7 +349,6 @@ $allowedPages = [
     'login',
     'register',
     'profile',
-    'adminprofile',
     'vip',
     'leaderboard',
     'forgot_password',
@@ -387,7 +386,6 @@ $isLoggedIn =
 $protectedPages = [
     'skins',
     'skins_vps',
-    'adminprofile',
     'profile',
 ];
 
@@ -616,7 +614,6 @@ $pageFile = match ($page) {
     'skins' => __DIR__ . '/pages/weaponpaints.php',
     'servers' => __DIR__ . '/pages/serverlist.php',
     'servers_vps' => __DIR__ . '/pages/serverlist.php',
-    'adminprofile' => __DIR__ . '/panels/cs2/index.php',
     default => __DIR__ . '/pages/' . $page . '.php',
 };
 
