@@ -357,6 +357,17 @@
 
             syncPageStyles(finalSlug);
             replaceContent(fader, incomingContent.innerHTML);
+
+            // Home is a full-bleed route; keep its layout state in sync when
+            // the page is entered through AJAX navigation as well as direct load.
+            const isHomePage = finalSlug === 'home';
+            body.classList.toggle('site-body--home', isHomePage);
+            const mainContent = document.getElementById('mainContent');
+            if (mainContent) {
+                mainContent.classList.toggle('main-content--home', isHomePage);
+            }
+            fader.classList.toggle('content-fader--home', isHomePage);
+
             await loadPageScripts(finalSlug);
 
             if (pushState) {
