@@ -140,6 +140,7 @@
         function updateCardFaceitAverage(button, payload) {
             const card = button ? button.closest('[data-sl-card]') : null;
             const output = card ? card.querySelector('[data-sl-faceit-average]') : null;
+            const averageRow = card ? card.querySelector('[data-sl-faceit-average-row]') : null;
             if (!output) return;
 
             const players = Array.isArray(payload && payload.players) ? payload.players : [];
@@ -170,6 +171,7 @@
                 output.dataset.averageState = 'empty';
                 output.dataset.averageValue = '';
                 output.style.visibility = 'hidden';
+                if (averageRow) averageRow.hidden = true;
                 return;
             }
 
@@ -189,6 +191,7 @@
                     + ', represented by level ' + iconLevel + ' icon'
             );
             output.style.visibility = 'visible';
+            if (averageRow) averageRow.hidden = false;
         }
 
         function renderPlayers(payload) {
@@ -415,14 +418,15 @@
                         continue;
                     }
 
-                    const output = button.closest('[data-sl-card]')
-                        ? button.closest('[data-sl-card]').querySelector('[data-sl-faceit-average]')
-                        : null;
+                    const card = button.closest('[data-sl-card]');
+                    const output = card ? card.querySelector('[data-sl-faceit-average]') : null;
+                    const averageRow = card ? card.querySelector('[data-sl-faceit-average-row]') : null;
                     if (output) {
                         output.removeAttribute('src');
                         output.dataset.averageState = 'loading';
                         output.style.visibility = 'hidden';
                     }
+                    if (averageRow) averageRow.hidden = true;
 
                     try {
                         const data = await fetchPlayersData(serverId, false);
@@ -433,6 +437,7 @@
                             output.dataset.averageState = 'unavailable';
                             output.style.visibility = 'hidden';
                         }
+                        if (averageRow) averageRow.hidden = true;
                     }
                 }
             }
