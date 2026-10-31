@@ -1,5 +1,4 @@
-<link rel="stylesheet" href="css/pages-base.css">
-<link rel="stylesheet" href="css/about.css">
+
 <div class="about-page">
 
     <div class="logo-wrapper">
@@ -101,4 +100,4 @@
     </div>
 
 </div>
-<script src="js/about.js" defer></script>
+
