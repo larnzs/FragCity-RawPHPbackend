@@ -400,13 +400,16 @@ $faceitIconVersion = function_exists('asset_version')
                                                     <span><i class="fa-solid fa-users" aria-hidden="true"></i> بازیکنان</span>
                                                     <strong><?= $server['status'] === 'online' ? $server['players'] . ' / ' . $server['max_players'] : '—' ?></strong>
                                                 </div>
-                                                <div
-                                                    class="sl-metric sl-metric--faceit-average"
-                                                    title="میانگین FACEIT فقط از بازیکنان آنلاین دارای Level معتبر محاسبه می‌شود."
+                                                <img
+                                                    class="sl-faceit-average-icon"
+                                                    data-sl-faceit-average
+                                                    data-average-state="pending"
+                                                    width="32"
+                                                    height="32"
+                                                    alt="Average FACEIT level icon"
+                                                    aria-label="Average FACEIT level icon"
+                                                    decoding="async"
                                                 >
-                                                    <span><i class="fa-solid fa-chart-line" aria-hidden="true"></i> AVG FACEIT</span>
-                                                    <strong dir="ltr" data-sl-faceit-average data-average-state="pending">—</strong>
-                                                </div>
                                                 <div
                                                     class="sl-metric sl-metric--client-ping"
                                                     title="پینگ واقعی بازدیدکننده هنوز از مرورگر قابل اندازه‌گیری نیست؛ برای این مقدار به ابزار کلاینت/ارتباط UDP سازگار نیاز داریم."
