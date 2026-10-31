@@ -56,6 +56,10 @@ try {
     $standbySettings = json_decode($standbySettingsRaw, true, 512, JSON_THROW_ON_ERROR);
     $standbyApiClient = $read('class/PterodactylStandbyApiClient.php');
     $standbyRepository = $read('class/PterodactylStandbyRepository.php');
+    $serverListPage = $read('pages/serverlist.php');
+    $serverListStylesheet = $read('css/serverlist.css');
+    $siteHeaderMarkup = $read('includes/header.php');
+    $siteHeaderStylesheet = $read('css/header.css');
     $standbyPterodactylClient = $read('linuxapi/src/PterodactylStandby/PterodactylApplicationClient.php');
     $standbyDiscovery = $read('linuxapi/src/PterodactylStandby/PterodactylStandbyDiscovery.php');
     $standbyA2S = $read('linuxapi/src/PterodactylStandby/A2SInfoQuery.php');
@@ -448,6 +452,33 @@ $check(
         && str_contains($standbySitePlayersEndpoint, 'PterodactylStandbyRepository')
         && !str_contains($standbySitePlayersEndpoint, "['host']")
         && !str_contains($standbySitePlayersEndpoint, "['port']")
+);
+
+$check(
+    'Standby cURL client releases CurlHandle without the PHP 8.5-deprecated curl_close() call',
+    str_contains($standbyApiClient, 'curl_exec($handle)')
+        && str_contains($standbyApiClient, 'unset($handle)')
+        && !str_contains($standbyApiClient, 'curl_close(')
+);
+
+$check(
+    'Server Browser desaturates offline cards and labels the server-side A2S RTT honestly',
+    str_contains($serverListPage, "sl-server-card--offline")
+        && str_contains($serverListPage, "sl-metric--query-rtt")
+        && str_contains($serverListPage, "fa-signal")
+        && str_contains($serverListPage, "A2S Ping")
+        && str_contains($serverListPage, "پینگ واقعی اینترنت بازیکن نیست")
+        && str_contains($serverListStylesheet, '.sl-server-card[data-status="offline"]')
+        && str_contains($serverListStylesheet, 'filter: grayscale(1) saturate(0);')
+);
+
+$check(
+    'Mobile header places the hamburger at the right of the profile and darkens on scroll down',
+    str_contains($siteHeaderMarkup, 'id="mobileNavOpen"')
+        && str_contains($siteHeaderMarkup, 'id="shockUserDropdown"')
+        && str_contains($siteHeaderStylesheet, 'flex-direction: row-reverse !important;')
+        && str_contains($siteHeaderStylesheet, '.shock-header.is-scroll-down')
+        && str_contains($siteHeaderStylesheet, 'rgba(7, 7, 7, .97)')
 );
 
 $check(
