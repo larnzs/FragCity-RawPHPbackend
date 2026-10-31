@@ -10462,18 +10462,14 @@ html.fc-no-animation .wp-app .wp-saved-paint-card::after {
 }
 
 /* =========================================================
-   WeaponPaints workspace layout
-   Right-side vertical category rail, separate glass toolbar,
-   and Server List-style directional page / modal transitions.
+   WeaponPaints single-row workspace and integrated category toolbar
+   Categories right · CT/BOTH/T centered · search left
 ========================================================= */
 
 .wp-app .wp-workspace-layout {
     position: relative;
     z-index: 1;
-    display: grid;
-    grid-template-columns: 184px minmax(0, 1fr);
-    align-items: start;
-    gap: 16px;
+    display: block;
     width: min(1550px, calc(100% - 32px));
     margin: 0 auto;
     padding: 16px 0 24px;
@@ -10481,235 +10477,8 @@ html.fc-no-animation .wp-app .wp-saved-paint-card::after {
 }
 
 .wp-app .wp-workspace-main {
-    grid-column: 2;
-    min-width: 0;
-}
-
-.wp-app .wp-sidebar {
-    position: sticky;
-    top: calc(var(--fc-header-overlap-height, 72px) + 14px);
-    z-index: 60;
-    grid-column: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-    max-height: calc(100dvh - var(--fc-header-overlap-height, 72px) - 28px);
-    min-width: 0;
-    padding: 12px;
-    overflow-x: hidden;
-    overflow-y: auto;
-    border: 1px solid rgba(255, 255, 255, .105);
-    border-radius: 15px;
-    background:
-        radial-gradient(ellipse at 100% 0%, rgba(249, 115, 22, .085), transparent 48%),
-        linear-gradient(145deg, rgba(28, 29, 35, .88), rgba(13, 14, 18, .82));
-    box-shadow:
-        0 14px 38px rgba(0, 0, 0, .24),
-        inset 0 1px 0 rgba(255, 255, 255, .035);
-    -webkit-backdrop-filter: blur(18px) saturate(125%);
-    backdrop-filter: blur(18px) saturate(125%);
-    scrollbar-width: thin;
-    scrollbar-color: rgba(249, 115, 22, .26) transparent;
-}
-
-.wp-app .wp-sidebar-brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-width: 0;
-    padding: 3px 2px 12px;
-    border-bottom: 1px solid rgba(255, 255, 255, .075);
-}
-
-.wp-app .wp-sidebar-brand__mark {
-    display: grid;
-    flex: 0 0 36px;
-    width: 36px;
-    height: 36px;
-    place-items: center;
-    border: 1px solid rgba(249, 115, 22, .28);
-    border-radius: 10px;
-    background: rgba(249, 115, 22, .09);
-    color: #FB923C;
-    box-shadow: 0 0 20px rgba(249, 115, 22, .075);
-}
-
-.wp-app .wp-sidebar-brand__copy {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    gap: 3px;
-    line-height: 1.15;
-    direction: ltr;
-    text-align: left;
-}
-
-.wp-app .wp-sidebar-brand__copy strong {
-    color: #F5F5F5;
-    font-size: .72rem;
-    font-weight: 900;
-    letter-spacing: .12em;
-}
-
-.wp-app .wp-sidebar-brand__copy small {
-    color: #8A8A8A;
-    font-size: .55rem;
-    font-weight: 800;
-    letter-spacing: .1em;
-}
-
-.wp-app .wp-sidebar-tabs {
-    display: flex !important;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 4px;
     width: 100%;
     min-width: 0;
-    margin: 0;
-    padding: 0;
-    overflow: visible;
-    direction: rtl;
-}
-
-.wp-app .wp-sidebar-tabs .wp-category-switcher,
-.wp-app .wp-sidebar-tabs .wp-category-switcher--unified {
-    display: flex !important;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 4px;
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-    overflow: visible;
-}
-
-.wp-app .wp-sidebar-tabs .wp-tab {
-    position: relative;
-    isolation: isolate;
-    display: flex !important;
-    flex: 0 0 auto;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 11px;
-    width: 100%;
-    min-width: 0;
-    min-height: 42px;
-    height: 42px;
-    padding: 0 11px;
-    overflow: hidden;
-    border: 1px solid transparent;
-    border-radius: 9px;
-    background: transparent;
-    color: #A1A1AA;
-    box-shadow: none;
-    text-align: right;
-    font-family: inherit;
-    font-size: .75rem;
-    font-weight: 750;
-    line-height: 1;
-    white-space: nowrap;
-    cursor: pointer;
-    transition:
-        color 180ms ease,
-        background-color 180ms ease,
-        border-color 180ms ease,
-        box-shadow 220ms ease,
-        transform 220ms cubic-bezier(.2, .75, .25, 1);
-}
-
-.wp-app .wp-sidebar-tabs .wp-tab::after {
-    display: none !important;
-    content: none !important;
-}
-
-.wp-app .wp-sidebar-tabs .wp-tab::before {
-    content: "";
-    position: absolute;
-    z-index: -1;
-    top: 8px;
-    right: 0;
-    bottom: 8px;
-    width: 2px;
-    border-radius: 99px;
-    background: #F97316;
-    opacity: 0;
-    transform: scaleY(.45);
-    transition: opacity 180ms ease, transform 220ms ease;
-}
-
-.wp-app .wp-sidebar-tabs .wp-tab:hover,
-.wp-app .wp-sidebar-tabs .wp-tab:focus-visible {
-    border-color: rgba(249, 115, 22, .22);
-    outline: none;
-    background: rgba(249, 115, 22, .07);
-    color: #F5F5F5;
-    transform: translateX(-2px);
-}
-
-.wp-app .wp-sidebar-tabs .wp-tab.is-active,
-.wp-app .wp-sidebar-tabs .wp-tab.active {
-    border-color: rgba(249, 115, 22, .25);
-    background:
-        linear-gradient(90deg, rgba(249, 115, 22, .11), rgba(249, 115, 22, .045));
-    color: #FDBA74;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, .035),
-        0 5px 16px rgba(0, 0, 0, .12);
-    transform: translateX(-1px);
-}
-
-.wp-app .wp-sidebar-tabs .wp-tab.is-active::before,
-.wp-app .wp-sidebar-tabs .wp-tab.active::before {
-    opacity: 1;
-    transform: scaleY(1);
-}
-
-.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg,
-.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-fallback {
-    display: block;
-    flex: 0 0 42px;
-    width: 42px;
-    min-width: 42px;
-    height: 26px;
-    min-height: 26px;
-    margin: 0;
-    object-fit: contain;
-    object-position: center;
-}
-
-.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-fallback {
-    flex-basis: 20px;
-    width: 20px;
-    min-width: 20px;
-    height: 20px;
-    min-height: 20px;
-    color: currentColor;
-    font-size: 1rem;
-    line-height: 20px;
-}
-
-.wp-app .wp-header .wp-team-switcher .wp-team-btn-svg {
-    display: block;
-    flex: 0 0 21px;
-    width: 21px;
-    height: 21px;
-    object-fit: contain;
-    object-position: center;
-}
-
-.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-label {
-    display: block;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-align: right;
-}
-
-.wp-app .wp-sidebar-tabs .wp-tab > [hidden] {
-    display: none !important;
 }
 
 /* Match the actual site header's dark frosted-glass material, not an opaque bar. */
@@ -11135,3 +10904,263 @@ html.fc-no-animation .wp-app .wp-main .tab-content > .tab-pane {
     position: relative;
     z-index: 1;
 }
+
+
+/* =========================================================
+   Final integrated WeaponPaints toolbar
+========================================================= */
+
+.wp-app .wp-workspace-main > .wp-header {
+    width: 100%;
+    margin: 0 0 14px;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-toolbar-controls {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+    grid-template-areas: "categories team search" !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    direction: rtl !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified {
+    grid-area: categories !important;
+    display: flex !important;
+    flex: 1 1 auto !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 5px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 1px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    direction: rtl !important;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified::-webkit-scrollbar {
+    display: none;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified > .wp-tab {
+    position: relative;
+    isolation: isolate;
+    display: inline-flex !important;
+    flex: 0 0 42px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0 !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 !important;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .075) !important;
+    border-radius: 10px !important;
+    background: rgba(8, 8, 8, .42) !important;
+    color: #A1A1AA !important;
+    box-shadow: none !important;
+    transform: none !important;
+    transition:
+        color 180ms ease,
+        background-color 180ms ease,
+        border-color 180ms ease,
+        box-shadow 200ms ease,
+        transform 200ms ease !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified > .wp-tab:hover,
+.wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified > .wp-tab:focus-visible {
+    border-color: rgba(249, 115, 22, .32) !important;
+    background: rgba(249, 115, 22, .08) !important;
+    color: #F5F5F5 !important;
+    outline: none;
+    transform: translateY(-1px) !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified > .wp-tab.is-active,
+.wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified > .wp-tab.active {
+    border-color: rgba(249, 115, 22, .52) !important;
+    background: linear-gradient(145deg, rgba(249, 115, 22, .21), rgba(249, 115, 22, .09)) !important;
+    color: #FDBA74 !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .055),
+        0 5px 16px rgba(0, 0, 0, .16),
+        0 0 0 1px rgba(249, 115, 22, .06) !important;
+    transform: translateY(-1px) !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified > .wp-tab::before {
+    content: none !important;
+    display: none !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified > .wp-tab > .wp-tab-label {
+    display: none !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified > .wp-tab > .wp-tab-svg {
+    display: block !important;
+    flex: 0 0 28px !important;
+    width: 28px !important;
+    min-width: 0 !important;
+    height: 24px !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    object-fit: contain !important;
+    object-position: center !important;
+}
+
+/* Landscape weapon silhouettes need a wider box; the compact official-style SVGs stay square. */
+.wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/ak47.svg"],
+.wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/p90.svg"],
+.wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/m249.svg"],
+.wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/usp_silencer.svg"],
+.wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/awp.svg"],
+.wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/knife_m9_bayonet.svg"] {
+    flex-basis: 31px !important;
+    width: 31px !important;
+    height: 21px !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/gloves.svg"] {
+    flex-basis: 30px !important;
+    width: 30px !important;
+    height: 22px !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/agent.svg"] {
+    flex-basis: 28px !important;
+    width: 28px !important;
+    height: 22px !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/music_kit.svg"] {
+    flex-basis: 22px !important;
+    width: 22px !important;
+    height: 22px !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/pin.svg"] {
+    flex-basis: 21px !important;
+    width: 21px !important;
+    height: 23px !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-tab-fallback {
+    display: block !important;
+    flex: 0 0 20px !important;
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    font-size: .95rem !important;
+    line-height: 20px !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-tab-fallback[hidden] {
+    display: none !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-team-switcher {
+    grid-area: team !important;
+    justify-self: center !important;
+    min-width: max-content !important;
+    margin: 0 !important;
+}
+
+.wp-app .wp-workspace-main > .wp-header .wp-search-wrap {
+    grid-area: search !important;
+    justify-self: end !important;
+    width: min(100%, 360px) !important;
+    min-width: 0 !important;
+    max-width: 360px !important;
+    margin: 0 !important;
+}
+
+/* At tablet widths, keep all categories together on row one and the
+   centered team control + left search on row two. */
+@media (max-width: 1000px) {
+    .wp-app .wp-workspace-main > .wp-header .wp-toolbar-controls {
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+        grid-template-areas:
+            "categories categories categories"
+            ". team search" !important;
+        row-gap: 9px !important;
+    }
+
+    .wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified {
+        padding-bottom: 2px !important;
+    }
+
+    .wp-app .wp-workspace-main > .wp-header .wp-team-switcher {
+        justify-self: center !important;
+    }
+
+    .wp-app .wp-workspace-main > .wp-header .wp-search-wrap {
+        width: min(100%, 360px) !important;
+        max-width: 360px !important;
+        justify-self: end !important;
+    }
+}
+
+/* Compact touch targets without changing the right / center / left order. */
+@media (max-width: 760px) {
+    .wp-app .wp-workspace-layout {
+        width: min(1550px, calc(100% - 20px));
+        padding-top: 9px;
+    }
+
+    .wp-app .wp-workspace-main > .wp-header {
+        position: relative !important;
+        top: auto !important;
+        margin-bottom: 10px;
+        padding: 8px !important;
+    }
+
+    .wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified > .wp-tab {
+        flex-basis: 39px !important;
+        width: 39px !important;
+        min-width: 39px !important;
+        height: 39px !important;
+        min-height: 39px !important;
+        border-radius: 9px !important;
+    }
+
+    .wp-app .wp-workspace-main > .wp-header .wp-search-wrap {
+        width: min(100%, 260px) !important;
+        max-width: 260px !important;
+        min-height: 40px !important;
+    }
+
+    .wp-app .wp-workspace-main > .wp-header .wp-search {
+        min-height: 38px !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .wp-app .wp-workspace-main > .wp-header .wp-toolbar-controls {
+        gap: 7px !important;
+    }
+
+    .wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified {
+        gap: 4px !important;
+    }
+
+    .wp-app .wp-workspace-main > .wp-header .wp-category-switcher--unified > .wp-tab {
+        flex-basis: 36px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+    }
+}
+
