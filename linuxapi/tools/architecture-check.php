@@ -148,8 +148,8 @@ $check(
         && str_contains($weaponPaintsJavascript, "setupMobileModalTabs(")
         && str_contains($weaponPaintsStylesheet, '.wp-mobile-modal-tabs')
         && str_contains($weaponPaintsStylesheet, '.wp-skin-list-pane.is-mobile-active')
-        && str_contains($weaponPaintsStylesheet, '.wp-addon-list-pane.is-mobile-active')
-        && str_contains($weaponPaintsStylesheet, '.wp-addon-properties.is-mobile-active')
+        && str_contains($weaponPaintsStylesheet, '.wp-addon-workspace > .wp-addon-list-pane.is-mobile-active')
+        && str_contains($weaponPaintsStylesheet, '.wp-addon-workspace > .wp-addon-properties.is-mobile-active')
 );
 
 $check(
