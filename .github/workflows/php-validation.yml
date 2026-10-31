@@ -23,12 +23,18 @@ jobs:
       - name: Validate Server Browser JavaScript syntax
         run: node --check js/serverlist.js
 
-      - name: Validate FACEIT SVG XML and internal references
+      - name: Validate FACEIT source SVGs and public icon path
         run: |
           python3 - <<'PY'
           from pathlib import Path
           import re
           import xml.etree.ElementTree as ET
+
+          server_page = Path("pages/serverlist.php").read_text(encoding="utf-8")
+          if 'data-faceit-icon-base="/img/faceit/"' not in server_page:
+              raise SystemExit("Server Browser must use the verified /img/faceit/ public directory")
+          if "'/img/faceit/6.svg'" not in server_page:
+              raise SystemExit("FACEIT cache version must be based on the verified /img/faceit/6.svg asset")
 
           svg_namespace = "{http://www.w3.org/2000/svg}"
           for level in range(12):
