@@ -3097,6 +3097,13 @@
         ));
         const direction = previousIndex < 0 || targetIndex >= previousIndex ? 1 : -1;
         const transitionToken = ++state.tabTransitionToken;
+        const motionIsDisabled =
+            document.documentElement.classList.contains('fc-no-animation') ||
+            Boolean(
+                window.matchMedia &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            );
+        const tabExitDuration = motionIsDisabled ? 0 : 230;
 
         tabButtons.forEach(button => {
             const targetSelector =
@@ -3139,7 +3146,7 @@
                     pane.classList.remove('show', 'active', 'wp-tab-exiting', 'wp-tab-entering');
                     pane.style.display = 'none';
                     pane.style.removeProperty('--wp-tab-direction');
-                }, 230);
+                }, tabExitDuration);
 
                 return;
             }
