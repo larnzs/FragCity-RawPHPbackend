@@ -59,9 +59,10 @@
         let modalCloseTimer = 0;
         let modalIsClosing = false;
         let activePlayerButton = null;
-        let playerRequestController = null;
         let playerRequestSequence = 0;
+        const PLAYER_CACHE_TTL_MS = 30000;
         const playerCache = new Map();
+        const playerRequests = new Map();
 
         function setView(view) {
             const nextView = view === 'grid' ? 'grid' : 'list';
@@ -228,11 +229,9 @@
         function closePlayerModal() {
             if (!playerModal || playerModal.hidden || modalIsClosing) return;
 
+            // Keep an in-flight request alive after closing the modal.
+            // Its response can warm the cache for the next open.
             ++playerRequestSequence;
-            if (playerRequestController) {
-                playerRequestController.abort();
-                playerRequestController = null;
-            }
 
             playerModal.setAttribute('aria-hidden', 'true');
             if (document.documentElement.classList.contains('fc-no-animation')) {
@@ -244,27 +243,22 @@
             playerModal.classList.remove('is-open');
             playerModal.classList.add('is-closing');
             window.clearTimeout(modalCloseTimer);
-            modalCloseTimer = window.setTimeout(finishPlayerModalClose, 270);
-        }
-
-        async function loadPlayers(serverId, forceRefresh) {
-            if (!playerModal || !/^[a-f0-9]{16}$/i.test(serverId)) return;
-
+            modalCloseTimer = window.setTimeout(finishPlayerModa        async function fetchPlayersData(serverId, forceRefresh) {
             const cacheEntry = playerCache.get(serverId);
-            if (!forceRefresh && cacheEntry && Date.now() - cacheEntry.savedAt < 5000) {
-                renderPlayers(cacheEntry.data);
-                return;
+            if (!forceRefresh && cacheEntry && Date.now() - cacheEntry.savedAt < PLAYER_CACHE_TTL_MS) {
+                return cacheEntry.data;
             }
 
-            if (playerRequestController) playerRequestController.abort();
+            const pendingRequest = playerRequests.get(serverId);
+            if (pendingRequest && !forceRefresh) {
+                return pendingRequest.promise;
+            }
+            if (pendingRequest && forceRefresh) {
+                pendingRequest.controller.abort();
+            }
+
             const controller = new AbortController();
-            playerRequestController = controller;
-            const requestSequence = ++playerRequestSequence;
-
-            setPlayerModalSection('loading');
-            if (playerModalCount) playerModalCount.textContent = '...';
-
-            try {
+            const promise = (async function () {
                 const response = await fetch(
                     '/api/public-server-players.php?server_id=' + encodeURIComponent(serverId),
                     {
@@ -290,10 +284,40 @@
                     throw new Error('سرور در حال حاضر اطلاعات بازیکنان را ارائه نمی‌کند.');
                 }
 
-                if (requestSequence !== playerRequestSequence || playerModal.hidden) return;
-
+                // Cache even when the modal has been closed while the request ran.
                 playerCache.set(serverId, { data: result.data, savedAt: Date.now() });
-                renderPlayers(result.data);
+                return result.data;
+            })();
+
+            const requestEntry = { promise: promise, controller: controller };
+            playerRequests.set(serverId, requestEntry);
+
+            try {
+                return await promise;
+            } finally {
+                if (playerRequests.get(serverId) === requestEntry) {
+                    playerRequests.delete(serverId);
+                }
+            }
+        }
+
+        async function loadPlayers(serverId, forceRefresh) {
+            if (!playerModal || !/^[a-f0-9]{16}$/i.test(serverId)) return;
+
+            const requestSequence = ++playerRequestSequence;
+            const cacheEntry = playerCache.get(serverId);
+            if (!forceRefresh && cacheEntry && Date.now() - cacheEntry.savedAt < PLAYER_CACHE_TTL_MS) {
+                renderPlayers(cacheEntry.data);
+                return;
+            }
+
+            setPlayerModalSection('loading');
+            if (playerModalCount) playerModalCount.textContent = '...';
+
+            try {
+                const data = await fetchPlayersData(serverId, forceRefresh);
+                if (requestSequence !== playerRequestSequence || playerModal.hidden) return;
+                renderPlayers(data);
             } catch (error) {
                 if (error && error.name === 'AbortError') return;
                 if (requestSequence !== playerRequestSequence || playerModal.hidden) return;
@@ -304,10 +328,25 @@
                         : 'ارتباط با سرویس بازیکنان برقرار نشد.';
                 }
                 setPlayerModalSection('error');
-            } finally {
-                if (requestSequence === playerRequestSequence) {
-                    playerRequestController = null;
-                }
+            }
+        }
+
+        function prefetchPlayers(button) {
+            if (!button || button.disabled) return;
+
+            const serverId = String(button.dataset.serverId || '').toLowerCase();
+            if (!/^[a-f0-9]{16}$/.test(serverId)) return;
+
+            const cacheEntry = playerCache.get(serverId);
+            if (cacheEntry && Date.now() - cacheEntry.savedAt < PLAYER_CACHE_TTL_MS) return;
+            if (playerRequests.has(serverId)) return;
+
+            // The request starts on hover/focus, before the player modal is opened.
+            void fetchPlayersData(serverId, false).catch(function () {
+                // Prefetch is intentionally silent; opening the modal shows any error.
+            });
+        }
+
             }
         }
 
@@ -478,6 +517,17 @@
             });
         }
 
+        list.addEventListener('pointerover', function (event) {
+            const playersButton = event.target.closest('[data-sl-players]');
+            if (!playersButton || (event.relatedTarget && playersButton.contains(event.relatedTarget))) return;
+            prefetchPlayers(playersButton);
+        });
+
+        list.addEventListener('focusin', function (event) {
+            const playersButton = event.target.closest('[data-sl-players]');
+            if (playersButton) prefetchPlayers(playersButton);
+        });
+
         list.addEventListener('click', function (event) {
             const playersButton = event.target.closest('[data-sl-players]');
             if (playersButton && !playersButton.disabled) {
@@ -545,10 +595,7 @@
         function cleanupPlayerModalPortal() {
             if (root.isConnected) return;
             ++playerRequestSequence;
-            if (playerRequestController) {
-                playerRequestController.abort();
-                playerRequestController = null;
-            }
+            // Pending prefetches are allowed to finish and populate their short-lived cache.
             window.clearTimeout(modalCloseTimer);
             if (playerModal) playerModal.remove();
             document.body.classList.remove('sl-player-modal-open');
