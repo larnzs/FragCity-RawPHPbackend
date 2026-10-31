@@ -10,8 +10,8 @@ body {
     width: 100%;
     min-height: 100%;
     background:
-        radial-gradient(circle at top, rgba(59, 130, 246, 0.10), transparent 34%),
-        radial-gradient(circle at bottom, rgba(14, 165, 233, 0.06), transparent 26%),
+        radial-gradient(circle at top, rgba(249, 115, 22, 0.10), transparent 34%),
+        radial-gradient(circle at bottom, rgba(255, 179, 71, 0.06), transparent 26%),
         linear-gradient(180deg, rgba(2, 6, 23, 0.98), rgba(8, 15, 28, 0.99));
     overflow-x: hidden;
 }
@@ -29,7 +29,7 @@ body {
 }
 
 .banlist-page a {
-    color: #60A5FA;
+    color: #FB923C;
     text-decoration: none;
 }
 
@@ -70,11 +70,11 @@ body {
     justify-content: center;
     flex-shrink: 0;
     border-radius: 15px;
-    background: rgba(59, 130, 246, 0.12);
-    border: 1px solid rgba(59, 130, 246, 0.28);
-    color: #60A5FA;
+    background: rgba(249, 115, 22, 0.12);
+    border: 1px solid rgba(249, 115, 22, 0.28);
+    color: #FB923C;
     font-size: 1.35rem;
-    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.08);
+    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.08);
 }
 
 .banlist-header h1 {
@@ -98,9 +98,9 @@ body {
     gap: 8px;
     padding: 9px 14px;
     border-radius: 999px;
-    background: rgba(59, 130, 246, 0.08);
-    border: 1px solid rgba(59, 130, 246, 0.18);
-    color: #93C5FD;
+    background: rgba(249, 115, 22, 0.08);
+    border: 1px solid rgba(249, 115, 22, 0.18);
+    color: #FDBA74;
     font-size: 0.8rem;
     white-space: nowrap;
 }
@@ -111,11 +111,11 @@ body {
 
 .banlist-container {
     background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(15, 23, 42, 0.94));
-    border: 1px solid #22304A;
+    border: 1px solid #292929;
     border-radius: 24px;
     overflow: hidden;
     padding: 22px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 40px rgba(59, 130, 246, 0.05);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 40px rgba(249, 115, 22, 0.05);
 }
 
 /* =========================================================
@@ -142,7 +142,7 @@ body {
     padding: 8px 16px;
     border-radius: 9px;
     background: transparent;
-    border: 1px solid #22304A;
+    border: 1px solid #292929;
     color: #94A3B8;
     text-decoration: none;
     font-size: 0.84rem;
@@ -153,30 +153,30 @@ body {
 }
 
 .ban-tab:hover {
-    background: rgba(59, 130, 246, 0.06);
-    border-color: rgba(59, 130, 246, 0.35);
+    background: rgba(249, 115, 22, 0.06);
+    border-color: rgba(249, 115, 22, 0.35);
     color: #CBD5E1;
     transform: translateY(-1px);
 }
 
 .ban-tab:focus-visible {
-    outline: 2px solid #60A5FA;
+    outline: 2px solid #FB923C;
     outline-offset: 2px;
 }
 
 .ban-tab.active {
-    background: linear-gradient(135deg, #3B82F6, #2563EB);
-    border-color: #3B82F6;
+    background: linear-gradient(135deg, #F97316, #C2410C);
+    border-color: #F97316;
     color: #FFFFFF;
-    box-shadow: 0 8px 22px rgba(59, 130, 246, 0.24);
+    box-shadow: 0 8px 22px rgba(249, 115, 22, 0.24);
 }
 
 .ban-tab.active:hover {
-    background: linear-gradient(135deg, #3B82F6, #2563EB);
-    border-color: #3B82F6;
+    background: linear-gradient(135deg, #F97316, #C2410C);
+    border-color: #F97316;
     color: #FFFFFF;
     transform: translateY(-1px);
-    box-shadow: 0 10px 26px rgba(59, 130, 246, 0.28);
+    box-shadow: 0 10px 26px rgba(249, 115, 22, 0.28);
 }
 
 .ban-tab i { font-size: 0.85rem; }
@@ -223,16 +223,16 @@ body {
     border-radius: 17px;
     border: 1px solid rgba(148, 163, 184, 0.08);
     scrollbar-width: thin;
-    scrollbar-color: #334155 #0B1220;
+    scrollbar-color: #454545 #111111;
 }
 
 .ban-table-scroll::-webkit-scrollbar { height: 9px; }
-.ban-table-scroll::-webkit-scrollbar-track { background: #0B1220; }
+.ban-table-scroll::-webkit-scrollbar-track { background: #111111; }
 .ban-table-scroll::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #454545;
     border-radius: 999px;
 }
-.ban-table-scroll::-webkit-scrollbar-thumb:hover { background: #3B82F6; }
+.ban-table-scroll::-webkit-scrollbar-thumb:hover { background: #F97316; }
 
 /* =========================================================
    Table
@@ -248,9 +248,9 @@ body {
 
 .ban-table th {
     padding: 14px 13px;
-    background: #0B1220;
-    color: #93C5FD;
-    border-bottom: 1px solid rgba(59, 130, 246, 0.22);
+    background: #111111;
+    color: #FDBA74;
+    border-bottom: 1px solid rgba(249, 115, 22, 0.22);
     font-size: 0.78rem;
     font-weight: 700;
     text-align: left;
@@ -259,7 +259,7 @@ body {
 
 .ban-table th i {
     margin-right: 6px;
-    color: #60A5FA;
+    color: #FB923C;
 }
 
 .ban-table th.col-rank {
@@ -282,7 +282,7 @@ body {
 }
 
 .ban-table tbody tr:hover {
-    background: rgba(59, 130, 246, 0.045);
+    background: rgba(249, 115, 22, 0.045);
 }
 
 .ban-table tbody tr:last-child td { border-bottom: none; }
@@ -290,7 +290,7 @@ body {
 .rank-cell {
     width: 50px;
     text-align: center !important;
-    color: #60A5FA !important;
+    color: #FB923C !important;
     font-size: 0.95rem !important;
     font-weight: 800;
 }
@@ -318,8 +318,8 @@ body {
     flex-shrink: 0;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid rgba(59, 130, 246, 0.6);
-    box-shadow: 0 0 12px rgba(59, 130, 246, 0.16);
+    border: 2px solid rgba(249, 115, 22, 0.6);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.16);
 }
 
 .ban-player-info {
@@ -342,7 +342,7 @@ body {
 .ban-steam-id {
     display: inline-block;
     padding: 2px 7px;
-    background: #0B1220;
+    background: #111111;
     border: 1px solid rgba(148, 163, 184, 0.10);
     border-radius: 999px;
     color: #64748B;
@@ -391,9 +391,9 @@ body {
 }
 
 .banlist-state.empty .banlist-state-icon {
-    background: rgba(59, 130, 246, 0.09);
-    border: 1px solid rgba(59, 130, 246, 0.20);
-    color: #60A5FA;
+    background: rgba(249, 115, 22, 0.09);
+    border: 1px solid rgba(249, 115, 22, 0.20);
+    color: #FB923C;
 }
 
 .banlist-state.error .banlist-state-icon {
@@ -441,12 +441,12 @@ body {
         flex-wrap: nowrap;
         padding-bottom: 15px;
         scrollbar-width: thin;
-        scrollbar-color: #334155 transparent;
+        scrollbar-color: #454545 transparent;
     }
 
     .banlist-tabs::-webkit-scrollbar { height: 5px; }
     .banlist-tabs::-webkit-scrollbar-thumb {
-        background: #334155;
+        background: #454545;
         border-radius: 999px;
     }
 
