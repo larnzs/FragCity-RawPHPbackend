@@ -10885,6 +10885,10 @@ body > .wp-modal.wp-is-open {
     pointer-events: auto;
 }
 
+body > .wp-modal.wp-is-open:not(.wp-modal-visible):not(.show) {
+    opacity: 0 !important;
+}
+
 body > .wp-modal.wp-modal-visible,
 body > .wp-modal.show {
     opacity: 1 !important;
