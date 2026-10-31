@@ -149,7 +149,13 @@ $mobileNavItems = [
     <div class="shock-container">
         <div class="shock-brand">
             <a href="index.php" class="shock-logo-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
-                <img src="assets/images/logo/main.png" alt="FragCity" class="shock-logo-img">
+                <picture class="shock-logo-picture">
+                    <source
+                        media="(max-width: 1100px)"
+                        srcset="/img/logoresponsive.png"
+                    >
+                    <img src="/assets/images/logo/main.png" alt="FragCity" class="shock-logo-img">
+                </picture>
             </a>
         </div>
 
