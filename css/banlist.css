@@ -977,3 +977,11 @@ body.site-body:has(.banlist-page) .main-content {
         flex: 1 1 auto;
     }
 }
+
+
+.banlist-page .banlist-search-btn:hover,
+.banlist-page .banlist-search-btn:focus-visible {
+    border-color: #EA580C;
+    background: #EA580C;
+    color: #FFFFFF;
+}
