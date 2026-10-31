@@ -32,11 +32,6 @@
       "_comment": "Optional Ranks plugin database. Leave name empty to avoid accidentally pointing the plugin at the website DB.",
       "extends": "main",
       "name": ""
-    },
-    "simpleadmin_plugin": {
-      "_comment": "Optional SimpleAdmin plugin database. Leave name empty until its schema and restricted credentials are configured.",
-      "extends": "main",
-      "name": ""
     }
   },
   "integrations": {
@@ -179,10 +174,6 @@
     "database.ranks_plugin": {
       "_comment": "Database profile for the Ranks plugin adapter.",
       "database_profile": "ranks_plugin"
-    },
-    "database.simpleadmin_plugin": {
-      "_comment": "Database profile for the SimpleAdmin plugin adapter.",
-      "database_profile": "simpleadmin_plugin"
     },
     "database.weaponpaints_plugin": {
       "_comment": "WeaponPaints is API-only. Keep transport set to api; do not add a direct DB profile for GLOBAL_weaponpaints.",

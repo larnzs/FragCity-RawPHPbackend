@@ -81,6 +81,8 @@ try {
     $standbySitePlayersEndpoint = $read('api/public-server-players.php');
     $simpleAdminSiteRepository = $read('class/SimpleAdminRepository.php');
     $simpleAdminLookup = $read('linuxapi/src/SimpleAdmin/SimpleAdminPlayerLookup.php');
+    $simpleAdminBanlist = $read('linuxapi/src/SimpleAdmin/SimpleAdminBanlist.php');
+    $banlistPage = $read('pages/banlist.php');
     $simpleAdminDocs = $read('docs/CONFIGURATION.md');
     $simpleAdminMigration = $read('linuxapi/migrations/20261031_simpleadmin_player_lookup.sql');
     $faceitApiClient = $read('class/FaceitApiClient.php');
@@ -192,6 +194,8 @@ $check(
     is_array($websiteSettings['app'] ?? null)
         && is_array($websiteSettings['databases']['main'] ?? null)
         && (($websiteSettings['files']['database.weaponpaints_plugin']['transport'] ?? null) === 'api')
+        && !isset($websiteSettings['databases']['simpleadmin_plugin'])
+        && !isset($websiteSettings['files']['database.simpleadmin_plugin'])
         && (($websiteSettings['integrations']['weaponpaints_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
         && (($websiteSettings['integrations']['pterodactyl_standby_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
         && (($websiteSettings['integrations']['pterodactyl_monitoring_api']['base_url'] ?? null) === 'https://api.fragcity.ir')
@@ -226,15 +230,32 @@ $check(
 );
 
 $check(
-    'SimpleAdmin reuses the existing Plugin DB account with schema-wide read-only access while the identity resolver never reads IPs',
+    'SimpleAdmin Ban List is fully API-backed with server pagination and admin-only IP fields',
     str_contains($simpleAdminSiteRepository, "'/v1/simpleadmin'")
         && str_contains($simpleAdminSiteRepository, 'resolve_player_names')
+        && str_contains($simpleAdminSiteRepository, 'getBanlistRecords')
         && str_contains($linuxApiClient, 'Unsupported Linux API path.')
+        && str_contains($index, 'get_records')
+        && str_contains($index, 'new SimpleAdminBanlist($simplePdo)')
         && str_contains($simpleAdminLookup, 'FROM sa_players_ips')
         && str_contains($simpleAdminLookup, 'BINARY name')
         && str_contains($simpleAdminLookup, 'CAST(steamid AS CHAR)')
         && str_contains($simpleAdminLookup, 'ambiguous')
         && !str_contains($simpleAdminLookup, 'address')
+        && str_contains($simpleAdminBanlist, 'FROM sa_bans')
+        && str_contains($simpleAdminBanlist, 'FROM sa_unbans')
+        && str_contains($simpleAdminBanlist, 'FROM sa_mutes')
+        && str_contains($simpleAdminBanlist, 'FROM sa_unmutes')
+        && str_contains($simpleAdminBanlist, 'FROM sa_warns')
+        && str_contains($simpleAdminBanlist, 'FROM sa_players_ips')
+        && str_contains($simpleAdminBanlist, 'INET_NTOA(address)')
+        && str_contains($simpleAdminBanlist, 'LIMIT :page_limit OFFSET :page_offset')
+        && str_contains($simpleAdminBanlist, 'includeSensitive')
+        && str_contains($banlistPage, 'getBanlistRecords')
+        && str_contains($banlistPage, "\\$_SESSION['role']")
+        && str_contains($banlistPage, '$showSensitiveData')
+        && !str_contains($banlistPage, 'RemoteBanlistDatabase')
+        && !is_file($root . '/database/kyonxcbt_simpleadmin_plugin.php')
         && str_contains($linuxConfig, "'GLOBAL_simpleadmin'")
         && str_contains($linuxConfig, "Reuses the root Plugin DB account")
         && str_contains($linuxConfig, "schema-wide SELECT on")
@@ -243,8 +264,10 @@ $check(
         && !str_contains($linuxConfig, "'REPLACE_WITH_A_UNIQUE_READ_ONLY_DATABASE_PASSWORD'")
         && str_contains($simpleAdminDocs, 'GRANT SELECT ON GLOBAL_simpleadmin.*')
         && str_contains($simpleAdminDocs, 'EXACT_DB_HOST')
-        && str_contains($simpleAdminDocs, 'Ban List page')
+        && str_contains($simpleAdminDocs, 'get_records')
         && str_contains($simpleAdminMigration, 'idx_sa_players_ips_name_steamid_used_at')
+        && str_contains($nginxApiBootstrap, 'location = /v1/simpleadmin')
+        && str_contains($nginxApi, 'location = /v1/simpleadmin')
         && str_contains($standbySitePlayersEndpoint, 'new SimpleAdminRepository()')
         && str_contains($standbySitePlayersEndpoint, 'new FaceitApiClient()')
 );

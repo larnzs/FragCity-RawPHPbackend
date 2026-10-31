@@ -30,7 +30,6 @@ The complete template documents these sections:
 | `databases.plugin_sync` | Optional isolated plugin-sync schema |
 | `databases.legacy_services` | Compatibility profile for older site pages |
 | `databases.ranks_plugin` | Optional Ranks plugin schema |
-| `databases.simpleadmin_plugin` | Optional SimpleAdmin plugin schema |
 | `integrations.steam` | Steam Web API and OpenID-related site settings |
 | `integrations.zarinpal` | Payment gateway URLs and merchant identity |
 | `integrations.weaponpaints_api` | Signed Linux WeaponPaints API client |
@@ -38,7 +37,7 @@ The complete template documents these sections:
 | `integrations.pterodactyl_monitoring_api` | Signed admin Monitoring API client |
 | `files` | Per-page, class and plugin behavior/settings |
 
-Every database profile referenced by `files.*.database_profile` must exist under `databases`. A profile with an empty schema name is intentionally unconfigured. Do not configure a website-side `databases.weaponpaints` connection: the site must never connect directly to the Linux WeaponPaints database.
+Every database profile referenced by `files.*.database_profile` must exist under `databases`. A profile with an empty schema name is intentionally unconfigured. SimpleAdmin and WeaponPaints are accessed through the signed Linux API; do not configure website-side `databases.simpleadmin_plugin` or `databases.weaponpaints` connections.
 
 ## Website-to-Linux API credentials
 
@@ -60,9 +59,9 @@ openssl rand -hex 32
 
 Do not paste secrets into chat, Git, issue trackers or browser JavaScript. The website stores only the matching HMAC secret for each integration. It must never store the Pterodactyl Application API token or a Wings token.
 
-### WeaponPaints
+### WeaponPaints and SimpleAdmin
 
-Use `settings/weaponpaints-api.integration.example.json` as a small reference fragment, or use the complete template. The website's `files.database.weaponpaints_plugin.transport` must remain `api`. Its secret matches the root `shared_secret` in `/etc/fragcity-api/config.php`. The Linux API's database connection remains on `GLOBAL_weaponpaints`; this is separate from `databases.main`.
+Use `settings/weaponpaints-api.integration.example.json` as a small reference fragment, or use the complete template. The website's `files.database.weaponpaints_plugin.transport` must remain `api`. Its secret matches the root `shared_secret` in `/etc/fragcity-api/config.php`; the same signed client is used for `/v1/simpleadmin`. SimpleAdmin's `GLOBAL_simpleadmin` schema is accessed only by the Linux API, reusing the existing Plugin DB account with schema-wide read-only SELECT. The website must not connect directly to it.
 
 ### Public Server Browser / Standby
 

@@ -495,7 +495,7 @@ try {
     }
 
     if ($isSimpleAdminRequest) {
-        if ($action !== 'resolve_player_names') {
+        if (!in_array($action, ['resolve_player_names', 'get_records'], true)) {
             apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
         }
 
@@ -510,8 +510,8 @@ try {
             ? $simpleAdminConfig['database']
             : [];
 
-        // Reuse the same existing Plugin DB account already used for the
-        // WeaponPaints connection. Only the target schema changes.
+        // Reuse the same existing Plugin DB account already used for WeaponPaints.
+        // Only the target schema changes; grants remain read-only on SimpleAdmin.
         $simpleHost = trim((string)($dbConfig['host'] ?? '127.0.0.1'));
         $simplePort = (int)($dbConfig['port'] ?? 3306);
         $simpleName = trim((string)($simpleDatabase['name'] ?? 'GLOBAL_simpleadmin'));
@@ -539,22 +539,39 @@ try {
                 ]
             );
 
-            require_once __DIR__ . '/../src/SimpleAdmin/SimpleAdminPlayerLookup.php';
-            $lookup = new SimpleAdminPlayerLookup($simplePdo);
-            apiRespond(200, [
-                'success' => true,
-                'data' => [
-                    'matches' => $lookup->resolveNames($body['names'] ?? null),
-                ],
-            ]);
+            if ($action === 'resolve_player_names') {
+                require_once __DIR__ . '/../src/SimpleAdmin/SimpleAdminPlayerLookup.php';
+                $lookup = new SimpleAdminPlayerLookup($simplePdo);
+                apiRespond(200, [
+                    'success' => true,
+                    'data' => [
+                        'matches' => $lookup->resolveNames($body['names'] ?? null),
+                    ],
+                ]);
+            }
+
+            require_once __DIR__ . '/../src/SimpleAdmin/SimpleAdminBanlist.php';
+            $banlist = new SimpleAdminBanlist($simplePdo);
+            $records = $banlist->getRecords(
+                $body['type'] ?? null,
+                $body['search'] ?? '',
+                $body['page'] ?? null,
+                $body['per_page'] ?? null,
+                $body['include_sensitive'] ?? false
+            );
+
+            apiRespond(200, ['success' => true, 'data' => $records]);
         } catch (InvalidArgumentException $e) {
-            apiRespond(400, ['success' => false, 'error' => 'invalid_player_names']);
+            $errorCode = $action === 'resolve_player_names'
+                ? 'invalid_player_names'
+                : 'invalid_banlist_request';
+            apiRespond(400, ['success' => false, 'error' => $errorCode]);
         } catch (Throwable $e) {
-            error_log('[FragCity API] SimpleAdmin player lookup failed; type=' . get_class($e));
+            error_log('[FragCity API] SimpleAdmin request failed; action=' . $action
+                . '; type=' . get_class($e));
             apiRespond(503, ['success' => false, 'error' => 'simpleadmin_unavailable']);
         }
     }
-
     if ($isPterodactylMonitoringRequest) {
         if ($action !== 'get_snapshot') {
             apiRespond(400, ['success' => false, 'error' => 'invalid_action']);

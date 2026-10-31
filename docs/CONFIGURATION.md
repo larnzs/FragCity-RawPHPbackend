@@ -50,7 +50,7 @@ Exampleهای جزئی:
 
 ### پروفایل‌های Plugin
 
-`plugin_sync`, `ranks_plugin` و `simpleadmin_plugin` فقط زمانی باید به دیتابیس مستقل اشاره کنند که schema و user محدود آن‌ها واقعاً ایجاد شده باشند. مقدار `name` خالی در Example عمداً آن‌ها را غیرفعال/نامشخص نگه می‌دارد.
+`plugin_sync` و `ranks_plugin` فقط زمانی باید به دیتابیس مستقل اشاره کنند که Schema و دسترسی‌های لازم آن‌ها واقعاً ایجاد شده باشند. SimpleAdmin از طریق Linux API و با همان حساب Plugin سمت لینوکس خوانده می‌شود؛ پروفایل مستقیم `simpleadmin_plugin` در تنظیمات وب‌سایت دیگر استفاده نمی‌شود.
 
 ## ۴. Pterodactyl Server Browser
 
@@ -68,7 +68,7 @@ Exampleهای جزئی:
 
 **دامنهٔ دسترسی دیتابیس، کل Schema است، نه فقط جدول IPها.** صفحه Ban List به جدول‌های `sa_bans`, `sa_unbans`, `sa_mutes`, `sa_unmutes` و `sa_warns` نیاز دارد و اطلاعات هویتی/تاریخچه بازیکن نیز از جدول‌هایی مثل `sa_players_ips` و `sa_renames` خوانده می‌شود. بنابراین کاربر Plugin به دسترسی خواندن روی تمام جدول‌های `GLOBAL_simpleadmin` نیاز دارد. این به معنی ارائهٔ دسترسی SQL خام به وب‌سایت نیست: Linux API باید فقط actionهای مشخص و allowlist‌شده را اجرا کند و فیلدهای لازم هر خروجی را برگرداند؛ هیچ عملیات نوشتن لازم نیست.
 
-در وضعیت فعلی، action پیاده‌سازی‌شده در مسیر SimpleAdmin فقط `resolve_player_names` است. این resolver برای تبدیل نام A2S به SteamID64 فقط ستون‌های `name`, `steamid` و `used_at` از `sa_players_ips` را می‌خواند و ستون `address` را Query یا به سایت ارسال نمی‌کند. صفحه فعلی Ban List هنوز از پروفایل قدیمی اتصال مستقیم سایت استفاده می‌کند؛ باید پیش از حذف آن پروفایل، action خواندنی Ban List به Linux API اضافه و صفحه به آن منتقل شود.
+مسیر SimpleAdmin دو action خواندنی دارد: `resolve_player_names` برای تبدیل نام A2S به SteamID64 و `get_records` برای دریافت صفحه‌بندی‌شدهٔ اطلاعات Ban List. action دوم بخش‌های `bans`, `unbans`, `mutes`, `unmutes`, `warns` و `playerips` را از جدول‌های اصلی SimpleAdmin می‌خواند؛ جست‌وجو، مرتب‌سازی ثابت و شمارش کل نتایج در Linux API اجرا می‌شود. صفحه `pages/banlist.php` از `class/SimpleAdminRepository.php` و همین API استفاده می‌کند و دیگر اتصال مستقیم دیتابیس ندارد. در resolver هویت، IPها خوانده نمی‌شوند؛ در Ban List نیز فیلد IP فقط برای درخواست امضاشدهٔ backend ادمین برگردانده می‌شود.
 
 پیش‌نیازهای resolver:
 - Migration شمارهٔ 013 باید اجرا شده باشد تا ستون `sa_players_ips.name` وجود داشته باشد.
@@ -92,7 +92,7 @@ FLUSH PRIVILEGES;
 
 در `/etc/fragcity-api/config.php` فقط بلوک `simpleadmin` را از `linuxapi/config.example.php` Merge کن؛ این بلوک فقط نام دیتابیس را تعیین می‌کند و credential را از تنظیمات دیتابیس موجود به ارث می‌برد. فایل Runtime را کامل overwrite نکن. پس از بررسی مجوز و ایندکس، `enabled` را روی `true` بگذار.
 
-**حفاظت از IP بازیکنان:** مسیر عمومی Ban List نباید ستون‌های `player_ip` یا `address` را به بازدیدکنندگان عادی نمایش دهد. اگر ابزار IP history لازم است، آن را فقط پشت دسترسی admin نگه دار و از پاسخ عمومی حذف کن.
+**حفاظت از IP بازیکنان:** تب `playerips` و ستون‌های IP مربوط به Ban/Unban فقط برای کاربر واردشده با نقش `admin` فعال‌اند. برای بازدیدکنندگان عادی، API نه ستون IP را Query می‌کند و نه آن را در پاسخ برمی‌گرداند. مقدار عددی `sa_players_ips.address` نیز در API با `INET_NTOA()` به IPv4 قابل‌خواندن تبدیل می‌شود.
 
 Resolver فقط وقتی نام دقیقاً به یک SteamID یکتا برسد آن را برمی‌گرداند. اگر نام به چند SteamID تعلق داشته باشد، وضعیت `ambiguous` می‌دهد تا رتبهٔ FACEIT به فرد اشتباه نسبت داده نشود. خود Level از دیتابیس SimpleAdmin نمی‌آید: بعد از resolve شدن SteamID، درخواست FACEIT از PHP روی هاست اشتراکی و با کلید `integrations.faceit_api.api_key` انجام می‌شود؛ Linux API هیچ درخواست FACEIT ارسال نمی‌کند.
 ## ۵. Pterodactyl Monitoring

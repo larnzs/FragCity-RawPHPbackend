@@ -1,299 +1,59 @@
 <?php
 // pages/banlist.php
 
-require_once __DIR__ . '/../database/kyonxcbt_simpleadmin_plugin.php';
+require_once __DIR__ . '/../class/SimpleAdminRepository.php';
 
 $pageTitle = "لیست محرومیت‌ها | FragCity";
 
-$type = $_GET['type'] ?? 'bans';
+$isAdmin = (($_SESSION['user_logged_in'] ?? false) === true)
+    && (string)($_SESSION['role'] ?? '') === 'admin';
+$showSensitiveData = $isAdmin;
 
-$allowedTypes = [
-    'bans',
-    'unbans',
-    'mutes',
-    'unmutes',
-    'warns',
-    'playerips'
-];
-
-if (!in_array($type, $allowedTypes, true)) {
+$type = is_string($_GET['type'] ?? null) ? $_GET['type'] : 'bans';
+$allowedTypes = ['bans', 'unbans', 'mutes', 'unmutes', 'warns', 'playerips'];
+if (!in_array($type, $allowedTypes, true) || ($type === 'playerips' && !$isAdmin)) {
     $type = 'bans';
 }
 
-switch ($type) {
+$search = trim(is_string($_GET['q'] ?? null) ? $_GET['q'] : '');
+$search = function_exists('mb_substr')
+    ? mb_substr($search, 0, 120, 'UTF-8')
+    : substr($search, 0, 120);
 
-    case 'bans':
-
-        $sql = "
-            SELECT
-                id,
-                player_name,
-                player_steamid,
-                player_ip,
-                admin_name,
-                admin_steamid,
-                reason,
-                duration,
-                ends,
-                created
-            FROM sa_bans
-            WHERE status = 'ACTIVE'
-            ORDER BY created DESC
-        ";
-
-        break;
-
-
-    case 'unbans':
-
-        $sql = "
-            SELECT
-                u.id AS unban_id,
-                u.ban_id,
-                u.reason AS unban_reason,
-                u.date AS unban_date,
-                b.player_name,
-                b.player_steamid,
-                b.player_ip,
-                b.admin_name,
-                b.admin_steamid,
-                b.reason AS ban_reason,
-                b.created AS ban_created
-            FROM sa_unbans u
-            JOIN sa_bans b
-                ON u.ban_id = b.id
-            ORDER BY u.date DESC
-        ";
-
-        break;
-
-
-    case 'mutes':
-
-        $sql = "
-            SELECT
-                id,
-                player_name,
-                player_steamid,
-                admin_name,
-                admin_steamid,
-                reason,
-                duration,
-                ends,
-                created,
-                type
-            FROM sa_mutes
-            WHERE status = 'ACTIVE'
-            ORDER BY created DESC
-        ";
-
-        break;
-
-
-    case 'unmutes':
-
-        $sql = "
-            SELECT
-                u.id AS unmute_id,
-                u.mute_id,
-                u.reason AS unmute_reason,
-                u.date AS unmute_date,
-                m.player_name,
-                m.player_steamid,
-                m.admin_name,
-                m.admin_steamid,
-                m.reason AS mute_reason,
-                m.type,
-                m.created AS mute_created
-            FROM sa_unmutes u
-            JOIN sa_mutes m
-                ON u.mute_id = m.id
-            ORDER BY u.date DESC
-        ";
-
-        break;
-
-
-    case 'warns':
-
-        $sql = "
-            SELECT
-                id,
-                player_name,
-                player_steamid,
-                admin_name,
-                admin_steamid,
-                reason,
-                duration,
-                ends,
-                created
-            FROM sa_warns
-            WHERE status = 'ACTIVE'
-            ORDER BY created DESC
-        ";
-
-        break;
-
-
-    case 'playerips':
-
-        $sql = "
-            SELECT
-                steamid,
-                name,
-                address,
-                used_at
-            FROM sa_players_ips
-            ORDER BY used_at DESC
-        ";
-
-        break;
-}
-
-
-$search = trim((string)($_GET['q'] ?? ''));
-$pageNum = max(1, (int)($_GET['page_num'] ?? 1));
+$pageNum = max(1, min(100000, (int)($_GET['page_num'] ?? 1)));
 $perPage = (int)($_GET['per_page'] ?? 15);
-
 $allowedPerPage = [10, 15, 25, 50, 100];
 if (!in_array($perPage, $allowedPerPage, true)) {
     $perPage = 15;
 }
 
-$orderMap = [
-    'bans'      => 'created',
-    'unbans'    => 'unban_date',
-    'mutes'     => 'created',
-    'unmutes'   => 'unmute_date',
-    'warns'     => 'created',
-    'playerips' => 'used_at',
-];
-
-$searchBindings = [];
-$searchSqlParts = [];
-
-if ($search !== '') {
-    $like = '%' . $search . '%';
-    $searchBindings[':search'] = $like;
-
-    switch ($type) {
-        case 'bans':
-            $searchSqlParts = [
-                "base.player_name LIKE :search",
-                "base.player_steamid LIKE :search",
-                "base.player_ip LIKE :search",
-                "base.admin_name LIKE :search",
-                "base.admin_steamid LIKE :search",
-                "base.reason LIKE :search",
-            ];
-            break;
-
-        case 'unbans':
-            $searchSqlParts = [
-                "base.player_name LIKE :search",
-                "base.player_steamid LIKE :search",
-                "base.player_ip LIKE :search",
-                "base.admin_name LIKE :search",
-                "base.admin_steamid LIKE :search",
-                "base.ban_reason LIKE :search",
-                "base.unban_reason LIKE :search",
-            ];
-            break;
-
-        case 'mutes':
-            $searchSqlParts = [
-                "base.player_name LIKE :search",
-                "base.player_steamid LIKE :search",
-                "base.admin_name LIKE :search",
-                "base.admin_steamid LIKE :search",
-                "base.reason LIKE :search",
-                "base.type LIKE :search",
-            ];
-            break;
-
-        case 'unmutes':
-            $searchSqlParts = [
-                "base.player_name LIKE :search",
-                "base.player_steamid LIKE :search",
-                "base.admin_name LIKE :search",
-                "base.admin_steamid LIKE :search",
-                "base.mute_reason LIKE :search",
-                "base.unmute_reason LIKE :search",
-                "base.type LIKE :search",
-            ];
-            break;
-
-        case 'warns':
-            $searchSqlParts = [
-                "base.player_name LIKE :search",
-                "base.player_steamid LIKE :search",
-                "base.admin_name LIKE :search",
-                "base.admin_steamid LIKE :search",
-                "base.reason LIKE :search",
-            ];
-            break;
-
-        case 'playerips':
-            $searchSqlParts = [
-                "base.name LIKE :search",
-                "base.steamid LIKE :search",
-                "CAST(base.address AS CHAR) LIKE :search",
-            ];
-            break;
-    }
-}
-
-$searchWhere = $searchSqlParts
-    ? ' WHERE (' . implode(' OR ', $searchSqlParts) . ')'
-    : '';
-
 $error = null;
-$allData = [];
 $data = [];
 $totalItems = 0;
 $totalPages = 1;
 $pageStartIndex = 0;
 $pageEndIndex = 0;
-$orderColumn = $orderMap[$type] ?? 'created';
 
 try {
-    $db = new RemoteBanlistDatabase();
-
-    $pagedSql = "
-        SELECT *
-        FROM (
-            $sql
-        ) AS base
-        $searchWhere
-        ORDER BY base.$orderColumn DESC
-    ";
-
-    $allData = $db->select(
-        $pagedSql,
-        $searchBindings
+    $result = (new SimpleAdminRepository())->getBanlistRecords(
+        $type,
+        $search,
+        $pageNum,
+        $perPage,
+        $showSensitiveData
     );
 
-    if (!is_array($allData)) {
-        $allData = [];
-    }
+    $data = is_array($result['items'] ?? null) ? $result['items'] : [];
+    $totalItems = max(0, (int)($result['total'] ?? 0));
+    $totalPages = max(1, (int)($result['total_pages'] ?? 1));
+    $pageNum = max(1, min($totalPages, (int)($result['page'] ?? 1)));
+    $perPage = (int)($result['per_page'] ?? $perPage);
 
-    $totalItems = count($allData);
-    $totalPages = max(1, (int)ceil($totalItems / $perPage));
-    $pageNum = min($pageNum, $totalPages);
-
-    $offset = ($pageNum - 1) * $perPage;
-
-    $data = array_slice(
-        $allData,
-        $offset,
-        $perPage
-    );
-
-    $pageStartIndex = $totalItems > 0 ? $offset + 1 : 0;
-    $pageEndIndex = min($offset + $perPage, $totalItems);
-} catch (Exception $e) {
-    $error = $e->getMessage();
-    $allData = [];
+    $pageStartIndex = $totalItems > 0 ? (($pageNum - 1) * $perPage) + 1 : 0;
+    $pageEndIndex = min(($pageNum - 1) * $perPage + count($data), $totalItems);
+} catch (Throwable $e) {
+    error_log('[FragCity] Ban List Linux API request failed: ' . get_class($e));
+    $error = 'دریافت اطلاعات SimpleAdmin از طریق API فعلاً ممکن نیست. لطفاً اتصال API را بررسی کنید.';
     $data = [];
     $totalItems = 0;
     $totalPages = 1;
@@ -307,276 +67,114 @@ try {
 
 function esc($value): string
 {
-    return htmlspecialchars(
-        (string)($value ?? ''),
-        ENT_QUOTES,
-        'UTF-8'
-    );
+    return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
 }
-
 
 function formatDuration($minutes): string
 {
     $minutes = (int)$minutes;
-
     if ($minutes <= 0) {
         return 'نامحدود';
     }
 
-    $days = floor($minutes / 1440);
-
-    $hours = floor(
-        ($minutes % 1440) / 60
-    );
-
+    $days = (int)floor($minutes / 1440);
+    $hours = (int)floor(($minutes % 1440) / 60);
     $mins = $minutes % 60;
-
     $result = '';
 
-    if ($days > 0) {
-        $result .= $days . ' روز ';
-    }
+    if ($days > 0) $result .= $days . ' روز ';
+    if ($hours > 0) $result .= $hours . ' ساعت ';
+    if ($mins > 0) $result .= $mins . ' دقیقه';
 
-    if ($hours > 0) {
-        $result .= $hours . ' ساعت ';
-    }
-
-    if ($mins > 0) {
-        $result .= $mins . ' دقیقه';
-    }
-
-    return trim(
-        $result ?: '0 دقیقه'
-    );
+    return trim($result ?: '0 دقیقه');
 }
-
-
-function int2ip($int): string
-{
-    return long2ip(
-        (int)$int
-    );
-}
-
 
 function getUserAvatar($steamid): string
 {
     $steamid = (string)$steamid;
-
-    if (
-        $steamid !== ''
-    ) {
-
-        $localAvatarPath =
-            __DIR__ .
-            '/../img/avatars/avatar_' .
-            $steamid .
-            '.jpg';
-
-        if (
-            file_exists(
-                $localAvatarPath
-            )
-        ) {
-
-            return
-                'img/avatars/avatar_' .
-                $steamid .
-                '.jpg?' .
-                filemtime(
-                    $localAvatarPath
-                );
-
+    if ($steamid !== '') {
+        $localAvatarPath = __DIR__ . '/../img/avatars/avatar_' . $steamid . '.jpg';
+        if (file_exists($localAvatarPath)) {
+            return 'img/avatars/avatar_' . $steamid . '.jpg?' . filemtime($localAvatarPath);
         }
 
-        return
-            'https://avatars.steamstatic.com/' .
-            rawurlencode($steamid) .
-            '?size=medium';
+        return 'https://avatars.steamstatic.com/' . rawurlencode($steamid) . '?size=medium';
     }
 
     return 'assets/images/default_avatar.png';
 }
 
-
-function renderPlayerCell(
-    string $name,
-    string $steamid
-): string {
-
-    $avatar =
-        getUserAvatar($steamid);
-
-    $steamShort =
-        $steamid !== ''
-            ? substr(
-                $steamid,
-                -8
-            )
-            : '';
+function renderPlayerCell(string $name, string $steamid): string
+{
+    $avatar = getUserAvatar($steamid);
+    $steamShort = $steamid !== '' ? substr($steamid, -8) : '';
 
     return '
         <div class="ban-player">
-
-            <img
-                src="' . esc($avatar) . '"
-                alt="' . esc($name) . '"
-                class="ban-avatar"
-                onerror="this.src=\'assets/images/default_avatar.png\'"
-            >
-
+            <img src="' . esc($avatar) . '" alt="' . esc($name) . '"
+                 class="ban-avatar"
+                 onerror="this.src=\'assets/images/default_avatar.png\'">
             <div class="ban-player-info">
-
-                <span class="ban-player-name">
-                    ' . esc($name) . '
-                </span>
-
-                ' . (
-                    $steamShort !== ''
-                        ? '
-                            <span class="ban-steam-id">
-                                ' . esc($steamShort) . '
-                            </span>
-                        '
-                        : ''
-                ) . '
-
+                <span class="ban-player-name">' . esc($name) . '</span>
+                ' . ($steamShort !== '' ? '
+                    <span class="ban-steam-id">' . esc($steamShort) . '</span>
+                ' : '') . '
             </div>
-
         </div>
     ';
 }
 
-
-function renderAdminCell(
-    string $name,
-    string $steamid
-): string {
-
-    $avatar =
-        getUserAvatar($steamid);
-
-    $steamShort =
-        $steamid !== ''
-            ? substr(
-                $steamid,
-                -8
-            )
-            : '';
+function renderAdminCell(string $name, string $steamid): string
+{
+    $avatar = getUserAvatar($steamid);
+    $steamShort = $steamid !== '' ? substr($steamid, -8) : '';
 
     return '
         <div class="ban-player ban-admin">
-
-            <img
-                src="' . esc($avatar) . '"
-                alt="' . esc($name) . '"
-                class="ban-avatar"
-                onerror="this.src=\'assets/images/default_avatar.png\'"
-            >
-
+            <img src="' . esc($avatar) . '" alt="' . esc($name) . '"
+                 class="ban-avatar"
+                 onerror="this.src=\'assets/images/default_avatar.png\'">
             <div class="ban-player-info">
-
-                <span class="ban-player-name">
-                    ' . esc($name) . '
-                </span>
-
-                ' . (
-                    $steamShort !== ''
-                        ? '
-                            <span class="ban-steam-id">
-                                ' . esc($steamShort) . '
-                            </span>
-                        '
-                        : ''
-                ) . '
-
+                <span class="ban-player-name">' . esc($name) . '</span>
+                ' . ($steamShort !== '' ? '
+                    <span class="ban-steam-id">' . esc($steamShort) . '</span>
+                ' : '') . '
             </div>
-
         </div>
     ';
 }
 
-
-function renderTableCell(
-    $content,
-    string $class = ''
-): string {
-
-    return '
-        <td class="ban-table-cell ' .
-        esc($class) .
-        '">
-            ' .
-            $content .
-            '
-        </td>
-    ';
+function renderTableCell($content, string $class = ''): string
+{
+    return '<td class="ban-table-cell ' . esc($class) . '">' . $content . '</td>';
 }
-
 
 /* =========================================================
    Tabs
 ========================================================= */
 
 $tabs = [
-
-    'bans' => [
-        'icon'  => 'fa-ban',
-        'label' => 'بن‌ها',
-        'tone'  => 'danger'
-    ],
-
-    'unbans' => [
-        'icon'  => 'fa-rotate-left',
-        'label' => 'رفع بن‌ها',
-        'tone'  => 'success'
-    ],
-
-    'mutes' => [
-        'icon'  => 'fa-volume-xmark',
-        'label' => 'میوت / گگ',
-        'tone'  => 'danger'
-    ],
-
-    'unmutes' => [
-        'icon'  => 'fa-volume-high',
-        'label' => 'رفع میوت',
-        'tone'  => 'success'
-    ],
-
-    'warns' => [
-        'icon'  => 'fa-triangle-exclamation',
-        'label' => 'اخطارها',
-        'tone'  => 'warning'
-    ],
-
-    'playerips' => [
-        'icon'  => 'fa-network-wired',
-        'label' => 'آی‌پی بازیکنان',
-        'tone'  => 'info'
-    ]
-
+    'bans' => ['icon' => 'fa-ban', 'label' => 'بن‌ها', 'tone' => 'danger'],
+    'unbans' => ['icon' => 'fa-rotate-left', 'label' => 'رفع بن‌ها', 'tone' => 'success'],
+    'mutes' => ['icon' => 'fa-volume-xmark', 'label' => 'میوت / گگ', 'tone' => 'danger'],
+    'unmutes' => ['icon' => 'fa-volume-high', 'label' => 'رفع میوت', 'tone' => 'success'],
+    'warns' => ['icon' => 'fa-triangle-exclamation', 'label' => 'اخطارها', 'tone' => 'warning'],
+    'playerips' => ['icon' => 'fa-network-wired', 'label' => 'آی‌پی بازیکنان', 'tone' => 'info'],
 ];
 
+if (!$isAdmin) {
+    unset($tabs['playerips']);
+}
 
 function banlistBuildUrl(array $params = []): string
 {
-    $query = array_merge(
-        [
-            'page' => 'banlist',
-            'type' => $GLOBALS['type'] ?? 'bans',
-            'q' => $GLOBALS['search'] ?? '',
-            'per_page' => $GLOBALS['perPage'] ?? 15,
-            'page_num' => $GLOBALS['pageNum'] ?? 1,
-        ],
-        $params
-    );
-
-    foreach (['page_num', 'per_page', 'q', 'type', 'page'] as $key) {
-        if (!array_key_exists($key, $query)) {
-            continue;
-        }
-    }
+    $query = array_merge([
+        'page' => 'banlist',
+        'type' => $GLOBALS['type'] ?? 'bans',
+        'q' => $GLOBALS['search'] ?? '',
+        'per_page' => $GLOBALS['perPage'] ?? 15,
+        'page_num' => $GLOBALS['pageNum'] ?? 1,
+    ], $params);
 
     return '?' . http_build_query($query);
 }
@@ -802,7 +400,7 @@ function banlistBuildUrl(array $params = []): string
                     name="q"
                     value="<?= esc($search) ?>"
                     class="banlist-search-input"
-                    placeholder="جستجو در نام، SteamID، IP، دلیل و ادمین..."
+                    placeholder="<?= $showSensitiveData ? 'جستجو در نام، SteamID، IP، دلیل و ادمین...' : 'جستجو در نام، SteamID، دلیل و ادمین...' ?>"
                     autocomplete="off"
                 >
                 <button type="submit" class="banlist-search-btn">
@@ -893,10 +491,12 @@ function banlistBuildUrl(array $params = []): string
                                         Player
                                     </th>
 
+                                    <?php if ($showSensitiveData): ?>
                                     <th>
                                         <i class="fas fa-globe"></i>
                                         IP
                                     </th>
+                                    <?php endif; ?>
 
                                     <th>
                                         <i class="fas fa-user-shield"></i>
@@ -933,10 +533,12 @@ function banlistBuildUrl(array $params = []): string
                                         Player
                                     </th>
 
+                                    <?php if ($showSensitiveData): ?>
                                     <th>
                                         <i class="fas fa-globe"></i>
                                         IP
                                     </th>
+                                    <?php endif; ?>
 
                                     <th>
                                         <i class="fas fa-user-shield"></i>
@@ -1088,10 +690,12 @@ function banlistBuildUrl(array $params = []): string
                                         Player
                                     </th>
 
+                                    <?php if ($showSensitiveData): ?>
                                     <th>
                                         <i class="fas fa-globe"></i>
                                         IP
                                     </th>
+                                    <?php endif; ?>
 
                                     <th>
                                         <i class="fas fa-calendar"></i>
@@ -1135,13 +739,22 @@ function banlistBuildUrl(array $params = []): string
                                             )
                                         ) ?>
 
+                                        <?php if ($showSensitiveData): ?>
+
+
                                         <?= renderTableCell(
-                                            esc(
-                                                $row['player_ip']
-                                                    ?: '---'
-                                            ),
+
+
+                                            esc($row['player_ip'] ?? '---'),
+
+
                                             'mono-cell'
+
+
                                         ) ?>
+
+
+                                        <?php endif; ?>
 
                                         <?= renderTableCell(
                                             renderAdminCell(
@@ -1193,13 +806,22 @@ function banlistBuildUrl(array $params = []): string
                                             )
                                         ) ?>
 
+                                        <?php if ($showSensitiveData): ?>
+
+
                                         <?= renderTableCell(
-                                            esc(
-                                                $row['player_ip']
-                                                    ?: '---'
-                                            ),
+
+
+                                            esc($row['player_ip'] ?? '---'),
+
+
                                             'mono-cell'
+
+
                                         ) ?>
+
+
+                                        <?php endif; ?>
 
                                         <?= renderTableCell(
                                             renderAdminCell(
@@ -1414,11 +1036,7 @@ function banlistBuildUrl(array $params = []): string
                                         ) ?>
 
                                         <?= renderTableCell(
-                                            esc(
-                                                int2ip(
-                                                    $row['address'] ?? 0
-                                                )
-                                            ),
+                                            esc($row['address'] ?? '---'),
                                             'mono-cell'
                                         ) ?>
 

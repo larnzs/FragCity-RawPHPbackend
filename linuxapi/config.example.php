@@ -53,10 +53,10 @@ return [
      * and player history. The API must expose only purpose-built allowlisted
      * actions and selected fields, never arbitrary SQL or raw table dumps.
      *
-     * Currently implemented action: resolve_player_names. That resolver reads
-     * only name, steamid and used_at from sa_players_ips; it never selects or
-     * returns the stored address. The Ban List page must be migrated to a
-     * dedicated read-only API action before its old direct-DB profile is removed.
+     * Read-only actions: resolve_player_names and get_records. The latter
+     * provides paginated bans, unbans, mutes, unmutes, warns and administrator-only
+     * player IP history. Public Ban List requests never receive IP columns.
+     * The identity resolver itself only reads name, steamid and used_at.
      *
      * Reuses the root Plugin DB account with schema-wide SELECT on
      * GLOBAL_simpleadmin.*. No INSERT, UPDATE or DELETE privileges are needed.

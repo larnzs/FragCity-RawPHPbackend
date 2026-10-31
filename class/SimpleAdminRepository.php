@@ -4,7 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../settings/loader.php';
 require_once __DIR__ . '/FragCityLinuxApiClient.php';
 
-/** Website boundary for the read-only SimpleAdmin player identity lookup. */
+/** Website adapter for the signed, read-only SimpleAdmin API. */
 final class SimpleAdminRepository
 {
     private FragCityLinuxApiClient $api;
@@ -27,6 +27,7 @@ final class SimpleAdminRepository
             if (!is_array($player) || self::normalizeSteamId($player['steam_id'] ?? null) !== null) {
                 continue;
             }
+
             $name = trim((string)($player['name'] ?? ''));
             if ($name !== '') {
                 $names[$name] = $name;
@@ -47,10 +48,10 @@ final class SimpleAdminRepository
             if (!is_array($match) || !is_string($match['name'] ?? null)) {
                 continue;
             }
+
             $name = $match['name'];
             $status = is_string($match['status'] ?? null) ? $match['status'] : 'not_found';
             $steamId = self::normalizeSteamId($match['steam_id'] ?? null);
-
             $matches[$name] = ($status === 'resolved' && $steamId !== null)
                 ? ['steam_id' => $steamId, 'status' => 'resolved']
                 : [
@@ -63,6 +64,7 @@ final class SimpleAdminRepository
             if (!is_array($player)) {
                 continue;
             }
+
             if (self::normalizeSteamId($player['steam_id'] ?? null) !== null) {
                 $players[$index]['steam_id_status'] = 'resolved';
                 continue;
@@ -77,11 +79,52 @@ final class SimpleAdminRepository
         return $players;
     }
 
+    /**
+     * Fetch one paginated Ban List dataset from SimpleAdmin.
+     * IP fields are requested only for a signed-in FragCity administrator.
+     *
+     * @return array{items:array,total:int,page:int,per_page:int,total_pages:int}
+     */
+    public function getBanlistRecords(
+        string $type,
+        string $search,
+        int $page,
+        int $perPage,
+        bool $includeSensitive
+    ): array {
+        $data = $this->api->request([
+            'action' => 'get_records',
+            'type' => $type,
+            'search' => $search,
+            'page' => $page,
+            'per_page' => $perPage,
+            'include_sensitive' => $includeSensitive,
+        ], '/v1/simpleadmin');
+
+        $items = $data['items'] ?? null;
+        if (!is_array($items)
+            || !is_numeric($data['total'] ?? null)
+            || !is_numeric($data['page'] ?? null)
+            || !is_numeric($data['per_page'] ?? null)
+            || !is_numeric($data['total_pages'] ?? null)) {
+            throw new RuntimeException('SimpleAdmin API returned an invalid Ban List payload.');
+        }
+
+        return [
+            'items' => $items,
+            'total' => max(0, (int)$data['total']),
+            'page' => max(1, (int)$data['page']),
+            'per_page' => max(1, (int)$data['per_page']),
+            'total_pages' => max(1, (int)$data['total_pages']),
+        ];
+    }
+
     private static function normalizeSteamId(mixed $value): ?string
     {
         if (!is_string($value) && !is_int($value)) {
             return null;
         }
+
         $steamId = trim((string)$value);
         return preg_match('/^7656119[0-9]{10}$/D', $steamId) === 1 ? $steamId : null;
     }
