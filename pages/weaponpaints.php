@@ -1264,20 +1264,17 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 ?>
 
 <div class="wp-app">
-
-    <!-- =========================================================
-         TOP HEADER
-    ========================================================== -->
-
-    <header class="wp-header">
-
-        <nav
-            class="wp-tabs"
-            id="mainTabs"
-            aria-label="Weapon categories"
-        >
-
-            <div
+    <div class="wp-workspace-layout">
+        <aside class="wp-sidebar" aria-label="دسته‌بندی آیتم‌ها">
+            <div class="wp-sidebar-brand">
+                <span class="wp-sidebar-brand__mark"><i class="fas fa-crosshairs" aria-hidden="true"></i></span>
+                <span class="wp-sidebar-brand__copy">
+                    <strong>FRAGCITY</strong>
+                    <small>WEAPON PAINTS</small>
+                </span>
+            </div>
+            <nav class="wp-tabs wp-sidebar-tabs" id="mainTabs" aria-label="دسته‌بندی آیتم‌ها">
+                            <div
                 class="wp-category-switcher wp-category-switcher--unified"
                 aria-label="Inventory and weapon categories"
             >
@@ -1291,7 +1288,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-inventory"
                 >
-                    <i class="fas fa-box-open" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/inventory.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-box-open wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">Inventory</span>
                 </button>
 
                 <button
@@ -1303,7 +1309,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-skins"
                 >
-                    <i class="fas fa-paint-brush" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/skins.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-paint-brush wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">All Skins</span>
                 </button>
 
                 <button
@@ -1315,7 +1330,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-rifles"
                 >
-                    <i class="fas fa-crosshairs" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/rifles.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-crosshairs wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">Rifles</span>
                 </button>
 
                 <button
@@ -1327,7 +1351,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-smg"
                 >
-                    <i class="fas fa-bolt" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/smg.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-bolt wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">SMG</span>
                 </button>
 
                 <button
@@ -1339,7 +1372,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-heavy"
                 >
-                    <i class="fas fa-fire" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/heavy.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-fire wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">Heavy Guns</span>
                 </button>
 
                 <button
@@ -1351,7 +1393,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-pistol"
                 >
-                    <i class="fas fa-gun" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/pistols.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-gun wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">Pistols</span>
                 </button>
 
                 <button
@@ -1363,7 +1414,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-sniper"
                 >
-                    <i class="fas fa-binoculars" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/snipers.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-binoculars wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">Snipers</span>
                 </button>
 
                 <button
@@ -1375,7 +1435,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-knives"
                 >
-                    <i class="fas fa-cutlery" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/knives.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-cutlery wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">Knives</span>
                 </button>
 
                 <button
@@ -1387,7 +1456,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-gloves"
                 >
-                    <i class="fas fa-hand-paper" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/gloves.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-hand-paper wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">Gloves</span>
                 </button>
 
                 <button
@@ -1399,7 +1477,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-agents"
                 >
-                    <i class="fas fa-user-secret" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/agents.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-user-secret wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">Agents</span>
                 </button>
 
                 <button
@@ -1411,7 +1498,16 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-music"
                 >
-                    <i class="fas fa-music" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/music.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-music wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">Music</span>
                 </button>
 
                 <button
@@ -1423,9 +1519,33 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     data-bs-toggle="tab"
                     data-bs-target="#tab-pins"
                 >
-                    <i class="fas fa-thumbtack" aria-hidden="true"></i>
+                    <img
+                        class="wp-tab-svg"
+                        src="/img/weaponpaintsicons/pins.svg"
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onerror="this.hidden=true;this.nextElementSibling.hidden=false;"
+                    >
+                    <i class="fas fa-thumbtack wp-tab-fallback" aria-hidden="true" hidden></i>
+                    <span class="wp-tab-label">Pins</span>
                 </button>
             </div>
+            </nav>
+        </aside>
+        <div class="wp-workspace-main">
+
+    <!-- =========================================================
+         TOP HEADER
+    ========================================================== -->
+
+    <header class="wp-header">
+
+        <nav
+            class="wp-tabs wp-toolbar-controls"
+            id="wpToolbarControls"
+            aria-label="Team and search controls"
+        >
 
             <!-- Current Team -->
 
@@ -3175,8 +3295,9 @@ foreach ($skinInventory as $inventoryEntry) {
             aria-label="Choose page"
         ></nav>
     </aside>
-
-</div>
+        </div><!-- /.wp-workspace-main -->
+    </div><!-- /.wp-workspace-layout -->
+</div><!-- /.wp-app -->
 
 
 <!-- =========================================================
