@@ -177,7 +177,14 @@
     }
 
     function pageAssetList(slug, type) {
-        const assets = pageAssets[slug];
+        // Resolve older public route names to the canonical route bundle.
+        const aliases = {
+            servers: 'servers_vps',
+            skins_vps: 'skins',
+            leaderboard_vps: 'leaderboard'
+        };
+        const assetKey = aliases[slug] || slug;
+        const assets = pageAssets[assetKey];
         if (!assets || !Array.isArray(assets[type])) return [];
         return assets[type];
     }
