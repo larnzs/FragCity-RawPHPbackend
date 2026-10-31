@@ -23,6 +23,15 @@ jobs:
       - name: Validate Server Browser JavaScript syntax
         run: node --check js/serverlist.js
 
+      - name: Verify FACEIT level SVG assets
+        run: |
+          set -eu
+          for level in $(seq 0 11); do
+            asset="img/icons/faceit/${level}.svg"
+            test -s "$asset"
+            grep -q '<svg' "$asset"
+          done
+
       - name: Lint every PHP source file
         run: |
           set -eu
