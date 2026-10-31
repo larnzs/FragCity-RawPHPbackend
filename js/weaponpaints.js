@@ -1561,13 +1561,26 @@
 
 
     function getActivePane() {
+        // During the short overlap animation, two panes can be active.
+        // Prefer the tab ID in state so search, forms and pagination track
+        // the newly selected category rather than the outgoing pane.
+        const preferredPane = state.currentActiveTab
+            ? document.getElementById(state.currentActiveTab)
+            : null;
+
+        if (
+            preferredPane &&
+            preferredPane.classList.contains('tab-pane') &&
+            preferredPane.classList.contains('active')
+        ) {
+            return preferredPane;
+        }
 
         return document.querySelector(
             '.wp-main .tab-content > .tab-pane.show.active'
         ) || document.querySelector(
             '.wp-main .tab-content > .tab-pane.active'
         );
-
     }
 
 
