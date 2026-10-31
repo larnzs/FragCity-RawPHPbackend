@@ -1276,7 +1276,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
         <nav
             class="wp-tabs wp-toolbar-controls"
             id="wpToolbarControls"
-            aria-label="Team and search controls"
+            aria-label="Skin categories, team and search controls"
         >
 
             <div
