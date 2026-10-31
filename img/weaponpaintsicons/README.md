@@ -1,28 +1,29 @@
 # WeaponPaints SVG assets
 
-These are the SVG files currently used by the WeaponPaints interface. Public URLs are served from `/img/weaponpaintsicons/<filename>`.
+All files are served from `/img/weaponpaintsicons/<filename>` and are used by the horizontal WeaponPaints toolbar.
 
-## Category rail
+## Category toolbar
 
-| UI category | SVG file |
+| Category | SVG |
 | --- | --- |
+| Inventory | `inventory.svg` |
+| All Skins | `allskins.svg` |
 | Rifles | `ak47.svg` |
-| Heavy guns | `m249.svg` |
+| SMG | `p90.svg` |
+| Heavy Guns | `m249.svg` |
 | Pistols | `usp_silencer.svg` |
 | Snipers | `awp.svg` |
 | Knives | `knife_m9_bayonet.svg` |
 | Gloves | `gloves.svg` |
 | Agents | `agent.svg` |
-| Music kits | `music_kit.svg` |
+| Music Kits | `music_kit.svg` |
 | Pins | `pin.svg` |
 
-The Inventory, All Skins, and SMG categories currently use their Font Awesome fallback because no matching SVG has been uploaded for those categories yet. The UI intentionally keeps these fallbacks so a missing asset never breaks navigation.
+## Team selector
 
-## Team switcher
+- `t_char_bg.svg` — Terrorist
+- `ct_char_bg.svg` — Counter-Terrorist
 
-- `t_char_bg.svg` — Terrorist team
-- `ct_char_bg.svg` — Counter-Terrorist team
+The category switcher, team selector, and search field share one toolbar row on desktop. On narrower screens, the category strip remains horizontally scrollable and the team/search controls use a second row.
 
-## Asset guidance
-
-Keep the uploaded filenames unchanged because the PHP markup references them directly. Weapon silhouettes are landscape artwork and are scaled with `object-fit: contain`; team artwork is displayed separately in the CT/T selector. Prefer transparent SVGs with a clear `viewBox` and no embedded raster assets.
+The glove icon's red artwork has been converted to white to match the other monochrome toolbar assets. Weapon silhouettes use a wider display box than square category icons; the CSS keeps each icon's proportions with `object-fit: contain`.
