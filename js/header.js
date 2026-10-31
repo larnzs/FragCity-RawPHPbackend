@@ -7,15 +7,9 @@
     const body = document.body;
     const siteHeader = document.getElementById('siteHeader');
     let scrollTicking = false;
-    // Apply the dark header after only a few pixels so it reacts immediately on touch screens.
+    // Keep the header transparent only at the very top of the document.
+    // Once the user scrolls, retain the graphite surface in both directions.
     const HEADER_SCROLL_THRESHOLD = 4;
-    let lastScrollTop = 0;
-
-    /*
-     * At the top, the header is transparent. Scrolling down adds a
-     * translucent background; scrolling up removes it immediately.
-     * Keep this lightweight to avoid sticky-header flicker.
-     */
     function updateHeaderScrollState() {
         if (!siteHeader) {
             scrollTicking = false;
@@ -30,17 +24,9 @@
         if (scrollTop <= HEADER_SCROLL_THRESHOLD) {
             siteHeader.classList.remove('is-scrolled', 'is-scroll-down');
         } else {
-            siteHeader.classList.add('is-scrolled');
-
-            if (scrollTop > lastScrollTop + 0.5) {
-                siteHeader.classList.add('is-scroll-down');
-            } else if (scrollTop < lastScrollTop - 0.5) {
-                // Preserve the transparent-on-scroll-up behavior.
-                siteHeader.classList.remove('is-scroll-down');
-            }
+            // Keep the same filled header while scrolling down or back up.
+            siteHeader.classList.add('is-scrolled', 'is-scroll-down');
         }
-
-        lastScrollTop = scrollTop;
         scrollTicking = false;
     }
 
