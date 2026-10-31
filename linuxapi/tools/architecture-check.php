@@ -117,7 +117,7 @@ $check(
 
 $check(
     'Pin catalog preserves each pin ID after pagination converts the catalog to a numeric list',
-    str_contains($weaponPaintsUtils, "'id'        => (int)$id")
+    str_contains($weaponPaintsUtils, '\'id\'        => (int)$id')
         && str_contains($weaponPaintsPage, "\$pin['id']")
         && is_array($pinCatalog)
         && count($pinCatalog) > 0
