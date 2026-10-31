@@ -305,7 +305,7 @@ $mobileNavItems = [
 <nav class="mobile-nav" id="mobileNav" aria-label="منوی موبایل" aria-hidden="true">
     <div class="mobile-nav-header">
         <a href="index.php" class="mobile-nav-logo" data-ajax-nav data-slug="home">
-            <img src="assets/images/logo/main.png" alt="FragCity">
+            <img src="/img/logoresponsive.png" alt="FragCity">
             <span>FRAGCITY</span>
         </a>
         <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="بستن منو">
