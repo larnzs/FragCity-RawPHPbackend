@@ -149,6 +149,8 @@ class UtilsClass
             $name = $item['name'] ?? $item['pin_name'] ?? 'Unknown';
             if ($id === null) continue;
             $pins[$id] = [
+                // Keep the ID in each record because pagination converts the catalog to array_values().
+                'id'        => (int)$id,
                 'name'      => $name,
                 'image_url' => IMAGE_BASE_SKINS . ($item['image'] ?? ''),
             ];
