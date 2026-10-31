@@ -9694,7 +9694,7 @@ body:has(.wp-app) > .wp-modal .wp-mobile-modal-tabs {
 
 /* Sticker and Keychain now use the same frame, spacing and gallery proportions
    as Select Paint. This is deliberately shared across all three dialogs. */
-body > #skinModal .wp-modal-content,
+body > #skinModal .modal-content,
 body > #stickerModal .modal-content,
 body > #keychainModal .modal-content {
     overflow: hidden;
