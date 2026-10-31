@@ -404,6 +404,39 @@ if (
     exit;
 }
 
+/*
+ * Login is rendered as a site-wide modal. Keep a small fragment endpoint
+ * for the modal so it can fetch the same PHP form without replacing the
+ * current page or moving the footer.
+ */
+if ($page === 'login' && $isLoggedIn) {
+    header('Location: index.php', true, 303);
+    exit;
+}
+
+if (
+    $page === 'login' &&
+    !$isLoggedIn &&
+    $_SERVER['REQUEST_METHOD'] === 'GET' &&
+    (string) ($_GET['auth_modal'] ?? '') === '1'
+) {
+    $returnTo = $_GET['return_to'] ?? null;
+    if (is_string($returnTo) && !preg_match('/[\\r\\n]/', $returnTo)) {
+        $_SESSION['login_return_url'] = safe_local_redirect($returnTo, 'index.php');
+    }
+
+    header('Content-Type: text/html; charset=UTF-8');
+    require __DIR__ . '/pages/login.php';
+    exit;
+}
+
+/* Preserve ?page=login as a deep link, but render the site beneath the modal. */
+$openLoginModal = $page === 'login';
+if ($openLoginModal) {
+    $page = 'home';
+    $current_page = 'home';
+}
+
 $displayName = (string) (
     $_SESSION['username'] ?? ''
 );
@@ -838,6 +871,7 @@ window.FragCityCurrentPage = <?= json_encode(
     JSON_HEX_QUOT |
     JSON_INVALID_UTF8_SUBSTITUTE
 ) ?>;
+window.FragCityOpenLoginModal = <?= $openLoginModal ? 'true' : 'false' ?>;
 </script>
 
 <?php if (is_file($globalScriptPath)): ?>
