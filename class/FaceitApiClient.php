@@ -15,7 +15,8 @@ final class FaceitApiClient
     private const NEGATIVE_CACHE_TTL_SECONDS = 600;
     private const ERROR_CACHE_TTL_SECONDS = 45;
     private const DEFAULT_RATE_LIMIT_BACKOFF_SECONDS = 60;
-    private const MAX_RATE_LIMIT_BACKOFF_SECONDS = 300;
+    private const MAX_RATE_LIMIT_BACKOFF_SECONDS = 3600;
+    private const AUTH_ERROR_BACKOFF_SECONDS = 300;
     private const MAX_CONCURRENT_LOOKUPS = 12;
 
     private string $apiKey;
@@ -76,9 +77,7 @@ final class FaceitApiClient
                 }
 
                 if ($record !== null && $this->isRetryBackoffActive($record)) {
-                    $profiles[$steamId] = self::hasUsableLevel($record['profile'])
-                        ? $record['profile']
-                        : $record['profile'];
+                    $profiles[$steamId] = $record['profile'];
                     continue;
                 }
 
@@ -353,7 +352,7 @@ final class FaceitApiClient
             } elseif ($httpStatus === 401 || $httpStatus === 403) {
                 error_log('[FragCity FACEIT] Data API rejected the configured credentials (HTTP ' . $httpStatus . ').');
                 $results[$steamId] = self::emptyProfile('api_unavailable');
-                $retryAfterBySteamId[$steamId] = self::MAX_RATE_LIMIT_BACKOFF_SECONDS;
+                $retryAfterBySteamId[$steamId] = self::AUTH_ERROR_BACKOFF_SECONDS;
             } elseif ($httpStatus >= 200 && $httpStatus < 300 && is_string($body)) {
                 $decoded = json_decode($body, true);
                 if (!is_array($decoded) || json_last_error() !== JSON_ERROR_NONE) {
