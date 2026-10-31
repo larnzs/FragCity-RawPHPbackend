@@ -9533,3 +9533,56 @@ body:has(.wp-app) > .wp-modal .wp-mobile-modal-tabs {
         transition: none !important;
     }
 }
+
+
+/* Unified warm-accent category tabs: override legacy blue/gold per-category rules. */
+.wp-app .wp-header .wp-category-switcher--unified > .wp-tab[data-bs-target].is-active,
+.wp-app .wp-header .wp-category-switcher--unified > .wp-tab[data-bs-target].active {
+    color: #F97316 !important;
+    background: rgba(249, 115, 22, .12) !important;
+    border-color: rgba(249, 115, 22, .30) !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.wp-app .wp-header .wp-category-switcher--unified > .wp-tab[data-bs-target].is-active > i,
+.wp-app .wp-header .wp-category-switcher--unified > .wp-tab[data-bs-target].active > i {
+    color: #F97316 !important;
+}
+
+/* Match the complete outer height of the team switcher and search box. */
+@media (max-width: 520px) {
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher,
+    .wp-app .wp-header .wp-tabs > .wp-search-wrap {
+        height: 42px !important;
+        min-height: 42px !important;
+        box-sizing: border-box !important;
+        align-self: stretch !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher {
+        padding: 3px !important;
+        align-items: center !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn {
+        height: 34px !important;
+        min-height: 34px !important;
+        line-height: 1 !important;
+        align-self: center !important;
+        box-sizing: border-box !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-search-wrap {
+        display: flex !important;
+        align-items: center !important;
+        overflow: hidden;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-search-wrap .wp-search {
+        height: 40px !important;
+        min-height: 40px !important;
+        line-height: 1.2 !important;
+        box-sizing: border-box !important;
+    }
+}
