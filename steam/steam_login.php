@@ -8,6 +8,7 @@ fragcity_start_session();
 // Load runtime settings and constants before using the settings helpers/constants.
 require_once __DIR__ . '/../class/config.php';
 require_once __DIR__ . '/../class/SteamProfileService.php';
+require_once __DIR__ . '/../class/RememberMeService.php';
 require_once __DIR__ . '/openid.php';
 
 $configuredDomain = defined('STEAM_DOMAIN_NAME')
@@ -65,6 +66,10 @@ try {
 
     if (!$openid->mode) {
 
+        // Carry the user's explicit choice through the Steam OpenID redirect.
+        $_SESSION['remember_login_requested'] =
+            (string) ($_GET['remember_me'] ?? '') === '1';
+
         $openid->identity = 'https://steamcommunity.com/openid';
 
         header('Location: ' . $openid->authUrl());
@@ -73,6 +78,7 @@ try {
 
     } elseif ($openid->mode == 'cancel') {
 
+        unset($_SESSION['remember_login_requested']);
         header('Location: ' . $loginPage);
 
         exit;
@@ -91,6 +97,7 @@ try {
 
             if (!$steamid64) {
 
+                unset($_SESSION['remember_login_requested']);
                 $_SESSION['auth_error'] = 'شناسه Steam نامعتبر است.';
 
                 header('Location: ' . $loginPage);
@@ -161,6 +168,13 @@ try {
                     error_log('[FragCity] Steam profile persistence skipped: no usable Steam summary was available.');
                 }
 
+                RememberMeService::apply(
+                    $pdo,
+                    (string) $steamid64,
+                    !empty($_SESSION['remember_login_requested'])
+                );
+                unset($_SESSION['remember_login_requested']);
+
                 header('Location: ' . $dashboardPage);
 
                 exit;
@@ -189,6 +203,7 @@ try {
 
         } else {
 
+            unset($_SESSION['remember_login_requested']);
             $_SESSION['auth_error'] = 'اعتبارسنجی OpenID ناموفق بود.';
 
             header('Location: ' . $loginPage);
@@ -202,6 +217,7 @@ try {
 } catch (Throwable $e) {
 
     error_log('[FragCity] Steam OpenID login failed: ' . $e->getMessage());
+    unset($_SESSION['remember_login_requested']);
     $_SESSION['auth_error'] = 'ورود با استیم انجام نشد. لطفاً دوباره تلاش کنید.';
 
     header('Location: ' . $loginPage, true, 303);
