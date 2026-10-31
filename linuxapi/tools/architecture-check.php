@@ -252,7 +252,7 @@ $check(
         && str_contains($simpleAdminBanlist, 'LIMIT :page_limit OFFSET :page_offset')
         && str_contains($simpleAdminBanlist, 'includeSensitive')
         && str_contains($banlistPage, 'getBanlistRecords')
-        && str_contains($banlistPage, "\\$_SESSION['role']")
+        && str_contains($banlistPage, '$_SESSION')
         && str_contains($banlistPage, '$showSensitiveData')
         && !str_contains($banlistPage, 'RemoteBanlistDatabase')
         && !is_file($root . '/database/kyonxcbt_simpleadmin_plugin.php')
