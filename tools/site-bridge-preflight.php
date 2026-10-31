@@ -75,7 +75,7 @@ $requiredColumns = [
     'ticket_replies' => ['id', 'ticket_id', 'steamid', 'message', 'is_admin', 'created_at'],
     'users' => [
         'id', 'steamid64', 'steam', 'username', 'email', 'password_hash', 'role', 'created_at',
-        'vip_level', 'vip_expire', 'phone', 'insmaster', 'avatar',
+        'vip_level', 'vip_expire', 'phone', 'insmaster', 'insmanager', 'avatar',
         'steam_personaname', 'steam_profileurl', 'steam_avatar_url', 'steam_avatar_path',
         'steam_personastate', 'steam_communityvisibilitystate', 'steam_profilestate',
         'steam_timecreated', 'steam_lastlogoff', 'steam_loccountrycode',

@@ -230,7 +230,7 @@ $check(
 );
 
 $check(
-    'SimpleAdmin Ban List is fully API-backed with server pagination and admin-only IP fields',
+    'SimpleAdmin Ban List is API-backed with DB-authorized manager/admin IP fields',
     str_contains($simpleAdminSiteRepository, "'/v1/simpleadmin'")
         && str_contains($simpleAdminSiteRepository, 'resolve_player_names')
         && str_contains($simpleAdminSiteRepository, 'getBanlistRecords')
@@ -253,7 +253,11 @@ $check(
         && str_contains($simpleAdminBanlist, 'includeSensitive')
         && str_contains($banlistPage, 'getBanlistRecords')
         && str_contains($banlistPage, '$_SESSION')
-        && str_contains($banlistPage, '$showSensitiveData')
+        && str_contains($banlistPage, 'SELECT insmanager FROM users WHERE steamid64 = ? LIMIT 1')
+        && str_contains($banlistPage, '$isAdmin || $isInsManager')
+        && str_contains($banlistPage, "($type === 'playerips' && !$canViewPlayerIps)")
+        && str_contains($banlistPage, '$showSensitiveData = $canViewPlayerIps;')
+        && str_contains($preflight, "'insmanager'")
         && !str_contains($banlistPage, 'RemoteBanlistDatabase')
         && !is_file($root . '/database/kyonxcbt_simpleadmin_plugin.php')
         && str_contains($linuxConfig, "'GLOBAL_simpleadmin'")

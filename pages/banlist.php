@@ -5,13 +5,41 @@ require_once __DIR__ . '/../class/SimpleAdminRepository.php';
 
 $pageTitle = "لیست محرومیت‌ها | FragCity";
 
-$isAdmin = (($_SESSION['user_logged_in'] ?? false) === true)
-    && (string)($_SESSION['role'] ?? '') === 'admin';
-$showSensitiveData = $isAdmin;
+$isLoggedIn = (($_SESSION['user_logged_in'] ?? false) === true);
+$isAdmin = $isLoggedIn && (string)($_SESSION['role'] ?? '') === 'admin';
+
+// insmanager is a database permission, not a browser/session-provided flag.
+// Resolve it against the authenticated SteamID on every request and fail closed.
+$isInsManager = false;
+$viewerSteamId64 = trim((string)($_SESSION['steamid'] ?? ''));
+
+if (
+    $isLoggedIn
+    && preg_match('/^[0-9]{17}$/D', $viewerSteamId64) === 1
+    && isset($pdo)
+    && $pdo instanceof PDO
+) {
+    try {
+        $permissionStatement = $pdo->prepare(
+            'SELECT insmanager FROM users WHERE steamid64 = ? LIMIT 1'
+        );
+        $permissionStatement->execute([$viewerSteamId64]);
+        $isInsManager = (int)$permissionStatement->fetchColumn() === 1;
+    } catch (Throwable $permissionError) {
+        error_log(
+            '[FragCity] Ban List insmanager permission lookup failed (SQLSTATE '
+            . (string)$permissionError->getCode() . ').'
+        );
+    }
+}
+
+// Keep existing administrator access while allowing explicitly flagged managers.
+$canViewPlayerIps = $isAdmin || $isInsManager;
+$showSensitiveData = $canViewPlayerIps;
 
 $type = is_string($_GET['type'] ?? null) ? $_GET['type'] : 'bans';
 $allowedTypes = ['bans', 'unbans', 'mutes', 'unmutes', 'warns', 'playerips'];
-if (!in_array($type, $allowedTypes, true) || ($type === 'playerips' && !$isAdmin)) {
+if (!in_array($type, $allowedTypes, true) || ($type === 'playerips' && !$canViewPlayerIps)) {
     $type = 'bans';
 }
 
@@ -162,7 +190,7 @@ $tabs = [
     'playerips' => ['icon' => 'fa-network-wired', 'label' => 'آی‌پی بازیکنان', 'tone' => 'info'],
 ];
 
-if (!$isAdmin) {
+if (!$canViewPlayerIps) {
     unset($tabs['playerips']);
 }
 
