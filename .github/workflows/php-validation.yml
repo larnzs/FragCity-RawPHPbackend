@@ -44,7 +44,7 @@ jobs:
               ids = {element.attrib["id"] for element in root.iter() if "id" in element.attrib}
               for element in root.iter():
                   for attribute, value in element.attrib.items():
-                      for reference in re.findall(r"url\\(#([^)]+)\\)", value):
+                      for reference in re.findall(r"url\(#([^)]+)\)", value):
                           if reference not in ids:
                               raise SystemExit(f"{path}: unresolved SVG reference #{reference}")
                       if attribute.endswith("href") and value.startswith("#") and value[1:] not in ids:
