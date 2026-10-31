@@ -62,7 +62,7 @@ $isPageActive = static function (array $pages) use ($current_page): string {
     return in_array($current_page, $pages, true) ? 'active' : '';
 };
 
-$morePages = ['skins', 'skins_vps', 'launcher', 'leaderboard', 'leaderboard_vps', 'banlist', 'vip'];
+$morePages = ['buyserveropen', 'buyserver', 'launcher', 'leaderboard', 'leaderboard_vps', 'banlist', 'vip'];
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
@@ -135,8 +135,8 @@ if (!is_array($steamUrlParts) || strtolower((string)($steamUrlParts['scheme'] ??
 
 $mobileNavItems = [
     ['servers_vps', 'لیست سرورها', 'fa-server', ['servers_vps', 'servers']],
-    ['buyserveropen', 'خرید سرور', 'fa-shopping-cart', ['buyserveropen', 'buyserver']],
     ['skins', 'انتخاب اسکین', 'fa-palette', ['skins', 'skins_vps']],
+    ['buyserveropen', 'خرید سرور', 'fa-shopping-cart', ['buyserveropen', 'buyserver']],
     ['launcher', 'دانلود لانچر', 'fa-download', ['launcher']],
     ['leaderboard', 'لیدربورد', 'fa-trophy', ['leaderboard', 'leaderboard_vps']],
     ['banlist', 'لیست محرومیت‌ها', 'fa-gavel', ['banlist']],
@@ -165,10 +165,10 @@ $mobileNavItems = [
                 لیست سرورها
             </a>
 
-            <a href="?page=buyserveropen"
-               class="shock-nav-item <?= $isPageActive(['buyserveropen', 'buyserver']) ?>"
-               data-ajax-nav data-slug="buyserveropen">
-                خرید سرور
+            <a href="?page=skins"
+               class="shock-nav-item <?= $isPageActive(['skins', 'skins_vps']) ?>"
+               data-ajax-nav data-slug="skins">
+                انتخاب اسکین
             </a>
 
             <div class="frag-dropdown" id="shockMoreDropdown">
@@ -182,8 +182,8 @@ $mobileNavItems = [
                 </button>
 
                 <div class="frag-dropdown-menu" id="shockMoreMenu">
-                    <a href="?page=skins" class="frag-drop-link <?= $isPageActive(['skins', 'skins_vps']) ?>" data-ajax-nav data-slug="skins">
-                        <i class="fas fa-palette"></i><span>انتخاب اسکین</span>
+                    <a href="?page=buyserveropen" class="frag-drop-link <?= $isPageActive(['buyserveropen', 'buyserver']) ?>" data-ajax-nav data-slug="buyserveropen">
+                        <i class="fas fa-shopping-cart"></i><span>خرید سرور</span>
                     </a>
                     <a href="?page=launcher" class="frag-drop-link <?= $isPageActive(['launcher']) ?>" data-ajax-nav data-slug="launcher">
                         <i class="fas fa-download"></i><span>دانلود لانچر</span>
