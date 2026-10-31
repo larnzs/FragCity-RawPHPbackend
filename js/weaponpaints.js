@@ -4291,6 +4291,26 @@
             toolbar.remove();
         }
 
+        setupMobileModalTabs(
+            dom.skinModalBody,
+            '.wp-skin-workspace',
+            [
+                {
+                    key: 'paint',
+                    selector: '.wp-skin-list-pane',
+                    label: 'انتخاب Paint',
+                    icon: 'fa-palette'
+                },
+                {
+                    key: 'features',
+                    selector: '.wp-skin-controls',
+                    label: 'افزودن ویژگی‌ها',
+                    icon: 'fa-sliders'
+                }
+            ],
+            'paint'
+        );
+
         bindSkinModalInteractions();
 
     }
@@ -4773,6 +4793,88 @@
     }
 
 
+    function setupMobileModalTabs(
+        modalBody,
+        workspaceSelector,
+        panelDefinitions,
+        defaultPanel
+    ) {
+        if (!modalBody) return;
+
+        const workspace = modalBody.querySelector(workspaceSelector);
+        if (!workspace) return;
+
+        const previousTabs = modalBody.querySelector('.wp-mobile-modal-tabs');
+        if (previousTabs) previousTabs.remove();
+
+        const tabs = document.createElement('div');
+        tabs.className = 'wp-mobile-modal-tabs';
+        tabs.setAttribute('role', 'tablist');
+        tabs.setAttribute('aria-label', 'Modal sections');
+
+        const validPanels = [];
+
+        panelDefinitions.forEach(function (definition) {
+            const panel = workspace.querySelector(definition.selector);
+            if (!panel) return;
+
+            panel.dataset.wpMobilePanel = definition.key;
+            if (!panel.id) {
+                panel.id = 'wp-mobile-' + definition.key + '-' + Math.random().toString(36).slice(2, 8);
+            }
+
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'wp-mobile-modal-tab';
+            button.dataset.wpMobileTab = definition.key;
+            button.setAttribute('role', 'tab');
+            button.setAttribute('aria-controls', panel.id);
+            button.setAttribute('aria-selected', 'false');
+
+            if (definition.icon) {
+                const icon = document.createElement('i');
+                icon.className = 'fas ' + definition.icon;
+                icon.setAttribute('aria-hidden', 'true');
+                button.appendChild(icon);
+            }
+
+            const label = document.createElement('span');
+            label.textContent = definition.label;
+            button.appendChild(label);
+            tabs.appendChild(button);
+            validPanels.push({ key: definition.key, panel: panel, button: button });
+        });
+
+        if (validPanels.length !== 2 || !workspace.parentNode) return;
+
+        function activatePanel(key) {
+            const nextKey = validPanels.some(function (entry) {
+                return entry.key === key;
+            }) ? key : validPanels[0].key;
+
+            workspace.dataset.wpMobileActivePanel = nextKey;
+            modalBody.dataset.wpMobileActivePanel = nextKey;
+
+            validPanels.forEach(function (entry) {
+                const active = entry.key === nextKey;
+                entry.panel.classList.toggle('is-mobile-active', active);
+                entry.button.classList.toggle('is-active', active);
+                entry.button.setAttribute('aria-selected', active ? 'true' : 'false');
+                entry.button.tabIndex = active ? 0 : -1;
+            });
+        }
+
+        tabs.addEventListener('click', function (event) {
+            const button = event.target.closest('[data-wp-mobile-tab]');
+            if (!button || !tabs.contains(button)) return;
+            activatePanel(button.dataset.wpMobileTab);
+        });
+
+        workspace.parentNode.insertBefore(tabs, workspace);
+        activatePanel(defaultPanel);
+    }
+
+
     function prepareAddonModalLayout(
         modalBody,
         headerToolsId,
@@ -4810,6 +4912,30 @@
         listPane.setAttribute('aria-label', ariaLabel + ' choices');
         scrollPane.appendChild(grid);
         listPane.appendChild(loadMore);
+
+        const selectionLabel = gridId === 'stickerGrid'
+            ? 'انتخاب Sticker'
+            : 'انتخاب Keychain';
+
+        setupMobileModalTabs(
+            modalBody,
+            '.wp-addon-workspace',
+            [
+                {
+                    key: 'select',
+                    selector: '.wp-addon-list-pane',
+                    label: selectionLabel,
+                    icon: gridId === 'stickerGrid' ? 'fa-sticky-note' : 'fa-key'
+                },
+                {
+                    key: 'features',
+                    selector: '.wp-addon-properties',
+                    label: 'افزودن ویژگی‌ها',
+                    icon: 'fa-sliders'
+                }
+            ],
+            'select'
+        );
     }
 
 
