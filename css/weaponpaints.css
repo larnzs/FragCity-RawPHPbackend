@@ -9221,7 +9221,7 @@ body:has(.wp-app) .main-content {
 
 .wp-app .wp-header {
     position: sticky !important;
-    top: 76px !important;
+    top: 72px !important;
     z-index: 1040 !important;
     background: rgba(13, 13, 13, .97) !important;
     border-bottom: 1px solid #292929 !important;
@@ -9233,12 +9233,6 @@ body:has(.wp-app) .main-content {
 .wp-app .wp-mobile-modal-tabs,
 body:has(.wp-app) > .wp-modal .wp-mobile-modal-tabs {
     display: none;
-}
-
-@media (max-width: 1100px) {
-    .wp-app .wp-header {
-        top: 72px !important;
-    }
 }
 
 @media (max-width: 700px) {
