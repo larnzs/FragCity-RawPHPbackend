@@ -142,6 +142,51 @@ $statusLabels = [
 
 <section class="serverlist-page" id="fragcityServerBrowser" dir="rtl">
     <div class="sl-page-shell">
+        <section class="sl-hero" aria-labelledby="slHeroTitle">
+            <div class="sl-hero-copy">
+                <div class="sl-eyebrow" data-fc-reveal="up">
+                    <span class="sl-eyebrow-mark"></span>
+                    FRAGCITY <span>/</span> CS2 COMMUNITY
+                </div>
+                <h1 id="slHeroTitle" data-fc-reveal="up" data-fc-reveal-delay="70">
+                    سرور بعدی‌ات را
+                    <span>اینجا پیدا کن.</span>
+                </h1>
+                <p data-fc-reveal="up" data-fc-reveal-delay="140">
+                    فهرست سرورهای عمومی FragCity را مرور کن، وضعیت و نقشه را ببین،
+                    بازیکنان آنلاین را بررسی کن و با یک کلیک به سرور موردنظرت وصل شو.
+                </p>
+                <div class="sl-hero-actions" data-fc-reveal="up" data-fc-reveal-delay="210">
+                    <a class="sl-primary-action" href="#slBrowserControls">
+                        <i class="fa-solid fa-compass" aria-hidden="true"></i>
+                        پیدا کردن سرور
+                        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                    </a>
+                    <a class="sl-secondary-action" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen">
+                        سرور اختصاصی خودت را بساز
+                        <i class="fa-solid fa-arrow-up-left" aria-hidden="true"></i>
+                    </a>
+                </div>
+                <div class="sl-hero-signals" data-fc-reveal="up" data-fc-reveal-delay="270">
+                    <span><i class="fa-solid fa-signal" aria-hidden="true"></i> وضعیت سرورها</span>
+                    <span><i class="fa-solid fa-users" aria-hidden="true"></i> تعداد بازیکنان</span>
+                    <span><i class="fa-solid fa-map" aria-hidden="true"></i> نقشه و گیم‌مود</span>
+                </div>
+            </div>
+
+            <div class="sl-hero-art" data-fc-reveal="left" aria-hidden="true">
+                <div class="sl-art-grid"></div>
+                <span class="sl-art-ring sl-art-ring-one"></span>
+                <span class="sl-art-ring sl-art-ring-two"></span>
+                <div class="sl-art-center">
+                    <i class="fa-solid fa-tower-broadcast"></i>
+                    <span>FC</span>
+                </div>
+                <span class="sl-art-tag sl-art-tag-top">PUBLIC SERVERS</span>
+                <span class="sl-art-tag sl-art-tag-bottom">FIND YOUR GAME</span>
+            </div>
+        </section>
+
         <section class="sl-overview" aria-label="آمار سرورها">
             <article class="sl-overview-card" data-fc-reveal="up">
                 <span class="sl-overview-icon sl-icon-orange"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
@@ -191,7 +236,7 @@ $statusLabels = [
                 </div>
             </div>
             <?php if ($serverSnapshotStale): ?>
-                <div class="sl-snapshot-stale" role="status">
+                <div class="sl-snapshot-stale" role="status" data-fc-reveal="up">
                     <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
                     اتصال به منبع زنده موقتاً ناموفق بود؛ آخرین اطلاعات موفق
                     <?= $serverSnapshotAge !== null ? ' (' . $serverSnapshotAge . ' ثانیه قبل)' : '' ?>
@@ -276,7 +321,7 @@ $statusLabels = [
                 <?php if ($serverRows !== []): ?>
                     <?php foreach ($serverGroups as $groupName => $groupServers): ?>
                         <section class="sl-server-group" data-sl-group>
-                            <div class="sl-group-heading">
+                            <div class="sl-group-heading" data-fc-reveal="up">
                                 <div class="sl-group-title">
                                     <span class="sl-group-accent"></span>
                                     <h3><?= $escapeServerValue($groupName) ?></h3>
@@ -286,7 +331,7 @@ $statusLabels = [
                             </div>
 
                             <div class="sl-server-grid">
-                                <?php foreach ($groupServers as $server): ?>
+                                <?php foreach ($groupServers as $serverIndex => $server): ?>
                                     <?php
                                     $status = $server['status'];
                                     $statusClass = 'sl-status-' . $status;
@@ -308,6 +353,8 @@ $statusLabels = [
                                         data-mode="<?= $escapeServerValue($modeSearch) ?>"
                                         data-address="<?= $escapeServerValue($server['address']) ?>"
                                         data-players="<?= $server['players'] ?>"
+                                        data-fc-reveal="up"
+                                        data-fc-reveal-delay="<?= min(240, ($serverIndex % 5) * 48) ?>"
                                         data-fc-interactive
                                     >
                                         <div class="sl-card-cover">
@@ -423,7 +470,7 @@ $statusLabels = [
                 <small>فقط سرورهای تأییدشده با AppID 730 نمایش داده می‌شوند.</small>
             </div>
 
-            <div class="sl-no-match" id="slNoMatch" hidden>
+            <div class="sl-no-match" id="slNoMatch" hidden data-fc-reveal="up">
                 <i class="fa-solid fa-filter-circle-xmark" aria-hidden="true"></i>
                 <strong>نتیجه‌ای پیدا نشد</strong>
                 <span>فیلترها یا عبارت جستجو را تغییر بده.</span>
