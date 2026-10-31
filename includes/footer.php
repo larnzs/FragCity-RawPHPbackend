@@ -5,7 +5,7 @@
     <div class="footer-content">
         <div class="footer-grid">
             <section class="footer-col footer-brand" aria-label="درباره FragCity">
-                <a href="index.php?page=home" class="footer-brand-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
+                <a href="/index.php?page=home" class="footer-brand-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
                     <img
                         src="/assets/images/logo/main.png"
                         alt="FragCity"
@@ -22,9 +22,9 @@
             <nav class="footer-col" aria-label="دسترسی سریع">
                 <h2 class="footer-heading">دسترسی سریع</h2>
                 <ul class="footer-links">
-                    <li><a href="index.php?page=servers_vps" data-ajax-nav data-slug="servers_vps">لیست سرورها</a></li>
+                    <li><a href="/index.php?page=servers_vps" data-ajax-nav data-slug="servers_vps">لیست سرورها</a></li>
                     <li><a href="index.php?page=skins" data-ajax-nav data-slug="skins">اسکین‌ها</a></li>
-                    <li><a href="index.php?page=launcher" data-ajax-nav data-slug="launcher">دانلود لانچر <span class="footer-link-soon">به‌زودی</span></a></li>
+                    <li><a href="/index.php?page=launcher" data-ajax-nav data-slug="launcher">دانلود لانچر <span class="footer-link-soon">به‌زودی</span></a></li>
                 </ul>
             </nav>
 
