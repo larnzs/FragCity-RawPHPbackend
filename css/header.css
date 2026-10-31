@@ -2402,3 +2402,84 @@ body.fc-auth-modal-open {
         display: none;
     }
 }
+
+
+/* Keep the overlay/header overlap and the first page content on the same
+   measured height. The mobile container resolves to 66px in this layout. */
+:root {
+    --fc-header-overlap-height: 72px;
+}
+
+.shock-header {
+    margin-bottom: calc(-1 * var(--fc-header-overlap-height)) !important;
+}
+
+@media (max-width: 700px) {
+    :root {
+        --fc-header-overlap-height: 66px;
+    }
+
+    .shock-header {
+        margin-bottom: calc(-1 * var(--fc-header-overlap-height)) !important;
+    }
+}
+
+/* Compact icon-first Performance Mode control. The label expands on hover
+   and keyboard focus without changing the button's vertical alignment. */
+.shock-header .fc-motion-toggle {
+    box-sizing: border-box;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    flex: 0 0 40px;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+    border-radius: 10px;
+    transition:
+        width 190ms ease,
+        flex-basis 190ms ease,
+        gap 190ms ease,
+        padding 190ms ease,
+        color 140ms ease,
+        background-color 140ms ease,
+        border-color 140ms ease;
+}
+
+.shock-header .fc-motion-toggle__label {
+    display: inline-block;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    white-space: nowrap;
+    font-size: .67rem;
+    transition:
+        max-width 190ms ease,
+        opacity 130ms ease,
+        visibility 130ms ease;
+}
+
+.shock-header .fc-motion-toggle:hover,
+.shock-header .fc-motion-toggle:focus-visible {
+    width: 158px;
+    min-width: 158px;
+    flex-basis: 158px;
+    gap: 8px;
+    padding-inline: 11px;
+}
+
+.shock-header .fc-motion-toggle:hover .fc-motion-toggle__label,
+.shock-header .fc-motion-toggle:focus-visible .fc-motion-toggle__label {
+    max-width: 112px;
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-header .fc-motion-toggle,
+    .shock-header .fc-motion-toggle__label {
+        transition: none !important;
+    }
+}
