@@ -39,6 +39,11 @@ try {
     $siteBridge = $read('api/internal_agent_bridge.php');
     $preflight = $read('tools/site-bridge-preflight.php');
     $weaponRepo = $read('class/WeaponPaintsRepository.php');
+    $weaponPaintsUtils = $read('class/utils.php');
+    $weaponPaintsPage = $read('pages/weaponpaints.php');
+    $weaponPaintsJavascript = $read('js/weaponpaints.js');
+    $weaponPaintsStylesheet = $read('css/weaponpaints.css');
+    $pinCatalog = json_decode($read('data/collectibles_en.json'), true, 512, JSON_THROW_ON_ERROR);
     $apiClient = $read('class/FragCityLinuxApiClient.php');
     $settingsLoader = $read('settings/loader.php');
 
@@ -108,6 +113,41 @@ $check(
         && str_contains($apiClient, "hash_hmac('sha256'")
         && str_contains($apiClient, 'CURLOPT_SSL_VERIFYPEER => true')
         && !str_contains($weaponRepo, 'new PDO')
+);
+
+$check(
+    'Pin catalog preserves each pin ID after pagination converts the catalog to a numeric list',
+    str_contains($weaponPaintsUtils, "'id'        => (int)$id")
+        && str_contains($weaponPaintsPage, "\$pin['id']")
+        && is_array($pinCatalog)
+        && count($pinCatalog) > 0
+        && array_reduce($pinCatalog, static function (bool $valid, mixed $pin): bool {
+            $id = is_array($pin) ? ($pin['id'] ?? $pin['pin_id'] ?? null) : null;
+            return $valid && (is_int($id) || (is_string($id) && preg_match('/^\\d+$/D', $id) === 1))
+                && (int)$id >= 0 && (int)$id <= 100000;
+        }, true)
+);
+
+$check(
+    'WeaponPaints skin, sticker and keychain modals expose separate mobile selection and feature tabs',
+    str_contains($weaponPaintsJavascript, 'function setupMobileModalTabs(')
+        && str_contains($weaponPaintsJavascript, "label: 'انتخاب Paint'")
+        && str_contains($weaponPaintsJavascript, "label: 'افزودن ویژگی‌ها'")
+        && str_contains($weaponPaintsJavascript, "key: 'select'")
+        && str_contains($weaponPaintsJavascript, "setupMobileModalTabs(")
+        && str_contains($weaponPaintsStylesheet, '.wp-mobile-modal-tabs')
+        && str_contains($weaponPaintsStylesheet, '.wp-skin-list-pane.is-mobile-active')
+        && str_contains($weaponPaintsStylesheet, '.wp-addon-list-pane.is-mobile-active')
+        && str_contains($weaponPaintsStylesheet, '.wp-addon-properties.is-mobile-active')
+);
+
+$check(
+    'WeaponPaints mobile category bar is sticky within the main content scrollport and compact controls fit small screens',
+    str_contains($weaponPaintsStylesheet, '.wp-app .wp-header')
+        && str_contains($weaponPaintsStylesheet, 'position: sticky !important;')
+        && str_contains($weaponPaintsStylesheet, 'top: 0 !important;')
+        && str_contains($weaponPaintsStylesheet, 'grid-template-areas:')
+        && str_contains($weaponPaintsStylesheet, 'scroll-snap-type: x proximity;')
 );
 
 $check(
