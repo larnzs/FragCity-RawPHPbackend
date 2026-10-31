@@ -273,12 +273,6 @@
                 return Number(b.dataset.players || 0) - Number(a.dataset.players || 0);
             }
 
-            if (sort === 'query-asc') {
-                const aValue = a.dataset.query === '' ? Number.POSITIVE_INFINITY : Number(a.dataset.query);
-                const bValue = b.dataset.query === '' ? Number.POSITIVE_INFINITY : Number(b.dataset.query);
-                return aValue - bValue;
-            }
-
             if (sort === 'name-asc') {
                 return (a.dataset.name || '').localeCompare(b.dataset.name || '', 'fa');
             }
