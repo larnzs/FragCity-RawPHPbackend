@@ -1980,45 +1980,21 @@ body.sl-player-modal-open {
     font: 800 .72rem var(--fc-font-mono) !important;
 }
 
-.sl-faceit-pending,
-.sl-faceit-level-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 25px;
-    padding: 4px 8px;
-    border: 1px solid rgba(249,115,22,.14);
-    border-radius: 6px;
-    background: rgba(249,115,22,.055);
-    color: #bd8a62;
-    font-size: .59rem;
-    font-weight: 800;
-    white-space: nowrap;
-}
-
-.sl-faceit-level-badge {
-    min-width: 36px;
-    min-height: 34px;
-    gap: 7px;
-    padding: 3px 7px;
-    border-color: rgba(255,179,71,.22);
-    background: rgba(255,179,71,.09);
-    color: #ffc27f;
-    font-family: var(--fc-font-mono);
+.sl-player-faceit {
+    text-align: center;
+    vertical-align: middle;
 }
 
 .sl-faceit-level-icon {
-    display: block;
+    display: inline-block;
     width: 30px;
     height: 30px;
-    flex: 0 0 30px;
+    min-width: 30px;
+    min-height: 30px;
     object-fit: contain;
-}
-
-.sl-faceit-level-badge--unranked {
-    border-color: rgba(255,255,255,.08);
-    background: rgba(255,255,255,.035);
-    color: #9a9a9a;
+    object-position: center;
+    vertical-align: middle;
+    filter: drop-shadow(0 4px 3px rgba(0, 0, 0, .92));
 }
 
 .sl-player-modal-footer {
@@ -3715,52 +3691,28 @@ html.fc-no-animation .sl-player-modal-backdrop {
 }
 
 
-/* FACEIT card averages and reliable SVG badge sizing. */
+/* FACEIT levels are represented by standalone SVG artwork only. */
 .sl-card-metrics {
     grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-.sl-metric--faceit-average {
-    border-color: rgba(255, 179, 71, .18);
-    background: linear-gradient(145deg, rgba(255, 179, 71, .065), rgba(255, 255, 255, .018));
-}
-
-.sl-metric--faceit-average > span i {
-    color: #ffb347;
-}
-
-.sl-metric--faceit-average > strong[data-average-state="ready"] {
-    color: #ffc36d;
-}
-
-.sl-metric--faceit-average > strong[data-average-state="loading"] {
-    color: #aeb4bf;
-}
-
-.sl-faceit-level-icon {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    min-height: 30px;
-    flex: 0 0 30px;
+.sl-faceit-average-icon {
     display: block;
+    justify-self: center;
+    align-self: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
     object-fit: contain;
     object-position: center;
     aspect-ratio: 1 / 1;
+    visibility: hidden;
+    filter: drop-shadow(0 4px 3px rgba(0, 0, 0, .92));
 }
 
-.sl-faceit-level-icon-fallback {
-    width: 30px;
-    height: 30px;
-    flex: 0 0 30px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(255, 179, 71, .3);
-    border-radius: 50%;
-    background: rgba(255, 179, 71, .1);
-    color: #ffc36d;
-    font: 800 .65rem var(--fc-font-mono);
+.sl-faceit-average-icon[data-average-state="ready"] {
+    visibility: visible;
 }
 
 #serverList[data-sl-view="list"] .sl-card-content {
