@@ -264,6 +264,13 @@
         });
     }
 
+    async function loadPageScripts(slug) {
+        const scripts = pageAssetList(slug, 'js');
+        for (const src of scripts) {
+            await loadScript(src);
+        }
+    }
+
     async function ensureAuthLoginAssets() {
         const styles = pageAssetList('login', 'css');
 
@@ -338,7 +345,7 @@
         const message = document.createElement('div');
         message.className = 'fc-auth-modal__loading';
         message.setAttribute('role', 'alert');
-        message.textContent = 'بارگذاری فرم ورود انجام نشد. اتصال اینترنت را بررسی و دوباره تلاش کنید.';
+        message.textContent = 'بارگذاری فرم ورود ناموفق بود. لطفاً دوباره تلاش کنید.';
         authLoginModalContent.replaceChildren(message);
     }
 
@@ -356,7 +363,11 @@
 
         const response = await fetch(requestUrl.href, {
             credentials: 'same-origin',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            cache: 'no-store',
+            headers: {
+                'Accept': 'text/html',
+                'X-Requested-With': 'XMLHttpRequest'
+            }
         });
 
         if (!response.ok) {
@@ -430,6 +441,7 @@
                 );
                 if (firstInput) firstInput.focus();
             } catch (error) {
+                console.error('[FragCity] Login modal failed to load:', error);
                 showAuthLoginLoadError();
             } finally {
                 authLoginOpenPromise = null;
