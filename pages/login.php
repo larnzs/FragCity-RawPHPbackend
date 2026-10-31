@@ -65,6 +65,25 @@ unset($_SESSION['auth_error']);
                 </div>
             </div>
 
+            <!-- Remember this browser -->
+            <label class="auth-remember" for="rememberMe">
+                <input
+                    id="rememberMe"
+                    type="checkbox"
+                    name="remember_me"
+                    value="1"
+                    role="switch"
+                    aria-label="مرا به خاطر بسپار"
+                >
+                <span class="auth-remember__switch" aria-hidden="true">
+                    <span class="auth-remember__thumb"></span>
+                </span>
+                <span class="auth-remember__text">
+                    <strong>مرا به خاطر بسپار</strong>
+                    <small>تا ۳۰ روز بدون ورود مجدد</small>
+                </span>
+            </label>
+
             <!-- Forgot Password -->
             <div class="form-group auth-links">
                 <a
