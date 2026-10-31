@@ -1972,3 +1972,57 @@ body.mobile-menu-open {
         transition: none !important;
     }
 }
+
+
+/*
+ * Persistent frosted-glass header:
+ * transparent only at the absolute top; both scroll directions retain
+ * the same translucent graphite surface and blur.
+ */
+.shock-header:not(.is-scroll-down):not(.is-scroll-up):not(.is-scrolled) {
+    background: rgba(13, 13, 13, 0) !important;
+    border-bottom-color: transparent !important;
+    box-shadow: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+.shock-header.is-scrolled,
+.shock-header.is-scroll-down,
+.shock-header.is-scroll-up {
+    background: rgba(13, 13, 13, .58) !important;
+    border-bottom-color: rgba(255, 255, 255, .09) !important;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .22) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(125%) !important;
+    backdrop-filter: blur(18px) saturate(125%) !important;
+}
+
+/* Header dropdowns use the same glass language as the sticky bar. */
+.shock-header .frag-dropdown-menu {
+    background:
+        linear-gradient(145deg, rgba(28, 29, 35, .88), rgba(13, 14, 18, .82)) !important;
+    border-color: rgba(255, 255, 255, .11) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(130%) !important;
+    backdrop-filter: blur(20px) saturate(130%) !important;
+}
+
+.shock-header,
+.shock-header.is-scrolled,
+.shock-header.is-scroll-down,
+.shock-header.is-scroll-up {
+    transition:
+        background-color 220ms ease,
+        border-color 220ms ease,
+        box-shadow 220ms ease,
+        -webkit-backdrop-filter 220ms ease,
+        backdrop-filter 220ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-header,
+    .shock-header.is-scrolled,
+    .shock-header.is-scroll-down,
+    .shock-header.is-scroll-up {
+        transition: none !important;
+    }
+}
