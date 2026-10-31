@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="32px"
+	 height="32px" viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+<g id="Layer_2">
+	<g>
+		
+			<rect x="11.369" y="14.628" transform="matrix(0.7069 -0.7073 0.7073 0.7069 -9.2911 14.4546)" fill="#FFFFFF" width="2.856" height="7.623"/>
+		
+			<rect x="11.489" y="14.73" transform="matrix(0.7068 -0.7074 0.7074 0.7068 -5.9479 17.9651)" fill="#FFFFFF" width="14.419" height="2.856"/>
+	</g>
+	<g>
+		<g>
+			<polyline fill="none" stroke="#FFFFFF" stroke-width="2.5238" stroke-miterlimit="10" points="31.382,23.984 25.543,25.622 
+				23.906,19.783 			"/>
+			<path fill="none" stroke="#FFFFFF" stroke-width="2.5238" stroke-miterlimit="10" d="M25.68,24.746
+				c2.25-2.325,3.635-5.493,3.633-8.984c0.001-7.137-5.784-12.923-12.921-12.922c-1.947,0.001-3.795,0.434-5.451,1.204"/>
+		</g>
+		<g>
+			<polyline fill="none" stroke="#FFFFFF" stroke-width="2.5238" stroke-miterlimit="10" points="0.718,8.629 6.558,6.991 
+				8.196,12.829 			"/>
+			<path fill="none" stroke="#FFFFFF" stroke-width="2.5238" stroke-miterlimit="10" d="M6.421,7.867
+				c-2.25,2.325-3.634,5.492-3.633,8.984c-0.001,7.137,5.784,12.923,12.921,12.922c1.918-0.001,3.739-0.421,5.377-1.171"/>
+		</g>
+	</g>
+</g>
+</svg>
