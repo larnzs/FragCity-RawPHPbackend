@@ -11,9 +11,11 @@ final class FaceitApiClient
 {
     private const API_BASE = 'https://open.faceit.com/data/v4';
     private const CACHE_DIRECTORY = 'fragcity-faceit-cache-v1';
-    private const CACHE_TTL_SECONDS = 900;
+    private const CACHE_TTL_SECONDS = 1800;
     private const NEGATIVE_CACHE_TTL_SECONDS = 600;
     private const ERROR_CACHE_TTL_SECONDS = 45;
+    private const DEFAULT_RATE_LIMIT_BACKOFF_SECONDS = 60;
+    private const MAX_RATE_LIMIT_BACKOFF_SECONDS = 300;
     private const MAX_CONCURRENT_LOOKUPS = 12;
 
     private string $apiKey;
@@ -33,6 +35,9 @@ final class FaceitApiClient
 
     /**
      * Add FACEIT rank metadata to trusted player rows.
+     *
+     * A per-SteamID file lock prevents simultaneous PHP requests from
+     * sending duplicate FACEIT lookups for the same player.
      *
      * @param array<int|string, mixed> $players
      * @return array<int|string, mixed>
@@ -55,20 +60,103 @@ final class FaceitApiClient
 
         if ($this->apiKey !== '' && $steamIds !== []) {
             $missing = [];
+            $staleProfiles = [];
+            $staleCachedAt = [];
 
             foreach ($steamIds as $steamId) {
-                $cached = $this->readCache($steamId);
-                if ($cached !== null) {
-                    $profiles[$steamId] = $cached;
-                } else {
-                    $missing[] = $steamId;
+                $record = $this->readCacheRecord($steamId);
+                if ($record !== null && $this->isCacheFresh($record)) {
+                    $profiles[$steamId] = $record['profile'];
+                    continue;
                 }
+
+                if ($record !== null && self::hasUsableLevel($record['profile'])) {
+                    $staleProfiles[$steamId] = $record['profile'];
+                    $staleCachedAt[$steamId] = $record['cached_at'];
+                }
+
+                if ($record !== null && $this->isRetryBackoffActive($record)) {
+                    $profiles[$steamId] = self::hasUsableLevel($record['profile'])
+                        ? $record['profile']
+                        : $record['profile'];
+                    continue;
+                }
+
+                $missing[] = $steamId;
             }
 
-            foreach (array_chunk($missing, self::MAX_CONCURRENT_LOOKUPS) as $batch) {
-                foreach ($this->fetchBatch($batch) as $steamId => $profile) {
-                    $profiles[$steamId] = $profile;
-                    $this->writeCache($steamId, $profile);
+            // Acquire locks in a stable order so overlapping batches cannot deadlock.
+            sort($missing, SORT_STRING);
+            $locks = [];
+            try {
+                $toFetch = [];
+
+                foreach ($missing as $steamId) {
+                    $lock = $this->acquireCacheLock($steamId);
+                    if (is_resource($lock)) {
+                        $locks[$steamId] = $lock;
+                    }
+
+                    // Another PHP request may have populated the cache while
+                    // this request waited for the lock.
+                    $record = $this->readCacheRecord($steamId);
+                    if ($record !== null && $this->isCacheFresh($record)) {
+                        $profiles[$steamId] = $record['profile'];
+                        continue;
+                    }
+
+                    if ($record !== null && self::hasUsableLevel($record['profile'])) {
+                        $staleProfiles[$steamId] = $record['profile'];
+                        $staleCachedAt[$steamId] = $record['cached_at'];
+                    }
+
+                    if ($record !== null && $this->isRetryBackoffActive($record)) {
+                        $profiles[$steamId] = $record['profile'];
+                        continue;
+                    }
+
+                    $toFetch[] = $steamId;
+                }
+
+                foreach (array_chunk($toFetch, self::MAX_CONCURRENT_LOOKUPS) as $batch) {
+                    $batchResponse = $this->fetchBatch($batch);
+                    $batchProfiles = $batchResponse['profiles'];
+                    $retryAfter = $batchResponse['retry_after'];
+
+                    foreach ($batch as $steamId) {
+                        $profile = $batchProfiles[$steamId] ?? self::emptyProfile('api_unavailable');
+
+                        if ($profile['faceit_status'] === 'api_unavailable') {
+                            $cooldown = max(
+                                self::ERROR_CACHE_TTL_SECONDS,
+                                (int)($retryAfter[$steamId] ?? self::ERROR_CACHE_TTL_SECONDS)
+                            );
+                            $retryAt = time() + min(self::MAX_RATE_LIMIT_BACKOFF_SECONDS, $cooldown);
+
+                            if (isset($staleProfiles[$steamId]) && self::hasUsableLevel($staleProfiles[$steamId])) {
+                                // Keep showing the last known Level during transient FACEIT outages.
+                                $profiles[$steamId] = $staleProfiles[$steamId];
+                                $this->writeCache(
+                                    $steamId,
+                                    $staleProfiles[$steamId],
+                                    $staleCachedAt[$steamId] ?? time(),
+                                    $retryAt
+                                );
+                            } else {
+                                $profiles[$steamId] = $profile;
+                                $this->writeCache($steamId, $profile, time(), $retryAt);
+                            }
+                            continue;
+                        }
+
+                        $profiles[$steamId] = $profile;
+                        $this->writeCache($steamId, $profile);
+                    }
+                }
+            } finally {
+                foreach ($locks as $lock) {
+                    @flock($lock, LOCK_UN);
+                    @fclose($lock);
                 }
             }
         }
@@ -125,30 +213,45 @@ final class FaceitApiClient
     }
 
     /**
+     * @param array{faceit_level:?int,faceit_status:string} $profile
+     */
+    private static function hasUsableLevel(array $profile): bool
+    {
+        $level = $profile['faceit_level'] ?? null;
+        return is_int($level) && $level >= 1 && $level <= 10;
+    }
+
+    /**
      * @param array<int, string> $steamIds
-     * @return array<string, array{faceit_level:?int,faceit_status:string}>
+     * @return array{
+     *   profiles:array<string,array{faceit_level:?int,faceit_status:string}>,
+     *   retry_after:array<string,int>
+     * }
      */
     private function fetchBatch(array $steamIds): array
     {
         $results = [];
+        $retryAfterBySteamId = [];
 
         if ($steamIds === []) {
-            return $results;
+            return ['profiles' => $results, 'retry_after' => $retryAfterBySteamId];
         }
 
         if (!function_exists('curl_init') || !function_exists('curl_multi_init')) {
             foreach ($steamIds as $steamId) {
                 $results[$steamId] = self::emptyProfile('api_unavailable');
+                $retryAfterBySteamId[$steamId] = self::ERROR_CACHE_TTL_SECONDS;
             }
-            return $results;
+            return ['profiles' => $results, 'retry_after' => $retryAfterBySteamId];
         }
 
         $multiHandle = curl_multi_init();
         if ($multiHandle === false) {
             foreach ($steamIds as $steamId) {
                 $results[$steamId] = self::emptyProfile('api_unavailable');
+                $retryAfterBySteamId[$steamId] = self::ERROR_CACHE_TTL_SECONDS;
             }
-            return $results;
+            return ['profiles' => $results, 'retry_after' => $retryAfterBySteamId];
         }
 
         $handles = [];
@@ -167,8 +270,11 @@ final class FaceitApiClient
             $handle = curl_init(self::API_BASE . '/players?' . $query);
             if ($handle === false) {
                 $results[$steamId] = self::emptyProfile('api_unavailable');
+                $retryAfterBySteamId[$steamId] = self::ERROR_CACHE_TTL_SECONDS;
                 continue;
             }
+
+            $headerState = (object)['retry_after_seconds' => null];
 
             curl_setopt_array($handle, [
                 CURLOPT_HTTPGET => true,
@@ -185,10 +291,28 @@ final class FaceitApiClient
                 CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
                 CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
                 CURLOPT_USERAGENT => 'FragCity-ServerBrowser/1.0',
+                CURLOPT_HEADERFUNCTION => static function ($curl, string $headerLine) use ($headerState): int {
+                    if (stripos($headerLine, 'Retry-After:') === 0) {
+                        $value = trim(substr($headerLine, strlen('Retry-After:')));
+                        if (ctype_digit($value)) {
+                            $seconds = (int)$value;
+                        } else {
+                            $timestamp = strtotime($value);
+                            $seconds = $timestamp === false ? 0 : $timestamp - time();
+                        }
+
+                        $headerState->retry_after_seconds = max(0, min(300, $seconds));
+                    }
+
+                    return strlen($headerLine);
+                },
             ]);
 
             curl_multi_add_handle($multiHandle, $handle);
-            $handles[$steamId] = $handle;
+            $handles[$steamId] = [
+                'handle' => $handle,
+                'header_state' => $headerState,
+            ];
         }
 
         $running = 0;
@@ -206,21 +330,36 @@ final class FaceitApiClient
             }
         } while ($running > 0);
 
-        foreach ($handles as $steamId => $handle) {
+        foreach ($handles as $steamId => $request) {
+            $handle = $request['handle'];
             $body = curl_multi_getcontent($handle);
             $curlError = curl_errno($handle);
             $httpStatus = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
+            $retryHeader = $request['header_state']->retry_after_seconds;
 
             if ($curlError !== 0) {
                 error_log('[FragCity FACEIT] Data API transport failed; cURL code=' . $curlError);
                 $results[$steamId] = self::emptyProfile('api_unavailable');
+                $retryAfterBySteamId[$steamId] = self::ERROR_CACHE_TTL_SECONDS;
             } elseif ($httpStatus === 404) {
                 $results[$steamId] = self::emptyProfile('profile_not_found');
+            } elseif ($httpStatus === 429) {
+                error_log('[FragCity FACEIT] Data API rate limit reached (HTTP 429).');
+                $results[$steamId] = self::emptyProfile('api_unavailable');
+                $retryAfterBySteamId[$steamId] = max(
+                    self::DEFAULT_RATE_LIMIT_BACKOFF_SECONDS,
+                    min(self::MAX_RATE_LIMIT_BACKOFF_SECONDS, (int)($retryHeader ?? 0))
+                );
+            } elseif ($httpStatus === 401 || $httpStatus === 403) {
+                error_log('[FragCity FACEIT] Data API rejected the configured credentials (HTTP ' . $httpStatus . ').');
+                $results[$steamId] = self::emptyProfile('api_unavailable');
+                $retryAfterBySteamId[$steamId] = self::MAX_RATE_LIMIT_BACKOFF_SECONDS;
             } elseif ($httpStatus >= 200 && $httpStatus < 300 && is_string($body)) {
                 $decoded = json_decode($body, true);
                 if (!is_array($decoded) || json_last_error() !== JSON_ERROR_NONE) {
                     error_log('[FragCity FACEIT] Data API returned invalid JSON.');
                     $results[$steamId] = self::emptyProfile('api_unavailable');
+                    $retryAfterBySteamId[$steamId] = self::ERROR_CACHE_TTL_SECONDS;
                 } else {
                     $game = $decoded['games']['cs2'] ?? null;
                     if (!is_array($game)) {
@@ -239,14 +378,17 @@ final class FaceitApiClient
             } else {
                 error_log('[FragCity FACEIT] Data API request returned HTTP ' . $httpStatus . '.');
                 $results[$steamId] = self::emptyProfile('api_unavailable');
+                $retryAfterBySteamId[$steamId] = self::ERROR_CACHE_TTL_SECONDS;
             }
 
             curl_multi_remove_handle($multiHandle, $handle);
             unset($handles[$steamId]);
         }
 
-        foreach ($handles as $steamId => $handle) {
+        foreach ($handles as $steamId => $request) {
+            $handle = $request['handle'];
             $results[$steamId] = self::emptyProfile('api_unavailable');
+            $retryAfterBySteamId[$steamId] = self::ERROR_CACHE_TTL_SECONDS;
             curl_multi_remove_handle($multiHandle, $handle);
         }
 
@@ -255,14 +397,24 @@ final class FaceitApiClient
         foreach ($steamIds as $steamId) {
             if (!isset($results[$steamId])) {
                 $results[$steamId] = self::emptyProfile('api_unavailable');
+                $retryAfterBySteamId[$steamId] = self::ERROR_CACHE_TTL_SECONDS;
             }
         }
 
-        return $results;
+        return [
+            'profiles' => $results,
+            'retry_after' => $retryAfterBySteamId,
+        ];
     }
 
-    /** @return array{faceit_level:?int,faceit_status:string}|null */
-    private function readCache(string $steamId): ?array
+    /**
+     * @return array{
+     *   cached_at:int,
+     *   retry_after_at:int,
+     *   profile:array{faceit_level:?int,faceit_status:string}
+     * }|null
+     */
+    private function readCacheRecord(string $steamId): ?array
     {
         $path = $this->cachePath($steamId);
         if (!is_file($path) || !is_readable($path)) {
@@ -278,41 +430,73 @@ final class FaceitApiClient
         }
 
         $status = (string)($record['profile']['faceit_status'] ?? '');
-        $ttl = match ($status) {
+        $allowedStatuses = [
+            'available',
+            'unranked',
+            'no_cs2_profile',
+            'profile_not_found',
+            'api_unavailable',
+        ];
+        if (!in_array($status, $allowedStatuses, true)) {
+            return null;
+        }
+
+        $level = $record['profile']['faceit_level'] ?? null;
+        $profile = [
+            'faceit_level' => is_int($level) && $level >= 1 && $level <= 10 ? $level : null,
+            'faceit_status' => $status,
+        ];
+
+        return [
+            'cached_at' => $record['cached_at'],
+            'retry_after_at' => is_int($record['retry_after_at'] ?? null) ? $record['retry_after_at'] : 0,
+            'profile' => $profile,
+        ];
+    }
+
+    /**
+     * @param array{cached_at:int,retry_after_at:int,profile:array{faceit_level:?int,faceit_status:string}} $record
+     */
+    private function isCacheFresh(array $record): bool
+    {
+        $ttl = match ($record['profile']['faceit_status']) {
             'available', 'unranked', 'no_cs2_profile' => self::CACHE_TTL_SECONDS,
             'profile_not_found' => self::NEGATIVE_CACHE_TTL_SECONDS,
             'api_unavailable' => self::ERROR_CACHE_TTL_SECONDS,
             default => 0,
         };
 
-        if ($ttl < 1 || time() - $record['cached_at'] > $ttl) {
-            return null;
-        }
+        return $ttl > 0 && time() - $record['cached_at'] <= $ttl;
+    }
 
-        $level = $record['profile']['faceit_level'] ?? null;
-        return [
-            'faceit_level' => is_int($level) && $level >= 1 && $level <= 10 ? $level : null,
-            'faceit_status' => $status,
-        ];
+    /**
+     * @param array{cached_at:int,retry_after_at:int,profile:array{faceit_level:?int,faceit_status:string}} $record
+     */
+    private function isRetryBackoffActive(array $record): bool
+    {
+        return $record['retry_after_at'] > time();
     }
 
     /** @param array{faceit_level:?int,faceit_status:string} $profile */
-    private function writeCache(string $steamId, array $profile): void
-    {
-        if (!is_dir($this->cacheDirectory)
-            && !@mkdir($this->cacheDirectory, 0700, true)
-            && !is_dir($this->cacheDirectory)) {
+    private function writeCache(
+        string $steamId,
+        array $profile,
+        ?int $cachedAt = null,
+        ?int $retryAfterAt = null
+    ): void {
+        if (!$this->ensureCacheDirectory()) {
             return;
         }
 
-        $json = json_encode(
-            [
-                'cached_at' => time(),
-                'profile' => $profile,
-            ],
-            JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
-        );
+        $record = [
+            'cached_at' => $cachedAt ?? time(),
+            'profile' => $profile,
+        ];
+        if ($retryAfterAt !== null && $retryAfterAt > 0) {
+            $record['retry_after_at'] = $retryAfterAt;
+        }
 
+        $json = json_encode($record, JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
         $path = $this->cachePath($steamId);
         $temporary = $path . '.tmp.' . getmypid() . '.' . bin2hex(random_bytes(4));
 
@@ -327,6 +511,33 @@ final class FaceitApiClient
         }
 
         @chmod($path, 0600);
+    }
+
+    /** @return resource|false */
+    private function acquireCacheLock(string $steamId)
+    {
+        if (!$this->ensureCacheDirectory()) {
+            return false;
+        }
+
+        $handle = @fopen($this->cachePath($steamId) . '.lock', 'c');
+        if ($handle === false) {
+            return false;
+        }
+
+        @chmod($this->cachePath($steamId) . '.lock', 0600);
+        if (!@flock($handle, LOCK_EX)) {
+            @fclose($handle);
+            return false;
+        }
+
+        return $handle;
+    }
+
+    private function ensureCacheDirectory(): bool
+    {
+        return is_dir($this->cacheDirectory)
+            || (@mkdir($this->cacheDirectory, 0700, true) && is_dir($this->cacheDirectory));
     }
 
     private function cachePath(string $steamId): string
