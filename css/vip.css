@@ -34,3 +34,15 @@
 .feature-text { font-size:.82rem; color:#cbd5e1; line-height:1.7; }
 .feature-title { color:var(--feature-color,#93c5fd); font-weight:800; font-size:.82rem; }
 @media (max-width:700px) { .vip-page { padding:20px 12px 42px; } .vip-xp-header,.vip-xp-footer { align-items:flex-start; flex-direction:column; } .vip-sync-btn { width:100%; justify-content:center; } .vip-levels-card { padding:16px; } }
+
+/* Shared safe-area rhythm: clear the overlay header and the global footer. */
+.vip-page {
+    padding-top: calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap, 28px));
+    padding-bottom: var(--fc-page-safe-bottom, 64px);
+}
+
+@media (max-width: 700px) {
+    .vip-page {
+        padding-top: calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px));
+    }
+}
