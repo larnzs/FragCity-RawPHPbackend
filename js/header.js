@@ -345,10 +345,9 @@
         // A protected-page redirect already stored its intended destination in
         // the session. Otherwise, return the user to the page they opened login from.
         if (currentUrl.searchParams.get('page') !== 'login') {
-            requestUrl.searchParams.set(
-                'return_to',
-                currentUrl.pathname + currentUrl.search
-            );
+            let returnTo = currentUrl.pathname + currentUrl.search;
+            if (returnTo === '/' || returnTo === '') returnTo = '/index.php';
+            requestUrl.searchParams.set('return_to', returnTo);
         }
 
         const response = await fetch(requestUrl.href, {
@@ -537,7 +536,7 @@
 
     document.addEventListener('click', function (event) {
         const trigger = event.target.closest('[data-auth-modal-open]');
-        if (!trigger) return;
+        if (!trigger || !authLoginModal || !authLoginModalContent) return;
 
         if (
             event.defaultPrevented ||
