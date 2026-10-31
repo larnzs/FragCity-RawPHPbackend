@@ -341,3 +341,112 @@
         max-height: 46px !important;
     }
 }
+
+
+/* ==========================================================================
+   FragCity frosted footer surfaces
+   Keeps the existing grid, routes, trust badges and responsive sizing intact.
+   ========================================================================== */
+
+.site-footer {
+    border-top-color: rgba(255, 255, 255, 0.085);
+    background:
+        radial-gradient(ellipse at 78% 0%, rgba(249, 115, 22, 0.075), transparent 42%),
+        linear-gradient(180deg, rgba(17, 17, 17, 0.96), rgba(5, 5, 5, 0.985));
+    -webkit-backdrop-filter: blur(18px) saturate(125%);
+    backdrop-filter: blur(18px) saturate(125%);
+}
+
+.footer-col {
+    padding: 19px 18px 20px;
+    border: 1px solid rgba(255, 255, 255, 0.065);
+    border-radius: 16px;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.014)),
+        rgba(17, 17, 17, 0.42);
+    box-shadow:
+        0 14px 34px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    backdrop-filter: blur(18px) saturate(120%);
+}
+
+.footer-brand {
+    border-color: rgba(249, 115, 22, 0.11);
+    background:
+        radial-gradient(ellipse at 92% 0%, rgba(249, 115, 22, 0.075), transparent 48%),
+        linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.014)),
+        rgba(17, 17, 17, 0.42);
+}
+
+.footer-heading::after {
+    box-shadow: 0 0 14px rgba(249, 115, 22, 0.28);
+}
+
+.footer-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 3px 8px;
+    margin-inline: -8px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    transition:
+        color 150ms ease,
+        transform 150ms ease,
+        background-color 150ms ease,
+        border-color 150ms ease;
+}
+
+.footer-links a:hover,
+.footer-links a:focus-visible {
+    border-color: rgba(249, 115, 22, 0.12);
+    background: rgba(249, 115, 22, 0.055);
+    color: #FDBA74;
+}
+
+.enamad-badge,
+.zarinpal-box {
+    border-color: rgba(255, 255, 255, 0.105);
+    background: rgba(255, 255, 255, 0.035);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    backdrop-filter: blur(14px) saturate(120%);
+}
+
+.enamad-badge:hover,
+.zarinpal-box:hover {
+    border-color: rgba(249, 115, 22, 0.34);
+    background: rgba(249, 115, 22, 0.055);
+}
+
+.footer-bottom {
+    border-top-color: rgba(255, 255, 255, 0.075);
+}
+
+@media (max-width: 560px) {
+    .footer-col {
+        padding: 15px 13px 16px;
+        border-radius: 13px;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .site-footer,
+    .footer-col,
+    .enamad-badge,
+    .zarinpal-box {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    .footer-col {
+        background: #111111;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .footer-links a {
+        transition: none !important;
+    }
+}
