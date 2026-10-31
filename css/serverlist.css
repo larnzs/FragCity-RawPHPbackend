@@ -3515,3 +3515,16 @@ body.site-body:has(.serverlist-page) .main-content {
         padding: 9px;
     }
 }
+
+/* Shared bottom clearance and measured header-safe top spacing. */
+.serverlist-page {
+    padding-top: calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap, 28px)) !important;
+    padding-bottom: var(--fc-page-safe-bottom, 56px) !important;
+}
+
+@media (max-width: 760px) {
+    .serverlist-page {
+        padding-top: calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px)) !important;
+        padding-bottom: var(--fc-page-safe-bottom, 44px) !important;
+    }
+}
