@@ -277,27 +277,6 @@ $mobileNavItems = [
                     </div>
                 </div>
 
-                <!-- اصلاح مسیر دکمه پنل ادمینی به پوشه واقعی panels/cs2/index.php -->
-                <div class="frag-dropdown" id="shockAdminPanelDropdown">
-                    <button type="button"
-                            class="shock-nav-item"
-                            id="shockAdminPanelButton"
-                            aria-expanded="false"
-                            aria-controls="shockAdminPanelMenu">
-                        <i class="fas fa-shield-halved" aria-hidden="true"></i>
-                        <span class="admin-panel-label">پنل ادمینی سرور</span>
-                        <i class="fas fa-chevron-down frag-arrow" aria-hidden="true"></i>
-                    </button>
-
-                    <div class="frag-dropdown-menu admin-panel-menu" id="shockAdminPanelMenu">
-                        <a href="panels/cs2/index.php"
-                           class="frag-drop-link admin-panel-game-link">
-                            <img src="assets/images/logo/cs2.png" alt="" class="admin-panel-game-icon">
-                            <span>Counter Strike 2</span>
-                        </a>
-                    </div>
-                </div>
-
             <?php else: ?>
                 <a href="?page=login"
                    class="frag-login-btn <?= $isPageActive(['login', 'register']) ?>"
@@ -347,11 +326,6 @@ $mobileNavItems = [
             <a href="?page=profile" class="mobile-nav-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
                 <i class="fas fa-user-circle" aria-hidden="true"></i>
                 <span><?= htmlspecialchars((string) $displayName, ENT_QUOTES, 'UTF-8') ?></span>
-            </a>
-            <!-- اصلاح لینک منوی موبایل -->
-            <a href="panels/cs2/index.php" class="mobile-nav-link">
-                <i class="fas fa-shield-halved" aria-hidden="true"></i>
-                <span>پنل ادمینی سرور (CS2)</span>
             </a>
             <a href="?logout=1" class="mobile-nav-link logout-link">
                 <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
