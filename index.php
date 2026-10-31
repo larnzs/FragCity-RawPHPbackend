@@ -730,6 +730,23 @@ $pageFile = match ($page) {
         content="dark"
     >
 
+    <script>
+    (function () {
+        try {
+            var saved = localStorage.getItem('fragcity:no-animation-mode');
+            var prefersReduced = window.matchMedia
+                && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (saved === '1' || (saved === null && prefersReduced)) {
+                document.documentElement.classList.add('fc-no-animation');
+            }
+        } catch (error) {
+            if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.documentElement.classList.add('fc-no-animation');
+            }
+        }
+    })();
+    </script>
+
     <title>FragCity | سرور CS2</title>
 
     <!-- Font Awesome: CDN only -->
