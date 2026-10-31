@@ -28,16 +28,6 @@
                 </ul>
             </nav>
 
-            <nav class="footer-col" aria-label="راهنما و پشتیبانی">
-                <h2 class="footer-heading">راهنما و پشتیبانی</h2>
-                <ul class="footer-links">
-                    <li><a href="index.php?page=support" data-ajax-nav data-slug="support">ارتباط با ما</a></li>
-                    <li><a href="index.php?page=usermanual" data-ajax-nav data-slug="usermanual">راهنمای کاربر</a></li>
-                    <li><a href="index.php?page=rules" data-ajax-nav data-slug="rules">قوانین و مقررات</a></li>
-                    <li><a href="index.php?page=privacy" data-ajax-nav data-slug="privacy">حریم خصوصی</a></li>
-                </ul>
-            </nav>
-
             <section class="footer-col footer-trust" aria-label="نشان‌های اعتماد">
                 <h2 class="footer-heading">نشان‌های اعتماد</h2>
                 <div class="trust-badges">
