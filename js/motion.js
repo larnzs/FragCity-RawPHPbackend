@@ -1,54 +1,57 @@
 /*
- * FragCity Motion Controller v2
- * Automatically enhances page entrances, shared interactive cards, and
- * scroll reveals. Re-initializes safely after the site's AJAX navigation.
+ * FragCity Motion Controller v3
+ * Supports a persistent low-motion mode that disconnects scroll/mutation
+ * observers and exposes all content immediately.
  */
 (function () {
     'use strict';
 
-    if (window.FragCityMotion && window.FragCityMotion.version === 2) return;
+    if (window.FragCityMotion && window.FragCityMotion.version === 3) return;
 
     const root = document.documentElement;
     const reducedMotionQuery = window.matchMedia
         ? window.matchMedia('(prefers-reduced-motion: reduce)')
         : null;
-    const reducedMotion = Boolean(reducedMotionQuery && reducedMotionQuery.matches);
+    const prefersReducedMotion = Boolean(reducedMotionQuery && reducedMotionQuery.matches);
 
-    root.classList.add('fc-motion-enabled', 'fc-motion-ready');
-
-    const revealSelector = [
-        '.profile-hero','.profile-identity-strip','.profile-progress-item',
-        '.stat-card','.profile-inventory-card','.profile-loadout-summary','.profile-settings-card',
-        '.wallet-page-header','.wallet-balance-card','.wallet-section-header',
-        '.wallet-empty-state','.transaction-item',
-        '.serverlist-page .sl-page-head','.serverlist-page .sl-empty-state',
-        '.sl-toolbar','.sl-group-head',
-        '.sl-server-card','.sl-empty','.leaderboard-header','.leaderboard-stat-card',
-        '.podium-card','.leaderboard-table-scroll','.banlist-header','.banlist-table-wrapper',
-        '.banlist-state','.privacy-card','.rules-card','.manual-card',
-        '.faq-item','.warning-card','.mode-grid > *','.command-grid > *',
-        '.command-grid-2 > *','.matchzy-card','.admin-guide-card',
-        '.vip-page .info-section','.vip-page .feature-panel','.skins-page-shell',
-        '.support-card',
-        '.ticket-create-card','.ticket-list-card','.social-item','.ticket-row',
-        '.about-page .section-title','.about-page .about-text','.value-item',
-        '.vip-xp-card','.vip-levels-card','.feature-card','.servers-card','.panel-card',
-        '.console-card','.instance-item','.wp-section-head','.wp-card','.selection-card',
-        '.wp-control-card','.wp-empty-state','[data-fc-reveal]'
-    ].join(',');
-
-    const interactiveSelector = [
-        '.fc-card--interactive','.wp-card--clickable','.sl-server-card','[data-fc-interactive]'
-    ].join(',');
-
+    let noAnimation = root.classList.contains('fc-no-animation');
     let intersectionObserver = null;
     let mutationObserver = null;
     let mutationFrame = 0;
     const pendingNodes = new Set();
 
+    const revealSelector = [
+        '.profile-hero', '.profile-identity-strip', '.profile-progress-item',
+        '.stat-card', '.profile-inventory-card', '.profile-loadout-summary', '.profile-settings-card',
+        '.wallet-page-header', '.wallet-balance-card', '.wallet-section-header',
+        '.wallet-empty-state', '.transaction-item',
+        '.serverlist-page .sl-page-head', '.serverlist-page .sl-empty-state',
+        '.sl-toolbar', '.sl-group-head', '.sl-server-card', '.sl-empty',
+        '.leaderboard-header', '.leaderboard-stat-card', '.podium-card', '.leaderboard-table-scroll',
+        '.banlist-header', '.banlist-table-wrapper', '.banlist-state',
+        '.privacy-card', '.rules-card', '.manual-card', '.faq-item', '.warning-card',
+        '.mode-grid > *', '.command-grid > *', '.command-grid-2 > *',
+        '.matchzy-card', '.admin-guide-card',
+        '.vip-page .info-section', '.vip-page .feature-panel', '.skins-page-shell',
+        '.support-card', '.ticket-create-card', '.ticket-list-card', '.social-item', '.ticket-row',
+        '.about-page .section-title', '.about-page .about-text', '.value-item',
+        '.vip-xp-card', '.vip-levels-card', '.feature-card', '.servers-card', '.panel-card',
+        '.console-card', '.instance-item', '.wp-section-head', '.wp-card', '.selection-card',
+        '.wp-control-card', '.wp-empty-state', '[data-fc-reveal]'
+    ].join(',');
+
+    const interactiveSelector = [
+        '.fc-card--interactive', '.wp-card--clickable', '.sl-server-card', '[data-fc-interactive]'
+    ].join(',');
+
+    function motionDisabled() {
+        return noAnimation || prefersReducedMotion;
+    }
+
     function getIntersectionObserver() {
         if (intersectionObserver) return intersectionObserver;
-        if (!('IntersectionObserver' in window)) return null;
+        if (motionDisabled() || !('IntersectionObserver' in window)) return null;
+
         intersectionObserver = new IntersectionObserver(function (entries) {
             entries.forEach(function (entry) {
                 if (!entry.isIntersecting) return;
@@ -56,6 +59,7 @@
                 intersectionObserver.unobserve(entry.target);
             });
         }, { threshold: 0.08, rootMargin: '0px 0px -36px 0px' });
+
         return intersectionObserver;
     }
 
@@ -86,22 +90,35 @@
 
     function prepareReveal(element) {
         if (isExcluded(element)) return;
-        if (!element.hasAttribute('data-fc-reveal')) element.setAttribute('data-fc-reveal', 'up');
+        if (!element.hasAttribute('data-fc-reveal')) {
+            element.setAttribute('data-fc-reveal', 'up');
+        }
+
+        if (motionDisabled()) {
+            element.classList.add('is-visible');
+            element.style.removeProperty('--fc-reveal-delay');
+            return;
+        }
+
         if (element.dataset.fcMotionReady === 'true') {
-            if (reducedMotion) element.classList.add('is-visible');
+            if (!element.classList.contains('is-visible')) {
+                const observer = getIntersectionObserver();
+                if (observer) observer.observe(element);
+                else element.classList.add('is-visible');
+            }
             return;
         }
 
         element.dataset.fcMotionReady = 'true';
         const authoredDelay = element.getAttribute('data-fc-reveal-delay');
-        const parsedDelay = authoredDelay === null ? siblingDelay(element) : Number.parseInt(authoredDelay, 10);
-        const delay = Number.isFinite(parsedDelay) ? Math.min(Math.max(parsedDelay, 0), 420) : 0;
-        if (delay > 0) element.style.setProperty('--fc-reveal-delay', delay + 'ms');
+        const parsedDelay = authoredDelay === null
+            ? siblingDelay(element)
+            : Number.parseInt(authoredDelay, 10);
+        const delay = Number.isFinite(parsedDelay)
+            ? Math.min(Math.max(parsedDelay, 0), 420)
+            : 0;
 
-        if (reducedMotion) {
-            element.classList.add('is-visible');
-            return;
-        }
+        if (delay > 0) element.style.setProperty('--fc-reveal-delay', delay + 'ms');
 
         const observer = getIntersectionObserver();
         if (observer) observer.observe(element);
@@ -117,10 +134,13 @@
     function visitTree(rootNode) {
         if (!rootNode) return;
         const candidates = [];
+
         if (
             rootNode instanceof Element &&
             (rootNode.matches(revealSelector) || rootNode.matches(interactiveSelector))
-        ) candidates.push(rootNode);
+        ) {
+            candidates.push(rootNode);
+        }
 
         if (typeof rootNode.querySelectorAll === 'function') {
             rootNode.querySelectorAll(revealSelector + ',' + interactiveSelector).forEach(function (element) {
@@ -135,7 +155,8 @@
     }
 
     function animatePage(contentRoot) {
-        if (!contentRoot || !contentRoot.children) return;
+        if (motionDisabled() || !contentRoot || !contentRoot.children) return;
+
         Array.from(contentRoot.children).forEach(function (pageElement) {
             if (isExcluded(pageElement) || pageElement.tagName === 'SCRIPT' || pageElement.tagName === 'STYLE') return;
             pageElement.classList.remove('fc-motion-page-enter');
@@ -150,7 +171,7 @@
             : document;
         visitTree(scope);
 
-        if (animateCurrentPage) {
+        if (animateCurrentPage && !motionDisabled()) {
             const contentRoot = scope.id === 'contentFader'
                 ? scope
                 : document.getElementById('contentFader');
@@ -159,9 +180,11 @@
     }
 
     function queueMutationNodes(nodes) {
+        if (motionDisabled()) return;
         nodes.forEach(function (node) {
             if (node.nodeType === Node.ELEMENT_NODE) pendingNodes.add(node);
         });
+
         if (pendingNodes.size === 0 || mutationFrame) return;
         mutationFrame = window.requestAnimationFrame(function () {
             mutationFrame = 0;
@@ -171,7 +194,12 @@
     }
 
     function watchContent(contentRoot) {
-        if (!contentRoot || !('MutationObserver' in window)) return;
+        if (
+            motionDisabled() ||
+            !contentRoot ||
+            !('MutationObserver' in window)
+        ) return;
+
         if (mutationObserver) mutationObserver.disconnect();
         mutationObserver = new MutationObserver(function (records) {
             records.forEach(function (record) {
@@ -181,19 +209,90 @@
         mutationObserver.observe(contentRoot, { childList: true, subtree: true });
     }
 
+    function disconnectMotionObservers() {
+        if (intersectionObserver) intersectionObserver.disconnect();
+        if (mutationObserver) mutationObserver.disconnect();
+        intersectionObserver = null;
+        mutationObserver = null;
+
+        if (mutationFrame) {
+            window.cancelAnimationFrame(mutationFrame);
+            mutationFrame = 0;
+        }
+        pendingNodes.clear();
+    }
+
+    function disableMotion() {
+        disconnectMotionObservers();
+        root.classList.remove('fc-motion-enabled', 'fc-motion-ready');
+
+        document.querySelectorAll('[data-fc-reveal]').forEach(function (element) {
+            element.classList.add('is-visible');
+            element.style.removeProperty('--fc-reveal-delay');
+        });
+        document.querySelectorAll('.fc-motion-page-enter').forEach(function (element) {
+            element.classList.remove('fc-motion-page-enter');
+        });
+    }
+
+    function enableMotion() {
+        if (prefersReducedMotion) {
+            root.classList.add('fc-motion-enabled', 'fc-motion-ready');
+            scan(document, false);
+            return;
+        }
+
+        root.classList.add('fc-motion-enabled', 'fc-motion-ready');
+        const contentRoot = document.getElementById('contentFader');
+        scan(document, true);
+        watchContent(contentRoot);
+    }
+
+    function setNoAnimation(enabled) {
+        noAnimation = Boolean(enabled);
+        root.classList.toggle('fc-no-animation', noAnimation);
+
+        if (noAnimation) disableMotion();
+        else enableMotion();
+
+        window.dispatchEvent(new CustomEvent('fc-motion-mode-ready'));
+    }
+
     window.FragCityMotion = Object.freeze({
-        version: 2,
-        refresh: function (container) { scan(container || document, false); },
-        reducedMotion: reducedMotion
+        version: 3,
+        refresh: function (container) {
+            if (motionDisabled()) {
+                const scope = container || document;
+                if (scope.querySelectorAll) {
+                    scope.querySelectorAll('[data-fc-reveal]').forEach(function (element) {
+                        element.classList.add('is-visible');
+                    });
+                }
+                return;
+            }
+            scan(container || document, false);
+        },
+        setNoAnimation: setNoAnimation,
+        reducedMotion: prefersReducedMotion
     });
 
-    const initialContent = document.getElementById('contentFader');
-    scan(document, true);
-    watchContent(initialContent);
+    if (noAnimation) {
+        disableMotion();
+    } else {
+        root.classList.add('fc-motion-enabled', 'fc-motion-ready');
+        const initialContent = document.getElementById('contentFader');
+        scan(document, true);
+        watchContent(initialContent);
+    }
 
     window.addEventListener('content-loaded', function () {
+        if (motionDisabled()) return;
         const nextContent = document.getElementById('contentFader');
         scan(nextContent || document, true);
         watchContent(nextContent);
+    });
+
+    window.addEventListener('fc-no-animation-change', function (event) {
+        setNoAnimation(Boolean(event.detail && event.detail.enabled));
     });
 })();
