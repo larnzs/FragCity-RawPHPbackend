@@ -66,7 +66,7 @@
       "shared_secret": "REPLACE_WITH_PTERODACTYL_STANDBY_SECRET"
     },
     "pterodactyl_monitoring_api": {
-      "_comment": "Signed Linux API for the admin-only Pterodactyl/Wings monitoring page. Its secret matches pterodactyl_monitoring.shared_secret on Linux and must be unique.",
+      "_comment": "Signed admin-only Linux API for read-only Pterodactyl/Wings monitoring. The legacy CS2 dashboard UI is not shipped. Its secret matches pterodactyl_monitoring.shared_secret on Linux and must be unique.",
       "base_url": "https://api.fragcity.ir",
       "shared_secret": "REPLACE_WITH_PTERODACTYL_MONITORING_SECRET"
     }
@@ -160,10 +160,6 @@
     },
     "panels.cs2.players": {
       "_comment": "Website DB profile for CS2 player data.",
-      "database_profile": "main"
-    },
-    "panels.cs2.servers": {
-      "_comment": "Website DB profile for the CS2 panel's server catalogue. Live node monitoring is a separate signed Linux API integration.",
       "database_profile": "main"
     },
     "pages.support": {
