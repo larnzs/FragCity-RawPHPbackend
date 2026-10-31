@@ -7,9 +7,13 @@
     const body = document.body;
     const siteHeader = document.getElementById('siteHeader');
     let scrollTicking = false;
-    // Keep the header transparent only at the very top of the document.
-    // Once the user scrolls, retain the graphite surface in both directions.
+    let lastScrollTop = Math.max(
+        window.scrollY || 0,
+        document.documentElement.scrollTop || 0
+    );
     const HEADER_SCROLL_THRESHOLD = 4;
+    const HEADER_DIRECTION_THRESHOLD = 2;
+
     function updateHeaderScrollState() {
         if (!siteHeader) {
             scrollTicking = false;
@@ -20,13 +24,23 @@
             window.scrollY || 0,
             document.documentElement.scrollTop || 0
         );
+        const delta = scrollTop - lastScrollTop;
 
         if (scrollTop <= HEADER_SCROLL_THRESHOLD) {
-            siteHeader.classList.remove('is-scrolled', 'is-scroll-down');
+            siteHeader.classList.remove('is-scrolled', 'is-scroll-down', 'is-scroll-up');
         } else {
-            // Keep the same filled header while scrolling down or back up.
-            siteHeader.classList.add('is-scrolled', 'is-scroll-down');
+            siteHeader.classList.add('is-scrolled');
+
+            if (delta > HEADER_DIRECTION_THRESHOLD) {
+                siteHeader.classList.add('is-scroll-down');
+                siteHeader.classList.remove('is-scroll-up');
+            } else if (delta < -HEADER_DIRECTION_THRESHOLD) {
+                siteHeader.classList.add('is-scroll-up');
+                siteHeader.classList.remove('is-scroll-down');
+            }
         }
+
+        lastScrollTop = scrollTop;
         scrollTicking = false;
     }
 
