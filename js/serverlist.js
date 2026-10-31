@@ -478,7 +478,7 @@
                 const target = root.querySelector('#slBrowserControls');
                 if (!target) return;
                 event.preventDefault();
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                target.scrollIntoView({ behavior: document.documentElement.classList.contains('fc-no-animation') ? 'auto' : 'smooth', block: 'start' });
             });
         });
 
