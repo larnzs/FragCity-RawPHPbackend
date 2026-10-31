@@ -100,3 +100,26 @@ body:has(.privacy-page, .rules-page, .support-page, .manual-page, .vip-page, .ab
         transition-duration: .01ms !important;
     }
 }
+
+/* Keep the first heading clear of the sticky overlay header and leave a
+   consistent breathing-space before the global footer. */
+.privacy-page,
+.rules-page,
+.support-page,
+.manual-page,
+.vip-page,
+.about-page {
+    padding-top: calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap, 28px));
+    padding-bottom: var(--fc-page-safe-bottom, 64px);
+}
+
+@media (max-width: 700px) {
+    .privacy-page,
+    .rules-page,
+    .support-page,
+    .manual-page,
+    .vip-page,
+    .about-page {
+        padding-top: calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px));
+    }
+}
