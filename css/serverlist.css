@@ -3713,3 +3713,89 @@ html.fc-no-animation .sl-player-modal-backdrop {
         animation:none!important;
     }
 }
+
+
+/* FACEIT card averages and reliable SVG badge sizing. */
+.sl-card-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sl-metric--faceit-average {
+    border-color: rgba(255, 179, 71, .18);
+    background: linear-gradient(145deg, rgba(255, 179, 71, .065), rgba(255, 255, 255, .018));
+}
+
+.sl-metric--faceit-average > span i {
+    color: #ffb347;
+}
+
+.sl-metric--faceit-average > strong[data-average-state="ready"] {
+    color: #ffc36d;
+}
+
+.sl-metric--faceit-average > strong[data-average-state="loading"] {
+    color: #aeb4bf;
+}
+
+.sl-faceit-level-icon {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    flex: 0 0 30px;
+    display: block;
+    object-fit: contain;
+    object-position: center;
+    aspect-ratio: 1 / 1;
+}
+
+.sl-faceit-level-icon-fallback {
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 179, 71, .3);
+    border-radius: 50%;
+    background: rgba(255, 179, 71, .1);
+    color: #ffc36d;
+    font: 800 .65rem var(--fc-font-mono);
+}
+
+#serverList[data-sl-view="list"] .sl-card-content {
+    grid-template-columns:
+        minmax(135px, 1.05fr)
+        minmax(125px, .92fr)
+        minmax(260px, 1.75fr)
+        minmax(95px, .7fr)
+        minmax(185px, 1.1fr);
+}
+
+#serverList[data-sl-view="list"] .sl-card-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 1280px) and (min-width: 761px) {
+    #serverList[data-sl-view="list"] .sl-card-content {
+        grid-template-columns:
+            minmax(135px, 1fr)
+            minmax(130px, .95fr)
+            minmax(235px, 1.45fr);
+        grid-template-areas:
+            "heading address footer"
+            "metrics metrics capacity";
+    }
+}
+
+@media (max-width: 760px) {
+    #serverList[data-sl-view="list"] .sl-card-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .sl-card-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
