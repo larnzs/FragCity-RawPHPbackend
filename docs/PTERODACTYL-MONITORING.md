@@ -2,16 +2,15 @@
 
 ## Purpose
 
-The CS2 Admin Panel has an admin-only monitoring page that requests a fresh snapshot on demand. No Cron job, cache refresher, or browser-side Pterodactyl token is used.
+The read-only Pterodactyl/Wings monitoring backend remains available through an admin-only website API endpoint. The legacy CS2 dashboard UI and the entire `panels/` directory have been removed; no browser monitoring page is shipped. The backend does not require Cron or a cache refresher, and no Pterodactyl token is exposed to a browser.
 
-- Panel page: `panels/cs2/monitoring.php`
 - Browser polling endpoint: `GET /api/admin-pterodactyl-monitoring.php`
 - Website signed client: `class/PterodactylMonitoringApiClient.php`
 - Website repository: `class/PterodactylMonitoringRepository.php`
 - Linux API route: `POST /v1/pterodactyl-monitoring`
 - Linux monitoring service: `linuxapi/src/PterodactylMonitoring/PterodactylMonitoringService.php`
 
-The browser polls the website endpoint every 15 seconds while the monitoring page is open. The website checks the current session and requires `role=admin`, then sends a signed request to the Linux API. The Linux API fetches Pterodactyl data and returns a sanitized snapshot. The browser never receives the Pterodactyl Application API key or Wings token.
+There is no bundled monitoring page. A future authorized admin tool may call the website endpoint; the endpoint checks the current session and requires `role=admin`, then sends a signed request to Linux API. Linux fetches Pterodactyl data and returns a sanitized snapshot. The client never receives the Pterodactyl Application API key or Wings token.
 
 ## Where the metrics come from
 
@@ -109,7 +108,6 @@ From the website repository root:
 php -l class/PterodactylMonitoringApiClient.php
 php -l class/PterodactylMonitoringRepository.php
 php -l api/admin-pterodactyl-monitoring.php
-php -l panels/cs2/monitoring.php
 php -l linuxapi/src/PterodactylMonitoring/PterodactylMonitoringPanelClient.php
 php -l linuxapi/src/PterodactylMonitoring/WingsMonitoringClient.php
 php -l linuxapi/src/PterodactylMonitoring/PterodactylMonitoringService.php
@@ -118,7 +116,7 @@ php -l linuxapi/public/index.php
 php linuxapi/tools/architecture-check.php
 ~~~
 
-Then sign into FragCity with an account whose stored role is exactly `admin` and open `panels/cs2/index.php?page=monitoring`. The page should display node health, Wings/system details, and resource counters for allowlisted CS2 servers. It refreshes every 15 seconds while open.
+The previous CS2 admin dashboard has been removed. The protected endpoint remains dormant until a separate admin interface or trusted tool is implemented. There is no browser page to open or polling loop to run at this stage.
 
 Common errors:
 
