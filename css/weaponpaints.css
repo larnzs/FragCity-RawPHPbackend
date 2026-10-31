@@ -10230,3 +10230,25 @@ body > .wp-modal .wp-addon-card {
         transform: none !important;
     }
 }
+
+
+/* Performance mode also cancels hover transforms introduced by this layer. */
+@media (prefers-reduced-motion: reduce) {
+    .wp-app .wp-header .wp-category-switcher--unified > .wp-tab:hover,
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn:hover {
+        transform: none !important;
+    }
+}
+
+html.fc-no-animation .wp-app .wp-card:hover,
+html.fc-no-animation .wp-app .wp-card:focus-visible,
+html.fc-no-animation .wp-app .wp-saved-paint-card:hover,
+html.fc-no-animation .wp-app .wp-control-card:hover,
+html.fc-no-animation .wp-app .wp-header .wp-category-switcher--unified > .wp-tab:hover,
+html.fc-no-animation .wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn:hover,
+html.fc-no-animation .wp-app .wp-btn:hover,
+html.fc-no-animation .wp-app .wp-page-btn:hover,
+html.fc-no-animation body > .wp-modal .selection-card:hover,
+html.fc-no-animation body > .wp-modal .wp-addon-card:hover {
+    transform: none !important;
+}
