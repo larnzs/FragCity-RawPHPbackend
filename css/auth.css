@@ -1,1068 +1,766 @@
-/* ======================================================
-   FragCity Authentication
-   Login / Register / Forgot Password / Reset Password
-====================================================== */
+/*
+ * FragCity Authentication
+ * Login / Register / Forgot Password / Reset Password
+ * Visual language: graphite glass, FragCity orange, warm amber accents.
+ */
 
-.auth-page{
+.auth-page {
+    --auth-bg: #0D0D0D;
+    --auth-panel: rgba(19, 19, 19, 0.78);
+    --auth-panel-strong: rgba(23, 23, 23, 0.9);
+    --auth-field: rgba(8, 8, 8, 0.62);
+    --auth-border: rgba(255, 255, 255, 0.09);
+    --auth-border-strong: rgba(255, 255, 255, 0.14);
+    --auth-text: #F5F5F5;
+    --auth-muted: #A3A3A3;
+    --auth-subtle: #737373;
+    --auth-orange: #F97316;
+    --auth-orange-hover: #EA580C;
+    --auth-amber: #FFB347;
+    --auth-orange-soft: rgba(249, 115, 22, 0.1);
+
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: calc(100% + 50px);
     min-height: calc(100vh - 66px);
     margin: -25px;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:40px 20px;
-    direction:rtl;
-
+    padding: 44px 20px;
+    overflow: hidden;
+    direction: rtl;
+    color: var(--auth-text);
     background:
-        radial-gradient(circle at top right, rgba(37,99,235,.08), transparent 34%),
-        radial-gradient(circle at bottom left, rgba(14,165,233,.05), transparent 30%),
-        #070b12;
+        radial-gradient(ellipse at 50% 0%, rgba(249, 115, 22, 0.105), transparent 38%),
+        radial-gradient(ellipse at 0% 85%, rgba(255, 179, 71, 0.045), transparent 34%),
+        radial-gradient(ellipse at 100% 100%, rgba(249, 115, 22, 0.055), transparent 32%),
+        linear-gradient(145deg, #0D0D0D 0%, #101010 52%, #090909 100%);
 }
 
-@media (max-width: 700px) {
-    .auth-page {
-        width: calc(100% + 28px);
-        margin: -18px -14px;
-    }
+.auth-page::before,
+.auth-page::after {
+    position: absolute;
+    z-index: -1;
+    display: block;
+    border: 1px solid rgba(249, 115, 22, 0.13);
+    border-radius: 50%;
+    content: "";
+    pointer-events: none;
 }
 
-.auth-container{
+.auth-page::before {
+    top: 9%;
+    right: max(-180px, calc(50% - 700px));
+    width: 420px;
+    height: 420px;
+    box-shadow:
+        0 0 0 34px rgba(249, 115, 22, 0.018),
+        0 0 0 70px rgba(249, 115, 22, 0.012);
+    animation: authAmbientDrift 18s ease-in-out infinite alternate;
+}
 
-    width:100%;
-    max-width:470px;
+.auth-page::after {
+    bottom: -260px;
+    left: max(-160px, calc(50% - 700px));
+    width: 500px;
+    height: 500px;
+    border-color: rgba(255, 179, 71, 0.1);
+    box-shadow:
+        0 0 0 42px rgba(255, 179, 71, 0.014),
+        0 0 0 88px rgba(255, 179, 71, 0.01);
+    animation: authAmbientDrift 22s ease-in-out infinite alternate-reverse;
+}
 
+.auth-container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 490px;
+    padding: 36px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.105);
+    border-radius: 22px;
     background:
-        linear-gradient(180deg,#111827,#0F172A);
-
-    border:1px solid #22304A;
-
-    border-radius:22px;
-
-    padding:34px;
-
+        radial-gradient(ellipse at 50% 0%, rgba(249, 115, 22, 0.085), transparent 48%),
+        linear-gradient(145deg, rgba(28, 28, 28, 0.88), rgba(13, 13, 13, 0.82));
     box-shadow:
-        0 20px 60px rgba(0,0,0,.45),
-        0 0 40px rgba(59,130,246,.08);
-
-    animation:authFade .35s ease;
-
-}
-
-@keyframes authFade{
-
-    from{
-
-        opacity:0;
-        transform:translateY(18px);
-
-    }
-
-    to{
-
-        opacity:1;
-        transform:none;
-
-    }
-
-}
-
-/* ==========================
-        Logo
-========================== */
-
-.auth-logo{
-
-    display:flex;
-    justify-content:center;
-    margin-bottom:18px;
-
-}
-
-.auth-logo img{
-
-    width:86px;
-    height:86px;
-    object-fit:contain;
-
-    filter:
-        drop-shadow(0 0 18px rgba(59,130,246,.45));
-
-}
-
-.auth-container h2{
-
-    margin:0;
-
-    text-align:center;
-
-    color:#F8FAFC;
-
-    font-size:28px;
-
-    font-weight:800;
-
-}
-
-.auth-subtitle{
-
-    margin-top:10px;
-    margin-bottom:30px;
-
-    text-align:center;
-
-    color:#94A3B8;
-
-    font-size:.92rem;
-
-}
-
-/* ==========================
-        Error
-========================== */
-
-.auth-error{
-
-    background:rgba(239,68,68,.12);
-
-    border:1px solid rgba(239,68,68,.35);
-
-    color:#FCA5A5;
-
-    border-radius:14px;
-
-    padding:14px;
-
-    margin-bottom:22px;
-
-    text-align:center;
-
-}
-
-/* ==========================
-        Form
-========================== */
-
-.form-group{
-
-    margin-bottom:20px;
-
-}
-
-.form-group label{
-
-    display:block;
-
-    margin-bottom:8px;
-
-    color:#CBD5E1;
-
-    font-size:.92rem;
-
-    font-weight:500;
-
-}
-
-.form-group input{
-
-    width:100%;
-
-    height:52px;
-
-    padding:0 16px;
-
-    background:#0B1220;
-
-    border:1px solid #22304A;
-
-    border-radius:14px;
-
-    color:#F8FAFC;
-
-    font-family:inherit;
-
-    font-size:.95rem;
-
-    transition:.25s;
-
-    box-sizing:border-box;
-
-    outline:none;
-
-}
-
-.form-group input::placeholder{
-
-    color:#64748B;
-
-}
-
-.form-group input:focus{
-
-    border-color:#3B82F6;
-
-    box-shadow:
-        0 0 0 4px rgba(59,130,246,.18);
-
-}
-
-/* ==========================
-      Password Box
-========================== */
-
-.password-box{
-
-    position:relative;
-
-}
-
-.password-box input{
-
-    padding-left:50px;
-
-}
-
-.toggle-password{
-
-    position:absolute;
-
-    left:12px;
-
-    top:50%;
-
-    transform:translateY(-50%);
-
-    width:34px;
-
-    height:34px;
-
-    border:none;
-
-    background:none;
-
-    color:#94A3B8;
-
-    cursor:pointer;
-
-    transition:.2s;
-
-}
-
-.toggle-password:hover{
-
-    color:#60A5FA;
-
-}
-
-.toggle-password i{
-
-    font-size:17px;
-
-}
-
-/* ==========================
-        Links
-========================== */
-
-.auth-links{
-
-    display:flex;
-
-    justify-content:flex-start;
-
-}
-
-.forgot-link{
-
-    color:#60A5FA;
-
-    text-decoration:none;
-
-    font-size:.9rem;
-
-    transition:.25s;
-
-}
-
-.forgot-link:hover{
-
-    color:#93C5FD;
-
-}
-
-/* ==========================
-        Button
-========================== */
-
-.btn-auth-submit{
-
-    width:100%;
-
-    height:54px;
-
-    margin-top:6px;
-
-    border:none;
-
-    border-radius:14px;
-
-    background:
-        linear-gradient(135deg,#3B82F6,#2563EB);
-
-    color:#fff;
-
-    font-size:1rem;
-
-    font-weight:700;
-
-    font-family:inherit;
-
-    cursor:pointer;
-
-    transition:.25s;
-
-}
-
-.btn-auth-submit:hover{
-
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 12px 30px rgba(59,130,246,.35);
-
-}
-
-.btn-auth-submit:disabled{
-
-    opacity:.65;
-
-    cursor:not-allowed;
-
-}
-
-.btn-auth-submit i{
-
-    margin-left:8px;
-
-}
-/* ==========================
-      Separator
-========================== */
-
-.auth-separator{
-
-    display:flex;
-
-    align-items:center;
-
-    margin:28px 0;
-
-    color:#64748B;
-
-    font-size:.85rem;
-
-}
-
-.auth-separator::before,
-.auth-separator::after{
-
-    content:"";
-
-    flex:1;
-
-    height:1px;
-
-    background:#22304A;
-
-}
-
-.auth-separator span{
-
-    padding:0 14px;
-
-}
-
-/* ==========================
-      Steam Login
-========================== */
-
-.btn-steam-login{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:10px;
-
-    width:100%;
-
-    height:54px;
-
-    border-radius:14px;
-
-    background:#171F30;
-
-    border:1px solid #22304A;
-
-    color:#F8FAFC;
-
-    text-decoration:none;
-
-    font-size:.95rem;
-
-    font-weight:600;
-
-    transition:.25s;
-
-    box-sizing:border-box;
-
-}
-
-.btn-steam-login i{
-
-    font-size:22px;
-
-    color:#60A5FA;
-
-}
-
-.btn-steam-login:hover{
-
-    background:#1E293B;
-
-    border-color:#3B82F6;
-
-    color:#FFFFFF;
-
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 12px 28px rgba(59,130,246,.22);
-
-}
-
-/* ==========================
-      Footer
-========================== */
-
-.auth-switch{
-
-    margin-top:28px;
-
-    text-align:center;
-
-    color:#94A3B8;
-
-    font-size:.93rem;
-
-}
-
-.auth-switch a{
-
-    color:#60A5FA;
-
-    text-decoration:none;
-
-    font-weight:700;
-
-    transition:.25s;
-
-}
-
-.auth-switch a:hover{
-
-    color:#93C5FD;
-
-}
-
-/* ==========================
-      Loading State
-========================== */
-
-.btn-auth-submit.is-loading{
-
-    position:relative;
-
-    pointer-events:none;
-
-    opacity:.85;
-
-}
-
-.btn-auth-submit.is-loading::after{
-
-    content:"";
-
-    position:absolute;
-
-    top:50%;
-
-    left:50%;
-
-    width:18px;
-
-    height:18px;
-
-    margin-left:-9px;
-
-    margin-top:-9px;
-
-    border:2px solid rgba(255,255,255,.35);
-
-    border-top-color:#fff;
-
-    border-radius:50%;
-
-    animation:authSpin .8s linear infinite;
-
-}
-
-.btn-auth-submit.is-loading{
-
-    color:transparent;
-
-}
-
-@keyframes authSpin{
-
-    to{
-
-        transform:rotate(360deg);
-
-    }
-
-}
-
-/* ==========================
-      Responsive
-========================== */
-
-@media (max-width:768px){
-
-    .auth-page{
-
-        padding:24px 16px;
-
-    }
-
-    .auth-container{
-
-        padding:26px;
-
-        border-radius:18px;
-
-    }
-
-    .auth-logo img{
-
-        width:72px;
-
-        height:72px;
-
-    }
-
-    .auth-container h2{
-
-        font-size:24px;
-
-    }
-
-    .auth-subtitle{
-
-        font-size:.88rem;
-
-        margin-bottom:24px;
-
-    }
-
-}
-
-@media (max-width:480px){
-
-    .auth-container{
-
-        padding:22px;
-
-    }
-
-    .form-group input{
-
-        height:50px;
-
-    }
-
-    .btn-auth-submit,
-
-    .btn-steam-login{
-
-        height:50px;
-
-        font-size:.92rem;
-
-    }
-
-}
-/* ==========================
-      Steam Register Button
-========================== */
-
-.auth-steam-button{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:10px;
-
-    width:100%;
-
-    height:54px;
-
-    border-radius:14px;
-
-    background:#171F30;
-
-    border:1px solid #22304A;
-
-    color:#F8FAFC;
-
-    text-decoration:none;
-
-    font-size:.95rem;
-
-    font-weight:600;
-
-    font-family:inherit;
-
-    transition:.25s;
-
-    box-sizing:border-box;
-
-}
-
-.auth-steam-button i{
-
-    color:#60A5FA;
-
-    font-size:22px;
-
-}
-
-.auth-steam-button:hover{
-
-    background:#1E293B;
-
-    border-color:#3B82F6;
-
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 12px 28px rgba(59,130,246,.22);
-
-}
-
-
-/* ==========================
-      Steam Avatar
-========================== */
-
-.auth-steam-avatar{
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:center;
-
-    justify-content:center;
-
-    margin-bottom:22px;
-
-}
-
-.auth-steam-avatar img{
-
-    width:82px;
-
-    height:82px;
-
-    border-radius:50%;
-
-    object-fit:cover;
-
-    border:3px solid #3B82F6;
-
-    box-shadow:
-        0 0 0 5px rgba(59,130,246,.12),
-        0 0 25px rgba(59,130,246,.25);
-
-}
-
-.auth-steam-avatar-label{
-
-    margin-top:10px;
-
-    color:#94A3B8;
-
-    font-size:.8rem;
-
-}
-
-
-/* ==========================
-      Optional / Required
-========================== */
-
-.auth-required{
-
-    color:#EF4444;
-
-    margin-right:3px;
-
-}
-
-.auth-optional{
-
-    color:#64748B;
-
-    font-size:.78rem;
-
-    font-weight:400;
-
-    margin-right:4px;
-
-}
-
-
-/* ==========================
-      Switch Divider
-========================== */
-
-.auth-switch-divider{
-
-    color:#475569;
-
-    margin:0 6px;
-
-}
-
-
-/* ==========================
-      Register Inputs
-========================== */
-
-#registerForm .form-group input{
-
-    direction:rtl;
-
-}
-
-#registerForm input[name="steamid64"],
-#registerForm input[name="phone"]{
-
-    direction:ltr;
-
-    text-align:left;
-
-}
-
-#registerForm input[type="email"]{
-
-    direction:ltr;
-
-    text-align:left;
-
-}
-
-
-/* ==========================
-      Mobile
-========================== */
-
-@media (max-width:480px){
-
-    .auth-steam-avatar img{
-
-        width:72px;
-
-        height:72px;
-
-    }
-
-}
-/* ==========================
-      Auth Messages
-========================== */
-
-.auth-message{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:10px;
-
-    padding:15px 16px;
-
-    margin-bottom:22px;
-
-    border-radius:14px;
-
-    font-size:.92rem;
-
-    line-height:1.7;
-
-    text-align:center;
-
-}
-
-.auth-message i{
-
-    font-size:20px;
-
-    flex-shrink:0;
-
-}
-
-
-/* Success */
-
-.auth-message.success{
-
-    background:
-        rgba(34,197,94,.10);
-
-    border:
-        1px solid
-        rgba(34,197,94,.30);
-
-    color:#86EFAC;
-
-}
-
-
-/* Error */
-
-.auth-message.error{
-
-    background:
-        rgba(239,68,68,.10);
-
-    border:
-        1px solid
-        rgba(239,68,68,.30);
-
-    color:#FCA5A5;
-
-}
-
-
-/* ==========================
-      Auth Message Buttons
-========================== */
-
-.auth-message-button{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:8px;
-
-    text-decoration:none;
-
-    box-sizing:border-box;
-
-    margin-top:4px;
-
-}
-
-
-.auth-message-button-secondary{
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:8px;
-
-    width:100%;
-
-    height:52px;
-
-    border-radius:14px;
-
-    background:#171F30;
-
-    border:1px solid #22304A;
-
-    color:#CBD5E1;
-
-    text-decoration:none;
-
-    font-size:.95rem;
-
-    font-weight:600;
-
-    transition:.25s;
-
-    box-sizing:border-box;
-
-}
-
-
-.auth-message-button-secondary:hover{
-
-    background:#1E293B;
-
-    border-color:#3B82F6;
-
-    color:#F8FAFC;
-
-    transform:translateY(-2px);
-
-    box-shadow:
-        0 10px 24px
-        rgba(59,130,246,.18);
-
-}
-
-
-/* ==========================
-      Reset Password
-========================== */
-
-#resetPasswordForm{
-
-    margin-top:4px;
-
-}
-
-
-#resetPasswordForm .btn-auth-submit{
-
-    margin-top:6px;
-
-}
-
-
-/* ==========================
-      Mobile
-========================== */
-
-@media (max-width:480px){
-
-    .auth-message{
-
-        font-size:.88rem;
-
-    }
-
-}
-/* ==========================
-      Forgot Password
-========================== */
-
-.auth-message-content{
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:center;
-
-    gap:10px;
-
-    min-width:0;
-
-}
-
-.auth-reset-link{
-
-    display:block;
-
-    max-width:100%;
-
-    color:#60A5FA;
-
-    font-size:.82rem;
-
-    line-height:1.7;
-
-    text-decoration:none;
-
-    word-break:break-all;
-
-    text-align:center;
-
-    transition:.25s;
-
-}
-
-.auth-reset-link:hover{
-
-    color:#93C5FD;
-
-    text-decoration:underline;
-
-}
-
-#forgotPasswordForm{
-
-    margin-top:4px;
-
-}
-
-#forgotPasswordForm input[name="steamid64"]{
-
-    direction:ltr;
-
-    text-align:left;
-
-    letter-spacing:.3px;
-
-}
-
-@media (max-width:480px){
-
-    .auth-reset-link{
-
-        font-size:.75rem;
-
-    }
-
-}
-
-/* Auth Warning Box - Dark Glass Theme */
-.auth-warning-box {
-    background: rgba(245, 158, 11, 0.08);
-    border: 1px solid rgba(245, 158, 11, 0.25);
-    color: #fbbf24;
-    padding: 14px 16px;
-    border-radius: 11px;
-    margin-bottom: 20px;
-    font-size: 0.88rem;
-    line-height: 1.7;
+        0 28px 82px rgba(0, 0, 0, 0.48),
+        0 0 54px rgba(249, 115, 22, 0.055),
+        inset 0 1px 0 rgba(255, 255, 255, 0.055);
+    -webkit-backdrop-filter: blur(24px) saturate(130%);
+    backdrop-filter: blur(24px) saturate(130%);
+    animation: authCardIn 620ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.auth-container::before {
+    position: absolute;
+    top: 0;
+    right: 12%;
+    left: 12%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 179, 71, 0.65), rgba(249, 115, 22, 0.72), transparent);
+    content: "";
+    pointer-events: none;
+}
+
+.auth-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+    animation: authLogoIn 720ms 90ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.auth-logo img {
+    display: block;
+    width: 86px;
+    height: 86px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 22px rgba(249, 115, 22, 0.22));
+}
+
+.auth-container h2 {
+    margin: 0;
+    color: #FAFAFA;
+    font-size: clamp(1.45rem, 4vw, 1.8rem);
+    font-weight: 850;
+    line-height: 1.55;
     text-align: center;
+    letter-spacing: -0.025em;
+}
+
+.auth-subtitle {
+    margin: 8px 0 28px;
+    color: #A3A3A3;
+    font-size: 0.9rem;
+    line-height: 1.8;
+    text-align: center;
+}
+
+/* Error and status messages */
+.auth-error,
+.auth-message,
+.auth-warning-box {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    box-shadow: 0 4px 12px rgba(2, 6, 23, 0.2);
+    margin-bottom: 20px;
+    padding: 13px 15px;
+    border-radius: 12px;
+    font-size: 0.86rem;
+    line-height: 1.75;
+    text-align: center;
+}
+
+.auth-error,
+.auth-message.error {
+    border: 1px solid rgba(239, 68, 68, 0.28);
+    background: rgba(239, 68, 68, 0.085);
+    color: #FCA5A5;
+}
+
+.auth-message.success {
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    background: rgba(34, 197, 94, 0.075);
+    color: #86EFAC;
+}
+
+.auth-message i {
+    flex: 0 0 auto;
+    font-size: 1.1rem;
+}
+
+.auth-warning-box {
+    border: 1px solid rgba(249, 115, 22, 0.24);
+    background: rgba(249, 115, 22, 0.075);
+    color: #FDBA74;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.025);
 }
 
 .auth-warning-box i {
+    flex: 0 0 auto;
+    color: var(--auth-amber, #FFB347);
     font-size: 1.1rem;
-    color: #f59e0b;
-    flex-shrink: 0;
+}
+
+/* Form fields */
+.auth-container form {
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #D4D4D4;
+    font-size: 0.84rem;
+    font-weight: 650;
+    line-height: 1.7;
+}
+
+.form-group input {
+    box-sizing: border-box;
+    width: 100%;
+    height: 52px;
+    padding: 0 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 11px;
+    outline: none;
+    background: rgba(7, 7, 7, 0.62);
+    color: #F5F5F5;
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition:
+        border-color 180ms ease,
+        background-color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+.form-group input::placeholder {
+    color: #686868;
+    opacity: 1;
+}
+
+.form-group input:hover {
+    border-color: rgba(255, 255, 255, 0.17);
+}
+
+.form-group input:focus {
+    border-color: rgba(249, 115, 22, 0.65);
+    background: rgba(17, 17, 17, 0.82);
+    box-shadow:
+        0 0 0 3px rgba(249, 115, 22, 0.1),
+        0 8px 22px rgba(0, 0, 0, 0.14);
+}
+
+.form-group input:focus-visible {
+    outline: 1px solid rgba(255, 179, 71, 0.38);
+    outline-offset: 2px;
+}
+
+.password-box {
+    position: relative;
+}
+
+.password-box input {
+    padding-left: 52px;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    left: 9px;
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    transform: translateY(-50%);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #929292;
+    cursor: pointer;
+    transition:
+        color 160ms ease,
+        background-color 160ms ease,
+        border-color 160ms ease;
+}
+
+.toggle-password:hover,
+.toggle-password:focus-visible {
+    border-color: rgba(249, 115, 22, 0.16);
+    outline: none;
+    background: rgba(249, 115, 22, 0.075);
+    color: #FDBA74;
+}
+
+.toggle-password i {
+    font-size: 0.95rem;
+}
+
+/* Links */
+.auth-links {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: -4px;
+    margin-bottom: 16px;
+}
+
+.forgot-link,
+.auth-reset-link {
+    color: #FB923C;
+    font-size: 0.82rem;
+    line-height: 1.7;
+    text-decoration: none;
+    transition: color 160ms ease, text-shadow 160ms ease;
+}
+
+.forgot-link:hover,
+.auth-reset-link:hover {
+    color: #FFB347;
+    text-shadow: 0 0 16px rgba(249, 115, 22, 0.22);
+}
+
+.auth-reset-link {
+    display: block;
+    max-width: 100%;
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+    text-align: center;
+}
+
+/* Primary FragCity action */
+.btn-auth-submit {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 52px;
+    margin-top: 5px;
+    padding: 11px 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 179, 71, 0.5);
+    border-radius: 11px;
+    background: linear-gradient(120deg, #F97316 0%, #EA580C 58%, #C2410C 100%);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 0.94rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow:
+        0 10px 28px rgba(249, 115, 22, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    transition:
+        transform 180ms cubic-bezier(0.2, 0.75, 0.25, 1),
+        box-shadow 180ms ease,
+        filter 180ms ease,
+        border-color 180ms ease;
+}
+
+.btn-auth-submit::before {
+    position: absolute;
+    top: -80%;
+    left: -45%;
+    width: 34%;
+    height: 260%;
+    transform: rotate(22deg) translateX(-180%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    content: "";
+    transition: transform 560ms ease;
+    pointer-events: none;
+}
+
+.btn-auth-submit:hover:not(:disabled) {
+    transform: translateY(-2px);
+    border-color: rgba(255, 179, 71, 0.75);
+    filter: saturate(1.08) brightness(1.04);
+    box-shadow:
+        0 15px 34px rgba(249, 115, 22, 0.26),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-auth-submit:hover:not(:disabled)::before {
+    transform: rotate(22deg) translateX(520%);
+}
+
+.btn-auth-submit:active:not(:disabled) {
+    transform: translateY(0) scale(0.99);
+}
+
+.btn-auth-submit:disabled {
+    opacity: 0.62;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.btn-auth-submit i {
+    margin-left: 1px;
+}
+
+.btn-auth-submit.is-loading {
+    pointer-events: none;
+    color: transparent;
+    opacity: 0.88;
+}
+
+.btn-auth-submit.is-loading::before {
+    display: none;
+}
+
+.btn-auth-submit.is-loading::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 18px;
+    margin: -9px 0 0 -9px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #FFFFFF;
+    border-radius: 50%;
+    content: "";
+    animation: authSpin 780ms linear infinite;
+}
+
+/* Steam: neutral graphite surface, not a second primary button */
+.btn-steam-login,
+.auth-steam-button,
+.auth-message-button-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 52px;
+    gap: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.115);
+    border-radius: 11px;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018)),
+        rgba(19, 19, 19, 0.72);
+    color: #E5E5E5;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-backdrop-filter: blur(14px) saturate(120%);
+    backdrop-filter: blur(14px) saturate(120%);
+    transition:
+        transform 180ms cubic-bezier(0.2, 0.75, 0.25, 1),
+        border-color 180ms ease,
+        background-color 180ms ease,
+        color 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.btn-steam-login i,
+.auth-steam-button i {
+    color: #F5F5F5;
+    font-size: 1.25rem;
+    transition: color 180ms ease, transform 180ms ease;
+}
+
+.btn-steam-login:hover,
+.auth-steam-button:hover,
+.auth-message-button-secondary:hover {
+    transform: translateY(-2px);
+    border-color: rgba(249, 115, 22, 0.3);
+    background:
+        linear-gradient(135deg, rgba(249, 115, 22, 0.09), rgba(255, 255, 255, 0.025)),
+        rgba(24, 24, 24, 0.82);
+    color: #FFFFFF;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+}
+
+.btn-steam-login:hover i,
+.auth-steam-button:hover i {
+    transform: scale(1.06);
+    color: #FDBA74;
+}
+
+.auth-steam-button {
+    margin-bottom: 2px;
+}
+
+.auth-message-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+    text-decoration: none;
+}
+
+.auth-message-button-secondary {
+    padding: 10px 16px;
+    color: #D4D4D4;
+}
+
+/* Separator and account switch */
+.auth-separator {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 25px 0;
+    color: #777777;
+    font-size: 0.78rem;
+}
+
+.auth-separator::before,
+.auth-separator::after {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+    content: "";
+}
+
+.auth-separator span {
+    padding: 0 2px;
+}
+
+.auth-switch {
+    margin: 25px 0 0;
+    color: #A3A3A3;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    text-align: center;
+}
+
+.auth-switch a {
+    color: #FB923C;
+    font-weight: 800;
+    text-decoration: none;
+    transition: color 160ms ease, text-shadow 160ms ease;
+}
+
+.auth-switch a:hover {
+    color: #FFB347;
+    text-shadow: 0 0 16px rgba(249, 115, 22, 0.2);
+}
+
+.auth-switch-divider {
+    margin: 0 6px;
+    color: #666666;
+}
+
+/* Steam registration identity */
+.auth-steam-avatar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 0 22px;
+    padding: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.025);
+}
+
+.auth-steam-avatar img {
+    display: block;
+    width: 82px;
+    height: 82px;
+    border: 2px solid rgba(249, 115, 22, 0.58);
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow:
+        0 0 0 5px rgba(249, 115, 22, 0.075),
+        0 0 26px rgba(249, 115, 22, 0.15);
+}
+
+.auth-steam-avatar-label {
+    margin-top: 11px;
+    color: #C4C4C4;
+    font-size: 0.78rem;
+    text-align: center;
+}
+
+.auth-required {
+    margin-right: 3px;
+    color: #F87171;
+}
+
+.auth-optional {
+    margin-right: 4px;
+    color: #858585;
+    font-size: 0.74rem;
+    font-weight: 450;
+}
+
+#registerForm .form-group input {
+    direction: rtl;
+}
+
+#registerForm input[name="steamid64"],
+#registerForm input[name="phone"],
+#registerForm input[type="email"],
+#forgotPasswordForm input[name="steamid64"] {
+    direction: ltr;
+    text-align: left;
+    unicode-bidi: plaintext;
+}
+
+#resetPasswordForm,
+#forgotPasswordForm {
+    margin-top: 4px;
+}
+
+#resetPasswordForm .btn-auth-submit {
+    margin-top: 6px;
+}
+
+.auth-message-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+/* Motion */
+@keyframes authCardIn {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 22px, 0) scale(0.985);
+        filter: blur(7px);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes authLogoIn {
+    from {
+        opacity: 0;
+        transform: translate3d(0, 10px, 0) scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+}
+
+@keyframes authAmbientDrift {
+    from { transform: translate3d(0, 0, 0) rotate(-8deg); }
+    to { transform: translate3d(-18px, 22px, 0) rotate(8deg); }
+}
+
+@keyframes authSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .auth-page {
+        padding: 30px 16px;
+    }
+
+    .auth-container {
+        max-width: 470px;
+        padding: 29px;
+        border-radius: 19px;
+    }
+
+    .auth-logo img {
+        width: 76px;
+        height: 76px;
+    }
+
+    .auth-subtitle {
+        margin-bottom: 23px;
+        font-size: 0.86rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-page {
+        width: calc(100% + 28px);
+        margin: -18px -14px;
+        padding: 24px 13px;
+    }
+
+    .auth-container {
+        padding: 23px 19px;
+        border-radius: 17px;
+    }
+
+    .auth-logo img {
+        width: 70px;
+        height: 70px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group input {
+        height: 49px;
+        padding-right: 13px;
+        font-size: 0.86rem;
+    }
+
+    .btn-auth-submit,
+    .btn-steam-login,
+    .auth-steam-button {
+        min-height: 49px;
+        font-size: 0.88rem;
+    }
+
+    .auth-separator {
+        margin: 21px 0;
+    }
+
+    .auth-switch {
+        margin-top: 21px;
+    }
+
+    .auth-steam-avatar {
+        padding: 13px;
+    }
+
+    .auth-steam-avatar img {
+        width: 72px;
+        height: 72px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-page::before,
+    .auth-page::after,
+    .auth-container,
+    .auth-logo,
+    .btn-auth-submit.is-loading::after {
+        animation: none !important;
+    }
+
+    .auth-container,
+    .auth-logo {
+        opacity: 1;
+        filter: none;
+        transform: none;
+    }
+
+    .form-group input,
+    .toggle-password,
+    .btn-auth-submit,
+    .btn-steam-login,
+    .auth-steam-button,
+    .auth-message-button-secondary,
+    .auth-switch a,
+    .forgot-link,
+    .auth-reset-link {
+        transition: none !important;
+    }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .auth-container,
+    .form-group input,
+    .btn-steam-login,
+    .auth-steam-button,
+    .auth-message-button-secondary,
+    .auth-steam-avatar {
+        -webkit-backdrop-filter: none;
+        backdrop-filter: none;
+    }
+
+    .auth-container {
+        background: #151515;
+    }
+
+    .form-group input {
+        background: #090909;
+    }
 }
