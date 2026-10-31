@@ -492,7 +492,7 @@ function leaderboardBuildUrl(array $params = []): string
         height: 48px;
         padding: 0 14px;
         border-radius: 13px;
-        background: #0b1220;
+        background: #111111;
         border: 1px solid #263653;
         color: #f8fafc;
         font: inherit;
@@ -504,8 +504,8 @@ function leaderboardBuildUrl(array $params = []): string
     }
     .leaderboard-search:focus,
     .leaderboard-sort-select:focus {
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.14);
+        border-color: #F97316;
+        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.14);
     }
     .leaderboard-search-btn,
     .leaderboard-order-btn,
@@ -519,7 +519,7 @@ function leaderboardBuildUrl(array $params = []): string
         padding: 0 14px;
         border-radius: 13px;
         border: 1px solid #263653;
-        background: #0b1220;
+        background: #111111;
         color: #cbd5e1;
         text-decoration: none;
         font-size: 0.86rem;
@@ -530,7 +530,7 @@ function leaderboardBuildUrl(array $params = []): string
     .leaderboard-order-btn:hover,
     .leaderboard-page-btn:hover,
     .leaderboard-size-btn:hover {
-        border-color: rgba(59, 130, 246, 0.48);
+        border-color: rgba(249, 115, 22, 0.48);
         background: rgba(15, 23, 42, 0.96);
         color: #fff;
     }
@@ -565,7 +565,7 @@ function leaderboardBuildUrl(array $params = []): string
     .leaderboard-size-btn.active,
     .leaderboard-page-btn.active {
         border-color: rgba(96, 165, 250, 0.42);
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.10), rgba(15, 23, 42, 0.96));
+        background: linear-gradient(135deg, rgba(249, 115, 22, 0.10), rgba(15, 23, 42, 0.96));
         color: #f8fafc;
     }
     .leaderboard-page-btn.disabled {
