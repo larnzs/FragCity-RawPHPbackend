@@ -474,3 +474,16 @@ body.site-body {
         transition: none;
     }
 }
+
+
+/* Neutral global canvas: avoid the old blue-grey shell showing around pages. */
+body.site-body {
+    background: #0D0D0D !important;
+    color: #F5F5F5;
+}
+
+body.site-body .app-container,
+body.site-body .main-content,
+body.site-body .content-fader {
+    background: transparent;
+}
