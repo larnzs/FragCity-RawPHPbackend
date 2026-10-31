@@ -761,11 +761,11 @@
             button.setAttribute('aria-pressed', enabled ? 'true' : 'false');
             button.classList.toggle('is-active', enabled);
             button.title = enabled
-                ? 'حالت بدون انیمیشن فعال است؛ برای بازگشت کلیک کنید'
-                : 'فعال‌سازی حالت بدون انیمیشن';
+                ? 'No Animation Mode is on — click to restore animations'
+                : 'Enable No Animation Mode';
             const label = button.querySelector('.fc-motion-toggle__label');
             if (label) {
-                label.textContent = enabled ? 'حالت سریع: روشن' : 'بدون انیمیشن';
+                label.textContent = 'No Animation Mode';
             }
             const state = button.querySelector('.fc-motion-toggle__state');
             if (state) state.textContent = enabled ? 'روشن' : 'خاموش';
