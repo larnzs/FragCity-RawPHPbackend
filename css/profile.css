@@ -1616,3 +1616,9 @@
         background: #151515;
     }
 }
+
+/* Preserve the full-bleed profile banner while separating the final content
+   from the shared footer. */
+.profile-fullscreen {
+    padding-bottom: var(--fc-page-safe-bottom, 56px);
+}
