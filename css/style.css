@@ -487,3 +487,60 @@ body.site-body .main-content,
 body.site-body .content-fader {
     background: transparent;
 }
+
+/* =========================================================
+   Global page safe areas
+   The header overlays the document flow, so normal pages reserve
+   its measured height plus a consistent content breathing-space.
+   Full-bleed/feature pages are excluded below and own their canvas.
+========================================================= */
+
+:root {
+    --fc-page-safe-gap: clamp(24px, 2.6vw, 36px);
+    --fc-page-safe-bottom: clamp(48px, 5vw, 64px);
+}
+
+.site-body .main-content {
+    flex: 1 0 auto;
+    min-width: 0;
+    padding:
+        calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap))
+        clamp(18px, 2.6vw, 40px)
+        var(--fc-page-safe-bottom);
+}
+
+/* These page roots already implement their own full-bleed canvas and
+   header/footer safe areas; do not double-pad their wrapper. */
+.site-body .main-content:has(
+    .home-landing,
+    .serverlist-page,
+    .leaderboard-page,
+    .banlist-page,
+    .buy-server-page,
+    .privacy-page,
+    .rules-page,
+    .support-page,
+    .manual-page,
+    .vip-page,
+    .about-page,
+    .wallet-page,
+    .profile-fullscreen,
+    .auth-page,
+    .wp-app
+) {
+    padding: 0 !important;
+}
+
+@media (max-width: 700px) {
+    :root {
+        --fc-page-safe-gap: 20px;
+        --fc-page-safe-bottom: 44px;
+    }
+
+    .site-body .main-content {
+        padding:
+            calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap))
+            14px
+            var(--fc-page-safe-bottom);
+    }
+}
