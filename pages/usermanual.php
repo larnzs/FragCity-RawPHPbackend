@@ -2,8 +2,7 @@
 // pages/usermanual.php
 $pageTitle = "راهنمای کاربر و کامندها";
 ?>
-<link rel="stylesheet" href="css/pages-base.css">
-<link rel="stylesheet" href="css/usermanual.css">
+
 
 <div class="manual-page">
     <div class="manual-hero">
@@ -481,4 +480,4 @@ $pageTitle = "راهنمای کاربر و کامندها";
         </div>
     </div>
 </div>
-<script src="js/usermanual.js" defer></script>
+
