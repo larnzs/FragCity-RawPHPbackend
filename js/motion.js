@@ -39,7 +39,7 @@
         '.console-card', '.instance-item',
         '.wp-app .wp-header', '.wp-app .wp-section-head', '.wp-app .wp-inventory-subhead',
         '.wp-app .wp-view-mode-switcher', '.wp-app .wp-pagination', '.wp-app .wp-inventory-saved',
-        '.wp-app .wp-card', '.wp-app .selection-card', '.wp-app .wp-control-card',
+        '.wp-app .wp-item', '.wp-app .selection-card', '.wp-app .wp-control-card',
         '.wp-app .wp-empty-state', '[data-fc-reveal]'
     ].join(',');
 
