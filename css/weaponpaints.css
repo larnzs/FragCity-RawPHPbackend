@@ -9199,3 +9199,324 @@ body > #keychainModal .wp-addon-none-icon {
         transform: none !important;
     }
 }
+
+
+
+/* =========================================================
+   47. Mobile WeaponPaints toolbar, sticky category navigation
+   and two-panel modal navigation.
+========================================================= */
+
+/* The site header remains above this bar; the WeaponPaints controls
+   stick immediately beneath it instead of disappearing behind it. */
+.wp-app .wp-header {
+    position: sticky !important;
+    top: 76px !important;
+    z-index: 1040 !important;
+    background: rgba(13, 13, 13, .97) !important;
+    border-bottom: 1px solid #292929 !important;
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .18);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+}
+
+.wp-app .wp-mobile-modal-tabs {
+    display: none;
+}
+
+@media (max-width: 1100px) {
+    .wp-app .wp-header {
+        top: 66px !important;
+    }
+}
+
+@media (max-width: 520px) {
+    .wp-app .wp-header {
+        padding: 8px 0 7px !important;
+    }
+
+    .wp-app .wp-header .wp-tabs {
+        width: min(calc(100% - 20px), 1550px) !important;
+        display: grid !important;
+        grid-template-columns: minmax(124px, .84fr) minmax(0, 1.16fr) !important;
+        grid-template-areas:
+            "team search"
+            "categories categories" !important;
+        align-items: center;
+        gap: 7px !important;
+        overflow: visible !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher {
+        grid-area: team !important;
+        justify-self: stretch !important;
+        width: 100%;
+        min-width: 0;
+        height: 40px !important;
+        min-height: 40px !important;
+        gap: 2px !important;
+        padding: 3px !important;
+        border-radius: 9px !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn {
+        flex: 1 1 0;
+        min-width: 0 !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        padding: 0 4px !important;
+        gap: 4px;
+        font-size: .66rem !important;
+        white-space: nowrap;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-search-wrap {
+        grid-area: search !important;
+        justify-self: stretch !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 40px;
+        min-height: 40px;
+    }
+
+    .wp-app .wp-header .wp-search-wrap {
+        min-height: 40px !important;
+        border-radius: 9px !important;
+    }
+
+    .wp-app .wp-header .wp-search {
+        height: 38px !important;
+        min-height: 38px !important;
+        padding-inline: 11px 33px !important;
+        font-size: .72rem !important;
+    }
+
+    .wp-app .wp-header .wp-category-switcher--unified {
+        grid-area: categories !important;
+        width: 100%;
+        min-width: 0;
+        gap: 5px !important;
+        padding: 1px 0 2px !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x proximity;
+    }
+
+    .wp-app .wp-header .wp-category-switcher--unified > .wp-tab {
+        flex: 0 0 35px !important;
+        width: 35px !important;
+        min-width: 35px !important;
+        height: 35px !important;
+        min-height: 35px !important;
+        border-radius: 8px !important;
+        scroll-snap-align: start;
+    }
+
+    .wp-app .wp-header .wp-category-switcher--unified > .wp-tab > i {
+        font-size: .86rem !important;
+    }
+
+    .wp-app .wp-main {
+        padding-top: 8px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .wp-app .wp-header .wp-tabs {
+        grid-template-columns: minmax(112px, .88fr) minmax(0, 1.12fr) !important;
+        gap: 6px !important;
+    }
+
+    .wp-app .wp-header .wp-tabs > .wp-team-switcher .wp-team-btn {
+        font-size: .61rem !important;
+    }
+
+    .wp-app .wp-header .wp-category-switcher--unified > .wp-tab {
+        flex-basis: 33px !important;
+        width: 33px !important;
+        min-width: 33px !important;
+        height: 33px !important;
+        min-height: 33px !important;
+    }
+}
+
+/* Shared mobile tab controls used by Paint, Sticker and Keychain dialogs. */
+@media (max-width: 720px) {
+    body:has(.wp-app) > .wp-modal .wp-mobile-modal-tabs {
+        flex: 0 0 auto;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+        width: 100%;
+        margin: 0 0 8px;
+        padding: 3px;
+        border: 1px solid #292929;
+        border-radius: 10px;
+        background: #111111;
+    }
+
+    body:has(.wp-app) > .wp-modal .wp-mobile-modal-tab {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-width: 0;
+        min-height: 38px;
+        padding: 7px 9px;
+        border: 1px solid transparent;
+        border-radius: 7px;
+        background: transparent;
+        color: #929292;
+        font: 800 .7rem inherit;
+        cursor: pointer;
+        transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease;
+    }
+
+    body:has(.wp-app) > .wp-modal .wp-mobile-modal-tab > i {
+        color: currentColor;
+        font-size: .72rem;
+    }
+
+    body:has(.wp-app) > .wp-modal .wp-mobile-modal-tab.is-active {
+        border-color: rgba(249, 115, 22, .28);
+        background: rgba(249, 115, 22, .11);
+        color: #FB923C;
+    }
+
+    body:has(.wp-app) > .wp-modal .wp-mobile-modal-tab:focus-visible {
+        outline: 2px solid rgba(249, 115, 22, .65);
+        outline-offset: 2px;
+    }
+
+    /* Paint modal: show the paint gallery first, settings only in its own tab. */
+    #skinModalBody .wp-skin-workspace {
+        display: block !important;
+        flex: 1 1 auto !important;
+        width: 100%;
+        min-width: 0;
+        min-height: 0 !important;
+        height: 0 !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: minmax(0, 1fr) !important;
+        overflow: hidden !important;
+    }
+
+    #skinModalBody .wp-skin-workspace > [data-wp-mobile-panel] {
+        display: none !important;
+    }
+
+    #skinModalBody .wp-skin-workspace > .wp-skin-list-pane.is-mobile-active {
+        display: flex !important;
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    #skinModalBody .wp-skin-workspace > .wp-skin-controls.is-mobile-active {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        align-content: start;
+        width: 100%;
+        max-width: none !important;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        padding: 7px !important;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+    }
+
+    #skinModalBody .wp-skin-workspace > .wp-skin-controls.is-mobile-active > .wp-setting-card,
+    #skinModalBody .wp-skin-workspace > .wp-skin-controls.is-mobile-active > .wp-addon-control-card,
+    #skinModalBody .wp-skin-workspace > .wp-skin-controls.is-mobile-active > .wp-control-card {
+        grid-column: 1 !important;
+        width: 100%;
+        max-width: none;
+    }
+
+    #skinModalBody .wp-skin-grid-scroll {
+        width: 100%;
+        min-height: 0;
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+    }
+
+    #skinModalBody #skinSelectionGrid.selection-grid--skin {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 7px !important;
+    }
+
+    #skinModalBody .selection-card--skin .selection-image {
+        height: 68px !important;
+    }
+
+    /* Sticker and Keychain: picker and property editor get separate tabs too. */
+    body > #stickerModal .wp-addon-workspace,
+    body > #keychainModal .wp-addon-workspace {
+        display: block !important;
+        flex: 1 1 auto !important;
+        width: 100%;
+        min-width: 0;
+        min-height: 0 !important;
+        height: 0 !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: minmax(0, 1fr) !important;
+        overflow: hidden !important;
+    }
+
+    body > #stickerModal .wp-addon-workspace > [data-wp-mobile-panel],
+    body > #keychainModal .wp-addon-workspace > [data-wp-mobile-panel] {
+        display: none !important;
+    }
+
+    body > #stickerModal .wp-addon-workspace > .wp-addon-list-pane.is-mobile-active,
+    body > #keychainModal .wp-addon-workspace > .wp-addon-list-pane.is-mobile-active {
+        display: flex !important;
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    body > #stickerModal .wp-addon-workspace > .wp-addon-properties.is-mobile-active,
+    body > #keychainModal .wp-addon-workspace > .wp-addon-properties.is-mobile-active {
+        display: flex !important;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        max-height: none !important;
+        min-width: 0;
+        min-height: 0;
+        padding: 7px !important;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    body > #stickerModal .wp-addon-settings-card,
+    body > #keychainModal .wp-addon-settings-card {
+        flex: 0 0 auto;
+        width: 100%;
+        padding: 9px !important;
+    }
+
+    body > #stickerModal .wp-addon-grid-scroll,
+    body > #keychainModal .wp-addon-grid-scroll {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body:has(.wp-app) > .wp-modal .wp-mobile-modal-tab {
+        transition: none !important;
+    }
+}
