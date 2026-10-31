@@ -1265,17 +1265,24 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
 <div class="wp-app">
     <div class="wp-workspace-layout">
-        <aside class="wp-sidebar" aria-label="دسته‌بندی آیتم‌ها">
-            <div class="wp-sidebar-brand">
-                <span class="wp-sidebar-brand__mark"><i class="fas fa-crosshairs" aria-hidden="true"></i></span>
-                <span class="wp-sidebar-brand__copy">
-                    <strong>FRAGCITY</strong>
-                    <small>WEAPON PAINTS</small>
-                </span>
-            </div>
-            <nav class="wp-tabs wp-sidebar-tabs" id="mainTabs" aria-label="دسته‌بندی آیتم‌ها">
-                            <div
+        <div class="wp-workspace-main">
+
+    <!-- =========================================================
+         TOP HEADER
+    ========================================================== -->
+
+    <header class="wp-header">
+
+        <nav
+            class="wp-tabs wp-toolbar-controls"
+            id="wpToolbarControls"
+            aria-label="Team and search controls"
+        >
+
+            <div
                 class="wp-category-switcher wp-category-switcher--unified"
+                id="mainTabs"
+                role="group"
                 aria-label="Inventory and weapon categories"
             >
 
@@ -1311,7 +1318,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 >
                     <img
                         class="wp-tab-svg"
-                        src="/img/weaponpaintsicons/skins.svg"
+                        src="/img/weaponpaintsicons/allskins.svg"
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1353,7 +1360,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 >
                     <img
                         class="wp-tab-svg"
-                        src="/img/weaponpaintsicons/smg.svg"
+                        src="/img/weaponpaintsicons/p90.svg"
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1531,21 +1538,6 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     <span class="wp-tab-label">Pins</span>
                 </button>
             </div>
-            </nav>
-        </aside>
-        <div class="wp-workspace-main">
-
-    <!-- =========================================================
-         TOP HEADER
-    ========================================================== -->
-
-    <header class="wp-header">
-
-        <nav
-            class="wp-tabs wp-toolbar-controls"
-            id="wpToolbarControls"
-            aria-label="Team and search controls"
-        >
 
             <!-- Current Team -->
 
