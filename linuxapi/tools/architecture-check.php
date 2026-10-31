@@ -625,11 +625,15 @@ $check(
 );
 
 $check(
-    'WeaponPaints category navigation is separated into a right-side vertical SVG rail',
-    str_contains($weaponPaintsPage, '<aside class="wp-sidebar"')
-        && str_contains($weaponPaintsPage, '<nav class="wp-tabs wp-sidebar-tabs" id="mainTabs"')
+    'WeaponPaints category tabs share one horizontal toolbar with centered team controls and left search',
+    !str_contains($weaponPaintsPage, '<aside class="wp-sidebar"')
+        && str_contains($weaponPaintsPage, 'class="wp-category-switcher wp-category-switcher--unified"')
+        && str_contains($weaponPaintsPage, 'id="mainTabs"')
         && str_contains($weaponPaintsPage, 'id="wpToolbarControls"')
+        && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/inventory.svg')
+        && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/allskins.svg')
         && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/ak47.svg')
+        && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/p90.svg')
         && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/m249.svg')
         && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/usp_silencer.svg')
         && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/awp.svg')
@@ -640,8 +644,20 @@ $check(
         && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/pin.svg')
         && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/t_char_bg.svg')
         && str_contains($weaponPaintsPage, '/img/weaponpaintsicons/ct_char_bg.svg')
-        && str_contains($weaponPaintsPage, 'wp-tab-fallback')
+        && str_contains($weaponPaintsStylesheet, 'grid-template-areas: "categories team search"')
+        && str_contains($weaponPaintsStylesheet, '.wp-workspace-main > .wp-header .wp-category-switcher--unified')
+        && str_contains($weaponPaintsStylesheet, 'grid-area: team !important;')
+        && str_contains($weaponPaintsStylesheet, 'grid-area: search !important;')
+        && str_contains($weaponPaintsStylesheet, '.wp-tab-svg[src$="/gloves.svg"]')
+        && str_contains($weaponPaintsJavascript, 'wp-tab-exiting')
+        && str_contains($weaponPaintsJavascript, 'tabExitDuration')
+        && str_contains($weaponPaintsJavascript, 'const preferredPane = state.currentActiveTab')
+        && str_contains($weaponPaintsStylesheet, '@keyframes wpPaneEnterDirectional')
+        && str_contains($weaponPaintsStylesheet, '@keyframes wpPaneExitDirectional')
+        && is_file($root . '/img/weaponpaintsicons/inventory.svg')
+        && is_file($root . '/img/weaponpaintsicons/allskins.svg')
         && is_file($root . '/img/weaponpaintsicons/ak47.svg')
+        && is_file($root . '/img/weaponpaintsicons/p90.svg')
         && is_file($root . '/img/weaponpaintsicons/m249.svg')
         && is_file($root . '/img/weaponpaintsicons/usp_silencer.svg')
         && is_file($root . '/img/weaponpaintsicons/awp.svg')
@@ -652,16 +668,9 @@ $check(
         && is_file($root . '/img/weaponpaintsicons/pin.svg')
         && is_file($root . '/img/weaponpaintsicons/t_char_bg.svg')
         && is_file($root . '/img/weaponpaintsicons/ct_char_bg.svg')
-        && str_contains($weaponPaintsStylesheet, '.wp-app .wp-sidebar-tabs')
-        && str_contains($weaponPaintsStylesheet, 'grid-template-columns: 184px minmax(0, 1fr)')
-        && str_contains($weaponPaintsStylesheet, 'flex-direction: column')
-        && str_contains($weaponPaintsJavascript, 'wp-tab-exiting')
-        && str_contains($weaponPaintsJavascript, 'tabExitDuration')
-        && str_contains($weaponPaintsJavascript, 'const preferredPane = state.currentActiveTab')
-        && str_contains($weaponPaintsStylesheet, '@keyframes wpPaneEnterDirectional')
-        && str_contains($weaponPaintsStylesheet, '@keyframes wpPaneExitDirectional')
         && is_file($root . '/img/weaponpaintsicons/README.md')
 );
+
 
 $check(
     'WeaponPaints paint, sticker and keychain modals use Server List glass blur and enter/exit motion',
