@@ -13220,3 +13220,179 @@ html.fc-no-animation body:has(.wp-app) > #stickerModal .wp-addon-card:hover,
 html.fc-no-animation body:has(.wp-app) > #keychainModal .wp-addon-card:hover {
     transform: none !important;
 }
+
+
+/* Alignment and pagination visibility fix: keep the workspace on one shared grid. */
+/* The category rail and the page content share one exact horizontal canvas. */
+.wp-app .wp-sidebar,
+.wp-app .wp-workspace-main {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+    box-sizing: border-box !important;
+}
+
+.wp-app .wp-sidebar {
+    align-items: center !important;
+}
+
+.wp-app .wp-sidebar-tabs {
+    min-height: 44px !important;
+    align-items: center !important;
+}
+
+.wp-app .wp-sidebar-team,
+.wp-app .wp-sidebar-search {
+    align-self: center !important;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn {
+    height: 44px !important;
+    min-height: 44px !important;
+}
+
+.wp-app .wp-sidebar .wp-search-wrap {
+    height: 44px !important;
+    min-height: 44px !important;
+}
+
+.wp-app.has-floating-pagination .wp-workspace-main .wp-main {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin-inline: 0 !important;
+    transform: none !important;
+}
+
+/* The Inventory artwork has a fuller SVG viewBox; constrain its visual footprint. */
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/inventory.svg"] {
+    flex: 0 0 24px !important;
+    width: 24px !important;
+    min-width: 24px !important;
+    max-width: 24px !important;
+    height: 22px !important;
+    min-height: 22px !important;
+    max-height: 22px !important;
+    object-fit: contain !important;
+    object-position: center !important;
+}
+
+/* Explicitly size the pagination rail's controls so cloned page links cannot collapse. */
+body:has(.wp-app) > #wpFloatingPagination:not([hidden]) {
+    display: flex !important;
+    z-index: 1045 !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination .wp-floating-pagination__controls {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating {
+    display: flex !important;
+    flex: 0 1 auto !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    min-height: 0 !important;
+    gap: 4px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    visibility: visible !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating .wp-page-btn {
+    display: inline-flex !important;
+    flex: 0 0 32px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 46px !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    font-size: .7rem !important;
+    line-height: 1 !important;
+    text-indent: 0 !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating .wp-page-btn:not(.wp-page-btn--nav) {
+    color: #B3B3B3 !important;
+    font-variant-numeric: tabular-nums;
+}
+
+body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating .wp-page-btn.is-active {
+    color: #F97316 !important;
+    border-color: rgba(249, 115, 22, .62) !important;
+    background: rgba(249, 115, 22, .14) !important;
+}
+
+@media (max-width: 760px) {
+    .wp-app .wp-sidebar .wp-team-switcher .wp-team-btn,
+    .wp-app .wp-sidebar .wp-search-wrap {
+        height: 40px !important;
+        min-height: 40px !important;
+    }
+
+    body:has(.wp-app) > #wpFloatingPagination:not([hidden]) {
+        align-items: center !important;
+    }
+
+    body:has(.wp-app) > #wpFloatingPagination .wp-floating-pagination__controls {
+        flex: 1 1 auto !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating {
+        flex: 0 0 auto !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        width: max-content !important;
+        min-width: 100% !important;
+        max-height: none !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        gap: 4px !important;
+    }
+
+    body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating .wp-page-btn {
+        flex: 0 0 32px !important;
+        width: 32px !important;
+        min-width: 32px !important;
+        max-width: 32px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+    }
+}
+
+@media (max-width: 430px) {
+    .wp-app .wp-sidebar {
+        gap: 7px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab {
+        flex-shrink: 0 !important;
+    }
+
+    .wp-app .wp-sidebar .wp-team-switcher .wp-team-btn,
+    .wp-app .wp-sidebar .wp-search-wrap {
+        height: 38px !important;
+        min-height: 38px !important;
+    }
+}
