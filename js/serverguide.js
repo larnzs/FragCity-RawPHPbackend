@@ -215,6 +215,14 @@
         });
 
         setCategory('all');
+
+        // Refresh the shared reveal system after this AJAX-loaded page initializes.
+        if (
+            window.FragCityMotion
+            && typeof window.FragCityMotion.refresh === 'function'
+        ) {
+            window.FragCityMotion.refresh(root);
+        }
     }
 
     if (document.readyState === 'loading') {
