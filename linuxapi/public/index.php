@@ -361,6 +361,57 @@ function apiSaveSkin(PDO $pdo, string $steamid, array $teams, array $body): void
     }
 }
 
+/**
+ * Remove one saved skin configuration for exactly one player/team/weapon/paint.
+ * The plugin's active row is cleared only when it references that same paint.
+ */
+function apiDeleteSkinInventory(PDO $pdo, string $steamid, array $teams, array $body): bool
+{
+    $defindex = apiInt($body['defindex'] ?? null, 'defindex', 1, 10000);
+    $paint = apiInt($body['paint_id'] ?? null, 'paint_id', 0, 100000);
+    $deleted = false;
+
+    foreach ($teams as $team) {
+        $stmt = $pdo->prepare(
+            'DELETE FROM wp_player_skin_inventory
+             WHERE steamid = :steamid
+               AND weapon_team = :team
+               AND weapon_defindex = :defindex
+               AND weapon_paint_id = :paint'
+        );
+        $stmt->execute([
+            ':steamid' => $steamid,
+            ':team' => $team,
+            ':defindex' => $defindex,
+            ':paint' => $paint,
+        ]);
+
+        if ($stmt->rowCount() < 1) {
+            continue;
+        }
+
+        $deleted = true;
+
+        // Clear the plugin's active loadout only if it points to this exact paint.
+        apiExec($pdo,
+            'DELETE FROM wp_player_skins
+             WHERE steamid = :steamid
+               AND weapon_team = :team
+               AND weapon_defindex = :defindex
+               AND weapon_paint_id = :paint',
+            [
+                ':steamid' => $steamid,
+                ':team' => $team,
+                ':defindex' => $defindex,
+                ':paint' => $paint,
+            ]
+        );
+    }
+
+    return $deleted;
+}
+
+
 
 $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
 $uri = (string)($_SERVER['REQUEST_URI'] ?? '/');
@@ -704,7 +755,9 @@ try {
     }
 
     $teams = apiTeams($body);
-    apiTransaction($pdo, function () use ($pdo, $steamid, $teams, $body, $action): void {
+    $mutationResult = ['saved' => true];
+
+    apiTransaction($pdo, function () use ($pdo, $steamid, $teams, $body, $action, &$mutationResult): void {
         switch ($action) {
             case 'save_glove': apiSaveGlove($pdo, $steamid, $teams, $body); break;
             case 'save_agent': apiSaveAgent($pdo, $steamid, $teams, $body); break;
@@ -712,11 +765,16 @@ try {
             case 'save_pin': apiSavePin($pdo, $steamid, $teams, $body); break;
             case 'save_knife': apiSaveKnife($pdo, $steamid, $body); break;
             case 'save_skin': apiSaveSkin($pdo, $steamid, $teams, $body); break;
+            case 'delete_skin':
+                $mutationResult = [
+                    'deleted' => apiDeleteSkinInventory($pdo, $steamid, $teams, $body),
+                ];
+                break;
             default: throw new InvalidArgumentException('Unsupported action.');
         }
     });
 
-    apiRespond(200, ['success' => true, 'data' => ['saved' => true]]);
+    apiRespond(200, ['success' => true, 'data' => $mutationResult]);
 } catch (InvalidArgumentException $e) {
     apiRespond(400, ['success' => false, 'error' => 'invalid_request']);
 } catch (PDOException $e) {
