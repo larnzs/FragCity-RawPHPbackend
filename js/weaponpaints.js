@@ -44,6 +44,7 @@
 
     const pageLifecycle = {
         pageRoot: null,
+        lastScrollHintAt: 0,
         modalDelegatesBound: false,
         modalEscapeBound: false,
         delegatedEventsBound: false,
@@ -354,6 +355,24 @@
                 },
                 3200
             );
+
+    }
+
+    function showWeaponPaintsScrollHint() {
+
+        const now = Date.now();
+
+        // init() and pageshow may both fire for the same visit.
+        if (now - pageLifecycle.lastScrollHintAt < 1400) {
+            return;
+        }
+
+        pageLifecycle.lastScrollHintAt = now;
+
+        showWpToast(
+            'برای اسکرول افقی بین تب‌ها، کلید Shift را نگه دارید و چرخ ماوس را حرکت دهید.',
+            'warning'
+        );
 
     }
 
@@ -7475,6 +7494,7 @@
             setPageReady();
             applyWeaponPaintsLayoutMode();
             applyGlobalSearch();
+            showWeaponPaintsScrollHint();
             return;
         }
 
@@ -7498,6 +7518,7 @@
         setPageReady();
         syncFloatingPagination();
         applyGlobalSearch();
+        showWeaponPaintsScrollHint();
 
     }
 
@@ -7515,6 +7536,7 @@
             applyWeaponPaintsLayoutMode();
 
             applyGlobalSearch();
+            showWeaponPaintsScrollHint();
 
         }
     );
