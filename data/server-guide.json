@@ -805,7 +805,9 @@
       "category": "admin",
       "title": "تغییر نقشه",
       "command": "!map <mapname>",
-      "aliases": [],
+      "aliases": [
+        "css_changemap"
+      ],
       "description": "نقشه سرور را تغییر می‌دهد. دسترسی تغییر نقشه لازم است؛ در صورت فعال بودن GameModeManager، منوی نقشه‌ها نیز در دسترس است.",
       "access": "@css/changemap",
       "syntax": "!map <mapname>",
@@ -1007,7 +1009,10 @@
       "category": "admin",
       "title": "بارگذاری Workshop Map",
       "command": "!wsmap <map or workshop id>",
-      "aliases": [],
+      "aliases": [
+        "css_changewsmap",
+        "css_workshop"
+      ],
       "description": "نقشه Workshop را با نام یا شناسه آن بارگذاری می‌کند.",
       "access": "@css/changemap",
       "syntax": "!wmap <workshop_id>",
@@ -1760,7 +1765,9 @@
       "command": "!penalties",
       "aliases": [
         "!mypenalties",
-        "!comms"
+        "!comms",
+        "css_mypenalties",
+        "css_comms"
       ],
       "description": "جریمه‌های فعال خود، از جمله Ban و محدودیت‌های Chat/Voice را نشان می‌دهد.",
       "access": "عمومی",
@@ -1901,7 +1908,8 @@
       "title": "مخفی شدن ادمین در Scoreboard",
       "command": "!hide",
       "aliases": [
-        "!stealth"
+        "!stealth",
+        "css_stealth"
       ],
       "description": "حالت Stealth را روشن یا خاموش می‌کند تا ادمین در Scoreboard نمایش داده نشود.",
       "access": "@css/kick",
@@ -1949,7 +1957,8 @@
       "title": "بازیکنان قطع‌شده اخیر",
       "command": "!disconnected",
       "aliases": [
-        "!last"
+        "!last",
+        "css_last"
       ],
       "description": "فهرست بازیکنان اخیراً Disconnect شده را نمایش می‌دهد؛ Alias آن !last است.",
       "access": "@css/kick",
@@ -2047,7 +2056,10 @@
       "aliases": [
         "!rg",
         "!restart",
-        "!restartgame"
+        "!restartgame",
+        "css_rg",
+        "css_restart",
+        "css_restartgame"
       ],
       "description": "راند یا بازی را ریستارت می‌کند. Aliasها: !rg، !restart و !restartgame.",
       "access": "@css/generic",
@@ -2240,7 +2252,8 @@
       "title": "مدیریت پلاگین‌ها",
       "command": "!pluginsmanager",
       "aliases": [
-        "!pluginmanager"
+        "!pluginmanager",
+        "css_pluginmanager"
       ],
       "description": "منوی مدیریت پلاگین‌ها را باز می‌کند؛ Alias: !pluginmanager.",
       "access": "ادمین (بر اساس تنظیمات پلاگین)",
@@ -2257,7 +2270,8 @@
       "title": "شنود صدای بازیکنان",
       "command": "!adminvoice",
       "aliases": [
-        "!listenall"
+        "!listenall",
+        "css_listenall"
       ],
       "description": "دسترسی شنود Voice را فعال/غیرفعال می‌کند؛ Alias: !listenall.",
       "access": "ادمین (بر اساس تنظیمات پلاگین)",
@@ -5156,7 +5170,9 @@
       "console_command": "css_tp <#userid or name>",
       "aliases": [
         "!tpto",
-        "!goto"
+        "!goto",
+        "css_tpto",
+        "css_goto"
       ],
       "description": "ادمین را به محل بازیکن منتقل می‌کند. می‌توان از نام، User ID یا Target selector استفاده کرد.",
       "access": "@css/kick",
@@ -5172,7 +5188,8 @@
       "command": "!bring <target>",
       "console_command": "css_bring <#userid or name>",
       "aliases": [
-        "!tphere"
+        "!tphere",
+        "css_tphere"
       ],
       "description": "بازیکن هدف را به موقعیت ادمین منتقل می‌کند؛ برای جابه‌جایی بازیکن گیرکرده یا جمع‌کردن بازیکنان کاربرد دارد.",
       "access": "@css/kick",
@@ -5188,7 +5205,8 @@
       "command": "!resize <target> <size>",
       "console_command": "css_resize <#userid or name> <size>",
       "aliases": [
-        "!size"
+        "!size",
+        "css_size"
       ],
       "description": "اندازه بازیکن را تغییر می‌دهد. دستور و Alias در Commands.json این بسته ثبت شده‌اند؛ مقادیر معتبر و Permission را مطابق تنظیمات همان نسخه بررسی کن.",
       "access": "بر اساس تنظیمات پلاگین",
