@@ -1,0 +1,1275 @@
+{
+  "meta": {
+    "title": "راهنمای دستورات و تنظیمات سرور",
+    "description": "فهرست دستورات و تنظیمات قابل استفاده در سرورهای CS2 فرگ‌سیتی.",
+    "notice": "دسترسی و عملکرد بعضی دستورات به مود فعال و سطح دسترسی بازیکن بستگی دارد. در صورت بی‌اثر بودن یک دستور، دسترسی و پلاگین مربوط را بررسی کنید."
+  },
+  "categories": [
+    {
+      "id": "player",
+      "title": "بازیکنان",
+      "description": "دستورات روزمره برای بازیکنان در مسابقه",
+      "icon": "fa-user"
+    },
+    {
+      "id": "modes",
+      "title": "مودها و نقشه‌ها",
+      "description": "انتخاب و تغییر حالت بازی",
+      "icon": "fa-gamepad"
+    },
+    {
+      "id": "match",
+      "title": "مدیریت مسابقه",
+      "description": "کنترل راند، تایم‌اوت و روند Mix",
+      "icon": "fa-flag"
+    },
+    {
+      "id": "admin",
+      "title": "مدیریت سرور",
+      "description": "دستورات مدیریتی و Moderation",
+      "icon": "fa-shield-halved"
+    },
+    {
+      "id": "practice",
+      "title": "تمرین و لاین‌آپ",
+      "description": "ابزارهای تمرین، اسپان و گرنید",
+      "icon": "fa-crosshairs"
+    },
+    {
+      "id": "settings",
+      "title": "تنظیمات بازی",
+      "description": "تغییر گزینه‌های قابل تنظیم سرور",
+      "icon": "fa-sliders"
+    }
+  ],
+  "items": [
+    {
+      "id": "ready",
+      "type": "command",
+      "category": "player",
+      "title": "اعلام آمادگی",
+      "command": ".ready",
+      "aliases": [
+        ".r"
+      ],
+      "description": "اعلام می‌کند که برای شروع مسابقه آماده هستید.",
+      "access": "بازیکن",
+      "syntax": ".ready",
+      "example": ".r",
+      "tags": [
+        "mix",
+        "ready"
+      ]
+    },
+    {
+      "id": "unready",
+      "type": "command",
+      "category": "player",
+      "title": "لغو آمادگی",
+      "command": ".unready",
+      "aliases": [
+        ".ur"
+      ],
+      "description": "وضعیت آمادگی خود را لغو می‌کند.",
+      "access": "بازیکن",
+      "syntax": ".unready",
+      "example": ".ur",
+      "tags": [
+        "mix",
+        "ready"
+      ]
+    },
+    {
+      "id": "pause",
+      "type": "command",
+      "category": "player",
+      "title": "درخواست Pause",
+      "command": ".pause",
+      "aliases": [],
+      "description": "درخواست توقف بازی در شرایط مجاز مسابقه را ثبت می‌کند.",
+      "access": "بازیکن",
+      "syntax": ".pause",
+      "tags": [
+        "mix",
+        "pause"
+      ]
+    },
+    {
+      "id": "tech",
+      "type": "command",
+      "category": "player",
+      "title": "درخواست توقف فنی",
+      "command": ".tech",
+      "aliases": [],
+      "description": "درخواست Technical Pause را ثبت می‌کند.",
+      "access": "بازیکن",
+      "syntax": ".tech",
+      "tags": [
+        "mix",
+        "pause"
+      ]
+    },
+    {
+      "id": "unpause",
+      "type": "command",
+      "category": "player",
+      "title": "درخواست ادامه بازی",
+      "command": ".unpause",
+      "aliases": [],
+      "description": "درخواست خارج شدن از Pause را ثبت می‌کند؛ ممکن است به تأیید طرف مقابل نیاز داشته باشد.",
+      "access": "بازیکن",
+      "syntax": ".unpause",
+      "tags": [
+        "mix",
+        "pause"
+      ]
+    },
+    {
+      "id": "stay",
+      "type": "command",
+      "category": "player",
+      "title": "ماندن در همان سمت",
+      "command": ".stay",
+      "aliases": [],
+      "description": "پس از Knife Round درخواست ماندن در سمت فعلی را ثبت می‌کند.",
+      "access": "بازیکن",
+      "syntax": ".stay",
+      "tags": [
+        "mix",
+        "team"
+      ]
+    },
+    {
+      "id": "switch",
+      "type": "command",
+      "category": "player",
+      "title": "تعویض سمت",
+      "command": ".switch",
+      "aliases": [
+        ".swap"
+      ],
+      "description": "در مرحله‌ای که تعویض سمت مجاز باشد، انتخاب Switch را ثبت می‌کند.",
+      "access": "بازیکن",
+      "syntax": ".switch",
+      "tags": [
+        "mix",
+        "team"
+      ]
+    },
+    {
+      "id": "stop",
+      "type": "command",
+      "category": "player",
+      "title": "درخواست بازگردانی راند",
+      "command": ".stop",
+      "aliases": [],
+      "description": "درخواست بازگردانی بکاپ راند را ثبت می‌کند؛ بازگردانی به تأیید هر دو تیم نیاز دارد.",
+      "access": "بازیکن",
+      "syntax": ".stop",
+      "note": "این دستور به‌تنهایی راند را بدون تأیید دو تیم بازنمی‌گرداند.",
+      "tags": [
+        "mix",
+        "backup"
+      ]
+    },
+    {
+      "id": "tac",
+      "type": "command",
+      "category": "player",
+      "title": "تایم‌اوت تاکتیکی",
+      "command": ".tac",
+      "aliases": [],
+      "description": "درخواست Tactical Timeout را ثبت می‌کند.",
+      "access": "بازیکن",
+      "syntax": ".tac",
+      "tags": [
+        "mix",
+        "timeout"
+      ]
+    },
+    {
+      "id": "coach",
+      "type": "command",
+      "category": "player",
+      "title": "ورود به حالت مربی",
+      "command": ".coach <side>",
+      "aliases": [],
+      "description": "درخواست ورود به حالت Coach برای سمت مشخص‌شده.",
+      "access": "بازیکن",
+      "syntax": ".coach <side>",
+      "example": ".coach t",
+      "tags": [
+        "mix",
+        "coach"
+      ]
+    },
+    {
+      "id": "uncoach",
+      "type": "command",
+      "category": "player",
+      "title": "خروج از حالت مربی",
+      "command": ".uncoach",
+      "aliases": [],
+      "description": "از حالت Coach خارج می‌شود.",
+      "access": "بازیکن",
+      "syntax": ".uncoach",
+      "tags": [
+        "mix",
+        "coach"
+      ]
+    },
+    {
+      "id": "modes",
+      "type": "command",
+      "category": "modes",
+      "title": "نمایش فهرست مودها",
+      "command": "!modes",
+      "aliases": [
+        "!gamemode"
+      ],
+      "description": "منوی مودهای قابل انتخاب روی سرور را باز می‌کند.",
+      "access": "بازیکن",
+      "syntax": "!modes",
+      "tags": [
+        "mode",
+        "menu"
+      ]
+    },
+    {
+      "id": "mix",
+      "type": "command",
+      "category": "modes",
+      "title": "فعال‌سازی مود Mix",
+      "command": "!mix",
+      "aliases": [
+        "css_mix"
+      ],
+      "description": "مود رقابتی Mix را فعال می‌کند؛ در دسترس بودن آن به سرور و پلاگین‌های نصب‌شده بستگی دارد.",
+      "access": "ادمین یا دسترسی مود",
+      "syntax": "!mix",
+      "tags": [
+        "mode",
+        "mix"
+      ]
+    },
+    {
+      "id": "casual",
+      "type": "command",
+      "category": "modes",
+      "title": "فعال‌سازی مود Casual",
+      "command": "!casual",
+      "aliases": [
+        "css_casual"
+      ],
+      "description": "مود Casual را فعال می‌کند.",
+      "access": "ادمین یا دسترسی مود",
+      "syntax": "!casual",
+      "tags": [
+        "mode",
+        "casual"
+      ]
+    },
+    {
+      "id": "retakes",
+      "type": "command",
+      "category": "modes",
+      "title": "فعال‌سازی مود Retakes",
+      "command": "!retakes",
+      "aliases": [
+        "!retake",
+        "css_retakes"
+      ],
+      "description": "مود Retakes را فعال می‌کند.",
+      "access": "ادمین یا دسترسی مود",
+      "syntax": "!retakes",
+      "tags": [
+        "mode",
+        "retakes"
+      ]
+    },
+    {
+      "id": "practice-mode",
+      "type": "command",
+      "category": "modes",
+      "title": "فعال‌سازی مود Practice",
+      "command": "!prac",
+      "aliases": [
+        "!practice",
+        "css_practice"
+      ],
+      "description": "مود تمرین را فعال می‌کند.",
+      "access": "ادمین یا دسترسی مود",
+      "syntax": "!prac",
+      "tags": [
+        "mode",
+        "practice"
+      ]
+    },
+    {
+      "id": "warmup",
+      "type": "command",
+      "category": "modes",
+      "title": "فعال‌سازی مود Warmup",
+      "command": "!warmup",
+      "aliases": [
+        "css_warmup"
+      ],
+      "description": "مود Warmup را فعال می‌کند.",
+      "access": "ادمین یا دسترسی مود",
+      "syntax": "!warmup",
+      "tags": [
+        "mode",
+        "warmup"
+      ]
+    },
+    {
+      "id": "wingman",
+      "type": "command",
+      "category": "modes",
+      "title": "فعال‌سازی مود Wingman",
+      "command": "!wingman",
+      "aliases": [
+        "css_wingman"
+      ],
+      "description": "مود Wingman را فعال می‌کند.",
+      "access": "ادمین یا دسترسی مود",
+      "syntax": "!wingman",
+      "tags": [
+        "mode",
+        "wingman"
+      ]
+    },
+    {
+      "id": "deathmatch",
+      "type": "command",
+      "category": "modes",
+      "title": "فعال‌سازی مود Deathmatch",
+      "command": "!dm",
+      "aliases": [],
+      "description": "مود Deathmatch را فعال می‌کند.",
+      "access": "ادمین یا دسترسی مود",
+      "syntax": "!dm",
+      "tags": [
+        "mode",
+        "deathmatch"
+      ]
+    },
+    {
+      "id": "gungame",
+      "type": "command",
+      "category": "modes",
+      "title": "فعال‌سازی مود GunGame",
+      "command": "!gg",
+      "aliases": [],
+      "description": "مود GunGame را فعال می‌کند.",
+      "access": "ادمین یا دسترسی مود",
+      "syntax": "!gg",
+      "tags": [
+        "mode",
+        "gungame"
+      ]
+    },
+    {
+      "id": "match-start",
+      "type": "command",
+      "category": "match",
+      "title": "شروع اجباری مسابقه",
+      "command": ".start",
+      "aliases": [
+        "!forcestart"
+      ],
+      "description": "شروع مسابقه را به‌صورت اجباری اجرا می‌کند. از این دستور فقط در شرایط لازم استفاده کنید.",
+      "access": "ادمین مسابقه",
+      "syntax": ".start",
+      "tags": [
+        "match",
+        "start"
+      ]
+    },
+    {
+      "id": "match-restart",
+      "type": "command",
+      "category": "match",
+      "title": "ریستارت یا پایان مسابقه",
+      "command": ".restart",
+      "aliases": [
+        ".endmatch"
+      ],
+      "description": "مسابقه را ریستارت یا پایان می‌دهد؛ رفتار دقیق به وضعیت Match و پلاگین بستگی دارد.",
+      "access": "ادمین مسابقه",
+      "syntax": ".restart",
+      "tags": [
+        "match",
+        "restart"
+      ]
+    },
+    {
+      "id": "forcepause",
+      "type": "command",
+      "category": "match",
+      "title": "توقف اجباری مسابقه",
+      "command": ".forcepause",
+      "aliases": [
+        ".fp"
+      ],
+      "description": "مسابقه را به‌صورت اجباری Pause می‌کند.",
+      "access": "ادمین مسابقه",
+      "syntax": ".forcepause",
+      "tags": [
+        "match",
+        "pause"
+      ]
+    },
+    {
+      "id": "forceunpause",
+      "type": "command",
+      "category": "match",
+      "title": "ادامه اجباری مسابقه",
+      "command": ".forceunpause",
+      "aliases": [
+        ".fup"
+      ],
+      "description": "Pause اجباری را برمی‌دارد و مسابقه را ادامه می‌دهد.",
+      "access": "ادمین مسابقه",
+      "syntax": ".forceunpause",
+      "tags": [
+        "match",
+        "pause"
+      ]
+    },
+    {
+      "id": "restore-round",
+      "type": "command",
+      "category": "match",
+      "title": "بازگردانی راند مشخص",
+      "command": ".restore <round>",
+      "aliases": [],
+      "description": "بکاپ راند مشخص‌شده را بازیابی می‌کند.",
+      "access": "ادمین مسابقه",
+      "syntax": ".restore <round>",
+      "example": ".restore 12",
+      "tags": [
+        "match",
+        "restore"
+      ]
+    },
+    {
+      "id": "skip-veto",
+      "type": "command",
+      "category": "match",
+      "title": "رد کردن مرحله Veto",
+      "command": ".skipveto",
+      "aliases": [
+        ".sv"
+      ],
+      "description": "مرحله انتخاب/حذف نقشه (Veto) را رد می‌کند.",
+      "access": "ادمین مسابقه",
+      "syntax": ".skipveto",
+      "tags": [
+        "match",
+        "veto"
+      ]
+    },
+    {
+      "id": "roundknife",
+      "type": "command",
+      "category": "match",
+      "title": "تنظیم Knife Round",
+      "command": ".roundknife",
+      "aliases": [
+        ".rk",
+        "!kniferound"
+      ],
+      "description": "حالت Knife Round را فعال یا غیرفعال می‌کند.",
+      "access": "ادمین مسابقه",
+      "syntax": ".roundknife",
+      "tags": [
+        "match",
+        "knife"
+      ]
+    },
+    {
+      "id": "match-settings",
+      "type": "command",
+      "category": "match",
+      "title": "نمایش تنظیمات مسابقه",
+      "command": ".settings",
+      "aliases": [],
+      "description": "تنظیمات فعلی Match را نمایش می‌دهد.",
+      "access": "ادمین مسابقه",
+      "syntax": ".settings",
+      "tags": [
+        "match",
+        "settings"
+      ]
+    },
+    {
+      "id": "team1",
+      "type": "command",
+      "category": "match",
+      "title": "تغییر نام تیم اول",
+      "command": ".team1 <name>",
+      "aliases": [],
+      "description": "نام نمایشی تیم اول را تنظیم می‌کند.",
+      "access": "ادمین مسابقه",
+      "syntax": ".team1 <name>",
+      "example": ".team1 FragCity",
+      "tags": [
+        "match",
+        "team"
+      ]
+    },
+    {
+      "id": "team2",
+      "type": "command",
+      "category": "match",
+      "title": "تغییر نام تیم دوم",
+      "command": ".team2 <name>",
+      "aliases": [],
+      "description": "نام نمایشی تیم دوم را تنظیم می‌کند.",
+      "access": "ادمین مسابقه",
+      "syntax": ".team2 <name>",
+      "example": ".team2 Opponents",
+      "tags": [
+        "match",
+        "team"
+      ]
+    },
+    {
+      "id": "exit-practice",
+      "type": "command",
+      "category": "match",
+      "title": "خروج از Practice",
+      "command": ".exitprac",
+      "aliases": [],
+      "description": "از مود Practice خارج می‌شود و به مود مسابقه برمی‌گردد.",
+      "access": "ادمین مسابقه",
+      "syntax": ".exitprac",
+      "tags": [
+        "match",
+        "practice"
+      ]
+    },
+    {
+      "id": "ban",
+      "type": "command",
+      "category": "admin",
+      "title": "محروم کردن بازیکن",
+      "command": "!ban <name> <minutes> <reason>",
+      "aliases": [],
+      "description": "بازیکن را برای مدت مشخص و با دلیل ثبت‌شده محروم می‌کند.",
+      "access": "ادمین",
+      "syntax": "!ban <name> <minutes> <reason>",
+      "example": "!ban PlayerName 30 Griefing",
+      "tags": [
+        "moderation",
+        "ban"
+      ]
+    },
+    {
+      "id": "gag",
+      "type": "command",
+      "category": "admin",
+      "title": "محدود کردن چت",
+      "command": "!gag <name> <minutes> <reason>",
+      "aliases": [],
+      "description": "ارسال پیام متنی بازیکن را برای مدت مشخص محدود می‌کند.",
+      "access": "ادمین",
+      "syntax": "!gag <name> <minutes> <reason>",
+      "example": "!gag PlayerName 10 Spam",
+      "tags": [
+        "moderation",
+        "chat"
+      ]
+    },
+    {
+      "id": "mute",
+      "type": "command",
+      "category": "admin",
+      "title": "قطع صدای میکروفون",
+      "command": "!mute <name> <minutes> <reason>",
+      "aliases": [],
+      "description": "امکان استفاده از میکروفون بازیکن را برای مدت مشخص محدود می‌کند.",
+      "access": "ادمین",
+      "syntax": "!mute <name> <minutes> <reason>",
+      "example": "!mute PlayerName 10 MicSpam",
+      "tags": [
+        "moderation",
+        "voice"
+      ]
+    },
+    {
+      "id": "kickid",
+      "type": "command",
+      "category": "admin",
+      "title": "اخراج با User ID",
+      "command": "!kickid <userid>",
+      "aliases": [],
+      "description": "بازیکن را با شناسه User ID از سرور خارج می‌کند.",
+      "access": "ادمین",
+      "syntax": "!kickid <userid>",
+      "example": "!kickid 7",
+      "tags": [
+        "moderation",
+        "kick"
+      ]
+    },
+    {
+      "id": "map",
+      "type": "command",
+      "category": "admin",
+      "title": "تغییر نقشه",
+      "command": "!map <mapname>",
+      "aliases": [],
+      "description": "نقشه سرور را به نام نقشه مشخص‌شده تغییر می‌دهد.",
+      "access": "ادمین",
+      "syntax": "!map <mapname>",
+      "example": "!map de_mirage",
+      "tags": [
+        "map"
+      ]
+    },
+    {
+      "id": "maps",
+      "type": "command",
+      "category": "admin",
+      "title": "نمایش نقشه‌های مود فعلی",
+      "command": "!maps",
+      "aliases": [],
+      "description": "فهرست نقشه‌های در دسترس برای مود فعلی را نمایش می‌دهد.",
+      "access": "ادمین",
+      "syntax": "!maps",
+      "tags": [
+        "map",
+        "menu"
+      ]
+    },
+    {
+      "id": "lock",
+      "type": "command",
+      "category": "admin",
+      "title": "قفل تغییر تیم",
+      "command": "!lock",
+      "aliases": [],
+      "description": "تغییر تیم را قفل می‌کند.",
+      "access": "ادمین",
+      "syntax": "!lock",
+      "tags": [
+        "team"
+      ]
+    },
+    {
+      "id": "unban",
+      "type": "command",
+      "category": "admin",
+      "title": "رفع محرومیت",
+      "command": "!unban <steamid64>",
+      "aliases": [],
+      "description": "محرومیت ثبت‌شده برای SteamID64 را برمی‌دارد.",
+      "access": "ادمین",
+      "syntax": "!unban <steamid64>",
+      "example": "!unban 76561198000000000",
+      "tags": [
+        "moderation",
+        "ban"
+      ]
+    },
+    {
+      "id": "respawn",
+      "type": "command",
+      "category": "admin",
+      "title": "احیای تیم",
+      "command": "!respawn <@ct/@t>",
+      "aliases": [],
+      "description": "بازیکنان سمت مشخص‌شده را احیا می‌کند.",
+      "access": "ادمین",
+      "syntax": "!respawn <@ct/@t>",
+      "example": "!respawn @ct",
+      "tags": [
+        "gameplay"
+      ]
+    },
+    {
+      "id": "slap",
+      "type": "command",
+      "category": "admin",
+      "title": "Slap بازیکن",
+      "command": "!slap <name>",
+      "aliases": [],
+      "description": "به بازیکن مشخص‌شده ضربه وارد می‌کند.",
+      "access": "ادمین",
+      "syntax": "!slap <name>",
+      "tags": [
+        "moderation"
+      ]
+    },
+    {
+      "id": "slay",
+      "type": "command",
+      "category": "admin",
+      "title": "Slay بازیکن",
+      "command": "!slay <name>",
+      "aliases": [],
+      "description": "بازیکن مشخص‌شده را از راند خارج می‌کند.",
+      "access": "ادمین",
+      "syntax": "!slay <name>",
+      "tags": [
+        "moderation"
+      ]
+    },
+    {
+      "id": "round-restart",
+      "type": "command",
+      "category": "admin",
+      "title": "ریست راند",
+      "command": "!rr",
+      "aliases": [
+        "!restart",
+        "!restartgame"
+      ],
+      "description": "راند یا بازی را طبق عملکرد پلاگین ریستارت می‌کند.",
+      "access": "ادمین",
+      "syntax": "!rr",
+      "tags": [
+        "gameplay",
+        "restart"
+      ]
+    },
+    {
+      "id": "score-reset",
+      "type": "command",
+      "category": "admin",
+      "title": "ریست امتیاز",
+      "command": "!rs",
+      "aliases": [],
+      "description": "امتیاز بازی را ریست می‌کند.",
+      "access": "ادمین",
+      "syntax": "!rs",
+      "tags": [
+        "gameplay",
+        "score"
+      ]
+    },
+    {
+      "id": "move-player",
+      "type": "command",
+      "category": "admin",
+      "title": "انتقال بازیکن به تیم",
+      "command": "!move <name> <t/ct/spec>",
+      "aliases": [],
+      "description": "بازیکن را به Terrorist، Counter-Terrorist یا Spectator منتقل می‌کند.",
+      "access": "ادمین",
+      "syntax": "!move <name> <t/ct/spec>",
+      "example": "!move PlayerName ct",
+      "tags": [
+        "team"
+      ]
+    },
+    {
+      "id": "rename",
+      "type": "command",
+      "category": "admin",
+      "title": "تغییر نام بازیکن",
+      "command": "!rename <old> <new>",
+      "aliases": [],
+      "description": "نام بازیکن را تغییر می‌دهد.",
+      "access": "ادمین",
+      "syntax": "!rename <old> <new>",
+      "example": "!rename OldName NewName",
+      "tags": [
+        "player"
+      ]
+    },
+    {
+      "id": "wmap",
+      "type": "command",
+      "category": "admin",
+      "title": "بارگذاری Workshop Map",
+      "command": "!wmap <workshop_id>",
+      "aliases": [],
+      "description": "نقشه Workshop را با شناسه آن بارگذاری می‌کند.",
+      "access": "ادمین",
+      "syntax": "!wmap <workshop_id>",
+      "example": "!wmap 1234567890",
+      "tags": [
+        "map",
+        "workshop"
+      ]
+    },
+    {
+      "id": "rcon",
+      "type": "command",
+      "category": "admin",
+      "title": "اجرای دستور RCON",
+      "command": "!rcon <command>",
+      "aliases": [],
+      "description": "دستور کنسول سرور را از طریق ابزار مدیریتی اجرا می‌کند. فقط دستورهای موردنیاز و مجاز را اجرا کنید.",
+      "access": "ادمین",
+      "syntax": "!rcon <command>",
+      "example": "!rcon status",
+      "tags": [
+        "console",
+        "rcon"
+      ]
+    },
+    {
+      "id": "spawn",
+      "type": "command",
+      "category": "practice",
+      "title": "رفتن به Spawn شماره‌دار",
+      "command": ".spawn <number>",
+      "aliases": [],
+      "description": "به نقطه Spawn با شماره مشخص‌شده منتقل می‌شود.",
+      "access": "بازیکن در Practice",
+      "syntax": ".spawn <number>",
+      "example": ".spawn 3",
+      "tags": [
+        "spawn",
+        "practice"
+      ]
+    },
+    {
+      "id": "ctspawn",
+      "type": "command",
+      "category": "practice",
+      "title": "رفتن به Spawn تیم CT",
+      "command": ".ctspawn",
+      "aliases": [],
+      "description": "به Spawn مربوط به تیم CT منتقل می‌شود.",
+      "access": "بازیکن در Practice",
+      "syntax": ".ctspawn",
+      "tags": [
+        "spawn",
+        "practice"
+      ]
+    },
+    {
+      "id": "tspawn",
+      "type": "command",
+      "category": "practice",
+      "title": "رفتن به Spawn تیم T",
+      "command": ".tspawn",
+      "aliases": [],
+      "description": "به Spawn مربوط به تیم T منتقل می‌شود.",
+      "access": "بازیکن در Practice",
+      "syntax": ".tspawn",
+      "tags": [
+        "spawn",
+        "practice"
+      ]
+    },
+    {
+      "id": "bot",
+      "type": "command",
+      "category": "practice",
+      "title": "افزودن Bot در موقعیت فعلی",
+      "command": ".bot",
+      "aliases": [],
+      "description": "یک Bot در موقعیت فعلی قرار می‌دهد.",
+      "access": "بازیکن در Practice",
+      "syntax": ".bot",
+      "tags": [
+        "bot",
+        "practice"
+      ]
+    },
+    {
+      "id": "crouchbot",
+      "type": "command",
+      "category": "practice",
+      "title": "افزودن Bot نشسته",
+      "command": ".crouchbot",
+      "aliases": [
+        ".cbot"
+      ],
+      "description": "یک Bot در حالت Crouch قرار می‌دهد.",
+      "access": "بازیکن در Practice",
+      "syntax": ".crouchbot",
+      "tags": [
+        "bot",
+        "practice"
+      ]
+    },
+    {
+      "id": "boost",
+      "type": "command",
+      "category": "practice",
+      "title": "ساخت Bot برای Boost",
+      "command": ".boost",
+      "aliases": [],
+      "description": "Bot موردنیاز برای تمرین Boost را ایجاد می‌کند.",
+      "access": "بازیکن در Practice",
+      "syntax": ".boost",
+      "tags": [
+        "bot",
+        "practice"
+      ]
+    },
+    {
+      "id": "nobots",
+      "type": "command",
+      "category": "practice",
+      "title": "حذف Botها",
+      "command": ".nobots",
+      "aliases": [],
+      "description": "Botهای تمرینی را حذف می‌کند.",
+      "access": "بازیکن در Practice",
+      "syntax": ".nobots",
+      "tags": [
+        "bot",
+        "practice"
+      ]
+    },
+    {
+      "id": "clear",
+      "type": "command",
+      "category": "practice",
+      "title": "پاک کردن دود و آتش",
+      "command": ".clear",
+      "aliases": [],
+      "description": "Smoke و Fireهای فعال را پاک می‌کند.",
+      "access": "بازیکن در Practice",
+      "syntax": ".clear",
+      "tags": [
+        "utility",
+        "practice"
+      ]
+    },
+    {
+      "id": "god",
+      "type": "command",
+      "category": "practice",
+      "title": "تغییر حالت God",
+      "command": ".god",
+      "aliases": [],
+      "description": "حالت God را در محیط تمرین تغییر می‌دهد.",
+      "access": "بازیکن در Practice",
+      "syntax": ".god",
+      "tags": [
+        "practice"
+      ]
+    },
+    {
+      "id": "noflash",
+      "type": "command",
+      "category": "practice",
+      "title": "مصونیت از Flash",
+      "command": ".noflash",
+      "aliases": [],
+      "description": "حالت مصونیت در برابر Flash را تغییر می‌دهد.",
+      "access": "بازیکن در Practice",
+      "syntax": ".noflash",
+      "tags": [
+        "practice"
+      ]
+    },
+    {
+      "id": "dryrun",
+      "type": "command",
+      "category": "practice",
+      "title": "فعال‌سازی Dry Run",
+      "command": ".dryrun",
+      "aliases": [
+        ".dry"
+      ],
+      "description": "حالت Dry Run را برای تمرین فعال یا غیرفعال می‌کند.",
+      "access": "بازیکن در Practice",
+      "syntax": ".dryrun",
+      "tags": [
+        "practice"
+      ]
+    },
+    {
+      "id": "savenade",
+      "type": "command",
+      "category": "practice",
+      "title": "ذخیره Lineup",
+      "command": ".savenade <name> <desc>",
+      "aliases": [],
+      "description": "لاین‌آپ فعلی را با نام و توضیحات ذخیره می‌کند.",
+      "access": "بازیکن در Practice",
+      "syntax": ".savenade <name> <desc>",
+      "example": ".savenade mirage-a-main A main smoke",
+      "tags": [
+        "nade",
+        "lineup"
+      ]
+    },
+    {
+      "id": "loadnade",
+      "type": "command",
+      "category": "practice",
+      "title": "بارگذاری Lineup",
+      "command": ".loadnade <name>",
+      "aliases": [],
+      "description": "لاین‌آپ ذخیره‌شده را بارگذاری می‌کند.",
+      "access": "بازیکن در Practice",
+      "syntax": ".loadnade <name>",
+      "example": ".loadnade mirage-a-main",
+      "tags": [
+        "nade",
+        "lineup"
+      ]
+    },
+    {
+      "id": "listnades",
+      "type": "command",
+      "category": "practice",
+      "title": "نمایش Lineupها",
+      "command": ".listnades",
+      "aliases": [],
+      "description": "فهرست لاین‌آپ‌های ذخیره‌شده را نمایش می‌دهد.",
+      "access": "بازیکن در Practice",
+      "syntax": ".listnades",
+      "tags": [
+        "nade",
+        "lineup"
+      ]
+    },
+    {
+      "id": "rethrow",
+      "type": "command",
+      "category": "practice",
+      "title": "پرتاب مجدد آخرین Grenade",
+      "command": ".rethrow",
+      "aliases": [
+        ".rt"
+      ],
+      "description": "آخرین Grenade پرتاب‌شده را دوباره اجرا می‌کند.",
+      "access": "بازیکن در Practice",
+      "syntax": ".rethrow",
+      "tags": [
+        "nade",
+        "lineup"
+      ]
+    },
+    {
+      "id": "timer",
+      "type": "command",
+      "category": "practice",
+      "title": "تایمر تمرین",
+      "command": ".timer",
+      "aliases": [],
+      "description": "تایمر تمرین را شروع یا متوقف می‌کند.",
+      "access": "بازیکن در Practice",
+      "syntax": ".timer",
+      "tags": [
+        "practice",
+        "timer"
+      ]
+    },
+    {
+      "id": "back",
+      "type": "command",
+      "category": "practice",
+      "title": "بازگشت به موقعیت قبلی",
+      "command": ".back <number>",
+      "aliases": [],
+      "description": "به موقعیت مشخص‌شده در تاریخچه تمرین بازمی‌گردد.",
+      "access": "بازیکن در Practice",
+      "syntax": ".back <number>",
+      "example": ".back 2",
+      "tags": [
+        "practice",
+        "movement"
+      ]
+    },
+    {
+      "id": "fastforward",
+      "type": "command",
+      "category": "practice",
+      "title": "جلو بردن زمان",
+      "command": ".fastforward",
+      "aliases": [
+        ".ff"
+      ],
+      "description": "زمان تمرین را جلو می‌برد.",
+      "access": "بازیکن در Practice",
+      "syntax": ".fastforward",
+      "tags": [
+        "practice",
+        "timer"
+      ]
+    },
+    {
+      "id": "solid",
+      "type": "command",
+      "category": "practice",
+      "title": "تنظیم برخورد هم‌تیمی‌ها",
+      "command": ".solid",
+      "aliases": [],
+      "description": "تنظیم برخورد فیزیکی هم‌تیمی‌ها را تغییر می‌دهد.",
+      "access": "بازیکن در Practice",
+      "syntax": ".solid",
+      "tags": [
+        "practice",
+        "physics"
+      ]
+    },
+    {
+      "id": "impacts",
+      "type": "command",
+      "category": "practice",
+      "title": "نمایش نقاط برخورد گلوله",
+      "command": ".impacts",
+      "aliases": [],
+      "description": "نمایش نقاط برخورد گلوله را تغییر می‌دهد.",
+      "access": "بازیکن در Practice",
+      "syntax": ".impacts",
+      "tags": [
+        "practice",
+        "debug"
+      ]
+    },
+    {
+      "id": "traj",
+      "type": "command",
+      "category": "practice",
+      "title": "نمایش مسیر Grenade",
+      "command": ".traj",
+      "aliases": [],
+      "description": "نمایش مسیر پرتاب Grenade را تغییر می‌دهد.",
+      "access": "بازیکن در Practice",
+      "syntax": ".traj",
+      "tags": [
+        "practice",
+        "nade"
+      ]
+    },
+    {
+      "id": "settings-menu",
+      "type": "setting",
+      "category": "settings",
+      "title": "باز کردن منوی تنظیمات",
+      "command": "!settings",
+      "aliases": [],
+      "description": "منوی تنظیمات قابل تغییر سرور را باز می‌کند؛ گزینه‌های موجود به پلاگین و مود فعال بستگی دارد.",
+      "access": "ادمین",
+      "syntax": "!settings",
+      "tags": [
+        "settings",
+        "menu"
+      ]
+    },
+    {
+      "id": "bunnyhop-on",
+      "type": "setting",
+      "category": "settings",
+      "title": "فعال کردن Bunny Hop",
+      "command": "!bh1",
+      "aliases": [],
+      "description": "Bunny Hop را فعال می‌کند.",
+      "access": "ادمین",
+      "syntax": "!bh1",
+      "tags": [
+        "settings",
+        "movement"
+      ]
+    },
+    {
+      "id": "bunnyhop-off",
+      "type": "setting",
+      "category": "settings",
+      "title": "غیرفعال کردن Bunny Hop",
+      "command": "!bh0",
+      "aliases": [],
+      "description": "Bunny Hop را غیرفعال می‌کند.",
+      "access": "ادمین",
+      "syntax": "!bh0",
+      "tags": [
+        "settings",
+        "movement"
+      ]
+    },
+    {
+      "id": "friendlyfire-on",
+      "type": "setting",
+      "category": "settings",
+      "title": "فعال کردن Friendly Fire",
+      "command": "!ff1",
+      "aliases": [],
+      "description": "آسیب‌رسانی به هم‌تیمی‌ها را فعال می‌کند.",
+      "access": "ادمین",
+      "syntax": "!ff1",
+      "tags": [
+        "settings",
+        "gameplay"
+      ]
+    },
+    {
+      "id": "friendlyfire-off",
+      "type": "setting",
+      "category": "settings",
+      "title": "غیرفعال کردن Friendly Fire",
+      "command": "!ff0",
+      "aliases": [],
+      "description": "آسیب‌رسانی به هم‌تیمی‌ها را غیرفعال می‌کند.",
+      "access": "ادمین",
+      "syntax": "!ff0",
+      "tags": [
+        "settings",
+        "gameplay"
+      ]
+    },
+    {
+      "id": "headshot-on",
+      "type": "setting",
+      "category": "settings",
+      "title": "فعال کردن Only Headshot",
+      "command": "!hs1",
+      "aliases": [],
+      "description": "حالت فقط Headshot را فعال می‌کند.",
+      "access": "ادمین",
+      "syntax": "!hs1",
+      "tags": [
+        "settings",
+        "gameplay"
+      ]
+    },
+    {
+      "id": "headshot-off",
+      "type": "setting",
+      "category": "settings",
+      "title": "غیرفعال کردن Only Headshot",
+      "command": "!hs0",
+      "aliases": [],
+      "description": "حالت فقط Headshot را غیرفعال می‌کند.",
+      "access": "ادمین",
+      "syntax": "!hs0",
+      "tags": [
+        "settings",
+        "gameplay"
+      ]
+    },
+    {
+      "id": "alltalk-on",
+      "type": "setting",
+      "category": "settings",
+      "title": "فعال کردن All Talk",
+      "command": "!t1",
+      "aliases": [],
+      "description": "All Talk را فعال می‌کند.",
+      "access": "ادمین",
+      "syntax": "!t1",
+      "tags": [
+        "settings",
+        "voice"
+      ]
+    },
+    {
+      "id": "alltalk-off",
+      "type": "setting",
+      "category": "settings",
+      "title": "غیرفعال کردن All Talk",
+      "command": "!t0",
+      "aliases": [],
+      "description": "All Talk را غیرفعال می‌کند.",
+      "access": "ادمین",
+      "syntax": "!t0",
+      "tags": [
+        "settings",
+        "voice"
+      ]
+    }
+  ]
+}
