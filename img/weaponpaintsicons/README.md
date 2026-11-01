@@ -2,7 +2,9 @@
 
 All SVGs are served from `/img/weaponpaintsicons/<filename>`.
 
-## Vertical right-side control rail
+## Category toolbar
+
+The category tabs are displayed horizontally in a glass-effect toolbar directly below the main FragCity header.
 
 | Category | SVG |
 | --- | --- |
@@ -19,12 +21,12 @@ All SVGs are served from `/img/weaponpaintsicons/<filename>`.
 | Music Kits | `music_kit.svg` |
 | Pins | `pin.svg` |
 
-## Vertical team selector
+## Team selector
 
 - `t_char_bg.svg` — Terrorist (T)
 - `ct_char_bg.svg` — Counter-Terrorist (CT)
 - BOTH uses the layered-controls icon from the icon font.
 
-The right-side rail groups category navigation, the vertical T / BOTH / CT selector, and the search field. Search starts as a compact icon control and expands to the left when focused. Category and team SVGs are displayed in FragCity orange with a soft glow; active controls receive a highlighted box and stronger lower glow.
+The toolbar keeps category navigation, the horizontal T / BOTH / CT selector, and the search field together. It stays below the main header while scrolling and uses a translucent graphite surface with backdrop blur. Category and team SVGs use the FragCity orange accent; active controls use a restrained orange border and translucent fill without glow effects.
 
-Weapon silhouettes, gloves, agents, music kits, and pins each have individual display dimensions so their proportions remain balanced in the narrow rail. The glove source artwork is white; CSS applies the shared orange treatment without modifying the original SVG paths.
+Weapon silhouettes, gloves, agents, music kits, and pins share a centered icon viewport with `object-fit: contain`, preserving their native proportions. The glove source artwork is white; CSS applies the orange treatment without modifying the original SVG paths.
