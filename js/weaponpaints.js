@@ -2005,6 +2005,10 @@
             }
         }
 
+        if (activePane.id === 'tab-pins') {
+            floatingPagination.classList.add('wp-pagination--pins');
+        }
+
         if (info) {
             info.textContent = currentPage + ' / ' + totalPages;
         }
