@@ -391,6 +391,7 @@ $allowedPages = [
     'buyserveropen',
     'launcher',
     'usermanual',
+    'serverguide',
     'about',
     'support',
     'login',
@@ -690,6 +691,15 @@ $pageAssets = [
         ],
         'js' => [
             '/js/usermanual.js?v=' . asset_version(__DIR__ . '/js/usermanual.js'),
+        ],
+    ],
+
+    'serverguide' => [
+        'css' => [
+            '/css/serverguide.css?v=' . asset_version(__DIR__ . '/css/serverguide.css'),
+        ],
+        'js' => [
+            '/js/serverguide.js?v=' . asset_version(__DIR__ . '/js/serverguide.js'),
         ],
     ],
 
