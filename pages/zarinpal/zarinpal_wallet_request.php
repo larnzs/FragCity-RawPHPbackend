@@ -27,7 +27,7 @@ function terminateRequest($message) {
             <i class="fas fa-exclamation-triangle"></i>
             <h2>خطا در پردازش درخواست</h2>
             <p>' . htmlspecialchars($msg) . '</p>
-            <a href="https://fragcity.ir/?page=wallet_charge" class="btn">بازگشت به کیف پول</a>
+            <a href="https://fragcity.ir/" class="btn">بازگشت به کیف پول</a>
         </div>
     </body>
     </html>';
