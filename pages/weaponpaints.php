@@ -2294,6 +2294,8 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
         <section
             class="tab-pane fade <?= $currentTab === 'tab-pins' ? 'show active' : '' ?>"
             id="tab-pins"
+            data-pin-total-pages="<?= (int)$pinTotalPages ?>"
+            data-pin-current-page="<?= (int)$pinPage ?>"
         >
 
             <div class="wp-section-head">
@@ -2570,7 +2572,13 @@ foreach ($skinInventory as $inventoryEntry) {
                 $savedTeamLabel = $savedTeam === 3 ? 'CT' : 'T';
                 $savedImage = is_array($savedPaint) ? (string)($savedPaint['image_url'] ?? '') : '';
                 ?>
-                <article class="wp-item wp-saved-paint-item" data-wp-inventory-category="<?= esc(isset($knifes[$savedDef]) ? 'knives' : inventoryCategoryForWeaponDefindex($savedDef)) ?>">
+                <article
+                    class="wp-item wp-saved-paint-item"
+                    data-wp-inventory-category="<?= esc(isset($knifes[$savedDef]) ? 'knives' : inventoryCategoryForWeaponDefindex($savedDef)) ?>"
+                    data-wp-inventory-team="<?= esc($savedTeam) ?>"
+                    data-wp-inventory-def="<?= esc($savedDef) ?>"
+                    data-wp-inventory-paint="<?= esc($savedPaintId) ?>"
+                >
                     <?php if ($savedCanEdit): ?>
                         <button
                             type="button"
@@ -2613,6 +2621,21 @@ foreach ($skinInventory as $inventoryEntry) {
                     <?php else: ?>
                         </div>
                     <?php endif; ?>
+
+                    <button
+                        type="button"
+                        class="wp-inventory-remove-btn"
+                        data-wp-inventory-remove
+                        data-team="<?= esc($savedTeam) ?>"
+                        data-def="<?= esc($savedDef) ?>"
+                        data-paint-id="<?= esc($savedPaintId) ?>"
+                        data-csrf-token="<?= esc($csrfToken) ?>"
+                        aria-label="<?= esc('حذف ' . $savedWeaponLabel . ' - ' . $savedPaintName . ' از Inventory') ?>"
+                        title="حذف از Inventory"
+                    >
+                        <i class="fas fa-xmark" aria-hidden="true"></i>
+                        <span>حذف</span>
+                    </button>
                 </article>
             <?php endforeach; ?>
         </div>
