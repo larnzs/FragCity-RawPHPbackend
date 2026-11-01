@@ -132,6 +132,7 @@
             const icon = button.querySelector('i');
             const label = button.querySelector('span');
             const originalTitle = button.getAttribute('title') || 'کپی دستور';
+            const originalAriaLabel = button.getAttribute('aria-label');
 
             button.classList.add('is-copied');
             button.setAttribute('title', 'کپی شد');
@@ -148,7 +149,11 @@
             window.setTimeout(function () {
                 button.classList.remove('is-copied');
                 button.setAttribute('title', originalTitle);
-                button.removeAttribute('aria-label');
+                if (originalAriaLabel) {
+                    button.setAttribute('aria-label', originalAriaLabel);
+                } else {
+                    button.removeAttribute('aria-label');
+                }
 
                 if (icon) {
                     icon.classList.remove('fa-check');
