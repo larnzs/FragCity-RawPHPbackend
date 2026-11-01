@@ -23,8 +23,6 @@
     const revealSelector = [
         '.profile-hero', '.profile-identity-strip', '.profile-progress-item',
         '.stat-card', '.profile-inventory-card', '.profile-loadout-summary', '.profile-settings-card',
-        '.wallet-page-header', '.wallet-balance-card', '.wallet-section-header',
-        '.wallet-empty-state', '.transaction-item',
         '.serverlist-page .sl-page-head', '.serverlist-page .sl-empty-state',
         '.sl-toolbar', '.sl-group-head', '.sl-server-card', '.sl-empty',
         '.leaderboard-header', '.leaderboard-stat-card', '.podium-card', '.leaderboard-table-scroll',
