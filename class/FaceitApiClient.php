@@ -185,7 +185,8 @@ final class FaceitApiClient
                 $profile = $profiles[$steamId] ?? self::emptyProfile('api_unavailable');
             }
 
-            $players[$index]['faceit_level'] = $profile['faceit_level'];
+            $players[$index]['faceit_level'] = $profile['faceit_level'] ?? null;
+            $players[$index]['faceit_elo'] = $profile['faceit_elo'] ?? null;
             $players[$index]['faceit_status'] = $profile['faceit_status'];
         }
 
@@ -202,28 +203,59 @@ final class FaceitApiClient
         return preg_match('/^7656119[0-9]{10}$/D', $steamId) === 1 ? $steamId : null;
     }
 
-    /** @return array{faceit_level:null,faceit_status:string} */
+    private static function levelFromElo(int $elo): ?int
+    {
+        $thresholds = [
+            1 => 100,
+            2 => 501,
+            3 => 751,
+            4 => 901,
+            5 => 1051,
+            6 => 1201,
+            7 => 1351,
+            8 => 1531,
+            9 => 1751,
+            10 => 2001,
+        ];
+
+        $level = null;
+        foreach ($thresholds as $candidateLevel => $minimumElo) {
+            if ($elo >= $minimumElo) {
+                $level = $candidateLevel;
+            } else {
+                break;
+            }
+        }
+
+        return $level;
+    }
+
+    /** @return array{faceit_level:null,faceit_elo:null,faceit_status:string} */
     private static function emptyProfile(string $status): array
     {
         return [
             'faceit_level' => null,
+            'faceit_elo' => null,
             'faceit_status' => $status,
         ];
     }
 
     /**
-     * @param array{faceit_level:?int,faceit_status:string} $profile
+     * @param array{faceit_level:?int,faceit_elo?:?int,faceit_status:string} $profile
      */
     private static function hasUsableLevel(array $profile): bool
     {
         $level = $profile['faceit_level'] ?? null;
-        return is_int($level) && $level >= 1 && $level <= 10;
+        $elo = $profile['faceit_elo'] ?? null;
+
+        return (is_int($level) && $level >= 1 && $level <= 10)
+            || (is_int($elo) && $elo >= 100 && $elo <= 100000);
     }
 
     /**
      * @param array<int, string> $steamIds
      * @return array{
-     *   profiles:array<string,array{faceit_level:?int,faceit_status:string}>,
+     *   profiles:array<string,array{faceit_level:?int,faceit_elo:?int,faceit_status:string}>,
      *   retry_after:array<string,int>
      * }
      */
@@ -366,9 +398,23 @@ final class FaceitApiClient
                     } else {
                         $rawLevel = $game['skill_level'] ?? null;
                         $level = is_numeric($rawLevel) ? (int)$rawLevel : 0;
-                        $results[$steamId] = $level >= 1 && $level <= 10
+
+                        $rawElo = $game['faceit_elo'] ?? null;
+                        $elo = is_numeric($rawElo) ? (int)$rawElo : null;
+                        if ($elo !== null && ($elo < 100 || $elo > 100000)) {
+                            $elo = null;
+                        }
+
+                        if ($level < 1 || $level > 10) {
+                            $level = $elo !== null
+                                ? (self::levelFromElo($elo) ?? 0)
+                                : 0;
+                        }
+
+                        $results[$steamId] = ($level >= 1 && $level <= 10) || $elo !== null
                             ? [
-                                'faceit_level' => $level,
+                                'faceit_level' => $level >= 1 && $level <= 10 ? $level : null,
+                                'faceit_elo' => $elo,
                                 'faceit_status' => 'available',
                             ]
                             : self::emptyProfile('unranked');
@@ -410,7 +456,7 @@ final class FaceitApiClient
      * @return array{
      *   cached_at:int,
      *   retry_after_at:int,
-     *   profile:array{faceit_level:?int,faceit_status:string}
+     *   profile:array{faceit_level:?int,faceit_elo?:?int,faceit_status:string}
      * }|null
      */
     private function readCacheRecord(string $steamId): ?array
@@ -446,6 +492,15 @@ final class FaceitApiClient
             'faceit_status' => $status,
         ];
 
+        // Older cache files do not contain ELO. Preserve that distinction so
+        // they are refreshed once instead of being treated as complete data.
+        if (array_key_exists('faceit_elo', $record['profile'])) {
+            $elo = $record['profile']['faceit_elo'];
+            $profile['faceit_elo'] = is_int($elo) && $elo >= 100 && $elo <= 100000
+                ? $elo
+                : null;
+        }
+
         return [
             'cached_at' => $record['cached_at'],
             'retry_after_at' => is_int($record['retry_after_at'] ?? null) ? $record['retry_after_at'] : 0,
@@ -454,10 +509,14 @@ final class FaceitApiClient
     }
 
     /**
-     * @param array{cached_at:int,retry_after_at:int,profile:array{faceit_level:?int,faceit_status:string}} $record
+     * @param array{cached_at:int,retry_after_at:int,profile:array{faceit_level:?int,faceit_elo?:?int,faceit_status:string}} $record
      */
     private function isCacheFresh(array $record): bool
     {
+        if (!array_key_exists('faceit_elo', $record['profile'])) {
+            return false;
+        }
+
         $ttl = match ($record['profile']['faceit_status']) {
             'available', 'unranked', 'no_cs2_profile' => self::CACHE_TTL_SECONDS,
             'profile_not_found' => self::NEGATIVE_CACHE_TTL_SECONDS,
@@ -469,14 +528,14 @@ final class FaceitApiClient
     }
 
     /**
-     * @param array{cached_at:int,retry_after_at:int,profile:array{faceit_level:?int,faceit_status:string}} $record
+     * @param array{cached_at:int,retry_after_at:int,profile:array{faceit_level:?int,faceit_elo?:?int,faceit_status:string}} $record
      */
     private function isRetryBackoffActive(array $record): bool
     {
         return $record['retry_after_at'] > time();
     }
 
-    /** @param array{faceit_level:?int,faceit_status:string} $profile */
+    /** @param array{faceit_level:?int,faceit_elo?:?int,faceit_status:string} $profile */
     private function writeCache(
         string $steamId,
         array $profile,
