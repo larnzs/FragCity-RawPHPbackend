@@ -63,6 +63,7 @@ Important package-specific distinctions:
 - The package README notes that GameModeManager is awaiting an upstream fix. Its configured modes and command reference are useful documentation, but mark it as `verify` until the current runtime is tested.
 - The current GameModeManager configuration has its own RTV feature disabled. This does not mean the separate GG1MapChooser or RockTheVote plugins are disabled.
 - GG1MapChooser's current config enables RTV but disables its separate PoolVote feature. Reflect the individual setting rather than treating every voting feature as enabled.
+- RockTheVote is a third, separate configuration. Its tracked config enables RTV, Votemap, EndOfMapVote, and ExtendMapVote. Do not merge those states with GG1MapChooser or GameModeManager.
 - FACEIT ELO commands depend on a valid runtime API key. Never commit a real API key.
 - VIPCore database credentials, FACEIT keys, Discord webhooks, RCON passwords, and other secrets must never be copied into this guide or committed to the repository.
 
