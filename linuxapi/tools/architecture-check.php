@@ -126,6 +126,7 @@ try {
     $homePage = $read('pages/home.php');
     $serverGuideStylesheet = $read('css/serverguide.css');
     $serverGuideJavascript = $read('js/serverguide.js');
+    $motionJavascript = $read('js/motion.js');
     $serverGuideDocs = $read('docs/SERVER-GUIDE.md');
     $serverGuideCatalogRaw = $read('data/server-guide.json');
     $serverGuideCatalog = json_decode($serverGuideCatalogRaw, true, 512, JSON_THROW_ON_ERROR);
@@ -144,6 +145,8 @@ foreach (($serverGuideCatalog['categories'] ?? []) as $category) {
 }
 
 $serverGuideItemIds = [];
+$serverGuideRiskLevels = ['high', 'action', 'info', 'safe'];
+$serverGuideRiskCounts = array_fill_keys($serverGuideRiskLevels, 0);
 $serverGuideCatalogValid = count($serverGuideCategoryIds) > 0
     && is_array($serverGuideCatalog['items'] ?? null)
     && count($serverGuideCatalog['items']) > 0;
@@ -156,6 +159,7 @@ foreach (($serverGuideCatalog['items'] ?? []) as $item) {
             && strtolower((string)($sourceParts['scheme'] ?? '')) === 'https'
             && trim((string)($sourceParts['host'] ?? '')) !== '');
     $availability = is_array($item) ? (string)($item['availability'] ?? '') : '';
+    $risk = is_array($item) ? (string)($item['risk'] ?? '') : '';
 
     if (!is_array($item)
         || !is_string($item['id'] ?? null)
@@ -166,11 +170,13 @@ foreach (($serverGuideCatalog['items'] ?? []) as $item) {
         || trim((string)($item['command'] ?? '')) === ''
         || trim((string)($item['description'] ?? '')) === ''
         || !$sourceIsSafe
+        || !in_array($risk, $serverGuideRiskLevels, true)
         || ($availability !== '' && !in_array($availability, ['default', 'config', 'mode', 'verify', 'disabled'], true))) {
         $serverGuideCatalogValid = false;
         break;
     }
     $serverGuideItemIds[$item['id']] = true;
+    ++$serverGuideRiskCounts[$risk];
 }
 
 $check(
@@ -924,6 +930,34 @@ $check(
         && str_contains($serverGuidePage, 'console_command')
         && str_contains($serverGuideStylesheet, '.sg-entry-availability--mode')
         && str_contains($serverGuideStylesheet, '.sg-entry-type--mode')
+);
+
+$check(
+    'Server Guide classifies every catalog entry by operational impact and renders all four impact levels',
+    $serverGuideCatalogValid
+        && array_sum($serverGuideRiskCounts) === count($serverGuideCatalog['items'])
+        && count(array_filter($serverGuideRiskCounts, static fn($count) => $count > 0)) === 4
+        && str_contains($serverGuidePage, '$riskLabels')
+        && str_contains($serverGuidePage, 'sg-risk-chip')
+        && str_contains($serverGuideStylesheet, '.sg-entry--risk-high')
+        && str_contains($serverGuideStylesheet, '.sg-entry--risk-action')
+        && str_contains($serverGuideStylesheet, '.sg-entry--risk-info')
+        && str_contains($serverGuideStylesheet, '.sg-entry--risk-safe')
+);
+
+$check(
+    'Server Guide uses the shared viewport reveal controller on direct and AJAX page loads',
+    str_contains($serverGuidePage, 'data-fc-reveal="up"')
+        && str_contains($serverGuidePage, 'data-fc-reveal="left"')
+        && str_contains($serverGuideJavascript, 'FragCityMotion.refresh')
+        && str_contains($motionJavascript, '[data-fc-reveal]')
+);
+
+$check(
+    'Server Guide uses a compact three-column desktop grid with tablet and mobile breakpoints',
+    str_contains($serverGuideStylesheet, 'repeat(3, minmax(0, 1fr))')
+        && str_contains($serverGuideStylesheet, 'repeat(2, minmax(0, 1fr))')
+        && str_contains($serverGuideStylesheet, 'grid-template-columns: minmax(0, 1fr)')
 );
 
 $check(
