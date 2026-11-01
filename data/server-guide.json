@@ -55,7 +55,6 @@
       "description": "اعلام می‌کند که برای شروع مسابقه آماده هستید.",
       "access": "بازیکن",
       "syntax": ".ready",
-      "example": ".r",
       "tags": [
         "mix",
         "ready"
@@ -73,7 +72,6 @@
       "description": "وضعیت آمادگی خود را لغو می‌کند.",
       "access": "بازیکن",
       "syntax": ".unready",
-      "example": ".ur",
       "tags": [
         "mix",
         "ready"
@@ -375,15 +373,89 @@
       "category": "match",
       "title": "شروع اجباری مسابقه",
       "command": ".start",
-      "aliases": [
-        "!forcestart"
-      ],
+      "aliases": [],
       "description": "شروع مسابقه را به‌صورت اجباری اجرا می‌کند. از این دستور فقط در شرایط لازم استفاده کنید.",
       "access": "ادمین مسابقه",
       "syntax": ".start",
       "tags": [
         "match",
         "start"
+      ]
+    },
+    {
+      "id": "forcestart",
+      "type": "command",
+      "category": "match",
+      "title": "شروع سریع Knife Round",
+      "command": "!forcestart",
+      "aliases": [],
+      "description": "شروع سریع راند چاقو را به‌صورت اجباری اجرا می‌کند.",
+      "access": "ادمین مسابقه",
+      "syntax": "!forcestart",
+      "tags": [
+        "match",
+        "knife",
+        "start"
+      ]
+    },
+    {
+      "id": "end-match-mode",
+      "type": "command",
+      "category": "match",
+      "title": "پایان مود Mix",
+      "command": "!end",
+      "aliases": [],
+      "description": "مود Mix را متوقف می‌کند.",
+      "access": "ادمین مسابقه",
+      "syntax": "!end",
+      "tags": [
+        "match",
+        "end"
+      ]
+    },
+    {
+      "id": "end-warmup",
+      "type": "command",
+      "category": "match",
+      "title": "پایان Warmup",
+      "command": "!endwarmup",
+      "aliases": [],
+      "description": "مرحله Warmup را به پایان می‌رساند.",
+      "access": "ادمین مسابقه",
+      "syntax": "!endwarmup",
+      "tags": [
+        "match",
+        "warmup"
+      ]
+    },
+    {
+      "id": "pause-warmup",
+      "type": "command",
+      "category": "match",
+      "title": "توقف زمان Warmup",
+      "command": "!pausewarmup",
+      "aliases": [],
+      "description": "زمان Warmup را متوقف می‌کند.",
+      "access": "ادمین مسابقه",
+      "syntax": "!pausewarmup",
+      "tags": [
+        "match",
+        "warmup"
+      ]
+    },
+    {
+      "id": "start-warmup",
+      "type": "command",
+      "category": "match",
+      "title": "شروع مجدد Warmup",
+      "command": "!startwarmup",
+      "aliases": [],
+      "description": "Warmup را دوباره شروع می‌کند.",
+      "access": "ادمین مسابقه",
+      "syntax": "!startwarmup",
+      "tags": [
+        "match",
+        "warmup"
       ]
     },
     {
@@ -447,7 +519,6 @@
       "description": "بکاپ راند مشخص‌شده را بازیابی می‌کند.",
       "access": "ادمین مسابقه",
       "syntax": ".restore <round>",
-      "example": ".restore 12",
       "tags": [
         "match",
         "restore"
@@ -513,7 +584,6 @@
       "description": "نام نمایشی تیم اول را تنظیم می‌کند.",
       "access": "ادمین مسابقه",
       "syntax": ".team1 <name>",
-      "example": ".team1 FragCity",
       "tags": [
         "match",
         "team"
@@ -529,7 +599,6 @@
       "description": "نام نمایشی تیم دوم را تنظیم می‌کند.",
       "access": "ادمین مسابقه",
       "syntax": ".team2 <name>",
-      "example": ".team2 Opponents",
       "tags": [
         "match",
         "team"
@@ -560,7 +629,6 @@
       "description": "بازیکن را برای مدت مشخص و با دلیل ثبت‌شده محروم می‌کند.",
       "access": "ادمین",
       "syntax": "!ban <name> <minutes> <reason>",
-      "example": "!ban PlayerName 30 Griefing",
       "tags": [
         "moderation",
         "ban"
@@ -576,7 +644,6 @@
       "description": "ارسال پیام متنی بازیکن را برای مدت مشخص محدود می‌کند.",
       "access": "ادمین",
       "syntax": "!gag <name> <minutes> <reason>",
-      "example": "!gag PlayerName 10 Spam",
       "tags": [
         "moderation",
         "chat"
@@ -592,7 +659,6 @@
       "description": "امکان استفاده از میکروفون بازیکن را برای مدت مشخص محدود می‌کند.",
       "access": "ادمین",
       "syntax": "!mute <name> <minutes> <reason>",
-      "example": "!mute PlayerName 10 MicSpam",
       "tags": [
         "moderation",
         "voice"
@@ -608,7 +674,6 @@
       "description": "بازیکن را با شناسه User ID از سرور خارج می‌کند.",
       "access": "ادمین",
       "syntax": "!kickid <userid>",
-      "example": "!kickid 7",
       "tags": [
         "moderation",
         "kick"
@@ -624,7 +689,6 @@
       "description": "نقشه سرور را به نام نقشه مشخص‌شده تغییر می‌دهد.",
       "access": "ادمین",
       "syntax": "!map <mapname>",
-      "example": "!map de_mirage",
       "tags": [
         "map"
       ]
@@ -668,7 +732,6 @@
       "description": "محرومیت ثبت‌شده برای SteamID64 را برمی‌دارد.",
       "access": "ادمین",
       "syntax": "!unban <steamid64>",
-      "example": "!unban 76561198000000000",
       "tags": [
         "moderation",
         "ban"
@@ -684,7 +747,6 @@
       "description": "بازیکنان سمت مشخص‌شده را احیا می‌کند.",
       "access": "ادمین",
       "syntax": "!respawn <@ct/@t>",
-      "example": "!respawn @ct",
       "tags": [
         "gameplay"
       ]
@@ -760,7 +822,6 @@
       "description": "بازیکن را به Terrorist، Counter-Terrorist یا Spectator منتقل می‌کند.",
       "access": "ادمین",
       "syntax": "!move <name> <t/ct/spec>",
-      "example": "!move PlayerName ct",
       "tags": [
         "team"
       ]
@@ -775,7 +836,6 @@
       "description": "نام بازیکن را تغییر می‌دهد.",
       "access": "ادمین",
       "syntax": "!rename <old> <new>",
-      "example": "!rename OldName NewName",
       "tags": [
         "player"
       ]
@@ -790,7 +850,6 @@
       "description": "نقشه Workshop را با شناسه آن بارگذاری می‌کند.",
       "access": "ادمین",
       "syntax": "!wmap <workshop_id>",
-      "example": "!wmap 1234567890",
       "tags": [
         "map",
         "workshop"
@@ -806,7 +865,6 @@
       "description": "دستور کنسول سرور را از طریق ابزار مدیریتی اجرا می‌کند. فقط دستورهای موردنیاز و مجاز را اجرا کنید.",
       "access": "ادمین",
       "syntax": "!rcon <command>",
-      "example": "!rcon status",
       "tags": [
         "console",
         "rcon"
@@ -822,7 +880,6 @@
       "description": "به نقطه Spawn با شماره مشخص‌شده منتقل می‌شود.",
       "access": "بازیکن در Practice",
       "syntax": ".spawn <number>",
-      "example": ".spawn 3",
       "tags": [
         "spawn",
         "practice"
@@ -989,7 +1046,6 @@
       "description": "لاین‌آپ فعلی را با نام و توضیحات ذخیره می‌کند.",
       "access": "بازیکن در Practice",
       "syntax": ".savenade <name> <desc>",
-      "example": ".savenade mirage-a-main A main smoke",
       "tags": [
         "nade",
         "lineup"
@@ -1005,7 +1061,6 @@
       "description": "لاین‌آپ ذخیره‌شده را بارگذاری می‌کند.",
       "access": "بازیکن در Practice",
       "syntax": ".loadnade <name>",
-      "example": ".loadnade mirage-a-main",
       "tags": [
         "nade",
         "lineup"
@@ -1068,7 +1123,6 @@
       "description": "به موقعیت مشخص‌شده در تاریخچه تمرین بازمی‌گردد.",
       "access": "بازیکن در Practice",
       "syntax": ".back <number>",
-      "example": ".back 2",
       "tags": [
         "practice",
         "movement"
