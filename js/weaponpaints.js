@@ -6893,7 +6893,8 @@
                 ? item.querySelector('.wp-card-title').textContent.trim()
                 : 'این اسکین';
 
-            if (!['2', '3'].includes(team) || !/^\\d+$/.test(defindex) || !/^\\d+$/.test(paintId) || !csrfToken) {
+            const isUnsignedInteger = value => /^[0-9]+$/.test(value);
+            if (!['2', '3'].includes(team) || !isUnsignedInteger(defindex) || !isUnsignedInteger(paintId) || !csrfToken) {
                 showWpToast('اطلاعات حذف این اسکین معتبر نیست.', 'error');
                 return;
             }
