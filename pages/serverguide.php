@@ -60,10 +60,10 @@ $guideCommandCount = count($guideItems);
 $guideCategoryCount = count($guideCategoryMap);
 ?>
 
-<section class="server-guide" id="fragcityServerGuide" dir="rtl">
+<section class="server-guide sg-page-fader" id="fragcityServerGuide" dir="rtl">
     <div class="sg-shell">
-        <header class="sg-hero" data-fc-reveal="up">
-            <div class="sg-hero-copy" data-fc-reveal="up" data-fc-reveal-delay="70">
+        <header class="sg-hero" data-sg-reveal="up">
+            <div class="sg-hero-copy" data-sg-reveal="up" data-sg-reveal-delay="70">
                 <div class="sg-eyebrow">
                     <span class="sg-eyebrow-dot"></span>
                     FRAGCITY <span>/</span> SERVER FIELD GUIDE
@@ -81,7 +81,7 @@ $guideCategoryCount = count($guideCategoryMap);
                     <span><i class="fa-solid fa-copy" aria-hidden="true"></i> کپی سریع</span>
                 </div>
             </div>
-            <div class="sg-hero-art" data-fc-reveal="left" data-fc-reveal-delay="130" aria-hidden="true">
+            <div class="sg-hero-art" data-sg-reveal="left" data-sg-reveal-delay="130" aria-hidden="true">
                 <span class="sg-art-orbit sg-art-orbit-one"></span>
                 <span class="sg-art-orbit sg-art-orbit-two"></span>
                 <span class="sg-art-crosshair"><i class="fa-solid fa-crosshairs"></i></span>
@@ -96,7 +96,7 @@ $guideCategoryCount = count($guideCategoryMap);
         </header>
 
         <section class="sg-directory" aria-label="فهرست دستورات، مودها و تنظیمات">
-            <div class="sg-toolbar" data-fc-reveal="up">
+            <div class="sg-toolbar" data-sg-reveal="up">
                 <label class="sg-search" for="sgSearch">
                     <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                     <input
@@ -114,7 +114,7 @@ $guideCategoryCount = count($guideCategoryMap);
                 </button>
             </div>
 
-            <nav class="sg-category-nav" id="sgCategoryNav" data-fc-reveal="up" aria-label="دسته‌بندی دستورات">
+            <nav class="sg-category-nav" id="sgCategoryNav" data-sg-reveal="up" aria-label="دسته‌بندی دستورات">
                 <button type="button" class="sg-category-filter active" data-guide-filter="all" data-guide-label="همه دستورات" aria-pressed="true">
                     <i class="fa-solid fa-border-all" aria-hidden="true"></i>
                     همه
@@ -142,7 +142,7 @@ $guideCategoryCount = count($guideCategoryMap);
                 <?php endforeach; ?>
             </nav>
 
-            <div class="sg-results-heading" data-fc-reveal="up">
+            <div class="sg-results-heading" data-sg-reveal="up">
                 <div>
                     <span class="sg-section-kicker">COMMAND DIRECTORY</span>
                     <h2 id="sgResultsTitle">همه دستورات</h2>
@@ -151,13 +151,13 @@ $guideCategoryCount = count($guideCategoryMap);
             </div>
 
             <?php if (!empty($guideMeta['notice'])): ?>
-                <div class="sg-notice" data-fc-reveal="up">
+                <div class="sg-notice" data-sg-reveal="up">
                     <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                     <span><?= $guideEscape($guideMeta['notice']) ?></span>
                 </div>
             <?php endif; ?>
 
-            <div class="sg-risk-legend" data-fc-reveal="up" aria-label="راهنمای سطح اثر دستورات">
+            <div class="sg-risk-legend" data-sg-reveal="up" aria-label="راهنمای سطح اثر دستورات">
                 <span class="sg-risk-legend__title">سطح اثر</span>
                 <span class="sg-risk-legend__item sg-risk-legend__item--high"><i aria-hidden="true"></i> پرریسک</span>
                 <span class="sg-risk-legend__item sg-risk-legend__item--action"><i aria-hidden="true"></i> تغییردهنده</span>
@@ -258,7 +258,7 @@ $guideCategoryCount = count($guideCategoryMap);
                         data-guide-category="<?= $guideEscape($itemCategory) ?>"
                         data-guide-risk="<?= $guideEscape($risk) ?>"
                         data-guide-search="<?= $guideEscape($searchText) ?>"
-                        data-fc-reveal="up"
+                        data-sg-reveal="up"
                     >
                         <div class="sg-entry-top">
                             <span class="sg-entry-category">
