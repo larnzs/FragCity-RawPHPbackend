@@ -122,9 +122,43 @@ try {
     $nginxApi = $read('linuxapi/nginx/fragcity-api-https.conf.example');
     $standbyDocs = $read('docs/PTERODACTYL-STANDBY-API.md');
     $publicDocs = $read('docs/PUBLIC-SERVER-SCANNER.md');
+    $serverGuidePage = $read('pages/serverguide.php');
+    $serverGuideStylesheet = $read('css/serverguide.css');
+    $serverGuideJavascript = $read('js/serverguide.js');
+    $serverGuideDocs = $read('docs/SERVER-GUIDE.md');
+    $serverGuideCatalogRaw = $read('data/server-guide.json');
+    $serverGuideCatalog = json_decode($serverGuideCatalogRaw, true, 512, JSON_THROW_ON_ERROR);
 } catch (Throwable $e) {
     fwrite(STDERR, 'FAIL: ' . $e->getMessage() . PHP_EOL);
     exit(2);
+}
+
+$serverGuideCategoryIds = [];
+foreach (($serverGuideCatalog['categories'] ?? []) as $category) {
+    if (!is_array($category) || !is_string($category['id'] ?? null) || $category['id'] === ''
+        || isset($serverGuideCategoryIds[$category['id']])) {
+        throw new RuntimeException('Server Guide catalog contains an invalid or duplicate category ID.');
+    }
+    $serverGuideCategoryIds[$category['id']] = true;
+}
+
+$serverGuideItemIds = [];
+$serverGuideCatalogValid = count($serverGuideCategoryIds) > 0
+    && is_array($serverGuideCatalog['items'] ?? null)
+    && count($serverGuideCatalog['items']) > 0;
+foreach (($serverGuideCatalog['items'] ?? []) as $item) {
+    if (!is_array($item)
+        || !is_string($item['id'] ?? null)
+        || $item['id'] === ''
+        || isset($serverGuideItemIds[$item['id']])
+        || !isset($serverGuideCategoryIds[(string)($item['category'] ?? '')])
+        || !in_array((string)($item['type'] ?? ''), ['command', 'setting'], true)
+        || trim((string)($item['command'] ?? '')) === ''
+        || trim((string)($item['description'] ?? '')) === '') {
+        $serverGuideCatalogValid = false;
+        break;
+    }
+    $serverGuideItemIds[$item['id']] = true;
 }
 
 $check(
@@ -844,6 +878,36 @@ $check(
         && str_contains($standbyDocs, "'base_url' => 'https://panel.fragcity.ir'")
         && str_contains($standbyDocs, 'A2S_PLAYER')
         && str_contains($standbyDocs, 'does not return SteamID')
+);
+
+$check(
+    'Server Guide is registered as a native PHP page with dedicated versioned CSS and JavaScript',
+    str_contains($websiteIndex, "'serverguide',")
+        && str_contains($websiteIndex, "'serverguide' => [")
+        && str_contains($websiteIndex, '/css/serverguide.css?v=')
+        && str_contains($websiteIndex, '/js/serverguide.js?v=')
+        && str_contains($siteHeaderMarkup, "?page=serverguide")
+        && str_contains($footerMarkup, "?page=serverguide")
+);
+
+$check(
+    'Server Guide catalog is valid JSON with unique IDs, known categories, and documented command entries',
+    $serverGuideCatalogValid
+        && count($serverGuideItemIds) === count($serverGuideCatalog['items'])
+        && str_contains($serverGuideDocs, 'data/server-guide.json')
+        && str_contains($serverGuidePage, "json_decode")
+);
+
+$check(
+    'Server Guide supports category filters, search, command copying, empty results, and responsive styling',
+    str_contains($serverGuidePage, 'data-guide-filter')
+        && str_contains($serverGuidePage, 'data-guide-copy')
+        && str_contains($serverGuidePage, 'sgEmptyState')
+        && str_contains($serverGuideJavascript, 'normalize(entry.dataset.guideSearch)')
+        && str_contains($serverGuideJavascript, 'navigator.clipboard.writeText')
+        && str_contains($serverGuideJavascript, 'data-guide-filter')
+        && str_contains($serverGuideStylesheet, '.sg-entry-grid')
+        && str_contains($serverGuideStylesheet, '@media (max-width: 650px)')
 );
 
 $check(
