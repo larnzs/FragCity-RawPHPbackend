@@ -7364,6 +7364,13 @@ body > #keychainModal .wp-modal-body {
     box-shadow: 0 22px 55px rgba(0, 0, 0, .32), 0 0 24px rgba(34, 197, 94, .09) !important;
 }
 
+.wp-toast--warning {
+    color: #fef3c7 !important;
+    border-color: rgba(251, 191, 36, .52) !important;
+    background: linear-gradient(135deg, rgba(56, 39, 8, .97), rgba(13, 20, 32, .97)) !important;
+    box-shadow: 0 22px 55px rgba(0, 0, 0, .32), 0 0 24px rgba(251, 191, 36, .12) !important;
+}
+
 .wp-toast--error {
     color: #fee2e2 !important;
     border-color: rgba(248, 113, 113, .48) !important;
@@ -11045,15 +11052,15 @@ html.fc-no-animation .wp-app .wp-main .tab-content > .tab-pane {
 }
 
 .wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/music_kit.svg"] {
-    flex-basis: 22px !important;
-    width: 22px !important;
-    height: 22px !important;
+    flex-basis: 18px !important;
+    width: 18px !important;
+    height: 18px !important;
 }
 
 .wp-app .wp-workspace-main > .wp-header .wp-tab-svg[src$="/pin.svg"] {
-    flex-basis: 21px !important;
-    width: 21px !important;
-    height: 23px !important;
+    flex-basis: 17px !important;
+    width: 17px !important;
+    height: 19px !important;
 }
 
 .wp-app .wp-workspace-main > .wp-header .wp-tab-fallback {
