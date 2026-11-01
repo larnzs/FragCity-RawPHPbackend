@@ -628,6 +628,7 @@ $check(
 $check(
     'WeaponPaints categories, team selector and search share one compact vertical right-side rail',
     str_contains($weaponPaintsPage, '<aside class="wp-sidebar"')
+        && !str_contains($weaponPaintsPage, 'wp-sidebar-brand')
         && str_contains($weaponPaintsPage, '<nav class="wp-tabs wp-sidebar-tabs" id="mainTabs"')
         && !str_contains($weaponPaintsPage, 'id="wpToolbarControls"')
         && str_contains($weaponPaintsPage, 'id="skinSearchGlobal"')
@@ -655,7 +656,12 @@ $check(
         && str_contains($weaponPaintsStylesheet, 'height: 28px !important;')
         && str_contains($weaponPaintsStylesheet, 'grid-template-columns: 72px minmax(0, 1fr) !important;')
         && str_contains($weaponPaintsStylesheet, '.wp-sidebar-tabs .wp-tab.is-active')
-        && str_contains($weaponPaintsStylesheet, 'drop-shadow(0 0 5px rgba(249, 115, 22, .56))')
+        && str_contains($weaponPaintsStylesheet, 'grid-template-columns: 108px minmax(0, 1fr) !important;')
+        && str_contains($weaponPaintsStylesheet, 'clamp(24px, 6.5vw, 100px)')
+        && str_contains($weaponPaintsStylesheet, 'width: 88px !important;')
+        && str_contains($weaponPaintsStylesheet, 'background: rgba(249, 115, 22, .13) !important;')
+        && str_contains($weaponPaintsStylesheet, 'content: none !important;')
+        && str_contains($weaponPaintsStylesheet, 'filter: none !important;')
         && str_contains($weaponPaintsStylesheet, '.wp-sidebar .wp-team-switcher')
         && str_contains($weaponPaintsStylesheet, '.wp-sidebar .wp-search-wrap:focus-within')
         && str_contains($weaponPaintsStylesheet, '.wp-sidebar .wp-team-switcher .wp-team-btn.is-active::after')
