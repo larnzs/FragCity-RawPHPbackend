@@ -849,8 +849,8 @@ $check(
         && str_contains($weaponPaintsStylesheet, '.wp-app .wp-saved-paint-item')
         && str_contains($weaponPaintsStylesheet, 'top: 9px !important;')
         && str_contains($weaponPaintsStylesheet, 'right: 9px !important;')
-        && str_contains($weaponPaintsStylesheet, '.wp-app .wp-sidebar-team {\n    direction: ltr !important;')
-        && str_contains($weaponPaintsStylesheet, '.wp-app .wp-sidebar-team > .wp-team-switcher {\n    direction: rtl !important;')
+        && preg_match('/\\.wp-app \\.wp-sidebar-team\\s*\\{\\s*direction:\\s*ltr\\s*!important;/s', $weaponPaintsStylesheet) === 1
+        && preg_match('/\\.wp-app \\.wp-sidebar-team\\s*>\\s*\\.wp-team-switcher\\s*\\{\\s*direction:\\s*rtl\\s*!important;/s', $weaponPaintsStylesheet) === 1
 );
 
 $check(
