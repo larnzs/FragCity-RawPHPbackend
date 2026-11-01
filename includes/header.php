@@ -67,6 +67,23 @@ $morePages = ['buyserveropen', 'buyserver', 'launcher', 'leaderboard', 'leaderbo
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
+// Read the same wallet balance source used by the former wallet page.
+$headerWalletBalance = 0;
+if ($isLoggedIn && trim((string)$displaySteamID) !== '') {
+    try {
+        require_once dirname(__DIR__) . '/class/customer_db.php';
+        $headerWalletDb = new CustomerDB();
+        $headerWalletRows = $headerWalletDb->select(
+            'SELECT balance FROM user_wallets WHERE steamid = ? LIMIT 1',
+            [(string)$displaySteamID]
+        );
+        $headerWalletBalance = max(0, (int)($headerWalletRows[0]['balance'] ?? 0));
+    } catch (Throwable $walletError) {
+        error_log('[FragCity] Header wallet balance unavailable.');
+    }
+}
+$headerWalletBalanceLabel = number_format($headerWalletBalance) . ' تومان';
+
 $headerSteamId64 = preg_match('/^[0-9]{17}$/D', (string)$displaySteamID)
     ? (string)$displaySteamID : '';
 if ($headerSteamId64 === '' && preg_match('/^STEAM_[0-5]:([01]):([0-9]+)$/D', (string)$displaySteamID, $idMatch)) {
@@ -403,13 +420,24 @@ $mobileMoreNavItems = [
                             <a href="?page=profile" class="frag-drop-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
                                 <i class="fas fa-user"></i><span>مشاهده پروفایل</span>
                             </a>
-                            <a href="?page=wallet"
-                               class="frag-drop-link <?= $isPageActive(['wallet']) ?>"
-                               data-ajax-nav
-                               data-slug="wallet">
-                                <i class="fas fa-wallet"></i>
-                                <span>کیف پول شما</span>
-                            </a>
+                            <div class="frag-drop-wallet-card">
+                                <div class="frag-drop-wallet-card__balance">
+                                    <span class="frag-drop-wallet-card__label">
+                                        <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+                                        موجودی کیف پول
+                                    </span>
+                                    <strong dir="rtl"><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                                </div>
+                                <button
+                                    type="button"
+                                    class="frag-drop-wallet-card__add"
+                                    data-fc-wallet-charge-open
+                                    aria-label="افزایش موجودی کیف پول"
+                                    title="افزایش موجودی"
+                                >
+                                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                                </button>
+                            </div>
                             <div class="frag-drop-divider"></div>
                             <form action="index.php" method="post" class="frag-drop-logout-form">
                                 <input type="hidden" name="auth_action" value="logout">
@@ -504,6 +532,16 @@ $mobileMoreNavItems = [
                 <i class="fas fa-user-circle" aria-hidden="true"></i>
                 <span><?= htmlspecialchars((string) $displayName, ENT_QUOTES, 'UTF-8') ?></span>
             </a>
+            <div class="mobile-wallet-balance-row">
+                <span>
+                    <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+                    موجودی
+                    <strong><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                </span>
+                <button type="button" data-fc-wallet-charge-open aria-label="افزایش موجودی کیف پول" title="افزایش موجودی">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                </button>
+            </div>
             <form action="index.php" method="post" class="mobile-nav-logout-form">
                 <input type="hidden" name="auth_action" value="logout">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($headerCsrfToken, ENT_QUOTES, 'UTF-8') ?>">
@@ -550,6 +588,73 @@ $mobileMoreNavItems = [
                     <span>در حال آماده‌سازی فرم ورود...</span>
                 </div>
             </div>
+        </section>
+    </div>
+<?php endif; ?>
+<?php if ($isLoggedIn): ?>
+    <div
+        class="fc-wallet-charge-modal"
+        id="fcWalletChargeModal"
+        aria-hidden="true"
+        hidden
+    >
+        <div class="fc-wallet-charge-modal__backdrop" data-fc-wallet-charge-close></div>
+        <section
+            class="fc-wallet-charge-modal__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="fcWalletChargeTitle"
+            tabindex="-1"
+        >
+            <button
+                type="button"
+                class="fc-wallet-charge-modal__close"
+                data-fc-wallet-charge-close
+                aria-label="بستن پنجره شارژ"
+            >
+                <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+
+            <div class="fc-wallet-charge-modal__icon" aria-hidden="true">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+            <div class="fc-wallet-charge-modal__heading">
+                <span>FRAGCITY WALLET</span>
+                <h2 id="fcWalletChargeTitle">افزایش موجودی</h2>
+                <p>مبلغ مورد نظر برای شارژ کیف پول خود را وارد کنید.</p>
+            </div>
+
+            <form
+                id="fcWalletChargeForm"
+                action="/pages/zarinpal/zarinpal_wallet_request.php"
+                method="POST"
+                class="fc-wallet-charge-modal__form"
+            >
+                <label for="fcWalletChargeAmount">مبلغ شارژ (تومان)</label>
+                <div class="fc-wallet-charge-modal__input-wrap">
+                    <i class="fa-solid fa-coins" aria-hidden="true"></i>
+                    <input
+                        type="number"
+                        id="fcWalletChargeAmount"
+                        name="amount"
+                        min="1000"
+                        step="1000"
+                        inputmode="numeric"
+                        placeholder="حداقل ۱,۰۰۰ تومان"
+                        required
+                    >
+                </div>
+                <p class="fc-wallet-charge-modal__hint">حداقل مبلغ شارژ ۱,۰۰۰ تومان است.</p>
+                <div class="fc-wallet-charge-modal__actions">
+                    <button type="submit" class="fc-wallet-charge-modal__submit">
+                        <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
+                        ادامه و پرداخت
+                    </button>
+                    <button type="button" class="fc-wallet-charge-modal__cancel" data-fc-wallet-charge-close>
+                        انصراف
+                    </button>
+                </div>
+            </form>
         </section>
     </div>
 <?php endif; ?>
