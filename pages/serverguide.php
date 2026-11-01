@@ -62,8 +62,8 @@ $guideCategoryCount = count($guideCategoryMap);
 
 <section class="server-guide" id="fragcityServerGuide" dir="rtl">
     <div class="sg-shell">
-        <header class="sg-hero">
-            <div class="sg-hero-copy">
+        <header class="sg-hero" data-fc-reveal="up">
+            <div class="sg-hero-copy" data-fc-reveal="up" data-fc-reveal-delay="70">
                 <div class="sg-eyebrow">
                     <span class="sg-eyebrow-dot"></span>
                     FRAGCITY <span>/</span> SERVER FIELD GUIDE
@@ -81,7 +81,7 @@ $guideCategoryCount = count($guideCategoryMap);
                     <span><i class="fa-solid fa-copy" aria-hidden="true"></i> کپی سریع</span>
                 </div>
             </div>
-            <div class="sg-hero-art" aria-hidden="true">
+            <div class="sg-hero-art" data-fc-reveal="left" data-fc-reveal-delay="130" aria-hidden="true">
                 <span class="sg-art-orbit sg-art-orbit-one"></span>
                 <span class="sg-art-orbit sg-art-orbit-two"></span>
                 <span class="sg-art-crosshair"><i class="fa-solid fa-crosshairs"></i></span>
@@ -96,7 +96,7 @@ $guideCategoryCount = count($guideCategoryMap);
         </header>
 
         <section class="sg-directory" aria-label="فهرست دستورات، مودها و تنظیمات">
-            <div class="sg-toolbar">
+            <div class="sg-toolbar" data-fc-reveal="up">
                 <label class="sg-search" for="sgSearch">
                     <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                     <input
@@ -114,7 +114,7 @@ $guideCategoryCount = count($guideCategoryMap);
                 </button>
             </div>
 
-            <nav class="sg-category-nav" id="sgCategoryNav" aria-label="دسته‌بندی دستورات">
+            <nav class="sg-category-nav" id="sgCategoryNav" data-fc-reveal="up" aria-label="دسته‌بندی دستورات">
                 <button type="button" class="sg-category-filter active" data-guide-filter="all" data-guide-label="همه دستورات" aria-pressed="true">
                     <i class="fa-solid fa-border-all" aria-hidden="true"></i>
                     همه
@@ -142,7 +142,7 @@ $guideCategoryCount = count($guideCategoryMap);
                 <?php endforeach; ?>
             </nav>
 
-            <div class="sg-results-heading">
+            <div class="sg-results-heading" data-fc-reveal="up">
                 <div>
                     <span class="sg-section-kicker">COMMAND DIRECTORY</span>
                     <h2 id="sgResultsTitle">همه دستورات</h2>
@@ -151,11 +151,20 @@ $guideCategoryCount = count($guideCategoryMap);
             </div>
 
             <?php if (!empty($guideMeta['notice'])): ?>
-                <div class="sg-notice">
+                <div class="sg-notice" data-fc-reveal="up">
                     <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                     <span><?= $guideEscape($guideMeta['notice']) ?></span>
                 </div>
             <?php endif; ?>
+
+            <div class="sg-risk-legend" data-fc-reveal="up" aria-label="راهنمای سطح اثر دستورات">
+                <span class="sg-risk-legend__title">سطح اثر</span>
+                <span class="sg-risk-legend__item sg-risk-legend__item--high"><i aria-hidden="true"></i> پرریسک</span>
+                <span class="sg-risk-legend__item sg-risk-legend__item--action"><i aria-hidden="true"></i> تغییردهنده</span>
+                <span class="sg-risk-legend__item sg-risk-legend__item--info"><i aria-hidden="true"></i> اطلاعی</span>
+                <span class="sg-risk-legend__item sg-risk-legend__item--safe"><i aria-hidden="true"></i> کم‌ریسک</span>
+                <span class="sg-risk-legend__note">این نشان سطح اثر را مشخص می‌کند؛ Permission لازم در هر کارت جداگانه آمده است.</span>
+            </div>
 
             <div class="sg-entry-grid" id="sgEntryGrid">
                 <?php foreach ($guideItems as $item): ?>
@@ -178,6 +187,7 @@ $guideCategoryCount = count($guideCategoryMap);
                         $item['access'] ?? '',
                         $item['plugin'] ?? '',
                         $item['availability_note'] ?? '',
+                        $item['risk'] ?? '',
                         implode(' ', is_array($item['tags'] ?? null) ? $item['tags'] : []),
                     ];
                     $searchText = implode(' ', array_filter($searchParts, 'is_string'));
@@ -194,6 +204,30 @@ $guideCategoryCount = count($guideCategoryMap);
                         'mode' => 'مود',
                     ];
                     $itemTypeLabel = $itemTypeLabels[$itemType];
+
+                    // Risk describes the direct impact; required permissions stay separate.
+                    $riskRaw = (string) ($item['risk'] ?? 'safe');
+                    $risk = in_array($riskRaw, ['high', 'action', 'info', 'safe'], true)
+                        ? $riskRaw
+                        : 'safe';
+                    $riskLabels = [
+                        'high' => 'پرریسک',
+                        'action' => 'تغییردهنده',
+                        'info' => 'اطلاعی',
+                        'safe' => 'کم‌ریسک',
+                    ];
+                    $riskIcons = [
+                        'high' => 'fa-triangle-exclamation',
+                        'action' => 'fa-arrows-rotate',
+                        'info' => 'fa-circle-info',
+                        'safe' => 'fa-shield-halved',
+                    ];
+                    $riskDescriptions = [
+                        'high' => 'می‌تواند مجازات بازیکن، دسترسی مدیریتی یا اجرای فرمان با اثر گسترده را انجام دهد.',
+                        'action' => 'وضعیت بازی، نقشه، مود، بازیکن یا تنظیمات سرور را تغییر می‌دهد.',
+                        'info' => 'برای نمایش اطلاعات، فهرست یا وضعیت است و تغییر مستقیم ایجاد نمی‌کند.',
+                        'safe' => 'عملیات شخصی، تمرینی یا درخواستی کم‌اثر است؛ رفتار نهایی به مود و تنظیمات بستگی دارد.',
+                    ];
 
                     // Status is catalog metadata, not a live check of the server.
                     $availability = (string) ($item['availability'] ?? '');
@@ -219,19 +253,31 @@ $guideCategoryCount = count($guideCategoryMap);
                     $consoleCommand = trim((string) ($item['console_command'] ?? ''));
                     ?>
                     <article
-                        class="sg-entry"
+                        class="sg-entry sg-entry--risk-<?= $guideEscape($risk) ?>"
                         data-guide-entry
                         data-guide-category="<?= $guideEscape($itemCategory) ?>"
+                        data-guide-risk="<?= $guideEscape($risk) ?>"
                         data-guide-search="<?= $guideEscape($searchText) ?>"
+                        data-fc-reveal="up"
                     >
                         <div class="sg-entry-top">
                             <span class="sg-entry-category">
                                 <i class="fa-solid <?= $guideEscape($category['icon'] ?? 'fa-terminal') ?>" aria-hidden="true"></i>
                                 <?= $guideEscape($category['title'] ?? 'عمومی') ?>
                             </span>
-                            <span class="sg-entry-type sg-entry-type--<?= $guideEscape($itemType) ?>">
-                                <?= $guideEscape($itemTypeLabel) ?>
-                            </span>
+                            <div class="sg-entry-badges">
+                                <span class="sg-entry-type sg-entry-type--<?= $guideEscape($itemType) ?>">
+                                    <?= $guideEscape($itemTypeLabel) ?>
+                                </span>
+                                <span
+                                    class="sg-risk-chip sg-risk-chip--<?= $guideEscape($risk) ?>"
+                                    title="<?= $guideEscape($riskDescriptions[$risk]) ?>"
+                                    aria-label="سطح اثر: <?= $guideEscape($riskLabels[$risk]) ?>"
+                                >
+                                    <i class="fa-solid <?= $guideEscape($riskIcons[$risk]) ?>" aria-hidden="true"></i>
+                                    <?= $guideEscape($riskLabels[$risk]) ?>
+                                </span>
+                            </div>
                         </div>
 
                         <div class="sg-entry-title-row">
