@@ -933,16 +933,22 @@
       "title": "ریست راند",
       "command": "!rr",
       "aliases": [
+        "!rg",
         "!restart",
         "!restartgame"
       ],
       "description": "راند یا بازی را طبق عملکرد پلاگین ریستارت می‌کند.",
-      "access": "ادمین",
+      "access": "@css/generic",
       "syntax": "!rr",
       "tags": [
         "gameplay",
         "restart"
-      ]
+      ],
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
+      "console_command": "css_rr",
+      "availability": "default",
+      "availability_note": "نام و Aliasهای console command با Commands.json شاخه integration/kus-monorepo تطبیق داده شده‌اند."
     },
     {
       "id": "score-reset",
@@ -5140,6 +5146,55 @@
       "plugin": "AFKManager",
       "source_url": "https://github.com/NiGHT757/AFKManager",
       "availability": "config"
+    },
+    {
+      "id": "sa-tp",
+      "type": "command",
+      "category": "admin",
+      "title": "تله‌پورت ادمین به بازیکن",
+      "command": "!tp <target>",
+      "console_command": "css_tp <#userid or name>",
+      "aliases": [
+        "!tpto",
+        "!goto"
+      ],
+      "description": "ادمین را به محل بازیکن منتقل می‌کند. می‌توان از نام، User ID یا Target selector استفاده کرد.",
+      "access": "@css/kick",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
+      "availability": "default"
+    },
+    {
+      "id": "sa-bring",
+      "type": "command",
+      "category": "admin",
+      "title": "آوردن بازیکن به محل ادمین",
+      "command": "!bring <target>",
+      "console_command": "css_bring <#userid or name>",
+      "aliases": [
+        "!tphere"
+      ],
+      "description": "بازیکن هدف را به موقعیت ادمین منتقل می‌کند؛ برای جابه‌جایی بازیکن گیرکرده یا جمع‌کردن بازیکنان کاربرد دارد.",
+      "access": "@css/kick",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
+      "availability": "default"
+    },
+    {
+      "id": "sa-resize",
+      "type": "command",
+      "category": "admin",
+      "title": "تغییر اندازه بازیکن",
+      "command": "!resize <target> <size>",
+      "console_command": "css_resize <#userid or name> <size>",
+      "aliases": [
+        "!size"
+      ],
+      "description": "اندازه بازیکن را تغییر می‌دهد. دستور و Alias در Commands.json این بسته ثبت شده‌اند؛ مقادیر معتبر و Permission را مطابق تنظیمات همان نسخه بررسی کن.",
+      "access": "بر اساس تنظیمات پلاگین",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
+      "availability": "default"
     }
   ]
 }
