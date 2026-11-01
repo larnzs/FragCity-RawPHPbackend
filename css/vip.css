@@ -101,3 +101,11 @@
 .vip-competitive-note strong{color:#F2C29B;font-size:.72rem;font-weight:850}
 .vip-competitive-note small{color:#969696;font-size:.65rem;line-height:1.8}
 @media(max-width:700px){.vip-competitive-note{align-items:flex-start;margin-top:-12px;margin-bottom:17px;padding:11px}.vip-competitive-note-icon{flex-basis:30px;width:30px;height:30px}.vip-competitive-note small{font-size:.61rem}}
+
+/* Wallet charge triggers are buttons now that the standalone wallet page is retired. */
+button.vip-wallet-shortcut,
+button.vip-checkout-wallet {
+    appearance: none;
+    font-family: inherit;
+    cursor: pointer;
+}
