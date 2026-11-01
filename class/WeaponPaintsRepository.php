@@ -92,6 +92,33 @@ final class WeaponPaintsRepository
     }
 
     /**
+     * Delete one saved inventory record. The Linux API also clears the
+     * active plugin row only when it references this exact same paint.
+     */
+    public function deleteSkinInventory(
+        string $steamid,
+        int $team,
+        int $defindex,
+        int $paint
+    ): bool {
+        if (!in_array($team, [2, 3], true)) {
+            throw new InvalidArgumentException('Invalid inventory team.');
+        }
+        if ($defindex < 1 || $defindex > 10000 || $paint < 0 || $paint > 100000) {
+            throw new InvalidArgumentException('Invalid inventory skin key.');
+        }
+
+        $data = $this->callApi('delete_skin', [
+            'steamid' => $steamid,
+            'teams' => [$team],
+            'defindex' => $defindex,
+            'paint_id' => $paint,
+        ]);
+
+        return ($data['deleted'] ?? false) === true;
+    }
+
+    /**
      * Preserve the plugin's serialized values at the page boundary, and convert
      * them to structured, validated JSON before sending them to Linux API.
      *
