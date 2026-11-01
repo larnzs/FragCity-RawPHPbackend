@@ -772,6 +772,21 @@ $pageFile = match ($page) {
         name="viewport"
         content="width=device-width, initial-scale=1.0"
     >
+    <!-- Critical root scrollbar guard: hide the viewport scrollbar before external CSS loads. -->
+    <style id="fc-root-scrollbar-guard">
+        html,
+        body.site-body {
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+
+        html::-webkit-scrollbar,
+        body.site-body::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+    </style>
     <meta
         name="color-scheme"
         content="dark"
