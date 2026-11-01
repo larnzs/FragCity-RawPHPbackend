@@ -478,49 +478,91 @@ $steamCardAvatarUrl = $steamAvatarUrl !== ''
     ? $steamAvatarUrl
     : (string)($steamProfile['avatarfull'] ?? '');
 if ($avatarUrl === '') $avatarUrl = $steamCardAvatarUrl;
-// FACEIT stats are optional until a verified FACEIT integration populates the session.
-$faceitProfileData = $_SESSION['faceit_profile'] ?? [];
-$faceitEloCandidate = is_array($faceitProfileData)
-    ? ($faceitProfileData['elo'] ?? $faceitProfileData['faceit_elo'] ?? null)
-    : null;
+// Read the same cached FACEIT player profile used by the header and server list.
+// This returns both skill_level and faceit_elo without exposing the API key.
+$faceitProfileData = [];
+$faceitStatus = 'api_unavailable';
+if ($steamid64 !== '') {
+    try {
+        require_once __DIR__ . '/../class/FaceitApiClient.php';
+        $faceitRows = (new FaceitApiClient())->enrichPlayers([
+            ['steam_id' => $steamid64],
+        ]);
+        $faceitProfileData = is_array($faceitRows[0] ?? null)
+            ? $faceitRows[0]
+            : [];
+        $faceitStatus = (string)($faceitProfileData['faceit_status'] ?? 'api_unavailable');
+    } catch (Throwable $faceitError) {
+        error_log('[FragCity] Profile FACEIT lookup unavailable.');
+    }
+}
+
+$faceitLevelCandidate = $faceitProfileData['faceit_level'] ?? null;
+$faceitLevel = is_numeric($faceitLevelCandidate)
+    && (int)$faceitLevelCandidate >= 1
+    && (int)$faceitLevelCandidate <= 10
+        ? (int)$faceitLevelCandidate
+        : null;
+
+$faceitEloCandidate = $faceitProfileData['faceit_elo'] ?? null;
 $faceitElo = is_numeric($faceitEloCandidate) ? (int)$faceitEloCandidate : null;
-if ($faceitElo !== null && $faceitElo < 100) $faceitElo = null;
+if ($faceitElo !== null && ($faceitElo < 100 || $faceitElo > 100000)) {
+    $faceitElo = null;
+}
 
-$faceitLevel = null;
-$faceitProgress = 0.0;
-$faceitProgressText = 'اتصال FACEIT تنظیم نشده';
-if ($faceitElo !== null) {
-    // Current CS2 FACEIT level thresholds; Level 10 is open-ended.
-    $faceitLevels = [
-        1 => ['min' => 100, 'next' => 501],
-        2 => ['min' => 501, 'next' => 751],
-        3 => ['min' => 751, 'next' => 901],
-        4 => ['min' => 901, 'next' => 1051],
-        5 => ['min' => 1051, 'next' => 1201],
-        6 => ['min' => 1201, 'next' => 1351],
-        7 => ['min' => 1351, 'next' => 1531],
-        8 => ['min' => 1531, 'next' => 1751],
-        9 => ['min' => 1751, 'next' => 2001],
-        10 => ['min' => 2001, 'next' => null],
-    ];
+$faceitLevels = [
+    1 => ['min' => 100, 'next' => 501],
+    2 => ['min' => 501, 'next' => 751],
+    3 => ['min' => 751, 'next' => 901],
+    4 => ['min' => 901, 'next' => 1051],
+    5 => ['min' => 1051, 'next' => 1201],
+    6 => ['min' => 1201, 'next' => 1351],
+    7 => ['min' => 1351, 'next' => 1531],
+    8 => ['min' => 1531, 'next' => 1751],
+    9 => ['min' => 1751, 'next' => 2001],
+    10 => ['min' => 2001, 'next' => null],
+];
 
-    foreach ($faceitLevels as $level => $range) {
+if ($faceitLevel === null && $faceitElo !== null) {
+    foreach ($faceitLevels as $candidateLevel => $range) {
         if ($faceitElo >= $range['min']) {
-            $faceitLevel = $level;
+            $faceitLevel = $candidateLevel;
         } else {
             break;
         }
     }
+}
 
+$faceitProgress = 0.0;
+$faceitProgressText = [
+    'api_not_configured' => 'اتصال FACEIT تنظیم نشده',
+    'profile_not_found' => 'اکانت FACEIT پیدا نشد',
+    'no_cs2_profile' => 'پروفایل CS2 در FACEIT پیدا نشد',
+    'unranked' => 'هنوز رتبه‌ای برای CS2 ثبت نشده',
+    'api_unavailable' => 'اطلاعات FACEIT موقتاً در دسترس نیست',
+    'steam_id_missing' => 'شناسه Steam معتبر نیست',
+][$faceitStatus] ?? 'اطلاعات FACEIT در دسترس نیست';
+$faceitNextLevelText = '';
+
+if ($faceitLevel !== null && $faceitElo !== null) {
     if ($faceitLevel === 10) {
-        // FACEIT Level 10 has no upper Elo limit; the level cap is shown as full.
+        // Level 10 is open-ended; the indicator represents reaching the level.
         $faceitProgress = 100.0;
-    } elseif ($faceitLevel !== null) {
+        $faceitNextLevelText = 'Level 10 · بدون سقف ELO';
+    } else {
         $range = $faceitLevels[$faceitLevel];
-        $faceitProgress = (($faceitElo - $range['min']) / max(1, $range['next'] - $range['min'])) * 100;
+        $rangeWidth = max(1, (int)$range['next'] - (int)$range['min']);
+        $faceitProgress = (($faceitElo - (int)$range['min']) / $rangeWidth) * 100;
         $faceitProgress = max(0, min(100, $faceitProgress));
+        $eloToNextLevel = max(0, (int)$range['next'] - $faceitElo);
+        $faceitNextLevelText = 'تا Level ' . ($faceitLevel + 1)
+            . ' · ' . number_format($eloToNextLevel) . ' ELO باقی مانده';
     }
-    $faceitProgressText = 'Level ' . (int)$faceitLevel . ' · ' . number_format($faceitElo) . ' ELO';
+
+    $faceitProgressText = 'Level ' . $faceitLevel . ' · '
+        . number_format($faceitElo) . ' ELO';
+} elseif ($faceitLevel !== null) {
+    $faceitProgressText = 'Level ' . $faceitLevel . ' · ELO در دسترس نیست';
 }
 
 // Load this player's saved Paint configurations through the same signed Linux API
@@ -709,7 +751,21 @@ if (!function_exists('formatPlaytime')) {
                 </div>
                 <div class="profile-progress-item">
                     <div class="profile-progress-head">
-                        <span class="profile-progress-label"><i class="fa-solid fa-ranking-star" aria-hidden="true"></i> FACEIT LEVEL / ELO</span>
+                        <span class="profile-progress-label">
+                            <?php if ($faceitLevel !== null): ?>
+                                <img
+                                    class="profile-faceit-level-icon"
+                                    src="/img/faceit/<?= $faceitLevel ?>.svg"
+                                    alt=""
+                                    aria-hidden="true"
+                                    width="24"
+                                    height="24"
+                                >
+                            <?php else: ?>
+                                <i class="fa-solid fa-ranking-star" aria-hidden="true"></i>
+                            <?php endif; ?>
+                            FACEIT LEVEL / ELO
+                        </span>
                         <span class="profile-progress-value"><?= htmlspecialchars($faceitProgressText, ENT_QUOTES, 'UTF-8') ?></span>
                     </div>
                     <div class="xp-bar-container">
@@ -723,6 +779,9 @@ if (!function_exists('formatPlaytime')) {
                             aria-valuenow="<?= htmlspecialchars((string) round($faceitProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
                         ></div>
                     </div>
+                    <?php if ($faceitNextLevelText !== ''): ?>
+                        <span class="profile-faceit-next"><?= htmlspecialchars($faceitNextLevelText, ENT_QUOTES, 'UTF-8') ?></span>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
