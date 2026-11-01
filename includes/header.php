@@ -63,7 +63,7 @@ $isPageActive = static function (array $pages) use ($current_page): string {
     return in_array($current_page, $pages, true) ? 'active' : '';
 };
 
-$morePages = ['buyserveropen', 'buyserver', 'launcher', 'leaderboard', 'leaderboard_vps', 'banlist', 'vip'];
+$morePages = ['buyserveropen', 'buyserver', 'launcher', 'leaderboard', 'leaderboard_vps', 'banlist', 'vip', 'serverguide'];
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
@@ -257,6 +257,7 @@ $mobileMoreNavItems = [
     ['leaderboard', 'لیدربورد', 'fa-trophy', ['leaderboard', 'leaderboard_vps']],
     ['banlist', 'لیست محرومیت‌ها', 'fa-gavel', ['banlist']],
     ['vip', 'VIP', 'fa-crown', ['vip']],
+    ['serverguide', 'راهنمای سرور', 'fa-book-open', ['serverguide']],
 ];
 ?>
 
@@ -312,6 +313,9 @@ $mobileMoreNavItems = [
                     </a>
                     <a href="?page=vip" class="frag-drop-link <?= $isPageActive(['vip']) ?>" data-ajax-nav data-slug="vip">
                         <i class="fas fa-crown"></i><span>VIP</span>
+                    </a>
+                    <a href="?page=serverguide" class="frag-drop-link <?= $isPageActive(['serverguide']) ?>" data-ajax-nav data-slug="serverguide">
+                        <i class="fas fa-book-open"></i><span>راهنمای سرور</span>
                     </a>
                 </div>
             </div>
