@@ -2040,3 +2040,42 @@
 .site-body .main-content.main-content--home {
     padding-bottom: var(--fc-page-safe-bottom, 64px) !important;
 }
+
+
+/* Server Guide remains a tertiary action beside the two main landing CTAs. */
+.home-button-guide {
+    min-height: 52px;
+    padding-inline: 10px;
+    border-color: transparent;
+    background: transparent;
+    color: #aaaeb8;
+    box-shadow: none;
+    font-weight: 750;
+}
+
+.home-button-guide i {
+    color: #F97316;
+    font-size: .92rem;
+    transition: color .22s ease, transform .22s ease;
+}
+
+.home-button-guide:hover {
+    border-color: rgba(249, 115, 22, .12);
+    background: rgba(249, 115, 22, .055);
+    color: #fff;
+    box-shadow: none;
+}
+
+.home-button-guide:hover i {
+    color: #FFB347;
+    transform: translateX(-2px);
+}
+
+@media (max-width: 560px) {
+    .home-hero-actions .home-button-guide {
+        width: auto;
+        min-height: 40px;
+        align-self: flex-start;
+        padding-inline: 5px;
+    }
+}
