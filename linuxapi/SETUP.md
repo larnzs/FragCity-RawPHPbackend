@@ -216,8 +216,8 @@ chmod 0600 "$SQL_FILE"
 cat > "$SQL_FILE" <<SQL
 CREATE USER 'fragcity_weaponpaints_api'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';
 
-GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_skins TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_skin_inventory TO 'fragcity_weaponpaints_api'@'127.0.0.1';
+GRANT SELECT, INSERT, UPDATE, DELETE ON GLOBAL_weaponpaints.wp_player_skins TO 'fragcity_weaponpaints_api'@'127.0.0.1';
+GRANT SELECT, INSERT, UPDATE, DELETE ON GLOBAL_weaponpaints.wp_player_skin_inventory TO 'fragcity_weaponpaints_api'@'127.0.0.1';
 GRANT INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_gloves TO 'fragcity_weaponpaints_api'@'127.0.0.1';
 GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_knife TO 'fragcity_weaponpaints_api'@'127.0.0.1';
 GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_agents TO 'fragcity_weaponpaints_api'@'127.0.0.1';
@@ -264,8 +264,12 @@ The nonce table grant includes SELECT intentionally. The API cleanup query check
 The current installation created the account and config before this guide was added. Do not recreate the user or overwrite the existing config. After creating `wp_player_skin_inventory` with the schema migration above, grant the existing API account access to it. Preserve the nonce permissions as well:
 
 ~~~sql
-GRANT SELECT, INSERT, UPDATE
+GRANT SELECT, INSERT, UPDATE, DELETE
 ON GLOBAL_weaponpaints.wp_player_skin_inventory
+TO 'fragcity_weaponpaints_api'@'127.0.0.1';
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON GLOBAL_weaponpaints.wp_player_skins
 TO 'fragcity_weaponpaints_api'@'127.0.0.1';
 
 GRANT SELECT, INSERT, DELETE
@@ -277,9 +281,29 @@ SHOW GRANTS FOR 'fragcity_weaponpaints_api'@'127.0.0.1';
 
 Run that SQL in MariaDB (for example, via sudo mariadb). If MariaDB reports that this exact account/host does not exist, inspect mysql.user and SHOW GRANTS first; do not create an additional host entry by guesswork.
 
+### Skin inventory delete permissions
+
+The website's Inventory X action removes exactly one row by SteamID, team, weapon defindex and paint ID. The API also removes the matching active `wp_player_skins` row only when that row points to the same paint. It does not touch other paints, teams or players.
+
+For an existing installation, the API account needs DELETE permission on only these two WeaponPaints tables in addition to its existing read/write grants:
+
+~~~sql
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON GLOBAL_weaponpaints.wp_player_skin_inventory
+TO 'fragcity_weaponpaints_api'@'127.0.0.1';
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+ON GLOBAL_weaponpaints.wp_player_skins
+TO 'fragcity_weaponpaints_api'@'127.0.0.1';
+
+SHOW GRANTS FOR 'fragcity_weaponpaints_api'@'127.0.0.1';
+~~~
+
+Run once in MariaDB after reviewing the existing account. Do not recreate the account or change its password/config for this permission update.
+
 ## 6. Deploy the updated API runtime files
 
-Only run this after the schema migration has completed and the API account has `SELECT, INSERT, UPDATE` privileges on `GLOBAL_weaponpaints.wp_player_skin_inventory` (Section 4 grants this on a fresh install; Section 5 grants it to the existing account). Run it from the repository root on the Debian host.
+Only run this after the schema migration has completed and the API account has `SELECT, INSERT, UPDATE, DELETE` privileges on both `wp_player_skin_inventory` and `wp_player_skins` (Section 4 grants these on a fresh install; Section 5 grants them to the existing account). Run it from the repository root on the Debian host.
 
 ~~~bash
 sudo cp -a linuxapi/. /var/www/fragcity-api/
