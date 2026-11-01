@@ -91,6 +91,7 @@ Catalog item fields:
 | `plugin` | Exact plugin name responsible for the feature. |
 | `source_url` | HTTPS link to the relevant vendor docs or package source. |
 | `availability` | One of `default`, `config`, `mode`, `verify`, or `disabled`. |
+| `risk` | One of `high`, `action`, `info`, or `safe`; describes direct operational impact. |
 | `availability_note` | Explains conditional activation, configuration, or verification requirements. |
 | `example` | Optional, verified command example. |
 | `note` | Optional safety or usage caveat. |
@@ -142,3 +143,15 @@ php linuxapi/tools/architecture-check.php
 ## Accuracy rule
 
 The catalog describes a particular tracked package snapshot. It is not a replacement for the installed server's live plugin state. A file under `configs/plugins/` proves that a configuration file is tracked; it does not prove the corresponding plugin is loaded. A DLL under `plugins/disabled/` is not a globally active plugin. Always preserve this distinction in the public guide.
+
+
+## Operational impact colors
+
+Every catalog entry has a `risk` value. The guide uses restrained tones adjacent to FragCity's existing orange and warm-orange palette:
+
+- `high`: muted red for player sanctions, permission/privilege changes, RCON, or similarly high-impact administration.
+- `action`: orange for commands that change a map, mode, round, player state, or server setting.
+- `info`: warm amber for read-only information, lists, and status displays.
+- `safe`: neutral silver for low-impact personal or practice actions.
+
+These colors classify expected impact, not authorization. The `access` field remains the source for required permissions. Player voting commands are marked as state-changing requests; they are not equivalent to direct admin sanctions because the vote must still pass the plugin's configured threshold.
