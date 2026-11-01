@@ -123,6 +123,7 @@ try {
     $standbyDocs = $read('docs/PTERODACTYL-STANDBY-API.md');
     $publicDocs = $read('docs/PUBLIC-SERVER-SCANNER.md');
     $serverGuidePage = $read('pages/serverguide.php');
+    $homePage = $read('pages/home.php');
     $serverGuideStylesheet = $read('css/serverguide.css');
     $serverGuideJavascript = $read('js/serverguide.js');
     $serverGuideDocs = $read('docs/SERVER-GUIDE.md');
@@ -892,12 +893,16 @@ $check(
 );
 
 $check(
-    'Server Guide is registered as a native PHP page with dedicated versioned CSS and JavaScript',
+    'Server Guide is reachable from primary navigation, the home page, and the server directory',
     str_contains($websiteIndex, "'serverguide',")
         && str_contains($websiteIndex, "'serverguide' => [")
         && str_contains($websiteIndex, '/css/serverguide.css?v=')
         && str_contains($websiteIndex, '/js/serverguide.js?v=')
-        && str_contains($siteHeaderMarkup, "?page=serverguide")
+        && str_contains($siteHeaderMarkup, 'shock-nav-item--guide')
+        && str_contains($siteHeaderMarkup, 'fa-book-open')
+        && str_contains($siteHeaderMarkup, "['serverguide', 'راهنمای سرور', 'fa-book-open', ['serverguide']]")
+        && str_contains($homePage, 'home-button-guide')
+        && str_contains($publicPage, 'sl-guide-action')
         && str_contains($footerMarkup, "?page=serverguide")
 );
 
