@@ -12860,3 +12860,116 @@ html.fc-no-animation .wp-app .wp-sidebar .wp-search-wrap {
         scroll-behavior: auto;
     }
 }
+
+
+/* Active category label reveal: inactive tabs stay icon-only. */
+.wp-app .wp-sidebar-tabs .wp-tab {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    min-height: 42px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    overflow: hidden !important;
+    justify-content: center !important;
+    transition:
+        width 260ms cubic-bezier(.22, .61, .36, 1),
+        min-width 260ms cubic-bezier(.22, .61, .36, 1),
+        max-width 260ms cubic-bezier(.22, .61, .36, 1),
+        padding 260ms ease,
+        gap 260ms ease,
+        background-color 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-label {
+    display: inline-block !important;
+    flex: 0 1 auto !important;
+    width: auto !important;
+    max-width: 0;
+    margin: 0 !important;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(7px);
+    color: inherit !important;
+    font-size: .67rem !important;
+    font-weight: 750;
+    line-height: 1.1;
+    white-space: nowrap;
+    transition:
+        max-width 260ms cubic-bezier(.22, .61, .36, 1),
+        opacity 180ms ease,
+        transform 260ms cubic-bezier(.22, .61, .36, 1),
+        visibility 0s linear 260ms;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab.is-active,
+.wp-app .wp-sidebar-tabs .wp-tab.active {
+    width: auto !important;
+    min-width: 108px !important;
+    max-width: 190px !important;
+    padding: 0 11px !important;
+    gap: 8px !important;
+    justify-content: center !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab.is-active > .wp-tab-label,
+.wp-app .wp-sidebar-tabs .wp-tab.active > .wp-tab-label {
+    max-width: 150px;
+    margin-inline-start: 1px !important;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition-delay: 0s, 55ms, 0s, 0s;
+}
+
+/* Music and Pin source glyphs are visually smaller than the weapon silhouettes. */
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/music_kit.svg"] {
+    flex: 0 0 14px !important;
+    width: 14px !important;
+    min-width: 14px !important;
+    max-width: 14px !important;
+    height: 14px !important;
+    min-height: 14px !important;
+    max-height: 14px !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/pin.svg"] {
+    flex: 0 0 13px !important;
+    width: 13px !important;
+    min-width: 13px !important;
+    max-width: 13px !important;
+    height: 15px !important;
+    min-height: 15px !important;
+    max-height: 15px !important;
+}
+
+@media (max-width: 760px) {
+    .wp-app .wp-sidebar-tabs .wp-tab {
+        width: 44px !important;
+        min-width: 44px !important;
+        max-width: 44px !important;
+        min-height: 39px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab.is-active,
+    .wp-app .wp-sidebar-tabs .wp-tab.active {
+        min-width: 96px !important;
+        max-width: min(170px, 54vw) !important;
+        padding-inline: 8px !important;
+        gap: 6px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-label {
+        font-size: .59rem !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wp-app .wp-sidebar-tabs .wp-tab,
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-label {
+        transition: none !important;
+    }
+}
