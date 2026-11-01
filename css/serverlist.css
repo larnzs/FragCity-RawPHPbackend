@@ -3826,3 +3826,345 @@ html.fc-no-animation .sl-player-modal-backdrop {
     margin-top: 9px;
     padding-top: 8px;
 }
+
+
+/* Guy mascot — layered hero artwork and responsive HUD accents. */
+.sl-hero {
+    grid-template-columns: minmax(0, 1.12fr) minmax(285px, .78fr);
+}
+
+.sl-hero-copy {
+    position: relative;
+    z-index: 5;
+}
+
+.sl-hero-mascot {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 390px);
+    min-width: 0;
+    height: clamp(280px, 29vw, 390px);
+    aspect-ratio: auto;
+    justify-self: center;
+    align-self: center;
+    display: grid;
+    place-items: end center;
+    overflow: visible;
+    isolation: isolate;
+    transform: none;
+    filter: none;
+}
+
+.sl-mascot-glow {
+    position: absolute;
+    z-index: -3;
+    width: 82%;
+    height: 72%;
+    left: 7%;
+    bottom: 4%;
+    border-radius: 50%;
+    background:
+        radial-gradient(ellipse, rgba(249, 115, 22, .28) 0%, rgba(249, 115, 22, .10) 38%, transparent 72%);
+    filter: blur(18px);
+    animation: sl-mascot-glow 5.5s ease-in-out infinite;
+}
+
+.sl-mascot-orbit {
+    position: absolute;
+    z-index: -2;
+    left: 10%;
+    bottom: 9%;
+    width: 78%;
+    aspect-ratio: 1;
+    border: 1px solid rgba(249, 115, 22, .28);
+    border-radius: 50%;
+    box-shadow: 0 0 32px rgba(249, 115, 22, .07), inset 0 0 30px rgba(249, 115, 22, .035);
+    transform: scaleY(.52) rotate(-17deg);
+    animation: sl-mascot-orbit 18s linear infinite;
+}
+
+.sl-mascot-orbit--inner {
+    left: 20%;
+    bottom: 17%;
+    width: 58%;
+    border-color: rgba(255, 179, 71, .30);
+    transform: scaleY(.60) rotate(28deg);
+    animation-duration: 23s;
+    animation-direction: reverse;
+}
+
+.sl-mascot-grid {
+    position: absolute;
+    z-index: -2;
+    inset: 12% 5% 5%;
+    border: 1px solid rgba(255, 179, 71, .12);
+    border-radius: 30px 30px 70px 30px;
+    background:
+        linear-gradient(135deg, rgba(249, 115, 22, .08), transparent 54%),
+        repeating-linear-gradient(0deg, transparent 0 22px, rgba(255, 255, 255, .028) 23px 24px),
+        repeating-linear-gradient(90deg, transparent 0 22px, rgba(255, 255, 255, .028) 23px 24px);
+    transform: perspective(500px) rotateY(10deg) rotateZ(-5deg);
+    box-shadow: inset 0 0 55px rgba(249, 115, 22, .045);
+}
+
+.sl-mascot-aim-line {
+    position: absolute;
+    z-index: 0;
+    top: 55%;
+    right: -7%;
+    width: 34%;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(249, 115, 22, .72), rgba(255, 179, 71, .22), transparent);
+    box-shadow: 0 0 10px rgba(249, 115, 22, .28);
+    pointer-events: none;
+}
+
+.sl-mascot-aim-line::after {
+    content: "";
+    position: absolute;
+    top: -3px;
+    right: 0;
+    width: 7px;
+    height: 7px;
+    border: 1px solid rgba(255, 179, 71, .85);
+    border-radius: 50%;
+    background: #17110d;
+    box-shadow: 0 0 12px rgba(249, 115, 22, .55);
+}
+
+.sl-hero-guy {
+    position: absolute;
+    z-index: 3;
+    inset: auto 0 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    filter:
+        drop-shadow(0 20px 30px rgba(0, 0, 0, .42))
+        drop-shadow(0 0 18px rgba(249, 115, 22, .13));
+    transform: translateY(5px);
+    animation: sl-guy-arrive 850ms cubic-bezier(.2, .75, .25, 1) both;
+}
+
+.sl-mascot-tag {
+    position: absolute;
+    z-index: 4;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 9px;
+    border: 1px solid rgba(255, 179, 71, .22);
+    border-radius: 8px;
+    background: rgba(13, 13, 13, .78);
+    color: #e6a16b;
+    font: 800 .54rem/1 var(--fc-font-sans);
+    letter-spacing: .12em;
+    white-space: nowrap;
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, .22);
+}
+
+.sl-mascot-tag--top {
+    top: 8%;
+    left: 1%;
+}
+
+.sl-mascot-tag--bottom {
+    right: 2%;
+    bottom: 12%;
+    color: #a9a29a;
+    border-color: rgba(255, 255, 255, .10);
+}
+
+.sl-mascot-target {
+    position: absolute;
+    z-index: 4;
+    top: 48%;
+    right: 4%;
+    width: 29px;
+    height: 29px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(249, 115, 22, .42);
+    border-radius: 9px;
+    background: rgba(19, 15, 12, .82);
+    color: #ffae70;
+    font-size: .78rem;
+    box-shadow: 0 0 20px rgba(249, 115, 22, .16);
+    animation: sl-mascot-target 3.8s ease-in-out infinite;
+}
+
+@keyframes sl-mascot-orbit {
+    to { rotate: 360deg; }
+}
+
+@keyframes sl-mascot-glow {
+    0%, 100% { opacity: .60; transform: scale(.94); }
+    50% { opacity: 1; transform: scale(1.06); }
+}
+
+@keyframes sl-mascot-target {
+    0%, 100% { opacity: .72; transform: scale(.94); }
+    50% { opacity: 1; transform: scale(1.06); }
+}
+
+@keyframes sl-guy-arrive {
+    from { opacity: 0; transform: translate3d(-10px, 18px, 0); }
+    to { opacity: 1; transform: translate3d(0, 5px, 0); }
+}
+
+@media (max-width: 1100px) and (min-width: 761px) {
+    .sl-hero {
+        grid-template-columns: minmax(0, 1fr) minmax(235px, .62fr);
+        gap: 14px;
+    }
+
+    .sl-hero-mascot {
+        height: clamp(245px, 30vw, 320px);
+    }
+
+    .sl-mascot-tag {
+        font-size: .48rem;
+        padding: 6px 7px;
+    }
+}
+
+@media (max-width: 760px) {
+    .sl-hero {
+        grid-template-columns: minmax(0, 1fr) minmax(125px, .46fr);
+        align-items: center;
+        gap: 5px;
+        min-height: 0;
+    }
+
+    .sl-hero-copy {
+        min-width: 0;
+    }
+
+    .sl-hero-mascot {
+        display: grid !important;
+        width: 100%;
+        height: clamp(190px, 42vw, 245px);
+        min-width: 0;
+        align-self: end;
+    }
+
+    .sl-mascot-grid {
+        inset: 12% 0 5%;
+        border-radius: 20px;
+    }
+
+    .sl-mascot-tag {
+        font-size: .43rem;
+        padding: 5px 6px;
+    }
+
+    .sl-mascot-tag--top {
+        top: 5%;
+        left: 0;
+    }
+
+    .sl-mascot-tag--bottom {
+        right: 0;
+        bottom: 8%;
+    }
+
+    .sl-mascot-target {
+        top: 45%;
+        right: 0;
+        width: 23px;
+        height: 23px;
+        font-size: .65rem;
+    }
+
+    .sl-mascot-aim-line {
+        right: -4%;
+        width: 25%;
+    }
+
+    .sl-hero h1 {
+        font-size: clamp(1.55rem, 6.1vw, 2.05rem);
+        line-height: 1.42;
+    }
+
+    .sl-hero-actions {
+        gap: 8px;
+        margin-top: 18px;
+    }
+
+    .sl-hero-signals {
+        gap: 7px 11px;
+        margin-top: 17px;
+    }
+}
+
+@media (max-width: 480px) {
+    .sl-hero {
+        grid-template-columns: minmax(0, 1fr) minmax(108px, .40fr);
+        gap: 0;
+        padding: 20px 13px;
+    }
+
+    .sl-hero-mascot {
+        height: 190px;
+        margin-inline-start: -4px;
+    }
+
+    .sl-hero h1 {
+        font-size: clamp(1.45rem, 6.4vw, 1.8rem);
+        margin-top: 12px;
+    }
+
+    .sl-hero-copy > p {
+        font-size: .72rem;
+        line-height: 1.85;
+    }
+
+    .sl-hero-actions {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .sl-primary-action,
+    .sl-secondary-action {
+        min-height: 37px;
+        padding: 8px 11px;
+        font-size: .66rem;
+    }
+
+    .sl-hero-signals {
+        font-size: .57rem;
+    }
+
+    .sl-mascot-tag {
+        font-size: .38rem;
+        letter-spacing: .06em;
+    }
+
+    .sl-mascot-tag--bottom {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sl-mascot-glow,
+    .sl-mascot-orbit,
+    .sl-mascot-target,
+    .sl-hero-guy {
+        animation: none !important;
+        transform: none !important;
+    }
+}
+
+html.fc-no-animation .sl-mascot-glow,
+html.fc-no-animation .sl-mascot-orbit,
+html.fc-no-animation .sl-mascot-target,
+html.fc-no-animation .sl-hero-guy {
+    animation: none !important;
+    transform: none !important;
+}
