@@ -568,6 +568,38 @@
         );
     }
 
+        function applyProfileProgressBars(root) {
+        const bars = root.querySelectorAll('.xp-bar[data-progress]');
+
+        bars.forEach(function (bar) {
+            const rawProgress = Number(bar.getAttribute('data-progress'));
+            const progress = Number.isFinite(rawProgress)
+                ? Math.max(0, Math.min(100, rawProgress))
+                : 0;
+            const progressKey = progress.toFixed(2);
+
+            if (bar.dataset.wpAppliedProgress === progressKey) {
+                return;
+            }
+
+            bar.dataset.wpAppliedProgress = progressKey;
+            bar.setAttribute('aria-valuenow', progressKey);
+
+            if (document.documentElement.classList.contains('fc-no-animation')) {
+                bar.style.width = progressKey + '%';
+                return;
+            }
+
+            bar.style.width = '0%';
+            window.requestAnimationFrame(function () {
+                if (bar.isConnected) {
+                    bar.style.width = progressKey + '%';
+                }
+            });
+        });
+    }
+
+
     function initProfilePage() {
         const root =
             document.querySelector(
@@ -575,7 +607,8 @@
             );
 
         if (root) {
-            bindProfilePage(root);
+            bindProfilePage(root);
+            applyProfileProgressBars(root);
         }
     }
 
