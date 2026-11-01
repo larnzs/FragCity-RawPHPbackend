@@ -316,7 +316,29 @@
     }
 
 
+    function clearWpToast() {
+
+        const toast =
+            document.getElementById('wpToastRuntime');
+
+        if (!toast) {
+            return;
+        }
+
+        window.clearTimeout(toast.__wpToastTimer);
+        toast.remove();
+
+    }
+
+
     function showWpToast(message, type = 'info') {
+
+        // WeaponPaints notifications must never outlive their page stylesheet.
+        // AJAX navigation can unload weaponpaints.css while the script remains cached.
+        if (!document.querySelector('.wp-app')) {
+            clearWpToast();
+            return;
+        }
 
         let toast =
             document.getElementById('wpToastRuntime');
@@ -359,6 +381,11 @@
     }
 
     function showWeaponPaintsScrollHint() {
+
+        if (!document.querySelector('.wp-app')) {
+            clearWpToast();
+            return;
+        }
 
         const now = Date.now();
 
@@ -7535,6 +7562,11 @@
         'pageshow',
         () => {
 
+            if (!document.querySelector('.wp-app')) {
+                clearWpToast();
+                return;
+            }
+
             setPageReady();
 
             applyWeaponPaintsLayoutMode();
@@ -7553,17 +7585,23 @@
             state.navigationLocked =
                 false;
 
+            clearWpToast();
+
         }
     );
 
     window.addEventListener('content-loaded', event => {
         const page = event.detail && event.detail.page;
-        if (page === 'skins' && document.querySelector('.wp-app')) {
+        const hasWeaponPaintsPage = Boolean(document.querySelector('.wp-app'));
+
+        if (page === 'skins' && hasWeaponPaintsPage) {
             init();
             return;
         }
 
-        if ((page && page !== 'skins') || !document.querySelector('.wp-app')) {
+        if ((page && page !== 'skins') || !hasWeaponPaintsPage) {
+            // Remove body-level toast before the WeaponPaints stylesheet is unloaded.
+            clearWpToast();
             removeFloatingPagination();
         }
     });
