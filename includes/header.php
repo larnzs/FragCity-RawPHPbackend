@@ -169,6 +169,64 @@ $headerFaceitStatusLabel = [
     'steam_id_missing' => 'SteamID در دسترس نیست',
 ][$headerFaceitStatus] ?? 'اطلاعات FACEIT در دسترس نیست';
 
+$headerFaceitEloCandidate = $headerFaceitProfile['faceit_elo'] ?? null;
+$headerFaceitElo = is_numeric($headerFaceitEloCandidate) ? (int)$headerFaceitEloCandidate : null;
+if ($headerFaceitElo !== null && ($headerFaceitElo < 100 || $headerFaceitElo > 100000)) {
+    $headerFaceitElo = null;
+}
+
+$headerFaceitLevels = [
+    1 => ['min' => 100, 'next' => 501],
+    2 => ['min' => 501, 'next' => 751],
+    3 => ['min' => 751, 'next' => 901],
+    4 => ['min' => 901, 'next' => 1051],
+    5 => ['min' => 1051, 'next' => 1201],
+    6 => ['min' => 1201, 'next' => 1351],
+    7 => ['min' => 1351, 'next' => 1531],
+    8 => ['min' => 1531, 'next' => 1751],
+    9 => ['min' => 1751, 'next' => 2001],
+    10 => ['min' => 2001, 'next' => null],
+];
+
+if ($headerFaceitLevel === null && $headerFaceitElo !== null) {
+    foreach ($headerFaceitLevels as $candidateLevel => $range) {
+        if ($headerFaceitElo >= $range['min']) {
+            $headerFaceitLevel = $candidateLevel;
+        } else {
+            break;
+        }
+    }
+}
+
+$headerFaceitDisplayLevel = $headerFaceitLevel ?? 0;
+$headerFaceitRankColors = [
+    0 => '#CDCDCD',
+    1 => '#EEEEEE',
+    2 => '#1CE400',
+    3 => '#1CE400',
+    4 => '#FFC800',
+    5 => '#FFC800',
+    6 => '#FFC800',
+    7 => '#FFC800',
+    8 => '#FF6309',
+    9 => '#FF6309',
+    10 => '#FE1F00',
+];
+$headerFaceitRankColor = $headerFaceitRankColors[$headerFaceitDisplayLevel] ?? '#CDCDCD';
+$headerFaceitProgress = 0.0;
+
+if ($headerFaceitDisplayLevel === 10) {
+    $headerFaceitProgress = 100.0;
+} elseif ($headerFaceitDisplayLevel > 0 && $headerFaceitElo !== null) {
+    $headerFaceitRange = $headerFaceitLevels[$headerFaceitDisplayLevel];
+    $headerFaceitRangeWidth = max(1, (int)$headerFaceitRange['next'] - (int)$headerFaceitRange['min']);
+    $headerFaceitProgress = (($headerFaceitElo - (int)$headerFaceitRange['min']) / $headerFaceitRangeWidth) * 100;
+    $headerFaceitProgress = max(0, min(100, $headerFaceitProgress));
+}
+$headerFaceitEloLabel = $headerFaceitElo !== null
+    ? number_format($headerFaceitElo) . ' ELO'
+    : '— ELO';
+
 // Keep the two most-used destinations visible at the top of the mobile drawer.
 $mobileNavItems = [
     ['servers_vps', 'لیست سرورها', 'fa-server', ['servers_vps', 'servers']],
@@ -295,16 +353,35 @@ $mobileMoreNavItems = [
                                         <span class="frag-drop-playing">در حال بازی: <?= htmlspecialchars($headerSteamGame, ENT_QUOTES, 'UTF-8') ?></span>
                                     <?php endif; ?>
                                 </div>
-                                <div class="frag-drop-faceit" data-status="<?= htmlspecialchars($headerFaceitStatus, ENT_QUOTES, 'UTF-8') ?>">
-                                    <span class="frag-drop-faceit__label">FACEIT LEVEL</span>
-                                    <span class="frag-drop-faceit__value">
-                                        <?php if ($headerFaceitLevel !== null): ?>
-                                            <img src="/img/faceit/<?= $headerFaceitLevel ?>.svg" alt="" aria-hidden="true" width="28" height="28">
-                                            <strong>Level <?= $headerFaceitLevel ?></strong>
-                                        <?php else: ?>
-                                            <span><?= htmlspecialchars($headerFaceitStatusLabel, ENT_QUOTES, 'UTF-8') ?></span>
-                                        <?php endif; ?>
-                                    </span>
+                                <div
+                                    class="frag-drop-faceit"
+                                    data-status="<?= htmlspecialchars($headerFaceitStatus, ENT_QUOTES, 'UTF-8') ?>"
+                                    data-faceit-level="<?= $headerFaceitDisplayLevel ?>"
+                                    style="--faceit-rank-color: <?= htmlspecialchars($headerFaceitRankColor, ENT_QUOTES, 'UTF-8') ?>;"
+                                >
+                                    <div class="frag-drop-faceit__top">
+                                        <span class="frag-drop-faceit__rank">
+                                            <img
+                                                src="/img/faceit/<?= $headerFaceitDisplayLevel ?>.svg"
+                                                alt=""
+                                                aria-hidden="true"
+                                                width="27"
+                                                height="27"
+                                            >
+                                            <strong><?= $headerFaceitDisplayLevel > 0 ? 'Level ' . $headerFaceitDisplayLevel : 'Unranked' ?></strong>
+                                        </span>
+                                        <strong class="frag-drop-faceit__elo"><?= htmlspecialchars($headerFaceitEloLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                                    </div>
+                                    <div
+                                        class="frag-drop-faceit__progress"
+                                        role="progressbar"
+                                        aria-label="FACEIT progress to next level"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                        aria-valuenow="<?= htmlspecialchars((string)round($headerFaceitProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
+                                    >
+                                        <span style="width: <?= htmlspecialchars((string)round($headerFaceitProgress, 2), ENT_QUOTES, 'UTF-8') ?>%;"></span>
+                                    </div>
                                 </div>
                                 <div class="frag-drop-detail-grid">
                                     <div class="frag-drop-detail"><span>وضعیت پروفایل</span><strong><?= htmlspecialchars($headerSteamVisibility, ENT_QUOTES, 'UTF-8') ?></strong></div>
