@@ -134,6 +134,41 @@ if (!is_array($steamUrlParts) || strtolower((string)($steamUrlParts['scheme'] ??
     $headerSteamProfileUrl = '';
 }
 
+// Resolve the authenticated player's CS2 FACEIT level through the shared,
+// server-side cache. The API key remains in PHP and is never sent to the client.
+$headerFaceitProfile = [];
+$headerFaceitLevel = null;
+$headerFaceitStatus = 'api_unavailable';
+if ($isLoggedIn && preg_match('/^7656119[0-9]{10}$/D', $headerSteamId64)) {
+    try {
+        require_once __DIR__ . '/../class/FaceitApiClient.php';
+        $headerFaceitRows = (new FaceitApiClient())->enrichPlayers([
+            ['steam_id' => $headerSteamId64],
+        ]);
+        $headerFaceitProfile = is_array($headerFaceitRows[0] ?? null)
+            ? $headerFaceitRows[0]
+            : [];
+        $candidateLevel = $headerFaceitProfile['faceit_level'] ?? null;
+        $headerFaceitLevel = is_numeric($candidateLevel)
+            && (int)$candidateLevel >= 1
+            && (int)$candidateLevel <= 10
+                ? (int)$candidateLevel
+                : null;
+        $headerFaceitStatus = (string)($headerFaceitProfile['faceit_status'] ?? 'api_unavailable');
+    } catch (Throwable $faceitError) {
+        error_log('[FragCity] Header FACEIT lookup unavailable.');
+    }
+}
+
+$headerFaceitStatusLabel = [
+    'unranked' => 'هنوز رتبه‌ای ثبت نشده',
+    'no_cs2_profile' => 'پروفایل CS2 پیدا نشد',
+    'profile_not_found' => 'اکانت FACEIT پیدا نشد',
+    'api_not_configured' => 'اتصال FACEIT تنظیم نشده',
+    'api_unavailable' => 'اطلاعات موقتاً در دسترس نیست',
+    'steam_id_missing' => 'SteamID در دسترس نیست',
+][$headerFaceitStatus] ?? 'اطلاعات FACEIT در دسترس نیست';
+
 // Keep the two most-used destinations visible at the top of the mobile drawer.
 $mobileNavItems = [
     ['servers_vps', 'لیست سرورها', 'fa-server', ['servers_vps', 'servers']],
@@ -259,6 +294,17 @@ $mobileMoreNavItems = [
                                     <?php if ($headerSteamGame !== ''): ?>
                                         <span class="frag-drop-playing">در حال بازی: <?= htmlspecialchars($headerSteamGame, ENT_QUOTES, 'UTF-8') ?></span>
                                     <?php endif; ?>
+                                </div>
+                                <div class="frag-drop-faceit" data-status="<?= htmlspecialchars($headerFaceitStatus, ENT_QUOTES, 'UTF-8') ?>">
+                                    <span class="frag-drop-faceit__label">FACEIT LEVEL</span>
+                                    <span class="frag-drop-faceit__value">
+                                        <?php if ($headerFaceitLevel !== null): ?>
+                                            <img src="/img/faceit/<?= $headerFaceitLevel ?>.svg" alt="" aria-hidden="true" width="28" height="28">
+                                            <strong>Level <?= $headerFaceitLevel ?></strong>
+                                        <?php else: ?>
+                                            <span><?= htmlspecialchars($headerFaceitStatusLabel, ENT_QUOTES, 'UTF-8') ?></span>
+                                        <?php endif; ?>
+                                    </span>
                                 </div>
                                 <div class="frag-drop-detail-grid">
                                     <div class="frag-drop-detail"><span>وضعیت پروفایل</span><strong><?= htmlspecialchars($headerSteamVisibility, ENT_QUOTES, 'UTF-8') ?></strong></div>
