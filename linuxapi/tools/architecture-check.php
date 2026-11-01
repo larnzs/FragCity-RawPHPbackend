@@ -946,11 +946,17 @@ $check(
 );
 
 $check(
-    'Server Guide uses the shared viewport reveal controller on direct and AJAX page loads',
-    str_contains($serverGuidePage, 'data-fc-reveal="up"')
-        && str_contains($serverGuidePage, 'data-fc-reveal="left"')
-        && str_contains($serverGuideJavascript, 'FragCityMotion.refresh')
-        && str_contains($motionJavascript, '[data-fc-reveal]')
+    'Server Guide uses WeaponPaints-style page-fader entrances and Server Browser-style viewport reveals',
+    str_contains($serverGuidePage, 'sg-page-fader')
+        && str_contains($serverGuidePage, 'data-sg-reveal="up"')
+        && str_contains($serverGuidePage, 'data-sg-reveal="left"')
+        && str_contains($serverGuideJavascript, 'setupPageMotion')
+        && str_contains($serverGuideJavascript, 'requestAnimationFrame')
+        && str_contains($serverGuideJavascript, 'IntersectionObserver')
+        && str_contains($serverGuideJavascript, "window.addEventListener('content-loaded', initServerGuide)")
+        && str_contains($serverGuideStylesheet, '.sg-page-fader.sg-page-ready')
+        && str_contains($serverGuideStylesheet, '.sg-revealed')
+        && str_contains($serverGuideStylesheet, '@keyframes sg-orbit-float')
 );
 
 $check(
