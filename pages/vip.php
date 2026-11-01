@@ -198,10 +198,17 @@ $vipCurrentStatus = !$isLoggedIn
             <h2>پلن‌های VIP</h2>
             <p>با انتخاب هر سطح، تمام قابلیت‌های همان سطح را مشاهده می‌کنی.</p>
         </div>
-        <a class="vip-wallet-shortcut" href="?page=wallet" data-ajax-nav data-slug="wallet">
-            <i class="fas fa-wallet" aria-hidden="true"></i>
-            کیف پول و شارژ حساب
-        </a>
+        <?php if ($isLoggedIn): ?>
+            <button type="button" class="vip-wallet-shortcut" data-fc-wallet-charge-open>
+                <i class="fas fa-wallet" aria-hidden="true"></i>
+                شارژ کیف پول
+            </button>
+        <?php else: ?>
+            <a class="vip-wallet-shortcut" href="?page=login" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
+                <i class="fas fa-wallet" aria-hidden="true"></i>
+                ورود برای شارژ کیف پول
+            </a>
+        <?php endif; ?>
     </div>
 
     <aside class="vip-competitive-note" role="note">
@@ -309,10 +316,17 @@ $vipCurrentStatus = !$isLoggedIn
                 خرید آنلاین به‌زودی فعال می‌شود
                 <i class="fas fa-lock" aria-hidden="true"></i>
             </button>
-            <a href="?page=wallet" data-ajax-nav data-slug="wallet" class="vip-checkout-wallet">
-                <i class="fas fa-wallet" aria-hidden="true"></i>
-                کیف پول
-            </a>
+            <?php if ($isLoggedIn): ?>
+                <button type="button" class="vip-checkout-wallet" data-fc-wallet-charge-open>
+                    <i class="fas fa-wallet" aria-hidden="true"></i>
+                    شارژ کیف پول
+                </button>
+            <?php else: ?>
+                <a href="?page=login" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" class="vip-checkout-wallet">
+                    <i class="fas fa-wallet" aria-hidden="true"></i>
+                    ورود
+                </a>
+            <?php endif; ?>
         </div>
     </aside>
 
