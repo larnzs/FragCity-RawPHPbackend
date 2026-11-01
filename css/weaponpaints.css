@@ -11246,7 +11246,7 @@ html.fc-no-animation .wp-app .wp-main .tab-content > .tab-pane {
     justify-content: flex-start;
     gap: 5px;
     width: 100%;
-    max-height: min(58vh, calc(100dvh - var(--fc-header-overlap-height, 72px) - 220px));
+    max-height: min(58vh, calc(100dvh - var(--fc-header-overlap-height, 72px) - 360px));
     min-width: 0;
     margin: 0;
     padding: 0 0 2px;
@@ -11477,6 +11477,8 @@ html.fc-no-animation .wp-app .wp-main .tab-content > .tab-pane {
 }
 
 .wp-app .wp-sidebar .wp-team-switcher .wp-team-btn {
+    position: relative;
+    isolation: isolate;
     display: flex !important;
     flex: 0 0 34px !important;
     align-items: center;
@@ -11520,6 +11522,29 @@ html.fc-no-animation .wp-app .wp-main .tab-content > .tab-pane {
     box-shadow:
         0 4px 14px rgba(249, 115, 22, .10),
         inset 0 1px 0 rgba(255, 255, 255, .06) !important;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    bottom: -3px;
+    width: 20px;
+    height: 2px;
+    border-radius: 999px;
+    background: #F97316;
+    opacity: .16;
+    filter: blur(4px);
+    transform: translateX(-50%);
+    box-shadow: 0 0 8px 2px rgba(249, 115, 22, .22);
+    transition: opacity 180ms ease, width 180ms ease, box-shadow 180ms ease;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn.is-active::after {
+    width: 29px;
+    opacity: .94;
+    box-shadow: 0 0 10px 3px rgba(249, 115, 22, .48);
 }
 
 .wp-app .wp-sidebar .wp-team-switcher .wp-team-btn-svg {
@@ -11662,7 +11687,7 @@ html.fc-no-animation .wp-app .wp-main .tab-content > .tab-pane {
     }
 
     .wp-app .wp-sidebar-tabs {
-        max-height: min(56vh, calc(100dvh - var(--fc-header-overlap-height, 66px) - 210px));
+        max-height: min(56vh, calc(100dvh - var(--fc-header-overlap-height, 66px) - 350px));
     }
 
     .wp-app .wp-sidebar-tabs .wp-category-switcher--unified {
