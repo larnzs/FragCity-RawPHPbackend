@@ -958,3 +958,254 @@
     margin-top: 3px;
     color: #cd9444;
 }
+
+
+/* =========================================================
+   Compact command directory + operational impact palette
+========================================================= */
+.server-guide .sg-shell {
+    width: min(1460px, calc(100% - 44px));
+}
+
+.server-guide .sg-entry-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.server-guide .sg-entry {
+    gap: 8px;
+    padding: 13px;
+    border-inline-start: 2px solid var(--sg-risk-color, rgba(255,255,255,.12));
+}
+
+.server-guide .sg-entry-title-row {
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.server-guide .sg-entry-title-row h3 {
+    font-size: .79rem;
+}
+
+.server-guide .sg-entry-description {
+    font-size: .65rem;
+    line-height: 1.75;
+}
+
+.server-guide .sg-entry-badges {
+    min-width: 0;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.server-guide .sg-entry-type {
+    padding: 3px 6px;
+    font-size: .53rem;
+}
+
+.server-guide .sg-entry-type--setting {
+    border-color: rgba(255,255,255,.10);
+    background: rgba(255,255,255,.035);
+    color: #b0aaa3;
+}
+
+.server-guide .sg-risk-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+    border: 1px solid var(--sg-risk-border);
+    border-radius: 5px;
+    background: var(--sg-risk-bg);
+    color: var(--sg-risk-text);
+    font-size: .52rem;
+    font-weight: 850;
+    line-height: 1.45;
+    white-space: nowrap;
+}
+
+.server-guide .sg-risk-chip i {
+    font-size: .56rem;
+}
+
+.server-guide .sg-entry--risk-high {
+    --sg-risk-color: #df746d;
+    --sg-risk-border: rgba(223,116,109,.26);
+    --sg-risk-bg: rgba(223,116,109,.085);
+    --sg-risk-text: #e99a92;
+}
+
+.server-guide .sg-entry--risk-action {
+    --sg-risk-color: #f97316;
+    --sg-risk-border: rgba(249,115,22,.25);
+    --sg-risk-bg: rgba(249,115,22,.075);
+    --sg-risk-text: #f99a57;
+}
+
+.server-guide .sg-entry--risk-info {
+    --sg-risk-color: #ffb347;
+    --sg-risk-border: rgba(255,179,71,.22);
+    --sg-risk-bg: rgba(255,179,71,.065);
+    --sg-risk-text: #e8bd7d;
+}
+
+.server-guide .sg-entry--risk-safe {
+    --sg-risk-color: #9b9b9b;
+    --sg-risk-border: rgba(190,190,190,.16);
+    --sg-risk-bg: rgba(255,255,255,.035);
+    --sg-risk-text: #b0b0b0;
+}
+
+.server-guide .sg-risk-legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 14px;
+    margin: 2px 0 13px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 10px;
+    background: rgba(18,18,18,.72);
+}
+
+.server-guide .sg-risk-legend__title {
+    color: #b9b0a8;
+    font-size: .62rem;
+    font-weight: 900;
+}
+
+.server-guide .sg-risk-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--sg-risk-text);
+    font-size: .6rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.server-guide .sg-risk-legend__item > i {
+    width: 7px;
+    height: 7px;
+    display: inline-block;
+    flex: 0 0 7px;
+    border-radius: 50%;
+    background: currentColor;
+    box-shadow: 0 0 8px currentColor;
+}
+
+.server-guide .sg-risk-legend__item--high { --sg-risk-text: #e99a92; }
+.server-guide .sg-risk-legend__item--action { --sg-risk-text: #f99a57; }
+.server-guide .sg-risk-legend__item--info { --sg-risk-text: #e8bd7d; }
+.server-guide .sg-risk-legend__item--safe { --sg-risk-text: #b0b0b0; }
+
+.server-guide .sg-risk-legend__note {
+    flex: 1 1 100%;
+    color: #777;
+    font-size: .56rem;
+    line-height: 1.6;
+}
+
+.server-guide .sg-entry--risk-high .sg-command-line {
+    border-color: rgba(223,116,109,.20);
+    background: rgba(223,116,109,.035);
+}
+
+.server-guide .sg-entry--risk-high .sg-command-line > code {
+    color: #e99a92;
+}
+
+.server-guide .sg-entry--risk-action .sg-command-line {
+    border-color: rgba(249,115,22,.18);
+}
+
+.server-guide .sg-entry--risk-action .sg-command-line > code {
+    color: #f99a57;
+}
+
+.server-guide .sg-entry--risk-info .sg-command-line {
+    border-color: rgba(255,179,71,.16);
+}
+
+.server-guide .sg-entry--risk-info .sg-command-line > code {
+    color: #e8bd7d;
+}
+
+.server-guide .sg-entry--risk-safe .sg-command-line {
+    border-color: rgba(190,190,190,.12);
+}
+
+.server-guide .sg-entry--risk-safe .sg-command-line > code {
+    color: #b0b0b0;
+}
+
+/* Console commands inherit the impact palette, not an unrelated blue. */
+.server-guide .sg-command-line--console {
+    border-color: var(--sg-risk-border, rgba(255,255,255,.08));
+    background: rgba(0,0,0,.16);
+}
+
+.server-guide .sg-command-line--console > code {
+    color: var(--sg-risk-text, #b8b8b8);
+}
+
+.server-guide .sg-command-label {
+    color: #8e857c;
+}
+
+.server-guide .sg-entry-availability--default {
+    border-color: rgba(255,179,71,.14);
+    background: rgba(255,179,71,.04);
+    color: #c8a978;
+}
+
+.server-guide .sg-entry-availability--config,
+.server-guide .sg-entry-availability--verify {
+    border-color: rgba(249,115,22,.15);
+    background: rgba(249,115,22,.04);
+    color: #d99a69;
+}
+
+.server-guide .sg-entry[hidden] {
+    display: none !important;
+}
+
+@media (max-width: 1100px) {
+    .server-guide .sg-entry-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 650px) {
+    .server-guide .sg-shell {
+        width: min(100% - 24px, 1460px);
+    }
+
+    .server-guide .sg-entry-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .server-guide .sg-entry {
+        gap: 8px;
+        padding: 12px;
+    }
+
+    .server-guide .sg-risk-legend {
+        gap: 7px 10px;
+    }
+
+    .server-guide .sg-risk-legend__note {
+        flex-basis: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .server-guide .sg-risk-chip,
+    .server-guide .sg-risk-legend {
+        transition: none !important;
+    }
+}
