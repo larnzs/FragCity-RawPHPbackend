@@ -2653,3 +2653,92 @@ button.mobile-nav-link.logout-link {
     line-height: 1.5;
     text-align: left;
 }
+
+
+/* FACEIT rank-coloured progress indicator inside the user dropdown. */
+#shockUserDropdown .frag-drop-faceit {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+    gap: 8px;
+    min-height: 0;
+    margin-top: 8px;
+    padding: 9px 10px;
+    border-color: color-mix(in srgb, var(--faceit-rank-color, #CDCDCD) 28%, transparent);
+    background:
+        linear-gradient(
+            105deg,
+            color-mix(in srgb, var(--faceit-rank-color, #CDCDCD) 9%, transparent),
+            rgba(255, 255, 255, .018)
+        );
+}
+
+#shockUserDropdown .frag-drop-faceit__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+}
+
+#shockUserDropdown .frag-drop-faceit__rank {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+    color: #E5E5E5;
+    font-size: .72rem;
+    font-weight: 800;
+}
+
+#shockUserDropdown .frag-drop-faceit__rank img {
+    display: block;
+    width: 27px;
+    height: 27px;
+    flex: 0 0 27px;
+    object-fit: contain;
+}
+
+#shockUserDropdown .frag-drop-faceit__rank strong {
+    color: var(--faceit-rank-color, #CDCDCD);
+    font-size: .74rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+#shockUserDropdown .frag-drop-faceit__elo {
+    flex: 0 0 auto;
+    color: var(--faceit-rank-color, #CDCDCD);
+    font-size: .72rem;
+    font-weight: 850;
+    font-variant-numeric: tabular-nums;
+    direction: ltr;
+    unicode-bidi: isolate;
+    white-space: nowrap;
+}
+
+#shockUserDropdown .frag-drop-faceit__progress {
+    width: 100%;
+    height: 5px;
+    min-height: 5px;
+    overflow: hidden;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .09);
+}
+
+#shockUserDropdown .frag-drop-faceit__progress > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--faceit-rank-color, #CDCDCD);
+    box-shadow: 0 0 8px color-mix(in srgb, var(--faceit-rank-color, #CDCDCD) 28%, transparent);
+    transition: width 360ms cubic-bezier(.22, .61, .36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #shockUserDropdown .frag-drop-faceit__progress > span {
+        transition: none;
+    }
+}
