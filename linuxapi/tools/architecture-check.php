@@ -147,14 +147,25 @@ $serverGuideCatalogValid = count($serverGuideCategoryIds) > 0
     && is_array($serverGuideCatalog['items'] ?? null)
     && count($serverGuideCatalog['items']) > 0;
 foreach (($serverGuideCatalog['items'] ?? []) as $item) {
+    $sourceUrl = is_array($item) ? trim((string)($item['source_url'] ?? '')) : '';
+    $sourceParts = $sourceUrl !== '' ? parse_url($sourceUrl) : false;
+    $sourceIsSafe = $sourceUrl === ''
+        || (filter_var($sourceUrl, FILTER_VALIDATE_URL) !== false
+            && is_array($sourceParts)
+            && strtolower((string)($sourceParts['scheme'] ?? '')) === 'https'
+            && trim((string)($sourceParts['host'] ?? '')) !== '');
+    $availability = is_array($item) ? (string)($item['availability'] ?? '') : '';
+
     if (!is_array($item)
         || !is_string($item['id'] ?? null)
         || $item['id'] === ''
         || isset($serverGuideItemIds[$item['id']])
         || !isset($serverGuideCategoryIds[(string)($item['category'] ?? '')])
-        || !in_array((string)($item['type'] ?? ''), ['command', 'setting'], true)
+        || !in_array((string)($item['type'] ?? 'command'), ['command', 'setting', 'mode'], true)
         || trim((string)($item['command'] ?? '')) === ''
-        || trim((string)($item['description'] ?? '')) === '') {
+        || trim((string)($item['description'] ?? '')) === ''
+        || !$sourceIsSafe
+        || ($availability !== '' && !in_array($availability, ['default', 'config', 'mode', 'verify', 'disabled'], true))) {
         $serverGuideCatalogValid = false;
         break;
     }
@@ -896,6 +907,18 @@ $check(
         && count($serverGuideItemIds) === count($serverGuideCatalog['items'])
         && str_contains($serverGuideDocs, 'data/server-guide.json')
         && str_contains($serverGuidePage, "json_decode")
+);
+
+$check(
+    'Server Guide renders plugin sources, availability state, game modes, and copyable console commands',
+    str_contains($serverGuidePage, '$itemTypeLabels')
+        && str_contains($serverGuidePage, '$availabilityLabels')
+        && str_contains($serverGuidePage, 'sg-entry-plugin')
+        && str_contains($serverGuidePage, 'sg-entry-source')
+        && str_contains($serverGuidePage, 'availability_note')
+        && str_contains($serverGuidePage, 'console_command')
+        && str_contains($serverGuideStylesheet, '.sg-entry-availability--mode')
+        && str_contains($serverGuideStylesheet, '.sg-entry-type--mode')
 );
 
 $check(
