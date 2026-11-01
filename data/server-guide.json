@@ -40,6 +40,24 @@
       "title": "تنظیمات بازی",
       "description": "تغییر گزینه‌های قابل تنظیم سرور",
       "icon": "fa-sliders"
+    },
+    {
+      "id": "votes",
+      "title": "رأی‌گیری و نقشه",
+      "description": "رأی‌گیری بازیکنان، انتخاب نقشه و RTV",
+      "icon": "fa-check-to-slot"
+    },
+    {
+      "id": "vip",
+      "title": "VIP و رنک",
+      "description": "دستورات VIP، FACEIT و سیستم رنک",
+      "icon": "fa-crown"
+    },
+    {
+      "id": "retakes",
+      "title": "Retakes و Arenas",
+      "description": "دستورات مودهای Retakes و Arena",
+      "icon": "fa-bomb"
     }
   ],
   "items": [
@@ -58,7 +76,11 @@
       "tags": [
         "mix",
         "ready"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "unready",
@@ -75,7 +97,11 @@
       "tags": [
         "mix",
         "ready"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "pause",
@@ -90,7 +116,11 @@
       "tags": [
         "mix",
         "pause"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "tech",
@@ -105,7 +135,11 @@
       "tags": [
         "mix",
         "pause"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "unpause",
@@ -120,7 +154,11 @@
       "tags": [
         "mix",
         "pause"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "stay",
@@ -135,7 +173,11 @@
       "tags": [
         "mix",
         "team"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "switch",
@@ -152,7 +194,11 @@
       "tags": [
         "mix",
         "team"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "stop",
@@ -168,7 +214,11 @@
       "tags": [
         "mix",
         "backup"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "tac",
@@ -183,7 +233,11 @@
       "tags": [
         "mix",
         "timeout"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "coach",
@@ -199,7 +253,11 @@
       "tags": [
         "mix",
         "coach"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "uncoach",
@@ -214,7 +272,11 @@
       "tags": [
         "mix",
         "coach"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "modes",
@@ -222,16 +284,18 @@
       "category": "modes",
       "title": "نمایش فهرست مودها",
       "command": "!modes",
-      "aliases": [
-        "!gamemode"
-      ],
-      "description": "منوی مودهای قابل انتخاب روی سرور را باز می‌کند.",
-      "access": "بازیکن",
+      "aliases": [],
+      "description": "منوی مدیریت مودهای تعریف‌شده در GameModeManager را نمایش می‌دهد.",
+      "access": "ادمین مود",
       "syntax": "!modes",
       "tags": [
         "mode",
         "menu"
-      ]
+      ],
+      "plugin": "GameModeManager",
+      "source_url": "https://github.com/nickj609/GameModeManager#commands",
+      "availability": "verify",
+      "availability_note": "پلاگین در README شاخه kus-monorepo منتظر رفع مشکل upstream اعلام شده است."
     },
     {
       "id": "mix",
@@ -374,13 +438,17 @@
       "title": "شروع اجباری مسابقه",
       "command": ".start",
       "aliases": [],
-      "description": "شروع مسابقه را به‌صورت اجباری اجرا می‌کند. از این دستور فقط در شرایط لازم استفاده کنید.",
-      "access": "ادمین مسابقه",
+      "description": "شروع مسابقه را به‌صورت اجباری اجرا می‌کند.",
+      "access": "ادمین MatchZy",
       "syntax": ".start",
       "tags": [
         "match",
         "start"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی این پلاگین/مود."
     },
     {
       "id": "forcestart",
@@ -465,15 +533,19 @@
       "title": "ریستارت یا پایان مسابقه",
       "command": ".restart",
       "aliases": [
-        ".endmatch"
+        ".rr"
       ],
-      "description": "مسابقه را ریستارت یا پایان می‌دهد؛ رفتار دقیق به وضعیت Match و پلاگین بستگی دارد.",
-      "access": "ادمین مسابقه",
+      "description": "مسابقه را ریستارت می‌کند. پایان مسابقه با دستور مستقل .endmatch انجام می‌شود.",
+      "access": "ادمین MatchZy",
       "syntax": ".restart",
       "tags": [
         "match",
         "restart"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی این پلاگین/مود."
     },
     {
       "id": "forcepause",
@@ -484,13 +556,16 @@
       "aliases": [
         ".fp"
       ],
-      "description": "مسابقه را به‌صورت اجباری Pause می‌کند.",
-      "access": "ادمین مسابقه",
+      "description": "مسابقه را با دسترسی ادمین متوقف می‌کند؛ بازیکنان قادر به برداشتن این Pause ادمین نیستند.",
+      "access": "ادمین MatchZy",
       "syntax": ".forcepause",
       "tags": [
         "match",
         "pause"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode"
     },
     {
       "id": "forceunpause",
@@ -501,13 +576,16 @@
       "aliases": [
         ".fup"
       ],
-      "description": "Pause اجباری را برمی‌دارد و مسابقه را ادامه می‌دهد.",
-      "access": "ادمین مسابقه",
+      "description": "Pause اجباری ادمین را برمی‌دارد.",
+      "access": "ادمین MatchZy",
       "syntax": ".forceunpause",
       "tags": [
         "match",
         "pause"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode"
     },
     {
       "id": "restore-round",
@@ -516,13 +594,17 @@
       "title": "بازگردانی راند مشخص",
       "command": ".restore <round>",
       "aliases": [],
-      "description": "بکاپ راند مشخص‌شده را بازیابی می‌کند.",
-      "access": "ادمین مسابقه",
+      "description": "بکاپ راند مشخص‌شده را در MatchZy بازیابی می‌کند.",
+      "access": "ادمین MatchZy",
       "syntax": ".restore <round>",
       "tags": [
         "match",
         "restore"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در مخزن kus-monorepo زیر plugins/disabled قرار دارد و فقط پس از فعال‌سازی مود مربوط کار می‌کند."
     },
     {
       "id": "skip-veto",
@@ -533,13 +615,16 @@
       "aliases": [
         ".sv"
       ],
-      "description": "مرحله انتخاب/حذف نقشه (Veto) را رد می‌کند.",
-      "access": "ادمین مسابقه",
+      "description": "مرحله Veto انتخاب/حذف نقشه را رد می‌کند.",
+      "access": "ادمین MatchZy",
       "syntax": ".skipveto",
       "tags": [
         "match",
         "veto"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode"
     },
     {
       "id": "roundknife",
@@ -548,16 +633,18 @@
       "title": "تنظیم Knife Round",
       "command": ".roundknife",
       "aliases": [
-        ".rk",
-        "!kniferound"
+        ".rk"
       ],
-      "description": "حالت Knife Round را فعال یا غیرفعال می‌کند.",
-      "access": "ادمین مسابقه",
+      "description": "Knife Round را فعال یا غیرفعال می‌کند؛ در صورت غیرفعال بودن، مسابقه از Warmup مستقیم وارد Live می‌شود.",
+      "access": "ادمین MatchZy",
       "syntax": ".roundknife",
       "tags": [
         "match",
         "knife"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode"
     },
     {
       "id": "match-settings",
@@ -581,13 +668,16 @@
       "title": "تغییر نام تیم اول",
       "command": ".team1 <name>",
       "aliases": [],
-      "description": "نام نمایشی تیم اول را تنظیم می‌کند.",
-      "access": "ادمین مسابقه",
+      "description": "نام تیم اول مسابقه را تغییر می‌دهد.",
+      "access": "ادمین MatchZy",
       "syntax": ".team1 <name>",
       "tags": [
         "match",
         "team"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode"
     },
     {
       "id": "team2",
@@ -596,13 +686,16 @@
       "title": "تغییر نام تیم دوم",
       "command": ".team2 <name>",
       "aliases": [],
-      "description": "نام نمایشی تیم دوم را تنظیم می‌کند.",
-      "access": "ادمین مسابقه",
+      "description": "نام تیم دوم مسابقه را تغییر می‌دهد.",
+      "access": "ادمین MatchZy",
       "syntax": ".team2 <name>",
       "tags": [
         "match",
         "team"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode"
     },
     {
       "id": "exit-practice",
@@ -611,73 +704,96 @@
       "title": "خروج از Practice",
       "command": ".exitprac",
       "aliases": [],
-      "description": "از مود Practice خارج می‌شود و به مود مسابقه برمی‌گردد.",
-      "access": "ادمین مسابقه",
+      "description": "از Practice Mode خارج می‌شود و به مود Match بازمی‌گردد.",
+      "access": "ادمین MatchZy",
       "syntax": ".exitprac",
       "tags": [
         "match",
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode"
     },
     {
       "id": "ban",
       "type": "command",
       "category": "admin",
-      "title": "محروم کردن بازیکن",
-      "command": "!ban <name> <minutes> <reason>",
+      "title": "محروم کردن بازیکن آنلاین",
+      "command": "!ban <target> [minutes/0] [reason]",
       "aliases": [],
-      "description": "بازیکن را برای مدت مشخص و با دلیل ثبت‌شده محروم می‌کند.",
-      "access": "ادمین",
+      "description": "بازیکن آنلاین را با SteamID/نام/شناسه کاربر یا گروه هدف‌گیری، برای مدت مشخص محروم می‌کند. زمان ۰ به معنی محرومیت دائمی است.",
+      "access": "@css/ban",
       "syntax": "!ban <name> <minutes> <reason>",
       "tags": [
         "moderation",
         "ban"
-      ]
+      ],
+      "console_command": "css_ban <#userid or name> [time in minutes/0 perm] [reason]",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "example": "!ban PlayerName 1440 \"Hacking\""
     },
     {
       "id": "gag",
       "type": "command",
       "category": "admin",
       "title": "محدود کردن چت",
-      "command": "!gag <name> <minutes> <reason>",
+      "command": "!gag <target> [minutes/0] [reason]",
       "aliases": [],
-      "description": "ارسال پیام متنی بازیکن را برای مدت مشخص محدود می‌کند.",
-      "access": "ادمین",
+      "description": "ارسال پیام متنی بازیکن را محدود می‌کند؛ صدای میکروفون را قطع نمی‌کند.",
+      "access": "@css/chat",
       "syntax": "!gag <name> <minutes> <reason>",
       "tags": [
         "moderation",
         "chat"
-      ]
+      ],
+      "console_command": "css_gag <#userid or name> [time in minutes/0 perm] [reason]",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "example": "!gag PlayerName 30 \"Chat spam\""
     },
     {
       "id": "mute",
       "type": "command",
       "category": "admin",
       "title": "قطع صدای میکروفون",
-      "command": "!mute <name> <minutes> <reason>",
+      "command": "!mute <target> [minutes/0] [reason]",
       "aliases": [],
-      "description": "امکان استفاده از میکروفون بازیکن را برای مدت مشخص محدود می‌کند.",
-      "access": "ادمین",
+      "description": "صدای میکروفون بازیکن را محدود می‌کند؛ چت متنی او را مسدود نمی‌کند.",
+      "access": "@css/chat",
       "syntax": "!mute <name> <minutes> <reason>",
       "tags": [
         "moderation",
         "voice"
-      ]
+      ],
+      "console_command": "css_mute <#userid or name> [time in minutes/0 perm] [reason]",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "example": "!mute PlayerName 60 \"Mic spam\""
     },
     {
       "id": "kickid",
       "type": "command",
       "category": "admin",
-      "title": "اخراج با User ID",
-      "command": "!kickid <userid>",
+      "title": "اخراج بازیکن",
+      "command": "!kick <target> [reason]",
       "aliases": [],
-      "description": "بازیکن را با شناسه User ID از سرور خارج می‌کند.",
-      "access": "ادمین",
+      "description": "بازیکن را با نام یا User ID از سرور خارج می‌کند.",
+      "access": "@css/kick",
       "syntax": "!kickid <userid>",
       "tags": [
         "moderation",
         "kick"
-      ]
+      ],
+      "console_command": "css_kick <#userid or name> [reason]",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "example": "!kick PlayerName \"AFK\""
     },
     {
       "id": "map",
@@ -686,12 +802,17 @@
       "title": "تغییر نقشه",
       "command": "!map <mapname>",
       "aliases": [],
-      "description": "نقشه سرور را به نام نقشه مشخص‌شده تغییر می‌دهد.",
-      "access": "ادمین",
+      "description": "نقشه سرور را تغییر می‌دهد. دسترسی تغییر نقشه لازم است؛ در صورت فعال بودن GameModeManager، منوی نقشه‌ها نیز در دسترس است.",
+      "access": "@css/changemap",
       "syntax": "!map <mapname>",
       "tags": [
         "map"
-      ]
+      ],
+      "console_command": "css_map <mapname>",
+      "plugin": "CS2-SimpleAdmin / GameModeManager",
+      "source_url": "https://github.com/nickj609/GameModeManager#commands",
+      "availability": "verify",
+      "availability_note": "هر دو پلاگین در مخزن دیده می‌شوند؛ GameModeManager طبق README این شاخه نیازمند رفع مشکل upstream است."
     },
     {
       "id": "maps",
@@ -700,13 +821,17 @@
       "title": "نمایش نقشه‌های مود فعلی",
       "command": "!maps",
       "aliases": [],
-      "description": "فهرست نقشه‌های در دسترس برای مود فعلی را نمایش می‌دهد.",
-      "access": "ادمین",
+      "description": "منوی مدیریت نقشه‌ها را باز می‌کند. GameModeManager یا GG1MapChooser می‌توانند این منو را فراهم کنند.",
+      "access": "ادمین نقشه",
       "syntax": "!maps",
       "tags": [
         "map",
         "menu"
-      ]
+      ],
+      "plugin": "GameModeManager / GG1MapChooser",
+      "source_url": "https://github.com/nickj609/GameModeManager#commands",
+      "availability": "verify",
+      "availability_note": "GameModeManager در README فعلی مخزن منتظر رفع مشکل معرفی شده؛ GG1MapChooser در پکیج به‌صورت پیش‌فرض قرار دارد."
     },
     {
       "id": "lock",
@@ -727,57 +852,74 @@
       "type": "command",
       "category": "admin",
       "title": "رفع محرومیت",
-      "command": "!unban <steamid64>",
+      "command": "!unban <steamid/name/ip> [reason]",
       "aliases": [],
-      "description": "محرومیت ثبت‌شده برای SteamID64 را برمی‌دارد.",
-      "access": "ادمین",
+      "description": "محرومیت یک بازیکن را با SteamID، نام یا IP لغو می‌کند؛ برای بازیکن آفلاین هم قابل استفاده است.",
+      "access": "@css/unban",
       "syntax": "!unban <steamid64>",
       "tags": [
         "moderation",
         "ban"
-      ]
+      ],
+      "console_command": "css_unban <steamid or name or ip> [reason]",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "example": "!unban 76561198012345678 \"Appeal accepted\""
     },
     {
       "id": "respawn",
       "type": "command",
       "category": "admin",
       "title": "احیای تیم",
-      "command": "!respawn <@ct/@t>",
+      "command": "!respawn <target>",
       "aliases": [],
-      "description": "بازیکنان سمت مشخص‌شده را احیا می‌کند.",
-      "access": "ادمین",
+      "description": "بازیکن هدف را دوباره وارد بازی می‌کند. در ماژول FunCommands قرار دارد.",
+      "access": "@css/cheats",
       "syntax": "!respawn <@ct/@t>",
       "tags": [
         "gameplay"
-      ]
+      ],
+      "console_command": "css_respawn <#userid or name>",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default"
     },
     {
       "id": "slap",
       "type": "command",
       "category": "admin",
       "title": "Slap بازیکن",
-      "command": "!slap <name>",
+      "command": "!slap <target> [damage]",
       "aliases": [],
-      "description": "به بازیکن مشخص‌شده ضربه وارد می‌کند.",
-      "access": "ادمین",
+      "description": "بازیکن را به عقب پرتاب می‌کند و در صورت تعیین مقدار، به او آسیب وارد می‌کند.",
+      "access": "@css/slay",
       "syntax": "!slap <name>",
       "tags": [
         "moderation"
-      ]
+      ],
+      "console_command": "css_slap <#userid or name> [damage]",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
+      "availability": "default"
     },
     {
       "id": "slay",
       "type": "command",
       "category": "admin",
       "title": "Slay بازیکن",
-      "command": "!slay <name>",
+      "command": "!slay <target>",
       "aliases": [],
-      "description": "بازیکن مشخص‌شده را از راند خارج می‌کند.",
-      "access": "ادمین",
+      "description": "بازیکن هدف را از راند خارج می‌کند.",
+      "access": "@css/slay",
       "syntax": "!slay <name>",
       "tags": [
         "moderation"
-      ]
+      ],
+      "console_command": "css_slay <#userid or name>",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
+      "availability": "default"
     },
     {
       "id": "round-restart",
@@ -817,43 +959,55 @@
       "type": "command",
       "category": "admin",
       "title": "انتقال بازیکن به تیم",
-      "command": "!move <name> <t/ct/spec>",
+      "command": "!team <target> [ct/t/spec]",
       "aliases": [],
-      "description": "بازیکن را به Terrorist، Counter-Terrorist یا Spectator منتقل می‌کند.",
-      "access": "ادمین",
+      "description": "بازیکن را به CT، T یا Spectator منتقل می‌کند؛ گزینه -k می‌تواند رفتار جابه‌جایی را تغییر دهد.",
+      "access": "@css/kick",
       "syntax": "!move <name> <t/ct/spec>",
       "tags": [
         "team"
-      ]
+      ],
+      "console_command": "css_team <#userid or name> [ct/t/spec] [-k]",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
+      "availability": "default"
     },
     {
       "id": "rename",
       "type": "command",
       "category": "admin",
       "title": "تغییر نام بازیکن",
-      "command": "!rename <old> <new>",
+      "command": "!rename <target> <new name>",
       "aliases": [],
-      "description": "نام بازیکن را تغییر می‌دهد.",
-      "access": "ادمین",
+      "description": "نام نمایشی بازیکن را تغییر می‌دهد.",
+      "access": "@css/kick",
       "syntax": "!rename <old> <new>",
       "tags": [
         "player"
-      ]
+      ],
+      "console_command": "css_rename <#userid or name> <new name>",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
+      "availability": "default"
     },
     {
       "id": "wmap",
       "type": "command",
       "category": "admin",
       "title": "بارگذاری Workshop Map",
-      "command": "!wmap <workshop_id>",
+      "command": "!wsmap <map or workshop id>",
       "aliases": [],
-      "description": "نقشه Workshop را با شناسه آن بارگذاری می‌کند.",
-      "access": "ادمین",
+      "description": "نقشه Workshop را با نام یا شناسه آن بارگذاری می‌کند.",
+      "access": "@css/changemap",
       "syntax": "!wmap <workshop_id>",
       "tags": [
         "map",
         "workshop"
-      ]
+      ],
+      "console_command": "css_wsmap <name or id>",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default"
     },
     {
       "id": "rcon",
@@ -862,13 +1016,17 @@
       "title": "اجرای دستور RCON",
       "command": "!rcon <command>",
       "aliases": [],
-      "description": "دستور کنسول سرور را از طریق ابزار مدیریتی اجرا می‌کند. فقط دستورهای موردنیاز و مجاز را اجرا کنید.",
-      "access": "ادمین",
+      "description": "یک دستور کنسول سرور را اجرا می‌کند. فقط برای ادمین دارای Permission مربوط.",
+      "access": "@css/rcon",
       "syntax": "!rcon <command>",
       "tags": [
         "console",
         "rcon"
-      ]
+      ],
+      "console_command": "css_rcon <command>",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default"
     },
     {
       "id": "spawn",
@@ -883,7 +1041,11 @@
       "tags": [
         "spawn",
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "ctspawn",
@@ -898,7 +1060,11 @@
       "tags": [
         "spawn",
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "tspawn",
@@ -913,7 +1079,11 @@
       "tags": [
         "spawn",
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "bot",
@@ -928,7 +1098,11 @@
       "tags": [
         "bot",
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "crouchbot",
@@ -945,7 +1119,11 @@
       "tags": [
         "bot",
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "boost",
@@ -960,7 +1138,11 @@
       "tags": [
         "bot",
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "nobots",
@@ -975,7 +1157,11 @@
       "tags": [
         "bot",
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "clear",
@@ -990,7 +1176,11 @@
       "tags": [
         "utility",
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "god",
@@ -1004,7 +1194,11 @@
       "syntax": ".god",
       "tags": [
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "noflash",
@@ -1018,7 +1212,11 @@
       "syntax": ".noflash",
       "tags": [
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "dryrun",
@@ -1034,7 +1232,11 @@
       "syntax": ".dryrun",
       "tags": [
         "practice"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "savenade",
@@ -1049,7 +1251,11 @@
       "tags": [
         "nade",
         "lineup"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "loadnade",
@@ -1064,7 +1270,11 @@
       "tags": [
         "nade",
         "lineup"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "listnades",
@@ -1079,7 +1289,11 @@
       "tags": [
         "nade",
         "lineup"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "rethrow",
@@ -1096,7 +1310,11 @@
       "tags": [
         "nade",
         "lineup"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "timer",
@@ -1111,7 +1329,11 @@
       "tags": [
         "practice",
         "timer"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "back",
@@ -1126,7 +1348,11 @@
       "tags": [
         "practice",
         "movement"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "fastforward",
@@ -1143,7 +1369,11 @@
       "tags": [
         "practice",
         "timer"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "solid",
@@ -1158,7 +1388,11 @@
       "tags": [
         "practice",
         "physics"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "impacts",
@@ -1173,7 +1407,11 @@
       "tags": [
         "practice",
         "debug"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "traj",
@@ -1188,7 +1426,11 @@
       "tags": [
         "practice",
         "nade"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
     },
     {
       "id": "settings-menu",
@@ -1197,13 +1439,17 @@
       "title": "باز کردن منوی تنظیمات",
       "command": "!settings",
       "aliases": [],
-      "description": "منوی تنظیمات قابل تغییر سرور را باز می‌کند؛ گزینه‌های موجود به پلاگین و مود فعال بستگی دارد.",
-      "access": "ادمین",
+      "description": "منوی تنظیمات بازی را باز می‌کند؛ گزینه‌های موجود به فایل‌های cfg و پلاگین‌های فعال وابسته‌اند.",
+      "access": "ادمین مود",
       "syntax": "!settings",
       "tags": [
         "settings",
         "menu"
-      ]
+      ],
+      "plugin": "GameModeManager / KUS settings",
+      "source_url": "https://github.com/nickj609/GameModeManager#commands",
+      "availability": "config",
+      "availability_note": "در GameModeManager.json منوی Settings فعال است؛ رأی‌گیری روی GameSettings در همین کانفیگ خاموش است."
     },
     {
       "id": "bunnyhop-on",
@@ -1324,6 +1570,1081 @@
         "settings",
         "voice"
       ]
+    },
+    {
+      "id": "sa-addban",
+      "type": "command",
+      "category": "admin",
+      "title": "محرومیت بازیکن آفلاین",
+      "command": "!addban <steamid> [minutes/0] [reason]",
+      "aliases": [],
+      "description": "بازیکن آفلاین را با SteamID محروم می‌کند؛ زمان ۰ یعنی دائمی.",
+      "access": "@css/ban",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_addban <steamid> [time in minutes/0 perm] [reason]",
+      "example": "76561198012345678 1440 \"Ban evasion\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-banip",
+      "type": "command",
+      "category": "admin",
+      "title": "محرومیت IP",
+      "command": "!banip <ip> [minutes/0] [reason]",
+      "aliases": [],
+      "description": "یک آدرس IP را محروم می‌کند؛ نوع Ban باید با تنظیم BanType سازگار باشد.",
+      "access": "@css/ban",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_banip <ip> [time in minutes/0 perm] [reason]",
+      "example": "192.0.2.10 1440 \"Ban evasion\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-warn",
+      "type": "command",
+      "category": "admin",
+      "title": "اخطار به بازیکن",
+      "command": "!warn <target> [reason]",
+      "aliases": [],
+      "description": "به بازیکن اخطار ثبت می‌کند؛ امکان اجرای خودکار اقدام بعدی با WarnThreshold وجود دارد.",
+      "access": "@css/kick",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_warn <#userid or name> [reason]",
+      "example": "PlayerName \"Chat abuse\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-unwarn",
+      "type": "command",
+      "category": "admin",
+      "title": "حذف آخرین اخطار",
+      "command": "!unwarn <steamid or name>",
+      "aliases": [],
+      "description": "آخرین اخطار بازیکن را حذف می‌کند؛ برای بازیکن آفلاین هم قابل استفاده است.",
+      "access": "@css/kick",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_unwarn <steamid or name>",
+      "example": "76561198012345678",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-asay",
+      "type": "command",
+      "category": "admin",
+      "title": "پیام خصوصی بین ادمین‌ها",
+      "command": "!asay <message>",
+      "aliases": [],
+      "description": "پیام را فقط برای ادمین‌های آنلاین ارسال می‌کند؛ مناسب هماهنگی Staff.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_asay <message>",
+      "example": "\"Player is suspicious, keep an eye on them\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-cssay",
+      "type": "command",
+      "category": "admin",
+      "title": "اعلان رنگی عمومی",
+      "command": "!cssay <message>",
+      "aliases": [],
+      "description": "اعلان رنگی را برای همه بازیکنان نمایش می‌دهد.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_cssay <message>",
+      "example": "\"Server will restart in 5 minutes!\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-say",
+      "type": "command",
+      "category": "admin",
+      "title": "پیام عمومی با پیشوند ادمین",
+      "command": "!say <message>",
+      "aliases": [],
+      "description": "پیام را در چت عمومی با پیشوند Admin ارسال می‌کند.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_say <message>",
+      "example": "\"Please be respectful in chat\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-psay",
+      "type": "command",
+      "category": "admin",
+      "title": "پیام خصوصی به بازیکن",
+      "command": "!psay <target> <message>",
+      "aliases": [],
+      "description": "پیام خصوصی را به بازیکن یا گروه هدف‌گیری‌شده می‌فرستد.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_psay <#userid or name> <message>",
+      "example": "PlayerName \"Please stop mic spamming\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-csay",
+      "type": "command",
+      "category": "admin",
+      "title": "پیام وسط صفحه",
+      "command": "!csay <message>",
+      "aliases": [],
+      "description": "متن بزرگ را در مرکز صفحه نمایش می‌دهد؛ برای اعلان‌های مهم مناسب است.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_csay <message>",
+      "example": "\"ROUND STARTS IN 10 SECONDS\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-hsay",
+      "type": "command",
+      "category": "admin",
+      "title": "پیام HUD",
+      "command": "!hsay <message>",
+      "aliases": [],
+      "description": "پیام را به‌صورت HUD روی صفحه نمایش می‌دهد.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_hsay <message>",
+      "example": "\"Tournament starting soon!\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-penalties",
+      "type": "command",
+      "category": "admin",
+      "title": "نمایش جریمه‌های خود",
+      "command": "!penalties",
+      "aliases": [
+        "!mypenalties",
+        "!comms"
+      ],
+      "description": "جریمه‌های فعال خود، از جمله Ban و محدودیت‌های Chat/Voice را نشان می‌دهد.",
+      "access": "عمومی",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_penalties",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-admin",
+      "type": "command",
+      "category": "admin",
+      "title": "منوی مدیریت",
+      "command": "!admin",
+      "aliases": [],
+      "description": "منوی اصلی SimpleAdmin برای مدیریت بازیکن، سرور و دستورات سفارشی را باز می‌کند.",
+      "access": "@css/generic",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_admin",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-adminhelp",
+      "type": "command",
+      "category": "admin",
+      "title": "راهنمای دستورات ادمین",
+      "command": "!adminhelp",
+      "aliases": [],
+      "description": "دستورات قابل استفاده برای Permissionهای فعلی و Syntax آن‌ها را نشان می‌دهد.",
+      "access": "@css/generic",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_adminhelp",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-addadmin",
+      "type": "command",
+      "category": "admin",
+      "title": "افزودن ادمین",
+      "command": "!addadmin <steamid> <name> <flags/groups> <immunity> <minutes>",
+      "aliases": [],
+      "description": "ادمین جدید می‌سازد. مدت ۰ دائمی است؛ گزینه -g برای ثبت در تمام سرورها استفاده می‌شود.",
+      "access": "@css/root",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_addadmin <steamid> <name> <flags/groups> <immunity> <duration>",
+      "example": "76561198012345678 \"Moderator\" \"@css/kick,@css/ban\" 50 43200",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-deladmin",
+      "type": "command",
+      "category": "admin",
+      "title": "حذف ادمین",
+      "command": "!deladmin <steamid>",
+      "aliases": [],
+      "description": "ادمین را از دیتابیس حذف می‌کند؛ گزینه -g برای حذف سراسری مستند شده است.",
+      "access": "@css/root",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_deladmin <steamid>",
+      "example": "76561198012345678",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-addgroup",
+      "type": "command",
+      "category": "admin",
+      "title": "ساخت گروه ادمین",
+      "command": "!addgroup <group> <flags> <immunity>",
+      "aliases": [],
+      "description": "گروه Permission جدید می‌سازد؛ نمونه گروه با نام #moderators تعریف می‌شود.",
+      "access": "@css/root",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_addgroup <group_name> <flags> <immunity>",
+      "example": "\"#moderators\" \"@css/kick,@css/ban,@css/chat\" 50",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-delgroup",
+      "type": "command",
+      "category": "admin",
+      "title": "حذف گروه ادمین",
+      "command": "!delgroup <group>",
+      "aliases": [],
+      "description": "گروه Permission را حذف می‌کند.",
+      "access": "@css/root",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_delgroup <group_name>",
+      "example": "\"#moderators\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-reloadadmins",
+      "type": "command",
+      "category": "admin",
+      "title": "بارگذاری مجدد ادمین‌ها",
+      "command": "!reloadadmins",
+      "aliases": [],
+      "description": "فهرست Permissionهای ادمین را از دیتابیس دوباره بارگذاری می‌کند.",
+      "access": "@css/root",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_reloadadmins",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-reloadbans",
+      "type": "command",
+      "category": "admin",
+      "title": "بارگذاری مجدد Banها",
+      "command": "!reloadbans",
+      "aliases": [],
+      "description": "داده‌های Ban را دوباره بارگذاری می‌کند.",
+      "access": "@css/root",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_reloadbans",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-hide",
+      "type": "command",
+      "category": "admin",
+      "title": "مخفی شدن ادمین در Scoreboard",
+      "command": "!hide",
+      "aliases": [
+        "!stealth"
+      ],
+      "description": "حالت Stealth را روشن یا خاموش می‌کند تا ادمین در Scoreboard نمایش داده نشود.",
+      "access": "@css/kick",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_hide",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-hidecomms",
+      "type": "command",
+      "category": "admin",
+      "title": "مخفی کردن اعلان جریمه‌ها",
+      "command": "!hidecomms",
+      "aliases": [],
+      "description": "اعلان‌های جریمه هنگام اتصال ادمین را مخفی یا آشکار می‌کند.",
+      "access": "@css/kick",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_hidecomms",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-who",
+      "type": "command",
+      "category": "admin",
+      "title": "اطلاعات بازیکن",
+      "command": "!who <target>",
+      "aliases": [],
+      "description": "اطلاعات بازیکن از جمله نام، SteamID، زمان اتصال و جریمه‌ها را نشان می‌دهد؛ نمایش IP نیازمند @css/showip است.",
+      "access": "@css/generic",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_who <#userid or name>",
+      "example": "#123",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-disconnected",
+      "type": "command",
+      "category": "admin",
+      "title": "بازیکنان قطع‌شده اخیر",
+      "command": "!disconnected",
+      "aliases": [
+        "!last"
+      ],
+      "description": "فهرست بازیکنان اخیراً Disconnect شده را نمایش می‌دهد؛ Alias آن !last است.",
+      "access": "@css/kick",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_disconnected",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-warns",
+      "type": "command",
+      "category": "admin",
+      "title": "فهرست اخطارهای بازیکن",
+      "command": "!warns <target>",
+      "aliases": [],
+      "description": "اخطارها، دلیل، صادرکننده و زمان ثبت آن‌ها را نشان می‌دهد.",
+      "access": "@css/kick",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_warns <#userid or name>",
+      "example": "PlayerName",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-players",
+      "type": "command",
+      "category": "admin",
+      "title": "فهرست بازیکنان آنلاین",
+      "command": "!players",
+      "aliases": [],
+      "description": "بازیکنان متصل، User ID، نام و تیم آن‌ها را فهرست می‌کند.",
+      "access": "@css/generic",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_players",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-wsmap",
+      "type": "command",
+      "category": "admin",
+      "title": "تغییر به Workshop Map",
+      "command": "!wsmap <name or id>",
+      "aliases": [],
+      "description": "نقشه Workshop را با نام یا شناسه بارگذاری می‌کند. Aliasها: !changewsmap و !workshop.",
+      "access": "@css/changemap",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_wsmap <name or id>",
+      "example": "3073150255",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-cvar",
+      "type": "command",
+      "category": "admin",
+      "title": "تغییر ConVar",
+      "command": "!cvar <cvar> <value>",
+      "aliases": [],
+      "description": "مقدار یک ConVar سرور را تغییر می‌دهد؛ فقط برای ادمین مجاز.",
+      "access": "@css/cvar",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_cvar <cvar> <value>",
+      "example": "sv_cheats 1",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-rcon",
+      "type": "command",
+      "category": "admin",
+      "title": "اجرای RCON",
+      "command": "!rcon <command>",
+      "aliases": [],
+      "description": "دستور کنسول را از طریق RCON اجرا می‌کند.",
+      "access": "@css/rcon",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_rcon <command>",
+      "example": "status",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-rr",
+      "type": "command",
+      "category": "admin",
+      "title": "ریستارت راند/بازی",
+      "command": "!rr",
+      "aliases": [
+        "!rg",
+        "!restart",
+        "!restartgame"
+      ],
+      "description": "راند یا بازی را ریستارت می‌کند. Aliasها: !rg، !restart و !restartgame.",
+      "access": "@css/generic",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_rr",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-addgag",
+      "type": "command",
+      "category": "admin",
+      "title": "Gag بازیکن آفلاین",
+      "command": "!addgag <steamid> [minutes/0] [reason]",
+      "aliases": [],
+      "description": "محدودیت چت را برای SteamID آفلاین ثبت می‌کند؛ زمان ۰ یعنی دائمی.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_addgag <steamid> [time in minutes/0 perm] [reason]",
+      "example": "76561198012345678 60 \"Chat abuse\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-ungag",
+      "type": "command",
+      "category": "admin",
+      "title": "رفع Gag",
+      "command": "!ungag <steamid or name> [reason]",
+      "aliases": [],
+      "description": "محدودیت چت بازیکن را رفع می‌کند.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_ungag <steamid or name> [reason]",
+      "example": "PlayerName",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-addmute",
+      "type": "command",
+      "category": "admin",
+      "title": "Mute بازیکن آفلاین",
+      "command": "!addmute <steamid> [minutes/0] [reason]",
+      "aliases": [],
+      "description": "محدودیت Voice را برای SteamID آفلاین ثبت می‌کند.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_addmute <steamid> [time in minutes/0 perm] [reason]",
+      "example": "76561198012345678 120 \"Voice abuse\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-unmute",
+      "type": "command",
+      "category": "admin",
+      "title": "رفع Mute",
+      "command": "!unmute <steamid or name> [reason]",
+      "aliases": [],
+      "description": "محدودیت Voice بازیکن را رفع می‌کند.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_unmute <steamid or name> [reason]",
+      "example": "PlayerName",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-silence",
+      "type": "command",
+      "category": "admin",
+      "title": "محدودیت همزمان Chat و Voice",
+      "command": "!silence <target> [minutes/0] [reason]",
+      "aliases": [],
+      "description": "هم چت متنی و هم Voice بازیکن را مسدود می‌کند.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_silence <#userid or name> [time in minutes/0 perm] [reason]",
+      "example": "PlayerName 60 \"Abuse\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-addsilence",
+      "type": "command",
+      "category": "admin",
+      "title": "Silence بازیکن آفلاین",
+      "command": "!addsilence <steamid> [minutes/0] [reason]",
+      "aliases": [],
+      "description": "محدودیت Chat و Voice را برای SteamID آفلاین ثبت می‌کند.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_addsilence <steamid> [time in minutes/0 perm] [reason]",
+      "example": "76561198012345678 120 \"Total communication ban\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-unsilence",
+      "type": "command",
+      "category": "admin",
+      "title": "رفع Silence",
+      "command": "!unsilence <steamid or name> [reason]",
+      "aliases": [],
+      "description": "محدودیت همزمان Chat و Voice را برمی‌دارد.",
+      "access": "@css/chat",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_unsilence <steamid or name> [reason]",
+      "example": "PlayerName",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-vote",
+      "type": "command",
+      "category": "admin",
+      "title": "ساخت رأی‌گیری سفارشی",
+      "command": "!vote <question> <option1> <option2> [more options]",
+      "aliases": [],
+      "description": "یک Poll سفارشی ایجاد می‌کند؛ بازیکنان گزینه را با شماره انتخاب می‌کنند.",
+      "access": "@css/generic",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_vote <question> [option1] [option2] ...",
+      "example": "\"Next map?\" \"de_dust2\" \"de_mirage\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-team",
+      "type": "command",
+      "category": "admin",
+      "title": "تغییر تیم بازیکن",
+      "command": "!team <target> [ct/t/spec]",
+      "aliases": [],
+      "description": "بازیکن را به CT، T یا Spectator منتقل می‌کند.",
+      "access": "@css/kick",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_team <#userid or name> [ct/t/spec] [-k]",
+      "example": "PlayerName ct",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-rename",
+      "type": "command",
+      "category": "admin",
+      "title": "تغییر نام موقت بازیکن",
+      "command": "!rename <target> <new name>",
+      "aliases": [],
+      "description": "نام بازیکن را تغییر می‌دهد.",
+      "access": "@css/kick",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_rename <#userid or name> <new name>",
+      "example": "PlayerName \"NewName\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-prename",
+      "type": "command",
+      "category": "admin",
+      "title": "تغییر نام دائمی بازیکن",
+      "command": "!prename <target> <new name>",
+      "aliases": [],
+      "description": "نام دائمی بازیکن را تنظیم می‌کند.",
+      "access": "@css/ban",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_prename <#userid or name> <new name>",
+      "example": "PlayerName \"EnforcedName\"",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-pluginsmanager",
+      "type": "command",
+      "category": "admin",
+      "title": "مدیریت پلاگین‌ها",
+      "command": "!pluginsmanager",
+      "aliases": [
+        "!pluginmanager"
+      ],
+      "description": "منوی مدیریت پلاگین‌ها را باز می‌کند؛ Alias: !pluginmanager.",
+      "access": "ادمین (بر اساس تنظیمات پلاگین)",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_pluginsmanager",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "sa-adminvoice",
+      "type": "command",
+      "category": "admin",
+      "title": "شنود صدای بازیکنان",
+      "command": "!adminvoice",
+      "aliases": [
+        "!listenall"
+      ],
+      "description": "دسترسی شنود Voice را فعال/غیرفعال می‌کند؛ Alias: !listenall.",
+      "access": "ادمین (بر اساس تنظیمات پلاگین)",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
+      "availability": "default",
+      "console_command": "css_adminvoice",
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+    },
+    {
+      "id": "fun-noclip",
+      "type": "command",
+      "category": "admin",
+      "title": "NoClip",
+      "command": "!noclip <target>",
+      "aliases": [],
+      "description": "حالت عبور از دیوار و حرکت آزاد را برای بازیکن هدف فعال/غیرفعال می‌کند.",
+      "access": "@css/cheats",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default",
+      "console_command": "css_noclip <target>"
+    },
+    {
+      "id": "fun-god",
+      "type": "command",
+      "category": "admin",
+      "title": "God Mode",
+      "command": "!god <target>",
+      "aliases": [],
+      "description": "آسیب‌پذیری بازیکن هدف را در حالت God تغییر می‌دهد.",
+      "access": "@css/cheats",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default",
+      "console_command": "css_god <target>"
+    },
+    {
+      "id": "fun-freeze",
+      "type": "command",
+      "category": "admin",
+      "title": "Freeze بازیکن",
+      "command": "!freeze <target>",
+      "aliases": [],
+      "description": "حرکت بازیکن هدف را متوقف می‌کند.",
+      "access": "@css/cheats",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default",
+      "console_command": "css_freeze <target>"
+    },
+    {
+      "id": "fun-unfreeze",
+      "type": "command",
+      "category": "admin",
+      "title": "Unfreeze بازیکن",
+      "command": "!unfreeze <target>",
+      "aliases": [],
+      "description": "Freeze بازیکن را برمی‌دارد.",
+      "access": "@css/cheats",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default",
+      "console_command": "css_unfreeze <target>"
+    },
+    {
+      "id": "fun-give",
+      "type": "command",
+      "category": "admin",
+      "title": "دادن اسلحه",
+      "command": "!give <target> <weapon>",
+      "aliases": [],
+      "description": "اسلحه مشخصی به بازیکن می‌دهد.",
+      "access": "@css/cheats",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default",
+      "console_command": "css_give <target> <weapon>"
+    },
+    {
+      "id": "fun-strip",
+      "type": "command",
+      "category": "admin",
+      "title": "گرفتن اسلحه‌ها",
+      "command": "!strip <target>",
+      "aliases": [],
+      "description": "تمام اسلحه‌های بازیکن هدف را حذف می‌کند.",
+      "access": "@css/slay",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default",
+      "console_command": "css_strip <target>"
+    },
+    {
+      "id": "fun-hp",
+      "type": "command",
+      "category": "admin",
+      "title": "تنظیم Health",
+      "command": "!hp <target> <health>",
+      "aliases": [],
+      "description": "Health بازیکن را تغییر می‌دهد؛ محدوده مستندشده ۱ تا ۹۹۹+ است.",
+      "access": "@css/slay",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default",
+      "console_command": "css_hp <target> <health>"
+    },
+    {
+      "id": "fun-speed",
+      "type": "command",
+      "category": "admin",
+      "title": "تنظیم سرعت",
+      "command": "!speed <target> <multiplier>",
+      "aliases": [],
+      "description": "ضریب سرعت حرکت بازیکن را تغییر می‌دهد؛ 1.0 سرعت عادی است.",
+      "access": "@css/slay",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default",
+      "console_command": "css_speed <target> <speed>"
+    },
+    {
+      "id": "fun-gravity",
+      "type": "command",
+      "category": "admin",
+      "title": "تنظیم جاذبه",
+      "command": "!gravity <target> <multiplier>",
+      "aliases": [],
+      "description": "ضریب جاذبه بازیکن را تغییر می‌دهد؛ 1.0 مقدار عادی است.",
+      "access": "@css/slay",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default",
+      "console_command": "css_gravity <target> <gravity>"
+    },
+    {
+      "id": "fun-money",
+      "type": "command",
+      "category": "admin",
+      "title": "تنظیم پول",
+      "command": "!money <target> <amount>",
+      "aliases": [],
+      "description": "مقدار پول بازیکن را تغییر می‌دهد؛ محدودیت موتور CS2 تا 65535 است.",
+      "access": "@css/slay",
+      "plugin": "CS2-SimpleAdmin FunCommands",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
+      "availability": "default",
+      "console_command": "css_money <target> <amount>"
+    },
+    {
+      "id": "sa-flag-generic",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/generic",
+      "command": "@css/generic",
+      "aliases": [],
+      "description": "دسترسی عمومی به منوی مدیریت و بعضی دستورات عمومی.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-chat",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/chat",
+      "command": "@css/chat",
+      "aliases": [],
+      "description": "دسترسی ارسال پیام مدیریتی و مدیریت محدودیت‌های چت/صدا.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-changemap",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/changemap",
+      "command": "@css/changemap",
+      "aliases": [],
+      "description": "دسترسی تغییر نقشه.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-slay",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/slay",
+      "command": "@css/slay",
+      "aliases": [],
+      "description": "دسترسی Slay، Slap و برخی دستورات Attribute بازیکن.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-kick",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/kick",
+      "command": "@css/kick",
+      "aliases": [],
+      "description": "دسترسی Kick، Warning و اطلاعات/مدیریت پایه بازیکن.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-ban",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/ban",
+      "command": "@css/ban",
+      "aliases": [],
+      "description": "دسترسی Ban، Ban IP و برخی دستورات محرومیت.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-permban",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/permban",
+      "command": "@css/permban",
+      "aliases": [],
+      "description": "فلگ مخصوص محرومیت دائمی.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-unban",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/unban",
+      "command": "@css/unban",
+      "aliases": [],
+      "description": "دسترسی رفع Ban.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-showip",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/showip",
+      "command": "@css/showip",
+      "aliases": [],
+      "description": "اجازه نمایش IP در اطلاعات بازیکن.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-cvar",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/cvar",
+      "command": "@css/cvar",
+      "aliases": [],
+      "description": "اجازه تغییر ConVar.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-rcon",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/rcon",
+      "command": "@css/rcon",
+      "aliases": [],
+      "description": "اجازه اجرای دستور RCON.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-flag-root",
+      "type": "setting",
+      "category": "settings",
+      "title": "Permission Flag @css/root",
+      "command": "@css/root",
+      "aliases": [],
+      "description": "دسترسی کامل مدیریتی.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "copy_label": "کپی Permission"
+    },
+    {
+      "id": "sa-bantype",
+      "type": "setting",
+      "category": "settings",
+      "title": "نوع Ban در SimpleAdmin",
+      "command": "BanType = 1",
+      "aliases": [],
+      "description": "در کانفیگ فعلی مقدار ۱ یعنی Ban بر اساس SteamID؛ مقدار ۲ برای IP و ۳ برای SteamID به‌همراه IP است.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "config",
+      "example": "BanType: 1 = SteamID"
+    },
+    {
+      "id": "sa-max-ban",
+      "type": "setting",
+      "category": "settings",
+      "title": "حداکثر مدت Ban",
+      "command": "MaxBanDuration = 10080",
+      "aliases": [],
+      "description": "مقدار فعلی ۱۰۰۸۰ دقیقه (۷ روز) است؛ ۰ در مستندات به معنی بدون محدودیت است.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "config"
+    },
+    {
+      "id": "sa-max-mute",
+      "type": "setting",
+      "category": "settings",
+      "title": "حداکثر مدت Mute",
+      "command": "MaxMuteDuration = 10080",
+      "aliases": [],
+      "description": "مقدار فعلی ۱۰۰۸۰ دقیقه است؛ محدودیت واقعی به کانفیگ runtime سرور بستگی دارد.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "config"
+    },
+    {
+      "id": "sa-disable-danger",
+      "type": "setting",
+      "category": "settings",
+      "title": "محدودسازی دستورات خطرناک",
+      "command": "DisableDangerousCommands = true",
+      "aliases": [],
+      "description": "در کانفیگ فعلی فعال است و دستورات خطرناک را طبق منطق پلاگین محدود می‌کند.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "config"
+    },
+    {
+      "id": "sa-multiserver",
+      "type": "setting",
+      "category": "settings",
+      "title": "حالت چندسروری SimpleAdmin",
+      "command": "MultiServerMode = true",
+      "aliases": [],
+      "description": "در کانفیگ فعلی فعال است؛ برای دیتابیس مشترک و همگام‌سازی Ban/Admin بین سرورها استفاده می‌شود.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "config"
+    },
+    {
+      "id": "sa-time-mode",
+      "type": "setting",
+      "category": "settings",
+      "title": "TimeMode در SimpleAdmin",
+      "command": "TimeMode = 1",
+      "aliases": [],
+      "description": "نحوه نمایش مدت‌زمان در منوها را تعیین می‌کند؛ تفسیر واحدها را با نسخه نصب‌شده بررسی کنید.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "config"
+    },
+    {
+      "id": "sa-danger-note",
+      "type": "setting",
+      "category": "settings",
+      "title": "محدودیت مدت Ban/Mute",
+      "command": "MaxBanDuration / MaxMuteDuration",
+      "aliases": [],
+      "description": "کانفیگ فعلی هر دو سقف را روی ۱۰۰۸۰ دقیقه قرار داده؛ دستورهای Ban/Mute بالاتر از این سقف قابل استفاده نیستند.",
+      "access": "تنظیم سرور",
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "config"
     }
   ]
 }
