@@ -1622,3 +1622,70 @@
 .profile-fullscreen {
     padding-bottom: var(--fc-page-safe-bottom, 56px);
 }
+
+
+/* ==========================================================================
+   Profile layout alignment + live FACEIT ELO progress
+   The shared site shell removes main-content padding for this full-bleed
+   page, so the profile root must not keep its former negative-margin bleed.
+   ========================================================================== */
+.site-body .main-content:has(.profile-fullscreen) {
+    padding: 0 !important;
+    min-width: 0;
+}
+
+.profile-fullscreen {
+    width: 100% !important;
+    max-width: 100%;
+    margin: 0 !important;
+    box-sizing: border-box;
+}
+
+.profile-fullscreen .profile-faceit-level-icon {
+    display: block;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 5px rgba(249, 115, 22, 0.16));
+}
+
+.profile-fullscreen .profile-faceit-next {
+    display: block;
+    margin-top: 0.28rem;
+    color: #A3A3A3;
+    font-size: 0.56rem;
+    font-weight: 650;
+    line-height: 1.5;
+    text-align: end;
+}
+
+.profile-fullscreen .profile-progress-item--faceit .xp-bar--faceit {
+    background: linear-gradient(90deg, #16A34A, #4ADE80);
+}
+
+@media (max-width: 780px) {
+    .profile-fullscreen {
+        width: 100% !important;
+        max-width: 100%;
+        margin: 0 !important;
+    }
+}
+
+@media (max-width: 520px) {
+    .profile-fullscreen {
+        width: 100% !important;
+        max-width: 100%;
+        margin: 0 !important;
+    }
+
+    .profile-fullscreen .profile-faceit-level-icon {
+        width: 21px;
+        height: 21px;
+        flex-basis: 21px;
+    }
+
+    .profile-fullscreen .profile-faceit-next {
+        font-size: 0.52rem;
+    }
+}
