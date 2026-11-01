@@ -4187,3 +4187,9 @@ html.fc-no-animation .sl-hero-guy {
         bottom: -22px !important;
     }
 }
+
+/* Server Browser filters must hide cards even when list view assigns display:grid. */
+#serverList .sl-server-card[hidden],
+#serverList .sl-server-group[hidden] {
+    display: none !important;
+}
