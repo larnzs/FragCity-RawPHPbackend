@@ -70,7 +70,7 @@
       "aliases": [
         ".r"
       ],
-      "description": "اعلام می‌کند که برای شروع مسابقه آماده هستید.",
+      "description": "بازیکن آمادگی خود را اعلام می‌کند؛ Alias: .r و !ready نیز قابل استفاده است.",
       "access": "بازیکن",
       "syntax": ".ready",
       "tags": [
@@ -89,7 +89,8 @@
       "title": "لغو آمادگی",
       "command": ".unready",
       "aliases": [
-        ".ur"
+        ".ur",
+        ".notready"
       ],
       "description": "وضعیت آمادگی خود را لغو می‌کند.",
       "access": "بازیکن",
@@ -257,7 +258,7 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط."
     },
     {
       "id": "uncoach",
@@ -653,13 +654,16 @@
       "title": "نمایش تنظیمات مسابقه",
       "command": ".settings",
       "aliases": [],
-      "description": "تنظیمات فعلی Match را نمایش می‌دهد.",
+      "description": "مقادیر فعلی تنظیمات مسابقه از جمله Knife Round و تعداد Readyهای لازم را نمایش می‌دهد.",
       "access": "ادمین مسابقه",
       "syntax": ".settings",
       "tags": [
         "match",
         "settings"
-      ]
+      ],
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode"
     },
     {
       "id": "team1",
@@ -1038,7 +1042,7 @@
       "title": "رفتن به Spawn شماره‌دار",
       "command": ".spawn <number>",
       "aliases": [],
-      "description": "به نقطه Spawn با شماره مشخص‌شده منتقل می‌شود.",
+      "description": "به Spawn رقابتی شماره‌دار تیم خود منتقل می‌شود.",
       "access": "بازیکن در Practice",
       "syntax": ".spawn <number>",
       "tags": [
@@ -1048,16 +1052,18 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط."
     },
     {
       "id": "ctspawn",
       "type": "command",
       "category": "practice",
       "title": "رفتن به Spawn تیم CT",
-      "command": ".ctspawn",
-      "aliases": [],
-      "description": "به Spawn مربوط به تیم CT منتقل می‌شود.",
+      "command": ".ctspawn <number>",
+      "aliases": [
+        ".cts"
+      ],
+      "description": "به Spawn رقابتی شماره‌دار CT منتقل می‌شود.",
       "access": "بازیکن در Practice",
       "syntax": ".ctspawn",
       "tags": [
@@ -1067,16 +1073,18 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط."
     },
     {
       "id": "tspawn",
       "type": "command",
       "category": "practice",
       "title": "رفتن به Spawn تیم T",
-      "command": ".tspawn",
-      "aliases": [],
-      "description": "به Spawn مربوط به تیم T منتقل می‌شود.",
+      "command": ".tspawn <number>",
+      "aliases": [
+        ".ts"
+      ],
+      "description": "به Spawn رقابتی شماره‌دار T منتقل می‌شود.",
       "access": "بازیکن در Practice",
       "syntax": ".tspawn",
       "tags": [
@@ -1086,7 +1094,7 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط."
     },
     {
       "id": "bot",
@@ -1209,7 +1217,9 @@
       "category": "practice",
       "title": "مصونیت از Flash",
       "command": ".noflash",
-      "aliases": [],
+      "aliases": [
+        ".noblind"
+      ],
       "description": "حالت مصونیت در برابر Flash را تغییر می‌دهد.",
       "access": "بازیکن در Practice",
       "syntax": ".noflash",
@@ -1246,9 +1256,11 @@
       "type": "command",
       "category": "practice",
       "title": "ذخیره Lineup",
-      "command": ".savenade <name> <desc>",
-      "aliases": [],
-      "description": "لاین‌آپ فعلی را با نام و توضیحات ذخیره می‌کند.",
+      "command": ".savenade <name> <description>",
+      "aliases": [
+        ".sn"
+      ],
+      "description": "لاین‌آپ فعلی را ذخیره می‌کند؛ در صورت مشخص بودن، توضیح هم نگهداری می‌شود.",
       "access": "بازیکن در Practice",
       "syntax": ".savenade <name> <desc>",
       "tags": [
@@ -1284,8 +1296,10 @@
       "type": "command",
       "category": "practice",
       "title": "نمایش Lineupها",
-      "command": ".listnades",
-      "aliases": [],
+      "command": ".listnades [filter]",
+      "aliases": [
+        ".lin"
+      ],
       "description": "فهرست لاین‌آپ‌های ذخیره‌شده را نمایش می‌دهد.",
       "access": "بازیکن در Practice",
       "syntax": ".listnades",
@@ -1366,7 +1380,7 @@
       "aliases": [
         ".ff"
       ],
-      "description": "زمان تمرین را جلو می‌برد.",
+      "description": "زمان سرور را به ۲۰ ثانیه جلو می‌برد.",
       "access": "بازیکن در Practice",
       "syntax": ".fastforward",
       "tags": [
@@ -1385,7 +1399,7 @@
       "title": "تنظیم برخورد هم‌تیمی‌ها",
       "command": ".solid",
       "aliases": [],
-      "description": "تنظیم برخورد فیزیکی هم‌تیمی‌ها را تغییر می‌دهد.",
+      "description": "mp_solid_teammates را فعال یا غیرفعال می‌کند.",
       "access": "بازیکن در Practice",
       "syntax": ".solid",
       "tags": [
@@ -1404,7 +1418,7 @@
       "title": "نمایش نقاط برخورد گلوله",
       "command": ".impacts",
       "aliases": [],
-      "description": "نمایش نقاط برخورد گلوله را تغییر می‌دهد.",
+      "description": "sv_showimpacts را فعال یا غیرفعال می‌کند.",
       "access": "بازیکن در Practice",
       "syntax": ".impacts",
       "tags": [
@@ -1423,7 +1437,7 @@
       "title": "نمایش مسیر Grenade",
       "command": ".traj",
       "aliases": [],
-      "description": "نمایش مسیر پرتاب Grenade را تغییر می‌دهد.",
+      "description": "sv_grenade_trajectory_prac_pipreview را فعال یا غیرفعال می‌کند.",
       "access": "بازیکن در Practice",
       "syntax": ".traj",
       "tags": [
@@ -3578,6 +3592,506 @@
       "plugin": "Warmup سفارشی طبق تنظیمات فعلی غیرفعال است؛ مود پیش‌فرض در فایل روی Deathmatch تنظیم شده است.",
       "source_url": "GameModeManager",
       "availability": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json"
+    },
+    {
+      "id": "matchzy-bestspawn",
+      "type": "command",
+      "category": "practice",
+      "title": "نزدیک‌ترین Spawn تیم",
+      "command": ".bestspawn",
+      "aliases": [],
+      "description": "بازیکن را به نزدیک‌ترین Spawn تیم خودش نسبت به موقعیت فعلی منتقل می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-worstspawn",
+      "type": "command",
+      "category": "practice",
+      "title": "دورترین Spawn تیم",
+      "command": ".worstspawn",
+      "aliases": [],
+      "description": "بازیکن را به دورترین Spawn تیم خودش منتقل می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-bestctspawn",
+      "type": "command",
+      "category": "practice",
+      "title": "نزدیک‌ترین Spawn تیم CT",
+      "command": ".bestctspawn",
+      "aliases": [],
+      "description": "به نزدیک‌ترین Spawn تیم CT منتقل می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-worstctspawn",
+      "type": "command",
+      "category": "practice",
+      "title": "دورترین Spawn تیم CT",
+      "command": ".worstctspawn",
+      "aliases": [],
+      "description": "به دورترین Spawn تیم CT منتقل می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-besttspawn",
+      "type": "command",
+      "category": "practice",
+      "title": "نزدیک‌ترین Spawn تیم T",
+      "command": ".besttspawn",
+      "aliases": [],
+      "description": "به نزدیک‌ترین Spawn تیم T منتقل می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-worsttspawn",
+      "type": "command",
+      "category": "practice",
+      "title": "دورترین Spawn تیم T",
+      "command": ".worsttspawn",
+      "aliases": [],
+      "description": "به دورترین Spawn تیم T منتقل می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-showspawns",
+      "type": "command",
+      "category": "practice",
+      "title": "نمایش Spawnها",
+      "command": ".showspawns",
+      "aliases": [],
+      "description": "تمام Spawnهای رقابتی را روی نقشه Highlight می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-hidespawns",
+      "type": "command",
+      "category": "practice",
+      "title": "مخفی کردن Spawnها",
+      "command": ".hidespawns",
+      "aliases": [],
+      "description": "نمایش Spawnهای Highlight‌شده را مخفی می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-crouchboost",
+      "type": "command",
+      "category": "practice",
+      "title": "ساخت Boost با Bot نشسته",
+      "command": ".crouchboost",
+      "aliases": [
+        ".cb"
+      ],
+      "description": "یک Bot نشسته ایجاد می‌کند تا برای تمرین Boost استفاده شود.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-practice-team-ct",
+      "type": "command",
+      "category": "practice",
+      "title": "رفتن به تیم CT",
+      "command": ".ct",
+      "aliases": [],
+      "description": "بازیکن را به تیم Counter-Terrorist منتقل می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-practice-team-t",
+      "type": "command",
+      "category": "practice",
+      "title": "رفتن به تیم T",
+      "command": ".t",
+      "aliases": [],
+      "description": "بازیکن را به تیم Terrorist منتقل می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-practice-team-spec",
+      "type": "command",
+      "category": "practice",
+      "title": "رفتن به Spectator",
+      "command": ".spec",
+      "aliases": [],
+      "description": "بازیکن را به حالت Spectator منتقل می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-fas",
+      "type": "command",
+      "category": "practice",
+      "title": "تماشاگر کردن بقیه بازیکنان",
+      "command": ".fas",
+      "aliases": [
+        ".watchme"
+      ],
+      "description": "تمام بازیکنان به جز اجراکننده را به Spectator منتقل می‌کند؛ Alias: .watchme.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-break",
+      "type": "command",
+      "category": "practice",
+      "title": "شکستن اشیای قابل تخریب",
+      "command": ".break",
+      "aliases": [],
+      "description": "تمام اشیای قابل تخریب مانند شیشه و درهای چوبی را می‌شکند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-nade-delay",
+      "type": "command",
+      "category": "practice",
+      "title": "تأخیر Grenade",
+      "command": ".delay <seconds>",
+      "aliases": [],
+      "description": "تأخیر پرتاب مجدد Grenade را بر حسب ثانیه تنظیم می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-throwindex",
+      "type": "command",
+      "category": "practice",
+      "title": "پرتاب Grenadeهای انتخابی",
+      "command": ".throwindex <index...>",
+      "aliases": [],
+      "description": "Grenadeهای ذخیره‌شده در تاریخچه را با شماره‌های مشخص دوباره پرتاب می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-lastindex",
+      "type": "command",
+      "category": "practice",
+      "title": "شماره آخرین Grenade",
+      "command": ".lastindex",
+      "aliases": [],
+      "description": "شماره آخرین Grenade پرتاب‌شده را نشان می‌دهد.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-rethrow-smoke",
+      "type": "command",
+      "category": "practice",
+      "title": "پرتاب مجدد Smoke",
+      "command": ".rethrowsmoke",
+      "aliases": [],
+      "description": "آخرین Smoke پرتاب‌شده را مجدداً اجرا می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-rethrow-he",
+      "type": "command",
+      "category": "practice",
+      "title": "پرتاب مجدد HE",
+      "command": ".rethrownade",
+      "aliases": [],
+      "description": "آخرین HE Grenade پرتاب‌شده را مجدداً اجرا می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-rethrow-flash",
+      "type": "command",
+      "category": "practice",
+      "title": "پرتاب مجدد Flash",
+      "command": ".rethrowflash",
+      "aliases": [],
+      "description": "آخرین Flash پرتاب‌شده را مجدداً اجرا می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-rethrow-molotov",
+      "type": "command",
+      "category": "practice",
+      "title": "پرتاب مجدد Molotov",
+      "command": ".rethrowmolotov",
+      "aliases": [],
+      "description": "آخرین Molotov پرتاب‌شده را مجدداً اجرا می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-rethrow-decoy",
+      "type": "command",
+      "category": "practice",
+      "title": "پرتاب مجدد Decoy",
+      "command": ".rethrowdecoy",
+      "aliases": [],
+      "description": "آخرین Decoy پرتاب‌شده را مجدداً اجرا می‌کند.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-delete-nade",
+      "type": "command",
+      "category": "practice",
+      "title": "حذف Lineup",
+      "command": ".deletenade <name>",
+      "aliases": [
+        ".dn"
+      ],
+      "description": "لاین‌آپ ذخیره‌شده را از فایل حذف می‌کند؛ Alias: .dn.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-import-nade",
+      "type": "command",
+      "category": "practice",
+      "title": "وارد کردن Lineup با کد",
+      "command": ".importnade <code>",
+      "aliases": [
+        ".in"
+      ],
+      "description": "لاین‌آپ را با کدی که هنگام ذخیره ساخته شده وارد می‌کند؛ Alias: .in.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-list-nades-filter",
+      "type": "command",
+      "category": "practice",
+      "title": "فیلتر کردن Lineupها",
+      "command": ".listnades <filter>",
+      "aliases": [
+        ".lin"
+      ],
+      "description": "فهرست Lineupها را نشان می‌دهد؛ با Filter فقط موارد منطبق نمایش داده می‌شوند؛ Alias: .lin.",
+      "access": "بازیکن در Practice",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-admin-forceready",
+      "type": "command",
+      "category": "match",
+      "title": "آماده‌سازی اجباری تیم",
+      "command": ".forceready",
+      "aliases": [],
+      "description": "تیم بازیکن اجراکننده را به‌صورت اجباری Ready می‌کند؛ فقط در مسابقه‌ای که با JSON/Get5 راه‌اندازی شده باشد.",
+      "access": "ادمین MatchZy",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-admin-endmatch",
+      "type": "command",
+      "category": "match",
+      "title": "پایان دادن مسابقه",
+      "command": ".endmatch [team1/team2]",
+      "aliases": [],
+      "description": "مسابقه را پایان می‌دهد؛ بدون برنده یا با تعیین تیم برنده. در حالت برنده، نتیجه Series نیز ثبت می‌شود.",
+      "access": "ادمین MatchZy",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-admin-readyrequired",
+      "type": "command",
+      "category": "match",
+      "title": "تعداد Ready لازم",
+      "command": ".readyrequired <number>",
+      "aliases": [],
+      "description": "تعداد بازیکنان لازم برای شروع مسابقه را تنظیم می‌کند؛ مقدار ۰ یعنی همه بازیکنان متصل باید Ready شوند.",
+      "access": "ادمین MatchZy",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-admin-addreadytime",
+      "type": "command",
+      "category": "match",
+      "title": "افزودن زمان Ready",
+      "command": ".addreadytime <seconds>",
+      "aliases": [],
+      "description": "زمان بیشتری به مرحله Ready می‌دهد؛ با تنظیم matchzy_time_to_start مرتبط است.",
+      "access": "ادمین MatchZy",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-admin-playout",
+      "type": "command",
+      "category": "match",
+      "title": "فعال/غیرفعال کردن Playout",
+      "command": ".playout",
+      "aliases": [],
+      "description": "در حالت Playout تمام راندها اجرا می‌شوند و بازی با برنده شدن زودتر یک تیم خاتمه نمی‌یابد؛ مناسب Scrim.",
+      "access": "ادمین MatchZy",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-admin-whitelist",
+      "type": "command",
+      "category": "match",
+      "title": "تغییر وضعیت Whitelist",
+      "command": ".whitelist",
+      "aliases": [],
+      "description": "Whitelist مسابقه را روشن یا خاموش می‌کند؛ SteamID64 بازیکنان در cfg/MatchZy/whitelist.cfg قرار می‌گیرد.",
+      "access": "ادمین MatchZy",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-admin-admin-asay",
+      "type": "command",
+      "category": "match",
+      "title": "پیام ادمین در چت",
+      "command": ".asay <message>",
+      "aliases": [],
+      "description": "پیام را با هویت ادمین در چت ارسال می‌کند.",
+      "access": "ادمین MatchZy",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-admin-reload-admins",
+      "type": "command",
+      "category": "match",
+      "title": "بارگذاری مجدد ادمین‌های MatchZy",
+      "command": ".reload_admins",
+      "aliases": [],
+      "description": "فهرست ادمین‌ها را از admins.json دوباره بارگذاری می‌کند.",
+      "access": "ادمین MatchZy",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-admin-admin-prac",
+      "type": "command",
+      "category": "match",
+      "title": "فعال‌سازی Practice",
+      "command": ".prac",
+      "aliases": [],
+      "description": "Practice Mode را شروع می‌کند؛ Alias: .tactics.",
+      "access": "ادمین MatchZy",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+    },
+    {
+      "id": "matchzy-admin-admin-rcon",
+      "type": "command",
+      "category": "match",
+      "title": "اجرای RCON از MatchZy",
+      "command": ".rcon <command>",
+      "aliases": [],
+      "description": "دستور سرور را از طریق MatchZy ارسال می‌کند.",
+      "access": "ادمین MatchZy",
+      "plugin": "MatchZy",
+      "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
+      "availability": "mode",
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
     }
   ]
 }
