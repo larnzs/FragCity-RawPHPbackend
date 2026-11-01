@@ -124,6 +124,7 @@ Example:
   "access": "@css/generic",
   "plugin": "PluginName",
   "source_url": "https://github.com/vendor/plugin",
+  "risk": "action",
   "availability": "default",
   "tags": ["plugin", "example"]
 }
