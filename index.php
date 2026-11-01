@@ -407,7 +407,6 @@ $allowedPages = [
     'privacy',
     'deadlock_servers_vps',
     'banlist',
-    'wallet',
     'donations',
 ];
 
@@ -563,19 +562,6 @@ $pageAssets = [
             'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js',
             '/js/profile.js?v=' . asset_version(
                 __DIR__ . '/js/profile.js'
-            ),
-        ],
-    ],
-
-    'wallet' => [
-        'css' => [
-            '/css/wallet.css?v=' . asset_version(
-                __DIR__ . '/css/wallet.css'
-            ),
-        ],
-        'js' => [
-            '/js/wallet.js?v=' . asset_version(
-                __DIR__ . '/js/wallet.js'
             ),
         ],
     ],
@@ -969,6 +955,10 @@ window.FragCityOpenLoginModal = <?= $openLoginModal ? 'true' : 'false' ?>;
         ENT_QUOTES,
         'UTF-8'
     ) ?>"
+></script>
+
+<script
+    src="/js/wallet-modal.js?v=<?= htmlspecialchars(asset_version(__DIR__ . '/js/wallet-modal.js'), ENT_QUOTES, 'UTF-8') ?>"
 ></script>
 
 <script
