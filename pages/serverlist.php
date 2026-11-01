@@ -187,7 +187,7 @@ $faceitIconVersion = function_exists('asset_version')
                 </div>
             </div>
 
-            <div class="sl-hero-art sl-hero-mascot" data-fc-reveal="left" aria-hidden="true">
+            <div class="sl-hero-art sl-hero-mascot" aria-hidden="true">
                 <span class="sl-mascot-glow"></span>
                 <span class="sl-mascot-orbit sl-mascot-orbit--outer"></span>
                 <span class="sl-mascot-orbit sl-mascot-orbit--inner"></span>
