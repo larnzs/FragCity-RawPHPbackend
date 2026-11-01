@@ -1266,10 +1266,6 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 <div class="wp-app">
     <div class="wp-workspace-layout">
         <aside class="wp-sidebar" aria-label="WeaponPaints navigation">
-            <div class="wp-sidebar-brand" aria-hidden="true">
-                <span class="wp-sidebar-brand__mark"><i class="fas fa-crosshairs"></i></span>
-            </div>
-
             <nav class="wp-tabs wp-sidebar-tabs" id="mainTabs" aria-label="Skin categories">
                 <div
                 class="wp-category-switcher wp-category-switcher--unified"
