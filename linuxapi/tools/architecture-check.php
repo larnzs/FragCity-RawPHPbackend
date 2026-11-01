@@ -791,6 +791,16 @@ $check(
 );
 
 $check(
+    'WeaponPaints inventory remove control overlays the card and the English TEAM label aligns left',
+    str_contains($weaponPaintsPage, 'data-wp-inventory-remove')
+        && str_contains($weaponPaintsStylesheet, '.wp-app .wp-saved-paint-item')
+        && str_contains($weaponPaintsStylesheet, 'top: 9px !important;')
+        && str_contains($weaponPaintsStylesheet, 'right: 9px !important;')
+        && str_contains($weaponPaintsStylesheet, '.wp-app .wp-sidebar-team {\n    direction: ltr !important;')
+        && str_contains($weaponPaintsStylesheet, '.wp-app .wp-sidebar-team > .wp-team-switcher {\n    direction: rtl !important;')
+);
+
+$check(
     'Sticker and Keychain modal frames, search headers, split panes and mobile tabs match Paint selection',
     str_contains($weaponPaintsStylesheet, 'body > #skinModal .modal-content,')
         && str_contains($weaponPaintsStylesheet, 'body > #stickerModal .modal-content,')
