@@ -3103,3 +3103,25 @@ body.fc-wallet-charge-open {
         transition: none !important;
     }
 }
+
+
+/* Server Guide: a quiet, icon-led primary navigation link. */
+.shock-header .shock-nav-item--guide {
+    gap: 7px;
+}
+
+.shock-header .shock-nav-item--guide i {
+    color: #F97316;
+    font-size: .84rem;
+    opacity: .9;
+}
+
+.shock-header .shock-nav-item--guide span {
+    line-height: 1;
+}
+
+.shock-header .shock-nav-item--guide:hover i,
+.shock-header .shock-nav-item--guide.active i {
+    color: #FFB347;
+    opacity: 1;
+}
