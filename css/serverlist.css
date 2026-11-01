@@ -4168,3 +4168,22 @@ html.fc-no-animation .sl-hero-guy {
     animation: none !important;
     transform: none !important;
 }
+
+
+/* Seat Guy on the actual bottom border of the hero frame, not its padded content edge. */
+/* Desktop hero padding-bottom is clamp(23px, 3.2vw, 44px). */
+.sl-hero-mascot .sl-hero-guy {
+    bottom: calc(-1 * clamp(23px, 3.2vw, 44px)) !important;
+}
+
+@media (max-width: 760px) {
+    .sl-hero-mascot .sl-hero-guy {
+        bottom: -25px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .sl-hero-mascot .sl-hero-guy {
+        bottom: -22px !important;
+    }
+}
