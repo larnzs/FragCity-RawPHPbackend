@@ -176,10 +176,47 @@ $guideCategoryCount = count($guideCategoryMap);
                         implode(' ', $aliases),
                         $item['description'] ?? '',
                         $item['access'] ?? '',
+                        $item['plugin'] ?? '',
+                        $item['availability_note'] ?? '',
                         implode(' ', is_array($item['tags'] ?? null) ? $item['tags'] : []),
                     ];
                     $searchText = implode(' ', array_filter($searchParts, 'is_string'));
-                    $itemType = ($item['type'] ?? 'command') === 'setting' ? 'setting' : 'command';
+
+                    // The catalog distinguishes executable commands, configuration
+                    // references and game-mode entries; keep the rendered label explicit.
+                    $itemTypeRaw = (string) ($item['type'] ?? 'command');
+                    $itemType = in_array($itemTypeRaw, ['command', 'setting', 'mode'], true)
+                        ? $itemTypeRaw
+                        : 'command';
+                    $itemTypeLabels = [
+                        'command' => 'دستور',
+                        'setting' => 'تنظیم',
+                        'mode' => 'مود',
+                    ];
+                    $itemTypeLabel = $itemTypeLabels[$itemType];
+
+                    // Status is catalog metadata, not a live check of the server.
+                    $availability = (string) ($item['availability'] ?? '');
+                    $availabilityLabels = [
+                        'default' => 'در پکیج پیش‌فرض',
+                        'config' => 'وابسته به تنظیمات',
+                        'mode' => 'فقط در مود مربوط',
+                        'verify' => 'نیازمند تست اجرا',
+                        'disabled' => 'در کانفیگ غیرفعال',
+                    ];
+                    $availabilityLabel = $availabilityLabels[$availability] ?? '';
+                    $availabilityClass = preg_replace('/[^a-z0-9_-]/i', '-', $availability);
+
+                    // Only allow HTTPS documentation links; never render a raw HTML URL.
+                    $sourceCandidate = trim((string) ($item['source_url'] ?? ''));
+                    $sourceParts = $sourceCandidate !== '' ? parse_url($sourceCandidate) : false;
+                    $sourceUrl = filter_var($sourceCandidate, FILTER_VALIDATE_URL)
+                        && is_array($sourceParts)
+                        && strtolower((string) ($sourceParts['scheme'] ?? '')) === 'https'
+                        ? $sourceCandidate
+                        : '';
+
+                    $consoleCommand = trim((string) ($item['console_command'] ?? ''));
                     ?>
                     <article
                         class="sg-entry"
@@ -193,7 +230,7 @@ $guideCategoryCount = count($guideCategoryMap);
                                 <?= $guideEscape($category['title'] ?? 'عمومی') ?>
                             </span>
                             <span class="sg-entry-type sg-entry-type--<?= $guideEscape($itemType) ?>">
-                                <?= $itemType === 'setting' ? 'تنظیم' : 'دستور' ?>
+                                <?= $guideEscape($itemTypeLabel) ?>
                             </span>
                         </div>
 
@@ -201,6 +238,30 @@ $guideCategoryCount = count($guideCategoryMap);
                             <h3><?= $guideEscape($item['title'] ?? $command) ?></h3>
                             <span class="sg-entry-access"><?= $guideEscape($item['access'] ?? '—') ?></span>
                         </div>
+
+                        <?php if (!empty($item['plugin']) || $availabilityLabel !== '' || $sourceUrl !== ''): ?>
+                            <div class="sg-entry-meta">
+                                <?php if (!empty($item['plugin'])): ?>
+                                    <span class="sg-entry-plugin">
+                                        <i class="fa-solid fa-puzzle-piece" aria-hidden="true"></i>
+                                        <?= $guideEscape($item['plugin']) ?>
+                                    </span>
+                                <?php endif; ?>
+
+                                <?php if ($availabilityLabel !== ''): ?>
+                                    <span class="sg-entry-availability sg-entry-availability--<?= $guideEscape($availabilityClass) ?>">
+                                        <?= $guideEscape($availabilityLabel) ?>
+                                    </span>
+                                <?php endif; ?>
+
+                                <?php if ($sourceUrl !== ''): ?>
+                                    <a class="sg-entry-source" href="<?= $guideEscape($sourceUrl) ?>" target="_blank" rel="noopener noreferrer">
+                                        <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                        منبع و مستندات
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
 
                         <div class="sg-command-line">
                             <code dir="ltr"><?= $guideEscape($command) ?></code>
@@ -215,6 +276,23 @@ $guideCategoryCount = count($guideCategoryMap);
                                 <span>کپی</span>
                             </button>
                         </div>
+
+                        <?php if ($consoleCommand !== '' && $consoleCommand !== $command): ?>
+                            <div class="sg-command-line sg-command-line--console">
+                                <span class="sg-command-label">کنسول سرور</span>
+                                <code dir="ltr"><?= $guideEscape($consoleCommand) ?></code>
+                                <button
+                                    type="button"
+                                    class="sg-copy-button"
+                                    data-guide-copy="<?= $guideEscape($consoleCommand) ?>"
+                                    aria-label="کپی دستور کنسول <?= $guideEscape($consoleCommand) ?>"
+                                    title="کپی دستور کنسول"
+                                >
+                                    <i class="fa-regular fa-copy" aria-hidden="true"></i>
+                                    <span>کپی</span>
+                                </button>
+                            </div>
+                        <?php endif; ?>
 
                         <?php if ($aliases !== []): ?>
                             <div class="sg-aliases">
@@ -249,6 +327,13 @@ $guideCategoryCount = count($guideCategoryMap);
                             <div class="sg-entry-note">
                                 <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
                                 <?= $guideEscape($item['note']) ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!empty($item['availability_note'])): ?>
+                            <div class="sg-entry-availability-note">
+                                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                                <?= $guideEscape($item['availability_note']) ?>
                             </div>
                         <?php endif; ?>
                     </article>
