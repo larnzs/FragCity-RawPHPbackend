@@ -72,11 +72,11 @@ $guideCategoryCount = count($guideCategoryMap);
                     راهنمای <span>سرور</span>
                 </h1>
                 <p>
-                    دستورها و تنظیمات کاربردی سرور CS2 را سریع پیدا کن،
-                    توضیحات را بخوان و با یک کلیک دستور را کپی کن.
+                    دستورها، مودها و تنظیمات سرور CS2 را بر اساس پلاگین پیدا کن؛
+                    Permission و وضعیت فعال بودن را ببین و با یک کلیک کپی کن.
                 </p>
                 <div class="sg-hero-meta">
-                    <span><i class="fa-solid fa-terminal" aria-hidden="true"></i> <?= number_format($guideCommandCount) ?> دستور و تنظیم</span>
+                    <span><i class="fa-solid fa-terminal" aria-hidden="true"></i> <?= number_format($guideCommandCount) ?> مورد راهنما</span>
                     <span><i class="fa-solid fa-layer-group" aria-hidden="true"></i> <?= number_format($guideCategoryCount) ?> دسته‌بندی</span>
                     <span><i class="fa-solid fa-copy" aria-hidden="true"></i> کپی سریع</span>
                 </div>
@@ -95,7 +95,7 @@ $guideCategoryCount = count($guideCategoryMap);
             </div>
         </header>
 
-        <section class="sg-directory" aria-label="فهرست دستورات و تنظیمات">
+        <section class="sg-directory" aria-label="فهرست دستورات، مودها و تنظیمات">
             <div class="sg-toolbar">
                 <label class="sg-search" for="sgSearch">
                     <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
@@ -103,7 +103,7 @@ $guideCategoryCount = count($guideCategoryMap);
                         id="sgSearch"
                         type="search"
                         autocomplete="off"
-                        placeholder="جستجوی دستور، توضیح یا کلیدواژه؛ مثل !ban یا !ready"
+                        placeholder="جستجوی دستور، پلاگین، توضیح یا کلیدواژه؛ مثل !ban یا MatchZy"
                         aria-label="جستجوی دستورات و تنظیمات"
                     >
                     <kbd>CTRL K</kbd>
