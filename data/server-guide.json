@@ -80,7 +80,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "unready",
@@ -102,7 +103,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "pause",
@@ -121,7 +123,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "action"
     },
     {
       "id": "tech",
@@ -140,7 +143,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "action"
     },
     {
       "id": "unpause",
@@ -159,7 +163,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "action"
     },
     {
       "id": "stay",
@@ -178,7 +183,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "switch",
@@ -199,7 +205,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "stop",
@@ -219,7 +226,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "action"
     },
     {
       "id": "tac",
@@ -238,7 +246,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "action"
     },
     {
       "id": "coach",
@@ -258,7 +267,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط."
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط.",
+      "risk": "safe"
     },
     {
       "id": "uncoach",
@@ -277,7 +287,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "modes",
@@ -296,7 +307,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "info"
     },
     {
       "id": "mix",
@@ -313,7 +325,8 @@
       "tags": [
         "mode",
         "mix"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "casual",
@@ -330,7 +343,8 @@
       "tags": [
         "mode",
         "casual"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "retakes",
@@ -348,7 +362,8 @@
       "tags": [
         "mode",
         "retakes"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "practice-mode",
@@ -366,7 +381,8 @@
       "tags": [
         "mode",
         "practice"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "warmup",
@@ -383,7 +399,8 @@
       "tags": [
         "mode",
         "warmup"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "wingman",
@@ -400,7 +417,8 @@
       "tags": [
         "mode",
         "wingman"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "deathmatch",
@@ -415,7 +433,8 @@
       "tags": [
         "mode",
         "deathmatch"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "gungame",
@@ -430,7 +449,8 @@
       "tags": [
         "mode",
         "gungame"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "match-start",
@@ -449,7 +469,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی این پلاگین/مود."
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی این پلاگین/مود.",
+      "risk": "action"
     },
     {
       "id": "forcestart",
@@ -465,7 +486,8 @@
         "match",
         "knife",
         "start"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "end-match-mode",
@@ -480,7 +502,8 @@
       "tags": [
         "match",
         "end"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "end-warmup",
@@ -495,7 +518,8 @@
       "tags": [
         "match",
         "warmup"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "pause-warmup",
@@ -510,7 +534,8 @@
       "tags": [
         "match",
         "warmup"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "start-warmup",
@@ -525,7 +550,8 @@
       "tags": [
         "match",
         "warmup"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "match-restart",
@@ -546,7 +572,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی این پلاگین/مود."
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی این پلاگین/مود.",
+      "risk": "high"
     },
     {
       "id": "forcepause",
@@ -566,7 +593,8 @@
       ],
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
-      "availability": "mode"
+      "availability": "mode",
+      "risk": "action"
     },
     {
       "id": "forceunpause",
@@ -586,7 +614,8 @@
       ],
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
-      "availability": "mode"
+      "availability": "mode",
+      "risk": "action"
     },
     {
       "id": "restore-round",
@@ -605,7 +634,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در مخزن kus-monorepo زیر plugins/disabled قرار دارد و فقط پس از فعال‌سازی مود مربوط کار می‌کند."
+      "availability_note": "MatchZy در مخزن kus-monorepo زیر plugins/disabled قرار دارد و فقط پس از فعال‌سازی مود مربوط کار می‌کند.",
+      "risk": "high"
     },
     {
       "id": "skip-veto",
@@ -625,7 +655,8 @@
       ],
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
-      "availability": "mode"
+      "availability": "mode",
+      "risk": "action"
     },
     {
       "id": "roundknife",
@@ -645,7 +676,8 @@
       ],
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
-      "availability": "mode"
+      "availability": "mode",
+      "risk": "action"
     },
     {
       "id": "match-settings",
@@ -663,7 +695,8 @@
       ],
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
-      "availability": "mode"
+      "availability": "mode",
+      "risk": "info"
     },
     {
       "id": "team1",
@@ -681,7 +714,8 @@
       ],
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
-      "availability": "mode"
+      "availability": "mode",
+      "risk": "action"
     },
     {
       "id": "team2",
@@ -699,7 +733,8 @@
       ],
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
-      "availability": "mode"
+      "availability": "mode",
+      "risk": "action"
     },
     {
       "id": "exit-practice",
@@ -717,7 +752,8 @@
       ],
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
-      "availability": "mode"
+      "availability": "mode",
+      "risk": "action"
     },
     {
       "id": "ban",
@@ -737,7 +773,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
-      "example": "!ban PlayerName 1440 \"Hacking\""
+      "example": "!ban PlayerName 1440 \"Hacking\"",
+      "risk": "high"
     },
     {
       "id": "gag",
@@ -757,7 +794,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
-      "example": "!gag PlayerName 30 \"Chat spam\""
+      "example": "!gag PlayerName 30 \"Chat spam\"",
+      "risk": "high"
     },
     {
       "id": "mute",
@@ -777,7 +815,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
-      "example": "!mute PlayerName 60 \"Mic spam\""
+      "example": "!mute PlayerName 60 \"Mic spam\"",
+      "risk": "high"
     },
     {
       "id": "kickid",
@@ -797,7 +836,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
-      "example": "!kick PlayerName \"AFK\""
+      "example": "!kick PlayerName \"AFK\"",
+      "risk": "high"
     },
     {
       "id": "map",
@@ -818,7 +858,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "availability_note": "دستور تغییر نقشه SimpleAdmin است؛ GameModeManager برای انتخاب مود قابلیت جداگانه دارد."
+      "availability_note": "دستور تغییر نقشه SimpleAdmin است؛ GameModeManager برای انتخاب مود قابلیت جداگانه دارد.",
+      "risk": "action"
     },
     {
       "id": "maps",
@@ -838,7 +879,8 @@
       "source_url": "https://github.com/ssypchenko/GG1MapChooser",
       "availability": "default",
       "availability_note": "GG1MapChooser در پکیج پیش‌فرض قرار دارد؛ منوی نقشه این پلاگین با GameModeManager جداست.",
-      "console_command": "css_maps"
+      "console_command": "css_maps",
+      "risk": "info"
     },
     {
       "id": "lock",
@@ -852,7 +894,8 @@
       "syntax": "!lock",
       "tags": [
         "team"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "unban",
@@ -872,7 +915,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
-      "example": "!unban 76561198012345678 \"Appeal accepted\""
+      "example": "!unban 76561198012345678 \"Appeal accepted\"",
+      "risk": "high"
     },
     {
       "id": "respawn",
@@ -890,7 +934,8 @@
       "console_command": "css_respawn <#userid or name>",
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "slap",
@@ -908,7 +953,8 @@
       "console_command": "css_slap <#userid or name> [damage]",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
-      "availability": "default"
+      "availability": "default",
+      "risk": "high"
     },
     {
       "id": "slay",
@@ -926,7 +972,8 @@
       "console_command": "css_slay <#userid or name>",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
-      "availability": "default"
+      "availability": "default",
+      "risk": "high"
     },
     {
       "id": "round-restart",
@@ -950,7 +997,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
       "console_command": "css_rr",
       "availability": "default",
-      "availability_note": "نام و Aliasهای console command با Commands.json شاخه integration/kus-monorepo تطبیق داده شده‌اند."
+      "availability_note": "نام و Aliasهای console command با Commands.json شاخه integration/kus-monorepo تطبیق داده شده‌اند.",
+      "risk": "action"
     },
     {
       "id": "score-reset",
@@ -965,7 +1013,8 @@
       "tags": [
         "gameplay",
         "score"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "move-player",
@@ -983,7 +1032,8 @@
       "console_command": "css_team <#userid or name> [ct/t/spec] [-k]",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "rename",
@@ -1001,7 +1051,8 @@
       "console_command": "css_rename <#userid or name> <new name>",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "wmap",
@@ -1023,7 +1074,8 @@
       "console_command": "css_wsmap <name or id>",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "rcon",
@@ -1042,7 +1094,8 @@
       "console_command": "css_rcon <command>",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
-      "availability": "default"
+      "availability": "default",
+      "risk": "high"
     },
     {
       "id": "spawn",
@@ -1061,7 +1114,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط."
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط.",
+      "risk": "safe"
     },
     {
       "id": "ctspawn",
@@ -1082,7 +1136,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط."
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط.",
+      "risk": "safe"
     },
     {
       "id": "tspawn",
@@ -1103,7 +1158,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط."
+      "availability_note": "MatchZy در plugins/disabled قرار دارد؛ فقط پس از فعال‌سازی پلاگین در مود مربوط.",
+      "risk": "safe"
     },
     {
       "id": "bot",
@@ -1122,7 +1178,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "crouchbot",
@@ -1143,7 +1200,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "boost",
@@ -1162,7 +1220,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "nobots",
@@ -1181,7 +1240,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "clear",
@@ -1200,7 +1260,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "god",
@@ -1218,7 +1279,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "noflash",
@@ -1238,7 +1300,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "dryrun",
@@ -1258,7 +1321,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "savenade",
@@ -1279,7 +1343,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "loadnade",
@@ -1298,7 +1363,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "listnades",
@@ -1319,7 +1385,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "info"
     },
     {
       "id": "rethrow",
@@ -1340,7 +1407,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "timer",
@@ -1359,7 +1427,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "back",
@@ -1378,7 +1447,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "fastforward",
@@ -1399,7 +1469,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "solid",
@@ -1418,7 +1489,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "impacts",
@@ -1437,7 +1509,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "traj",
@@ -1456,7 +1529,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است."
+      "availability_note": "MatchZy در kus-monorepo به‌صورت mode-specific در plugins/disabled نگهداری می‌شود؛ فعال‌سازی آن برای این مود ضروری است.",
+      "risk": "safe"
     },
     {
       "id": "settings-menu",
@@ -1475,7 +1549,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "info"
     },
     {
       "id": "bunnyhop-on",
@@ -1490,7 +1565,8 @@
       "tags": [
         "settings",
         "movement"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "bunnyhop-off",
@@ -1505,7 +1581,8 @@
       "tags": [
         "settings",
         "movement"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "friendlyfire-on",
@@ -1520,7 +1597,8 @@
       "tags": [
         "settings",
         "gameplay"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "friendlyfire-off",
@@ -1535,7 +1613,8 @@
       "tags": [
         "settings",
         "gameplay"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "headshot-on",
@@ -1550,7 +1629,8 @@
       "tags": [
         "settings",
         "gameplay"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "headshot-off",
@@ -1565,7 +1645,8 @@
       "tags": [
         "settings",
         "gameplay"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "alltalk-on",
@@ -1580,7 +1661,8 @@
       "tags": [
         "settings",
         "voice"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "alltalk-off",
@@ -1595,7 +1677,8 @@
       "tags": [
         "settings",
         "voice"
-      ]
+      ],
+      "risk": "action"
     },
     {
       "id": "sa-addban",
@@ -1611,7 +1694,8 @@
       "availability": "default",
       "console_command": "css_addban <steamid> [time in minutes/0 perm] [reason]",
       "example": "76561198012345678 1440 \"Ban evasion\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-banip",
@@ -1627,7 +1711,8 @@
       "availability": "default",
       "console_command": "css_banip <ip> [time in minutes/0 perm] [reason]",
       "example": "192.0.2.10 1440 \"Ban evasion\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-warn",
@@ -1643,7 +1728,8 @@
       "availability": "default",
       "console_command": "css_warn <#userid or name> [reason]",
       "example": "PlayerName \"Chat abuse\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-unwarn",
@@ -1659,7 +1745,8 @@
       "availability": "default",
       "console_command": "css_unwarn <steamid or name>",
       "example": "76561198012345678",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-asay",
@@ -1675,7 +1762,8 @@
       "availability": "default",
       "console_command": "css_asay <message>",
       "example": "\"Player is suspicious, keep an eye on them\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-cssay",
@@ -1691,7 +1779,8 @@
       "availability": "default",
       "console_command": "css_cssay <message>",
       "example": "\"Server will restart in 5 minutes!\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-say",
@@ -1707,7 +1796,8 @@
       "availability": "default",
       "console_command": "css_say <message>",
       "example": "\"Please be respectful in chat\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-psay",
@@ -1723,7 +1813,8 @@
       "availability": "default",
       "console_command": "css_psay <#userid or name> <message>",
       "example": "PlayerName \"Please stop mic spamming\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-csay",
@@ -1739,7 +1830,8 @@
       "availability": "default",
       "console_command": "css_csay <message>",
       "example": "\"ROUND STARTS IN 10 SECONDS\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-hsay",
@@ -1755,7 +1847,8 @@
       "availability": "default",
       "console_command": "css_hsay <message>",
       "example": "\"Tournament starting soon!\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-penalties",
@@ -1775,7 +1868,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_penalties",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "info"
     },
     {
       "id": "sa-admin",
@@ -1790,7 +1884,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_admin",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-adminhelp",
@@ -1805,7 +1900,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_adminhelp",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "info"
     },
     {
       "id": "sa-addadmin",
@@ -1821,7 +1917,8 @@
       "availability": "default",
       "console_command": "css_addadmin <steamid> <name> <flags/groups> <immunity> <duration>",
       "example": "76561198012345678 \"Moderator\" \"@css/kick,@css/ban\" 50 43200",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-deladmin",
@@ -1837,7 +1934,8 @@
       "availability": "default",
       "console_command": "css_deladmin <steamid>",
       "example": "76561198012345678",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-addgroup",
@@ -1853,7 +1951,8 @@
       "availability": "default",
       "console_command": "css_addgroup <group_name> <flags> <immunity>",
       "example": "\"#moderators\" \"@css/kick,@css/ban,@css/chat\" 50",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-delgroup",
@@ -1869,7 +1968,8 @@
       "availability": "default",
       "console_command": "css_delgroup <group_name>",
       "example": "\"#moderators\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-reloadadmins",
@@ -1884,7 +1984,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_reloadadmins",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-reloadbans",
@@ -1899,7 +2000,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_reloadbans",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-hide",
@@ -1917,7 +2019,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_hide",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-hidecomms",
@@ -1932,7 +2035,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_hidecomms",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-who",
@@ -1948,7 +2052,8 @@
       "availability": "default",
       "console_command": "css_who <#userid or name>",
       "example": "#123",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "info"
     },
     {
       "id": "sa-disconnected",
@@ -1966,7 +2071,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_disconnected",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "info"
     },
     {
       "id": "sa-warns",
@@ -1982,7 +2088,8 @@
       "availability": "default",
       "console_command": "css_warns <#userid or name>",
       "example": "PlayerName",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "info"
     },
     {
       "id": "sa-players",
@@ -1997,7 +2104,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_players",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "info"
     },
     {
       "id": "sa-wsmap",
@@ -2013,7 +2121,8 @@
       "availability": "default",
       "console_command": "css_wsmap <name or id>",
       "example": "3073150255",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-cvar",
@@ -2029,7 +2138,8 @@
       "availability": "default",
       "console_command": "css_cvar <cvar> <value>",
       "example": "sv_cheats 1",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-rcon",
@@ -2045,7 +2155,8 @@
       "availability": "default",
       "console_command": "css_rcon <command>",
       "example": "status",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-rr",
@@ -2067,7 +2178,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_rr",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-addgag",
@@ -2083,7 +2195,8 @@
       "availability": "default",
       "console_command": "css_addgag <steamid> [time in minutes/0 perm] [reason]",
       "example": "76561198012345678 60 \"Chat abuse\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-ungag",
@@ -2099,7 +2212,8 @@
       "availability": "default",
       "console_command": "css_ungag <steamid or name> [reason]",
       "example": "PlayerName",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-addmute",
@@ -2115,7 +2229,8 @@
       "availability": "default",
       "console_command": "css_addmute <steamid> [time in minutes/0 perm] [reason]",
       "example": "76561198012345678 120 \"Voice abuse\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-unmute",
@@ -2131,7 +2246,8 @@
       "availability": "default",
       "console_command": "css_unmute <steamid or name> [reason]",
       "example": "PlayerName",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-silence",
@@ -2147,7 +2263,8 @@
       "availability": "default",
       "console_command": "css_silence <#userid or name> [time in minutes/0 perm] [reason]",
       "example": "PlayerName 60 \"Abuse\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-addsilence",
@@ -2163,7 +2280,8 @@
       "availability": "default",
       "console_command": "css_addsilence <steamid> [time in minutes/0 perm] [reason]",
       "example": "76561198012345678 120 \"Total communication ban\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-unsilence",
@@ -2179,7 +2297,8 @@
       "availability": "default",
       "console_command": "css_unsilence <steamid or name> [reason]",
       "example": "PlayerName",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-vote",
@@ -2195,7 +2314,8 @@
       "availability": "default",
       "console_command": "css_vote <question> [option1] [option2] ...",
       "example": "\"Next map?\" \"de_dust2\" \"de_mirage\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-team",
@@ -2211,7 +2331,8 @@
       "availability": "default",
       "console_command": "css_team <#userid or name> [ct/t/spec] [-k]",
       "example": "PlayerName ct",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-rename",
@@ -2227,7 +2348,8 @@
       "availability": "default",
       "console_command": "css_rename <#userid or name> <new name>",
       "example": "PlayerName \"NewName\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "action"
     },
     {
       "id": "sa-prename",
@@ -2243,7 +2365,8 @@
       "availability": "default",
       "console_command": "css_prename <#userid or name> <new name>",
       "example": "PlayerName \"EnforcedName\"",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-pluginsmanager",
@@ -2261,7 +2384,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_pluginsmanager",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "sa-adminvoice",
@@ -2279,7 +2403,8 @@
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/tree/main/CS2-SimpleAdmin-docs/docs/user/commands",
       "availability": "default",
       "console_command": "css_adminvoice",
-      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است."
+      "availability_note": "نام دستور و Aliasها با Commands.json شاخه integration/kus-monorepo تطبیق داده شده است.",
+      "risk": "high"
     },
     {
       "id": "fun-noclip",
@@ -2293,7 +2418,8 @@
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
       "availability": "default",
-      "console_command": "css_noclip <target>"
+      "console_command": "css_noclip <target>",
+      "risk": "action"
     },
     {
       "id": "fun-god",
@@ -2307,7 +2433,8 @@
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
       "availability": "default",
-      "console_command": "css_god <target>"
+      "console_command": "css_god <target>",
+      "risk": "action"
     },
     {
       "id": "fun-freeze",
@@ -2321,7 +2448,8 @@
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
       "availability": "default",
-      "console_command": "css_freeze <target>"
+      "console_command": "css_freeze <target>",
+      "risk": "action"
     },
     {
       "id": "fun-unfreeze",
@@ -2335,7 +2463,8 @@
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
       "availability": "default",
-      "console_command": "css_unfreeze <target>"
+      "console_command": "css_unfreeze <target>",
+      "risk": "action"
     },
     {
       "id": "fun-give",
@@ -2349,7 +2478,8 @@
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
       "availability": "default",
-      "console_command": "css_give <target> <weapon>"
+      "console_command": "css_give <target> <weapon>",
+      "risk": "action"
     },
     {
       "id": "fun-strip",
@@ -2363,7 +2493,8 @@
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
       "availability": "default",
-      "console_command": "css_strip <target>"
+      "console_command": "css_strip <target>",
+      "risk": "action"
     },
     {
       "id": "fun-hp",
@@ -2377,7 +2508,8 @@
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
       "availability": "default",
-      "console_command": "css_hp <target> <health>"
+      "console_command": "css_hp <target> <health>",
+      "risk": "action"
     },
     {
       "id": "fun-speed",
@@ -2391,7 +2523,8 @@
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
       "availability": "default",
-      "console_command": "css_speed <target> <speed>"
+      "console_command": "css_speed <target> <speed>",
+      "risk": "action"
     },
     {
       "id": "fun-gravity",
@@ -2405,7 +2538,8 @@
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
       "availability": "default",
-      "console_command": "css_gravity <target> <gravity>"
+      "console_command": "css_gravity <target> <gravity>",
+      "risk": "action"
     },
     {
       "id": "fun-money",
@@ -2419,7 +2553,8 @@
       "plugin": "CS2-SimpleAdmin FunCommands",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/Modules/CS2-SimpleAdmin_FunCommands/README.md",
       "availability": "default",
-      "console_command": "css_money <target> <amount>"
+      "console_command": "css_money <target> <amount>",
+      "risk": "action"
     },
     {
       "id": "sa-flag-generic",
@@ -2433,7 +2568,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-chat",
@@ -2447,7 +2583,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-changemap",
@@ -2461,7 +2598,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-slay",
@@ -2475,7 +2613,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-kick",
@@ -2489,7 +2628,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-ban",
@@ -2503,7 +2643,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-permban",
@@ -2517,7 +2658,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-unban",
@@ -2531,7 +2673,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-showip",
@@ -2545,7 +2688,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-cvar",
@@ -2559,7 +2703,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-rcon",
@@ -2573,7 +2718,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-flag-root",
@@ -2587,7 +2733,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "default",
-      "copy_label": "کپی Permission"
+      "copy_label": "کپی Permission",
+      "risk": "info"
     },
     {
       "id": "sa-bantype",
@@ -2601,7 +2748,8 @@
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
       "availability": "config",
-      "example": "BanType: 1 = SteamID"
+      "example": "BanType: 1 = SteamID",
+      "risk": "info"
     },
     {
       "id": "sa-max-ban",
@@ -2614,7 +2762,8 @@
       "access": "تنظیم سرور",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "sa-max-mute",
@@ -2627,7 +2776,8 @@
       "access": "تنظیم سرور",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "sa-disable-danger",
@@ -2640,7 +2790,8 @@
       "access": "تنظیم سرور",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "sa-multiserver",
@@ -2653,7 +2804,8 @@
       "access": "تنظیم سرور",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "sa-time-mode",
@@ -2666,7 +2818,8 @@
       "access": "تنظیم سرور",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "sa-danger-note",
@@ -2679,7 +2832,8 @@
       "access": "تنظیم سرور",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "gmm-mode",
@@ -2695,7 +2849,8 @@
       "availability": "verify",
       "console_command": "css_gamemode <mode>",
       "example": "!mode surf",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-warmup-mode",
@@ -2709,7 +2864,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-end-warmup",
@@ -2723,7 +2879,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-start-warmup",
@@ -2737,7 +2894,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-timelimit",
@@ -2752,7 +2910,8 @@
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
       "console_command": "css_timelimit <true/false> <seconds>",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-setting",
@@ -2767,7 +2926,8 @@
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
       "example": "!setting enable movement_unlock",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-rtv-extend",
@@ -2781,7 +2941,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-rtv-enabled",
@@ -2795,7 +2956,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-rtv-duration",
@@ -2809,7 +2971,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-rtv-max-extends",
@@ -2823,7 +2986,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-rtv-end-map-vote",
@@ -2837,7 +3001,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-rtv-rounds-end",
@@ -2851,7 +3016,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-rtv-seconds-end",
@@ -2865,7 +3031,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-rtv-start-vote",
@@ -2879,7 +3046,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-player-game",
@@ -2893,7 +3061,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "info"
     },
     {
       "id": "gmm-player-nominate",
@@ -2907,7 +3076,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-player-nextmap",
@@ -2921,7 +3091,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "info"
     },
     {
       "id": "gmm-player-nextmode",
@@ -2935,7 +3106,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "info"
     },
     {
       "id": "gmm-player-timeleft",
@@ -2949,7 +3121,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "info"
     },
     {
       "id": "gmm-player-currentmap",
@@ -2963,7 +3136,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "info"
     },
     {
       "id": "gmm-player-changemap",
@@ -2977,7 +3151,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-player-currentmode",
@@ -2991,7 +3166,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "info"
     },
     {
       "id": "gmm-player-changemode",
@@ -3005,7 +3181,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "gmm-player-changesetting",
@@ -3019,7 +3196,8 @@
       "plugin": "GameModeManager",
       "source_url": "https://github.com/nickj609/GameModeManager#commands",
       "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-gun-game",
@@ -3034,7 +3212,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode gun game",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-deathmatch",
@@ -3049,7 +3228,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode deathmatch",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-competitive",
@@ -3064,7 +3244,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode competitive",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-wingman",
@@ -3079,7 +3260,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode wingman",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-practice",
@@ -3094,7 +3276,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode practice mode",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-prefire",
@@ -3109,7 +3292,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode prefire",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-retakes",
@@ -3124,7 +3308,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode retakes",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-executes",
@@ -3139,7 +3324,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode executes",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-awp-only",
@@ -3154,7 +3340,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode awp only",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-1v1-arenas",
@@ -3169,7 +3356,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode 1v1 arenas",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-aim",
@@ -3184,7 +3372,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode aim",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-bhop",
@@ -3199,7 +3388,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode bhop",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-surf",
@@ -3214,7 +3404,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode surf",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-kz",
@@ -3229,7 +3420,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode kreedz climbing",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-ctf",
@@ -3244,7 +3436,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode capture the flag",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-hide-n-seek",
@@ -3259,7 +3452,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode hide n seek",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-soccer",
@@ -3274,7 +3468,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode soccer",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-course",
@@ -3289,7 +3484,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode course",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-deathrun",
@@ -3304,7 +3500,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode deathrun",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-minigames",
@@ -3319,7 +3516,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode minigames",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-scoutzknivez",
@@ -3334,7 +3532,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode scoutzknivez",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-one-in-the-chamber",
@@ -3349,7 +3548,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode one in the chamber",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-battle-ball",
@@ -3364,7 +3564,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode battle ball",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-battle-royale",
@@ -3379,7 +3580,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode battle royale",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-casual",
@@ -3394,7 +3596,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode casual",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-casual-16",
@@ -3409,7 +3612,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode casual (1.6)",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-valve-competitive",
@@ -3424,7 +3628,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode competitive (valve)",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-valve-deathmatch",
@@ -3439,7 +3644,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode deathmatch ffa (valve)",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-arms-race",
@@ -3454,7 +3660,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode arms race (valve)",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-valve-wingman",
@@ -3469,7 +3676,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode wingman (valve)",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-casual-workshop",
@@ -3484,7 +3692,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode casual workshop",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-casual-active",
@@ -3499,7 +3708,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode casual active",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-valve-retakes",
@@ -3514,7 +3724,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode retakes (valve)",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "id": "mode-competitive-45",
@@ -3529,7 +3740,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
       "availability": "verify",
       "console_command": "css_gamemode competitive 45°",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن.",
+      "risk": "action"
     },
     {
       "0": "d",
@@ -3550,7 +3762,8 @@
       "access": "وضعیت کانفیگ tracked",
       "plugin": "GameModeManager",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
-      "availability": "disabled"
+      "availability": "disabled",
+      "risk": "info"
     },
     {
       "0": "c",
@@ -3569,7 +3782,8 @@
       "access": "وضعیت کانفیگ tracked",
       "plugin": "GameModeManager",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "0": "c",
@@ -3588,7 +3802,8 @@
       "access": "وضعیت کانفیگ tracked",
       "plugin": "GameModeManager",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "0": "d",
@@ -3609,7 +3824,8 @@
       "access": "وضعیت کانفیگ tracked",
       "plugin": "GameModeManager",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
-      "availability": "disabled"
+      "availability": "disabled",
+      "risk": "info"
     },
     {
       "id": "matchzy-bestspawn",
@@ -3623,7 +3839,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-worstspawn",
@@ -3637,7 +3854,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-bestctspawn",
@@ -3651,7 +3869,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-worstctspawn",
@@ -3665,7 +3884,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-besttspawn",
@@ -3679,7 +3899,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-worsttspawn",
@@ -3693,7 +3914,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-showspawns",
@@ -3707,7 +3929,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "info"
     },
     {
       "id": "matchzy-hidespawns",
@@ -3721,7 +3944,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "info"
     },
     {
       "id": "matchzy-crouchboost",
@@ -3737,7 +3961,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-practice-team-ct",
@@ -3751,7 +3976,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-practice-team-t",
@@ -3765,7 +3991,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-practice-team-spec",
@@ -3779,7 +4006,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-fas",
@@ -3795,7 +4023,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-break",
@@ -3809,7 +4038,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-nade-delay",
@@ -3823,7 +4053,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-throwindex",
@@ -3837,7 +4068,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-lastindex",
@@ -3851,7 +4083,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "info"
     },
     {
       "id": "matchzy-rethrow-smoke",
@@ -3865,7 +4098,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-rethrow-he",
@@ -3879,7 +4113,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-rethrow-flash",
@@ -3893,7 +4128,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-rethrow-molotov",
@@ -3907,7 +4143,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-rethrow-decoy",
@@ -3921,7 +4158,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "safe"
     },
     {
       "id": "matchzy-delete-nade",
@@ -3937,7 +4175,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-import-nade",
@@ -3953,7 +4192,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-list-nades-filter",
@@ -3969,7 +4209,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "info"
     },
     {
       "id": "matchzy-admin-forceready",
@@ -3983,7 +4224,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-admin-endmatch",
@@ -3997,7 +4239,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "high"
     },
     {
       "id": "matchzy-admin-readyrequired",
@@ -4011,7 +4254,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-admin-addreadytime",
@@ -4025,7 +4269,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-admin-playout",
@@ -4039,7 +4284,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-admin-whitelist",
@@ -4053,7 +4299,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "high"
     },
     {
       "id": "matchzy-admin-admin-asay",
@@ -4067,7 +4314,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-admin-reload-admins",
@@ -4081,7 +4329,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-admin-admin-prac",
@@ -4095,7 +4344,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "action"
     },
     {
       "id": "matchzy-admin-admin-rcon",
@@ -4109,7 +4359,8 @@
       "plugin": "MatchZy",
       "source_url": "https://github.com/shobhit-pathak/MatchZy/blob/dev/documentation/docs/commands.md",
       "availability": "mode",
-      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد."
+      "availability_note": "MatchZy در cs2-kus-addons زیر plugins/disabled قرار دارد؛ برای استفاده باید این پلاگین در مود/سرور موردنظر فعال شده باشد.",
+      "risk": "high"
     },
     {
       "id": "retakes-forcebombsite",
@@ -4123,7 +4374,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "action"
     },
     {
       "id": "retakes-forcebombsitestop",
@@ -4137,7 +4389,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "action"
     },
     {
       "id": "retakes-scramble",
@@ -4151,7 +4404,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "action"
     },
     {
       "id": "retakes-scrambleteams",
@@ -4165,7 +4419,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "action"
     },
     {
       "id": "retakes-voices",
@@ -4179,7 +4434,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "action"
     },
     {
       "id": "retakes-showspawns",
@@ -4196,7 +4452,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "info"
     },
     {
       "id": "retakes-addspawn",
@@ -4214,7 +4471,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "action"
     },
     {
       "id": "retakes-remove-spawn",
@@ -4232,7 +4490,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "action"
     },
     {
       "id": "retakes-nearestspawn",
@@ -4248,7 +4507,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "action"
     },
     {
       "id": "retakes-hidespawns",
@@ -4265,7 +4525,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "info"
     },
     {
       "id": "retakes-mapconfig",
@@ -4282,7 +4543,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "action"
     },
     {
       "id": "retakes-mapconfigs",
@@ -4299,7 +4561,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "info"
     },
     {
       "id": "retakes-debugqueues",
@@ -4313,7 +4576,8 @@
       "plugin": "CS2 Retakes",
       "source_url": "https://github.com/B3none/cs2-retakes#commands",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "info"
     },
     {
       "id": "k4-guns",
@@ -4330,7 +4594,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "k4-gunpref",
@@ -4344,7 +4609,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "k4-weaponpref",
@@ -4358,7 +4624,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "k4-rounds",
@@ -4374,7 +4641,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "k4-roundpref",
@@ -4388,7 +4656,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "k4-queue",
@@ -4402,7 +4671,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "info"
     },
     {
       "id": "k4-afk",
@@ -4416,7 +4686,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "info"
     },
     {
       "id": "k4-challenge",
@@ -4432,7 +4703,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "k4-duel",
@@ -4446,7 +4718,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "k4-challenge-accept",
@@ -4462,7 +4735,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "k4-challenge-approve",
@@ -4476,7 +4750,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "k4-challenge-decline",
@@ -4492,7 +4767,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "k4-challenge-deny",
@@ -4506,7 +4782,8 @@
       "plugin": "K4-Arenas",
       "source_url": "https://github.com/K4ryuu/K4-Arenas/wiki",
       "availability": "mode",
-      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست.",
+      "risk": "safe"
     },
     {
       "id": "vipcore-menu",
@@ -4520,7 +4797,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "default",
-      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند."
+      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند.",
+      "risk": "info"
     },
     {
       "id": "vipcore-admin-menu",
@@ -4534,7 +4812,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "default",
-      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند."
+      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند.",
+      "risk": "action"
     },
     {
       "id": "vipcore-add-user",
@@ -4548,7 +4827,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "default",
-      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند."
+      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند.",
+      "risk": "high"
     },
     {
       "id": "vipcore-update-user",
@@ -4562,7 +4842,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "default",
-      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند."
+      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند.",
+      "risk": "high"
     },
     {
       "id": "vipcore-delete-user",
@@ -4576,7 +4857,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "default",
-      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند."
+      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند.",
+      "risk": "high"
     },
     {
       "id": "vipcore-reload-player",
@@ -4591,7 +4873,8 @@
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "default",
       "console_command": "css_reload_vip_player <steamid>",
-      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند."
+      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند.",
+      "risk": "action"
     },
     {
       "id": "vipcore-reload",
@@ -4605,7 +4888,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "default",
-      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند."
+      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند.",
+      "risk": "action"
     },
     {
       "id": "vipcore-help",
@@ -4619,7 +4903,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "default",
-      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند."
+      "availability_note": "این دستورها از README سازنده VIPCore گرفته شده‌اند؛ دستورات مدیریتی نیازمند @css/root هستند.",
+      "risk": "info"
     },
     {
       "id": "vip-group-bronze",
@@ -4633,7 +4918,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "config",
-      "copy_label": "کپی نام گروه"
+      "copy_label": "کپی نام گروه",
+      "risk": "info"
     },
     {
       "id": "vip-group-silver",
@@ -4647,7 +4933,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "config",
-      "copy_label": "کپی نام گروه"
+      "copy_label": "کپی نام گروه",
+      "risk": "info"
     },
     {
       "id": "vip-group-gold",
@@ -4661,7 +4948,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "config",
-      "copy_label": "کپی نام گروه"
+      "copy_label": "کپی نام گروه",
+      "risk": "info"
     },
     {
       "id": "vip-group-platinum",
@@ -4675,7 +4963,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "config",
-      "copy_label": "کپی نام گروه"
+      "copy_label": "کپی نام گروه",
+      "risk": "info"
     },
     {
       "id": "vip-group-emerald",
@@ -4689,7 +4978,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "config",
-      "copy_label": "کپی نام گروه"
+      "copy_label": "کپی نام گروه",
+      "risk": "info"
     },
     {
       "id": "vip-group-diamond",
@@ -4703,7 +4993,8 @@
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
       "availability": "config",
-      "copy_label": "کپی نام گروه"
+      "copy_label": "کپی نام گروه",
+      "risk": "info"
     },
     {
       "id": "vip-time-mode",
@@ -4716,7 +5007,8 @@
       "access": "تنظیم سرور",
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "vip-menu-permission",
@@ -4729,7 +5021,8 @@
       "access": "تنظیم سرور",
       "plugin": "VIPCore",
       "source_url": "https://github.com/partiusfabaa/cs2-VIPCore#commands",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "playervotes-votemute",
@@ -4742,7 +5035,8 @@
       "access": "بازیکن",
       "plugin": "CS2-Playervotes",
       "source_url": "https://github.com/asapverneri/CS2-Playervotes#commands",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "playervotes-voteban",
@@ -4755,7 +5049,8 @@
       "access": "بازیکن",
       "plugin": "CS2-Playervotes",
       "source_url": "https://github.com/asapverneri/CS2-Playervotes#commands",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "playervotes-votekick",
@@ -4768,7 +5063,8 @@
       "access": "بازیکن",
       "plugin": "CS2-Playervotes",
       "source_url": "https://github.com/asapverneri/CS2-Playervotes#commands",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "playervotes-votegag",
@@ -4781,7 +5077,8 @@
       "access": "بازیکن",
       "plugin": "CS2-Playervotes",
       "source_url": "https://github.com/asapverneri/CS2-Playervotes#commands",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "playervotes-votesilence",
@@ -4794,7 +5091,8 @@
       "access": "بازیکن",
       "plugin": "CS2-Playervotes",
       "source_url": "https://github.com/asapverneri/CS2-Playervotes#commands",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "playervotes-threshold",
@@ -4807,7 +5105,8 @@
       "access": "تنظیم سرور",
       "plugin": "CS2-Playervotes",
       "source_url": "https://github.com/asapverneri/CS2-Playervotes#commands",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "playervotes-min-players",
@@ -4820,7 +5119,8 @@
       "access": "تنظیم سرور",
       "plugin": "CS2-Playervotes",
       "source_url": "https://github.com/asapverneri/CS2-Playervotes#commands",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "playervotes-immunity",
@@ -4833,7 +5133,8 @@
       "access": "تنظیم سرور",
       "plugin": "CS2-Playervotes",
       "source_url": "https://github.com/asapverneri/CS2-Playervotes#commands",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "playervotes-durations",
@@ -4846,7 +5147,8 @@
       "access": "تنظیم سرور",
       "plugin": "CS2-Playervotes",
       "source_url": "https://github.com/asapverneri/CS2-Playervotes#commands",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "staff-list",
@@ -4859,7 +5161,8 @@
       "access": "عمومی",
       "plugin": "CS2Stafflist",
       "source_url": "https://github.com/asapverneri/CS2-StaffList",
-      "availability": "default"
+      "availability": "default",
+      "risk": "info"
     },
     {
       "id": "staff-hide",
@@ -4872,7 +5175,8 @@
       "access": "@css/ban",
       "plugin": "CS2Stafflist",
       "source_url": "https://github.com/asapverneri/CS2-StaffList",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "faceit-elo",
@@ -4885,7 +5189,8 @@
       "access": "بازیکن",
       "plugin": "CS2FaceitLevels",
       "source_url": "https://github.com/Staaar0/cs2-FaceitLevels",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "faceit-elos",
@@ -4898,7 +5203,8 @@
       "access": "بازیکن",
       "plugin": "CS2FaceitLevels",
       "source_url": "https://github.com/Staaar0/cs2-FaceitLevels",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "faceit-elo-enabled",
@@ -4912,7 +5218,8 @@
       "plugin": "CS2FaceitLevels",
       "source_url": "https://github.com/Staaar0/cs2-FaceitLevels",
       "availability": "config",
-      "availability_note": "کلید API در فایل کانفیگ tracked خالی است؛ کلید واقعی را فقط در runtime config سرور قرار بده."
+      "availability_note": "کلید API در فایل کانفیگ tracked خالی است؛ کلید واقعی را فقط در runtime config سرور قرار بده.",
+      "risk": "info"
     },
     {
       "id": "ranks-rank",
@@ -4925,7 +5232,8 @@
       "access": "بازیکن",
       "plugin": "cs2-ranks",
       "source_url": "https://github.com/partiusfabaa/cs2-ranks",
-      "availability": "default"
+      "availability": "default",
+      "risk": "info"
     },
     {
       "id": "ranks-lvl",
@@ -4938,7 +5246,8 @@
       "access": "بازیکن",
       "plugin": "cs2-ranks",
       "source_url": "https://github.com/partiusfabaa/cs2-ranks",
-      "availability": "default"
+      "availability": "default",
+      "risk": "info"
     },
     {
       "id": "ranks-top",
@@ -4951,7 +5260,8 @@
       "access": "بازیکن",
       "plugin": "cs2-ranks",
       "source_url": "https://github.com/partiusfabaa/cs2-ranks",
-      "availability": "default"
+      "availability": "default",
+      "risk": "info"
     },
     {
       "id": "ranks-reload",
@@ -4966,7 +5276,8 @@
       "source_url": "https://github.com/partiusfabaa/cs2-ranks",
       "availability": "default",
       "console_command": "css_lr_reload",
-      "availability_note": "این دستور در مستندات سازنده Server Console only اعلام شده است."
+      "availability_note": "این دستور در مستندات سازنده Server Console only اعلام شده است.",
+      "risk": "action"
     },
     {
       "id": "ranks-giveexp",
@@ -4981,7 +5292,8 @@
       "source_url": "https://github.com/partiusfabaa/cs2-ranks",
       "availability": "default",
       "console_command": "css_lr_giveexp <username/#userid> [exp]",
-      "availability_note": "این دستور در مستندات سازنده Server Console only اعلام شده است."
+      "availability_note": "این دستور در مستندات سازنده Server Console only اعلام شده است.",
+      "risk": "high"
     },
     {
       "id": "ranks-takeexp",
@@ -4996,7 +5308,8 @@
       "source_url": "https://github.com/partiusfabaa/cs2-ranks",
       "availability": "default",
       "console_command": "css_lr_takeexp <username/#userid> [exp]",
-      "availability_note": "این دستور در مستندات سازنده Server Console only اعلام شده است."
+      "availability_note": "این دستور در مستندات سازنده Server Console only اعلام شده است.",
+      "risk": "high"
     },
     {
       "id": "ranks-enabled",
@@ -5011,7 +5324,8 @@
       "source_url": "https://github.com/partiusfabaa/cs2-ranks",
       "availability": "default",
       "console_command": "css_lr_enabled <1/0>",
-      "availability_note": "این دستور در مستندات سازنده Server Console only اعلام شده است."
+      "availability_note": "این دستور در مستندات سازنده Server Console only اعلام شده است.",
+      "risk": "action"
     },
     {
       "id": "resetscore",
@@ -5024,7 +5338,8 @@
       "access": "بازیکن",
       "plugin": "SimpleResetScore",
       "source_url": "https://github.com/stefanx111/cs2-SimpleResetScore",
-      "availability": "default"
+      "availability": "default",
+      "risk": "safe"
     },
     {
       "id": "gg1-rtm",
@@ -5042,7 +5357,8 @@
       "plugin": "GG1MapChooser",
       "source_url": "https://github.com/ssypchenko/GG1MapChooser",
       "availability": "disabled",
-      "availability_note": "در GG1MapChooser.json فعلی، PoolVoteSettings.Enable=false است؛ این قابلیت تا روشن شدن آن در دسترس نیست."
+      "availability_note": "در GG1MapChooser.json فعلی، PoolVoteSettings.Enable=false است؛ این قابلیت تا روشن شدن آن در دسترس نیست.",
+      "risk": "action"
     },
     {
       "id": "gg1-rtv-enabled",
@@ -5055,7 +5371,8 @@
       "access": "تنظیم سرور",
       "plugin": "GG1MapChooser",
       "source_url": "https://github.com/ssypchenko/GG1MapChooser",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "gg1-vote-settings",
@@ -5068,7 +5385,8 @@
       "access": "تنظیم سرور",
       "plugin": "GG1MapChooser",
       "source_url": "https://github.com/ssypchenko/GG1MapChooser",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "gg1-pool-vote-disabled",
@@ -5081,7 +5399,8 @@
       "access": "تنظیم سرور",
       "plugin": "GG1MapChooser",
       "source_url": "https://github.com/ssypchenko/GG1MapChooser",
-      "availability": "disabled"
+      "availability": "disabled",
+      "risk": "info"
     },
     {
       "id": "afk-punishment",
@@ -5094,7 +5413,8 @@
       "access": "تنظیم سرور",
       "plugin": "AFKManager",
       "source_url": "https://github.com/NiGHT757/AFKManager",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "afk-warnings",
@@ -5107,7 +5427,8 @@
       "access": "تنظیم سرور",
       "plugin": "AFKManager",
       "source_url": "https://github.com/NiGHT757/AFKManager",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "afk-spectator-kick",
@@ -5120,7 +5441,8 @@
       "access": "تنظیم سرور",
       "plugin": "AFKManager",
       "source_url": "https://github.com/NiGHT757/AFKManager",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "afk-exempt-flags",
@@ -5133,7 +5455,8 @@
       "access": "تنظیم سرور",
       "plugin": "AFKManager",
       "source_url": "https://github.com/NiGHT757/AFKManager",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "anticamp-radius",
@@ -5146,7 +5469,8 @@
       "access": "تنظیم سرور",
       "plugin": "AFKManager",
       "source_url": "https://github.com/NiGHT757/AFKManager",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "anticamp-config",
@@ -5159,7 +5483,8 @@
       "access": "تنظیم سرور",
       "plugin": "AFKManager",
       "source_url": "https://github.com/NiGHT757/AFKManager",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "sa-tp",
@@ -5178,7 +5503,8 @@
       "access": "@css/kick",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "sa-bring",
@@ -5195,7 +5521,8 @@
       "access": "@css/kick",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "sa-resize",
@@ -5212,7 +5539,8 @@
       "access": "بر اساس تنظیمات پلاگین",
       "plugin": "CS2-SimpleAdmin",
       "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin/blob/main/CS2-SimpleAdmin-docs/docs/user/commands/playercommands.md",
-      "availability": "default"
+      "availability": "default",
+      "risk": "action"
     },
     {
       "id": "update-monitor-check",
@@ -5227,7 +5555,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/CS2UpdateMonitor/CS2UpdateMonitor.json",
       "availability": "config",
       "availability_note": "بررسی به‌روزرسانی و Restart باید روی سرور واقعی و با Maintenance Window تست شود.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "update-monitor-countdown",
@@ -5241,7 +5570,8 @@
       "plugin": "CS2UpdateMonitor",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/CS2UpdateMonitor/CS2UpdateMonitor.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "update-monitor-empty",
@@ -5255,7 +5585,8 @@
       "plugin": "CS2UpdateMonitor",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/CS2UpdateMonitor/CS2UpdateMonitor.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "customvotes-enabled",
@@ -5269,7 +5600,8 @@
       "plugin": "CS2-CustomVotes",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/CS2-CustomVotes/CS2-CustomVotes.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "customvotes-cooldown",
@@ -5283,7 +5615,8 @@
       "plugin": "CS2-CustomVotes",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/CS2-CustomVotes/CS2-CustomVotes.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "ads-interval",
@@ -5298,7 +5631,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/Advertisement/Advertisement.json",
       "availability": "verify",
       "availability_note": "این مقدار از فایل کانفیگ استخراج شده؛ لود بودن پلاگین را با css_plugins list تأیید کن.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "poor-map-prop-ads-permission",
@@ -5312,7 +5646,8 @@
       "plugin": "CS2-Poor-MapPropAds",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/CS2-Poor-MapPropAds/CS2-Poor-MapPropAds.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "antibait-permission",
@@ -5327,7 +5662,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/Antibait/Antibait.json",
       "availability": "verify",
       "availability_note": "وجود فایل کانفیگ به‌تنهایی اثبات Load بودن پلاگین نیست.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "deathmatch-custom-modes",
@@ -5342,7 +5678,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/Deathmatch/Deathmatch.json",
       "availability": "mode",
       "availability_note": "پلاگین Deathmatch در پکیج به‌صورت mode-specific نگهداری می‌شود.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "deathmatch-weapon-setup",
@@ -5356,7 +5693,8 @@
       "plugin": "CS2 Deathmatch",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/Deathmatch/Deathmatch.json",
       "availability": "mode",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "deathmatch-buy-menu",
@@ -5370,7 +5708,8 @@
       "plugin": "CS2 Deathmatch",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/Deathmatch/Deathmatch.json",
       "availability": "mode",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "deathrun-enabled",
@@ -5385,7 +5724,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/DeathrunManager/DeathrunManager.json",
       "availability": "mode",
       "availability_note": "این پلاگین در فهرست KUS به‌صورت mode-specific ثبت شده است.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "deathrun-only-maps",
@@ -5399,7 +5739,8 @@
       "plugin": "deathrun-manager",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/DeathrunManager/DeathrunManager.json",
       "availability": "mode",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "gamemodifiers-random",
@@ -5414,7 +5755,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModifiers/GameModifiers.json",
       "availability": "mode",
       "availability_note": "این پلاگین در پکیج به‌صورت mode-specific staged شده است.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "gamemodifiers-count",
@@ -5428,7 +5770,8 @@
       "plugin": "CS2-GameModifiers",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModifiers/GameModifiers.json",
       "availability": "mode",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "guns-menu",
@@ -5443,7 +5786,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GunsMenu/GunsMenu.json",
       "availability": "verify",
       "availability_note": "در manifest پکیج وضعیت installed برای GunsMenu false است؛ تا فعال‌سازی پلاگین این گزینه را قابل استفاده فرض نکن.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "k4-damage-summary",
@@ -5458,7 +5802,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/K4-DamageInfo/K4-DamageInfo.json",
       "availability": "mode",
       "availability_note": "K4-DamageInfo به‌صورت mode-specific در package README فهرست شده است.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "k4-damage-center",
@@ -5472,7 +5817,8 @@
       "plugin": "K4-DamageInfo",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/K4-DamageInfo/K4-DamageInfo.json",
       "availability": "mode",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "quake-sounds",
@@ -5487,7 +5833,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/QuakeSounds/QuakeSounds.json",
       "availability": "config",
       "availability_note": "برای استفاده از منوی تنظیمات، نام دستور/پیشوند را در سرور واقعی تأیید کن.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "quake-warmup",
@@ -5501,7 +5848,8 @@
       "plugin": "QuakeSounds",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/QuakeSounds/QuakeSounds.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "showdamage-armor",
@@ -5515,7 +5863,8 @@
       "plugin": "cs2-showdamage",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/ShowDamage/ShowDamage.json",
       "availability": "default",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "spectator-list-refresh",
@@ -5529,7 +5878,8 @@
       "plugin": "SpectatorList",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SpectatorList/SpectatorList.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "spectator-list-periodic",
@@ -5543,7 +5893,8 @@
       "plugin": "SpectatorList",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SpectatorList/SpectatorList.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "teleport-kill-chance",
@@ -5557,7 +5908,8 @@
       "plugin": "cs2-TeleportKill",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/TeleportKill/TeleportKill.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "teleport-kill-limits",
@@ -5571,7 +5923,8 @@
       "plugin": "cs2-TeleportKill",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/TeleportKill/TeleportKill.json",
       "availability": "verify",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "headshot-only-player-command",
@@ -5585,7 +5938,8 @@
       "plugin": "SLAYER_HeadshotOnly",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SLAYER_HeadshotOnly/SLAYER_HeadshotOnly.json",
       "availability": "default",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "headshot-only-admin-flag",
@@ -5599,7 +5953,8 @@
       "plugin": "SLAYER_HeadshotOnly",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SLAYER_HeadshotOnly/SLAYER_HeadshotOnly.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "noscope-player-command",
@@ -5613,7 +5968,8 @@
       "plugin": "SLAYER_Noscope",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SLAYER_Noscope/SLAYER_Noscope.json",
       "availability": "default",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "noscope-admin-flag",
@@ -5627,7 +5983,8 @@
       "plugin": "SLAYER_Noscope",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SLAYER_Noscope/SLAYER_Noscope.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "revive-settings",
@@ -5641,7 +5998,8 @@
       "plugin": "SLAYER_Revive",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SLAYER_Revive/SLAYER_Revive.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "revive-cost",
@@ -5655,7 +6013,8 @@
       "plugin": "SLAYER_Revive",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SLAYER_Revive/SLAYER_Revive.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "football-autostart",
@@ -5669,7 +6028,8 @@
       "plugin": "SLAYER_Football",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SLAYER_Football/SLAYER_Football.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "football-min-players",
@@ -5683,7 +6043,8 @@
       "plugin": "SLAYER_Football",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SLAYER_Football/SLAYER_Football.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "slayer-anticamp",
@@ -5698,7 +6059,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SLAYER_AntiCamp/SLAYER_AntiCamp.json",
       "availability": "mode",
       "availability_note": "این DLL در مسیر plugins/disabled قرار گرفته است.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "slayer-anticamp-punish",
@@ -5712,7 +6074,8 @@
       "plugin": "SLAYER_AntiCamp",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/SLAYER_AntiCamp/SLAYER_AntiCamp.json",
       "availability": "mode",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "weapon-speed-active",
@@ -5727,7 +6090,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/WeaponSpeed/WeaponSpeed.json",
       "availability": "verify",
       "availability_note": "برای توضیح اثر دقیق مقدار ۷۰۰ باید README یا سورس نسخه نصب‌شده را بررسی کرد.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "stealth-hide-on-join",
@@ -5741,7 +6105,8 @@
       "plugin": "CS2-SimpleAdmin Stealth Module",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/CS2-SimpleAdmin_StealthModule/CS2-SimpleAdmin_StealthModule.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "stealth-status-block",
@@ -5755,7 +6120,8 @@
       "plugin": "CS2-SimpleAdmin Stealth Module",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/CS2-SimpleAdmin_StealthModule/CS2-SimpleAdmin_StealthModule.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "vip-night-schedule",
@@ -5770,7 +6136,8 @@
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/VIPCore/Modules/vip_night.json",
       "availability": "config",
       "availability_note": "Timezone در فایل فعلی UTC است.",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "vip-teammate-heal",
@@ -5784,7 +6151,8 @@
       "plugin": "VIPCore Teammates Heal Module",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/VIPCore/Modules/vip_teammates_heal.json",
       "availability": "config",
-      "tags": []
+      "tags": [],
+      "risk": "info"
     },
     {
       "id": "rockthevote-enabled",
@@ -5798,7 +6166,8 @@
       "plugin": "RockTheVote",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/RockTheVote/RockTheVote.json",
       "availability": "config",
-      "availability_note": "مقدار از کانفیگ tracked شاخه integration/kus-monorepo خوانده شده؛ وضعیت واقعی سرور را با css_plugins list و فایل runtime بررسی کن."
+      "availability_note": "مقدار از کانفیگ tracked شاخه integration/kus-monorepo خوانده شده؛ وضعیت واقعی سرور را با css_plugins list و فایل runtime بررسی کن.",
+      "risk": "info"
     },
     {
       "id": "rockthevote-votemap",
@@ -5812,7 +6181,8 @@
       "plugin": "RockTheVote",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/RockTheVote/RockTheVote.json",
       "availability": "config",
-      "availability_note": "مقدار از کانفیگ tracked شاخه integration/kus-monorepo خوانده شده؛ وضعیت واقعی سرور را با css_plugins list و فایل runtime بررسی کن."
+      "availability_note": "مقدار از کانفیگ tracked شاخه integration/kus-monorepo خوانده شده؛ وضعیت واقعی سرور را با css_plugins list و فایل runtime بررسی کن.",
+      "risk": "info"
     },
     {
       "id": "rockthevote-endmap",
@@ -5826,7 +6196,8 @@
       "plugin": "RockTheVote",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/RockTheVote/RockTheVote.json",
       "availability": "config",
-      "availability_note": "مقدار از کانفیگ tracked شاخه integration/kus-monorepo خوانده شده؛ وضعیت واقعی سرور را با css_plugins list و فایل runtime بررسی کن."
+      "availability_note": "مقدار از کانفیگ tracked شاخه integration/kus-monorepo خوانده شده؛ وضعیت واقعی سرور را با css_plugins list و فایل runtime بررسی کن.",
+      "risk": "info"
     },
     {
       "id": "rockthevote-extend",
@@ -5840,7 +6211,8 @@
       "plugin": "RockTheVote",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/RockTheVote/RockTheVote.json",
       "availability": "config",
-      "availability_note": "مقدار از کانفیگ tracked شاخه integration/kus-monorepo خوانده شده؛ وضعیت واقعی سرور را با css_plugins list و فایل runtime بررسی کن."
+      "availability_note": "مقدار از کانفیگ tracked شاخه integration/kus-monorepo خوانده شده؛ وضعیت واقعی سرور را با css_plugins list و فایل runtime بررسی کن.",
+      "risk": "info"
     },
     {
       "id": "rockthevote-cooldown",
@@ -5854,7 +6226,8 @@
       "plugin": "RockTheVote",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/RockTheVote/RockTheVote.json",
       "availability": "config",
-      "availability_note": "مقدار از کانفیگ tracked شاخه integration/kus-monorepo خوانده شده؛ وضعیت واقعی سرور را با css_plugins list و فایل runtime بررسی کن."
+      "availability_note": "مقدار از کانفیگ tracked شاخه integration/kus-monorepo خوانده شده؛ وضعیت واقعی سرور را با css_plugins list و فایل runtime بررسی کن.",
+      "risk": "info"
     },
     {
       "id": "adminlist-visibility",
@@ -5868,7 +6241,8 @@
       "plugin": "AdminList",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/AdminList/AdminList.json",
       "availability": "verify",
-      "availability_note": "وجود فایل کانفیگ به معنی فعال بودن AdminList نیست؛ با css_plugins list بررسی شود."
+      "availability_note": "وجود فایل کانفیگ به معنی فعال بودن AdminList نیست؛ با css_plugins list بررسی شود.",
+      "risk": "info"
     },
     {
       "id": "menu-manager-lines",
@@ -5881,7 +6255,8 @@
       "access": "تنظیم سرور",
       "plugin": "MenuManagerCore",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/MenuManagerCore/MenuManagerCore.json",
-      "availability": "config"
+      "availability": "config",
+      "risk": "info"
     },
     {
       "id": "abs-mapcycle-random",
@@ -5895,7 +6270,8 @@
       "plugin": "ABS_MapCycle",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/ABS_MapCycle/ABS_MapCycle.json",
       "availability": "disabled",
-      "availability_note": "پلاگین در مسیر plugins/disabled قرار دارد؛ این مقادیر تا فعال‌سازی پلاگین اجرا نمی‌شوند."
+      "availability_note": "پلاگین در مسیر plugins/disabled قرار دارد؛ این مقادیر تا فعال‌سازی پلاگین اجرا نمی‌شوند.",
+      "risk": "info"
     },
     {
       "id": "abs-mapcycle-file",
@@ -5909,7 +6285,8 @@
       "plugin": "ABS_MapCycle",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/ABS_MapCycle/ABS_MapCycle.json",
       "availability": "disabled",
-      "availability_note": "پلاگین در مسیر plugins/disabled قرار دارد."
+      "availability_note": "پلاگین در مسیر plugins/disabled قرار دارد.",
+      "risk": "info"
     },
     {
       "id": "fixrandomspawn-warmup",
@@ -5923,7 +6300,8 @@
       "plugin": "FixRandomSpawn",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/FixRandomSpawn/FixRandomSpawn.json",
       "availability": "disabled",
-      "availability_note": "قبل از استفاده وضعیت Load بودن پلاگین و تنظیمات runtime را بررسی کن."
+      "availability_note": "قبل از استفاده وضعیت Load بودن پلاگین و تنظیمات runtime را بررسی کن.",
+      "risk": "info"
     },
     {
       "id": "k4-alwaysskins-map",
@@ -5937,7 +6315,8 @@
       "plugin": "K4-AlwaysWeaponSkins",
       "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/K4-AlwaysWeaponSkins/K4-AlwaysWeaponSkins.json",
       "availability": "verify",
-      "availability_note": "وضعیت نصب/لود این افزونه را از نسخه واقعی سرور بررسی کن."
+      "availability_note": "وضعیت نصب/لود این افزونه را از نسخه واقعی سرور بررسی کن.",
+      "risk": "info"
     }
   ]
 }
