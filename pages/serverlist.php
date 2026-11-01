@@ -179,6 +179,10 @@ $faceitIconVersion = function_exists('asset_version')
                         سرور اختصاصی خودت را بساز
                         <i class="fa-solid fa-arrow-up-left" aria-hidden="true"></i>
                     </a>
+                    <a class="sl-guide-action" href="/index.php?page=serverguide" data-ajax-nav data-slug="serverguide">
+                        <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+                        راهنمای سرور
+                    </a>
                 </div>
                 <div class="sl-hero-signals" data-fc-reveal="up" data-fc-reveal-delay="270">
                     <span><i class="fa-solid fa-signal" aria-hidden="true"></i> وضعیت سرورها</span>
