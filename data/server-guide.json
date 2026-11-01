@@ -805,9 +805,7 @@
       "category": "admin",
       "title": "تغییر نقشه",
       "command": "!map <mapname>",
-      "aliases": [
-        "css_map <mapname>"
-      ],
+      "aliases": [],
       "description": "نقشه سرور را تغییر می‌دهد. دسترسی تغییر نقشه لازم است؛ در صورت فعال بودن GameModeManager، منوی نقشه‌ها نیز در دسترس است.",
       "access": "@css/changemap",
       "syntax": "!map <mapname>",
@@ -815,10 +813,10 @@
         "map"
       ],
       "console_command": "css_map <mapname>",
-      "plugin": "CS2-SimpleAdmin / GameModeManager",
-      "source_url": "https://github.com/nickj609/GameModeManager#commands",
-      "availability": "verify",
-      "availability_note": "GameModeManager در README شاخه integration/kus-monorepo به‌عنوان پلاگینی که منتظر رفع مشکل upstream است ثبت شده؛ قبل از استفاده عملی، تعویض مود را روی سرور تست کن."
+      "plugin": "CS2-SimpleAdmin",
+      "source_url": "https://github.com/daffyyyy/CS2-SimpleAdmin",
+      "availability": "default",
+      "availability_note": "دستور تغییر نقشه SimpleAdmin است؛ GameModeManager برای انتخاب مود قابلیت جداگانه دارد."
     },
     {
       "id": "maps",
@@ -834,10 +832,10 @@
         "map",
         "menu"
       ],
-      "plugin": "GG1MapChooser / GameModeManager",
+      "plugin": "GG1MapChooser",
       "source_url": "https://github.com/ssypchenko/GG1MapChooser",
-      "availability": "verify",
-      "availability_note": "GG1MapChooser در پکیج پیش‌فرض قرار دارد؛ GameModeManager منتظر رفع مشکل upstream است.",
+      "availability": "default",
+      "availability_note": "GG1MapChooser در پکیج پیش‌فرض قرار دارد؛ منوی نقشه این پلاگین با GameModeManager جداست.",
       "console_command": "css_maps"
     },
     {
@@ -3525,14 +3523,14 @@
       "id": "gmm-rtv-current",
       "type": "setting",
       "category": "settings",
-      "title": "settings",
-      "command": "وضعیت RTV در GameModeManager",
+      "title": "وضعیت RTV داخلی GameModeManager",
+      "command": "RTV.Enabled = false",
       "aliases": [],
-      "description": "RTV.Enabled = false",
-      "access": "تنظیم سرور",
-      "plugin": "در فایل فعلی GameModeManager، RTV داخلی این پلاگین خاموش است. این مورد با GG1MapChooser جداگانه است.",
-      "source_url": "GameModeManager",
-      "availability": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json"
+      "description": "RTV داخلی GameModeManager در کانفیگ tracked فعلی خاموش است. این مقدار با تنظیمات GG1MapChooser و RockTheVote جداست.",
+      "access": "وضعیت کانفیگ tracked",
+      "plugin": "GameModeManager",
+      "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
+      "availability": "disabled"
     },
     {
       "0": "c",
@@ -3544,14 +3542,14 @@
       "id": "gmm-votes-current",
       "type": "setting",
       "category": "settings",
-      "title": "settings",
-      "command": "وضعیت رأی‌گیری‌های GameModeManager",
+      "title": "وضعیت رأی‌گیری GameModeManager",
+      "command": "Votes.Enabled = true",
       "aliases": [],
-      "description": "Votes.Enabled = true",
-      "access": "تنظیم سرور",
-      "plugin": "رأی‌گیری نقشه و مود در تنظیمات فعلی فعال است؛ رأی‌گیری GameSettings خاموش است.",
-      "source_url": "GameModeManager",
-      "availability": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json"
+      "description": "رأی‌گیری نقشه و مود در کانفیگ فعلی روشن است؛ رأی‌گیری GameSettings خاموش است.",
+      "access": "وضعیت کانفیگ tracked",
+      "plugin": "GameModeManager",
+      "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
+      "availability": "config"
     },
     {
       "0": "c",
@@ -3563,14 +3561,14 @@
       "id": "gmm-settings-current",
       "type": "setting",
       "category": "settings",
-      "title": "settings",
-      "command": "وضعیت منوی Settings",
+      "title": "وضعیت منوی Settings",
+      "command": "Settings.Enabled = true",
       "aliases": [],
-      "description": "Settings.Enabled = true",
-      "access": "تنظیم سرور",
-      "plugin": "منوی تنظیمات سفارشی در کانفیگ فعلی فعال است؛ فایل‌ها از پوشه settings خوانده می‌شوند.",
-      "source_url": "GameModeManager",
-      "availability": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json"
+      "description": "منوی Settings سفارشی در کانفیگ فعلی روشن است و فایل‌ها از پوشه cfg/settings خوانده می‌شوند.",
+      "access": "وضعیت کانفیگ tracked",
+      "plugin": "GameModeManager",
+      "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
+      "availability": "config"
     },
     {
       "0": "d",
@@ -3584,14 +3582,14 @@
       "id": "gmm-warmup-current",
       "type": "setting",
       "category": "settings",
-      "title": "settings",
-      "command": "وضعیت Warmup سفارشی",
+      "title": "وضعیت Warmup سفارشی",
+      "command": "Warmup.Enabled = false",
       "aliases": [],
-      "description": "Warmup.Enabled = false",
-      "access": "تنظیم سرور",
-      "plugin": "Warmup سفارشی طبق تنظیمات فعلی غیرفعال است؛ مود پیش‌فرض در فایل روی Deathmatch تنظیم شده است.",
-      "source_url": "GameModeManager",
-      "availability": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json"
+      "description": "Warmup سفارشی در کانفیگ فعلی خاموش است؛ مود پیش‌فرض Warmup روی Deathmatch قرار دارد.",
+      "access": "وضعیت کانفیگ tracked",
+      "plugin": "GameModeManager",
+      "source_url": "https://github.com/larnzs/cs2-kus-addons/blob/integration/kus-monorepo/game/csgo/addons/counterstrikesharp/configs/plugins/GameModeManager/GameModeManager.json",
+      "availability": "disabled"
     },
     {
       "id": "matchzy-bestspawn",
@@ -4286,17 +4284,16 @@
     {
       "id": "retakes-debugqueues",
       "type": "command",
-      "category": "مشاهده وضعیت صف Retakes",
-      "title": "css_debugqueues",
-      "command": "وضعیت فعلی Queue را در کنسول سرور نمایش می‌دهد؛ این دستور Server-only است.",
+      "category": "retakes",
+      "title": "مشاهده وضعیت صف Retakes",
+      "command": "css_debugqueues",
       "aliases": [],
-      "description": "کنسول سرور",
-      "access": "CS2 Retakes",
-      "plugin": "https://github.com/B3none/cs2-retakes#commands",
-      "source_url": "mode",
-      "availability": {
-        "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
-      }
+      "description": "وضعیت فعلی Queue را در کنسول سرور نمایش می‌دهد؛ این دستور Server-only است.",
+      "access": "کنسول سرور",
+      "plugin": "CS2 Retakes",
+      "source_url": "https://github.com/B3none/cs2-retakes#commands",
+      "availability": "mode",
+      "availability_note": "این پلاگین در cs2-kus-addons زیر plugins/disabled قرار دارد و باید برای مود موردنظر فعال شود؛ حضور فایل کانفیگ به معنی Load بودن آن نیست."
     },
     {
       "id": "k4-guns",
