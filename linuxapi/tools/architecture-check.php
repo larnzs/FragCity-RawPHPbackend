@@ -564,6 +564,14 @@ $check(
 );
 
 $check(
+    'Server Browser search hides matching cards and empty groups in list and grid views',
+    str_contains($standbyBrowserJavascript, 'card.hidden = !isVisible;')
+        && str_contains($serverListStylesheet, '#serverList .sl-server-card[hidden]')
+        && str_contains($serverListStylesheet, '#serverList .sl-server-group[hidden]')
+        && str_contains($serverListStylesheet, 'display: none !important;')
+);
+
+$check(
     'Server Browser defaults to Online and does not sort the visitor by A2S RTT',
     str_contains($serverListPage, 'data-sl-filter="online" aria-pressed="true"')
         && str_contains($standbyBrowserJavascript, "let statusFilter = 'online';")
