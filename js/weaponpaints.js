@@ -3211,7 +3211,7 @@
 
         }
 
-        // The category buttons live in the vertical sidebar; team controls live in the toolbar.
+        // Category and team controls are grouped in the compact right-side rail.
 
         const tabButtons =
             dom.mainTabs.querySelectorAll(
