@@ -156,20 +156,20 @@ if ($status !== 'OK' || empty($authority)) {
             <div class="progress-container">
                 <div class="progress-bar"></div>
             </div>
-            <p style="color:#aaa; font-size:0.9rem;">در حال انتقال به کیف پول...</p>
+            <p style="color:#aaa; font-size:0.9rem;">در حال بازگشت به FragCity...</p>
             <script>
                 setTimeout(function(){
-                    window.location.href = 'https://fragcity.ir/?page=wallet_charge';
+                    window.location.href = 'https://fragcity.ir/';
                 }, 3000);
             </script>
         <?php else: ?>
             <div class="icon-circle"><i class="fas fa-exclamation-triangle"></i></div>
             <h1>خطا در پرداخت</h1>
             <p style="color:#aaa; margin-bottom: 24px;"><?= htmlspecialchars($error_message) ?></p>
-            <a href="https://fragcity.ir/?page=wallet_charge" class="btn-return">بازگشت به کیف پول</a>
+            <a href="https://fragcity.ir/" class="btn-return">بازگشت به FragCity</a>
             <script>
                 setTimeout(function(){
-                    window.location.href = 'https://fragcity.ir/?page=wallet_charge';
+                    window.location.href = 'https://fragcity.ir/';
                 }, 5000);
             </script>
         <?php endif; ?>
