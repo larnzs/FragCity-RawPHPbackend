@@ -22,6 +22,60 @@
         let activeCategory = 'all';
         let toastTimeout = 0;
 
+        function setupPageMotion() {
+            const revealElements = Array.from(root.querySelectorAll('[data-sg-reveal]'));
+            const motionDisabled = document.documentElement.classList.contains('fc-no-animation')
+                || Boolean(
+                    window.matchMedia
+                    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                );
+
+            if (motionDisabled) {
+                root.classList.add('sg-page-ready');
+                revealElements.forEach(function (element) {
+                    element.classList.add('sg-revealed');
+                });
+                return;
+            }
+
+            // WeaponPaints uses page-fader/ready with a forced layout pass.
+            void root.offsetWidth;
+            window.requestAnimationFrame(function () {
+                if (!root.isConnected) return;
+                root.classList.add('sg-page-ready');
+            });
+
+            if (!('IntersectionObserver' in window)) {
+                revealElements.forEach(function (element) {
+                    element.classList.add('sg-revealed');
+                });
+                return;
+            }
+
+            const observer = new IntersectionObserver(function (records) {
+                records.forEach(function (record) {
+                    if (!record.isIntersecting) return;
+                    record.target.classList.add('sg-revealed');
+                    observer.unobserve(record.target);
+                });
+            }, {
+                threshold: 0.08,
+                rootMargin: '0px 0px -42px 0px'
+            });
+
+            revealElements.forEach(function (element, index) {
+                const explicitDelay = Number.parseInt(element.dataset.sgRevealDelay || '', 10);
+                const delay = Number.isFinite(explicitDelay)
+                    ? Math.max(0, Math.min(explicitDelay, 420))
+                    : (index % 8) * 36;
+
+                element.style.setProperty('--sg-reveal-delay', delay + 'ms');
+                observer.observe(element);
+            });
+
+            root.__sgRevealObserver = observer;
+        }
+
         function normalize(value) {
             return String(value || '')
                 .toLocaleLowerCase('fa-IR')
@@ -215,19 +269,23 @@
         });
 
         setCategory('all');
-
-        // Refresh the shared reveal system after this AJAX-loaded page initializes.
-        if (
-            window.FragCityMotion
-            && typeof window.FragCityMotion.refresh === 'function'
-        ) {
-            window.FragCityMotion.refresh(root);
-        }
+        setupPageMotion();
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initServerGuide, { once: true });
-    } else {
+    // Match the Server Browser's direct-load and AJAX-navigation lifecycle.
+    if (window.FragCityServerGuide) {
+        window.FragCityServerGuide.init();
+        return;
+    }
+
+    window.FragCityServerGuide = Object.freeze({
+        init: initServerGuide
+    });
+
+    document.addEventListener('DOMContentLoaded', initServerGuide);
+    window.addEventListener('content-loaded', initServerGuide);
+
+    if (document.readyState !== 'loading') {
         initServerGuide();
     }
 })();
