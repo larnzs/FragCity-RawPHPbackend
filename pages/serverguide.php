@@ -106,7 +106,7 @@ $guideCategoryCount = count($guideCategoryMap);
                         placeholder="جستجوی دستور، توضیح یا کلیدواژه؛ مثل !ban یا !ready"
                         aria-label="جستجوی دستورات و تنظیمات"
                     >
-                    <kbd>⌘ K</kbd>
+                    <kbd>CTRL K</kbd>
                 </label>
                 <button type="button" class="sg-clear-search" id="sgClearSearch" hidden>
                     پاک کردن جستجو
