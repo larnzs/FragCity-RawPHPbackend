@@ -489,6 +489,24 @@ body.site-body .content-fader {
 }
 
 /* =========================================================
+   Global root scrollbar guard
+   Hide only the viewport scrollbar; native page scrolling remains enabled.
+   Inner scroll areas (tabs, menus, modal panels) keep their own scrollbar rules.
+========================================================= */
+html,
+body.site-body {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+html::-webkit-scrollbar,
+body.site-body::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* =========================================================
    Global page safe areas
    The header overlays the document flow, so normal pages reserve
    its measured height plus a consistent content breathing-space.
