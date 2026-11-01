@@ -12266,3 +12266,550 @@ html.fc-no-animation .wp-app .wp-sidebar .wp-search-wrap {
     }
 }
 
+
+
+/* =========================================================
+   WeaponPaints horizontal glass navigation below the site header
+   The former right-side rail becomes one sticky horizontal toolbar.
+========================================================= */
+
+.wp-app .wp-workspace-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 12px !important;
+    width: min(1550px, calc(100% - clamp(32px, 10.4vw, 200px))) !important;
+    max-width: 1550px !important;
+    margin: 0 auto !important;
+    padding:
+        calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap, 28px))
+        0
+        24px !important;
+    box-sizing: border-box !important;
+    direction: rtl !important;
+}
+
+.wp-app .wp-workspace-main {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    width: 100%;
+    min-width: 0;
+}
+
+.wp-app .wp-sidebar {
+    position: sticky !important;
+    top: calc(var(--fc-header-overlap-height, 72px) + 8px) !important;
+    z-index: 1040 !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between;
+    gap: 10px !important;
+    width: 100% !important;
+    min-width: 0;
+    max-height: none !important;
+    padding: 10px 12px !important;
+    overflow: visible !important;
+    border: 1px solid rgba(255, 255, 255, .10) !important;
+    border-radius: 15px !important;
+    background: rgba(17, 17, 17, .72) !important;
+    box-shadow:
+        0 12px 34px rgba(0, 0, 0, .22),
+        inset 0 1px 0 rgba(255, 255, 255, .045) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
+    backdrop-filter: blur(20px) saturate(145%) !important;
+    direction: rtl !important;
+}
+
+.wp-app .wp-sidebar-brand {
+    display: none !important;
+}
+
+.wp-app .wp-sidebar-tabs {
+    display: flex !important;
+    flex: 1 1 auto;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start;
+    gap: 6px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 0 2px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none;
+    direction: rtl !important;
+    -webkit-overflow-scrolling: touch;
+}
+
+.wp-app .wp-sidebar-tabs::-webkit-scrollbar,
+.wp-app .wp-sidebar-tabs .wp-category-switcher--unified::-webkit-scrollbar {
+    display: none !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-category-switcher--unified {
+    display: flex !important;
+    flex: 0 0 auto;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start;
+    gap: 6px !important;
+    width: max-content !important;
+    min-width: max-content !important;
+    max-width: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    direction: rtl !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab {
+    position: relative;
+    isolation: auto;
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    flex-direction: row;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: auto !important;
+    min-width: 76px !important;
+    max-width: none !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 11px !important;
+    overflow: visible;
+    border: 1px solid #292929 !important;
+    border-radius: 9px !important;
+    background: rgba(17, 17, 17, .80) !important;
+    color: #929292 !important;
+    box-shadow: none !important;
+    transform: none !important;
+    white-space: nowrap;
+    transition:
+        border-color 180ms ease,
+        background-color 180ms ease,
+        color 180ms ease !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab:hover,
+.wp-app .wp-sidebar-tabs .wp-tab:focus-visible {
+    border-color: #F97316 !important;
+    background: rgba(249, 115, 22, .08) !important;
+    color: #FB923C !important;
+    outline: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab.is-active,
+.wp-app .wp-sidebar-tabs .wp-tab.active {
+    border-color: rgba(249, 115, 22, .52) !important;
+    background: rgba(249, 115, 22, .13) !important;
+    color: #F97316 !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab::before,
+.wp-app .wp-sidebar-tabs .wp-tab::after,
+.wp-app .wp-sidebar-tabs .wp-tab.is-active::after,
+.wp-app .wp-sidebar-tabs .wp-tab.active::after {
+    content: none !important;
+    display: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-label {
+    display: inline !important;
+    color: inherit !important;
+    font-size: .68rem;
+    font-weight: 750;
+    line-height: 1;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg {
+    display: block !important;
+    flex: 0 0 25px !important;
+    width: 25px !important;
+    min-width: 25px !important;
+    max-width: 32px !important;
+    height: 23px !important;
+    min-height: 23px !important;
+    max-height: 23px !important;
+    margin: 0 !important;
+    object-fit: contain !important;
+    object-position: center !important;
+    opacity: .92;
+    filter:
+        brightness(0) saturate(100%)
+        invert(57%) sepia(93%) saturate(2112%)
+        hue-rotate(348deg) brightness(101%) contrast(101%) !important;
+    transform: none !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/ak47.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/p90.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/m249.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/usp_silencer.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/awp.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/knife_m9_bayonet.svg"] {
+    flex-basis: 31px !important;
+    width: 31px !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-fallback {
+    display: block !important;
+    flex: 0 0 19px !important;
+    width: 19px !important;
+    height: 19px !important;
+    margin: 0 !important;
+    color: #F97316 !important;
+    font-size: .9rem !important;
+    line-height: 19px !important;
+    filter: none !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-fallback[hidden] {
+    display: none !important;
+}
+
+.wp-app .wp-sidebar-divider {
+    flex: 0 0 1px !important;
+    width: 1px !important;
+    min-width: 1px !important;
+    height: 30px !important;
+    margin: 0 2px !important;
+    background: rgba(255, 255, 255, .12) !important;
+    box-shadow: none !important;
+}
+
+.wp-app .wp-sidebar-team {
+    display: flex !important;
+    flex: 0 0 auto;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: auto !important;
+    min-width: 0;
+}
+
+.wp-app .wp-sidebar-label {
+    color: #858585 !important;
+    font-size: .58rem !important;
+    font-weight: 800;
+    letter-spacing: .08em;
+    white-space: nowrap;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center;
+    gap: 5px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn {
+    position: relative;
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: auto !important;
+    min-width: 42px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    margin: 0 !important;
+    padding: 0 9px !important;
+    border: 1px solid #292929 !important;
+    border-radius: 8px !important;
+    background: rgba(17, 17, 17, .80) !important;
+    color: #929292 !important;
+    box-shadow: none !important;
+    font-size: .63rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    text-decoration: none;
+    transition:
+        border-color 180ms ease,
+        background-color 180ms ease,
+        color 180ms ease !important;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn:hover,
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn:focus-visible {
+    border-color: #F97316 !important;
+    background: rgba(249, 115, 22, .08) !important;
+    color: #FB923C !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn.is-active {
+    border-color: rgba(249, 115, 22, .52) !important;
+    background: rgba(249, 115, 22, .13) !important;
+    color: #F97316 !important;
+    box-shadow: none !important;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn::after {
+    content: none !important;
+    display: none !important;
+    box-shadow: none !important;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn-svg {
+    display: block;
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    filter: none !important;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn > i {
+    color: #F97316;
+    font-size: .72rem;
+    filter: none !important;
+}
+
+.wp-app .wp-sidebar-search {
+    position: relative;
+    z-index: 1045;
+    flex: 0 0 auto;
+    align-self: center;
+    width: auto !important;
+    min-width: 0;
+    overflow: visible;
+}
+
+.wp-app .wp-sidebar .wp-search-wrap {
+    position: relative;
+    display: flex !important;
+    align-items: center;
+    width: 44px !important;
+    min-width: 44px !important;
+    max-width: 44px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+    overflow: hidden;
+    border: 1px solid #292929 !important;
+    border-radius: 9px !important;
+    background: rgba(17, 17, 17, .80) !important;
+    color: #F97316 !important;
+    box-shadow: none !important;
+    transition:
+        width 200ms ease,
+        max-width 200ms ease,
+        border-color 180ms ease,
+        background-color 180ms ease !important;
+}
+
+.wp-app .wp-sidebar .wp-search-wrap:focus-within {
+    width: min(230px, 28vw) !important;
+    min-width: min(230px, 28vw) !important;
+    max-width: min(230px, 28vw) !important;
+    border-color: #F97316 !important;
+    background: rgba(17, 17, 17, .96) !important;
+    box-shadow: none !important;
+}
+
+.wp-app .wp-sidebar .wp-search-wrap > i {
+    position: absolute;
+    z-index: 2;
+    top: 50%;
+    right: 14px;
+    color: #F97316 !important;
+    font-size: .86rem;
+    pointer-events: none;
+    filter: none !important;
+    transform: translateY(-50%);
+}
+
+.wp-app .wp-sidebar .wp-search-wrap .wp-search {
+    width: 100% !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    margin: 0 !important;
+    padding: 0 38px 0 10px !important;
+    border: 0 !important;
+    outline: 0 !important;
+    background: transparent !important;
+    color: transparent !important;
+    caret-color: transparent;
+    box-shadow: none !important;
+    font-size: .72rem !important;
+    opacity: .02;
+}
+
+.wp-app .wp-sidebar .wp-search-wrap:focus-within .wp-search {
+    color: #F5F5F5 !important;
+    caret-color: #F97316;
+    opacity: 1;
+}
+
+.wp-app .wp-sidebar .wp-search-wrap:focus-within .wp-search::placeholder {
+    color: #898989 !important;
+}
+
+@media (max-width: 1100px) {
+    .wp-app .wp-workspace-layout {
+        width: calc(100% - 36px) !important;
+    }
+
+    .wp-app .wp-sidebar {
+        gap: 8px !important;
+        padding-inline: 9px !important;
+    }
+
+    .wp-app .wp-sidebar-label {
+        display: none !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab {
+        min-width: 68px !important;
+        padding-inline: 8px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-label {
+        font-size: .62rem;
+    }
+}
+
+@media (max-width: 760px) {
+    .wp-app .wp-workspace-layout {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        width: calc(100% - 20px) !important;
+        padding:
+            calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px))
+            0
+            20px !important;
+        gap: 9px !important;
+    }
+
+    .wp-app .wp-sidebar {
+        position: sticky !important;
+        top: calc(var(--fc-header-overlap-height, 66px) + 5px) !important;
+        gap: 7px !important;
+        padding: 8px !important;
+        border-radius: 12px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs {
+        gap: 5px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-category-switcher--unified {
+        gap: 5px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab {
+        min-width: 66px !important;
+        height: 39px !important;
+        min-height: 39px !important;
+        padding-inline: 7px !important;
+        gap: 5px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg {
+        flex-basis: 21px !important;
+        width: 21px !important;
+        min-width: 21px !important;
+        height: 20px !important;
+        min-height: 20px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-label {
+        font-size: .58rem;
+    }
+
+    .wp-app .wp-sidebar-team {
+        gap: 4px !important;
+    }
+
+    .wp-app .wp-sidebar .wp-team-switcher {
+        gap: 3px !important;
+    }
+
+    .wp-app .wp-sidebar .wp-team-switcher .wp-team-btn {
+        min-width: 34px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        padding-inline: 5px !important;
+        gap: 3px;
+        font-size: .56rem !important;
+    }
+
+    .wp-app .wp-sidebar .wp-team-switcher .wp-team-btn-svg {
+        width: 13px;
+        height: 13px;
+        flex-basis: 13px;
+    }
+
+    .wp-app .wp-sidebar .wp-search-wrap {
+        width: 38px !important;
+        min-width: 38px !important;
+        max-width: 38px !important;
+        height: 36px !important;
+        min-height: 36px !important;
+    }
+
+    .wp-app .wp-sidebar .wp-search-wrap:focus-within {
+        width: min(180px, 46vw) !important;
+        min-width: min(180px, 46vw) !important;
+        max-width: min(180px, 46vw) !important;
+    }
+}
+
+@media (max-width: 430px) {
+    .wp-app .wp-workspace-layout {
+        width: calc(100% - 14px) !important;
+    }
+
+    .wp-app .wp-sidebar {
+        gap: 5px !important;
+        padding: 7px 6px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab {
+        min-width: 60px !important;
+        padding-inline: 5px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-label {
+        font-size: .54rem;
+    }
+
+    .wp-app .wp-sidebar .wp-search-wrap:focus-within {
+        width: min(150px, 40vw) !important;
+        min-width: min(150px, 40vw) !important;
+        max-width: min(150px, 40vw) !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wp-app .wp-sidebar,
+    .wp-app .wp-sidebar .wp-tab,
+    .wp-app .wp-sidebar .wp-team-btn,
+    .wp-app .wp-sidebar .wp-search-wrap {
+        transition: none !important;
+    }
+}
