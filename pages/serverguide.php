@@ -115,7 +115,7 @@ $guideCategoryCount = count($guideCategoryMap);
             </div>
 
             <nav class="sg-category-nav" id="sgCategoryNav" aria-label="دسته‌بندی دستورات">
-                <button type="button" class="sg-category-filter active" data-guide-filter="all" aria-pressed="true">
+                <button type="button" class="sg-category-filter active" data-guide-filter="all" data-guide-label="همه دستورات" aria-pressed="true">
                     <i class="fa-solid fa-border-all" aria-hidden="true"></i>
                     همه
                     <span><?= number_format($guideCommandCount) ?></span>
@@ -132,6 +132,7 @@ $guideCategoryCount = count($guideCategoryMap);
                         type="button"
                         class="sg-category-filter"
                         data-guide-filter="<?= $guideEscape($categoryId) ?>"
+                        data-guide-label="<?= $guideEscape($category['title'] ?? $categoryId) ?>"
                         aria-pressed="false"
                     >
                         <i class="fa-solid <?= $guideEscape($categoryIcon) ?>" aria-hidden="true"></i>
