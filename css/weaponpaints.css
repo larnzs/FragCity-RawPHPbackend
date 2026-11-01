@@ -13402,19 +13402,20 @@ body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating .wp-page-btn.
    Saved Inventory remove action + compact Pins pagination
 ========================================================= */
 
-/* Each saved paint keeps its selectable card intact; the X is a separate action below it. */
+/* Keep the remove action overlaid inside each inventory card.
+   It stays a sibling of the edit button to avoid invalid nested buttons. */
 .wp-app .wp-saved-paint-item {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch !important;
-    justify-content: flex-start !important;
-    gap: 7px !important;
+    position: relative !important;
+    display: block !important;
+    height: 100% !important;
     min-width: 0 !important;
+    overflow: visible !important;
 }
 
 .wp-app .wp-saved-paint-item > .wp-saved-paint-card {
-    flex: 1 1 auto !important;
+    display: flex !important;
     width: 100% !important;
+    height: 100% !important;
     min-width: 0 !important;
 }
 
@@ -13422,14 +13423,18 @@ body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating .wp-page-btn.
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
-    align-self: center !important;
-    gap: 6px !important;
-    width: 70px !important;
-    min-width: 70px !important;
-    height: 27px !important;
-    min-height: 27px !important;
-    padding: 0 9px !important;
-    border: 1px solid rgba(248, 113, 113, .25) !important;
+    position: absolute !important;
+    top: 9px !important;
+    right: 9px !important;
+    z-index: 12 !important;
+    align-self: auto !important;
+    gap: 0 !important;
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    border: 1px solid rgba(248, 113, 113, .34) !important;
     border-radius: 8px !important;
     background: rgba(127, 29, 29, .12) !important;
     color: #FCA5A5 !important;
@@ -13448,6 +13453,18 @@ body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating .wp-page-btn.
 
 .wp-app .wp-inventory-remove-btn > i {
     font-size: .78rem !important;
+}
+
+.wp-app .wp-inventory-remove-btn > span {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
 }
 
 .wp-app .wp-inventory-remove-btn:hover,
@@ -13474,6 +13491,20 @@ body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating .wp-page-btn.
     opacity: 0 !important;
     transform: scale(.97) !important;
     transition: opacity 150ms ease, transform 150ms ease !important;
+}
+
+/* TEAM is English: keep its label on the physical left of the team controls. */
+.wp-app .wp-sidebar-team {
+    direction: ltr !important;
+}
+
+.wp-app .wp-sidebar-team > .wp-sidebar-label {
+    direction: ltr !important;
+    text-align: left !important;
+}
+
+.wp-app .wp-sidebar-team > .wp-team-switcher {
+    direction: rtl !important;
 }
 
 /* Pins pagination is a compact horizontal rail so the numbered pages stay visible. */
