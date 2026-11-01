@@ -44,6 +44,10 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                         <span>آشنایی با سرویس‌ها</span>
                         <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
                     </a>
+                    <a class="home-button home-button-guide" href="/index.php?page=serverguide" data-ajax-nav data-slug="serverguide">
+                        <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+                        <span>راهنمای سرور</span>
+                    </a>
                 </div>
 
                 <div class="home-hero-signals" data-fc-reveal="up" data-fc-reveal-delay="270">
