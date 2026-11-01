@@ -11756,3 +11756,226 @@ html.fc-no-animation .wp-app .wp-sidebar .wp-team-btn,
 html.fc-no-animation .wp-app .wp-sidebar .wp-search-wrap {
     transition: none !important;
 }
+
+
+/* =========================================================
+   Right-edge category rail refinement
+   Align with the page-safe header gap and mirror the compact
+   pagination tile treatment while keeping FragCity orange.
+========================================================= */
+
+.wp-app .wp-workspace-layout {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding:
+        calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap, 28px))
+        0
+        24px
+        clamp(18px, 2.6vw, 40px) !important;
+    box-sizing: border-box !important;
+}
+
+.wp-app .wp-sidebar {
+    top: calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap, 28px));
+    width: 82px;
+    min-width: 82px;
+    box-sizing: border-box;
+    justify-self: stretch;
+    align-self: start;
+    padding: 12px 8px;
+    border-right: 0;
+    border-radius: 16px 0 0 16px;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab {
+    flex: 0 0 44px !important;
+    width: 60px !important;
+    min-width: 60px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    box-sizing: border-box;
+    border: 1px solid rgba(249, 115, 22, .22) !important;
+    border-radius: 10px !important;
+    background: rgba(249, 115, 22, .045) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035) !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab:hover,
+.wp-app .wp-sidebar-tabs .wp-tab:focus-visible {
+    border-color: rgba(249, 115, 22, .48) !important;
+    background: rgba(249, 115, 22, .11) !important;
+    transform: translateX(-1px) !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab.is-active,
+.wp-app .wp-sidebar-tabs .wp-tab.active {
+    border-color: rgba(251, 146, 60, .72) !important;
+    background: linear-gradient(135deg, #9a3412, #c2410c) !important;
+    color: #fff !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, .10),
+        0 5px 14px rgba(249, 115, 22, .24),
+        0 0 0 1px rgba(249, 115, 22, .08) !important;
+    transform: none !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab.is-active::after,
+.wp-app .wp-sidebar-tabs .wp-tab.active::after {
+    width: 32px;
+    opacity: .96;
+    box-shadow: 0 0 12px 3px rgba(249, 115, 22, .58);
+}
+
+/* A single icon viewport keeps Gloves / Agents / Music / Pins
+   visually balanced with the wider weapon SVGs. */
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg,
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/inventory.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/allskins.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/ak47.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/p90.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/m249.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/usp_silencer.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/awp.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/knife_m9_bayonet.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/gloves.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/agent.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/music_kit.svg"],
+.wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/pin.svg"] {
+    flex: 0 0 40px !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    margin: 0 !important;
+    object-fit: contain !important;
+    object-position: center !important;
+}
+
+.wp-app .wp-sidebar .wp-team-switcher .wp-team-btn {
+    width: 58px !important;
+    min-width: 58px !important;
+}
+
+.wp-app .wp-sidebar .wp-search-wrap {
+    width: 58px !important;
+    min-width: 58px !important;
+    max-width: 58px !important;
+}
+
+@media (max-width: 760px) {
+    .wp-app .wp-workspace-layout {
+        grid-template-columns: 72px minmax(0, 1fr) !important;
+        width: 100% !important;
+        padding:
+            calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px))
+            0
+            20px
+            10px !important;
+        gap: 10px !important;
+    }
+
+    .wp-app .wp-sidebar {
+        top: calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px));
+        width: 72px;
+        min-width: 72px;
+        padding: 10px 6px;
+        border-radius: 14px 0 0 14px;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab {
+        flex-basis: 42px !important;
+        width: 56px !important;
+        min-width: 56px !important;
+        height: 42px !important;
+        min-height: 42px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg,
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/inventory.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/allskins.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/ak47.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/p90.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/m249.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/usp_silencer.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/awp.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/knife_m9_bayonet.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/gloves.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/agent.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/music_kit.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/pin.svg"] {
+        flex-basis: 38px !important;
+        width: 38px !important;
+        min-width: 38px !important;
+        max-width: 38px !important;
+        height: 26px !important;
+        min-height: 26px !important;
+        max-height: 26px !important;
+    }
+
+    .wp-app .wp-sidebar .wp-team-switcher .wp-team-btn {
+        width: 54px !important;
+        min-width: 54px !important;
+    }
+
+    .wp-app .wp-sidebar .wp-search-wrap {
+        width: 56px !important;
+        min-width: 56px !important;
+        max-width: 56px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    .wp-app .wp-workspace-layout {
+        grid-template-columns: 66px minmax(0, 1fr) !important;
+        width: 100% !important;
+        padding-left: 6px !important;
+        gap: 6px !important;
+    }
+
+    .wp-app .wp-sidebar {
+        width: 66px;
+        min-width: 66px;
+        padding-inline: 4px;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab {
+        width: 54px !important;
+        min-width: 54px !important;
+    }
+
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg,
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/inventory.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/allskins.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/ak47.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/p90.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/m249.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/usp_silencer.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/awp.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/knife_m9_bayonet.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/gloves.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/agent.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/music_kit.svg"],
+    .wp-app .wp-sidebar-tabs .wp-tab > .wp-tab-svg[src$="/pin.svg"] {
+        flex-basis: 36px !important;
+        width: 36px !important;
+        min-width: 36px !important;
+        max-width: 36px !important;
+        height: 26px !important;
+        min-height: 26px !important;
+        max-height: 26px !important;
+    }
+
+    .wp-app .wp-sidebar .wp-team-switcher .wp-team-btn {
+        width: 52px !important;
+        min-width: 52px !important;
+    }
+
+    .wp-app .wp-sidebar .wp-search-wrap {
+        width: 54px !important;
+        min-width: 54px !important;
+        max-width: 54px !important;
+    }
+}
