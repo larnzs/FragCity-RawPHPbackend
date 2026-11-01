@@ -34,6 +34,10 @@ $escapeServerValue = static function ($value): string {
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 };
 
+$serverlistGuyAssetVersion = function_exists('asset_version')
+    ? asset_version(dirname(__DIR__) . '/img/webp/serverlistguy.webp')
+    : '1';
+
 $lowerServerValue = static function ($value): string {
     $value = (string) $value;
     return function_exists('mb_strtolower')
@@ -183,16 +187,23 @@ $faceitIconVersion = function_exists('asset_version')
                 </div>
             </div>
 
-            <div class="sl-hero-art" data-fc-reveal="left" aria-hidden="true">
-                <div class="sl-art-grid"></div>
-                <span class="sl-art-ring sl-art-ring-one"></span>
-                <span class="sl-art-ring sl-art-ring-two"></span>
-                <div class="sl-art-center">
-                    <i class="fa-solid fa-tower-broadcast"></i>
-                    <span>FC</span>
-                </div>
-                <span class="sl-art-tag sl-art-tag-top">PUBLIC SERVERS</span>
-                <span class="sl-art-tag sl-art-tag-bottom">FIND YOUR GAME</span>
+            <div class="sl-hero-art sl-hero-mascot" data-fc-reveal="left" aria-hidden="true">
+                <span class="sl-mascot-glow"></span>
+                <span class="sl-mascot-orbit sl-mascot-orbit--outer"></span>
+                <span class="sl-mascot-orbit sl-mascot-orbit--inner"></span>
+                <span class="sl-mascot-grid"></span>
+                <span class="sl-mascot-aim-line"></span>
+                <span class="sl-mascot-tag sl-mascot-tag--top">FRAGCITY / FIELD GUIDE</span>
+                <span class="sl-mascot-tag sl-mascot-tag--bottom">COMMUNITY // 01</span>
+                <span class="sl-mascot-target"><i class="fa-solid fa-crosshairs"></i></span>
+                <img
+                    class="sl-hero-guy"
+                    src="/img/webp/serverlistguy.webp?v=<?= rawurlencode($serverlistGuyAssetVersion) ?>"
+                    alt=""
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
+                >
             </div>
         </section>
 
