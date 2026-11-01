@@ -12813,3 +12813,43 @@ html.fc-no-animation .wp-app .wp-sidebar .wp-search-wrap {
         transition: none !important;
     }
 }
+
+
+/* Horizontal category scrolling with native gestures and no visible track. */
+.wp-app .wp-sidebar-tabs {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
+    touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
+}
+
+.wp-app .wp-sidebar-tabs::-webkit-scrollbar,
+.wp-app .wp-sidebar-tabs::-webkit-scrollbar-track,
+.wp-app .wp-sidebar-tabs::-webkit-scrollbar-thumb {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    background: transparent !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-category-switcher--unified {
+    flex-wrap: nowrap !important;
+    width: max-content !important;
+    min-width: max-content !important;
+}
+
+.wp-app .wp-sidebar-tabs .wp-tab {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wp-app .wp-sidebar-tabs {
+        scroll-behavior: auto;
+    }
+}
