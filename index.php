@@ -414,6 +414,12 @@ $requestedPage = trim(
     (string) ($_GET['page'] ?? 'home')
 );
 
+// The standalone wallet route has been retired; normalize old bookmarks.
+if ($requestedPage === 'wallet') {
+    header('Location: index.php', true, 303);
+    exit;
+}
+
 $page = in_array(
     $requestedPage,
     $allowedPages,
