@@ -13396,3 +13396,214 @@ body:has(.wp-app) > #wpFloatingPagination .wp-pagination--floating .wp-page-btn.
         min-height: 38px !important;
     }
 }
+
+
+/* =========================================================
+   Saved Inventory remove action + compact Pins pagination
+========================================================= */
+
+/* Each saved paint keeps its selectable card intact; the X is a separate action below it. */
+.wp-app .wp-saved-paint-item {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    gap: 7px !important;
+    min-width: 0 !important;
+}
+
+.wp-app .wp-saved-paint-item > .wp-saved-paint-card {
+    flex: 1 1 auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.wp-app .wp-inventory-remove-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    align-self: center !important;
+    gap: 6px !important;
+    width: 70px !important;
+    min-width: 70px !important;
+    height: 27px !important;
+    min-height: 27px !important;
+    padding: 0 9px !important;
+    border: 1px solid rgba(248, 113, 113, .25) !important;
+    border-radius: 8px !important;
+    background: rgba(127, 29, 29, .12) !important;
+    color: #FCA5A5 !important;
+    font: inherit !important;
+    font-size: .64rem !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    transition:
+        color 150ms ease,
+        background 150ms ease,
+        border-color 150ms ease,
+        transform 150ms ease,
+        opacity 150ms ease !important;
+}
+
+.wp-app .wp-inventory-remove-btn > i {
+    font-size: .78rem !important;
+}
+
+.wp-app .wp-inventory-remove-btn:hover,
+.wp-app .wp-inventory-remove-btn:focus-visible {
+    border-color: rgba(248, 113, 113, .62) !important;
+    background: rgba(127, 29, 29, .28) !important;
+    color: #FEE2E2 !important;
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.wp-app .wp-inventory-remove-btn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, .13) !important;
+}
+
+.wp-app .wp-inventory-remove-btn:disabled,
+.wp-app .wp-inventory-remove-btn.is-loading {
+    opacity: .52 !important;
+    cursor: wait !important;
+    transform: none !important;
+}
+
+.wp-app .wp-inventory-item-removing {
+    opacity: 0 !important;
+    transform: scale(.97) !important;
+    transition: opacity 150ms ease, transform 150ms ease !important;
+}
+
+/* Pins pagination is a compact horizontal rail so the numbered pages stay visible. */
+body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins:not([hidden]) {
+    position: fixed !important;
+    top: auto !important;
+    right: auto !important;
+    bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: min(430px, calc(100vw - 28px)) !important;
+    max-width: calc(100vw - 28px) !important;
+    max-height: 56px !important;
+    padding: 6px 9px !important;
+    border-radius: 13px !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins .wp-floating-pagination__heading {
+    display: none !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins .wp-floating-pagination__info {
+    display: flex !important;
+    flex: 0 0 43px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 43px !important;
+    width: 43px !important;
+    white-space: nowrap !important;
+    font-size: .62rem !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins .wp-floating-pagination__controls {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    align-items: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins .wp-pagination--floating.wp-pagination--pins {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins .wp-pagination--floating.wp-pagination--pins::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins .wp-page-btn {
+    display: inline-flex !important;
+    flex: 0 0 29px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 29px !important;
+    min-width: 29px !important;
+    max-width: 29px !important;
+    height: 29px !important;
+    min-height: 29px !important;
+    max-height: 29px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    font-size: .67rem !important;
+    line-height: 1 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    flex-shrink: 0 !important;
+}
+
+body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins .wp-page-btn--nav {
+    font-size: .88rem !important;
+}
+
+@media (max-width: 760px) {
+    body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins:not([hidden]) {
+        right: auto !important;
+        left: 50% !important;
+        bottom: max(10px, env(safe-area-inset-bottom)) !important;
+        width: min(430px, calc(100vw - 20px)) !important;
+        max-width: calc(100vw - 20px) !important;
+        max-height: 54px !important;
+        padding: 6px 8px !important;
+        gap: 6px !important;
+    }
+
+    body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins .wp-floating-pagination__info {
+        flex-basis: 38px !important;
+        width: 38px !important;
+        min-width: 38px !important;
+        font-size: .58rem !important;
+    }
+
+    body:has(.wp-app) > #wpFloatingPagination.wp-floating-pagination--pins .wp-page-btn {
+        flex-basis: 27px !important;
+        width: 27px !important;
+        min-width: 27px !important;
+        max-width: 27px !important;
+        height: 27px !important;
+        min-height: 27px !important;
+        max-height: 27px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .wp-app .wp-inventory-remove-btn,
+    .wp-app .wp-inventory-item-removing {
+        transition: none !important;
+    }
+}
