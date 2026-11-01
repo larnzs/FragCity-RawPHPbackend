@@ -1265,23 +1265,14 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
 
 <div class="wp-app">
     <div class="wp-workspace-layout">
-        <div class="wp-workspace-main">
+        <aside class="wp-sidebar" aria-label="WeaponPaints navigation">
+            <div class="wp-sidebar-brand" aria-hidden="true">
+                <span class="wp-sidebar-brand__mark"><i class="fas fa-crosshairs"></i></span>
+            </div>
 
-    <!-- =========================================================
-         TOP HEADER
-    ========================================================== -->
-
-    <header class="wp-header">
-
-        <nav
-            class="wp-tabs wp-toolbar-controls"
-            id="wpToolbarControls"
-            aria-label="Skin categories, team and search controls"
-        >
-
-            <div
+            <nav class="wp-tabs wp-sidebar-tabs" id="mainTabs" aria-label="Skin categories">
+                <div
                 class="wp-category-switcher wp-category-switcher--unified"
-                id="mainTabs"
                 role="group"
                 aria-label="Inventory and weapon categories"
             >
@@ -1538,10 +1529,13 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                     <span class="wp-tab-label">Pins</span>
                 </button>
             </div>
+            </nav>
 
-            <!-- Current Team -->
+            <div class="wp-sidebar-divider" role="presentation"></div>
 
-            <div
+            <div class="wp-sidebar-team">
+                <span class="wp-sidebar-label">TEAM</span>
+                <div
                 class="wp-team-switcher"
                 role="group"
                 aria-label="Team selection"
@@ -1578,33 +1572,29 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                 </a>
 
             </div>
+            </div>
 
-<!-- Search stays on the same toolbar row as team and category controls. -->
+            <div class="wp-sidebar-divider" role="presentation"></div>
 
-            <div class="wp-search-wrap">
+            <div class="wp-sidebar-search">
+                <div class="wp-search-wrap" role="search" aria-label="Search WeaponPaints">
 
                 <i class="fas fa-magnifying-glass"></i>
 
                 <input
                     type="search"
                     id="skinSearchGlobal"
+                    aria-label="Search items"
                     class="wp-search"
                     placeholder="جستجو در آیتم‌ها..."
                     autocomplete="off"
                 >
 
             </div>
+            </div>
+        </aside>
 
-        </nav>
-
-
-    </header>
-
-
-    <!-- =========================================================
-         PAGE CONTENT
-    ========================================================== -->
-
+        <div class="wp-workspace-main">
     <main
         class="wp-main page-fader ready"
         id="mainPageFader"
