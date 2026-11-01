@@ -565,6 +565,22 @@ if ($faceitLevel !== null && $faceitElo !== null) {
     $faceitProgressText = 'Level ' . $faceitLevel . ' · ELO در دسترس نیست';
 }
 
+$faceitDisplayLevel = $faceitLevel ?? 0;
+$faceitRankColors = [
+    0 => '#CDCDCD',
+    1 => '#EEEEEE',
+    2 => '#1CE400',
+    3 => '#1CE400',
+    4 => '#FFC800',
+    5 => '#FFC800',
+    6 => '#FFC800',
+    7 => '#FFC800',
+    8 => '#FF6309',
+    9 => '#FF6309',
+    10 => '#FE1F00',
+];
+$faceitRankColor = $faceitRankColors[$faceitDisplayLevel] ?? '#CDCDCD';
+
 // Load this player's saved Paint configurations through the same signed Linux API
 // boundary used by the WeaponPaints page. Never connect to the plugin database here.
 // Build a compact loadout overview instead of resolving/rendering large gun-skin image cards.
@@ -749,21 +765,20 @@ if (!function_exists('formatPlaytime')) {
                         ></div>
                     </div>
                 </div>
-                <div class="profile-progress-item">
+                <div
+                    class="profile-progress-item profile-progress-item--faceit"
+                    style="--faceit-rank-color: <?= htmlspecialchars($faceitRankColor, ENT_QUOTES, 'UTF-8') ?>;"
+                >
                     <div class="profile-progress-head">
                         <span class="profile-progress-label">
-                            <?php if ($faceitLevel !== null): ?>
-                                <img
-                                    class="profile-faceit-level-icon"
-                                    src="/img/faceit/<?= $faceitLevel ?>.svg"
-                                    alt=""
-                                    aria-hidden="true"
-                                    width="24"
-                                    height="24"
-                                >
-                            <?php else: ?>
-                                <i class="fa-solid fa-ranking-star" aria-hidden="true"></i>
-                            <?php endif; ?>
+                            <img
+                                class="profile-faceit-level-icon"
+                                src="/img/faceit/<?= $faceitDisplayLevel ?>.svg"
+                                alt=""
+                                aria-hidden="true"
+                                width="24"
+                                height="24"
+                            >
                             FACEIT LEVEL / ELO
                         </span>
                         <span class="profile-progress-value"><?= htmlspecialchars($faceitProgressText, ENT_QUOTES, 'UTF-8') ?></span>
