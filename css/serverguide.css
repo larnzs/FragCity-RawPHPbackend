@@ -1209,3 +1209,106 @@
         transition: none !important;
     }
 }
+
+
+/* =========================================================
+   Server Guide page entrance — follows WeaponPaints .page-fader
+   and the viewport reveal rhythm used by the Server Browser.
+========================================================= */
+.server-guide.sg-page-fader {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+    transition:
+        opacity 350ms ease,
+        transform 350ms cubic-bezier(.22, .61, .36, 1);
+}
+
+.server-guide.sg-page-fader.sg-page-ready {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+}
+
+.server-guide [data-sg-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    filter: blur(2px);
+    transition:
+        opacity 520ms cubic-bezier(.22, .61, .36, 1) var(--sg-reveal-delay, 0ms),
+        transform 520ms cubic-bezier(.22, .61, .36, 1) var(--sg-reveal-delay, 0ms),
+        filter 520ms ease var(--sg-reveal-delay, 0ms);
+    will-change: opacity, transform, filter;
+}
+
+.server-guide [data-sg-reveal="left"] {
+    transform: translate3d(18px, 0, 0);
+}
+
+.server-guide [data-sg-reveal].sg-revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    filter: none;
+    will-change: auto;
+}
+
+.server-guide .sg-entry.sg-revealed:hover {
+    transform: translate3d(0, -3px, 0);
+}
+
+.server-guide .sg-art-orbit-one {
+    animation: sg-orbit-float 7s ease-in-out infinite;
+}
+
+.server-guide .sg-art-orbit-two {
+    animation: sg-orbit-float 7s ease-in-out -3.5s infinite;
+}
+
+.server-guide .sg-art-crosshair {
+    animation: sg-crosshair-pulse 3.6s ease-in-out infinite;
+    transform-origin: center;
+}
+
+.server-guide .sg-art-terminal {
+    animation: sg-terminal-float 6s ease-in-out infinite;
+}
+
+@keyframes sg-orbit-float {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -8px; }
+}
+
+@keyframes sg-crosshair-pulse {
+    0%, 100% { opacity: .48; scale: 1; }
+    50% { opacity: .82; scale: 1.06; }
+}
+
+@keyframes sg-terminal-float {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -5px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .server-guide.sg-page-fader,
+    .server-guide [data-sg-reveal] {
+        opacity: 1 !important;
+        transform: none !important;
+        filter: none !important;
+        transition: none !important;
+        will-change: auto;
+    }
+
+    .server-guide .sg-art-orbit-one,
+    .server-guide .sg-art-orbit-two,
+    .server-guide .sg-art-crosshair,
+    .server-guide .sg-art-terminal {
+        animation: none !important;
+    }
+}
+
+html.fc-no-animation .server-guide.sg-page-fader,
+html.fc-no-animation .server-guide [data-sg-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+    will-change: auto;
+}
