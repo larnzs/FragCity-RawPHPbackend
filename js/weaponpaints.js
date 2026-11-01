@@ -1927,8 +1927,56 @@
             floatingPagination.classList.add('wp-pagination--floating');
             floatingPagination.setAttribute('aria-label', 'Page navigation');
 
+            // Pins fallback: recover numbered controls from PHP metadata if an
+            // animation/cache race leaves the source paginator without page chips.
+            if (activePane.id === 'tab-pins' && sourcePageNumbers.length === 0) {
+                totalPages = Math.max(
+                    1,
+                    parseInt(activePane.dataset.pinTotalPages || '1', 10) || 1
+                );
+                currentPage = Math.max(
+                    1,
+                    Math.min(
+                        totalPages,
+                        parseInt(activePane.dataset.pinCurrentPage || '1', 10) || 1
+                    )
+                );
+
+                if (totalPages > 1) {
+                    const makePinLink = (page, label, extraClass) => {
+                        const link = document.createElement('a');
+                        link.href = '#';
+                        link.className = 'wp-page-btn' + (extraClass ? ' ' + extraClass : '');
+                        link.textContent = label;
+                        link.dataset.wpPage = String(page);
+                        link.dataset.wpNavigation = 'navigatePinPage';
+                        return link;
+                    };
+
+                    floatingPagination.replaceChildren(
+                        makePinLink(Math.max(1, currentPage - 1), '‹', 'wp-page-btn--nav')
+                    );
+
+                    for (let page = 1; page <= totalPages; page += 1) {
+                        const link = makePinLink(
+                            page,
+                            String(page),
+                            page === currentPage ? 'is-active' : ''
+                        );
+                        if (page === currentPage) {
+                            link.setAttribute('aria-current', 'page');
+                        }
+                        floatingPagination.appendChild(link);
+                    }
+
+                    floatingPagination.appendChild(
+                        makePinLink(Math.min(totalPages, currentPage + 1), '›', 'wp-page-btn--nav')
+                    );
+                }
+            }
+
             const navLinks = floatingPagination.querySelectorAll('.wp-page-btn--nav');
-            if (navLinks.length >= 2) {
+            if (navLinks.length >= 2 && activePane.id !== 'tab-pins') {
                 const previousIcon = navLinks[0].querySelector('i');
                 const nextIcon = navLinks[navLinks.length - 1].querySelector('i');
 
@@ -2032,9 +2080,9 @@
             }
         }
 
-        if (activePane.id === 'tab-pins') {
-            floatingPagination.classList.add('wp-pagination--pins');
-        }
+        const isPinsPane = activePane.id === 'tab-pins';
+        floatingPagination.classList.toggle('wp-pagination--pins', isPinsPane);
+        dock.classList.toggle('wp-floating-pagination--pins', isPinsPane);
 
         if (info) {
             info.textContent = currentPage + ' / ' + totalPages;
@@ -6814,6 +6862,103 @@
 
             }
         );
+
+        // Remove one saved inventory paint using the authenticated, CSRF-protected endpoint.
+        document.addEventListener('click', async event => {
+            const target = event.target instanceof Element
+                ? event.target
+                : (event.target && event.target.parentElement);
+            const removeButton = target
+                ? target.closest('[data-wp-inventory-remove]')
+                : null;
+            const app = document.querySelector('.wp-app');
+
+            if (!removeButton || !app || !app.contains(removeButton)) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (removeButton.disabled || removeButton.dataset.wpDeleteBusy === '1') {
+                return;
+            }
+
+            const team = String(removeButton.dataset.team || '');
+            const defindex = String(removeButton.dataset.def || '');
+            const paintId = String(removeButton.dataset.paintId || '');
+            const csrfToken = String(removeButton.dataset.csrfToken || '');
+            const item = removeButton.closest('.wp-saved-paint-item');
+            const itemTitle = item && item.querySelector('.wp-card-title')
+                ? item.querySelector('.wp-card-title').textContent.trim()
+                : 'این اسکین';
+
+            if (!['2', '3'].includes(team) || !/^\\d+$/.test(defindex) || !/^\\d+$/.test(paintId) || !csrfToken) {
+                showWpToast('اطلاعات حذف این اسکین معتبر نیست.', 'error');
+                return;
+            }
+
+            const confirmation = 'آیا از حذف «' + itemTitle + '» از Inventory مطمئن هستید؟';
+            if (!window.confirm(confirmation)) {
+                return;
+            }
+
+            removeButton.disabled = true;
+            removeButton.dataset.wpDeleteBusy = '1';
+            removeButton.classList.add('is-loading');
+
+            try {
+                const formData = new FormData();
+                formData.append('wp_csrf_token', csrfToken);
+                formData.append('team', team);
+                formData.append('defindex', defindex);
+                formData.append('paint_id', paintId);
+
+                const response = await fetch('/api/weaponpaints-inventory.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                let result;
+                try {
+                    result = await response.json();
+                } catch (parseError) {
+                    throw new Error('پاسخ سرور قابل‌خواندن نیست.');
+                }
+
+                if (!response.ok || !result || result.success !== true || result.deleted !== true) {
+                    if (response.status === 404) {
+                        throw new Error('این اسکین دیگر در Inventory وجود ندارد. صفحه را تازه‌سازی کنید.');
+                    }
+                    if (response.status === 403) {
+                        throw new Error('اعتبار درخواست منقضی شده است. صفحه را تازه‌سازی کنید.');
+                    }
+                    throw new Error('حذف اسکین از دیتابیس انجام نشد.');
+                }
+
+                if (item) {
+                    item.classList.add('wp-inventory-item-removing');
+                    window.setTimeout(() => item.remove(), 160);
+                }
+
+                showWpToast('اسکین از Inventory و Loadout فعال حذف شد.', 'success');
+                window.setTimeout(() => window.location.reload(), 420);
+            } catch (error) {
+                removeButton.disabled = false;
+                removeButton.dataset.wpDeleteBusy = '0';
+                removeButton.classList.remove('is-loading');
+                showWpToast(
+                    error instanceof Error ? error.message : 'حذف اسکین ناموفق بود.',
+                    'error'
+                );
+            }
+        });
 
         // Use window capture so the shared site's AJAX/navigation submit
         // listener cannot steal Weapon Paints forms before this handler.
