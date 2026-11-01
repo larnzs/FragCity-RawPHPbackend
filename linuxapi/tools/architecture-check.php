@@ -791,6 +791,14 @@ $check(
 );
 
 $check(
+    'WeaponPaints inventory deletion accepts numeric defindex and paint IDs without escaped-regex false negatives',
+    str_contains($weaponPaintsJavascript, 'const isUnsignedInteger = value => /^[0-9]+$/.test(value);')
+        && str_contains($weaponPaintsJavascript, '!isUnsignedInteger(defindex)')
+        && str_contains($weaponPaintsJavascript, '!isUnsignedInteger(paintId)')
+        && !str_contains($weaponPaintsJavascript, '/^\\\\d+$/')
+);
+
+$check(
     'WeaponPaints inventory remove control overlays the card and the English TEAM label aligns left',
     str_contains($weaponPaintsPage, 'data-wp-inventory-remove')
         && str_contains($weaponPaintsStylesheet, '.wp-app .wp-saved-paint-item')
