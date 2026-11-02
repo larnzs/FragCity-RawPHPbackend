@@ -37,6 +37,12 @@
         return element;
     }
 
+    function prepareMotion(element, interactive) {
+        if (!element) return;
+        element.setAttribute('data-fc-reveal', 'up');
+        if (interactive) element.setAttribute('data-fc-interactive', '');
+    }
+
     function formatDate(value) {
         if (!value) return '—';
         const date = new Date(value);
@@ -66,6 +72,7 @@
 
     function createIncidentCard(incident, active) {
         const card = makeElement('article', 'fc-status-incident-card' + (active ? ' is-active' : ''));
+        prepareMotion(card, false);
         const top = makeElement('div', 'fc-status-incident-top');
         top.appendChild(makeElement('strong', '', incident.title || 'رخداد'));
         top.appendChild(makeElement('time', '', formatDate(incident.updated_at || incident.created_at)));
@@ -97,6 +104,7 @@
 
     function renderMonitor(monitor) {
         const card = makeElement('article', 'fc-status-monitor-card');
+        prepareMotion(card, true);
         const heading = makeElement('div', 'fc-status-monitor-heading');
         const titleWrap = makeElement('div', 'fc-status-monitor-title-wrap');
         titleWrap.appendChild(makeElement('span', 'fc-status-monitor-dot fc-status-monitor-dot--' + statusMeta(monitor.status).tone));
@@ -138,6 +146,7 @@
         container.replaceChildren();
         (Array.isArray(groups) ? groups : []).forEach(function (group) {
             const section = makeElement('section', 'fc-status-group');
+            prepareMotion(section, true);
             const heading = makeElement('div', 'fc-status-group-heading');
             heading.appendChild(makeElement('h3', '', group.name || 'سرویس‌ها'));
             const count = Array.isArray(group.monitors) ? group.monitors.length : 0;
@@ -176,6 +185,7 @@
         const rows = Array.isArray(incidents) ? incidents : [];
         rows.forEach(function (incident) {
             const item = makeElement('article', 'fc-status-history-item');
+            prepareMotion(item, false);
             item.appendChild(makeElement('span', 'fc-status-history-marker'));
             const copy = makeElement('div', 'fc-status-history-copy');
             copy.appendChild(makeElement('strong', '', incident.title || 'تغییر وضعیت'));
@@ -223,6 +233,13 @@
         let requestController = null;
         let lastSnapshot = null;
 
+        function refreshMotion(container) {
+            const motion = window.FragCityMotion;
+            if (motion && typeof motion.refresh === 'function') {
+                motion.refresh(container || root);
+            }
+        }
+
         function setOverall(status) {
             const meta = statusMeta(status);
             if (overall) {
@@ -246,6 +263,7 @@
         function showError(code) {
             if (!alert) return;
             alert.hidden = false;
+            refreshMotion(alert);
             alert.textContent = code === 'status_not_configured'
                 ? 'اتصال Uptime Kuma هنوز تنظیم نشده است. پس از استقرار مانیتورینگ و انتشار Status Page عمومی، اطلاعات این قسمت نمایش داده می‌شود.'
                 : 'در دریافت وضعیت سرویس‌ها مشکلی پیش آمد. اطلاعات قبلی حفظ شده و در بروزرسانی بعدی دوباره تلاش می‌کنیم.';
@@ -286,6 +304,7 @@
                 });
                 renderIncidents(activeIncidents, activeList, data.active_incidents || [], data.maintenance || []);
                 renderIncidentHistory(historyList, historyEmpty, data.incident_history || []);
+                refreshMotion(root);
                 if (updated) updated.textContent = 'آخرین دریافت اطلاعات: ' + formatDate(data.updated_at || new Date().toISOString());
                 if (alert) alert.hidden = true;
             } catch (error) {
