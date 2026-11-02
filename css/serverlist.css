@@ -4667,3 +4667,9 @@ html.fc-no-animation .sl-hero-guy {
         padding: 10px;
     }
 }
+
+@media (max-width: 760px) {
+    .sl-overview {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
