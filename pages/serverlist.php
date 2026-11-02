@@ -111,8 +111,8 @@ foreach ($serverInventory as $entry) {
         'players' => $players,
         'max_players' => $maxPlayers,
         'query_rtt_ms' => $queryRtt,
-        'vac' => array_key_exists('vac', $entry) ? (bool) $entry['vac'] : null,
-        'password' => array_key_exists('password', $entry) ? (bool) $entry['password'] : null,
+        'vac' => array_key_exists('vac', $entry) && $entry['vac'] !== null ? (bool) $entry['vac'] : null,
+        'password' => array_key_exists('password', $entry) && $entry['password'] !== null ? (bool) $entry['password'] : null,
         'region' => trim((string) ($entry['region'] ?? '')),
         'country' => strtoupper(trim((string) ($entry['country'] ?? ''))),
     ];
@@ -123,10 +123,20 @@ $onlineServers = array_values(array_filter(
     static fn (array $server): bool => $server['status'] === 'online'
 ));
 $totalPlayers = array_sum(array_column($onlineServers, 'players'));
-$uniqueMaps = array_values(array_unique(array_map(
-    static fn (array $server): string => $server['map'],
+$serverMapCounts = [];
+foreach ($onlineServers as $server) {
+    $mapName = trim((string)($server['map'] ?? ''));
+    if ($mapName === '' || strcasecmp($mapName, 'Unknown') === 0) {
+        continue;
+    }
+    $serverMapCounts[$mapName] = ($serverMapCounts[$mapName] ?? 0) + 1;
+}
+arsort($serverMapCounts, SORT_NUMERIC);
+$uniqueMaps = array_keys($serverMapCounts);
+$availableSlots = array_sum(array_map(
+    static fn (array $server): int => max(0, $server['max_players'] - $server['players']),
     $onlineServers
-)));
+));
 $serverGroups = [];
 foreach ($serverRows as $server) {
     $groupKey = $server['mode'];
@@ -244,7 +254,15 @@ $faceitIconVersion = function_exists('asset_version')
                 </div>
                 <span class="sl-overview-hint">MAPS</span>
             </article>
-                </section>
+            <article class="sl-overview-card" data-fc-reveal="up" data-fc-reveal-delay="240">
+                <span class="sl-overview-icon sl-icon-orange"><i class="fa-solid fa-door-open" aria-hidden="true"></i></span>
+                <div class="sl-overview-copy">
+                    <span>جای خالی آنلاین</span>
+                    <strong><?= number_format($availableSlots) ?></strong>
+                </div>
+                <span class="sl-overview-hint">OPEN SLOTS</span>
+            </article>
+        </section>
 
             <section class="sl-browser" id="slBrowserControls">
             <div class="sl-section-heading" data-fc-reveal="up">
@@ -268,78 +286,164 @@ $faceitIconVersion = function_exists('asset_version')
                 </div>
             <?php endif; ?>
 
-            <div class="sl-filter-panel" data-fc-reveal="up">
-                <div class="sl-filter-top">
-                    <div class="sl-filter-pills" id="slFilterPills" role="group" aria-label="فیلتر وضعیت">
-                        <button type="button" class="sl-filter-pill" data-sl-filter="all" aria-pressed="false">
-                            همه <span><?= count($serverRows) ?></span>
-                        </button>
-                        <button type="button" class="sl-filter-pill active" data-sl-filter="online" aria-pressed="true">
-                            <i class="fa-solid fa-circle" aria-hidden="true"></i> آنلاین <span><?= count($onlineServers) ?></span>
-                        </button>
-                        <button type="button" class="sl-filter-pill" data-sl-filter="offline" aria-pressed="false">
-                            آفلاین
-                        </button>
-                    </div>
-
-                    <div class="sl-view-switch" role="group" aria-label="نحوه نمایش سرورها">
-                        <button type="button" class="sl-view-button active" data-sl-view-option="list" aria-pressed="true" title="نمایش لیستی">
-                            <i class="fa-solid fa-list" aria-hidden="true"></i>
-                            <span>لیستی</span>
-                        </button>
-                        <button type="button" class="sl-view-button" data-sl-view-option="grid" aria-pressed="false" title="نمایش کارت‌ها">
-                            <i class="fa-solid fa-grip" aria-hidden="true"></i>
-                            <span>کارت‌ها</span>
+            <div class="sl-browser-layout">
+                <aside class="sl-filter-sidebar" aria-label="فیلترهای سرور">
+                    <div class="sl-sidebar-heading">
+                        <div>
+                            <span class="sl-section-kicker">REFINE SERVERS</span>
+                            <h3>فیلترها</h3>
+                        </div>
+                        <button type="button" class="sl-reset-filters" id="slClearFilters">
+                            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+                            پاک‌کردن
                         </button>
                     </div>
 
-                    <label class="sl-search" for="slSearchInput">
-                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-                        <input id="slSearchInput" type="search" autocomplete="off" placeholder="جستجوی نام سرور یا نقشه..." <?= $serverRows === [] ? 'disabled' : '' ?>>
-                        <kbd>/</kbd>
-                    </label>
-                </div>
+                    <section class="sl-facet" data-sl-facet="vac">
+                        <h4><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Anti-Cheat <span>VAC</span></h4>
+                        <div class="sl-facet-options">
+                            <button type="button" class="sl-facet-option active" data-sl-option="vac" data-sl-value="all" aria-pressed="true">
+                                همه <span data-sl-count>0</span>
+                            </button>
+                            <button type="button" class="sl-facet-option" data-sl-option="vac" data-sl-value="protected" aria-pressed="false">
+                                محافظت‌شده با VAC <span data-sl-count>0</span>
+                            </button>
+                            <button type="button" class="sl-facet-option" data-sl-option="vac" data-sl-value="unprotected" aria-pressed="false">
+                                بدون VAC <span data-sl-count>0</span>
+                            </button>
+                            <button type="button" class="sl-facet-option" data-sl-option="vac" data-sl-value="unknown" aria-pressed="false">
+                                وضعیت نامشخص <span data-sl-count>0</span>
+                            </button>
+                        </div>
+                    </section>
 
-                <div class="sl-filter-bottom">
-                    <div class="sl-select-filters">
-                        <label class="sl-select-wrap">
-                            <span>گیم‌مود</span>
-                            <select id="slModeFilter" <?= $serverRows === [] ? 'disabled' : '' ?>>
-                                <option value="">همه حالت‌ها</option>
-                                <?php foreach (array_keys($serverGroups) as $modeName): ?>
-                                    <option value="<?= $escapeServerValue($lowerServerValue($modeName)) ?>"><?= $escapeServerValue($modeName) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-                        </label>
+                    <section class="sl-facet" data-sl-facet="game">
+                        <h4><i class="fa-solid fa-gamepad" aria-hidden="true"></i> بازی</h4>
+                        <div class="sl-facet-options">
+                            <button type="button" class="sl-facet-option active" data-sl-option="game" data-sl-value="all" aria-pressed="true">
+                                همه بازی‌ها <span data-sl-count>0</span>
+                            </button>
+                            <button type="button" class="sl-facet-option" data-sl-option="game" data-sl-value="cs2" aria-pressed="false">
+                                Counter-Strike 2 <span data-sl-count>0</span>
+                            </button>
+                        </div>
+                        <p class="sl-facet-note">این فهرست در حال حاضر فقط سرورهای دارای AppID 730 را دریافت می‌کند.</p>
+                    </section>
 
-                        <label class="sl-select-wrap">
-                            <span>نقشه</span>
-                            <select id="slMapFilter" <?= $serverRows === [] ? 'disabled' : '' ?>>
-                                <option value="">همه نقشه‌ها</option>
-                                <?php foreach ($uniqueMaps as $mapName): ?>
-                                    <option value="<?= $escapeServerValue($lowerServerValue($mapName)) ?>"><?= $escapeServerValue($mapName) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
-                        </label>
+                    <section class="sl-facet" data-sl-facet="mode">
+                        <h4><i class="fa-solid fa-layer-group" aria-hidden="true"></i> مود سرور</h4>
+                        <div class="sl-facet-options">
+                            <button type="button" class="sl-facet-option active" data-sl-option="mode" data-sl-value="all" aria-pressed="true">
+                                همه مودها <span data-sl-count>0</span>
+                            </button>
+                            <?php foreach (array_keys($serverGroups) as $modeName): ?>
+                                <button
+                                    type="button"
+                                    class="sl-facet-option"
+                                    data-sl-option="mode"
+                                    data-sl-value="<?= $escapeServerValue($lowerServerValue($modeName)) ?>"
+                                    aria-pressed="false"
+                                >
+                                    <?= $escapeServerValue($modeName) ?>
+                                    <span data-sl-count>0</span>
+                                </button>
+                            <?php endforeach; ?>
+                        </div>
+                    </section>
 
-                        <label class="sl-select-wrap sl-sort-wrap">
-                            <span>مرتب‌سازی</span>
-                            <select id="slSortSelect" <?= $serverRows === [] ? 'disabled' : '' ?>>
-                                <option value="default">پیش‌فرض</option>
-                                <option value="players-desc">بازیکن بیشتر</option>
-                                <option value="name-asc">نام سرور</option>
-                            </select>
-                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    <section class="sl-facet" data-sl-facet="players">
+                        <h4><i class="fa-solid fa-users" aria-hidden="true"></i> بازیکنان</h4>
+                        <div class="sl-facet-options">
+                            <button type="button" class="sl-facet-option active" data-sl-option="players" data-sl-value="all" aria-pressed="true">
+                                همه <span data-sl-count>0</span>
+                            </button>
+                            <button type="button" class="sl-facet-option" data-sl-option="players" data-sl-value="playing" aria-pressed="false">
+                                دارای بازیکن <span data-sl-count>0</span>
+                            </button>
+                            <button type="button" class="sl-facet-option" data-sl-option="players" data-sl-value="slots" aria-pressed="false">
+                                دارای جای خالی <span data-sl-count>0</span>
+                            </button>
+                            <button type="button" class="sl-facet-option" data-sl-option="players" data-sl-value="empty" aria-pressed="false">
+                                کاملاً خالی <span data-sl-count>0</span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <section class="sl-facet" data-sl-facet="display">
+                        <h4><i class="fa-solid fa-eye" aria-hidden="true"></i> نمایش</h4>
+                        <label class="sl-toggle-option">
+                            <input type="checkbox" data-sl-hide-offline checked>
+                            <span>پنهان کردن آفلاین‌ها</span>
                         </label>
+                        <label class="sl-toggle-option">
+                            <input type="checkbox" data-sl-hide-password>
+                            <span>پنهان کردن سرورهای رمزدار</span>
+                        </label>
+                        <label class="sl-toggle-option">
+                            <input type="checkbox" data-sl-favorites-only>
+                            <span>فقط علاقه‌مندی‌ها <b data-sl-favorite-count>0</b></span>
+                        </label>
+                    </section>
+
+                    <section class="sl-facet sl-map-facet" data-sl-facet="map">
+                        <h4><i class="fa-solid fa-map" aria-hidden="true"></i> مپ</h4>
+                        <label class="sl-map-search" for="slMapSearch">
+                            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                            <input id="slMapSearch" type="search" autocomplete="off" placeholder="search map...">
+                        </label>
+                        <div class="sl-map-options" id="slMapOptions">
+                            <?php foreach ($serverMapCounts as $mapName => $mapCount): ?>
+                                <button
+                                    type="button"
+                                    class="sl-map-option"
+                                    data-sl-map-option="<?= $escapeServerValue($lowerServerValue($mapName)) ?>"
+                                    aria-pressed="false"
+                                >
+                                    <span dir="ltr"><?= $escapeServerValue($mapName) ?></span>
+                                    <b data-sl-map-count><?= number_format($mapCount) ?></b>
+                                </button>
+                            <?php endforeach; ?>
+                            <p class="sl-map-empty" data-sl-map-empty hidden>مپ موردنظر پیدا نشد.</p>
+                        </div>
+                    </section>
+                </aside>
+
+                <div class="sl-browser-main">
+                    <div class="sl-filter-panel" data-fc-reveal="up">
+                        <div class="sl-filter-top">
+                            <div class="sl-view-switch" role="group" aria-label="نحوه نمایش سرورها">
+                                <button type="button" class="sl-view-button active" data-sl-view-option="list" aria-pressed="true" title="نمایش لیستی">
+                                    <i class="fa-solid fa-list" aria-hidden="true"></i>
+                                    <span>لیستی</span>
+                                </button>
+                                <button type="button" class="sl-view-button" data-sl-view-option="grid" aria-pressed="false" title="نمایش کارت‌ها">
+                                    <i class="fa-solid fa-grip" aria-hidden="true"></i>
+                                    <span>کارت‌ها</span>
+                                </button>
+                            </div>
+
+                            <label class="sl-search" for="slSearchInput">
+                                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                                <input id="slSearchInput" type="search" autocomplete="off" placeholder="جستجوی نام سرور، آدرس، مود یا مپ..." <?= $serverRows === [] ? 'disabled' : '' ?>>
+                                <kbd>/</kbd>
+                            </label>
+                        </div>
+
+                        <div class="sl-filter-bottom">
+                            <label class="sl-select-wrap sl-sort-wrap">
+                                <span>مرتب‌سازی</span>
+                                <select id="slSortSelect" <?= $serverRows === [] ? 'disabled' : '' ?>>
+                                    <option value="default">پیش‌فرض</option>
+                                    <option value="players-desc">بازیکن بیشتر</option>
+                                    <option value="name-asc">نام سرور</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                            </label>
+                            <span class="sl-results-label" id="slResultsLabel" aria-live="polite">
+                                نمایش <?= count($onlineServers) ?> سرور
+                            </span>
+                        </div>
                     </div>
-
-                    <span class="sl-results-label" id="slResultsLabel" aria-live="polite">
-                        نمایش <?= count($serverRows) ?> سرور
-                    </span>
-                </div>
-            </div>
 
             <div class="sl-server-list" id="serverList" data-sl-view="list">
                 <?php if ($serverRows !== []): ?>
@@ -377,6 +481,10 @@ $faceitIconVersion = function_exists('asset_version')
                                         data-mode="<?= $escapeServerValue($modeSearch) ?>"
                                         data-address="<?= $escapeServerValue($server['address']) ?>"
                                         data-players="<?= $server['players'] ?>"
+                                        data-max-players="<?= $server['max_players'] ?>"
+                                        data-vac="<?= $server['vac'] === null ? 'unknown' : ($server['vac'] ? 'protected' : 'unprotected') ?>"
+                                        data-password="<?= $server['password'] === null ? 'unknown' : ($server['password'] ? 'true' : 'false') ?>"
+                                        data-game="cs2"
                                         data-fc-reveal="up"
                                         data-fc-reveal-delay="<?= min(240, ($serverIndex % 5) * 48) ?>"
                                         data-fc-interactive
@@ -400,7 +508,12 @@ $faceitIconVersion = function_exists('asset_version')
                                                         <span class="sl-card-mode"><?= $escapeServerValue($server['mode']) ?></span>
                                                     </div>
                                                 </div>
-                                                <span class="sl-status-badge <?= $statusClass ?>"><?= $escapeServerValue($statusLabel) ?></span>
+                                                <div class="sl-card-actions">
+                                                    <span class="sl-status-badge <?= $statusClass ?>"><?= $escapeServerValue($statusLabel) ?></span>
+                                                    <button type="button" class="sl-favorite-toggle" data-sl-favorite aria-pressed="false" title="افزودن به علاقه‌مندی‌ها" aria-label="افزودن به علاقه‌مندی‌ها">
+                                                        <i class="fa-regular fa-star" aria-hidden="true"></i>
+                                                    </button>
+                                                </div>
                                             </div>
 
                                             <div class="sl-card-address">
@@ -511,8 +624,10 @@ $faceitIconVersion = function_exists('asset_version')
                 <i class="fa-solid fa-filter-circle-xmark" aria-hidden="true"></i>
                 <strong>نتیجه‌ای پیدا نشد</strong>
                 <span>فیلترها یا عبارت جستجو را تغییر بده.</span>
-                <button type="button" id="slClearFilters">پاک‌کردن فیلترها</button>
+                <button type="button" data-sl-reset>پاک‌کردن فیلترها</button>
             </div>
+                </div><!-- .sl-browser-main -->
+            </div><!-- .sl-browser-layout -->
             </section>
 
         <section class="sl-query-explainer" data-fc-reveal="up">
