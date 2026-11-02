@@ -132,7 +132,12 @@
                 }
             });
 
-            if (favoriteCount) favoriteCount.textContent = String(favoriteIds.size);
+            if (favoriteCount) {
+                const visibleInventoryFavorites = getCards().filter(function (card) {
+                    return favoriteIds.has(String(card.dataset.serverId || ''));
+                }).length;
+                favoriteCount.textContent = visibleInventoryFavorites.toLocaleString('fa-IR');
+            }
         }
 
         function setFacetSelection(facet, value) {
