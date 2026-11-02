@@ -624,10 +624,10 @@ $check(
 );
 
 $check(
-    'Server Browser defaults to Online and does not sort the visitor by A2S RTT',
-    str_contains($serverListPage, 'data-sl-filter="online" aria-pressed="true"')
-        && str_contains($standbyBrowserJavascript, "let statusFilter = 'online';")
-        && str_contains($standbyBrowserJavascript, "statusFilter = 'online';")
+    'Server Browser defaults to hiding non-online servers and does not sort the visitor by A2S RTT',
+    str_contains($serverListPage, 'data-sl-hide-offline checked')
+        && str_contains($standbyBrowserJavascript, 'hideOffline.checked')
+        && str_contains($standbyBrowserJavascript, "if (hideOffline && hideOffline.checked && !online) return false;")
         && !str_contains($serverListPage, 'query-asc')
         && !str_contains($standbyBrowserJavascript, 'query-asc')
 );
