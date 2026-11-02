@@ -266,13 +266,7 @@ $mobileMoreNavItems = [
     <div class="shock-container">
         <div class="shock-brand">
             <a href="index.php" class="shock-logo-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
-                <picture class="shock-logo-picture">
-                    <source
-                        media="(max-width: 1100px)"
-                        srcset="/img/logoresponsive.png"
-                    >
-                    <img src="/assets/images/logo/main.png" alt="FragCity" class="shock-logo-img">
-                </picture>
+                <img src="/img/webp/newlogo.webp" alt="FragCity" class="shock-logo-img">
             </a>
         </div>
 
@@ -280,13 +274,15 @@ $mobileMoreNavItems = [
             <a href="?page=servers_vps"
                class="shock-nav-item <?= $isPageActive(['servers_vps', 'servers']) ?>"
                data-ajax-nav data-slug="servers_vps">
-                لیست سرورها
+                <i class="fa-solid fa-server" aria-hidden="true"></i>
+                <span>لیست سرورها</span>
             </a>
 
             <a href="?page=skins"
                class="shock-nav-item <?= $isPageActive(['skins', 'skins_vps']) ?>"
                data-ajax-nav data-slug="skins">
-                انتخاب اسکین
+                <i class="fa-solid fa-palette" aria-hidden="true"></i>
+                <span>انتخاب اسکین</span>
             </a>
 
             <a href="?page=serverguide"
@@ -298,11 +294,12 @@ $mobileMoreNavItems = [
 
             <div class="frag-dropdown" id="shockMoreDropdown">
                 <button type="button"
-                        class="shock-nav-item <?= $isPageActive($morePages) ?>"
+                        class="shock-nav-item shock-nav-item--icon-only <?= $isPageActive($morePages) ?>"
                         id="shockMoreButton"
+                        aria-label="بیشتر"
+                        title="بیشتر"
                         aria-expanded="false"
                         aria-controls="shockMoreMenu">
-                    بیشتر
                     <i class="fas fa-chevron-down frag-arrow" aria-hidden="true"></i>
                 </button>
 
@@ -491,7 +488,7 @@ $mobileMoreNavItems = [
 <nav class="mobile-nav" id="mobileNav" aria-label="منوی موبایل" aria-hidden="true">
     <div class="mobile-nav-header">
         <a href="index.php" class="mobile-nav-logo" data-ajax-nav data-slug="home">
-            <img src="/img/logoresponsive.png" alt="FragCity">
+            <img src="/img/webp/newlogo.webp" alt="FragCity">
             <span>FRAGCITY</span>
         </a>
         <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="بستن منو">
