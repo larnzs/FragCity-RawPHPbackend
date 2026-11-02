@@ -185,6 +185,10 @@ $faceitIconVersion = function_exists('asset_version')
                         پیدا کردن سرور
                         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                     </a>
+                    <a class="sl-secondary-action" href="/index.php?page=status" data-ajax-nav data-slug="status">
+                        <i class="fa-solid fa-heart-pulse" aria-hidden="true"></i>
+                        وضعیت سرویس‌ها
+                    </a>
                     <a class="sl-secondary-action" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen">
                         سرور اختصاصی خودت را بساز
                         <i class="fa-solid fa-arrow-up-left" aria-hidden="true"></i>
