@@ -891,6 +891,29 @@ $check(
 );
 
 $check(
+    'Server List exposes real CS2-only VAC, password, player, mode, map, and local favorite facets',
+    str_contains($publicPage, 'data-sl-facet="vac"')
+        && str_contains($publicPage, 'data-sl-facet="game"')
+        && str_contains($publicPage, 'data-sl-facet="mode"')
+        && str_contains($publicPage, 'data-sl-facet="players"')
+        && str_contains($publicPage, 'data-sl-hide-offline')
+        && str_contains($publicPage, 'data-sl-hide-password')
+        && str_contains($publicPage, 'data-sl-favorites-only')
+        && str_contains($publicPage, 'data-sl-map-option')
+        && str_contains($publicPage, 'data-vac=')
+        && str_contains($publicPage, 'data-password=')
+        && str_contains($publicPage, 'data-game="cs2"')
+        && str_contains($publicPage, '$availableSlots')
+        && !str_contains($publicPage, 'HvH')
+        && str_contains($standbyBrowserJavascript, 'cardMatchesFacet')
+        && str_contains($standbyBrowserJavascript, 'updateFacetCounts')
+        && str_contains($standbyBrowserJavascript, 'fragcity.serverlist.favorites.v1')
+        && str_contains($standbyBrowserJavascript, 'data-sl-favorite')
+        && str_contains($standbyBrowserCss, '.sl-filter-sidebar')
+        && str_contains($standbyBrowserCss, '.sl-favorite-toggle')
+);
+
+$check(
     'Runtime example and standby deployment documentation use the verified Pterodactyl Panel origin',
     str_contains($linuxConfig, "'base_url' => 'https://panel.fragcity.ir'")
         && str_contains($standbyDocs, "'base_url' => 'https://panel.fragcity.ir'")
