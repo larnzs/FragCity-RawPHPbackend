@@ -66,7 +66,8 @@ try {
 
     if (!$openid->mode) {
 
-        // Carry the user's explicit choice through the Steam OpenID redirect.
+        // Capture the explicit choice before leaving FragCity for Steam.
+        // LightOpenID includes this query string in its exact return_to URL.
         $_SESSION['remember_login_requested'] =
             (string) ($_GET['remember_me'] ?? '') === '1';
 
@@ -85,11 +86,18 @@ try {
 
     } else {
 
+        // Steam returns to the same return_to URL, including remember_me=1.
+        // Restore from the callback query as well as the session so the
+        // 30-day choice survives a browser/session edge case during redirect.
+        $_SESSION['remember_login_requested'] =
+            (string) ($_GET['remember_me'] ?? '') === '1'
+            || !empty($_SESSION['remember_login_requested']);
+
         if ($openid->validate()) {
 
             $id = $openid->identity;
 
-            preg_match('/^https?:\/\/steamcommunity\.com\/openid\/id\/(\d{17,})/', $id, $matches);
+            preg_match('/^https?:\\/\\/steamcommunity\\.com\\/openid\\/id\\/(\\d{17,})/', $id, $matches);
 
             $steamid64 = $matches[1] ?? null;
 
@@ -168,11 +176,13 @@ try {
                     error_log('[FragCity] Steam profile persistence skipped: no usable Steam summary was available.');
                 }
 
+                $rememberSteamLogin = !empty($_SESSION['remember_login_requested']);
                 RememberMeService::apply(
                     $pdo,
                     (string) $steamid64,
-                    !empty($_SESSION['remember_login_requested'])
+                    $rememberSteamLogin
                 );
+                error_log('[FragCity] Steam remember-me choice applied (enabled=' . ($rememberSteamLogin ? 'yes' : 'no') . ').');
                 unset($_SESSION['remember_login_requested']);
 
                 header('Location: ' . $dashboardPage);

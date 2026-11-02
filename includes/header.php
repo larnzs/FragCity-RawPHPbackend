@@ -147,6 +147,11 @@ $steamUrlParts = $headerSteamProfileUrl !== '' ? parse_url($headerSteamProfileUr
 if (!is_array($steamUrlParts) || strtolower((string)($steamUrlParts['scheme'] ?? '')) !== 'https' || !in_array(strtolower((string)($steamUrlParts['host'] ?? '')), ['steamcommunity.com', 'www.steamcommunity.com'], true)) {
     $headerSteamProfileUrl = '';
 }
+$headerSteamProfileLink = $headerSteamProfileUrl !== ''
+    ? $headerSteamProfileUrl
+    : ($headerSteamId64 !== ''
+        ? 'https://steamcommunity.com/profiles/' . rawurlencode($headerSteamId64)
+        : '');
 
 // Resolve the authenticated player's CS2 FACEIT level through the shared,
 // server-side cache. The API key remains in PHP and is never sent to the client.
@@ -363,9 +368,18 @@ $mobileMoreNavItems = [
                                     <span class="frag-drop-name"><?= htmlspecialchars($headerSteamPersonaName, ENT_QUOTES, 'UTF-8') ?></span>
                                     <span class="frag-drop-steam">STEAMID64 · <?= htmlspecialchars($headerSteamId64 !== '' ? $headerSteamId64 : '—', ENT_QUOTES, 'UTF-8') ?></span>
                                 </div>
-                                <span class="frag-drop-profile-mark" aria-hidden="true">
-                                    <i class="fa-solid fa-gamepad"></i>
-                                </span>
+                                <?php if ($headerSteamProfileLink !== ''): ?>
+                                    <a
+                                        class="frag-drop-profile-mark"
+                                        href="<?= htmlspecialchars($headerSteamProfileLink, ENT_QUOTES, 'UTF-8') ?>"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        aria-label="مشاهده پروفایل در Steam"
+                                        title="پروفایل Steam"
+                                    >
+                                        <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                                    </a>
+                                <?php endif; ?>
                             </div>
 
                             <div class="frag-drop-steam-details">
@@ -376,13 +390,6 @@ $mobileMoreNavItems = [
                                     <div class="frag-drop-detail"><span>کشور</span><strong dir="ltr"><?= htmlspecialchars($headerCountry !== '' ? $headerCountry : '—', ENT_QUOTES, 'UTF-8') ?></strong></div>
                                     <div class="frag-drop-detail"><span>آخرین فعالیت</span><strong><?= htmlspecialchars($headerLastLogoffLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
                                 </div>
-                                <?php if ($headerSteamProfileUrl !== ''): ?>
-                                    <a class="frag-drop-steam-profile-link" href="<?= htmlspecialchars($headerSteamProfileUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer">
-                                        <i class="fa-brands fa-steam" aria-hidden="true"></i>
-                                        مشاهده حساب در Steam
-                                        <i class="fa-solid fa-arrow-up-left-from-circle" aria-hidden="true"></i>
-                                    </a>
-                                <?php endif; ?>
                             </div>
 
                             <div

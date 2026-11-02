@@ -61,9 +61,11 @@
         if (!steamLink || steamLink.dataset.rememberBound === '1') return;
 
         steamLink.dataset.rememberBound = '1';
-        steamLink.addEventListener('click', function () {
+        const baseHref = steamLink.dataset.steamLoginBase || steamLink.getAttribute('href');
+
+        function syncRememberChoice() {
             const toggle = document.getElementById('rememberMe');
-            const target = new URL(steamLink.href, window.location.href);
+            const target = new URL(baseHref, window.location.href);
 
             if (toggle && toggle.checked) {
                 target.searchParams.set('remember_me', '1');
@@ -71,9 +73,23 @@
                 target.searchParams.delete('remember_me');
             }
 
-            // The OpenID return URL preserves this option through Steam's redirect.
             steamLink.href = target.href;
+        }
+
+        const toggle = document.getElementById('rememberMe');
+        if (toggle) {
+            toggle.addEventListener('change', syncRememberChoice);
+        }
+
+        // Build the final URL at navigation time too; this avoids depending on
+        // an earlier click or on stale href state in the dynamically loaded modal.
+        steamLink.addEventListener('click', function (event) {
+            event.preventDefault();
+            syncRememberChoice();
+            window.location.assign(steamLink.href);
         });
+
+        syncRememberChoice();
     }
 
     function initAuthPages() {
