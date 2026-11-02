@@ -224,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <img
 
-                src="/img/webp/newlogo.webp"
+                src="/img/webp/newlogo.webp?v=20261102-2" onerror="this.onerror=null;this.src='/img/logoresponsive.png?v=20261102-2';"
 
                 alt="FragCity Logo"
 

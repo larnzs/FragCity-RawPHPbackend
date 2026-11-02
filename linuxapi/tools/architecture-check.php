@@ -833,10 +833,10 @@ $check(
 
 $check(
     'Header uses the current WebP logo across desktop and responsive navigation, with icon-led primary links',
-    substr_count($siteHeaderMarkup, 'src="/img/webp/newlogo.webp"') === 2
-        && !str_contains($siteHeaderMarkup, 'logoresponsive.png')
-        && !str_contains($siteHeaderMarkup, 'assets/images/logo/main.png')
+    substr_count($siteHeaderMarkup, 'src="/img/webp/newlogo.webp?v=20261102-2"') === 2
+        && substr_count($siteHeaderMarkup, "this.src='/img/logoresponsive.png?v=20261102-2'") === 2
         && is_file($root . '/img/webp/newlogo.webp')
+        && is_file($root . '/img/logoresponsive.png')
         && str_contains($siteHeaderMarkup, 'fa-server')
         && str_contains($siteHeaderMarkup, 'fa-palette')
         && str_contains($siteHeaderMarkup, 'shock-nav-item--icon-only')

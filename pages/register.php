@@ -19,7 +19,7 @@ $steamData = $isSteamRegister
 
         <!-- لوگوی FragCity -->
         <div class="auth-logo">
-            <img src="/img/webp/newlogo.webp" alt="FragCity Logo">
+            <img src="/img/webp/newlogo.webp?v=20261102-2" onerror="this.onerror=null;this.src='/img/logoresponsive.png?v=20261102-2';" alt="FragCity Logo">
         </div>
 
         <!-- عنوان -->

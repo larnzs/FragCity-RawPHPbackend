@@ -263,7 +263,7 @@ $mobileMoreNavItems = [
     <div class="shock-container">
         <div class="shock-brand">
             <a href="index.php" class="shock-logo-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
-                <img src="/img/webp/newlogo.webp" alt="FragCity" class="shock-logo-img">
+                <img src="/img/webp/newlogo.webp?v=20261102-2" onerror="this.onerror=null;this.src='/img/logoresponsive.png?v=20261102-2';" alt="FragCity" class="shock-logo-img">
             </a>
         </div>
 
@@ -351,6 +351,40 @@ $mobileMoreNavItems = [
                         </button>
 
                         <div class="frag-dropdown-menu" id="shockUserMenu">
+                            <div class="frag-drop-header frag-drop-header--profile">
+                                <span class="frag-drop-avatar-frame">
+                                    <img src="<?= htmlspecialchars($avatarSrc, ENT_QUOTES, 'UTF-8') ?>"
+                                         class="frag-drop-avatar"
+                                         alt=""
+                                         onerror="this.onerror=null;this.src='assets/images/default_avatar.png';">
+                                </span>
+                                <div class="frag-drop-info">
+                                    <span class="frag-drop-eyebrow">اکانت استیم فعلی</span>
+                                    <span class="frag-drop-name"><?= htmlspecialchars($headerSteamPersonaName, ENT_QUOTES, 'UTF-8') ?></span>
+                                    <span class="frag-drop-steam">STEAMID64 · <?= htmlspecialchars($headerSteamId64 !== '' ? $headerSteamId64 : '—', ENT_QUOTES, 'UTF-8') ?></span>
+                                </div>
+                                <span class="frag-drop-profile-mark" aria-hidden="true">
+                                    <i class="fa-solid fa-gamepad"></i>
+                                </span>
+                            </div>
+
+                            <div class="frag-drop-steam-details">
+                                <div class="frag-drop-detail-grid">
+                                    <div class="frag-drop-detail"><span>وضعیت پروفایل</span><strong><?= htmlspecialchars($headerSteamVisibility, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>تنظیمات پروفایل</span><strong><?= htmlspecialchars($headerProfileState, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>تاریخ ساخت حساب</span><strong><?= htmlspecialchars($headerCreatedLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>کشور</span><strong dir="ltr"><?= htmlspecialchars($headerCountry !== '' ? $headerCountry : '—', ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>آخرین فعالیت</span><strong><?= htmlspecialchars($headerLastLogoffLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                </div>
+                                <?php if ($headerSteamProfileUrl !== ''): ?>
+                                    <a class="frag-drop-steam-profile-link" href="<?= htmlspecialchars($headerSteamProfileUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer">
+                                        <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                                        مشاهده حساب در Steam
+                                        <i class="fa-solid fa-arrow-up-left-from-circle" aria-hidden="true"></i>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+
                             <div
                                 class="frag-drop-faceit"
                                 data-status="<?= htmlspecialchars($headerFaceitStatus, ENT_QUOTES, 'UTF-8') ?>"
@@ -383,23 +417,6 @@ $mobileMoreNavItems = [
                                 </div>
                             </div>
 
-                            <div class="frag-drop-header frag-drop-header--profile">
-                                <span class="frag-drop-avatar-frame">
-                                    <img src="<?= htmlspecialchars($avatarSrc, ENT_QUOTES, 'UTF-8') ?>"
-                                         class="frag-drop-avatar"
-                                         alt=""
-                                         onerror="this.onerror=null;this.src='assets/images/default_avatar.png';">
-                                </span>
-                                <div class="frag-drop-info">
-                                    <span class="frag-drop-eyebrow">اکانت استیم فعلی</span>
-                                    <span class="frag-drop-name"><?= htmlspecialchars($headerSteamPersonaName, ENT_QUOTES, 'UTF-8') ?></span>
-                                    <span class="frag-drop-steam">STEAMID64 · <?= htmlspecialchars($headerSteamId64 !== '' ? $headerSteamId64 : '—', ENT_QUOTES, 'UTF-8') ?></span>
-                                </div>
-                                <span class="frag-drop-profile-mark" aria-hidden="true">
-                                    <i class="fa-solid fa-gamepad"></i>
-                                </span>
-                            </div>
-
                             <div class="frag-drop-wallet-card">
                                 <div class="frag-drop-wallet-card__balance">
                                     <span class="frag-drop-wallet-card__label">
@@ -417,23 +434,6 @@ $mobileMoreNavItems = [
                                 >
                                     <i class="fa-solid fa-plus" aria-hidden="true"></i>
                                 </button>
-                            </div>
-
-                            <div class="frag-drop-steam-details">
-                                <div class="frag-drop-detail-grid">
-                                    <div class="frag-drop-detail"><span>وضعیت پروفایل</span><strong><?= htmlspecialchars($headerSteamVisibility, ENT_QUOTES, 'UTF-8') ?></strong></div>
-                                    <div class="frag-drop-detail"><span>تنظیمات پروفایل</span><strong><?= htmlspecialchars($headerProfileState, ENT_QUOTES, 'UTF-8') ?></strong></div>
-                                    <div class="frag-drop-detail"><span>تاریخ ساخت حساب</span><strong><?= htmlspecialchars($headerCreatedLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
-                                    <div class="frag-drop-detail"><span>کشور</span><strong dir="ltr"><?= htmlspecialchars($headerCountry !== '' ? $headerCountry : '—', ENT_QUOTES, 'UTF-8') ?></strong></div>
-                                    <div class="frag-drop-detail"><span>آخرین فعالیت</span><strong><?= htmlspecialchars($headerLastLogoffLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
-                                </div>
-                                <?php if ($headerSteamProfileUrl !== ''): ?>
-                                    <a class="frag-drop-steam-profile-link" href="<?= htmlspecialchars($headerSteamProfileUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer">
-                                        <i class="fa-brands fa-steam" aria-hidden="true"></i>
-                                        مشاهده حساب در Steam
-                                        <i class="fa-solid fa-arrow-up-left-from-circle" aria-hidden="true"></i>
-                                    </a>
-                                <?php endif; ?>
                             </div>
 
                             <div class="frag-drop-divider"></div>
@@ -486,7 +486,7 @@ $mobileMoreNavItems = [
 <nav class="mobile-nav" id="mobileNav" aria-label="منوی موبایل" aria-hidden="true">
     <div class="mobile-nav-header">
         <a href="index.php" class="mobile-nav-logo" data-ajax-nav data-slug="home">
-            <img src="/img/webp/newlogo.webp" alt="FragCity">
+            <img src="/img/webp/newlogo.webp?v=20261102-2" onerror="this.onerror=null;this.src='/img/logoresponsive.png?v=20261102-2';" alt="FragCity">
             <span>FRAGCITY</span>
         </a>
         <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="بستن منو">

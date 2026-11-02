@@ -3399,3 +3399,22 @@ body { max-width: 100%; overflow-x: clip; }
     .shock-header .shock-container { gap: 6px; padding-inline: 8px; }
     .mobile-nav { width: min(320px, calc(100vw - 12px)); }
 }
+
+
+/* Keep profile actions aligned from the right edge in this RTL dropdown. */
+#shockUserDropdown .frag-drop-actions .frag-drop-link {
+    justify-content: flex-start !important;
+    direction: rtl !important;
+    text-align: right !important;
+    gap: 8px !important;
+}
+
+#shockUserDropdown .frag-drop-actions .frag-drop-link > i {
+    flex: 0 0 22px !important;
+}
+
+#shockUserDropdown .frag-drop-actions .frag-drop-link > span {
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: right;
+}

@@ -7,7 +7,7 @@
             <section class="footer-col footer-brand" aria-label="درباره FragCity">
                 <a href="/index.php?page=home" class="footer-brand-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
                     <img
-                        src="/img/webp/newlogo.webp"
+                        src="/img/webp/newlogo.webp?v=20261102-2" onerror="this.onerror=null;this.src='/img/logoresponsive.png?v=20261102-2';"
                         alt="FragCity"
                         class="footer-logo"
                         loading="lazy"
