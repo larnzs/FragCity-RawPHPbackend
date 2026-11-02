@@ -1,6 +1,7 @@
-# Serve SVG assets with the correct MIME type.
+# Serve image assets with their correct MIME types.
 <IfModule mod_mime.c>
   AddType image/svg+xml .svg .svgz
+  AddType image/webp .webp
 </IfModule>
 
 
