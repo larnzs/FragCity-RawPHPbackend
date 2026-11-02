@@ -1799,32 +1799,6 @@
             document.body.appendChild(dock);
         }
 
-        const applyDockSide = side => {
-            const normalizedSide = side === 'left' ? 'left' : 'right';
-            dock.dataset.wpPosition = normalizedSide;
-            dock.classList.toggle('wp-floating-pagination--left', normalizedSide === 'left');
-            dock.classList.toggle('wp-floating-pagination--right', normalizedSide === 'right');
-
-            const sideToggle = dock.querySelector('[data-wp-pagination-side-toggle]');
-            if (sideToggle) {
-                const targetLabel = normalizedSide === 'right' ? 'چپ' : 'راست';
-                sideToggle.setAttribute('aria-label', 'انتقال نوار صفحه‌بندی به ' + targetLabel);
-                sideToggle.title = 'انتقال نوار به ' + targetLabel;
-            }
-        };
-
-        let savedSide = dock.dataset.wpPosition || 'right';
-        if (!['left', 'right'].includes(savedSide)) savedSide = 'right';
-        if (!dock.dataset.wpPosition) {
-            try {
-                const storedSide = window.localStorage.getItem('fragcity.wpPaginationSide');
-                if (storedSide === 'left' || storedSide === 'right') savedSide = storedSide;
-            } catch (storageError) {
-                // Keep the right-side default if storage is unavailable.
-            }
-        }
-        applyDockSide(savedSide);
-
         const controls = dock.querySelector('#wpFloatingPaginationControls');
         const info = dock.querySelector('#wpFloatingPaginationInfo');
 
@@ -1841,19 +1815,6 @@
                     : event.target && event.target.parentElement;
 
                 if (!target) {
-                    return;
-                }
-
-                const sideToggle = target.closest('[data-wp-pagination-side-toggle]');
-                if (sideToggle && dock.contains(sideToggle)) {
-                    event.preventDefault();
-                    const nextSide = dock.dataset.wpPosition === 'left' ? 'right' : 'left';
-                    applyDockSide(nextSide);
-                    try {
-                        window.localStorage.setItem('fragcity.wpPaginationSide', nextSide);
-                    } catch (storageError) {
-                        // The button still works for the current page view.
-                    }
                     return;
                 }
 
@@ -1955,65 +1916,9 @@
         let totalPages = 1;
         let currentPage = 1;
 
-        if (activePane.id === 'tab-pins') {
-            // Pins use their own server-side page metadata. Create the numbered
-            // controls here instead of cloning links that may be mid-transition.
-            totalPages = Math.max(
-                1,
-                parseInt(activePane.dataset.pinTotalPages || '1', 10) || 1
-            );
-            currentPage = Math.max(
-                1,
-                Math.min(
-                    totalPages,
-                    parseInt(activePane.dataset.pinCurrentPage || '1', 10) || 1
-                )
-            );
-
-            floatingPagination = document.createElement('nav');
-            floatingPagination.className = 'wp-pagination wp-pagination--floating wp-pagination--bottom wp-pagination--pins';
-            floatingPagination.setAttribute('aria-label', 'صفحه‌بندی نشان‌ها');
-
-            const makePinLink = (page, label, extraClass = '', ariaLabel = '') => {
-                const link = document.createElement('a');
-                link.href = '#';
-                link.className = 'wp-page-btn' + (extraClass ? ' ' + extraClass : '');
-                link.textContent = label;
-                link.dataset.wpPage = String(page);
-                link.dataset.wpNavigation = 'navigatePinPage';
-                link.dataset.wpFloatingLink = '1';
-                if (ariaLabel) link.setAttribute('aria-label', ariaLabel);
-                if (page === currentPage && !extraClass.includes('wp-page-btn--nav')) {
-                    link.classList.add('is-active');
-                    link.setAttribute('aria-current', 'page');
-                    currentPageLink = link;
-                }
-                return link;
-            };
-
-            if (totalPages > 1) {
-                floatingPagination.appendChild(
-                    makePinLink(Math.max(1, currentPage - 1), '‹', 'wp-page-btn--nav', 'صفحه قبل')
-                );
-            }
-
-            for (let page = 1; page <= totalPages; page += 1) {
-                floatingPagination.appendChild(
-                    makePinLink(page, String(page), '', 'صفحه ' + page)
-                );
-            }
-
-            if (totalPages > 1) {
-                floatingPagination.appendChild(
-                    makePinLink(Math.min(totalPages, currentPage + 1), '›', 'wp-page-btn--nav', 'صفحه بعد')
-                );
-            }
-
-            if (totalPages <= 1) {
-                floatingPagination.classList.add('wp-pagination--single-page');
-            }
-        } else if (sourcePagination) {
-            // Other server-paginated panes retain their PHP-generated links.
+        if (sourcePagination) {
+            // Server-paginated panes (All Skins / Pins / weapon categories)
+            // keep using their existing URLs and navigation callbacks.
             const sourcePageNumbers = Array.from(
                 sourcePagination.querySelectorAll('.wp-page-btn:not(.wp-page-btn--nav)')
             );
@@ -2023,8 +1928,56 @@
             floatingPagination.classList.add('wp-pagination--floating');
             floatingPagination.setAttribute('aria-label', 'Page navigation');
 
+            // Pins fallback: recover numbered controls from PHP metadata if an
+            // animation/cache race leaves the source paginator without page chips.
+            if (activePane.id === 'tab-pins' && sourcePageNumbers.length === 0) {
+                totalPages = Math.max(
+                    1,
+                    parseInt(activePane.dataset.pinTotalPages || '1', 10) || 1
+                );
+                currentPage = Math.max(
+                    1,
+                    Math.min(
+                        totalPages,
+                        parseInt(activePane.dataset.pinCurrentPage || '1', 10) || 1
+                    )
+                );
+
+                if (totalPages > 1) {
+                    const makePinLink = (page, label, extraClass) => {
+                        const link = document.createElement('a');
+                        link.href = '#';
+                        link.className = 'wp-page-btn' + (extraClass ? ' ' + extraClass : '');
+                        link.textContent = label;
+                        link.dataset.wpPage = String(page);
+                        link.dataset.wpNavigation = 'navigatePinPage';
+                        return link;
+                    };
+
+                    floatingPagination.replaceChildren(
+                        makePinLink(Math.max(1, currentPage - 1), '‹', 'wp-page-btn--nav')
+                    );
+
+                    for (let page = 1; page <= totalPages; page += 1) {
+                        const link = makePinLink(
+                            page,
+                            String(page),
+                            page === currentPage ? 'is-active' : ''
+                        );
+                        if (page === currentPage) {
+                            link.setAttribute('aria-current', 'page');
+                        }
+                        floatingPagination.appendChild(link);
+                    }
+
+                    floatingPagination.appendChild(
+                        makePinLink(Math.min(totalPages, currentPage + 1), '›', 'wp-page-btn--nav')
+                    );
+                }
+            }
+
             const navLinks = floatingPagination.querySelectorAll('.wp-page-btn--nav');
-            if (navLinks.length >= 2) {
+            if (navLinks.length >= 2 && activePane.id !== 'tab-pins') {
                 const previousIcon = navLinks[0].querySelector('i');
                 const nextIcon = navLinks[navLinks.length - 1].querySelector('i');
 

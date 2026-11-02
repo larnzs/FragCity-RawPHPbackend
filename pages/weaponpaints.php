@@ -3332,15 +3332,6 @@ foreach ($skinInventory as $inventoryEntry) {
             <i class="fas fa-list-ol" aria-hidden="true"></i>
             <span>PAGE</span>
         </div>
-        <button
-            type="button"
-            class="wp-floating-pagination__side-toggle"
-            data-wp-pagination-side-toggle
-            aria-label="انتقال نوار صفحه‌بندی به چپ"
-            title="انتقال نوار به چپ"
-        >
-            <i class="fas fa-arrows-left-right" aria-hidden="true"></i>
-        </button>
         <div class="wp-floating-pagination__info" id="wpFloatingPaginationInfo">1 / 1</div>
         <nav
             class="wp-floating-pagination__controls"
