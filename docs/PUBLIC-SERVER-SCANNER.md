@@ -236,3 +236,19 @@ If you change the target range, the worker inserts missing rows. Old port rows o
 ## Active Pterodactyl Server Browser
 
 The active public Server Browser now uses the Pterodactyl Application API and the on-demand A2S snapshot path. See `docs/PTERODACTYL-STANDBY-API.md`. The website requires its signed Pterodactyl Standby integration fragment; the Pterodactyl Application API key remains on the Linux API host only.
+
+## Active Server Browser filters and saved favorites
+
+The active pages/serverlist.php page builds its public directory from the signed Pterodactyl Standby snapshot. The sidebar filters operate on the same sanitized A2S snapshot already used by the cards; they do not trigger visitor-supplied host/port queries.
+
+- **Anti-Cheat / VAC:** uses the VAC-secure flag returned by A2S_INFO. protected, unprotected, and unknown are separate states. This is the game's VAC state, not a third-party product such as MaxAC.
+- **Game:** only Counter-Strike 2 is listed. The upstream discovery path verifies AppID 730; CS:GO is not part of this inventory.
+- **Mode:** uses the mode tag extracted from the A2S server name (mode: ... / mode=...). Servers without that tag remain Community; the browser does not infer Mix, Aim/AWP, Public, or any other mode from a hostname alone.
+- **Players:** all, has players, has free slots, and completely empty. These depend on the current online A2S player/max-player values.
+- **Display:** hide non-online servers, hide password-protected servers, or show only favorites.
+- **Map:** searchable map names with counts. Selecting a map and any other facet updates the other visible counts to the intersection of the remaining active filters.
+- **Favorites:** the star control on each server card saves the server ID in the visitor's browser localStorage under fragcity.serverlist.favorites.v1. Favorites are local to that browser profile; they are not synced to a FragCity account.
+
+The overview includes registered servers, online servers, online players, active maps, and open player slots. It intentionally does not show MaxAC status, website member/VIP totals, a visitor's actual UDP ping, or node CPU/RAM load because those values are not available from this public server snapshot. Do not substitute API HTTP latency or server-side A2S query RTT for a visitor's game ping.
+
+The filter counts are calculated in the browser against the server cards. They are not additional network requests and do not change the signed API or Pterodactyl access boundary.
