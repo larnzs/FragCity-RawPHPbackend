@@ -49,7 +49,7 @@
     }
 
     function formatUptime(value) {
-        if (!Number.isFinite(Number(value))) return '—';
+        if (value === null || value === undefined || value === '' || !Number.isFinite(Number(value))) return '—';
         return Number(value).toLocaleString('fa-IR', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 3
@@ -118,7 +118,8 @@
         const response = makeElement('div', 'fc-status-monitor-metric');
         response.appendChild(makeElement('span', '', 'زمان پاسخ'));
         const ping = Number(monitor.ping_ms);
-        response.appendChild(makeElement('strong', '', Number.isFinite(ping) ? ping.toLocaleString('fa-IR', { maximumFractionDigits: 1 }) + ' ms' : '—'));
+        const pingAvailable = monitor.ping_ms !== null && monitor.ping_ms !== undefined && monitor.ping_ms !== '' && Number.isFinite(ping);
+        response.appendChild(makeElement('strong', '', pingAvailable ? ping.toLocaleString('fa-IR', { maximumFractionDigits: 1 }) + ' ms' : '—'));
         metrics.appendChild(response);
 
         const checked = makeElement('div', 'fc-status-monitor-metric');
