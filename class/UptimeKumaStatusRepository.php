@@ -58,9 +58,14 @@ final class UptimeKumaStatusRepository
      */
     public function getSnapshot(): array
     {
-        $page = $this->fetchJson('/api/status-page/' . rawurlencode($this->slug));
-        $heartbeat = $this->fetchJson('/api/status-page/heartbeat/' . rawurlencode($this->slug));
-        $incidentHistory = $this->fetchJson('/api/status-page/' . rawurlencode($this->slug) . '/incident-history');
+        $responses = $this->fetchJsonBatch([
+            'page' => '/api/status-page/' . rawurlencode($this->slug),
+            'heartbeat' => '/api/status-page/heartbeat/' . rawurlencode($this->slug),
+            'incidents' => '/api/status-page/' . rawurlencode($this->slug) . '/incident-history',
+        ]);
+        $page = $responses['page'];
+        $heartbeat = $responses['heartbeat'];
+        $incidentHistory = $responses['incidents'];
 
         $pageConfig = is_array($page['config'] ?? null) ? $page['config'] : [];
         if (array_key_exists('published', $pageConfig) && $pageConfig['published'] !== true) {
@@ -208,57 +213,110 @@ final class UptimeKumaStatusRepository
         ];
     }
 
-    private function fetchJson(string $path): array
+    /**
+     * Fetch the three public Status Page documents concurrently so a slow
+     * monitoring host does not add three sequential timeout windows.
+     *
+     * @param array<string, string> $paths
+     * @return array<string, array>
+     */
+    private function fetchJsonBatch(array $paths): array
     {
-        $url = $this->baseUrl . $path;
-        $handle = curl_init($url);
-        if ($handle === false) {
-            throw new RuntimeException('Could not initialize Uptime Kuma request.');
+        $multi = curl_multi_init();
+        if ($multi === false) {
+            throw new RuntimeException('Could not initialize Uptime Kuma multi-request.');
         }
 
-        $body = '';
-        curl_setopt_array($handle, [
-            CURLOPT_HTTPGET => true,
-            CURLOPT_HTTPHEADER => ['Accept: application/json'],
-            CURLOPT_CONNECTTIMEOUT => 3,
-            CURLOPT_TIMEOUT => 7,
-            CURLOPT_FOLLOWLOCATION => false,
-            CURLOPT_MAXREDIRS => 0,
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
-            CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
-            CURLOPT_USERAGENT => 'FragCity-Status/1.0',
-            CURLOPT_WRITEFUNCTION => static function ($curl, string $chunk) use (&$body): int {
-                if (strlen($body) + strlen($chunk) > 1500000) {
-                    return 0;
+        $handles = [];
+        $bodies = array_fill_keys(array_keys($paths), '');
+
+        foreach ($paths as $key => $path) {
+            $handle = curl_init($this->baseUrl . $path);
+            if ($handle === false) {
+                throw new RuntimeException('Could not initialize Uptime Kuma request.');
+            }
+
+            curl_setopt_array($handle, [
+                CURLOPT_HTTPGET => true,
+                CURLOPT_HTTPHEADER => ['Accept: application/json'],
+                CURLOPT_CONNECTTIMEOUT => 3,
+                CURLOPT_TIMEOUT => 7,
+                CURLOPT_FOLLOWLOCATION => false,
+                CURLOPT_MAXREDIRS => 0,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_SSL_VERIFYHOST => 2,
+                CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
+                CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
+                CURLOPT_USERAGENT => 'FragCity-Status/1.0',
+                CURLOPT_WRITEFUNCTION => static function ($curl, string $chunk) use (&$bodies, $key): int {
+                    if (strlen($bodies[$key]) + strlen($chunk) > 1500000) {
+                        return 0;
+                    }
+                    $bodies[$key] .= $chunk;
+                    return strlen($chunk);
+                },
+            ]);
+
+            $addResult = curl_multi_add_handle($multi, $handle);
+            if ($addResult !== CURLM_OK) {
+                unset($handle);
+                throw new RuntimeException('Could not queue Uptime Kuma request.');
+            }
+            $handles[$key] = $handle;
+        }
+
+        $running = null;
+        do {
+            $multiStatus = curl_multi_exec($multi, $running);
+            if ($running > 0 && $multiStatus === CURLM_OK) {
+                $selected = curl_multi_select($multi, 1.0);
+                if ($selected === -1) {
+                    usleep(100000);
                 }
-                $body .= $chunk;
-                return strlen($chunk);
-            },
-        ]);
+            }
+        } while ($running > 0 && $multiStatus === CURLM_OK);
 
-        curl_exec($handle);
-        $curlError = curl_errno($handle);
-        $httpStatus = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
-        unset($handle);
-
-        if ($curlError !== 0 || $httpStatus !== 200 || $body === '') {
-            error_log('[FragCity] Uptime Kuma public status request failed; HTTP=' . $httpStatus . '; cURL=' . $curlError);
-            throw new RuntimeException('Uptime Kuma public status endpoint is unavailable.');
+        if ($multiStatus !== CURLM_OK) {
+            foreach ($handles as $handle) {
+                curl_multi_remove_handle($multi, $handle);
+            }
+            unset($handles, $multi);
+            throw new RuntimeException('Uptime Kuma multi-request failed.');
         }
 
-        try {
-            $decoded = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
-            throw new RuntimeException('Uptime Kuma returned invalid JSON.');
+        $responses = [];
+        foreach ($handles as $key => $handle) {
+            $curlError = curl_errno($handle);
+            $httpStatus = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
+            $body = $bodies[$key] ?? '';
+
+            curl_multi_remove_handle($multi, $handle);
+            unset($handles[$key]);
+
+            if ($curlError !== 0 || $httpStatus !== 200 || $body === '') {
+                error_log('[FragCity] Uptime Kuma public status request failed; endpoint=' . $key . '; HTTP=' . $httpStatus . '; cURL=' . $curlError);
+                unset($handle, $handles, $multi);
+                throw new RuntimeException('Uptime Kuma public status endpoint is unavailable.');
+            }
+
+            try {
+                $decoded = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+            } catch (JsonException $e) {
+                unset($handle, $handles, $multi);
+                throw new RuntimeException('Uptime Kuma returned invalid JSON.');
+            }
+
+            if (!is_array($decoded)) {
+                unset($handle, $handles, $multi);
+                throw new RuntimeException('Uptime Kuma returned an invalid data structure.');
+            }
+
+            $responses[$key] = $decoded;
+            unset($handle);
         }
 
-        if (!is_array($decoded)) {
-            throw new RuntimeException('Uptime Kuma returned an invalid data structure.');
-        }
-
-        return $decoded;
+        unset($handles, $multi);
+        return $responses;
     }
 
     private function normalizeStatus(mixed $value): string
