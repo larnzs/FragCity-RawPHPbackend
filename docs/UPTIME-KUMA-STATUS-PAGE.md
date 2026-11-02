@@ -51,11 +51,11 @@ Create a small set of checks first. Suggested initial monitors:
 
 | Monitor name | Monitor type | Target |
 |---|---|---|
-| FragCity Website | HTTP(s) | \`https://fragcity.ir\` |
-| FragCity API | HTTP(s) | \`https://api.fragcity.ir/health\` |
-| FragCity CS2 Server | Steam Game Server | The public host and A2S query/game port of the currently published server |
+| FragCity Website | HTTP(s) | `https://fragcity.ir` |
+| FragCity API | HTTP(s) | `https://api.fragcity.ir/health` |
+| FragCity Node | Ping | The public hostname or IP address of the Debian node |
 
-Use a 60-second interval at first. For the API health endpoint, require HTTP 200; optionally validate the expected JSON keyword \`"ok":true\`. For the game server, use the Steam Game Server monitor type, not a generic HTTP request.
+Use a 60-second interval at first. For the API health endpoint, require HTTP 200; optionally validate the expected JSON keyword `"ok":true`. The Ping monitor checks whether the node host is reachable from the Kuma container; it does not measure CPU/RAM load or prove every application on that host is healthy.
 
 If the website or API has a different canonical public hostname, use the real production URL. Do not point public monitors at a private Docker IP or an internal-only hostname.
 
@@ -63,7 +63,7 @@ If the website or API has a different canonical public hostname, use the real pr
 
 1. In Uptime Kuma, open **Status Pages** and create a page with slug \`fragcity\`.
 2. Set its title to \`FragCity — وضعیت سرویس‌ها\`.
-3. Create public groups such as \`سایت و API\` and \`سرورهای بازی\`.
+3. Create public groups such as \`سایت و API\` and \`زیرساخت\`.
 4. Add the monitors above to the appropriate groups.
 5. Mark both groups as **Public** and publish the Status Page.
 6. Keep monitor URLs, private tags and internal notes out of public fields. Only the public monitor names and heartbeat states are copied to FragCity.
@@ -101,7 +101,7 @@ The public heartbeat endpoint currently returns at most 100 recent heartbeat rec
 
 ## Important monitoring limitation
 
-Uptime Kuma is running on the same Debian host as the CS2 server/API in this initial setup. It can check the website, API and game-server endpoints, but it cannot send a reliable real-time alert about a total failure of its own host or power/network path. For independent outage alerts, add an external monitor or a second Kuma instance on a separate host later.
+Uptime Kuma is running on the same Debian host as the monitored FragCity services in this initial setup. It can check the website, API and node reachability, but it cannot send a reliable real-time alert about a total failure of its own host or power/network path. For independent outage alerts, add an external monitor or a second Kuma instance on a separate host later.
 
 The public website API is read-only, same-origin constrained and sanitizes the monitor data. It never exposes Kuma's management URL, credentials, monitor target URLs, private group data or raw upstream error messages.
 
