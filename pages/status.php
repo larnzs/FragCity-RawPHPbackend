@@ -17,7 +17,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                     FRAGCITY <span>/</span> SERVICE STATUS
                 </span>
                 <h1>وضعیت سرویس‌ها</h1>
-                <p>سلامت سرویس‌های عمومی FragCity، وضعیت سرور بازی و دسترسی API را از این صفحه بررسی کن.</p>
+                <p>سلامت وب‌سایت، نود زیرساخت و دسترسی API را از این صفحه بررسی کن.</p>
                 <div class="fc-status-overall" data-status-overall="unknown" aria-live="polite">
                     <span class="fc-status-overall-dot"></span>
                     <span class="fc-status-overall-copy">
@@ -26,7 +26,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                     </span>
                 </div>
             </div>
-            <div class="fc-status-hero-art" aria-hidden="true">
+            <div class="fc-status-hero-art" data-fc-reveal="left" aria-hidden="true">
                 <span class="fc-status-orbit fc-status-orbit-one"></span>
                 <span class="fc-status-orbit fc-status-orbit-two"></span>
                 <span class="fc-status-hero-core"><i class="fa-solid fa-heart-pulse"></i></span>
@@ -35,28 +35,28 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
         </header>
 
         <section class="fc-status-summary" aria-label="خلاصه وضعیت">
-            <article class="fc-status-summary-card" data-fc-reveal="up">
+            <article class="fc-status-summary-card" data-fc-reveal="up" data-fc-interactive>
                 <span class="fc-status-summary-icon fc-status-icon-green"><i class="fa-solid fa-circle-check"></i></span>
                 <div>
                     <span>سرویس‌های عملیاتی</span>
                     <strong data-status-summary="operational">—</strong>
                 </div>
             </article>
-            <article class="fc-status-summary-card" data-fc-reveal="up" data-fc-reveal-delay="60">
+            <article class="fc-status-summary-card" data-fc-reveal="up" data-fc-interactive data-fc-reveal-delay="60">
                 <span class="fc-status-summary-icon fc-status-icon-orange"><i class="fa-solid fa-server"></i></span>
                 <div>
                     <span>سرویس‌های مانیتورشده</span>
                     <strong data-status-summary="total">—</strong>
                 </div>
             </article>
-            <article class="fc-status-summary-card" data-fc-reveal="up" data-fc-reveal-delay="120">
+            <article class="fc-status-summary-card" data-fc-reveal="up" data-fc-interactive data-fc-reveal-delay="120">
                 <span class="fc-status-summary-icon fc-status-icon-warm"><i class="fa-solid fa-chart-line"></i></span>
                 <div>
                     <span>میانگین Uptime / ۲۴ ساعت</span>
                     <strong data-status-summary="uptime">—</strong>
                 </div>
             </article>
-            <article class="fc-status-summary-card" data-fc-reveal="up" data-fc-reveal-delay="180">
+            <article class="fc-status-summary-card" data-fc-reveal="up" data-fc-interactive data-fc-reveal-delay="180">
                 <span class="fc-status-summary-icon fc-status-icon-muted"><i class="fa-solid fa-triangle-exclamation"></i></span>
                 <div>
                     <span>رخداد یا نگهداری فعال</span>
@@ -76,7 +76,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
             </button>
         </div>
 
-        <div class="fc-status-alert" data-status-alert role="status" hidden></div>
+        <div class="fc-status-alert" data-status-alert data-fc-reveal="up" role="status" hidden></div>
 
         <section class="fc-status-incidents" data-status-active-incidents hidden aria-labelledby="fcStatusActiveTitle">
             <div class="fc-status-section-heading">
@@ -97,12 +97,12 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                 </div>
             </div>
 
-            <div class="fc-status-loading" data-status-loading>
+            <div class="fc-status-loading" data-status-loading data-fc-reveal="up">
                 <span class="fc-status-spinner" aria-hidden="true"></span>
                 <strong>در حال دریافت وضعیت سرویس‌ها...</strong>
             </div>
             <div class="fc-status-group-list" data-status-groups></div>
-            <div class="fc-status-empty" data-status-empty hidden>
+            <div class="fc-status-empty" data-status-empty data-fc-reveal="up" hidden>
                 <i class="fa-solid fa-satellite-dish" aria-hidden="true"></i>
                 <strong>هنوز سرویسی برای نمایش ثبت نشده است</strong>
                 <span>ابتدا سرویس‌ها را در Uptime Kuma به یک گروه عمومی در Status Page اضافه کن.</span>
@@ -118,12 +118,12 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                 </div>
             </div>
             <div class="fc-status-history-list" data-status-history></div>
-            <div class="fc-status-history-empty" data-status-history-empty hidden>
+            <div class="fc-status-history-empty" data-status-history-empty data-fc-reveal="up" hidden>
                 فعلاً رخداد ثبت‌شده‌ای وجود ندارد.
             </div>
         </section>
 
-        <footer class="fc-status-footnote">
+        <footer class="fc-status-footnote" data-fc-reveal="up">
             <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
             <span>برای حفظ امنیت، این صفحه فقط وضعیت عمومی سرویس‌ها را نمایش می‌دهد؛ جزئیات مدیریتی و اطلاعات داخلی زیرساخت منتشر نمی‌شوند.</span>
         </footer>
