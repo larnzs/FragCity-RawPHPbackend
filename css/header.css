@@ -3462,13 +3462,25 @@ body { max-width: 100%; overflow-x: clip; }
 }
 
 #shockUserDropdown .frag-drop-faceit__rank img {
-    filter: grayscale(1);
-    opacity: .82;
+    filter: none;
+    opacity: 1;
 }
 
 #shockUserDropdown .frag-drop-faceit__progress > span {
     background: var(--faceit-rank-color, #CDCDCD);
     box-shadow: none;
+}
+
+/* Keep FACEIT card edges aligned with the wallet card on desktop. */
+#shockUserDropdown .frag-drop-faceit {
+    margin: 10px 10px 0;
+}
+
+/* The mobile wallet card is edge-aligned to the dropdown's inner padding. */
+@media (max-width: 700px) {
+    #shockUserDropdown .frag-drop-faceit {
+        margin: 6px 0 7px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
