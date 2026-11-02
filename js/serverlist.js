@@ -27,14 +27,17 @@
         root.dataset.slReady = '1';
 
         const list = root.querySelector('#serverList');
-        const pills = root.querySelector('#slFilterPills');
         const search = root.querySelector('#slSearchInput');
-        const modeSelect = root.querySelector('#slModeFilter');
-        const mapSelect = root.querySelector('#slMapFilter');
         const sortSelect = root.querySelector('#slSortSelect');
         const noMatch = root.querySelector('#slNoMatch');
         const resultsLabel = root.querySelector('#slResultsLabel');
         const clearButton = root.querySelector('#slClearFilters');
+        const resetButtons = Array.from(root.querySelectorAll('[data-sl-reset]'));
+        const hideOffline = root.querySelector('[data-sl-hide-offline]');
+        const hidePassword = root.querySelector('[data-sl-hide-password]');
+        const favoritesOnly = root.querySelector('[data-sl-favorites-only]');
+        const mapSearch = root.querySelector('#slMapSearch');
+        const favoriteCount = root.querySelector('[data-sl-favorite-count]');
         const toast = root.querySelector('#slToast');
         const viewButtons = Array.from(root.querySelectorAll('[data-sl-view-option]'));
         const playerModal = root.querySelector('#slPlayerModal');
@@ -58,7 +61,11 @@
             document.body.appendChild(playerModal);
         }
 
-        let statusFilter = 'online';
+        let activeVac = 'all';
+        let activeGame = 'all';
+        let activeMode = 'all';
+        let activePlayers = 'all';
+        let activeMap = '';
         let toastTimer = 0;
         let modalCloseTimer = 0;
         let modalIsClosing = false;
@@ -82,6 +89,144 @@
         const getCards = function () {
             return Array.from(list.querySelectorAll('[data-sl-card]'));
         };
+
+        const FAVORITES_STORAGE_KEY = 'fragcity.serverlist.favorites.v1';
+        const favoriteIds = new Set();
+
+        try {
+            const savedFavorites = JSON.parse(window.localStorage.getItem(FAVORITES_STORAGE_KEY) || '[]');
+            if (Array.isArray(savedFavorites)) {
+                savedFavorites.forEach(function (id) {
+                    if (typeof id === 'string' && id.length > 0 && id.length <= 80) {
+                        favoriteIds.add(id);
+                    }
+                });
+            }
+        } catch (error) {
+            // Local storage can be unavailable in private browsing; favorites still work for this view.
+        }
+
+        function persistFavorites() {
+            try {
+                window.localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(Array.from(favoriteIds)));
+            } catch (error) {
+                showToast('علاقه‌مندی‌ها فقط تا پایان این بازدید نگه داشته می‌شوند.');
+            }
+        }
+
+        function updateFavoriteButtons() {
+            getCards().forEach(function (card) {
+                const id = String(card.dataset.serverId || '');
+                const isFavorite = favoriteIds.has(id);
+                card.dataset.favorite = isFavorite ? 'true' : 'false';
+                const button = card.querySelector('[data-sl-favorite]');
+                if (!button) return;
+                button.classList.toggle('is-favorite', isFavorite);
+                button.setAttribute('aria-pressed', isFavorite ? 'true' : 'false');
+                button.setAttribute('title', isFavorite ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها');
+                button.setAttribute('aria-label', isFavorite ? 'حذف از علاقه‌مندی‌ها' : 'افزودن به علاقه‌مندی‌ها');
+                const icon = button.querySelector('i');
+                if (icon) {
+                    icon.classList.toggle('fa-solid', isFavorite);
+                    icon.classList.toggle('fa-regular', !isFavorite);
+                }
+            });
+
+            if (favoriteCount) favoriteCount.textContent = String(favoriteIds.size);
+        }
+
+        function setFacetSelection(facet, value) {
+            root.querySelectorAll('[data-sl-option="' + facet + '"]').forEach(function (button) {
+                const active = button.dataset.slValue === value;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+        }
+
+        function cardMatchesFacet(card, excludedFacet) {
+            const online = card.dataset.status === 'online';
+            const players = Math.max(0, Number(card.dataset.players) || 0);
+            const maxPlayers = Math.max(0, Number(card.dataset.maxPlayers) || 0);
+
+            if (excludedFacet !== 'display') {
+                if (hideOffline && hideOffline.checked && !online) return false;
+                if (hidePassword && hidePassword.checked && card.dataset.password === 'true') return false;
+                if (favoritesOnly && favoritesOnly.checked && !favoriteIds.has(String(card.dataset.serverId || ''))) return false;
+            }
+
+            if (excludedFacet !== 'vac' && activeVac !== 'all' && card.dataset.vac !== activeVac) return false;
+            if (excludedFacet !== 'game' && activeGame !== 'all' && card.dataset.game !== activeGame) return false;
+            if (excludedFacet !== 'mode' && activeMode !== 'all' && normalize(card.dataset.mode) !== activeMode) return false;
+
+            if (excludedFacet !== 'players') {
+                if (activePlayers === 'playing' && (!online || players <= 0)) return false;
+                if (activePlayers === 'slots' && (!online || maxPlayers <= players)) return false;
+                if (activePlayers === 'empty' && (!online || players !== 0)) return false;
+            }
+
+            if (excludedFacet !== 'map' && activeMap !== '' && normalize(card.dataset.map) !== activeMap) return false;
+
+            const query = normalize(search ? search.value : '');
+            if (query !== '') {
+                const searchable = [
+                    card.dataset.name,
+                    card.dataset.map,
+                    card.dataset.mode,
+                    card.dataset.address
+                ].map(normalize).join(' ');
+                if (!searchable.includes(query)) return false;
+            }
+
+            return true;
+        }
+
+        function updateFacetCounts() {
+            root.querySelectorAll('[data-sl-option]').forEach(function (button) {
+                const facet = button.dataset.slOption || '';
+                const value = button.dataset.slValue || 'all';
+                const count = getCards().filter(function (card) {
+                    if (!cardMatchesFacet(card, facet)) return false;
+                    if (value === 'all') return true;
+                    if (facet === 'vac') return card.dataset.vac === value;
+                    if (facet === 'game') return card.dataset.game === value;
+                    if (facet === 'mode') return normalize(card.dataset.mode) === value;
+                    if (facet === 'players') {
+                        const online = card.dataset.status === 'online';
+                        const players = Math.max(0, Number(card.dataset.players) || 0);
+                        const maxPlayers = Math.max(0, Number(card.dataset.maxPlayers) || 0);
+                        if (value === 'playing') return online && players > 0;
+                        if (value === 'slots') return online && maxPlayers > players;
+                        if (value === 'empty') return online && players === 0;
+                    }
+                    return false;
+                }).length;
+                const output = button.querySelector('[data-sl-count]');
+                if (output) output.textContent = count.toLocaleString('fa-IR');
+                button.classList.toggle('is-zero', count === 0);
+            });
+
+            const mapQuery = normalize(mapSearch ? mapSearch.value : '');
+            const mapButtons = Array.from(root.querySelectorAll('[data-sl-map-option]'));
+            mapButtons.forEach(function (button) {
+                const value = button.dataset.slMapOption || '';
+                const matching = getCards().filter(function (card) {
+                    return cardMatchesFacet(card, 'map') && normalize(card.dataset.map) === value;
+                }).length;
+                const output = button.querySelector('[data-sl-map-count]');
+                if (output) output.textContent = matching.toLocaleString('fa-IR');
+                const text = normalize(button.textContent);
+                button.hidden = (mapQuery !== '' && !text.includes(mapQuery)) || matching === 0;
+                const active = activeMap === value;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+
+            const visibleMapButtons = mapButtons.filter(function (button) {
+                return !button.hidden;
+            });
+            const mapEmpty = root.querySelector('[data-sl-map-empty]');
+            if (mapEmpty) mapEmpty.hidden = visibleMapButtons.length !== 0;
+        }
 
         function setPlayerModalSection(section) {
             if (playerLoading) playerLoading.hidden = section !== 'loading';
@@ -518,28 +663,13 @@
         }
 
         function applyFilters() {
-            const query = normalize(search ? search.value : '');
-            const mode = normalize(modeSelect ? modeSelect.value : '');
-            const map = normalize(mapSelect ? mapSelect.value : '');
             let visible = 0;
 
             list.querySelectorAll('[data-sl-group]').forEach(function (group) {
                 let groupVisible = 0;
 
                 group.querySelectorAll('[data-sl-card]').forEach(function (card) {
-                    const statusMatch = statusFilter === 'all' || card.dataset.status === statusFilter;
-                    const modeMatch = mode === '' || normalize(card.dataset.mode) === mode;
-                    const mapMatch = map === '' || normalize(card.dataset.map) === map;
-                    const searchText = [
-                        card.dataset.name,
-                        card.dataset.map,
-                        card.dataset.mode,
-                        card.dataset.address
-                    ].map(normalize).join(' ');
-
-                    const searchMatch = query === '' || searchText.includes(query);
-                    const isVisible = statusMatch && modeMatch && mapMatch && searchMatch;
-
+                    const isVisible = cardMatchesFacet(card, null);
                     card.hidden = !isVisible;
                     if (isVisible) {
                         groupVisible++;
@@ -548,11 +678,14 @@
                 });
 
                 group.hidden = groupVisible === 0;
+                const total = group.querySelector('.sl-group-total');
+                if (total) total.textContent = groupVisible.toLocaleString('fa-IR') + ' سرور';
             });
 
             const totalCards = getCards().length;
             if (noMatch) noMatch.hidden = totalCards === 0 || visible !== 0;
-            if (resultsLabel) resultsLabel.textContent = 'نمایش ' + visible + ' سرور';
+            if (resultsLabel) resultsLabel.textContent = 'نمایش ' + visible.toLocaleString('fa-IR') + ' سرور';
+            updateFacetCounts();
         }
 
         if (viewButtons.length) {
@@ -564,24 +697,35 @@
             });
         }
 
-        if (pills) {
-            pills.addEventListener('click', function (event) {
-                const button = event.target.closest('[data-sl-filter]');
-                if (!button) return;
-
-                statusFilter = button.dataset.slFilter || 'all';
-                pills.querySelectorAll('[data-sl-filter]').forEach(function (pill) {
-                    const active = pill === button;
-                    pill.classList.toggle('active', active);
-                    pill.setAttribute('aria-pressed', active ? 'true' : 'false');
-                });
-                applyFilters();
-            });
-        }
-
-        [search, modeSelect, mapSelect].forEach(function (control) {
+        [search, hideOffline, hidePassword, favoritesOnly].forEach(function (control) {
             if (!control) return;
             control.addEventListener(control === search ? 'input' : 'change', applyFilters);
+        });
+
+        if (mapSearch) {
+            mapSearch.addEventListener('input', updateFacetCounts);
+        }
+
+        root.addEventListener('click', function (event) {
+            const option = event.target.closest('[data-sl-option]');
+            if (option && root.contains(option)) {
+                const facet = option.dataset.slOption || '';
+                const value = option.dataset.slValue || 'all';
+                if (facet === 'vac') activeVac = value;
+                if (facet === 'game') activeGame = value;
+                if (facet === 'mode') activeMode = value;
+                if (facet === 'players') activePlayers = value;
+                setFacetSelection(facet, value);
+                applyFilters();
+                return;
+            }
+
+            const mapOption = event.target.closest('[data-sl-map-option]');
+            if (mapOption && root.contains(mapOption)) {
+                const value = mapOption.dataset.slMapOption || '';
+                activeMap = activeMap === value ? '' : value;
+                applyFilters();
+            }
         });
 
         if (sortSelect) {
@@ -591,26 +735,31 @@
             });
         }
 
-        if (clearButton) {
-            clearButton.addEventListener('click', function () {
-                statusFilter = 'online';
-                if (search) search.value = '';
-                if (modeSelect) modeSelect.value = '';
-                if (mapSelect) mapSelect.value = '';
-                if (sortSelect) sortSelect.value = 'default';
+        function resetFilters() {
+            activeVac = 'all';
+            activeGame = 'all';
+            activeMode = 'all';
+            activePlayers = 'all';
+            activeMap = '';
+            if (hideOffline) hideOffline.checked = true;
+            if (hidePassword) hidePassword.checked = false;
+            if (favoritesOnly) favoritesOnly.checked = false;
+            if (search) search.value = '';
+            if (mapSearch) mapSearch.value = '';
+            if (sortSelect) sortSelect.value = 'default';
 
-                if (pills) {
-                    pills.querySelectorAll('[data-sl-filter]').forEach(function (pill) {
-                        const active = pill.dataset.slFilter === 'online';
-                        pill.classList.toggle('active', active);
-                        pill.setAttribute('aria-pressed', active ? 'true' : 'false');
-                    });
-                }
-
-                applySort();
-                applyFilters();
-            });
+            setFacetSelection('vac', 'all');
+            setFacetSelection('game', 'all');
+            setFacetSelection('mode', 'all');
+            setFacetSelection('players', 'all');
+            applySort();
+            applyFilters();
         }
+
+        if (clearButton) clearButton.addEventListener('click', resetFilters);
+        resetButtons.forEach(function (button) {
+            button.addEventListener('click', resetFilters);
+        });
 
         list.addEventListener('pointerover', function (event) {
             const playersButton = event.target.closest('[data-sl-players]');
@@ -624,6 +773,22 @@
         });
 
         list.addEventListener('click', function (event) {
+            const favoriteButton = event.target.closest('[data-sl-favorite]');
+            if (favoriteButton) {
+                const card = favoriteButton.closest('[data-sl-card]');
+                const serverId = card ? String(card.dataset.serverId || '') : '';
+                if (!serverId) return;
+
+                if (favoriteIds.has(serverId)) favoriteIds.delete(serverId);
+                else favoriteIds.add(serverId);
+
+                persistFavorites();
+                updateFavoriteButtons();
+                applyFilters();
+                showToast(favoriteIds.has(serverId) ? 'به علاقه‌مندی‌ها اضافه شد' : 'از علاقه‌مندی‌ها حذف شد');
+                return;
+            }
+
             const playersButton = event.target.closest('[data-sl-players]');
             if (playersButton && !playersButton.disabled) {
                 openPlayerModal(playersButton);
@@ -729,6 +894,11 @@
             });
         });
 
+        updateFavoriteButtons();
+        setFacetSelection('vac', 'all');
+        setFacetSelection('game', 'all');
+        setFacetSelection('mode', 'all');
+        setFacetSelection('players', 'all');
         applySort();
         applyFilters();
 
