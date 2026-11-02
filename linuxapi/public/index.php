@@ -411,6 +411,31 @@ function apiDeleteSkinInventory(PDO $pdo, string $steamid, array $teams, array $
     return $deleted;
 }
 
+/**
+ * Clear the authenticated player's saved firearm-paint inventory and active
+ * firearm-skin rows. This intentionally leaves all non-skin plugin tables alone.
+ *
+ * @return array{deleted:bool,deleted_inventory:int,deleted_active:int}
+ */
+function apiClearSkinInventory(PDO $pdo, string $steamid): array
+{
+    $inventory = $pdo->prepare(
+        'DELETE FROM wp_player_skin_inventory WHERE steamid = :steamid'
+    );
+    $inventory->execute([':steamid' => $steamid]);
+
+    $active = $pdo->prepare(
+        'DELETE FROM wp_player_skins WHERE steamid = :steamid'
+    );
+    $active->execute([':steamid' => $steamid]);
+
+    return [
+        'deleted' => true,
+        'deleted_inventory' => (int)$inventory->rowCount(),
+        'deleted_active' => (int)$active->rowCount(),
+    ];
+}
+
 
 
 $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
@@ -769,6 +794,9 @@ try {
                 $mutationResult = [
                     'deleted' => apiDeleteSkinInventory($pdo, $steamid, $teams, $body),
                 ];
+                break;
+            case 'clear_skin_inventory':
+                $mutationResult = apiClearSkinInventory($pdo, $steamid);
                 break;
             default: throw new InvalidArgumentException('Unsupported action.');
         }

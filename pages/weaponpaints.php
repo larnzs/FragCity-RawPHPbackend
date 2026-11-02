@@ -2010,7 +2010,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                     </span>
 
                                     <span class="wp-btn wp-btn--secondary wp-btn--sm">
-                                        Change Paint
+                                        انتخاب رنگ
                                     </span>
 
                                 </span>
@@ -2139,7 +2139,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                             class="wp-btn wp-btn--primary wp-btn--sm"
                                         >
                                             <i class="fas fa-check"></i>
-                                            Select
+                                            انتخاب
                                         </button>
 
                                     </form>
@@ -2267,7 +2267,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                             class="wp-btn wp-btn--primary wp-btn--sm"
                                         >
                                             <i class="fas fa-check"></i>
-                                            Select
+                                            انتخاب
                                         </button>
 
                                     </form>
@@ -2434,7 +2434,7 @@ $jsonFlags = JSON_UNESCAPED_UNICODE
                                                 class="wp-btn wp-btn--primary wp-btn--sm"
                                             >
                                                 <i class="fas fa-check"></i>
-                                                Select
+                                                انتخاب
                                             </button>
 
                                         </form>
@@ -2536,10 +2536,25 @@ foreach ($skinInventory as $inventoryEntry) {
             <h3 class="wp-inventory-subtitle" id="wpSavedPaintsTitle">اسکین‌های ذخیره‌شده</h3>
             <p class="wp-inventory-description">هر Paint تنظیمات استیکر و کی‌چین مخصوص خودش را دارد. برای ویرایش، روی کارت همان Paint بزنید.</p>
         </div>
-        <span class="wp-meta-pill wp-inventory-count">
-            <i class="fas fa-box-archive" aria-hidden="true"></i>
-            <?= count($inventoryPaintItems) ?> Saved
-        </span>
+        <div class="wp-inventory-head-actions">
+            <span class="wp-meta-pill wp-inventory-count">
+                <i class="fas fa-box-archive" aria-hidden="true"></i>
+                <?= count($inventoryPaintItems) ?> Saved
+            </span>
+            <?php if (!empty($skinInventory)): ?>
+                <button
+                    type="button"
+                    class="wp-inventory-clear-btn"
+                    data-wp-inventory-clear-open
+                    data-csrf-token="<?= esc($csrfToken) ?>"
+                    aria-haspopup="dialog"
+                    aria-controls="wpClearInventoryDialog"
+                >
+                    <i class="fas fa-trash-can" aria-hidden="true"></i>
+                    پاک کردن تمام اسکین‌ها
+                </button>
+            <?php endif; ?>
+        </div>
     </div>
 
     <?php if ($inventoryPaintItems): ?>
@@ -2647,6 +2662,34 @@ foreach ($skinInventory as $inventoryEntry) {
         </div>
     <?php endif; ?>
 </section>
+
+<dialog
+    class="wp-clear-inventory-dialog"
+    id="wpClearInventoryDialog"
+    aria-labelledby="wpClearInventoryTitle"
+    aria-describedby="wpClearInventoryDescription"
+>
+    <div class="wp-clear-inventory-dialog__content">
+        <span class="wp-clear-inventory-dialog__icon" aria-hidden="true">
+            <i class="fas fa-triangle-exclamation"></i>
+        </span>
+        <span class="wp-clear-inventory-dialog__eyebrow">INVENTORY ACTION</span>
+        <h3 id="wpClearInventoryTitle">پاک کردن تمام اسکین‌ها؟</h3>
+        <p id="wpClearInventoryDescription">
+            آیا مطمئنی می‌خوای تمام اسکین‌های ثبت‌شده در Inventory پاک بشن؟
+            این تغییر بازگشت‌پذیر نیست.
+        </p>
+        <div class="wp-clear-inventory-dialog__actions">
+            <button type="button" class="wp-clear-inventory-dialog__cancel" data-wp-inventory-clear-cancel>
+                نه برگرد!
+            </button>
+            <button type="button" class="wp-clear-inventory-dialog__confirm" data-wp-inventory-clear-confirm>
+                <i class="fas fa-trash-can" aria-hidden="true"></i>
+                همرو پاک کن
+            </button>
+        </div>
+    </div>
+</dialog>
 
 <div class="wp-inventory-subhead wp-inventory-subhead--current">
     <div class="wp-inventory-subhead-copy">

@@ -119,6 +119,29 @@ final class WeaponPaintsRepository
     }
 
     /**
+     * Clear only this player's saved firearm-skin inventory and active firearm
+     * skin rows. Knives, gloves, agents, music kits and pins are not touched.
+     *
+     * @return array{deleted_inventory:int, deleted_active:int}
+     */
+    public function clearSkinInventory(string $steamid): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $steamid)) {
+            throw new InvalidArgumentException('Invalid inventory player identifier.');
+        }
+
+        $data = $this->callApi('clear_skin_inventory', [
+            'steamid' => $steamid,
+            'teams' => [2, 3],
+        ]);
+
+        return [
+            'deleted_inventory' => (int)($data['deleted_inventory'] ?? 0),
+            'deleted_active' => (int)($data['deleted_active'] ?? 0),
+        ];
+    }
+
+    /**
      * Preserve the plugin's serialized values at the page boundary, and convert
      * them to structured, validated JSON before sending them to Linux API.
      *

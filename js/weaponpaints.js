@@ -331,7 +331,7 @@
     }
 
 
-    function showWpToast(message, type = 'info') {
+    function showWpToast(message, type = 'info', duration = 3200) {
 
         // WeaponPaints notifications must never outlive their page stylesheet.
         // AJAX navigation can unload weaponpaints.css while the script remains cached.
@@ -375,7 +375,7 @@
                 () => {
                     toast.classList.remove('is-visible');
                 },
-                3200
+                Math.max(1000, Number(duration) || 3200)
             );
 
     }
@@ -390,15 +390,16 @@
         const now = Date.now();
 
         // init() and pageshow may both fire for the same visit.
-        if (now - pageLifecycle.lastScrollHintAt < 1400) {
+        if (now - pageLifecycle.lastScrollHintAt < 5000) {
             return;
         }
 
         pageLifecycle.lastScrollHintAt = now;
 
         showWpToast(
-            'برای اسکرول افقی بین تب‌ها، کلید Shift را نگه دارید و چرخ ماوس را حرکت دهید.',
-            'warning'
+            'لطفا پس از انتخاب آیتم مورد نظر برای دیدن داخل سرور از دستور wp! استفاده کنید',
+            'warning',
+            5000
         );
 
     }
@@ -600,7 +601,7 @@
 
             button.classList.remove('wp-btn--success', 'wp-save-success');
             button.classList.add('wp-btn--primary');
-            button.innerHTML = '<i class="fas fa-check"></i> Select';
+            button.innerHTML = '<i class="fas fa-check"></i> انتخاب';
             button.removeAttribute('aria-label');
         });
 
@@ -2080,9 +2081,11 @@
             }
         }
 
-        const isPinsPane = activePane.id === 'tab-pins';
-        floatingPagination.classList.toggle('wp-pagination--pins', isPinsPane);
-        dock.classList.toggle('wp-floating-pagination--pins', isPinsPane);
+        // Every catalog tab uses the same bottom pagination rail as Pins.
+        floatingPagination.classList.remove('wp-pagination--pins');
+        dock.classList.remove('wp-floating-pagination--pins');
+        floatingPagination.classList.add('wp-pagination--bottom');
+        dock.classList.add('wp-floating-pagination--bottom');
 
         if (info) {
             info.textContent = currentPage + ' / ' + totalPages;
@@ -6862,6 +6865,116 @@
 
             }
         );
+
+        // Clear the signed-in player's saved firearm-skin inventory through the signed Linux API.
+        document.addEventListener('click', async event => {
+            const target = event.target instanceof Element
+                ? event.target
+                : (event.target && event.target.parentElement);
+            if (!target) {
+                return;
+            }
+
+            const openButton = target.closest('[data-wp-inventory-clear-open]');
+            const dialog = document.getElementById('wpClearInventoryDialog');
+
+            if (openButton && dialog) {
+                event.preventDefault();
+                const token = String(openButton.dataset.csrfToken || '');
+                if (!/^[a-f0-9]{64}$/.test(token)) {
+                    showWpToast('اعتبار درخواست معتبر نیست. صفحه را تازه‌سازی کنید.', 'error');
+                    return;
+                }
+
+                dialog.dataset.csrfToken = token;
+                if (typeof dialog.showModal === 'function') {
+                    if (!dialog.open) dialog.showModal();
+                } else {
+                    dialog.setAttribute('open', '');
+                }
+                const confirmButton = dialog.querySelector('[data-wp-inventory-clear-confirm]');
+                if (confirmButton) confirmButton.focus();
+                return;
+            }
+
+            const cancelButton = target.closest('[data-wp-inventory-clear-cancel]');
+            if (cancelButton && dialog) {
+                event.preventDefault();
+                if (typeof dialog.close === 'function' && dialog.open) dialog.close();
+                else dialog.removeAttribute('open');
+                return;
+            }
+
+            const confirmButton = target.closest('[data-wp-inventory-clear-confirm]');
+            const app = document.querySelector('.wp-app');
+            if (!confirmButton || !dialog || !app || !app.contains(dialog)) {
+                return;
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (confirmButton.disabled || confirmButton.dataset.wpClearBusy === '1') {
+                return;
+            }
+
+            const csrfToken = String(dialog.dataset.csrfToken || '');
+            if (!/^[a-f0-9]{64}$/.test(csrfToken)) {
+                showWpToast('اعتبار درخواست معتبر نیست. صفحه را تازه‌سازی کنید.', 'error');
+                return;
+            }
+
+            confirmButton.disabled = true;
+            confirmButton.dataset.wpClearBusy = '1';
+            confirmButton.classList.add('is-loading');
+            const cancel = dialog.querySelector('[data-wp-inventory-clear-cancel]');
+            if (cancel) cancel.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('wp_csrf_token', csrfToken);
+
+                const response = await fetch('/api/weaponpaints-inventory-clear.php', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                let result;
+                try {
+                    result = await response.json();
+                } catch (parseError) {
+                    throw new Error('پاسخ سرور قابل‌خواندن نیست.');
+                }
+
+                if (!response.ok || !result || result.success !== true || result.deleted !== true) {
+                    if (response.status === 403) {
+                        throw new Error('اعتبار درخواست منقضی شده است. صفحه را تازه‌سازی کنید.');
+                    }
+                    throw new Error('پاک کردن اسکین‌های Inventory انجام نشد.');
+                }
+
+                if (typeof dialog.close === 'function' && dialog.open) dialog.close();
+                else dialog.removeAttribute('open');
+
+                showWpToast('تمام اسکین‌های ذخیره‌شده پاک شدند.', 'success', 5000);
+                window.setTimeout(() => window.location.reload(), 520);
+            } catch (error) {
+                confirmButton.disabled = false;
+                confirmButton.dataset.wpClearBusy = '0';
+                confirmButton.classList.remove('is-loading');
+                if (cancel) cancel.disabled = false;
+                showWpToast(
+                    error instanceof Error ? error.message : 'پاک کردن Inventory ناموفق بود.',
+                    'error'
+                );
+            }
+        });
 
         // Remove one saved inventory paint using the authenticated, CSRF-protected endpoint.
         document.addEventListener('click', async event => {
