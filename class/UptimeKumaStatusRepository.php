@@ -263,6 +263,10 @@ final class UptimeKumaStatusRepository
 
     private function normalizeStatus(mixed $value): string
     {
+        if (!is_numeric($value)) {
+            return 'unknown';
+        }
+
         return match ((int)$value) {
             1 => 'up',
             0 => 'down',
