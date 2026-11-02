@@ -392,6 +392,7 @@ $allowedPages = [
     'launcher',
     'usermanual',
     'serverguide',
+    'status',
     'about',
     'support',
     'login',
@@ -700,6 +701,15 @@ $pageAssets = [
         ],
         'js' => [
             '/js/serverguide.js?v=' . asset_version(__DIR__ . '/js/serverguide.js'),
+        ],
+    ],
+
+    'status' => [
+        'css' => [
+            '/css/status.css?v=' . asset_version(__DIR__ . '/css/status.css'),
+        ],
+        'js' => [
+            '/js/status.js?v=' . asset_version(__DIR__ . '/js/status.js'),
         ],
     ],
 
