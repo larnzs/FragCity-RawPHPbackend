@@ -60,6 +60,14 @@ try {
     $standbyRepository = $read('class/PterodactylStandbyRepository.php');
     $serverListPage = $read('pages/serverlist.php');
     $serverListStylesheet = $read('css/serverlist.css');
+    $statusPage = $read('pages/status.php');
+    $statusRepository = $read('class/UptimeKumaStatusRepository.php');
+    $publicStatusEndpoint = $read('api/public-status.php');
+    $statusJavascript = $read('js/status.js');
+    $statusStylesheet = $read('css/status.css');
+    $uptimeKumaCompose = $read('deploy/uptime-kuma/compose.yaml');
+    $uptimeKumaNginx = $read('deploy/uptime-kuma/nginx-status.fragcity.ir.conf.example');
+    $uptimeKumaDocs = $read('docs/UPTIME-KUMA-STATUS-PAGE.md');
     $siteHeaderMarkup = $read('includes/header.php');
     $siteHeaderStylesheet = $read('css/header.css');
     $headerJavascript = $read('js/header.js');
@@ -911,6 +919,34 @@ $check(
         && str_contains($standbyBrowserJavascript, 'data-sl-favorite')
         && str_contains($standbyBrowserCss, '.sl-filter-sidebar')
         && str_contains($standbyBrowserCss, '.sl-favorite-toggle')
+);
+
+$check(
+    'FragCity public Status Page consumes sanitized published Uptime Kuma data without exposing management secrets',
+    str_contains($websiteIndex, "'status',")
+        && str_contains($websiteIndex, "'status' => [")
+        && str_contains($websiteIndex, '/css/status.css?v=')
+        && str_contains($websiteIndex, '/js/status.js?v=')
+        && str_contains($statusPage, 'data-status-endpoint="/api/public-status.php"')
+        && str_contains($statusJavascript, 'setInterval')
+        && str_contains($statusJavascript, 'data-status-summary')
+        && str_contains($statusStylesheet, '.fc-status-page')
+        && str_contains($statusRepository, '/api/status-page/heartbeat/')
+        && str_contains($statusRepository, '/incident-history')
+        && str_contains($statusRepository, 'uptime_24h')
+        && str_contains($statusRepository, 'CURLOPT_SSL_VERIFYPEER => true')
+        && str_contains($publicStatusEndpoint, 'same_origin_required')
+        && str_contains($publicStatusEndpoint, 'status_not_configured')
+        && !str_contains($publicStatusEndpoint, 'api_key')
+        && !str_contains($statusRepository, 'api_key')
+        && (($websiteSettings['integrations']['uptime_kuma']['base_url'] ?? null) === 'https://status.fragcity.ir')
+        && (($websiteSettings['integrations']['uptime_kuma']['status_page_slug'] ?? null) === 'fragcity')
+        && str_contains($uptimeKumaCompose, 'louislam/uptime-kuma:2.5.9')
+        && str_contains($uptimeKumaCompose, '127.0.0.1:3001:3001')
+        && str_contains($uptimeKumaNginx, 'proxy_set_header Upgrade')
+        && str_contains($uptimeKumaDocs, 'does **not** provide a 90-day numeric uptime series')
+        && str_contains($siteHeaderMarkup, "['status', 'وضعیت سرویس‌ها', 'fa-heart-pulse', ['status']]")
+        && str_contains($footerMarkup, '?page=status')
 );
 
 $check(
