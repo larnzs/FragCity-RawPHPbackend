@@ -15,6 +15,20 @@ This is the active source for the public CS2 Server Browser. It discovers CS2 se
 
 The request cache is refreshed only when a website request arrives after the TTL. It uses an atomic JSON write and a file lock so simultaneous visitors do not trigger duplicate refreshes. If upstream Pterodactyl/A2S is temporarily unavailable, the last good snapshot can be served as stale for up to 180 seconds. No scheduled job is needed.
 
+
+
+## Browser-measured node RTT (not in-game ping)
+
+The public card can show a browser-measured round-trip time to the public node endpoint:
+
+- The website exposes the HTTPS `/health` URL to the browser only when the current single-node server snapshot has exactly one public host and that host resolves to at least one of the same IP addresses as the configured Standby API host.
+- The browser performs one warm-up request, discards that sample, then measures five sequential no-cache HTTPS requests and displays their median. It refreshes every 30 seconds while the page is visible.
+- The label is **Ping شما تا نود**. This is browser-to-node HTTPS/TCP RTT; it is useful as a network-path estimate to the machine hosting the game servers, but it is **not the actual CS2 UDP/game ping**.
+- The A2S `query_rtt_ms` remains a separate server-side query measurement and is never used as the visitor's latency.
+- If the public game host and API host do not resolve to the same IP, or if the snapshot contains more than one distinct public host, the browser probe is disabled instead of reporting a misleading number.
+
+A true per-game UDP ping cannot be measured by ordinary browser JavaScript because browsers do not expose raw UDP sockets. Exact in-game latency is available from the CS2 client after connection; this browser metric is intentionally a clearly-labelled approximation to the node's network RTT.
+
 ## Components
 
 | Responsibility | File |

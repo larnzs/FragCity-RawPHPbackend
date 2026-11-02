@@ -90,6 +90,120 @@
             return Array.from(list.querySelectorAll('[data-sl-card]'));
         };
 
+        // Browser-side HTTPS RTT to the node, not the game's UDP ping.
+        const nodePingOutputs = Array.from(root.querySelectorAll('[data-sl-client-ping]'));
+        const nodePingUrl = String(root.dataset.nodePingUrl || '').trim();
+        let nodePingInterval = 0;
+        let nodePingInProgress = false;
+
+        function updateNodePing(value, state) {
+            nodePingOutputs.forEach(function (output) {
+                output.textContent = value;
+                output.dataset.pingState = state;
+                const metric = output.closest('.sl-metric--client-ping');
+                if (metric) metric.dataset.pingState = state;
+                if (state === 'unavailable') {
+                    output.setAttribute('aria-label', 'پینگ شبکه نود در دسترس نیست');
+                } else if (state === 'measuring') {
+                    output.setAttribute('aria-label', 'در حال اندازه‌گیری پینگ شبکه نود');
+                } else {
+                    output.setAttribute('aria-label', 'RTT شبکه تا نود: ' + value);
+                }
+            });
+        }
+
+        async function requestNodePingSample(index) {
+            const controller = new AbortController();
+            const timeoutId = window.setTimeout(function () {
+                controller.abort();
+            }, 4500);
+            const startedAt = performance.now();
+
+            try {
+                const target = new URL(nodePingUrl, window.location.href);
+                if (target.protocol !== 'https:') return null;
+                target.searchParams.set('fc_probe', String(Date.now()) + '-' + String(index));
+
+                // no-cors is intentional: the health endpoint needs no CORS access.
+                // Fetch completion still measures the browser's network round trip.
+                await fetch(target.toString(), {
+                    method: 'GET',
+                    mode: 'no-cors',
+                    credentials: 'omit',
+                    cache: 'no-store',
+                    redirect: 'error',
+                    referrerPolicy: 'no-referrer',
+                    signal: controller.signal
+                });
+
+                return Math.max(0, performance.now() - startedAt);
+            } catch (error) {
+                return null;
+            } finally {
+                window.clearTimeout(timeoutId);
+            }
+        }
+
+        async function measureNodePing() {
+            if (nodePingOutputs.length === 0 || !nodePingUrl || nodePingInProgress) return;
+            if (document.visibilityState === 'hidden') return;
+            if (!root.isConnected) {
+                if (nodePingInterval) window.clearInterval(nodePingInterval);
+                nodePingInterval = 0;
+                return;
+            }
+
+            nodePingInProgress = true;
+            updateNodePing('…', 'measuring');
+
+            try {
+                // Discard one warm-up request so DNS/TLS setup does not skew the displayed RTT.
+                const warmup = await requestNodePingSample(0);
+                if (warmup === null) {
+                    updateNodePing('—', 'unavailable');
+                    return;
+                }
+
+                const samples = [];
+                for (let index = 1; index <= 5; index++) {
+                    const sample = await requestNodePingSample(index);
+                    if (sample !== null && Number.isFinite(sample)) samples.push(sample);
+                    if (index < 5) {
+                        await new Promise(function (resolve) {
+                            window.setTimeout(resolve, 90);
+                        });
+                    }
+                }
+
+                if (samples.length < 3) {
+                    updateNodePing('—', 'unavailable');
+                    return;
+                }
+
+                samples.sort(function (a, b) { return a - b; });
+                const middle = Math.floor(samples.length / 2);
+                const median = samples.length % 2 === 0
+                    ? (samples[middle - 1] + samples[middle]) / 2
+                    : samples[middle];
+                const rounded = Math.round(median);
+                const state = rounded <= 60 ? 'good' : (rounded <= 120 ? 'ok' : 'bad');
+                updateNodePing(rounded + ' ms', state);
+            } finally {
+                nodePingInProgress = false;
+            }
+        }
+
+        if (nodePingOutputs.length > 0) {
+            if (nodePingUrl) {
+                void measureNodePing();
+                nodePingInterval = window.setInterval(function () {
+                    void measureNodePing();
+                }, 30000);
+            } else {
+                updateNodePing('—', 'unavailable');
+            }
+        }
+
         const FAVORITES_STORAGE_KEY = 'fragcity.serverlist.favorites.v1';
         const favoriteIds = new Set();
 
@@ -862,6 +976,8 @@
             ++playerRequestSequence;
             // Pending prefetches are allowed to finish and populate their short-lived cache.
             window.clearTimeout(modalCloseTimer);
+            if (nodePingInterval) window.clearInterval(nodePingInterval);
+            nodePingInterval = 0;
             if (playerModal) playerModal.remove();
             document.body.classList.remove('sl-player-modal-open');
             window.removeEventListener('content-loaded', cleanupPlayerModalPortal);

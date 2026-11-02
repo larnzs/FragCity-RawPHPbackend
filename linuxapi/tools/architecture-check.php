@@ -611,14 +611,16 @@ $check(
 );
 
 $check(
-    'Server Browser desaturates offline cards and does not mislabel server-side RTT as visitor ping',
+    'Server Browser measures visitor-to-node HTTPS RTT separately from in-game UDP ping',
     str_contains($serverListPage, "sl-server-card--offline")
         && str_contains($serverListPage, "sl-metric--client-ping")
-        && str_contains($serverListPage, "fa-signal")
-        && str_contains($serverListPage, "Ping شما")
-        && str_contains($serverListPage, "data-sl-client-ping")
-        && str_contains($serverListPage, "مرورگر به‌تنهایی نمی‌تواند UDP")
-        && !str_contains($serverListPage, "A2S RTT")
+        && str_contains($serverListPage, "data-node-ping-url")
+        && str_contains($serverListPage, "Ping شما تا نود")
+        && str_contains($serverListPage, "پینگ UDP واقعی داخل بازی CS2 نیست")
+        && str_contains($standbyBrowserJavascript, "mode: 'no-cors'")
+        && str_contains($standbyBrowserJavascript, "performance.now()")
+        && str_contains($standbyBrowserJavascript, "samples.length < 3")
+        && str_contains($serverListStylesheet, 'data-ping-state="good"')
         && str_contains($serverListStylesheet, '.sl-server-card[data-status="offline"]')
         && str_contains($serverListStylesheet, 'filter: grayscale(1) saturate(0);')
 );

@@ -146,6 +146,73 @@ foreach ($serverRows as $server) {
     $serverGroups[$groupKey][] = $server;
 }
 
+$serverPingProbeUrl = '';
+$publicServerHosts = array_values(array_unique(array_filter(
+    array_map(
+        static fn (array $server): string => trim((string) ($server['host'] ?? '')),
+        $serverRows
+    ),
+    static fn (string $host): bool => $host !== ''
+)));
+$standbyApiBaseUrl = trim((string) fragcity_settings(
+    'integrations.pterodactyl_standby_api.base_url',
+    ''
+));
+$standbyApiParts = parse_url($standbyApiBaseUrl);
+
+if (count($publicServerHosts) === 1
+    && is_array($standbyApiParts)
+    && strtolower((string) ($standbyApiParts['scheme'] ?? '')) === 'https'
+    && !empty($standbyApiParts['host'])
+    && !isset($standbyApiParts['user'])
+    && !isset($standbyApiParts['pass'])
+    && !isset($standbyApiParts['query'])
+    && !isset($standbyApiParts['fragment'])
+    && (!isset($standbyApiParts['path']) || $standbyApiParts['path'] === '' || $standbyApiParts['path'] === '/')) {
+    $resolveServerHost = static function (string $host): array {
+        $host = strtolower(trim($host, "[] \t\n\r\0\x0B"));
+        if ($host === '') {
+            return [];
+        }
+        if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
+            return [$host];
+        }
+
+        $addresses = [];
+        if (function_exists('gethostbynamel')) {
+            $ipv4Addresses = @gethostbynamel($host);
+            if (is_array($ipv4Addresses)) {
+                foreach ($ipv4Addresses as $address) {
+                    if (filter_var($address, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+                        $addresses[] = strtolower($address);
+                    }
+                }
+            }
+        }
+
+        if (function_exists('dns_get_record')) {
+            $dnsTypes = DNS_A | (defined('DNS_AAAA') ? DNS_AAAA : 0);
+            $records = @dns_get_record($host, $dnsTypes);
+            if (is_array($records)) {
+                foreach ($records as $record) {
+                    $address = $record['ip'] ?? ($record['ipv6'] ?? '');
+                    if (is_string($address) && filter_var($address, FILTER_VALIDATE_IP) !== false) {
+                        $addresses[] = strtolower($address);
+                    }
+                }
+            }
+        }
+
+        return array_values(array_unique($addresses));
+    };
+
+    $apiHostAddresses = $resolveServerHost((string) $standbyApiParts['host']);
+    $publicServerAddresses = $resolveServerHost($publicServerHosts[0]);
+    if (array_intersect($apiHostAddresses, $publicServerAddresses) !== []) {
+        $serverPingProbeUrl = rtrim($standbyApiBaseUrl, '/') . '/health';
+    }
+}
+
 $statusLabels = [
     'online' => 'آنلاین',
     'offline' => 'آفلاین',
@@ -163,6 +230,7 @@ $faceitIconVersion = function_exists('asset_version')
     dir="rtl"
     data-faceit-icon-base="/img/faceit/"
     data-faceit-icon-version="<?= $escapeServerValue($faceitIconVersion) ?>"
+    data-node-ping-url="<?= $escapeServerValue($serverPingProbeUrl) ?>"
 >
     <div class="sl-page-shell">
         <section class="sl-hero" aria-labelledby="slHeroTitle">
@@ -534,11 +602,11 @@ $faceitIconVersion = function_exists('asset_version')
                                                 </div>
                                                 <div
                                                     class="sl-metric sl-metric--client-ping"
-                                                    title="پینگ واقعی بازدیدکننده هنوز از مرورگر قابل اندازه‌گیری نیست؛ برای این مقدار به ابزار کلاینت/ارتباط UDP سازگار نیاز داریم."
-                                                    aria-label="پینگ شما تا سرور؛ فعلاً در دسترس نیست"
+                                                    title="RTT مرورگر تا میزبان عمومی نود از طریق HTTPS اندازه‌گیری می‌شود؛ این مقدار پینگ UDP واقعی داخل بازی CS2 نیست."
+                                                    aria-label="پینگ شبکه شما تا نود؛ تخمین RTT از طریق HTTPS"
                                                 >
-                                                    <span><i class="fa-solid fa-signal" aria-hidden="true"></i> Ping شما</span>
-                                                    <strong dir="ltr" data-sl-client-ping>—</strong>
+                                                    <span><i class="fa-solid fa-signal" aria-hidden="true"></i> Ping شما تا نود</span>
+                                                    <strong dir="ltr" data-sl-client-ping data-ping-state="pending" aria-live="polite">—</strong>
                                                 </div>
                                                 <div class="sl-metric">
                                                     <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> VAC</span>
