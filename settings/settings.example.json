@@ -68,6 +68,11 @@
       "_comment": "Signed admin-only Linux API for read-only Pterodactyl/Wings monitoring. The legacy CS2 dashboard UI is not shipped. Its secret matches pterodactyl_monitoring.shared_secret on Linux and must be unique.",
       "base_url": "https://api.fragcity.ir",
       "shared_secret": "REPLACE_WITH_PTERODACTYL_MONITORING_SECRET"
+    },
+    "uptime_kuma": {
+      "_comment": "Public read-only Uptime Kuma Status Page. Use the HTTPS origin only and a published public Status Page slug. No API key or admin password belongs here.",
+      "base_url": "https://status.fragcity.ir",
+      "status_page_slug": "fragcity"
     }
   },
   "files": {
