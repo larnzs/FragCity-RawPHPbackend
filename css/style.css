@@ -430,7 +430,8 @@ html {
 
 body.site-body {
     min-height: 100vh;
-    overflow-x: hidden;
+    /* Clip horizontal overflow without creating a scroll container that breaks sticky headers. */
+    overflow-x: clip;
 }
 
 
