@@ -310,7 +310,7 @@ if (empty($token)) {
 
             <img
 
-                src="assets/images/logo/main.png"
+                src="/img/webp/newlogo.webp"
 
                 alt="FragCity Logo"
 

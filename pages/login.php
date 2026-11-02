@@ -10,7 +10,7 @@ unset($_SESSION['auth_error']);
 
         <!-- FragCity Logo -->
         <div class="auth-logo">
-            <img src="assets/images/logo/main.png" alt="FragCity Logo">
+            <img src="/img/webp/newlogo.webp" alt="FragCity Logo">
         </div>
 
         <!-- Page Title -->

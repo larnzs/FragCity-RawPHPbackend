@@ -1,15 +1,82 @@
 <?php
 /**
- * Server purchase page is temporarily unavailable.
- *
- * The former flow depended on the retired Windows-Agent tables and could
- * reserve ports or debit the wallet. Do not initiate any purchase/payment
- * until the replacement is integrated with Pterodactyl and the wallet flow.
+ * FragCity server purchasing and customer management are being rebuilt.
+ * This page intentionally remains informational until the Pterodactyl-backed
+ * order, subscription, and wallet workflow is ready.
  */
 ?>
-<section class="fc-feature-unavailable" dir="rtl" style="max-width:900px;margin:32px auto;padding:28px;border:1px solid rgba(245,176,66,.25);border-radius:18px;background:#151515;color:#eee">
-    <h1 style="margin-top:0;color:#F5B042">خرید سرور CS2 در حال بازطراحی است</h1>
-    <p style="line-height:1.9;color:#ccc">سامانهٔ قدیمی خرید سرور به Agent ویندوزی و جدول‌هایی وابسته بود که دیگر استفاده نمی‌شوند. اتصال جدید بر پایهٔ Pterodactyl هنوز تکمیل نشده است.</p>
-    <p style="line-height:1.9;color:#ccc">در حال حاضر از این صفحه هیچ سفارشی ثبت نمی‌شود، موجودی کیف پولی کسر نمی‌شود و پرداختی آغاز نمی‌شود.</p>
-    <a href="/index.php" style="display:inline-block;margin-top:8px;padding:10px 18px;border-radius:10px;background:#F5B042;color:#111;text-decoration:none;font-weight:700">بازگشت به سایت</a>
-</section>
+<main class="fc-server-coming" dir="rtl">
+    <section class="fc-server-coming__panel" aria-labelledby="fcServerComingTitle">
+        <div class="fc-server-coming__topline">
+            <span class="fc-server-coming__brand">
+                <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+                FRAGCITY SERVICES
+            </span>
+            <span class="fc-server-coming__badge">
+                <span aria-hidden="true"></span>
+                به‌زودی راه‌اندازی می‌شود
+            </span>
+        </div>
+
+        <div class="fc-server-coming__icon" aria-hidden="true">
+            <span class="fc-server-coming__icon-ring"></span>
+            <i class="fa-solid fa-server"></i>
+        </div>
+
+        <p class="fc-server-coming__eyebrow" dir="ltr">SERVER HOSTING PLATFORM</p>
+        <h1 id="fcServerComingTitle">
+            خرید سرور و پنل مدیریت
+            <span>FragCity</span>
+        </h1>
+        <p class="fc-server-coming__description">
+            داریم تجربه‌ی جدید خرید و مدیریت سرورهای CS2 رو آماده می‌کنیم؛
+            به‌زودی می‌تونی سرویس‌هات رو مستقیم از سایت FragCity تهیه و از پنل تحت وب مدیریت کنی.
+        </p>
+
+        <div class="fc-server-coming__features">
+            <article class="fc-server-coming__feature">
+                <span class="fc-server-coming__feature-icon" aria-hidden="true">
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </span>
+                <div>
+                    <strong>خرید و تمدید سرور</strong>
+                    <small>انتخاب سرویس و مدت اشتراک از داخل سایت</small>
+                </div>
+            </article>
+            <article class="fc-server-coming__feature">
+                <span class="fc-server-coming__feature-icon" aria-hidden="true">
+                    <i class="fa-solid fa-sliders"></i>
+                </span>
+                <div>
+                    <strong>پنل مدیریت تحت وب</strong>
+                    <small>مدیریت سرویس‌ها در یک فضای یکپارچه</small>
+                </div>
+            </article>
+            <article class="fc-server-coming__feature">
+                <span class="fc-server-coming__feature-icon" aria-hidden="true">
+                    <i class="fa-solid fa-gauge-high"></i>
+                </span>
+                <div>
+                    <strong>کنترل و مشاهده وضعیت</strong>
+                    <small>دسترسی ساده‌تر به تنظیمات و اطلاعات سرویس</small>
+                </div>
+            </article>
+        </div>
+
+        <div class="fc-server-coming__actions">
+            <a href="?page=servers_vps" class="fc-server-coming__primary" data-ajax-nav data-slug="servers_vps">
+                <i class="fa-solid fa-list" aria-hidden="true"></i>
+                مشاهده سرورهای عمومی
+            </a>
+            <a href="?page=serverguide" class="fc-server-coming__secondary" data-ajax-nav data-slug="serverguide">
+                <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+                راهنمای سرور
+            </a>
+        </div>
+
+        <p class="fc-server-coming__notice">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            تا زمان تکمیل این بخش، امکان ثبت سفارش یا شروع پرداخت از این صفحه وجود ندارد.
+        </p>
+    </section>
+</main>

@@ -224,7 +224,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <img
 
-                src="assets/images/logo/main.png"
+                src="/img/webp/newlogo.webp"
 
                 alt="FragCity Logo"
 

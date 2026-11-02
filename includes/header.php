@@ -123,8 +123,6 @@ if ($isLoggedIn && $headerSteamId64 !== '' && isset($pdo) && $pdo instanceof PDO
 }
 $headerSteamPersonaName = trim((string)($headerSteamProfile['personaname'] ?? '')) ?: trim((string)$displayName);
 if ($headerSteamPersonaName === '') $headerSteamPersonaName = 'Steam Player';
-$headerSteamState = isset($headerSteamProfile['personastate']) ? (int)$headerSteamProfile['personastate'] : -1;
-$headerSteamStatus = [0 => 'آفلاین', 1 => 'آنلاین', 2 => 'مشغول', 3 => 'غایب', 4 => 'خواب', 5 => 'مایل به معامله', 6 => 'مایل به بازی'][$headerSteamState] ?? 'نامشخص';
 $headerVisibilityState = (int)($headerSteamProfile['communityvisibilitystate'] ?? 0);
 $headerSteamVisibility = $headerVisibilityState === 3 ? 'عمومی' : ($headerVisibilityState === 1 ? 'خصوصی' : ($headerVisibilityState === 2 ? 'فقط دوستان' : 'نامشخص'));
 $headerProfileState = isset($headerSteamProfile['profilestate']) ? ((int)$headerSteamProfile['profilestate'] === 1 ? 'تنظیم‌شده' : 'کامل نشده') : 'نامشخص';
@@ -144,7 +142,6 @@ if ($isLoggedIn && $avatarSrc === 'assets/images/default_avatar.png') {
         $avatarSrc = $avatarCandidate;
     }
 }
-$headerSteamGame = trim((string)($headerSteamProfile['gameextrainfo'] ?? ''));
 $headerSteamProfileUrl = trim((string)($headerSteamProfile['profileurl'] ?? ''));
 $steamUrlParts = $headerSteamProfileUrl !== '' ? parse_url($headerSteamProfileUrl) : false;
 if (!is_array($steamUrlParts) || strtolower((string)($steamUrlParts['scheme'] ?? '')) !== 'https' || !in_array(strtolower((string)($steamUrlParts['host'] ?? '')), ['steamcommunity.com', 'www.steamcommunity.com'], true)) {
@@ -354,6 +351,38 @@ $mobileMoreNavItems = [
                         </button>
 
                         <div class="frag-dropdown-menu" id="shockUserMenu">
+                            <div
+                                class="frag-drop-faceit"
+                                data-status="<?= htmlspecialchars($headerFaceitStatus, ENT_QUOTES, 'UTF-8') ?>"
+                                data-faceit-level="<?= $headerFaceitDisplayLevel ?>"
+                                style="--faceit-rank-color: <?= htmlspecialchars($headerFaceitRankColor, ENT_QUOTES, 'UTF-8') ?>;"
+                                aria-label="FACEIT level"
+                            >
+                                <div class="frag-drop-faceit__top">
+                                    <span class="frag-drop-faceit__rank">
+                                        <img
+                                            src="/img/faceit/<?= $headerFaceitDisplayLevel ?>.svg"
+                                            alt=""
+                                            aria-hidden="true"
+                                            width="27"
+                                            height="27"
+                                        >
+                                        <strong><?= $headerFaceitDisplayLevel > 0 ? 'Level ' . $headerFaceitDisplayLevel : 'Unranked' ?></strong>
+                                    </span>
+                                    <strong class="frag-drop-faceit__elo"><?= htmlspecialchars($headerFaceitEloLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                                </div>
+                                <div
+                                    class="frag-drop-faceit__progress"
+                                    role="progressbar"
+                                    aria-label="FACEIT progress to next level"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                    aria-valuenow="<?= htmlspecialchars((string)round($headerFaceitProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
+                                >
+                                    <span style="width: <?= htmlspecialchars((string)round($headerFaceitProgress, 2), ENT_QUOTES, 'UTF-8') ?>%;"></span>
+                                </div>
+                            </div>
+
                             <div class="frag-drop-header frag-drop-header--profile">
                                 <span class="frag-drop-avatar-frame">
                                     <img src="<?= htmlspecialchars($avatarSrc, ENT_QUOTES, 'UTF-8') ?>"
@@ -371,64 +400,6 @@ $mobileMoreNavItems = [
                                 </span>
                             </div>
 
-                            <div class="frag-drop-steam-details">
-                                <div class="frag-drop-status" data-state="<?= $headerSteamState ?>">
-                                    <span class="frag-drop-status-dot" aria-hidden="true"></span>
-                                    <strong><?= htmlspecialchars($headerSteamStatus, ENT_QUOTES, 'UTF-8') ?></strong>
-                                    <?php if ($headerSteamGame !== ''): ?>
-                                        <span class="frag-drop-playing">در حال بازی: <?= htmlspecialchars($headerSteamGame, ENT_QUOTES, 'UTF-8') ?></span>
-                                    <?php endif; ?>
-                                </div>
-                                <div
-                                    class="frag-drop-faceit"
-                                    data-status="<?= htmlspecialchars($headerFaceitStatus, ENT_QUOTES, 'UTF-8') ?>"
-                                    data-faceit-level="<?= $headerFaceitDisplayLevel ?>"
-                                    style="--faceit-rank-color: <?= htmlspecialchars($headerFaceitRankColor, ENT_QUOTES, 'UTF-8') ?>;"
-                                >
-                                    <div class="frag-drop-faceit__top">
-                                        <span class="frag-drop-faceit__rank">
-                                            <img
-                                                src="/img/faceit/<?= $headerFaceitDisplayLevel ?>.svg"
-                                                alt=""
-                                                aria-hidden="true"
-                                                width="27"
-                                                height="27"
-                                            >
-                                            <strong><?= $headerFaceitDisplayLevel > 0 ? 'Level ' . $headerFaceitDisplayLevel : 'Unranked' ?></strong>
-                                        </span>
-                                        <strong class="frag-drop-faceit__elo"><?= htmlspecialchars($headerFaceitEloLabel, ENT_QUOTES, 'UTF-8') ?></strong>
-                                    </div>
-                                    <div
-                                        class="frag-drop-faceit__progress"
-                                        role="progressbar"
-                                        aria-label="FACEIT progress to next level"
-                                        aria-valuemin="0"
-                                        aria-valuemax="100"
-                                        aria-valuenow="<?= htmlspecialchars((string)round($headerFaceitProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
-                                    >
-                                        <span style="width: <?= htmlspecialchars((string)round($headerFaceitProgress, 2), ENT_QUOTES, 'UTF-8') ?>%;"></span>
-                                    </div>
-                                </div>
-                                <div class="frag-drop-detail-grid">
-                                    <div class="frag-drop-detail"><span>وضعیت پروفایل</span><strong><?= htmlspecialchars($headerSteamVisibility, ENT_QUOTES, 'UTF-8') ?></strong></div>
-                                    <div class="frag-drop-detail"><span>تنظیمات پروفایل</span><strong><?= htmlspecialchars($headerProfileState, ENT_QUOTES, 'UTF-8') ?></strong></div>
-                                    <div class="frag-drop-detail"><span>تاریخ ساخت حساب</span><strong><?= htmlspecialchars($headerCreatedLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
-                                    <div class="frag-drop-detail"><span>کشور</span><strong dir="ltr"><?= htmlspecialchars($headerCountry !== '' ? $headerCountry : '—', ENT_QUOTES, 'UTF-8') ?></strong></div>
-                                    <div class="frag-drop-detail"><span>آخرین فعالیت</span><strong><?= htmlspecialchars($headerLastLogoffLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
-                                </div>
-                                <?php if ($headerSteamProfileUrl !== ''): ?>
-                                    <a class="frag-drop-steam-profile-link" href="<?= htmlspecialchars($headerSteamProfileUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer">
-                                        <i class="fa-brands fa-steam" aria-hidden="true"></i>
-                                        مشاهده حساب در Steam
-                                        <i class="fa-solid fa-arrow-up-left-from-circle" aria-hidden="true"></i>
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-
-                            <div class="frag-drop-divider"></div>
-                            <a href="?page=profile" class="frag-drop-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
-                                <i class="fas fa-user"></i><span>مشاهده پروفایل</span>
-                            </a>
                             <div class="frag-drop-wallet-card">
                                 <div class="frag-drop-wallet-card__balance">
                                     <span class="frag-drop-wallet-card__label">
@@ -446,6 +417,33 @@ $mobileMoreNavItems = [
                                 >
                                     <i class="fa-solid fa-plus" aria-hidden="true"></i>
                                 </button>
+                            </div>
+
+                            <div class="frag-drop-steam-details">
+                                <div class="frag-drop-detail-grid">
+                                    <div class="frag-drop-detail"><span>وضعیت پروفایل</span><strong><?= htmlspecialchars($headerSteamVisibility, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>تنظیمات پروفایل</span><strong><?= htmlspecialchars($headerProfileState, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>تاریخ ساخت حساب</span><strong><?= htmlspecialchars($headerCreatedLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>کشور</span><strong dir="ltr"><?= htmlspecialchars($headerCountry !== '' ? $headerCountry : '—', ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                    <div class="frag-drop-detail"><span>آخرین فعالیت</span><strong><?= htmlspecialchars($headerLastLogoffLabel, ENT_QUOTES, 'UTF-8') ?></strong></div>
+                                </div>
+                                <?php if ($headerSteamProfileUrl !== ''): ?>
+                                    <a class="frag-drop-steam-profile-link" href="<?= htmlspecialchars($headerSteamProfileUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer">
+                                        <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                                        مشاهده حساب در Steam
+                                        <i class="fa-solid fa-arrow-up-left-from-circle" aria-hidden="true"></i>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="frag-drop-divider"></div>
+                            <div class="frag-drop-actions">
+                                <a href="?page=buyserveropen" class="frag-drop-link" data-ajax-nav data-slug="buyserveropen">
+                                    <i class="fa-solid fa-server" aria-hidden="true"></i><span>سرورهای من</span>
+                                </a>
+                                <a href="?page=profile" class="frag-drop-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
+                                    <i class="fas fa-user" aria-hidden="true"></i><span>مشاهده پروفایل</span>
+                                </a>
                             </div>
                             <div class="frag-drop-divider"></div>
                             <form action="index.php" method="post" class="frag-drop-logout-form">
