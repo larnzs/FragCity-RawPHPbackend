@@ -3447,7 +3447,7 @@ body { max-width: 100%; overflow-x: clip; }
 }
 
 #shockUserDropdown .frag-drop-faceit {
-    margin: 10px 10px 0;
+    margin: 10px 0 0;
     padding: 11px 12px;
     border: 1px solid rgba(249, 115, 22, .2);
     border-radius: 13px;
@@ -3471,9 +3471,9 @@ body { max-width: 100%; overflow-x: clip; }
     box-shadow: none;
 }
 
-/* Keep FACEIT card edges aligned with the wallet card on desktop. */
+/* Match the wallet card's full-width alignment inside the dropdown. */
 #shockUserDropdown .frag-drop-faceit {
-    margin: 10px 10px 0;
+    margin: 10px 0 0;
 }
 
 /* The mobile wallet card is edge-aligned to the dropdown's inner padding. */
