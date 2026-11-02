@@ -26,7 +26,8 @@
         jsonQuery: 'HTTP JSON',
         port: 'TCP Port',
         ping: 'Ping',
-        steamGameServer: 'Steam Game Server',
+        steam: 'Steam Game Server',
+        gamedig: 'GameDig',
         docker: 'Docker',
         push: 'Push Monitor'
     };
