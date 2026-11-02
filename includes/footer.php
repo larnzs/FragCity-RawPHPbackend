@@ -26,6 +26,7 @@
                     <li><a href="index.php?page=skins" data-ajax-nav data-slug="skins">اسکین‌ها</a></li>
                     <li><a href="/index.php?page=launcher" data-ajax-nav data-slug="launcher">دانلود لانچر <span class="footer-link-soon">به‌زودی</span></a></li>
                     <li><a href="/index.php?page=serverguide" data-ajax-nav data-slug="serverguide">راهنمای سرور و کامندها</a></li>
+                    <li><a href="/index.php?page=status" data-ajax-nav data-slug="status">وضعیت سرویس‌ها</a></li>
                 </ul>
             </nav>
 
