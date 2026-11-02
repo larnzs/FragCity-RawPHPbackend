@@ -1,0 +1,13 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2.5.9
+    container_name: fragcity-uptime-kuma
+    init: true
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Tehran
+    ports:
+      - "127.0.0.1:3001:3001"
+    volumes:
+      - ./data:/app/data
+    stop_grace_period: 30s
