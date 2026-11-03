@@ -191,10 +191,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
             }
 
             $saveSettings = $pdo->prepare(
-                'UPDATE users
-                 SET username = ?, email = ?, phone = ?
+                "UPDATE users
+                 SET username = ?, email = ?, phone = ?,
+                     paymenter_sync_status = 'pending',
+                     paymenter_sync_error = NULL
                  WHERE steamid64 = ?
-                 LIMIT 1'
+                 LIMIT 1"
             );
             $saveSettings->execute([
                 $displayName,
