@@ -98,3 +98,16 @@ Pterodactyl خودش در رابط وب مشتری File Manager دارد و با
 ## 9. معماری تولیدی هنوز نهایی نیست
 
 موارد باز: جای نهایی Panel/Billing، SSO، مدل Wallet در Paymenter، رفتار تمدید/انقضا، سیاست نگهداری دادهٔ منقضی‌شده، درگاه پرداخت، API sync پلاگین و سیاست Backup. این موارد در [Decisions](DECISIONS.md) و [Roadmap](ROADMAP.md) پیگیری می‌شوند.
+
+## 10. مرز نهایی رابط کاربری و مدیریت مشتری — ADR-018
+
+**این بخش تصمیم قبلی بخش ۸ دربارهٔ استفاده از UI مشتری Pterodactyl را جایگزین می‌کند.** تمام UI مشتری و ادمین در Raw PHP FragCity ساخته می‌شود؛ نه Paymenter و نه Pterodactyl به‌عنوان پنل مستقیم مشتری استفاده نمی‌شوند.
+
+- FragCity مالک کاتالوگ، قیمت، فرم خرید، Zarinpal، پنل مشتری و پنل ادمین است.
+- Paymenter فقط Backend تجاری/سرویس است: User، Order، Service، Invoice، Ticket، چرخهٔ تمدید/انقضا و فراخوانی Extension برای Provisioning.
+- Pterodactyl/Wings مالک واقعی Server record، Node، Allocation، Container، منابع و اجرای بازی باقی می‌مانند.
+- تمام درخواست‌های مشتری از Backend سایت عبور می‌کنند. هیچ API Key، Client Token یا Wings credential به مرورگر داده نمی‌شود.
+- RCON برای فرمان‌های زنده است؛ تنظیمات دائمی باید در فایل اختصاصی Instance ذخیره شوند. ویرایش فایل با API سمت سرور، allowlist مسیر/کلید، schema validation و backup انجام می‌شود.
+- تنظیمات پلاگین/مود با Schemaهای داده‌محور ساخته می‌شوند؛ مسیر فایل یا JSON دلخواه از طرف مشتری پذیرفته نمی‌شود.
+
+جزئیات قرارداد پرداخت و Bridge در [PAYMENTER-BACKEND-INTEGRATION](PAYMENTER-BACKEND-INTEGRATION.md) و تصمیم تأییدشده در [ADR-018](DECISIONS.md#adr-018--fragcity-owns-the-customeradmin-ui-paymenter-is-a-private-backend-supervisor) ثبت شده است.
