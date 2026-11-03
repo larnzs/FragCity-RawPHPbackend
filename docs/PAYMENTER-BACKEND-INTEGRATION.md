@@ -1,6 +1,6 @@
 # FragCity ↔ Paymenter Backend Integration
 
-**Status:** Initial integration contract. The read-only API client is the first implementation step; write/provisioning operations remain pending verification.
+**Status:** The signed FragCity account-bridge slice is implemented. Purchase/provisioning operations remain pending verification.
 
 ## 1. Product boundary
 
