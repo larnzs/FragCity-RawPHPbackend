@@ -47,7 +47,7 @@ The public resources do not expose every operation required by FragCity:
 
 The Paymenter source shows the supported lifecycle: a paid invoice is processed by `ProcessPaidInvoiceService`; a pending server Service is sent to `CreateJob`; that job invokes the configured server extension. The supported `ExtensionHelper::addPayment()` path creates an invoice transaction; Paymenter's invoice settlement flow can then mark the invoice paid and run its normal paid-invoice processing.
 
-Therefore, do not make direct SQL writes into Paymenter's database and do not mark invoices paid by simply changing a status field. Use a small authenticated route in the existing FragCity Paymenter extension for the missing atomic operation. Do not fork or patch Paymenter core.
+Therefore, do not make direct SQL writes into Paymenter's database and do not mark invoices paid by simply changing a status field. Use a dedicated `FragCityAPI` add-on extension for the authenticated server-to-server Bridge. The previous locale-only `extensions/Others/FragCity` add-on has been removed and must not be reused. Do not fork or patch Paymenter core.
 
 Primary source references:
 
@@ -92,7 +92,7 @@ Expected output contains a PASS line, HTTP 200 and a count for the one-item samp
 ## 6. Next implementation slices
 
 1. Read-only Paymenter connection and least-privilege API key.
-2. Paymenter-side signed Bridge route in `extensions/Others/FragCity`; no Paymenter core edits.
+2. Create a dedicated Paymenter add-on at `extensions/Others/FragCityAPI` for the signed Bridge route; do not reintroduce localization code or edit Paymenter core.
 3. Idempotent provisioning transaction and user/product/plan mapping.
 4. Zarinpal server-purchase payment intent + verify + outbox/retry.
 5. One test customer, one test product, one test CS2 server; verify environment, node, limits and lifecycle.
