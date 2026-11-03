@@ -139,6 +139,26 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 - فایل‌های Nginx API در `linuxapi/nginx/` نمونه هستند؛ vhost پنل Pterodactyl را با آن‌ها جایگزین نکن.
 - هیچ Secret، Application API token، Wings token یا Database password را در Git، چت یا مرورگر قرار نده.
 
+## ۸. Paymenter Account Bridge
+
+ثبت‌نام و هویت کاربران از FragCity مدیریت می‌شود. Add-on اختصاصی `FragCityAPI` در Paymenter فقط از ارتباط سروربه‌سرور استفاده می‌کند و Core پرداخت‌یار را تغییر نمی‌دهد.
+
+- در Paymenter مسیر **Admin → Extensions → Others → FragCity API** را فعال کن.
+- یک Secret تصادفی حداقل ۳۲ بایتی بساز: `openssl rand -hex 32`.
+- همان مقدار را در تنظیمات Extension در Paymenter و فایل Runtime خصوصی سایت، زیر `integrations.paymenter_backend.shared_secret` قرار بده.
+- `integrations.paymenter_backend.base_url` فقط Origin HTTPS پنل Paymenter است؛ مسیر API به آن اضافه نکن.
+- در صورت داشتن IP خروجی ثابت برای هاست FragCity، آن IP را در `Allowed Source IPs` افزونه Paymenter تنظیم کن.
+- فایل `database/migrations/20261103_paymenter_user_sync.sql` را فقط یک‌بار روی دیتابیس اصلی FragCity اجرا کن.
+- برای تست اتصال، از ریشه پروژه اجرا کن: `php tools/paymenter-api-preflight.php`.
+
+Endpointهای Bridge:
+- `POST /api/v1/fragcity/bridge/ping`
+- `POST /api/v1/fragcity/bridge/users/sync`
+
+هر درخواست با HMAC-SHA256، timestamp و nonce یک‌بارمصرف امضا می‌شود. رمز عبور فقط در حافظه و در درخواست HTTPS امضاشده منتقل می‌شود؛ در Session، لاگ، تنظیمات یا دیتابیس به‌صورت خام ذخیره نمی‌شود. Paymenter آن را با Hash استاندارد خودش نگهداری می‌کند.
+
+برای جلوگیری از ساخت حساب تکراری، ستون `paymenter_user_id` در دیتابیس سایت شناسه حساب متناظر را نگه می‌دارد. تلفن و SteamID در Paymenter به‌صورت User Property ذخیره می‌شوند؛ Paymenter فیلد native شماره تلفن ندارد.
+
 ## ۹. کنترل قبل از اجرا
 
 ```powershell
