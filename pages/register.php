@@ -28,11 +28,9 @@ if ($isAccountCompletion && $pdo instanceof PDO) {
     }
 }
 
-$formUsername = (string) (
-    $completionUser['username']
-    ?? $steamData['personaname']
-    ?? ''
-);
+// Steam persona names are display labels, not account usernames. Never
+// prefill the required login username from an unvalidated Steam display name.
+$formUsername = (string) ($completionUser['username'] ?? '');
 $formFirstName = (string) ($completionUser['first_name'] ?? '');
 $formLastName = (string) ($completionUser['last_name'] ?? '');
 $formEmail = (string) ($completionUser['email'] ?? '');
