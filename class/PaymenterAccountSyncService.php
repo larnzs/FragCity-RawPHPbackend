@@ -17,6 +17,7 @@ final class PaymenterAccountSyncService
     public static function sync(PDO $pdo, array $user, string $plainPassword): array
     {
         $steamId = (string) ($user['steamid64'] ?? '');
+        $username = strtolower(trim((string) ($user['username'] ?? '')));
         $email = trim((string) ($user['email'] ?? ''));
         $phone = trim((string) ($user['phone'] ?? ''));
         $firstName = trim((string) ($user['first_name'] ?? ''));
@@ -24,6 +25,10 @@ final class PaymenterAccountSyncService
 
         if (!preg_match('/^[0-9]{17}$/D', $steamId)) {
             return ['success' => false, 'error' => 'invalid_steamid'];
+        }
+        if (!preg_match('/^[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]$/D', $username)) {
+            self::markFailed($pdo, $steamId, 'username_required');
+            return ['success' => false, 'error' => 'username_required'];
         }
         if ($firstName === '' || mb_strlen($firstName) > 191) {
             self::markFailed($pdo, $steamId, 'first_name_required');
@@ -50,6 +55,7 @@ final class PaymenterAccountSyncService
             $client = new PaymenterApiClient();
             $remote = $client->syncUser([
                 'steamid64' => $steamId,
+                'username' => $username,
                 'email' => $email,
                 'phone' => $phone,
                 'first_name' => $firstName,
@@ -141,6 +147,8 @@ final class PaymenterAccountSyncService
     private static function safeErrorCode(string $message): string
     {
         $allowed = [
+            'username_required',
+            'username_already_in_use',
             'first_name_required',
             'last_name_required',
             'paymenter_unreachable',
