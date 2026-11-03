@@ -141,7 +141,9 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 - در صورت داشتن IP خروجی ثابت برای هاست FragCity، آن IP را در `Allowed Source IPs` افزونه Paymenter تنظیم کن.
 - فایل `database/migrations/20261103_paymenter_user_sync.sql` را فقط یک‌بار روی دیتابیس اصلی FragCity اجرا کن.
 - فایل `database/migrations/20261104_client_name_fields.sql` را هم فقط یک‌بار روی همان دیتابیس اجرا کن؛ این Migration ستون‌های `first_name` و `last_name` را اضافه می‌کند. برای جلوگیری از پرشدن نام قانونی با نام نمایشی، رکوردهای قدیمی به‌صورت خودکار حدس زده یا backfill نمی‌شوند؛ کاربران قدیمی هنگام ورود بعدی فرم تکمیل حساب را می‌بینند.
-- نام کوچک و نام خانوادگی در فرم ثبت‌نام و تکمیل حساب اجباری‌اند و Paymenter Bridge نیز هر دو را به‌صورت required می‌پذیرد. Paymenter این مقادیر را در فیلدهای native کاربر ذخیره می‌کند؛ Provisioning رسمی Paymenter آن‌ها را هنگام ساخت کاربر Pterodactyl ارسال می‌کند.
+- نام کاربری در فرم ثبت‌نام و تکمیل حساب اجباری است: ۳ تا ۵۰ کاراکتر، فقط حروف انگلیسی، عدد، `_` و `-`، با حرف/عدد در ابتدا و انتها. نام و نام خانوادگی نیز اجباری‌اند.
+- Bridge مقدار Username را در Paymenter به‌صورت User Property با کلید `fragcity_username` ذخیره می‌کند؛ Paymenter فیلد native برای username ندارد. نام کوچک و نام خانوادگی در فیلدهای native Paymenter ذخیره می‌شوند.
+- افزونه `FragCityCS2` هنگام Provisioning، Username انتخابی و نام‌های native را با Application API در فیلدهای native کاربر Pterodactyl قرار می‌دهد، `external_id` را برابر شناسه کاربر Paymenter تنظیم می‌کند و سپس ساخت سرور را به پیاده‌سازی رسمی Paymenter واگذار می‌کند. Password پنل Pterodactyl همچنان مستقل است و در این مسیر منتقل نمی‌شود.
 - فایل‌های PHP جدید را پس از اعمال Migrationها منتشر کن و برای تست ساختار و اتصال از ریشه پروژه اجرا کن: `php tools/paymenter-api-preflight.php`.
 
 Endpointهای Bridge:
