@@ -259,6 +259,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
             isset($_POST['steam_register']) &&
             (string) $_POST['steam_register'] === '1';
 
+        // Never trust a user-supplied SteamID64 as proof of Steam ownership.
+        // New accounts must arrive through a validated Steam OpenID callback.
+        if (!$isAccountCompletion && !$isSteamRegister) {
+            $_SESSION['auth_error'] = 'برای امنیت حساب، ثبت‌نام جدید باید ابتدا با Steam تأیید شود.';
+            header('Location: index.php?page=register', true, 303);
+            exit;
+        }
+
         $username = trim((string) ($_POST['username'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
         $phone = trim((string) ($_POST['phone'] ?? ''));
