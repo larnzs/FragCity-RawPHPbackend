@@ -178,80 +178,80 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
                         <span>مشخصات حساب</span>
                     </div>
 
-            <div class="form-group">
-                <label for="username">
-                    نام کاربری (Username) <span class="auth-required">*</span>
-                </label>
-                <input
-                    id="username"
-                    type="text"
-                    name="username"
-                    value="<?= htmlspecialchars(strtolower($formUsername), ENT_QUOTES, 'UTF-8') ?>"
-                    placeholder="مثلاً elias_123"
-                    autocomplete="username"
-                    minlength="3"
-                    maxlength="50"
-                    pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,48}[A-Za-z0-9]"
-                    autocapitalize="none"
-                    spellcheck="false"
-                    required
-                >
-                <small class="auth-hint">۳ تا ۵۰ کاراکتر؛ فقط حروف انگلیسی، عدد، خط زیر (_) و خط تیره (-). نام کاربری نباید با _ یا - شروع یا تمام شود.</small>
-            </div>
+                <div class="form-group">
+                    <label for="username">
+                        نام کاربری (Username) <span class="auth-required">*</span>
+                    </label>
+                    <input
+                        id="username"
+                        type="text"
+                        name="username"
+                        value="<?= htmlspecialchars(strtolower($formUsername), ENT_QUOTES, 'UTF-8') ?>"
+                        placeholder="مثلاً elias_123"
+                        autocomplete="username"
+                        minlength="3"
+                        maxlength="50"
+                        pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,48}[A-Za-z0-9]"
+                        autocapitalize="none"
+                        spellcheck="false"
+                        required
+                    >
+                    <small class="auth-hint">۳ تا ۵۰ کاراکتر؛ فقط حروف انگلیسی، عدد، خط زیر (_) و خط تیره (-). نام کاربری نباید با _ یا - شروع یا تمام شود.</small>
+                </div>
 
-            <div class="form-group">
-                <label for="first_name">
-                    نام کوچک <span class="auth-required">*</span>
-                    <span class="auth-optional">Client First Name</span>
-                </label>
-                <input
-                    id="first_name"
-                    type="text"
-                    name="first_name"
-                    value="<?= htmlspecialchars($formFirstName, ENT_QUOTES, 'UTF-8') ?>"
-                    placeholder="نام کوچک"
-                    autocomplete="given-name"
-                    maxlength="191"
-                    required
-                >
-            </div>
+                <div class="form-group">
+                    <label for="first_name">
+                        نام کوچک <span class="auth-required">*</span>
+                        <span class="auth-optional">Client First Name</span>
+                    </label>
+                    <input
+                        id="first_name"
+                        type="text"
+                        name="first_name"
+                        value="<?= htmlspecialchars($formFirstName, ENT_QUOTES, 'UTF-8') ?>"
+                        placeholder="نام کوچک"
+                        autocomplete="given-name"
+                        maxlength="191"
+                        required
+                    >
+                </div>
 
-            <div class="form-group">
-                <label for="last_name">
-                    نام خانوادگی <span class="auth-required">*</span>
-                    <span class="auth-optional">Client Last Name</span>
-                </label>
-                <input
-                    id="last_name"
-                    type="text"
-                    name="last_name"
-                    value="<?= htmlspecialchars($formLastName, ENT_QUOTES, 'UTF-8') ?>"
-                    placeholder="نام خانوادگی"
-                    autocomplete="family-name"
-                    maxlength="191"
-                    required
-                >
-            </div>
+                <div class="form-group">
+                    <label for="last_name">
+                        نام خانوادگی <span class="auth-required">*</span>
+                        <span class="auth-optional">Client Last Name</span>
+                    </label>
+                    <input
+                        id="last_name"
+                        type="text"
+                        name="last_name"
+                        value="<?= htmlspecialchars($formLastName, ENT_QUOTES, 'UTF-8') ?>"
+                        placeholder="نام خانوادگی"
+                        autocomplete="family-name"
+                        maxlength="191"
+                        required
+                    >
+                </div>
 
-            <div class="form-group">
-                <label for="phone">
-                    شماره موبایل <span class="auth-required">*</span>
-                </label>
-                <input
-                    id="phone"
-                    type="tel"
-                    name="phone"
-                    value="<?= htmlspecialchars($formPhone, ENT_QUOTES, 'UTF-8') ?>"
-                    placeholder="09xxxxxxxxx"
-                    autocomplete="tel"
-                    inputmode="numeric"
-                    maxlength="11"
-                    pattern="09[0-9]{9}"
-                    required
-                >
-            </div>
+                <div class="form-group">
+                    <label for="phone">
+                        شماره موبایل <span class="auth-required">*</span>
+                    </label>
+                    <input
+                        id="phone"
+                        type="tel"
+                        name="phone"
+                        value="<?= htmlspecialchars($formPhone, ENT_QUOTES, 'UTF-8') ?>"
+                        placeholder="09xxxxxxxxx"
+                        autocomplete="tel"
+                        inputmode="numeric"
+                        maxlength="11"
+                        pattern="09[0-9]{9}"
+                        required
+                    >
+                </div>
 
-                </section>
+                    </section>
 
                 <section class="auth-form-column auth-form-column--credentials" aria-label="اطلاعات ورود">
                     <div class="auth-form-column-heading">
@@ -259,73 +259,73 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
                         <span>اطلاعات ورود</span>
                     </div>
 
-            <div class="form-group">
-                <label for="email">
-                    ایمیل <span class="auth-required">*</span>
-                </label>
-                <input
-                    id="email"
-                    type="email"
-                    name="email"
-                    value="<?= htmlspecialchars($formEmail, ENT_QUOTES, 'UTF-8') ?>"
-                    placeholder="example@mail.com"
-                    autocomplete="email"
-                    maxlength="100"
-                    required
-                >
-            </div>
-
-            <div class="form-group">
-                <label for="registerPassword">
-                    <?= $isAccountCompletion ? 'رمز عبور مشترک جدید' : 'رمز عبور' ?>
-                    <span class="auth-required">*</span>
-                </label>
-                <div class="password-box">
+                <div class="form-group">
+                    <label for="email">
+                        ایمیل <span class="auth-required">*</span>
+                    </label>
                     <input
-                        id="registerPassword"
-                        type="password"
-                        name="password"
-                        autocomplete="new-password"
-                        minlength="8"
+                        id="email"
+                        type="email"
+                        name="email"
+                        value="<?= htmlspecialchars($formEmail, ENT_QUOTES, 'UTF-8') ?>"
+                        placeholder="example@mail.com"
+                        autocomplete="email"
+                        maxlength="100"
                         required
                     >
-                    <button
-                        type="button"
-                        class="toggle-password"
-                        data-password-toggle
-                        data-password-target="registerPassword"
-                        aria-label="نمایش رمز عبور"
-                    >
-                        <i class="fas fa-eye"></i>
-                    </button>
                 </div>
-                <small class="auth-hint">حداقل ۸ کاراکتر، شامل حروف و عدد. همین رمز برای حساب FragCity و Paymenter استفاده می‌شود.</small>
-            </div>
 
-            <div class="form-group">
-                <label for="registerPasswordConfirm">تکرار رمز عبور <span class="auth-required">*</span></label>
-                <div class="password-box">
-                    <input
-                        id="registerPasswordConfirm"
-                        type="password"
-                        name="password_confirm"
-                        autocomplete="new-password"
-                        minlength="8"
-                        required
-                    >
-                    <button
-                        type="button"
-                        class="toggle-password"
-                        data-password-toggle
-                        data-password-target="registerPasswordConfirm"
-                        aria-label="نمایش رمز عبور"
-                    >
-                        <i class="fas fa-eye"></i>
-                    </button>
+                <div class="form-group">
+                    <label for="registerPassword">
+                        <?= $isAccountCompletion ? 'رمز عبور مشترک جدید' : 'رمز عبور' ?>
+                        <span class="auth-required">*</span>
+                    </label>
+                    <div class="password-box">
+                        <input
+                            id="registerPassword"
+                            type="password"
+                            name="password"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+                        <button
+                            type="button"
+                            class="toggle-password"
+                            data-password-toggle
+                            data-password-target="registerPassword"
+                            aria-label="نمایش رمز عبور"
+                        >
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <small class="auth-hint">حداقل ۸ کاراکتر، شامل حروف و عدد. همین رمز برای حساب FragCity و Paymenter استفاده می‌شود.</small>
                 </div>
-            </div>
 
-                </section>
+                <div class="form-group">
+                    <label for="registerPasswordConfirm">تکرار رمز عبور <span class="auth-required">*</span></label>
+                    <div class="password-box">
+                        <input
+                            id="registerPasswordConfirm"
+                            type="password"
+                            name="password_confirm"
+                            autocomplete="new-password"
+                            minlength="8"
+                            required
+                        >
+                        <button
+                            type="button"
+                            class="toggle-password"
+                            data-password-toggle
+                            data-password-target="registerPasswordConfirm"
+                            aria-label="نمایش رمز عبور"
+                        >
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                    </section>
             </div>
 
             <button type="submit" class="btn-auth-submit">
