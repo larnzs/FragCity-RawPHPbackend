@@ -197,3 +197,21 @@
 **پیامدها و محدودیت‌ها:** SURY مخزن رسمی Debian نیست؛ کلید، suite و معماری باید حفظ و تغییرات امنیتی/سازگاری آن پایش شود. وجود extensionهای موردنیاز و نسخهٔ واقعی Composer باید قبل از دانلود dependencyهای Panel تأیید شود. این ADR فقط محیط آزمایشگاهی را پوشش می‌دهد و به‌تنهایی سیاست Production یا ارتقای آینده را تعیین نمی‌کند.
 
 **مرجع:** [Pterodactyl PoC](PTERODACTYL-POC.md)، [Debian PoC Log](DEBIAN-POC.md)، https://getcomposer.org/download/.
+
+## ADR-018 — FragCity owns the customer/admin UI; Paymenter is a private backend supervisor
+
+**Status:** Accepted by the user for the FragCity hosting product.
+
+**Decision:** The Raw PHP FragCity website owns all public/customer and administrator interfaces, including the custom server storefront, checkout, customer server panel and administrator control panel. The default Paymenter UI and the Pterodactyl customer UI are not part of the customer journey; credentials or direct panel access must not be exposed to customers.
+
+**Paymenter responsibilities:** Keep Paymenter as an internal commercial/service supervisor for its useful records and workflows: users, orders, services, invoices, invoice items, tickets, expiry/billing lifecycle and server provisioning through the FragCity CS2 server extension. Use the Admin API where it is sufficient and a small authenticated route in the existing FragCity extension where the standard API has a confirmed gap. Do not fork or patch Paymenter core unless a separately approved blocker makes it unavoidable.
+
+**Pterodactyl responsibilities:** Remain the authority for server records, node/allocation assignment, container limits and the actual server process lifecycle. All customer actions are mediated by FragCity's backend; no Pterodactyl Application API key, Client API token or Wings credential is ever exposed to the browser.
+
+**Payment boundary:** FragCity creates and verifies the Zarinpal payment on its own backend. Only after server-side verification of the exact amount and Authority may the verified order be forwarded to the Paymenter Bridge. A durable local order/outbox and a unique external order UUID must make retries and duplicate callbacks safe. Paymenter invoices must be settled through its supported payment transaction mechanism (for example, ExtensionHelper::addPayment() in v1.5.9), not by raw SQL or a status-only mutation.
+
+**Configuration boundary:** Price catalogue, hardware labels/node profiles and customer-facing options are owned by FragCity. The validated game-server Environment values are passed to Paymenter/Pterodactyl only through the Bridge. Persistent plugin/game-mode settings are managed separately through controlled file operations; RCON is for live commands and is not a substitute for durable CFG/JSON edits.
+
+**First implementation gate:** Begin with a read-only HTTPS Paymenter Admin API client and CLI preflight using a least-privilege key. Do not enable order, invoice, payment or provisioning writes until this connectivity test passes and the Bridge request contract is reviewed.
+
+**References:** [FragCity ↔ Paymenter Backend Integration](PAYMENTER-BACKEND-INTEGRATION.md), [Paymenter API routes v1.5.9](https://github.com/Paymenter/Paymenter/blob/v1.5.9/routes/api.php), [Paymenter ExtensionHelper v1.5.9](https://github.com/Paymenter/Paymenter/blob/v1.5.9/app/Helpers/ExtensionHelper.php).
