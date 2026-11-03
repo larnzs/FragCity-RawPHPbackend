@@ -73,6 +73,11 @@
       "_comment": "Public read-only Uptime Kuma Status Page. Use the HTTPS origin only and a published public Status Page slug. No API key or admin password belongs here.",
       "base_url": "https://status.fragcity.ir",
       "status_page_slug": "fragcity"
+    },
+    "paymenter_backend": {
+      "_comment": "Private server-to-server connection to the Paymenter Admin API. This key is backend-only; never expose it to browser JavaScript or commit a real value.",
+      "base_url": "",
+      "api_key": ""
     }
   },
   "files": {
