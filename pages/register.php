@@ -81,6 +81,7 @@ $formPhone = (string) ($completionUser['phone'] ?? '');
             </div>
         <?php endif; ?>
 
+        <?php if ($isSteamRegister || $isAccountCompletion): ?>
         <form id="registerForm" method="post" action="">
             <input type="hidden" name="auth_action" value="register">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string) ($authCsrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>">
@@ -223,6 +224,11 @@ $formPhone = (string) ($completionUser['phone'] ?? '');
                 <?php endif; ?>
             </button>
         </form>
+        <?php else: ?>
+            <div class="auth-separator">
+                <span>برای امنیت حساب، ابتدا مالکیت Steam خود را تأیید کنید.</span>
+            </div>
+        <?php endif; ?>
 
         <p class="auth-switch">
             <?php if ($isAccountCompletion): ?>
