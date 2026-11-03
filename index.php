@@ -305,7 +305,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
         } elseif ($lastName === '' || mb_strlen($lastName) > 191) {
             $_SESSION['auth_error'] = 'نام خانوادگی الزامی است و نباید بیشتر از ۱۹۱ کاراکتر باشد.';
             $hasError = true;
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {
             $_SESSION['auth_error'] = 'ایمیل معتبر و قابل استفاده وارد کنید.';
             $hasError = true;
         } elseif (!preg_match('/^09[0-9]{9}$/D', $phone)) {
