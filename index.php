@@ -271,7 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
             exit;
         }
 
-        $username = trim((string) ($_POST['username'] ?? ''));
+        $username = strtolower(trim((string) ($_POST['username'] ?? '')));
         $firstName = trim((string) ($_POST['first_name'] ?? ''));
         $lastName = trim((string) ($_POST['last_name'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
@@ -295,6 +295,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
 
         if (!preg_match('/^[0-9]{17}$/D', $steamid)) {
             $_SESSION['auth_error'] = 'SteamID باید ۱۷ رقم باشد.';
+            $hasError = true;
+        } elseif (!preg_match('/^[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]$/D', $username)) {
+            $_SESSION['auth_error'] = 'نام کاربری باید ۳ تا ۵۰ کاراکتر، با حروف انگلیسی یا عدد در ابتدا و انتها و فقط شامل حروف انگلیسی، عدد، خط زیر (_) و خط تیره (-) باشد.';
             $hasError = true;
         } elseif ($firstName === '' || mb_strlen($firstName) > 191) {
             $_SESSION['auth_error'] = 'نام کوچک الزامی است و نباید بیشتر از ۱۹۱ کاراکتر باشد.';
@@ -336,6 +339,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                 }
 
                 if (!$hasError) {
+                    $usernameCheck = $pdo->prepare(
+                        'SELECT id FROM users WHERE username = ? AND steamid64 <> ? LIMIT 1'
+                    );
+                    $usernameCheck->execute([$username, $steamid]);
+                    if ($usernameCheck->fetch()) {
+                        $_SESSION['auth_error'] = 'این نام کاربری قبلاً استفاده شده است؛ نام دیگری انتخاب کنید.';
+                        $hasError = true;
+                    }
+                }
+
+                if (!$hasError) {
                     $phoneCheck = $pdo->prepare(
                         'SELECT id FROM users WHERE phone = ? AND steamid64 <> ? LIMIT 1'
                     );
@@ -361,7 +375,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                      LIMIT 1'
                 );
                 $update->execute([
-                    $username !== '' ? $username : (string) ($_SESSION['username'] ?? $steamid),
+                    $username,
                     $firstName,
                     $lastName,
                     $email,
@@ -391,9 +405,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                     redirect_back('index.php?page=register&complete=1');
                 }
 
-                $_SESSION['username'] = $username !== ''
-                    ? $username
-                    : (string) ($_SESSION['username'] ?? $steamid);
+                $_SESSION['username'] = $username;
                 unset($_SESSION['auth_error'], $_SESSION['steam_temp']);
 
                 header('Location: index.php', true, 303);
@@ -441,7 +453,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                 $stmt->execute([
                     $steamid,
                     $steam,
-                    $username !== '' ? $username : null,
+                    $username,
                     $firstName,
                     $lastName,
                     $email,
@@ -589,13 +601,14 @@ $paymenterSyncRequired = false;
 if ($isLoggedIn && $pdo instanceof PDO) {
     try {
         $syncLookup = $pdo->prepare(
-            'SELECT first_name, last_name, email, phone, paymenter_user_id, paymenter_sync_status
+            'SELECT username, first_name, last_name, email, phone, paymenter_user_id, paymenter_sync_status
              FROM users WHERE steamid64 = ? LIMIT 1'
         );
         $syncLookup->execute([(string) ($_SESSION['steamid'] ?? '')]);
         $syncState = $syncLookup->fetch(PDO::FETCH_ASSOC);
 
         $paymenterSyncRequired = !$syncState
+            || !preg_match('/^[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]$/D', strtolower(trim((string) ($syncState['username'] ?? ''))))
             || trim((string) ($syncState['first_name'] ?? '')) === ''
             || trim((string) ($syncState['last_name'] ?? '')) === ''
             || !filter_var(trim((string) ($syncState['email'] ?? '')), FILTER_VALIDATE_EMAIL)
