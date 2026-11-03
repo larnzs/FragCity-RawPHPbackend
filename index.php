@@ -23,6 +23,7 @@ $pdo=fragcity_create_pdo($indexProfile);
  | Explicit Remember-Me Restoration
  ========================================================== */
 require_once __DIR__ . '/class/RememberMeService.php';
+require_once __DIR__ . '/class/PaymenterAccountSyncService.php';
 
 $activeSteamId = (
     isset($_SESSION['user_logged_in']) &&
@@ -213,6 +214,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                 (string) ($_POST['remember_me'] ?? '') === '1'
             );
 
+            $emailReady = filter_var(trim((string) ($user['email'] ?? '')), FILTER_VALIDATE_EMAIL) !== false;
+            $phoneReady = preg_match('/^09[0-9]{9}$/D', trim((string) ($user['phone'] ?? ''))) === 1;
+
+            if (!$emailReady || !$phoneReady) {
+                $_SESSION['auth_error'] = 'برای اتصال حساب به پنل سرور، ایمیل معتبر و شماره موبایل خود را تکمیل کنید.';
+                header('Location: index.php?page=register&complete=1', true, 303);
+                exit;
+            }
+
+            // FragCity is the identity source of truth. The password was just
+            // verified locally, so it can be synchronized through the private
+            // signed backend channel without being stored in the session.
+            $sync = PaymenterAccountSyncService::sync($pdo, $user, $password);
+            if (!$sync['success']) {
+                $_SESSION['auth_error'] = 'ورود انجام شد، اما همگام‌سازی حساب سرور کامل نشد. اطلاعات و رمز مشترک را دوباره تأیید کنید.';
+                header('Location: index.php?page=register&complete=1', true, 303);
+                exit;
+            }
+
             $redirect = safe_local_redirect(
                 $_SESSION['login_return_url'] ?? '',
                 'index.php'
@@ -228,91 +248,181 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
         redirect_back();
     }
 
-    /* ------------------------- Register ------------------------- */
+    /* ------------------------- Register / Account Completion ------------------------- */
     if ($authAction === 'register') {
+        $isAccountCompletion =
+            isset($_POST['account_completion']) &&
+            (string) $_POST['account_completion'] === '1';
+
         $isSteamRegister =
+            !$isAccountCompletion &&
             isset($_POST['steam_register']) &&
             (string) $_POST['steam_register'] === '1';
-
-        $steamid = $isSteamRegister
-            ? (string) ($_SESSION['steam_temp']['steamid64'] ?? '')
-            : trim((string) ($_POST['steamid64'] ?? ''));
 
         $username = trim((string) ($_POST['username'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
         $phone = trim((string) ($_POST['phone'] ?? ''));
-        $password = $isSteamRegister
-            ? ''
-            : (string) ($_POST['password'] ?? '');
-        $passwordConfirm = $isSteamRegister
-            ? ''
-            : (string) ($_POST['password_confirm'] ?? '');
+        $password = (string) ($_POST['password'] ?? '');
+        $passwordConfirm = (string) ($_POST['password_confirm'] ?? '');
+
+        $steamid = $isAccountCompletion
+            ? (string) ($_SESSION['steamid'] ?? '')
+            : ($isSteamRegister
+                ? (string) ($_SESSION['steam_temp']['steamid64'] ?? '')
+                : trim((string) ($_POST['steamid64'] ?? '')));
 
         $hasError = false;
 
-        if (!preg_match('/^[0-9]{17}$/', $steamid)) {
+        if ($isAccountCompletion && empty($_SESSION['user_logged_in'])) {
+            $_SESSION['auth_error'] = 'برای تکمیل حساب ابتدا وارد شوید.';
+            header('Location: index.php?page=login', true, 303);
+            exit;
+        }
+
+        if (!preg_match('/^[0-9]{17}$/D', $steamid)) {
             $_SESSION['auth_error'] = 'SteamID باید ۱۷ رقم باشد.';
             $hasError = true;
-        } elseif (!preg_match('/^09[0-9]{9}$/', $phone)) {
+        } elseif ($username !== '' && mb_strlen($username) > 50) {
+            $_SESSION['auth_error'] = 'نام نمایشی نباید بیشتر از ۵۰ کاراکتر باشد.';
+            $hasError = true;
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {
+            $_SESSION['auth_error'] = 'ایمیل معتبر و قابل استفاده وارد کنید.';
+            $hasError = true;
+        } elseif (!preg_match('/^09[0-9]{9}$/D', $phone)) {
             $_SESSION['auth_error'] = 'شماره موبایل معتبر نیست.';
             $hasError = true;
-        } elseif (!$isSteamRegister && $password !== $passwordConfirm) {
+        } elseif ($password !== $passwordConfirm) {
             $_SESSION['auth_error'] = 'رمز عبور و تکرار آن مطابقت ندارند.';
             $hasError = true;
-        } elseif (!$isSteamRegister && strlen($password) < 6) {
-            $_SESSION['auth_error'] = 'رمز عبور حداقل باید ۶ کاراکتر باشد.';
+        } elseif (!PaymenterAccountSyncService::isStrongPassword($password)) {
+            $_SESSION['auth_error'] = 'رمز عبور باید حداقل ۸ کاراکتر و شامل حروف و عدد باشد.';
             $hasError = true;
-        } elseif (!$pdo) {
+        } elseif (!($pdo instanceof PDO)) {
             $_SESSION['auth_error'] = 'خطا در اتصال به دیتابیس.';
             $hasError = true;
         }
 
         if (!$hasError) {
             try {
+                // Existing rows may contain NULL/duplicate legacy values, so
+                // check collisions before adding any database-wide email index.
+                $emailCheck = $pdo->prepare(
+                    'SELECT id FROM users WHERE email = ? AND steamid64 <> ? LIMIT 1'
+                );
+                $emailCheck->execute([$email, $steamid]);
+                if ($emailCheck->fetch()) {
+                    $_SESSION['auth_error'] = 'این ایمیل قبلاً برای حساب دیگری در FragCity ثبت شده است.';
+                    $hasError = true;
+                }
+
+                if (!$hasError) {
+                    $phoneCheck = $pdo->prepare(
+                        'SELECT id FROM users WHERE phone = ? AND steamid64 <> ? LIMIT 1'
+                    );
+                    $phoneCheck->execute([$phone, $steamid]);
+                    if ($phoneCheck->fetch()) {
+                        $_SESSION['auth_error'] = 'این شماره موبایل قبلاً برای حساب دیگری ثبت شده است.';
+                        $hasError = true;
+                    }
+                }
+            } catch (PDOException $e) {
+                error_log('[FragCity] Registration identity lookup failed (SQLSTATE ' . $e->getCode() . ').');
+                $_SESSION['auth_error'] = 'در حال حاضر امکان بررسی اطلاعات حساب وجود ندارد.';
+                $hasError = true;
+            }
+        }
+
+        if ($isAccountCompletion && !$hasError) {
+            try {
+                $update = $pdo->prepare(
+                    'UPDATE users
+                     SET username = ?, email = ?, phone = ?, password_hash = ?
+                     WHERE steamid64 = ?
+                     LIMIT 1'
+                );
+                $update->execute([
+                    $username !== '' ? $username : (string) ($_SESSION['username'] ?? $steamid),
+                    $email,
+                    $phone,
+                    password_hash($password, PASSWORD_BCRYPT),
+                    $steamid,
+                ]);
+
+                $select = $pdo->prepare('SELECT * FROM users WHERE steamid64 = ? LIMIT 1');
+                $select->execute([$steamid]);
+                $currentUser = $select->fetch(PDO::FETCH_ASSOC);
+
+                if (!$currentUser) {
+                    throw new RuntimeException('updated_fragcity_user_not_found');
+                }
+
+                $sync = PaymenterAccountSyncService::sync($pdo, $currentUser, $password);
+                if (!$sync['success']) {
+                    $safeSyncError = (string) ($sync['error'] ?? 'paymenter_sync_failed');
+                    $_SESSION['auth_error'] = match ($safeSyncError) {
+                        'email_already_in_use' => 'این ایمیل در Paymenter قبلاً ثبت شده است. برای اتصال باید رمز همان حساب را وارد کنید یا از پشتیبانی کمک بگیرید.',
+                        'email_already_linked_to_another_paymenter_user',
+                        'paymenter_user_already_linked_to_another_steam_account' => 'این ایمیل یا حساب Paymenter به یک حساب Steam دیگر متصل است؛ برای جلوگیری از ادغام اشتباه حساب‌ها با پشتیبانی تماس بگیرید.',
+                        'paymenter_unreachable' => 'ارتباط با سرویس حساب سرور موقتاً برقرار نشد. دوباره تلاش کنید.',
+                        default => 'اطلاعات FragCity ذخیره شد، اما اتصال حساب Paymenter کامل نشد. دوباره تلاش کنید.',
+                    };
+                    redirect_back('index.php?page=register&complete=1');
+                }
+
+                $_SESSION['username'] = $username !== ''
+                    ? $username
+                    : (string) ($_SESSION['username'] ?? $steamid);
+                unset($_SESSION['auth_error'], $_SESSION['steam_temp']);
+
+                header('Location: index.php', true, 303);
+                exit;
+            } catch (PDOException $e) {
+                error_log('[FragCity] Account completion update failed (SQLSTATE ' . $e->getCode() . ').');
+                $_SESSION['auth_error'] = 'ذخیره اطلاعات حساب انجام نشد؛ دوباره تلاش کنید.';
+                redirect_back('index.php?page=register&complete=1');
+            } catch (Throwable $e) {
+                error_log('[FragCity] Account completion failed (' . get_class($e) . ').');
+                $_SESSION['auth_error'] = 'تکمیل حساب انجام نشد؛ دوباره تلاش کنید.';
+                redirect_back('index.php?page=register&complete=1');
+            }
+        }
+
+        if (!$isAccountCompletion && !$hasError) {
+            try {
                 $stmt = $pdo->prepare(
                     'SELECT id FROM users WHERE steamid64 = ? LIMIT 1'
                 );
                 $stmt->execute([$steamid]);
                 $existingUser = $stmt->fetch();
+
+                if ($existingUser) {
+                    $_SESSION['auth_error'] = 'این SteamID قبلاً ثبت‌نام کرده است؛ وارد شوید تا حساب موجود را تکمیل کنید.';
+                    $hasError = true;
+                }
             } catch (PDOException $e) {
                 error_log('[FragCity] Registration lookup failed (SQLSTATE ' . $e->getCode() . ').');
                 $_SESSION['auth_error'] = 'در حال حاضر امکان ثبت‌نام وجود ندارد؛ اتصال دیتابیس را بررسی کنید.';
-                redirect_back();
-            }
-
-            if ($existingUser) {
-                $_SESSION['auth_error'] = 'این SteamID قبلاً ثبت‌نام کرده است.';
                 $hasError = true;
             }
         }
 
-        if (!$hasError) {
-            $hash = $isSteamRegister
-                ? password_hash(
-                    bin2hex(random_bytes(16)),
-                    PASSWORD_BCRYPT
-                )
-                : password_hash(
-                    $password,
-                    PASSWORD_BCRYPT
-                );
-
+        if (!$isAccountCompletion && !$hasError) {
             $steam = steamid64_to_steam($steamid);
 
             try {
                 $stmt = $pdo->prepare(
-                    'INSERT INTO users
-                        (steamid64, steam, username, email, phone, password_hash)
-                     VALUES (?, ?, ?, ?, ?, ?)'
+                    "INSERT INTO users
+                        (steamid64, steam, username, email, phone, password_hash, paymenter_sync_status)
+                     VALUES (?, ?, ?, ?, ?, ?, 'pending')"
                 );
 
                 $stmt->execute([
                     $steamid,
                     $steam,
                     $username !== '' ? $username : null,
-                    $email !== '' ? $email : null,
+                    $email,
                     $phone,
-                    $hash,
+                    password_hash($password, PASSWORD_BCRYPT),
                 ]);
             } catch (PDOException $e) {
                 error_log('[FragCity] Registration insert failed (SQLSTATE ' . $e->getCode() . ').');
@@ -320,45 +430,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                 redirect_back();
             }
 
-            // Steam OpenID registration has just created the user row; now persist the
-            // normalized public Steam summary without making signup depend on the migration.
+            // Persist the normalized Steam public summary when this signup came
+            // through OpenID. A profile API failure must not block registration.
             if ($isSteamRegister) {
                 try {
                     require_once __DIR__ . '/class/SteamProfileService.php';
                     $profileForStorage = $_SESSION['steam_profile_cache'][$steamid]['player']
                         ?? ($_SESSION['steam_profile'] ?? []);
 
-                    // Persist only a normalized Steam API summary for this exact account.
-                    // If Steam is temporarily unavailable, don't store the SteamID as a
-                    // fabricated persona name; the next successful login can fill the fields.
                     if (
                         !is_array($profileForStorage)
-                        || (string)($profileForStorage['steamid'] ?? '') !== $steamid
+                        || (string) ($profileForStorage['steamid'] ?? '') !== $steamid
                     ) {
                         $profileForStorage = [];
                     }
 
                     if ($profileForStorage !== []) {
-                        $profilePersisted = SteamProfileService::persistPlayerSummary($pdo, $steamid, $profileForStorage);
-                        error_log($profilePersisted
-                            ? '[FragCity] Steam profile persistence after registration completed for the matching users row.'
-                            : '[FragCity] Steam profile persistence after registration found no matching users row.');
-                    } else {
-                        error_log('[FragCity] Steam profile persistence after registration skipped: no usable Steam summary was present in session.');
+                        SteamProfileService::persistPlayerSummary($pdo, $steamid, $profileForStorage);
                     }
                 } catch (Throwable $profileStoreError) {
-                    error_log('[FragCity] Steam profile persistence after registration failed (' . get_class($profileStoreError) . ', code ' . (string)$profileStoreError->getCode() . '): ' . substr($profileStoreError->getMessage(), 0, 300));
+                    error_log('[FragCity] Steam profile persistence after registration failed (' . get_class($profileStoreError) . ').');
                 }
             }
 
             session_regenerate_id(true);
             $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
-
             $_SESSION['user_logged_in'] = true;
             $_SESSION['steamid'] = $steamid;
-            $_SESSION['username'] = $username !== ''
-                ? $username
-                : $steamid;
+            $_SESSION['username'] = $username !== '' ? $username : $steamid;
             $_SESSION['role'] = 'user';
 
             if ($isSteamRegister) {
@@ -369,12 +468,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                 );
             }
 
+            $select = $pdo->prepare('SELECT * FROM users WHERE steamid64 = ? LIMIT 1');
+            $select->execute([$steamid]);
+            $newUser = $select->fetch(PDO::FETCH_ASSOC);
+
+            if (!$newUser) {
+                $_SESSION['auth_error'] = 'حساب FragCity ساخته شد، اما خواندن اطلاعات حساب ممکن نشد.';
+                header('Location: index.php?page=register&complete=1', true, 303);
+                exit;
+            }
+
+            $sync = PaymenterAccountSyncService::sync($pdo, $newUser, $password);
+            if (!$sync['success']) {
+                $_SESSION['auth_error'] = 'حساب FragCity ساخته شد، اما همگام‌سازی Paymenter کامل نشد. اطلاعات را دوباره تأیید کنید.';
+                header('Location: index.php?page=register&complete=1', true, 303);
+                exit;
+            }
+
             unset($_SESSION['remember_login_requested']);
             unset($_SESSION['steam_temp']);
             unset($_SESSION['login_return_url']);
 
             header('Location: index.php', true, 303);
             exit;
+        }
+
+        if ($isAccountCompletion) {
+            redirect_back('index.php?page=register&complete=1');
         }
 
         redirect_back();
@@ -435,6 +555,38 @@ $current_page = $page;
 $isLoggedIn =
     isset($_SESSION['user_logged_in']) &&
     $_SESSION['user_logged_in'] === true;
+
+/* Keep an authenticated account linked before exposing account/server features.
+ * Password login synchronizes with the password just verified. Steam and
+ * remember-me sessions without a local plaintext password are sent through the
+ * account-completion form to choose/confirm a shared password.
+ */
+$paymenterSyncRequired = false;
+if ($isLoggedIn && $pdo instanceof PDO) {
+    try {
+        $syncLookup = $pdo->prepare(
+            'SELECT email, phone, paymenter_user_id, paymenter_sync_status
+             FROM users WHERE steamid64 = ? LIMIT 1'
+        );
+        $syncLookup->execute([(string) ($_SESSION['steamid'] ?? '')]);
+        $syncState = $syncLookup->fetch(PDO::FETCH_ASSOC);
+
+        $paymenterSyncRequired = !$syncState
+            || !filter_var(trim((string) ($syncState['email'] ?? '')), FILTER_VALIDATE_EMAIL)
+            || !preg_match('/^09[0-9]{9}$/D', trim((string) ($syncState['phone'] ?? '')))
+            || (int) ($syncState['paymenter_user_id'] ?? 0) < 1
+            || (string) ($syncState['paymenter_sync_status'] ?? '') !== 'synced';
+    } catch (PDOException $e) {
+        error_log('[FragCity] Paymenter sync-state lookup failed (SQLSTATE ' . $e->getCode() . ').');
+        $paymenterSyncRequired = true;
+    }
+}
+
+if ($paymenterSyncRequired && $page !== 'register') {
+    $_SESSION['auth_error'] = 'برای استفاده از حساب و خرید سرور، همگام‌سازی حساب Paymenter را تکمیل کنید.';
+    header('Location: index.php?page=register&complete=1', true, 303);
+    exit;
+}
 
 /* Pages that require authentication. */
 $protectedPages = [
