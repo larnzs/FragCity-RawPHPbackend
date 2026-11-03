@@ -861,14 +861,6 @@
     margin-bottom: 15px;
 }
 
-.auth-page:has(#registerForm) #registerForm .btn-auth-submit {
-    margin-top: 17px;
-}
-
-.auth-page:has(#registerForm) .auth-switch {
-    margin-top: 16px;
-}
-
 .auth-page:has(#registerForm) #registerForm .form-group {
     margin-bottom: 14px;
 }
@@ -880,11 +872,11 @@
 
 .auth-page:has(#registerForm) #registerForm .btn-auth-submit {
     min-height: 50px;
-    margin-top: 3px;
+    margin-top: 17px;
 }
 
 .auth-page:has(#registerForm) .auth-switch {
-    margin-top: 20px;
+    margin-top: 16px;
 }
 
 @media (max-width: 820px) {
