@@ -134,16 +134,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
             return function_exists('mb_strlen') ? mb_strlen($value, 'UTF-8') : strlen($value);
         };
 
-        $displayName = $cleanProfileText($readProfileField('username'));
+        $displayName = strtolower($cleanProfileText($readProfileField('username')));
         $email = strtolower($readProfileField('email'));
         $phone = preg_replace('/[\\s()-]+/', '', $readProfileField('phone')) ?? '';
 
-        if (
-            $displayName === ''
-            || $profileTextLength($displayName) > 128
-            || preg_match('/[\\x00-\\x1F\\x7F]/u', $displayName)
-        ) {
-            profileRespond('یک نام کاربری معتبر وارد کنید.', 422);
+        if (!preg_match('/^[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]$/D', $displayName)) {
+            profileRespond('نام کاربری باید ۳ تا ۵۰ کاراکتر و فقط شامل حروف انگلیسی، عدد، خط زیر (_) و خط تیره (-) باشد؛ ابتدا و انتهای آن باید حرف یا عدد باشد.', 422);
         }
 
         if (
@@ -971,12 +967,16 @@ if (!function_exists('formatPlaytime')) {
                             type="text"
                             name="username"
                             value="<?= htmlspecialchars((string)($profileAccountSettings['username'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
-                            placeholder="نامی که در FragCity نمایش داده می‌شود"
-                            autocomplete="nickname"
-                            maxlength="128"
+                            placeholder="مثلاً elias_123"
+                            autocomplete="username"
+                            minlength="3"
+                            maxlength="50"
+                            pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,48}[A-Za-z0-9]"
+                            autocapitalize="none"
+                            spellcheck="false"
                             required
                         >
-                        <small>این نام کاربری در بخش‌های سایت نمایش داده می‌شود و برای ورود هم قابل استفاده است.</small>
+                        <small>فقط حروف انگلیسی، عدد، خط زیر (_) و خط تیره (-)؛ این نام برای ورود و حساب Pterodactyl استفاده می‌شود.</small>
                     </label>
 
                     <label class="profile-settings-field" for="profileEmail">
