@@ -789,7 +789,7 @@
 
 .auth-page:has(#registerForm) .auth-container {
     width: 100%;
-    max-width: 520px;
+    max-width: 940px;
     margin: 0 auto;
     padding: clamp(24px, 3vw, 34px);
 }
@@ -805,6 +805,68 @@
 
 .auth-page:has(#registerForm) .auth-subtitle {
     margin-bottom: 22px;
+}
+
+/* Registration form: two balanced columns on desktop, stacked on mobile. */
+.auth-page:has(#registerForm) #registerForm .auth-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    direction: rtl;
+    align-items: stretch;
+}
+
+.auth-page:has(#registerForm) #registerForm .auth-form-column {
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.075);
+    border-radius: 15px;
+    background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012)),
+        rgba(7, 7, 7, 0.2);
+}
+
+.auth-page:has(#registerForm) #registerForm .auth-form-column-heading {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+    color: #E5E5E5;
+    font-size: 0.88rem;
+    font-weight: 800;
+}
+
+.auth-page:has(#registerForm) #registerForm .auth-form-column-heading i {
+    color: #FB923C;
+    font-size: 0.95rem;
+}
+
+.auth-page:has(#registerForm) #registerForm .auth-form-column .form-group {
+    margin-bottom: 13px;
+}
+
+.auth-page:has(#registerForm) #registerForm .auth-form-column .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.auth-page:has(#registerForm) #registerForm .auth-hint {
+    display: block;
+    margin-top: 7px;
+    line-height: 1.75;
+}
+
+.auth-page:has(#registerForm) #registerForm .auth-form-wide {
+    margin-bottom: 15px;
+}
+
+.auth-page:has(#registerForm) #registerForm .btn-auth-submit {
+    margin-top: 17px;
+}
+
+.auth-page:has(#registerForm) .auth-switch {
+    margin-top: 16px;
 }
 
 .auth-page:has(#registerForm) #registerForm .form-group {
@@ -825,6 +887,17 @@
     margin-top: 20px;
 }
 
+@media (max-width: 820px) {
+    .auth-page:has(#registerForm) #registerForm .auth-form-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 13px;
+    }
+
+    .auth-page:has(#registerForm) #registerForm .auth-form-column {
+        padding: 16px;
+    }
+}
+
 @media (max-width: 768px) {
     .auth-page:has(#registerForm) {
         padding-top: calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px));
@@ -833,7 +906,7 @@
     }
 
     .auth-page:has(#registerForm) .auth-container {
-        max-width: 500px;
+        max-width: 720px;
         padding: 26px 24px;
     }
 }
