@@ -41,6 +41,8 @@ $completionSyncStatus = (string) ($completionUser['paymenter_sync_status'] ?? 'p
 $completionSyncError = (string) ($completionUser['paymenter_sync_error'] ?? '');
 
 $syncErrorDescriptions = [
+    'username_required' => 'نام کاربری معتبر برای حساب الزامی است.',
+    'username_already_in_use' => 'این نام کاربری قبلاً استفاده شده است؛ نام دیگری انتخاب کنید.',
     'first_name_required' => 'نام کوچک برای ساخت حساب کاربری الزامی است.',
     'last_name_required' => 'نام خانوادگی برای ساخت حساب کاربری الزامی است.',
     'email_required' => 'ایمیل معتبر برای همگام‌سازی ثبت نشده است.',
@@ -173,17 +175,23 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
 
             <div class="form-group">
                 <label for="username">
-                    نام نمایشی <span class="auth-optional">اختیاری</span>
+                    نام کاربری (Username) <span class="auth-required">*</span>
                 </label>
                 <input
                     id="username"
                     type="text"
                     name="username"
-                    value="<?= htmlspecialchars($formUsername, ENT_QUOTES, 'UTF-8') ?>"
-                    placeholder="نام شما"
-                    autocomplete="nickname"
+                    value="<?= htmlspecialchars(strtolower($formUsername), ENT_QUOTES, 'UTF-8') ?>"
+                    placeholder="مثلاً elias_123"
+                    autocomplete="username"
+                    minlength="3"
                     maxlength="50"
+                    pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,48}[A-Za-z0-9]"
+                    autocapitalize="none"
+                    spellcheck="false"
+                    required
                 >
+                <small class="auth-hint">۳ تا ۵۰ کاراکتر؛ فقط حروف انگلیسی، عدد، خط زیر (_) و خط تیره (-). نام کاربری نباید با _ یا - شروع یا تمام شود.</small>
             </div>
 
             <div class="form-group">
