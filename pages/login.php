@@ -31,12 +31,12 @@ unset($_SESSION['auth_error']);
 
             <!-- SteamID / Username / Phone -->
             <div class="form-group">
-                <label for="loginId">SteamID64، نام کاربری یا شماره تلفن</label>
+                <label for="loginId">ایمیل، SteamID64، نام کاربری یا شماره تلفن</label>
                 <input
                     id="loginId"
                     type="text"
                     name="login_id"
-                    placeholder="7656119xxxxxxxxx / username / 09xxxxxxxxx"
+                    placeholder="email@example.com / 7656119xxxxxxxxx / username / 09xxxxxxxxx"
                     autocomplete="username"
                     required
                 >
