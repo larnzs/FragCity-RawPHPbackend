@@ -130,15 +130,6 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 
 تنظیمات Standby شامل `node_id`، Allowlist مربوط به Egg/Image، `query_host` داخلی، `public_connect_host`، TTL و مسیر Cache است. Monitoring علاوه بر Allowlist نودها، تنظیمات Wings و در صورت نیاز `local_node_id` و `host_metrics_disk_path` دارد.
 
-## ۸. محافظت از تنظیمات
-
-- فایل `settings/settings.json` نباید وارد Git شود؛ الگوی آن در `.gitignore` وجود دارد.
-- در Apache فایل `settings/.htaccess` دسترسی مستقیم را مسدود می‌کند.
-- Nginx فایل `.htaccess` را اجرا نمی‌کند؛ `settings/nginx-protect.conf` را داخل server block سایت Include کن یا فایل Runtime را بیرون DocumentRoot قرار بده و `FRAGCITY_SETTINGS_FILE` را تنظیم کن.
-- فایل `/etc/fragcity-api/config.php` باید بیرون DocumentRoot و فقط برای PHP-FPM قابل‌خواندن باشد؛ PHP-FPM نباید بتواند آن را بنویسد.
-- فایل‌های Nginx API در `linuxapi/nginx/` نمونه هستند؛ vhost پنل Pterodactyl را با آن‌ها جایگزین نکن.
-- هیچ Secret، Application API token، Wings token یا Database password را در Git، چت یا مرورگر قرار نده.
-
 ## ۸. Paymenter Account Bridge
 
 ثبت‌نام و هویت کاربران از FragCity مدیریت می‌شود. Add-on اختصاصی `FragCityAPI` در Paymenter فقط از ارتباط سروربه‌سرور استفاده می‌کند و Core پرداخت‌یار را تغییر نمی‌دهد.
@@ -159,7 +150,16 @@ Endpointهای Bridge:
 
 برای جلوگیری از ساخت حساب تکراری، ستون `paymenter_user_id` در دیتابیس سایت شناسه حساب متناظر را نگه می‌دارد. تلفن و SteamID در Paymenter به‌صورت User Property ذخیره می‌شوند؛ Paymenter فیلد native شماره تلفن ندارد.
 
-## ۹. کنترل قبل از اجرا
+## ۹. محافظت از تنظیمات
+
+- فایل `settings/settings.json` نباید وارد Git شود؛ الگوی آن در `.gitignore` وجود دارد.
+- در Apache فایل `settings/.htaccess` دسترسی مستقیم را مسدود می‌کند.
+- Nginx فایل `.htaccess` را اجرا نمی‌کند؛ `settings/nginx-protect.conf` را داخل server block سایت Include کن یا فایل Runtime را بیرون DocumentRoot قرار بده و `FRAGCITY_SETTINGS_FILE` را تنظیم کن.
+- فایل `/etc/fragcity-api/config.php` باید بیرون DocumentRoot و فقط برای PHP-FPM قابل‌خواندن باشد؛ PHP-FPM نباید بتواند آن را بنویسد.
+- فایل‌های Nginx API در `linuxapi/nginx/` نمونه هستند؛ vhost پنل Pterodactyl را با آن‌ها جایگزین نکن.
+- هیچ Secret، Application API token، Wings token یا Database password را در Git، چت یا مرورگر قرار نده.
+
+## ۱۰. کنترل قبل از اجرا
 
 ```powershell
 php -r '$j=json_decode(file_get_contents("settings/settings.example.json"),true); if(!is_array($j)) {fwrite(STDERR,json_last_error_msg().PHP_EOL); exit(1);} echo "Valid website settings example".PHP_EOL;'
