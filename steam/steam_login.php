@@ -118,7 +118,21 @@ try {
 
             }
 
-            
+            // Do not silently switch an authenticated FragCity session to a
+            // different Steam identity. Log out explicitly before changing accounts.
+            $activeSteamId = !empty($_SESSION['user_logged_in'])
+                ? (string) ($_SESSION['steamid'] ?? '')
+                : '';
+
+            if (
+                $activeSteamId !== ''
+                && !hash_equals($activeSteamId, (string) $steamid64)
+            ) {
+                unset($_SESSION['remember_login_requested'], $_SESSION['steam_temp']);
+                $_SESSION['auth_error'] = 'برای ورود به حساب Steam دیگر، ابتدا از حساب فعلی FragCity خارج شوید.';
+                header('Location: ' . $dashboardPage, true, 303);
+                exit;
+            }
 
             // Use a single cached, server-side Steam summary implementation.
             $steamProfile = SteamProfileService::getPlayerSummary((string)$steamid64, true);
