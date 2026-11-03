@@ -19,7 +19,7 @@ $completionUser = null;
 if ($isAccountCompletion && $pdo instanceof PDO) {
     try {
         $lookup = $pdo->prepare(
-            'SELECT username, email, phone FROM users WHERE steamid64 = ? LIMIT 1'
+            'SELECT username, email, phone, paymenter_sync_status, paymenter_sync_error, paymenter_synced_at FROM users WHERE steamid64 = ? LIMIT 1'
         );
         $lookup->execute([(string) ($_SESSION['steamid'] ?? '')]);
         $completionUser = $lookup->fetch(PDO::FETCH_ASSOC) ?: null;
@@ -35,6 +35,34 @@ $formUsername = (string) (
 );
 $formEmail = (string) ($completionUser['email'] ?? '');
 $formPhone = (string) ($completionUser['phone'] ?? '');
+$completionSyncStatus = (string) ($completionUser['paymenter_sync_status'] ?? 'pending');
+$completionSyncError = (string) ($completionUser['paymenter_sync_error'] ?? '');
+
+$syncErrorDescriptions = [
+    'email_required' => 'ایمیل معتبر برای همگام‌سازی ثبت نشده است.',
+    'phone_required' => 'شماره موبایل معتبر برای همگام‌سازی ثبت نشده است.',
+    'password_policy' => 'رمز عبور با سیاست امنیتی موردنیاز مطابقت ندارد.',
+    'paymenter_unreachable' => 'سایت نتوانسته به سرویس Paymenter متصل شود.',
+    'paymenter_invalid_response' => 'پاسخ دریافتی از Paymenter معتبر یا قابل‌خواندن نیست.',
+    'bridge_not_configured' => 'تنظیمات افزونه FragCity API در Paymenter کامل نیست.',
+    'source_ip_not_allowed' => 'IP هاست سایت در فهرست مجاز افزونه Paymenter قرار ندارد.',
+    'invalid_signature_headers' => 'هدرهای احراز هویت درخواست کامل یا معتبر نیستند.',
+    'invalid_signature' => 'امضای امنیتی درخواست توسط Paymenter تأیید نشد.',
+    'request_replayed' => 'درخواست تکراری تشخیص داده شد؛ صفحه را تازه‌سازی و دوباره تلاش کنید.',
+    'invalid_json_body' => 'ساختار اطلاعات ارسالی به Paymenter معتبر نیست.',
+    'validation_failed' => 'یکی از اطلاعات ارسالی با قوانین حساب Paymenter مطابقت ندارد.',
+    'linked_paymenter_user_missing' => 'حساب Paymenter متصل‌شده دیگر وجود ندارد.',
+    'email_already_linked_to_another_paymenter_user' => 'این ایمیل به حساب Paymenter دیگری متصل شده است.',
+    'paymenter_user_already_linked_to_another_steam_account' => 'حساب Paymenter به یک حساب Steam دیگر متصل است.',
+    'email_already_in_use' => 'این ایمیل در Paymenter ثبت شده است و رمز واردشده با حساب موجود مطابقت ندارد.',
+    'account_sync_failed' => 'Paymenter هنگام ایجاد یا به‌روزرسانی حساب با خطای داخلی مواجه شد.',
+    'local_paymenter_link_not_saved' => 'حساب Paymenter پاسخ موفق داده، اما ثبت شناسه اتصال در دیتابیس FragCity تأیید نشده است.',
+    'paymenter_sync_failed' => 'همگام‌سازی حساب انجام نشد؛ کد فنی زیر را برای بررسی استفاده می‌کنیم.',
+];
+
+$safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
+    ? $completionSyncError
+    : '';
 ?>
 
 <div class="auth-page">
@@ -67,6 +95,31 @@ $formPhone = (string) ($completionUser['phone'] ?? '');
         <?php if ($error): ?>
             <div class="auth-error">
                 <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (
+            $isAccountCompletion
+            && ($completionSyncStatus === 'failed' || $safeSyncErrorCode !== '')
+        ): ?>
+            <div class="auth-diagnostic" role="status" aria-live="polite">
+                <div class="auth-diagnostic__heading">
+                    <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+                    <strong>وضعیت اتصال Paymenter: ناموفق</strong>
+                </div>
+                <p>
+                    <?= htmlspecialchars(
+                        $syncErrorDescriptions[$safeSyncErrorCode] ?? 'اتصال حساب کامل نشده است. کد فنی زیر برای تشخیص علت ثبت شده است.',
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>
+                </p>
+                <?php if ($safeSyncErrorCode !== ''): ?>
+                    <div class="auth-diagnostic__code">
+                        کد فنی:
+                        <code><?= htmlspecialchars($safeSyncErrorCode, ENT_QUOTES, 'UTF-8') ?></code>
+                    </div>
+                <?php endif; ?>
             </div>
         <?php endif; ?>
 
