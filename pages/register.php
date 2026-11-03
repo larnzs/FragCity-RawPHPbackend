@@ -156,7 +156,7 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
                     </div>
                 <?php endif; ?>
             <?php else: ?>
-                <div class="form-group">
+                <div class="form-group auth-form-wide">
                     <label for="steamid64">SteamID64</label>
                     <input
                         id="steamid64"
@@ -170,6 +170,13 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
                     >
                 </div>
             <?php endif; ?>
+
+            <div class="auth-form-grid">
+                <section class="auth-form-column auth-form-column--identity" aria-label="مشخصات حساب">
+                    <div class="auth-form-column-heading">
+                        <i class="fas fa-user-astronaut" aria-hidden="true"></i>
+                        <span>مشخصات حساب</span>
+                    </div>
 
             <div class="form-group">
                 <label for="username">
@@ -244,6 +251,14 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
                 >
             </div>
 
+                </section>
+
+                <section class="auth-form-column auth-form-column--credentials" aria-label="اطلاعات ورود">
+                    <div class="auth-form-column-heading">
+                        <i class="fas fa-shield-halved" aria-hidden="true"></i>
+                        <span>اطلاعات ورود</span>
+                    </div>
+
             <div class="form-group">
                 <label for="email">
                     ایمیل <span class="auth-required">*</span>
@@ -308,6 +323,9 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
                         <i class="fas fa-eye"></i>
                     </button>
                 </div>
+            </div>
+
+                </section>
             </div>
 
             <button type="submit" class="btn-auth-submit">
