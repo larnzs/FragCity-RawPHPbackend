@@ -19,7 +19,7 @@ $completionUser = null;
 if ($isAccountCompletion && $pdo instanceof PDO) {
     try {
         $lookup = $pdo->prepare(
-            'SELECT username, email, phone, paymenter_sync_status, paymenter_sync_error, paymenter_synced_at FROM users WHERE steamid64 = ? LIMIT 1'
+            'SELECT username, first_name, last_name, email, phone, paymenter_sync_status, paymenter_sync_error, paymenter_synced_at FROM users WHERE steamid64 = ? LIMIT 1'
         );
         $lookup->execute([(string) ($_SESSION['steamid'] ?? '')]);
         $completionUser = $lookup->fetch(PDO::FETCH_ASSOC) ?: null;
@@ -33,12 +33,16 @@ $formUsername = (string) (
     ?? $steamData['personaname']
     ?? ''
 );
+$formFirstName = (string) ($completionUser['first_name'] ?? '');
+$formLastName = (string) ($completionUser['last_name'] ?? '');
 $formEmail = (string) ($completionUser['email'] ?? '');
 $formPhone = (string) ($completionUser['phone'] ?? '');
 $completionSyncStatus = (string) ($completionUser['paymenter_sync_status'] ?? 'pending');
 $completionSyncError = (string) ($completionUser['paymenter_sync_error'] ?? '');
 
 $syncErrorDescriptions = [
+    'first_name_required' => 'نام کوچک برای ساخت حساب کاربری الزامی است.',
+    'last_name_required' => 'نام خانوادگی برای ساخت حساب کاربری الزامی است.',
     'email_required' => 'ایمیل معتبر برای همگام‌سازی ثبت نشده است.',
     'phone_required' => 'شماره موبایل معتبر برای همگام‌سازی ثبت نشده است.',
     'password_policy' => 'رمز عبور با سیاست امنیتی موردنیاز مطابقت ندارد.',
@@ -84,9 +88,9 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
 
         <p class="auth-subtitle">
             <?php if ($isAccountCompletion): ?>
-                برای فعال‌سازی خرید و مدیریت سرور، اطلاعات حساب Paymenter را تکمیل کنید.
+                برای فعال‌سازی خرید و مدیریت سرور، نام، نام خانوادگی و اطلاعات حساب را تکمیل کنید.
             <?php elseif ($isSteamRegister): ?>
-                حساب Steam شما شناسایی شد؛ ایمیل، موبایل و رمز مشترک حساب را تعیین کنید.
+                حساب Steam شما شناسایی شد؛ نام و نام خانوادگی، ایمیل، موبایل و رمز مشترک حساب را وارد کنید.
             <?php else: ?>
                 حساب FragCity خود را بسازید؛ حساب متناظر Paymenter هم خودکار ایجاد می‌شود.
             <?php endif; ?>
@@ -179,6 +183,40 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
                     placeholder="نام شما"
                     autocomplete="nickname"
                     maxlength="50"
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="first_name">
+                    نام کوچک <span class="auth-required">*</span>
+                    <span class="auth-optional">Client First Name</span>
+                </label>
+                <input
+                    id="first_name"
+                    type="text"
+                    name="first_name"
+                    value="<?= htmlspecialchars($formFirstName, ENT_QUOTES, 'UTF-8') ?>"
+                    placeholder="نام کوچک"
+                    autocomplete="given-name"
+                    maxlength="191"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="last_name">
+                    نام خانوادگی <span class="auth-required">*</span>
+                    <span class="auth-optional">Client Last Name</span>
+                </label>
+                <input
+                    id="last_name"
+                    type="text"
+                    name="last_name"
+                    value="<?= htmlspecialchars($formLastName, ENT_QUOTES, 'UTF-8') ?>"
+                    placeholder="نام خانوادگی"
+                    autocomplete="family-name"
+                    maxlength="191"
+                    required
                 >
             </div>
 
