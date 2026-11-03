@@ -57,6 +57,10 @@ $completeRegistrationPage = $resolveSteamRoute(
     'index.php?page=register&steam=1'
 );
 $dashboardPage = $resolveSteamRoute($steamRoutes['dashboard_page'] ?? null, 'index.php');
+$accountCompletionPage = $resolveSteamRoute(
+    $steamRoutes['account_completion_page'] ?? null,
+    'index.php?page=register&complete=1'
+);
 
 try {
 
@@ -185,8 +189,18 @@ try {
                 error_log('[FragCity] Steam remember-me choice applied (enabled=' . ($rememberSteamLogin ? 'yes' : 'no') . ').');
                 unset($_SESSION['remember_login_requested']);
 
-                header('Location: ' . $dashboardPage);
+                $emailReady = filter_var(trim((string) ($user['email'] ?? '')), FILTER_VALIDATE_EMAIL) !== false;
+                $phoneReady = preg_match('/^09[0-9]{9}$/D', trim((string) ($user['phone'] ?? ''))) === 1;
+                $paymenterLinked = (int) ($user['paymenter_user_id'] ?? 0) > 0
+                    && (string) ($user['paymenter_sync_status'] ?? '') === 'synced';
 
+                if (!$emailReady || !$phoneReady || !$paymenterLinked) {
+                    $_SESSION['auth_error'] = 'برای فعال‌سازی حساب سرور، اطلاعات تماس و رمز مشترک حساب را تکمیل کنید.';
+                    header('Location: ' . $accountCompletionPage, true, 303);
+                    exit;
+                }
+
+                header('Location: ' . $dashboardPage, true, 303);
                 exit;
 
             } else {
