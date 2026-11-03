@@ -145,6 +145,7 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 - Bridge مقدار Username را در Paymenter به‌صورت User Property با کلید `fragcity_username` ذخیره می‌کند؛ Paymenter فیلد native برای username ندارد. نام کوچک و نام خانوادگی در فیلدهای native Paymenter ذخیره می‌شوند.
 - افزونه `FragCityCS2` هنگام Provisioning، Username انتخابی و نام‌های native را با Application API در فیلدهای native کاربر Pterodactyl قرار می‌دهد، `external_id` را برابر شناسه کاربر Paymenter تنظیم می‌کند و سپس ساخت سرور را به پیاده‌سازی رسمی Paymenter واگذار می‌کند. Password پنل Pterodactyl همچنان مستقل است و در این مسیر منتقل نمی‌شود.
 - فایل‌های PHP جدید را پس از اعمال Migrationها منتشر کن و برای تست ساختار و اتصال از ریشه پروژه اجرا کن: `php tools/paymenter-api-preflight.php`.
+- پس از Deploy هر دو Extension و فایل‌های جدید سایت، فایل `database/migrations/20261104_paymenter_username_resync.sql` را فقط یک بار اجرا کن. این Query حساب‌های Paymenter لینک‌شده‌ی فعلی را به وضعیت `pending` می‌برد تا کاربران قدیمی نیز Property جدید `fragcity_username` را دریافت کنند؛ کاربران با ورود عادی و رمز خودکار Sync می‌شوند و نشست‌های Steam/Remember Me در ورود بعدی فرم تکمیل حساب را می‌بینند. این SQL را قبل از Deploy فرم جدید اجرا نکن.
 
 Endpointهای Bridge:
 - `POST /api/v1/fragcity/bridge/ping`
