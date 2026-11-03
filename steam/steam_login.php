@@ -203,13 +203,15 @@ try {
                 error_log('[FragCity] Steam remember-me choice applied (enabled=' . ($rememberSteamLogin ? 'yes' : 'no') . ').');
                 unset($_SESSION['remember_login_requested']);
 
+                $firstNameReady = trim((string) ($user['first_name'] ?? '')) !== '';
+                $lastNameReady = trim((string) ($user['last_name'] ?? '')) !== '';
                 $emailReady = filter_var(trim((string) ($user['email'] ?? '')), FILTER_VALIDATE_EMAIL) !== false;
                 $phoneReady = preg_match('/^09[0-9]{9}$/D', trim((string) ($user['phone'] ?? ''))) === 1;
                 $paymenterLinked = (int) ($user['paymenter_user_id'] ?? 0) > 0
                     && (string) ($user['paymenter_sync_status'] ?? '') === 'synced';
 
-                if (!$emailReady || !$phoneReady || !$paymenterLinked) {
-                    $_SESSION['auth_error'] = 'برای فعال‌سازی حساب سرور، اطلاعات تماس و رمز مشترک حساب را تکمیل کنید.';
+                if (!$firstNameReady || !$lastNameReady || !$emailReady || !$phoneReady || !$paymenterLinked) {
+                    $_SESSION['auth_error'] = 'برای فعال‌سازی حساب سرور، نام، نام خانوادگی و اطلاعات تماس را تکمیل کنید.';
                     header('Location: ' . $accountCompletionPage, true, 303);
                     exit;
                 }
