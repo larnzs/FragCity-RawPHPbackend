@@ -985,3 +985,83 @@
         max-width: 160px !important;
     }
 }
+
+/* Account completion diagnostics: expose only allow-listed error codes. */
+.auth-diagnostic {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 0 0 20px;
+    padding: 14px 16px;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    border-radius: 12px;
+    background: rgba(127, 29, 29, 0.14);
+    color: #FECACA;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.auth-diagnostic__heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #FCA5A5;
+}
+
+.auth-diagnostic__heading i {
+    color: #F87171;
+}
+
+.auth-diagnostic p {
+    margin: 0;
+    color: #E5B4B4;
+}
+
+.auth-diagnostic__code {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    color: #D4A5A5;
+    font-size: 0.75rem;
+}
+
+.auth-diagnostic__code code {
+    direction: ltr;
+    padding: 2px 7px;
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.24);
+    color: #FCA5A5;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+/*
+ * Authentication pages must use the document viewport as their only
+ * vertical scrollport. This overrides legacy .main-content overflow rules
+ * that can otherwise trap the long registration form in an inner scroller.
+ */
+body.site-body:has(.auth-page) .app-container,
+body.site-body:has(.auth-page) #mainContent,
+body.site-body:has(.auth-page) #contentFader {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    overflow-y: visible !important;
+    overscroll-behavior-y: auto !important;
+    contain: none !important;
+}
+
+body.site-body:has(.auth-page) #mainContent {
+    flex: 1 0 auto !important;
+}
+
+body.site-body:has(.auth-page) .auth-page {
+    height: auto !important;
+    max-height: none !important;
+    overflow-y: visible !important;
+    overscroll-behavior-y: auto !important;
+}
+
