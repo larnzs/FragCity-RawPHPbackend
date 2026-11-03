@@ -234,9 +234,7 @@ $formPhone = (string) ($completionUser['phone'] ?? '');
             <?php if ($isAccountCompletion): ?>
                 <a href="index.php">بازگشت به سایت</a>
             <?php elseif ($isSteamRegister): ?>
-                <a href="?page=register" data-ajax-nav data-slug="register">ثبت‌نام معمولی</a>
-                <span class="auth-switch-divider">|</span>
-                <a href="?page=login" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" aria-expanded="false">ورود</a>
+                <a href="?page=login" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" aria-expanded="false">ورود به حساب دیگر</a>
             <?php else: ?>
                 قبلاً ثبت‌نام کرده‌اید؟
                 <a href="?page=login" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" aria-expanded="false">ورود</a>
