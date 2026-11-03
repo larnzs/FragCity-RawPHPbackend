@@ -19,9 +19,19 @@ final class PaymenterAccountSyncService
         $steamId = (string) ($user['steamid64'] ?? '');
         $email = trim((string) ($user['email'] ?? ''));
         $phone = trim((string) ($user['phone'] ?? ''));
+        $firstName = trim((string) ($user['first_name'] ?? ''));
+        $lastName = trim((string) ($user['last_name'] ?? ''));
 
         if (!preg_match('/^[0-9]{17}$/D', $steamId)) {
             return ['success' => false, 'error' => 'invalid_steamid'];
+        }
+        if ($firstName === '' || mb_strlen($firstName) > 191) {
+            self::markFailed($pdo, $steamId, 'first_name_required');
+            return ['success' => false, 'error' => 'first_name_required'];
+        }
+        if ($lastName === '' || mb_strlen($lastName) > 191) {
+            self::markFailed($pdo, $steamId, 'last_name_required');
+            return ['success' => false, 'error' => 'last_name_required'];
         }
         if (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {
             self::markFailed($pdo, $steamId, 'email_required');
@@ -36,19 +46,14 @@ final class PaymenterAccountSyncService
             return ['success' => false, 'error' => 'password_policy'];
         }
 
-        $username = trim((string) ($user['username'] ?? ''));
-        if ($username === '') {
-            $username = $steamId;
-        }
-
         try {
             $client = new PaymenterApiClient();
             $remote = $client->syncUser([
                 'steamid64' => $steamId,
                 'email' => $email,
                 'phone' => $phone,
-                'first_name' => mb_substr($username, 0, 255),
-                'last_name' => '',
+                'first_name' => $firstName,
+                'last_name' => $lastName,
                 'password' => $plainPassword,
             ]);
 
@@ -136,6 +141,8 @@ final class PaymenterAccountSyncService
     private static function safeErrorCode(string $message): string
     {
         $allowed = [
+            'first_name_required',
+            'last_name_required',
             'paymenter_unreachable',
             'paymenter_invalid_response',
             'bridge_not_configured',
