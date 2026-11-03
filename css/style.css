@@ -507,6 +507,18 @@ body.site-body::-webkit-scrollbar {
     height: 0 !important;
 }
 
+/*
+ * The legacy .main-content rule above belongs to the admin layout and sets
+ * overflow-y:auto. Do not let that create a second scrollport in the public
+ * site shell; the document viewport must scroll the header, page and footer
+ * together.
+ */
+body.site-body .main-content {
+    height: auto;
+    max-height: none;
+    overflow-y: visible;
+}
+
 /* =========================================================
    Global page safe areas
    The header overlays the document flow, so normal pages reserve
