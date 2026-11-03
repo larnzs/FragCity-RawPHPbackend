@@ -169,10 +169,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
             redirect_back();
         }
 
-        if (preg_match('/^[0-9]{17}$/', $loginId)) {
+        if (preg_match('/^[0-9]{17}$/D', $loginId)) {
             $field = 'steamid64';
-        } elseif (preg_match('/^09[0-9]{9}$/', $loginId)) {
+        } elseif (preg_match('/^09[0-9]{9}$/D', $loginId)) {
             $field = 'phone';
+        } elseif (filter_var($loginId, FILTER_VALIDATE_EMAIL)) {
+            $field = 'email';
         } else {
             $field = 'username';
         }
