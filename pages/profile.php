@@ -181,8 +181,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
                 }
 
                 // Column names are fixed in this allow-list; user values remain bound parameters.
+                $comparison = $column === 'username'
+                    ? "LOWER({$column}) = ?"
+                    : "{$column} = ?";
                 $duplicate = $pdo->prepare(
-                    "SELECT id FROM users WHERE {$column} = ? AND steamid64 <> ? LIMIT 1"
+                    "SELECT id FROM users WHERE {$comparison} AND steamid64 <> ? LIMIT 1"
                 );
                 $duplicate->execute([$value, $steamid64]);
                 if ($duplicate->fetchColumn() !== false) {
