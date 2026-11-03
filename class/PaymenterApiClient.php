@@ -69,6 +69,7 @@ final class PaymenterApiClient
      *
      * @param array{
      *   steamid64:string,
+     *   username:string,
      *   email:string,
      *   phone:string,
      *   first_name:string,
@@ -167,6 +168,8 @@ final class PaymenterApiClient
                 'request_replayed',
                 'invalid_json_body',
                 'validation_failed',
+                'username_required',
+                'username_already_in_use',
                 'first_name_required',
                 'last_name_required',
                 'linked_paymenter_user_missing',
