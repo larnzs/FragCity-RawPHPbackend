@@ -305,10 +305,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
         } elseif ($lastName === '' || mb_strlen($lastName) > 191) {
             $_SESSION['auth_error'] = 'نام خانوادگی الزامی است و نباید بیشتر از ۱۹۱ کاراکتر باشد.';
             $hasError = true;
-        } elseif ($username !== '' && mb_strlen($username) > 50) {
-            $_SESSION['auth_error'] = 'نام نمایشی نباید بیشتر از ۵۰ کاراکتر باشد.';
-            $hasError = true;
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 100) {
             $_SESSION['auth_error'] = 'ایمیل معتبر و قابل استفاده وارد کنید.';
             $hasError = true;
         } elseif (!preg_match('/^09[0-9]{9}$/D', $phone)) {
@@ -396,6 +393,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                 if (!$sync['success']) {
                     $safeSyncError = (string) ($sync['error'] ?? 'paymenter_sync_failed');
                     $_SESSION['auth_error'] = match ($safeSyncError) {
+                        'username_required' => 'نام کاربری واردشده معتبر نیست؛ فقط از حروف انگلیسی، عدد، _ و - استفاده کنید.',
+                        'username_already_in_use' => 'این نام کاربری در Paymenter برای حساب دیگری رزرو شده است؛ نام دیگری انتخاب کنید.',
                         'email_already_in_use' => 'این ایمیل در Paymenter قبلاً ثبت شده است. برای اتصال باید رمز همان حساب را وارد کنید یا از پشتیبانی کمک بگیرید.',
                         'email_already_linked_to_another_paymenter_user',
                         'paymenter_user_already_linked_to_another_steam_account' => 'این ایمیل یا حساب Paymenter به یک حساب Steam دیگر متصل است؛ برای جلوگیری از ادغام اشتباه حساب‌ها با پشتیبانی تماس بگیرید.',
