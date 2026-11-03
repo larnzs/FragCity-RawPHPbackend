@@ -4,20 +4,19 @@ declare(strict_types=1);
 require_once __DIR__ . '/../settings/loader.php';
 
 /**
- * Server-side client for the Paymenter Admin API.
+ * Private HMAC client for the FragCityAPI add-on in Paymenter.
  *
- * This client must never be instantiated from browser-facing JavaScript.
- * The API key belongs only in the private FragCity runtime settings file.
+ * Never expose this client or its shared secret to browser JavaScript.
  */
 final class PaymenterApiClient
 {
     private string $baseUrl;
-    private string $apiKey;
+    private string $sharedSecret;
 
-    public function __construct(?string $baseUrl = null, ?string $apiKey = null)
+    public function __construct(?string $baseUrl = null, ?string $sharedSecret = null)
     {
         $baseUrl = trim($baseUrl ?? (string) fragcity_settings('integrations.paymenter_backend.base_url', ''));
-        $apiKey = trim($apiKey ?? (string) fragcity_settings('integrations.paymenter_backend.api_key', ''));
+        $sharedSecret = trim($sharedSecret ?? (string) fragcity_settings('integrations.paymenter_backend.shared_secret', ''));
 
         $parts = parse_url($baseUrl);
         if (
@@ -33,8 +32,11 @@ final class PaymenterApiClient
             throw new RuntimeException('Paymenter API base URL must be an HTTPS origin without a path.');
         }
 
-        if ($apiKey === '' || strlen($apiKey) > 1024 || preg_match('/[\\r\\n\\x00-\\x1F\\x7F]/', $apiKey)) {
-            throw new RuntimeException('Paymenter Admin API key is missing or invalid.');
+        if (
+            !preg_match('/^[a-f0-9]{64,256}$/iD', $sharedSecret)
+            || preg_match('/[\r\n\x00-\x1F\x7F]/', $sharedSecret)
+        ) {
+            throw new RuntimeException('Paymenter bridge shared secret is missing or invalid.');
         }
 
         if (!function_exists('curl_init')) {
@@ -42,32 +44,93 @@ final class PaymenterApiClient
         }
 
         $this->baseUrl = rtrim($baseUrl, '/');
-        $this->apiKey = $apiKey;
+        $this->sharedSecret = $sharedSecret;
     }
 
     /**
-     * Read one product page to verify TLS, API authentication and products.view.
+     * Verify TLS, route availability and HMAC configuration without changing
+     * Paymenter records.
      *
-     * @return array{http_status:int, visible_products:int}
+     * @return array{http_status:int,service:string,version:string}
      */
     public function testConnection(): array
     {
-        $url = $this->baseUrl . '/api/v1/admin/products?per_page=1';
-        $handle = curl_init($url);
+        $response = $this->post('/api/v1/fragcity/bridge/ping', []);
 
+        return [
+            'http_status' => 200,
+            'service' => (string) ($response['service'] ?? ''),
+            'version' => (string) ($response['version'] ?? ''),
+        ];
+    }
+
+    /**
+     * Create or synchronize the Paymenter account associated with a SteamID64.
+     *
+     * @param array{
+     *   steamid64:string,
+     *   email:string,
+     *   phone:string,
+     *   first_name:string,
+     *   last_name?:string,
+     *   password:string
+     * } $user
+     * @return array{user_id:int,created:bool,email:string}
+     */
+    public function syncUser(array $user): array
+    {
+        $response = $this->post('/api/v1/fragcity/bridge/users/sync', $user);
+        $data = $response['data'] ?? null;
+
+        if (
+            !is_array($data)
+            || !isset($data['user_id'])
+            || !is_numeric($data['user_id'])
+            || (int) $data['user_id'] < 1
+        ) {
+            throw new RuntimeException('Paymenter bridge returned an invalid user synchronization response.');
+        }
+
+        return [
+            'user_id' => (int) $data['user_id'],
+            'created' => (bool) ($data['created'] ?? false),
+            'email' => (string) ($data['email'] ?? ''),
+        ];
+    }
+
+    /**
+     * @param array<string,mixed> $payload
+     * @return array<string,mixed>
+     */
+    private function post(string $path, array $payload): array
+    {
+        $body = json_encode(
+            $payload,
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+        );
+        $timestamp = (string) time();
+        $nonce = bin2hex(random_bytes(16));
+        $message = $timestamp . "\n" . $nonce . "\n" . $body;
+        $signature = hash_hmac('sha256', $message, $this->sharedSecret);
+
+        $handle = curl_init($this->baseUrl . $path);
         if ($handle === false) {
-            throw new RuntimeException('Could not initialize the Paymenter API request.');
+            throw new RuntimeException('Could not initialize the Paymenter bridge request.');
         }
 
         curl_setopt_array($handle, [
-            CURLOPT_HTTPGET => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $body,
             CURLOPT_HTTPHEADER => [
                 'Accept: application/json',
-                'Authorization: Bearer ' . $this->apiKey,
+                'Content-Type: application/json',
+                'X-FragCity-Timestamp: ' . $timestamp,
+                'X-FragCity-Nonce: ' . $nonce,
+                'X-FragCity-Signature: ' . $signature,
             ],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 5,
-            CURLOPT_TIMEOUT => 15,
+            CURLOPT_TIMEOUT => 20,
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
@@ -75,38 +138,50 @@ final class PaymenterApiClient
             CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
         ]);
 
-        $response = curl_exec($handle);
+        $rawResponse = curl_exec($handle);
         $curlError = curl_errno($handle);
         $status = (int) curl_getinfo($handle, CURLINFO_HTTP_CODE);
         curl_close($handle);
 
-        if ($response === false || $curlError !== 0) {
-            error_log('[FragCity] Paymenter API transport failed; cURL code=' . $curlError);
-            throw new RuntimeException('Paymenter API is unreachable; check DNS, TLS and outbound HTTPS.');
+        if ($rawResponse === false || $curlError !== 0) {
+            error_log('[FragCity] Paymenter bridge transport failed; cURL code=' . $curlError . '.');
+            throw new RuntimeException('paymenter_unreachable');
         }
 
-        if ($status === 401) {
-            throw new RuntimeException('Paymenter rejected the API key (HTTP 401). Check that the key is enabled and valid.');
+        $decoded = json_decode((string) $rawResponse, true);
+        if (!is_array($decoded) || json_last_error() !== JSON_ERROR_NONE) {
+            error_log('[FragCity] Paymenter bridge returned invalid JSON; HTTP ' . $status . '.');
+            throw new RuntimeException('paymenter_invalid_response');
         }
 
-        if ($status === 403) {
-            throw new RuntimeException('Paymenter denied this API key (HTTP 403). Check key type, IP restrictions and products.view permission.');
+        if ($status < 200 || $status >= 300 || ($decoded['success'] ?? false) !== true) {
+            $error = is_string($decoded['error'] ?? null)
+                ? $decoded['error']
+                : 'paymenter_request_failed';
+
+            $safeErrors = [
+                'bridge_not_configured',
+                'source_ip_not_allowed',
+                'invalid_signature_headers',
+                'invalid_signature',
+                'request_replayed',
+                'invalid_json_body',
+                'validation_failed',
+                'linked_paymenter_user_missing',
+                'email_already_linked_to_another_paymenter_user',
+                'paymenter_user_already_linked_to_another_steam_account',
+                'email_already_in_use',
+                'account_sync_failed',
+            ];
+
+            if (!in_array($error, $safeErrors, true)) {
+                $error = 'paymenter_request_failed';
+            }
+
+            error_log('[FragCity] Paymenter bridge rejected a request; HTTP ' . $status . ', error=' . $error . '.');
+            throw new RuntimeException($error);
         }
 
-        if ($status < 200 || $status >= 300) {
-            error_log('[FragCity] Paymenter API returned HTTP ' . $status . ' during read-only preflight.');
-            throw new RuntimeException('Paymenter API returned HTTP ' . $status . '. Check the base URL and server logs.');
-        }
-
-        $decoded = json_decode((string) $response, true);
-        if (!is_array($decoded) || json_last_error() !== JSON_ERROR_NONE || !is_array($decoded['data'] ?? null)) {
-            error_log('[FragCity] Paymenter API returned an unexpected response during read-only preflight.');
-            throw new RuntimeException('Paymenter API response was not valid product-list JSON.');
-        }
-
-        return [
-            'http_status' => $status,
-            'visible_products' => count($decoded['data']),
-        ];
+        return $decoded;
     }
 }
