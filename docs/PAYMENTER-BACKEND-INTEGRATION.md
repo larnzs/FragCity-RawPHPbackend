@@ -35,6 +35,16 @@ Pterodactyl/Wings own the actual server record, node allocation, Docker containe
 
 Do not recreate retired Windows Agent tables or use them as the new provisioning source.
 
+## 2.1. Registration and credential synchronization
+
+- New FragCity identities are created only after a validated Steam OpenID callback. A browser-supplied SteamID64 by itself is not proof of account ownership.
+- The Steam registration-completion form and the authenticated account-completion form collect a valid email address, the required mobile number and a password confirmation.
+- A normal password login synchronizes the verified password and current account details to Paymenter through the private HMAC bridge.
+- An existing Steam/remember-me session has no plaintext password available. If its Paymenter link or required contact details are missing, the user is sent to the authenticated account-completion form to choose/confirm a password.
+- The FragCity website stores only its password hash. The plaintext password exists only in request memory and in the short-lived HTTPS/HMAC server-to-server body to Paymenter; neither side writes it to logs or stores it in plaintext.
+- Paymenter stores its own password hash. The built-in Pterodactyl extension creates/reuses the Pterodactyl user by email and name but does not submit the Paymenter password to Pterodactyl. Therefore **FragCity and Paymenter credentials are synchronized; the Pterodactyl panel password remains independent** until a separate SSO/password lifecycle is designed.
+- Email and mobile are required for account synchronization. The mobile number is stored in Paymenter as the `fragcity_phone` user property because Paymenter v1.5.9 does not provide a native phone field.
+
 ## 3. Paymenter v1.5.9 API findings
 
 The pinned API routes expose Admin API resources under `/api/v1/admin` for users, products, services, orders, invoices, invoice items, tickets, ticket messages and credits. These routes use a Paymenter Admin API key as a Bearer token. The API key must be enabled, have type `admin`, and carry only the permissions required by the integration. IP allowlisting should be used once the website's outbound IP is confirmed.
