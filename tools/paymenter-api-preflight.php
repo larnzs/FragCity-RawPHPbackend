@@ -31,6 +31,7 @@ try {
          WHERE TABLE_SCHEMA = DATABASE()
            AND TABLE_NAME = 'users'
            AND COLUMN_NAME IN (
+               'username',
                'first_name',
                'last_name',
                'paymenter_user_id',
@@ -42,6 +43,7 @@ try {
 
     $columns = $schemaCheck->fetchAll(PDO::FETCH_COLUMN);
     $requiredColumns = [
+        'username',
         'first_name',
         'last_name',
         'paymenter_user_id',
