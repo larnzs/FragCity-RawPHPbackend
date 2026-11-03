@@ -218,9 +218,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
 
             $emailReady = filter_var(trim((string) ($user['email'] ?? '')), FILTER_VALIDATE_EMAIL) !== false;
             $phoneReady = preg_match('/^09[0-9]{9}$/D', trim((string) ($user['phone'] ?? ''))) === 1;
+            $firstNameReady = trim((string) ($user['first_name'] ?? '')) !== '';
+            $lastNameReady = trim((string) ($user['last_name'] ?? '')) !== '';
 
-            if (!$emailReady || !$phoneReady) {
-                $_SESSION['auth_error'] = 'برای اتصال حساب به پنل سرور، ایمیل معتبر و شماره موبایل خود را تکمیل کنید.';
+            if (!$emailReady || !$phoneReady || !$firstNameReady || !$lastNameReady) {
+                $_SESSION['auth_error'] = 'برای فعال‌سازی حساب سرور، نام، نام خانوادگی، ایمیل و شماره موبایل را تکمیل کنید.';
                 header('Location: index.php?page=register&complete=1', true, 303);
                 exit;
             }
@@ -270,6 +272,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
         }
 
         $username = trim((string) ($_POST['username'] ?? ''));
+        $firstName = trim((string) ($_POST['first_name'] ?? ''));
+        $lastName = trim((string) ($_POST['last_name'] ?? ''));
         $email = trim((string) ($_POST['email'] ?? ''));
         $phone = trim((string) ($_POST['phone'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
@@ -291,6 +295,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
 
         if (!preg_match('/^[0-9]{17}$/D', $steamid)) {
             $_SESSION['auth_error'] = 'SteamID باید ۱۷ رقم باشد.';
+            $hasError = true;
+        } elseif ($firstName === '' || mb_strlen($firstName) > 191) {
+            $_SESSION['auth_error'] = 'نام کوچک الزامی است و نباید بیشتر از ۱۹۱ کاراکتر باشد.';
+            $hasError = true;
+        } elseif ($lastName === '' || mb_strlen($lastName) > 191) {
+            $_SESSION['auth_error'] = 'نام خانوادگی الزامی است و نباید بیشتر از ۱۹۱ کاراکتر باشد.';
             $hasError = true;
         } elseif ($username !== '' && mb_strlen($username) > 50) {
             $_SESSION['auth_error'] = 'نام نمایشی نباید بیشتر از ۵۰ کاراکتر باشد.';
@@ -346,12 +356,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
             try {
                 $update = $pdo->prepare(
                     'UPDATE users
-                     SET username = ?, email = ?, phone = ?, password_hash = ?
+                     SET username = ?, first_name = ?, last_name = ?, email = ?, phone = ?, password_hash = ?
                      WHERE steamid64 = ?
                      LIMIT 1'
                 );
                 $update->execute([
                     $username !== '' ? $username : (string) ($_SESSION['username'] ?? $steamid),
+                    $firstName,
+                    $lastName,
                     $email,
                     $phone,
                     password_hash($password, PASSWORD_BCRYPT),
@@ -422,14 +434,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
             try {
                 $stmt = $pdo->prepare(
                     "INSERT INTO users
-                        (steamid64, steam, username, email, phone, password_hash, paymenter_sync_status)
-                     VALUES (?, ?, ?, ?, ?, ?, 'pending')"
+                        (steamid64, steam, username, first_name, last_name, email, phone, password_hash, paymenter_sync_status)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending')"
                 );
 
                 $stmt->execute([
                     $steamid,
                     $steam,
                     $username !== '' ? $username : null,
+                    $firstName,
+                    $lastName,
                     $email,
                     $phone,
                     password_hash($password, PASSWORD_BCRYPT),
@@ -575,13 +589,15 @@ $paymenterSyncRequired = false;
 if ($isLoggedIn && $pdo instanceof PDO) {
     try {
         $syncLookup = $pdo->prepare(
-            'SELECT email, phone, paymenter_user_id, paymenter_sync_status
+            'SELECT first_name, last_name, email, phone, paymenter_user_id, paymenter_sync_status
              FROM users WHERE steamid64 = ? LIMIT 1'
         );
         $syncLookup->execute([(string) ($_SESSION['steamid'] ?? '')]);
         $syncState = $syncLookup->fetch(PDO::FETCH_ASSOC);
 
         $paymenterSyncRequired = !$syncState
+            || trim((string) ($syncState['first_name'] ?? '')) === ''
+            || trim((string) ($syncState['last_name'] ?? '')) === ''
             || !filter_var(trim((string) ($syncState['email'] ?? '')), FILTER_VALIDATE_EMAIL)
             || !preg_match('/^09[0-9]{9}$/D', trim((string) ($syncState['phone'] ?? '')))
             || (int) ($syncState['paymenter_user_id'] ?? 0) < 1
