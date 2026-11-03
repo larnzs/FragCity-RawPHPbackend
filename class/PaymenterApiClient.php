@@ -72,7 +72,7 @@ final class PaymenterApiClient
      *   email:string,
      *   phone:string,
      *   first_name:string,
-     *   last_name?:string,
+     *   last_name:string,
      *   password:string
      * } $user
      * @return array{user_id:int,created:bool,email:string}
@@ -167,6 +167,8 @@ final class PaymenterApiClient
                 'request_replayed',
                 'invalid_json_body',
                 'validation_failed',
+                'first_name_required',
+                'last_name_required',
                 'linked_paymenter_user_missing',
                 'email_already_linked_to_another_paymenter_user',
                 'paymenter_user_already_linked_to_another_steam_account',
