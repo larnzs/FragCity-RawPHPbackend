@@ -75,9 +75,9 @@
       "status_page_slug": "fragcity"
     },
     "paymenter_backend": {
-      "_comment": "Private server-to-server connection to the Paymenter Admin API. This key is backend-only; never expose it to browser JavaScript or commit a real value.",
-      "base_url": "",
-      "api_key": ""
+      "_comment": "Private HMAC connection to the FragCityAPI add-on in Paymenter. This shared secret must match the FragCity Bridge HMAC Secret configured in Paymenter Admin -> Extensions -> Others. Backend-only; never expose it to browser JavaScript or commit a real value.",
+      "base_url": "https://paymenter.fragcity.ir",
+      "shared_secret": ""
     }
   },
   "files": {
