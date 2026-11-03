@@ -76,22 +76,25 @@
 6. Console، فایل‌ها، محدودیت RAM/CPU/Disk و پورت‌ها بررسی شود.
 7. هنگام Provisioning اولیه، baseline کامل `addons/`، `cfg/` و فایل‌های متنی تعیین‌شده از شاخهٔ `integration/kus-monorepo` ریپوی `cs2-kus-addons` به فضای private هر Instance کپی شود. پیش از Startهای بعدی updater فقط پلاگین‌ها و Runtimeهای مدیریت‌شده را به‌روزرسانی کند؛ `cfg/`، فایل‌های `.txt` تنظیماتی و `addons/counterstrikesharp/configs/` نباید تغییر کنند و هیچ فایل payload به Base Game کپی/merge نشود. این updater مسئول اجرای SteamCMD یا CS2 نیست.
 8. در اولین ساخت هیچ preset مود نهایی اعمال نکن؛ ابتدا سلامت payload، اجرای سرور و جداسازی فایل‌ها را ثابت کن. سپس هر Instance را جداگانه کانفیگ کن.
-9. File Manager داخلی Pterodactyl را برای ویرایش cfg و تنظیمات افزونه تست کن؛ مجوزهای فایل، SFTP و Console را جداگانه بررسی کن. سایت/پنل C# فعلی حذف‌شده فرض نشود؛ نیاز به لینک‌دهی/SSO و شکاف‌های UI بعداً ارزیابی می‌شود.
+9. ویرایش cfg و تنظیمات افزونه را از طریق API فایل Pterodactyl در Backend آزمایش کن؛ مشتری نباید مستقیم وارد UI پتروداکتیل شود. مجوزهای فایل، Console و Power را پشت Backend و به‌صورت per-service بررسی کن.
 10. Update مرکزی Base و updater انتخابی payload دو عملیات جدا هستند: Update بازی همهٔ Instanceهای متکی را متوقف کرده و SteamCMD را یک‌بار روی Base اجرا می‌کند؛ updater پیش از هر Start فقط پلاگین‌ها و Runtimeهای مدیریت‌شده را در مسیر private همان Instance به‌روزرسانی می‌کند و مسیرهای محافظت‌شدهٔ کانفیگ را تغییر نمی‌دهد. بازگشت فقط Instanceهای قبلاً Running انجام شود. جزئیات در [CS2 Multi-Instance](CS2-MULTI-INSTANCE.md) آمده است.
 11. مسیر Linux/Pterodactyl معیار پذیرش اصلی است. Windows فقط برای تست دستی CS2، لاگ‌ها، Load پلاگین‌ها و تنظیم config استفاده می‌شود؛ آزمون managerهای Windows و cross-platform تا زمان بروز blocker مشخص در مسیر Linux، Deferred می‌ماند. شواهد هر تست در [Testing Bench](TESTING-BENCH.md) ثبت شود.
 12. پیشنهادهای اولیه در [Probably and Suggestions](PROBABLY-AND-SUGGESTIONS.md) نگهداری شوند؛ این فهرست به‌تنهایی انتخاب Production محسوب نمی‌شود.
 
 **شرط عبور:** پنل، وضعیت واقعی سرور و مالکیت منابع هماهنگ باشند؛ محدودیت‌های امنیتی مشتری قابل تست باشند.
 
-## P3 — اتصال فروش
+## P3 — اتصال Backend فروش FragCity به Paymenter
 
-1. Paymenter در نسخهٔ پایدار patched نصب شود.
-2. integration رسمی Pterodactyl پیکربندی شود.
-3. محصول Sandbox یا سفارش ساختگی ساخته شود.
-4. callback ناموفق، تکراری و retry آزمایش شوند.
-5. برای هر سفارش شناسهٔ یکتا وجود داشته باشد تا ساخت duplicate انجام نشود.
+1. UI خرید، پنل مشتری و پنل ادمین در Raw PHP FragCity باقی بمانند؛ Paymenter UI برای مشتری استفاده نشود.
+2. کلاینت HTTPS سمت سایت و Preflight فقط‌خواندنی Paymenter Admin API اجرا شود؛ API key با کمترین مجوز و فقط در Runtime خصوصی باشد.
+3. Bridge امن در Extension موجود FragCity در Paymenter ساخته شود؛ بدون تغییر مستقیم Core.
+4. قرارداد نگاشت FragCity user/product/plan/options به Paymenter User/Order/Service/Invoice/Invoice Item مشخص شود.
+5. پرداخت Zarinpal فقط در Backend سایت درخواست و Verify شود؛ پس از Verify موفق، سفارش به Bridge فرستاده شود.
+6. پرداخت با مکانیزم تراکنش رسمی Paymenter ثبت شود تا Invoice Settlement و Provisioning Job استاندارد اجرا شوند.
+7. callback تکراری، timeout بعد از پذیرش Paymenter، retry و reconciliation آزمایش شوند.
+8. برای هر خرید یک UUID یکتا و outbox پایدار وجود داشته باشد تا ساخت duplicate انجام نشود.
 
-**شرط عبور:** سفارش فقط یک instance بسازد و شکست Provisioning قابل شناسایی/جبران باشد.
+**شرط عبور:** هر خرید تأییدشده دقیقاً یک Service و حداکثر یک Pterodactyl Server بسازد؛ پرداخت ناموفق هیچ Provisioning ایجاد نکند و mismatch قابل reconcile باشد.
 
 ## P4 — مدل Wallet و انقضا
 
