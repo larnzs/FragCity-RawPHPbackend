@@ -177,6 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
             $field = 'email';
         } else {
             $field = 'username';
+            $loginId = strtolower($loginId);
         }
 
         try {
@@ -337,7 +338,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
 
                 if (!$hasError) {
                     $usernameCheck = $pdo->prepare(
-                        'SELECT id FROM users WHERE username = ? AND steamid64 <> ? LIMIT 1'
+                        'SELECT id FROM users WHERE LOWER(username) = ? AND steamid64 <> ? LIMIT 1'
                     );
                     $usernameCheck->execute([$username, $steamid]);
                     if ($usernameCheck->fetch()) {
