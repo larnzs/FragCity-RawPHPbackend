@@ -140,7 +140,9 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 - `integrations.paymenter_backend.base_url` فقط Origin HTTPS پنل Paymenter است؛ مسیر API به آن اضافه نکن.
 - در صورت داشتن IP خروجی ثابت برای هاست FragCity، آن IP را در `Allowed Source IPs` افزونه Paymenter تنظیم کن.
 - فایل `database/migrations/20261103_paymenter_user_sync.sql` را فقط یک‌بار روی دیتابیس اصلی FragCity اجرا کن.
-- برای تست اتصال، از ریشه پروژه اجرا کن: `php tools/paymenter-api-preflight.php`.
+- فایل `database/migrations/20261104_client_name_fields.sql` را هم فقط یک‌بار روی همان دیتابیس اجرا کن؛ این Migration ستون‌های `first_name` و `last_name` را اضافه می‌کند. برای جلوگیری از پرشدن نام قانونی با نام نمایشی، رکوردهای قدیمی به‌صورت خودکار حدس زده یا backfill نمی‌شوند؛ کاربران قدیمی هنگام ورود بعدی فرم تکمیل حساب را می‌بینند.
+- نام کوچک و نام خانوادگی در فرم ثبت‌نام و تکمیل حساب اجباری‌اند و Paymenter Bridge نیز هر دو را به‌صورت required می‌پذیرد. Paymenter این مقادیر را در فیلدهای native کاربر ذخیره می‌کند؛ Provisioning رسمی Paymenter آن‌ها را هنگام ساخت کاربر Pterodactyl ارسال می‌کند.
+- فایل‌های PHP جدید را پس از اعمال Migrationها منتشر کن و برای تست ساختار و اتصال از ریشه پروژه اجرا کن: `php tools/paymenter-api-preflight.php`.
 
 Endpointهای Bridge:
 - `POST /api/v1/fragcity/bridge/ping`
