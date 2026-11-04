@@ -102,6 +102,7 @@ $websiteFiles = [
     'class/PaymenterApiClient.php',
     'pages/lifecycle.php',
     'index.php',
+    'tools/lifecycle-preflight.php',
 ];
 $websiteSources = [];
 foreach ($websiteFiles as $relative) {

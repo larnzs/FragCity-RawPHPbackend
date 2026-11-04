@@ -88,7 +88,7 @@
         const reason = (form.querySelector('[name="reason"]')?.value || '').trim();
         const submit = form.querySelector('button[type="submit"]');
         if (!serviceId || reason.length < 8 || reason.length > 500) {
-            feedback(root, 'دلیل تأیید باید حداقل ۸ و حداکثر ۵۰۰ کاراکتر باشد.', true);
+            feedback(root, 'دلیل باید حداقل ۸ و حداکثر ۵۰۰ کاراکتر باشد.', true);
             return;
         }
         const confirmation = isRevocation
@@ -99,7 +99,9 @@
         const original = submit?.innerHTML || '';
         if (submit) {
             submit.disabled = true;
-            submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال ثبت مجوز...</span>';
+            submit.innerHTML = isRevocation
+                ? '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال لغو مجوز...</span>'
+                : '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال ثبت مجوز...</span>';
         }
         feedback(root, isRevocation ? 'در حال لغو مجوز و ثبت Audit Event...' : 'در حال ثبت مجوز و Audit Event...', false);
 
