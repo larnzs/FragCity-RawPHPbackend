@@ -156,8 +156,8 @@ $vipCurrentStatus = !$isLoggedIn
     <aside class="vip-competitive-note" role="note">
         <span class="vip-competitive-note-icon" aria-hidden="true"><i class="fas fa-scale-balanced"></i></span>
         <span>
-            <strong>حفظ تعادل رقابتی سرورها</strong>
-            <small>قابلیت‌های VIP بر اساس مود فعال سرور مدیریت می‌شوند؛ مودهای رقابتی می‌توانند تنظیمات محدودکننده و قوانین اختصاصی خودشان را داشته باشند.</small>
+            <strong>وضعیت فعال بودن VIP در مودهای بازی</strong>
+            <small>برای حفظ تعادل رقابتی، VIPCore در مودهای Competitive، Practice، Wingman، Deathmatch، Valve Competitive، Valve Wingman، Valve Deathmatch و Deathmatch FFA، Retakes، Valve Retakes، Executes، Prefire، 1v1 Arenas و Aim غیرفعال است. در مودهای AWP، AWP Aim، ScoutzKnivez، Gun Game، One in the Chamber، Battle Royale، Valve Arms Race و Competitive 45° فعال می‌ماند.</small>
         </span>
     </aside>
 
