@@ -28,6 +28,7 @@
         client_api_connection_failed: 'اتصال Client API برقرار نشد. وضعیت کلید و حساب پنل را بررسی کنید.',
         client_api_connect_rate_limited: 'تعداد تلاش‌های اتصال زیاد بوده است. ۱۵ دقیقه بعد دوباره تلاش کنید.',
         client_api_not_connected: 'ابتدا Client API حساب Pterodactyl را از بخش دسترسی پنل متصل کنید.',
+        client_api_storage_not_ready: 'ذخیره‌سازی Client API هنوز آماده نشده است. ابتدا افزونه FragCity API در Paymenter را به‌روزرسانی کنید.',
         client_api_permission_denied: 'حساب Pterodactyl برای این عملیات مجوز لازم را ندارد.',
         client_api_file_too_large_to_edit: 'این فایل برای ویرایش داخل مرورگر بیش از حد بزرگ است؛ آن را دانلود و با ابزار مناسب ویرایش کنید.',
         client_api_file_not_editable: 'این نوع فایل در ویرایشگر مرورگر پشتیبانی نمی‌شود. برای تغییر آن از فایل خام یا ابزار مناسب استفاده کنید.',
