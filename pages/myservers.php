@@ -657,6 +657,10 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     $selectedIo = (int) ($selectedLimits['io'] ?? 0);
                     $selectedUpdatedAt = $myServersDate($selectedServerData['updated_at'] ?? '');
                     $selectedDescription = trim((string) ($selectedServerData['description'] ?? ''));
+                    $selectedNodeMaintenance = $selectedServerData['node_maintenance_mode'] ?? null;
+                    $selectedNodeMaintenanceLabel = is_bool($selectedNodeMaintenance)
+                        ? ($selectedNodeMaintenance ? 'Maintenance' : 'Normal')
+                        : 'Unknown';
 
                     $selectedAllocations = is_array($selectedServerData['allocations'] ?? null)
                         ? $selectedServerData['allocations']
@@ -690,6 +694,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                         <div class="fc-details-grid fc-server-meta-grid" dir="ltr">
                             <div><span>Node</span><strong><?= $myServersEscape($selectedNodeLabel) ?></strong></div>
                             <div><span>Location</span><strong><?= $myServersEscape($selectedLocationLabel) ?></strong></div>
+                            <div><span>Location ID</span><strong class="fc-mono"><?= $selectedLocationId > 0 ? number_format($selectedLocationId) : '—' ?></strong></div>
                             <div><span>Nest</span><strong><?= $myServersEscape($selectedNestLabel) ?></strong></div>
                             <div><span>Egg</span><strong><?= $myServersEscape($selectedEggLabel) ?></strong></div>
                             <div><span>Docker Image</span><strong class="fc-mono"><?= $myServersEscape($selectedDockerImage !== '' ? $selectedDockerImage : '—') ?></strong></div>
@@ -698,7 +703,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                             <div><span>I/O Weight</span><strong><?= $selectedIo > 0 ? number_format($selectedIo) : '—' ?></strong></div>
                             <div><span>CPU Pinning</span><strong class="fc-mono"><?= $myServersEscape($selectedThreadsLabel) ?></strong></div>
                             <div><span>OOM Killer</span><strong><?= $myServersEscape($selectedOomLabel) ?></strong></div>
-                            <div><span>Node Maintenance</span><strong><?= !empty($selectedServerData['node_maintenance_mode']) ? 'Maintenance' : 'Normal' ?></strong></div>
+                            <div><span>Node Maintenance</span><strong><?= $myServersEscape($selectedNodeMaintenanceLabel) ?></strong></div>
                             <div><span>Last Updated</span><strong><?= $myServersEscape($selectedUpdatedAt) ?></strong></div>
                         </div>
 
@@ -730,7 +735,12 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                             : ($allocationPort > 0 ? 'PORT ' . $allocationPort : 'Unavailable');
                                         ?>
                                         <div class="fc-server-allocation">
-                                            <span><?= !empty($allocation['is_default']) ? 'PRIMARY ALLOCATION' : 'ADDITIONAL ALLOCATION' ?></span>
+                                            <span>
+                                                <?= !empty($allocation['is_default']) ? 'PRIMARY ALLOCATION' : 'ADDITIONAL ALLOCATION' ?>
+                                                <?php if ((int) ($allocation['id'] ?? 0) > 0): ?>
+                                                    · ID #<?= number_format((int) $allocation['id']) ?>
+                                                <?php endif; ?>
+                                            </span>
                                             <strong class="fc-mono"><?= $myServersEscape($allocationEndpoint) ?></strong>
                                         </div>
                                     <?php endforeach; ?>
