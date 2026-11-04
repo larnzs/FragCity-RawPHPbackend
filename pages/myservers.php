@@ -802,15 +802,21 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                             'is_default' => true,
                         ];
                     }
+                    $formatNetworkHost = static function (array $allocation): string {
+                        $ip = trim((string) ($allocation['ip'] ?? ''));
+                        $alias = trim((string) ($allocation['alias'] ?? ''));
+                        $host = $alias !== '' ? $alias : $ip;
+
+                        return filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)
+                            ? '[' . $host . ']'
+                            : $host;
+                    };
                     $networkPrimaryEndpoint = '';
                     foreach ($networkAllocations as $networkAllocation) {
                         if (!is_array($networkAllocation)) {
                             continue;
                         }
-                        $networkHost = trim((string) ($networkAllocation['ip'] ?? ''));
-                        if ($networkHost === '') {
-                            $networkHost = trim((string) ($networkAllocation['alias'] ?? ''));
-                        }
+                        $networkHost = $formatNetworkHost($networkAllocation);
                         $networkPort = (int) ($networkAllocation['port'] ?? 0);
                         if (!empty($networkAllocation['is_default']) || (int) ($networkAllocation['id'] ?? 0) === $primaryAllocationId) {
                             if ($networkHost !== '' && $networkPort > 0) {
@@ -822,7 +828,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     if ($networkPrimaryEndpoint === '' && $networkAllocations !== []) {
                         $firstAllocation = $networkAllocations[0];
                         if (is_array($firstAllocation)) {
-                            $networkHost = trim((string) ($firstAllocation['ip'] ?? $firstAllocation['alias'] ?? ''));
+                            $networkHost = $formatNetworkHost($firstAllocation);
                             $networkPort = (int) ($firstAllocation['port'] ?? 0);
                             if ($networkHost !== '' && $networkPort > 0) {
                                 $networkPrimaryEndpoint = $networkHost . ':' . $networkPort;
@@ -867,7 +873,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                     }
                                     $networkHost = trim((string) ($networkAllocation['ip'] ?? ''));
                                     $networkAlias = trim((string) ($networkAllocation['alias'] ?? ''));
-                                    $networkDisplayHost = $networkHost !== '' ? $networkHost : $networkAlias;
+                                    $networkDisplayHost = $formatNetworkHost($networkAllocation);
                                     $networkPort = (int) ($networkAllocation['port'] ?? 0);
                                     $networkEndpoint = $networkDisplayHost !== ''
                                         ? $networkDisplayHost . ($networkPort > 0 ? ':' . $networkPort : '')
