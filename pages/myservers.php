@@ -609,6 +609,138 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                         </div>
                     </div>
 
+                    <?php
+                    $selectedNodeId = (int) ($selectedServerData['node'] ?? 0);
+                    $selectedNodeName = trim((string) ($selectedServerData['node_name'] ?? ''));
+                    $selectedNodeLabel = $selectedNodeName !== ''
+                        ? $selectedNodeName . ($selectedNodeId > 0 ? ' (#' . $selectedNodeId . ')' : '')
+                        : ($selectedNodeId > 0 ? 'Node #' . $selectedNodeId : '—');
+
+                    $selectedLocationId = (int) ($selectedServerData['location_id'] ?? 0);
+                    $selectedLocationLong = trim((string) ($selectedServerData['location_long'] ?? ''));
+                    $selectedLocationShort = trim((string) ($selectedServerData['location_short'] ?? ''));
+                    $selectedLocationLabel = $selectedLocationLong !== ''
+                        ? $selectedLocationLong
+                        : ($selectedLocationShort !== '' ? $selectedLocationShort : '—');
+                    if ($selectedLocationShort !== '' && $selectedLocationLong !== '') {
+                        $selectedLocationLabel .= ' (' . $selectedLocationShort . ')';
+                    }
+                    if ($selectedLocationId > 0 && $selectedLocationLabel === '—') {
+                        $selectedLocationLabel = 'Location #' . $selectedLocationId;
+                    }
+
+                    $selectedNestId = (int) ($selectedServerData['nest_id'] ?? 0);
+                    $selectedNestName = trim((string) ($selectedServerData['nest_name'] ?? ''));
+                    $selectedNestLabel = $selectedNestName !== ''
+                        ? $selectedNestName . ($selectedNestId > 0 ? ' (#' . $selectedNestId . ')' : '')
+                        : ($selectedNestId > 0 ? 'Nest #' . $selectedNestId : '—');
+
+                    $selectedEggId = (int) ($selectedServerData['egg_id'] ?? 0);
+                    $selectedEggName = trim((string) ($selectedServerData['egg_name'] ?? ''));
+                    $selectedEggLabel = $selectedEggName !== ''
+                        ? $selectedEggName . ($selectedEggId > 0 ? ' (#' . $selectedEggId . ')' : '')
+                        : ($selectedEggId > 0 ? 'Egg #' . $selectedEggId : '—');
+
+                    $selectedDockerImage = trim((string) ($selectedServerData['docker_image'] ?? ''));
+                    $selectedInstalledValue = $selectedServerData['installed'] ?? null;
+                    $selectedInstallLabel = is_bool($selectedInstalledValue) || is_numeric($selectedInstalledValue)
+                        ? ((bool) $selectedInstalledValue ? 'Installed' : 'Not Installed')
+                        : 'Unknown';
+                    $selectedOomDisabled = array_key_exists('oom_disabled', $selectedLimits)
+                        ? (bool) $selectedLimits['oom_disabled']
+                        : null;
+                    $selectedOomLabel = $selectedOomDisabled === null
+                        ? '—'
+                        : ($selectedOomDisabled ? 'Disabled' : 'Enabled');
+                    $selectedThreads = trim((string) ($selectedLimits['threads'] ?? ''));
+                    $selectedThreadsLabel = $selectedThreads !== '' ? $selectedThreads : 'Default';
+                    $selectedIo = (int) ($selectedLimits['io'] ?? 0);
+                    $selectedUpdatedAt = $myServersDate($selectedServerData['updated_at'] ?? '');
+                    $selectedDescription = trim((string) ($selectedServerData['description'] ?? ''));
+
+                    $selectedAllocations = is_array($selectedServerData['allocations'] ?? null)
+                        ? $selectedServerData['allocations']
+                        : [];
+                    if (
+                        $selectedAllocations === []
+                        && (
+                            trim((string) ($selectedServerData['allocation_ip'] ?? '')) !== ''
+                            || trim((string) ($selectedServerData['allocation_alias'] ?? '')) !== ''
+                            || (int) ($selectedServerData['allocation_port'] ?? 0) > 0
+                        )
+                    ) {
+                        $selectedAllocations[] = [
+                            'id' => (int) ($selectedServerData['allocation'] ?? 0),
+                            'ip' => (string) ($selectedServerData['allocation_ip'] ?? ''),
+                            'alias' => (string) ($selectedServerData['allocation_alias'] ?? ''),
+                            'port' => (int) ($selectedServerData['allocation_port'] ?? 0),
+                            'is_default' => true,
+                        ];
+                    }
+                    ?>
+
+                    <section class="fc-dashboard-card fc-server-technical-card">
+                        <div class="fc-dashboard-card__heading">
+                            <div>
+                                <h3>مشخصات فنی و پیکربندی</h3>
+                            </div>
+                            <span><i class="fa-solid fa-sliders" aria-hidden="true"></i></span>
+                        </div>
+
+                        <div class="fc-details-grid fc-server-meta-grid" dir="ltr">
+                            <div><span>Node</span><strong><?= $myServersEscape($selectedNodeLabel) ?></strong></div>
+                            <div><span>Location</span><strong><?= $myServersEscape($selectedLocationLabel) ?></strong></div>
+                            <div><span>Nest</span><strong><?= $myServersEscape($selectedNestLabel) ?></strong></div>
+                            <div><span>Egg</span><strong><?= $myServersEscape($selectedEggLabel) ?></strong></div>
+                            <div><span>Docker Image</span><strong class="fc-mono"><?= $myServersEscape($selectedDockerImage !== '' ? $selectedDockerImage : '—') ?></strong></div>
+                            <div><span>Installation</span><strong><?= $myServersEscape($selectedInstallLabel) ?></strong></div>
+                            <div><span>Swap</span><strong><?= $myServersEscape($myServersMiB($selectedLimits['swap'] ?? 0)) ?></strong></div>
+                            <div><span>I/O Weight</span><strong><?= $selectedIo > 0 ? number_format($selectedIo) : '—' ?></strong></div>
+                            <div><span>CPU Pinning</span><strong class="fc-mono"><?= $myServersEscape($selectedThreadsLabel) ?></strong></div>
+                            <div><span>OOM Killer</span><strong><?= $myServersEscape($selectedOomLabel) ?></strong></div>
+                            <div><span>Node Maintenance</span><strong><?= !empty($selectedServerData['node_maintenance_mode']) ? 'Maintenance' : 'Normal' ?></strong></div>
+                            <div><span>Last Updated</span><strong><?= $myServersEscape($selectedUpdatedAt) ?></strong></div>
+                        </div>
+
+                        <?php if ($selectedDescription !== ''): ?>
+                            <div class="fc-server-description" dir="ltr">
+                                <span>SERVER DESCRIPTION</span>
+                                <p><?= $myServersEscape($selectedDescription) ?></p>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="fc-server-allocations">
+                            <div class="fc-server-allocations__heading">
+                                <span>NETWORK ALLOCATIONS</span>
+                                <strong><?= number_format(count($selectedAllocations)) ?></strong>
+                            </div>
+                            <?php if ($selectedAllocations !== []): ?>
+                                <div class="fc-server-allocations__list" dir="ltr">
+                                    <?php foreach ($selectedAllocations as $allocation): ?>
+                                        <?php
+                                        if (!is_array($allocation)) {
+                                            continue;
+                                        }
+                                        $allocationIp = trim((string) ($allocation['ip'] ?? ''));
+                                        $allocationAlias = trim((string) ($allocation['alias'] ?? ''));
+                                        $allocationHost = $allocationIp !== '' ? $allocationIp : $allocationAlias;
+                                        $allocationPort = (int) ($allocation['port'] ?? 0);
+                                        $allocationEndpoint = $allocationHost !== ''
+                                            ? $allocationHost . ($allocationPort > 0 ? ':' . $allocationPort : '')
+                                            : ($allocationPort > 0 ? 'PORT ' . $allocationPort : 'Unavailable');
+                                        ?>
+                                        <div class="fc-server-allocation">
+                                            <span><?= !empty($allocation['is_default']) ? 'PRIMARY ALLOCATION' : 'ADDITIONAL ALLOCATION' ?></span>
+                                            <strong class="fc-mono"><?= $myServersEscape($allocationEndpoint) ?></strong>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            <?php else: ?>
+                                <p class="fc-server-allocations__empty">No network allocation details are available.</p>
+                            <?php endif; ?>
+                        </div>
+                    </section>
+
                     <div class="fc-myservers__lower-grid">
                         <section class="fc-dashboard-card fc-dashboard-card--quick">
                             <div class="fc-dashboard-card__heading"><div><h3>دسترسی سریع</h3></div></div>
