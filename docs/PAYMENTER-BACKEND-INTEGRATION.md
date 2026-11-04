@@ -19,7 +19,7 @@ Paymenter is a private backend supervisor. Its own customer-facing theme and adm
 - The FragCity CS2 server extension and Pterodactyl provisioning.
 - Internal service actions/monitoring where Paymenter provides a safe supported path.
 
-Pterodactyl/Wings own the actual server record, node allocation, Docker container and execution lifecycle. Customers must not be directed to the Pterodactyl panel. FragCity's backend will authorize and proxy the supported operations.
+Pterodactyl/Wings own the actual server record, node allocation, Docker container and execution lifecycle. FragCity's `My Servers` page is the customer-facing inventory and credential-management surface. For an owned service it can link the customer to that server's Pterodactyl panel page; panel identity and password changes are authorized through the signed FragCity → Paymenter → Pterodactyl backend path. Customers never receive an Application API key.
 
 ## 2. Source-of-truth boundaries
 
@@ -45,7 +45,9 @@ Do not recreate retired Windows Agent tables or use them as the new provisioning
 - The FragCity website stores only its password hash. The plaintext password exists only in request memory and in the short-lived HTTPS/HMAC server-to-server body to Paymenter; neither side writes it to logs or stores it in plaintext.
 - Paymenter stores its own password hash and has no native username column. The bridge stores the selected FragCity username as the Paymenter User Property `fragcity_username`; `first_name`, `last_name`, `email` and `password` use Paymenter's native user fields.
 - Before the official Paymenter Pterodactyl server provisioner runs, `FragCityCS2` reads `fragcity_username` and creates or updates the Pterodactyl client through the Application API. The Pterodactyl native `username`, `first_name`, `last_name` and `email` receive the corresponding FragCity values. It also sets Pterodactyl `external_id` to the Paymenter user ID, then delegates server creation to the inherited official implementation.
-- Pterodactyl's Application API allows the password field to be omitted when creating a client user. The extension does not persist or send a plaintext password during provisioning, so the Pterodactyl panel password remains independent. FragCity and Paymenter passwords stay synchronized; Pterodactyl password synchronization is not part of this change.
+- Pterodactyl's Application API allows the password field to be omitted when creating a client user. The Pterodactyl panel password is intentionally independent from FragCity and Paymenter. Customers set or replace it in the FragCity `My Servers` page after re-entering their current FragCity password; the signed Bridge sends the new panel password to Paymenter, and the FragCityCS2 extension updates the Pterodactyl user through the Application API.
+- The current panel password is never readable or returned: Pterodactyl stores only a password hash. FragCity and Paymenter persist no Pterodactyl plaintext password or password hash. Paymenter stores only a `fragcity_panel_password_set_at` timestamp marker. The page displays the panel URL, username, email, server UUID/identifier, status and resource details; it provides a set/change-password form rather than a recoverable password display.
+- The signed customer bridge endpoints are `POST /api/v1/fragcity/bridge/servers/list` and `POST /api/v1/fragcity/bridge/servers/password`. Both resolve the SteamID64 through `fragcity_user_links`, and password changes are additionally scoped to a service owned by that linked Paymenter user.
 - Email and mobile are required for account synchronization. The mobile number is stored in Paymenter as the `fragcity_phone` user property because Paymenter v1.5.9 does not provide a native phone field.
 
 ## 3. Paymenter v1.5.9 API findings
@@ -109,7 +111,7 @@ Expected output contains a PASS line, HTTP 200 and a count for the one-item samp
 3. Idempotent provisioning transaction and user/product/plan mapping.
 4. Zarinpal server-purchase payment intent + verify + outbox/retry.
 5. One test customer, one test product, one test CS2 server; verify environment, node, limits and lifecycle.
-6. Website customer dashboard and administrator controls.
+6. Website `My Servers` inventory, customer server cards and independent Pterodactyl panel-password management (initial implementation now added; production verification remains pending).
 7. RCON/live controls and separate schema-driven CFG/JSON file settings, with backups, validation and explicit reload/restart semantics.
 
 No live purchase, real payment or production server operation is enabled by this document.
