@@ -32,6 +32,8 @@ The page interprets the bridge's lifecycle state and service status separately:
 
 A Pterodactyl 404 is not silently converted into provisioning. A timeout, 401/403 or 5xx is an operational failure and remains unavailable/retryable.
 
+The Paymenter user ID recorded on a service mapping is an ownership invariant, not a mutable lookup hint. If the current Paymenter service owner differs from the recorded owner, the lifecycle enters `review_required`; no Client/Server mutation, deletion, or automatic reassignment is permitted until an administrator resolves the identity conflict.
+
 The page never deletes, recreates, suspends or unsuspends a server directly. Those actions remain in the Paymenter extension/API lifecycle layer.
 
 The customer inventory read is also read-only with respect to Pterodactyl Client accounts. It verifies the pre-approved Client ID and durable customer UUID with GET requests only. It does not search by email, create a Client, or synchronize Client profile fields. Missing or conflicting identity mappings fail closed and require administrator review. The local lifecycle registry may still record observed server state and reconciliation timestamps.
