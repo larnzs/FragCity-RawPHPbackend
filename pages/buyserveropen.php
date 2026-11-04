@@ -64,11 +64,11 @@
         </div>
 
         <div class="fc-server-coming__actions">
-            <a href="?page=servers_vps" class="fc-server-coming__primary" data-ajax-nav data-slug="servers_vps">
+            <a href="/servers/" class="fc-server-coming__primary" data-ajax-nav data-slug="servers_vps">
                 <i class="fa-solid fa-list" aria-hidden="true"></i>
                 مشاهده سرورهای عمومی
             </a>
-            <a href="?page=serverguide" class="fc-server-coming__secondary" data-ajax-nav data-slug="serverguide">
+            <a href="/serverguide/" class="fc-server-coming__secondary" data-ajax-nav data-slug="serverguide">
                 <i class="fa-solid fa-book-open" aria-hidden="true"></i>
                 راهنمای سرور
             </a>
