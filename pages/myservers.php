@@ -25,7 +25,6 @@ require_once dirname(__DIR__) . '/class/PaymenterApiClient.php';
 
 $myServers = [];
 $myServersError = false;
-$myServersLifecycleAlerts = [];
 $myServersSteamId = (string) ($_SESSION['steamid'] ?? '');
 $myServersCsrf = (string) ($_SESSION['auth_csrf_token'] ?? '');
 
@@ -122,17 +121,8 @@ $myServersStatus = static function (array $row): array {
     $server = is_array($row['server'] ?? null) ? $row['server'] : [];
     $suspended = !empty($server['suspended']) || $serviceStatus === 'suspended';
 
-    if ($state === 'provisioning' || $state === 'suspending' || $state === 'unsuspending' || $state === 'deleting') {
-        return [$state === 'deleting' ? 'در حال حذف' : 'در حال پردازش', 'provisioning'];
-    }
-    if ($state === 'missing_external') {
-        return ['سرور در پنل پیدا نشد', 'unavailable'];
-    }
-    if ($state === 'paymenter_missing') {
-        return ['نیازمند بررسی مالکیت سرویس', 'unavailable'];
-    }
-    if ($state === 'deleted') {
-        return ['حذف شده', 'unavailable'];
+    if ($state === 'provisioning') {
+        return ['در حال آماده‌سازی', 'provisioning'];
     }
     if ($state !== 'ready') {
         return ['نیازمند بررسی', 'unavailable'];
@@ -153,7 +143,6 @@ if (preg_match('/^[0-9]{17}$/D', $myServersSteamId)) {
     try {
         $myServersClient = new PaymenterApiClient();
         $myServers = $myServersClient->getCustomerServers($myServersSteamId);
-        $myServersLifecycleAlerts = $myServersClient->getLifecycleAlerts();
 
         foreach ($myServers as $row) {
             if (!is_array($row)) {
@@ -241,7 +230,7 @@ if ($selectedServer === null && $myServersServices !== []) {
     $selectedServer = $myServersServices[0];
 }
 
-$allowedTabs = ['overview', 'network', 'console', 'files', 'access'];
+$allowedTabs = ['overview', 'network', 'access'];
 $requestedTab = strtolower(trim((string) ($_GET['tab'] ?? 'overview')));
 $activeTab = in_array($requestedTab, $allowedTabs, true) ? $requestedTab : 'overview';
 
@@ -290,16 +279,6 @@ $myServersDetailsStatus = static function (string $statusClass): string {
         </a>
     </header>
 
-    <?php if ((int) ($myServersLifecycleAlerts['paymenter_missing'] ?? 0) > 0): ?>
-        <div class="fc-myservers__state-card fc-myservers__state-card--error" role="status">
-            <span class="fc-myservers__state-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
-            <div>
-                <strong>یک نگاشت سرویس نیازمند بررسی است</strong>
-                <p>یک یا چند رکورد سرویس در Paymenter حذف شده، اما سابقه اتصال آن باقی مانده است. این مورد برای جلوگیری از حذف ناخواسته سرورهای پنل به بررسی پشتیبانی نیاز دارد.</p>
-            </div>
-        </div>
-        <?php endif; ?>
-
     <?php if ($myServersError): ?>
         <div class="fc-myservers__state-card fc-myservers__state-card--error" role="alert">
             <span class="fc-myservers__state-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
@@ -333,11 +312,8 @@ $myServersDetailsStatus = static function (string $statusClass): string {
         $selectedServerData = $selectedServer['server'];
         $selectedLimits = $selectedServer['limits'];
         $selectedFeatures = $selectedServer['features'];
+        $selectedCanManage = $selectedServer['state'] === 'ready';
         $selectedServiceActive = ($selectedServer['service_status'] ?? '') === 'active';
-        $selectedCanManage = $selectedServer['state'] === 'ready'
-            && $selectedServiceActive
-            && empty($selectedServerData['suspended']);
-        $selectedClientApiConnected = !empty($selectedServer['panel']['client_api_connected']);
         $selectedPasswordSet = $selectedServer['password_set'];
         ?>
 
@@ -354,23 +330,21 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     $itemServer = is_array($item['server'] ?? null) ? $item['server'] : [];
                     $itemLimits = is_array($item['limits'] ?? null) ? $item['limits'] : [];
                     $itemName = $item['name'] !== '' ? $item['name'] : $item['product_name'] . ' #' . $itemId;
-                    $itemState = strtolower(trim((string) ($item['state'] ?? 'unavailable')));
-                    $itemMissing = $itemState === 'missing_external';
                     $itemExpiry = $myServersExpirySummary(
                         $itemServer['service_created_at'] ?? '',
                         $itemServer['expires_at'] ?? ''
                     );
-                    if ($itemState !== 'ready') {
+                    if (($item['state'] ?? '') !== 'ready') {
                         $itemExpiry = [
                             'has_expiry' => false,
                             'days_remaining' => null,
                             'progress' => 0,
                             'critical' => false,
-                            'label' => $itemMissing ? 'Unavailable' : 'Pending',
+                            'label' => 'Pending',
                         ];
                     }
                     $itemIdentifier = trim((string) ($item['identifier'] ?? ''));
-                    $itemReady = $itemState === 'ready';
+                    $itemReady = ($item['state'] ?? '') === 'ready';
                     $itemMemory = (int) ($itemLimits['memory'] ?? 0);
                     $itemCpu = (int) ($itemLimits['cpu'] ?? 0);
                     $itemIp = trim((string) ($itemServer['allocation_ip'] ?? ''));
@@ -380,11 +354,11 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     if (filter_var($itemHost, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
                         $itemHost = '[' . $itemHost . ']';
                     }
-                    $itemEndpoint = $itemReady
-                        ? ($itemHost !== ''
+                    $itemEndpoint = !$itemReady
+                        ? 'Pending'
+                        : ($itemHost !== ''
                             ? $itemHost . ($itemPort > 0 ? ':' . $itemPort : '')
-                            : 'Not assigned')
-                        : ($itemMissing ? 'Not found in panel' : 'Pending');
+                            : 'Not assigned');
                     $itemPurchaseDate = $myServersDate($itemServer['service_created_at'] ?? '');
                     $itemExpiryPercent = max(0, min(100, (float) $itemExpiry['progress']));
                     ?>
@@ -421,11 +395,11 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                             </div>
                             <div class="fc-server-card__fact">
                                 <span>RAM</span>
-                                <strong><?= !$itemReady ? ($itemMissing ? '—' : 'Pending') : ($itemMemory > 0 ? $myServersEscape($myServersMiB($itemMemory)) : 'Unlimited') ?></strong>
+                                <strong><?= !$itemReady ? 'Pending' : ($itemMemory > 0 ? $myServersEscape($myServersMiB($itemMemory)) : 'Unlimited') ?></strong>
                             </div>
                             <div class="fc-server-card__fact">
                                 <span>CPU</span>
-                                <strong><?= !$itemReady ? ($itemMissing ? '—' : 'Pending') : ($itemCpu > 0 ? number_format($itemCpu) . '%' : 'Unlimited') ?></strong>
+                                <strong><?= !$itemReady ? 'Pending' : ($itemCpu > 0 ? number_format($itemCpu) . '%' : 'Unlimited') ?></strong>
                             </div>
                             <div class="fc-server-card__fact fc-server-card__fact--network">
                                 <span>IP / PORT</span>
@@ -514,18 +488,12 @@ $myServersDetailsStatus = static function (string $statusClass): string {
 
                 <div class="fc-myservers__sidebar-group">
                     <span class="fc-myservers__sidebar-caption">ابزارهای سرور</span>
-                    <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'console')) ?>"
-                       class="fc-myservers__nav-item <?= $activeTab === 'console' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
-                       <?= $activeTab === 'console' ? 'aria-current="page"' : '' ?>>
-                        <i class="fa-solid fa-terminal"></i><span>کنسول زنده</span>
-                        <?php if (!$selectedClientApiConnected): ?><small>اتصال لازم</small><?php endif; ?>
-                    </a>
-                    <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'files')) ?>"
-                       class="fc-myservers__nav-item <?= $activeTab === 'files' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
-                       <?= $activeTab === 'files' ? 'aria-current="page"' : '' ?>>
-                        <i class="fa-solid fa-folder-open"></i><span>مدیریت فایل‌ها</span>
-                        <?php if (!$selectedClientApiConnected): ?><small>اتصال لازم</small><?php endif; ?>
-                    </a>
+                    <button type="button" class="fc-myservers__nav-item is-disabled" disabled title="این بخش پس از سازگاری API فعال می‌شود">
+                        <i class="fa-solid fa-terminal"></i><span>کنسول</span><small>به‌زودی</small>
+                    </button>
+                    <button type="button" class="fc-myservers__nav-item is-disabled" disabled title="این بخش پس از سازگاری API فعال می‌شود">
+                        <i class="fa-solid fa-folder-open"></i><span>مدیریت فایل‌ها</span><small>به‌زودی</small>
+                    </button>
                     <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'network')) ?>"
                        class="fc-myservers__nav-item <?= $activeTab === 'network' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
                        <?= $activeTab === 'network' ? 'aria-current="page"' : '' ?>>
@@ -553,22 +521,8 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     <div class="fc-myservers__workspace-state fc-myservers__workspace-state--<?= $myServersEscape($selectedStatusClass) ?>">
                         <div class="fc-myservers__workspace-state-icon"><i class="fa-solid fa-clock" aria-hidden="true"></i></div>
                         <div>
-                            <h3><?= !$selectedServiceActive || !empty($selectedServerData['suspended'])
-                                ? 'سرویس شما موقتاً معلق است'
-                                : match ($selectedServer['state']) {
-                                    'provisioning' => 'سرور در حال آماده‌سازی است',
-                                    'missing_external' => 'سرور در Pterodactyl پیدا نشد',
-                                    'deleting' => 'درخواست حذف سرور در حال پردازش است',
-                                    default => 'اطلاعات سرور فعلاً در دسترس نیست',
-                                } ?></h3>
-                            <p><?= !$selectedServiceActive || !empty($selectedServerData['suspended'])
-                                ? 'سرویس در وضعیت Suspend قرار دارد و ابزارهای مدیریتی آن تا زمان فعال‌سازی مجدد غیرفعال هستند.'
-                                : match ($selectedServer['state']) {
-                                    'provisioning' => 'بعد از تکمیل ساخت سرور در Pterodactyl، اطلاعات و دسترسی‌ها در این داشبورد فعال می‌شوند.',
-                                    'missing_external' => 'رکورد سرویس در Paymenter وجود دارد، اما Pterodactyl برای آن سرور پاسخ 404 داده است. سرور به‌صورت خودکار دوباره ساخته نمی‌شود؛ برای بررسی یا بازیابی با پشتیبانی تماس بگیرید.',
-                                    'deleting' => 'عملیات حذف ثبت شده است. پس از تأیید حذف از Pterodactyl، سابقه سرویس به‌روزرسانی می‌شود.',
-                                    default => 'سرویس ثبت شده است، اما اطلاعات پنل قابل تأیید نیست. در صورت تداوم مشکل با پشتیبانی تماس بگیرید.',
-                                } ?></p>
+                            <h3><?= $selectedServer['state'] === 'provisioning' ? 'سرور در حال آماده‌سازی است' : 'اطلاعات سرور فعلاً در دسترس نیست' ?></h3>
+                            <p><?= $selectedServer['state'] === 'provisioning' ? 'بعد از تکمیل ساخت سرور در Pterodactyl، اطلاعات و دسترسی‌ها در این داشبورد فعال می‌شوند.' : 'سرویس ثبت شده است، اما اطلاعات پنل قابل تأیید نیست. در صورت تداوم مشکل با پشتیبانی تماس بگیرید.' ?></p>
                         </div>
                     </div>
                 <?php elseif ($activeTab === 'overview'): ?>
@@ -944,116 +898,6 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                         <?php endif; ?>
                     </section>
 
-                <?php elseif ($activeTab === 'console'): ?>
-                    <div class="fc-myservers__workspace-header">
-                        <div><h3>کنسول زنده</h3><p>مشاهده خروجی سرور و ارسال دستور از طریق اتصال امن Pterodactyl</p></div>
-                    </div>
-                    <?php if (!$selectedServiceActive): ?>
-                        <section class="fc-dashboard-card fc-tool-connect-required">
-                            <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                            <div>
-                                <h3>این سرویس فعال نیست</h3>
-                                <p>برای استفاده از کنسول زنده، وضعیت سرویس باید در Paymenter فعال باشد. اطلاعات شبکه و مشخصات سرویس همچنان قابل مشاهده است.</p>
-                            </div>
-                        </section>
-                    <?php elseif (!$selectedClientApiConnected): ?>
-                        <section class="fc-dashboard-card fc-tool-connect-required">
-                            <i class="fa-solid fa-key" aria-hidden="true"></i>
-                            <div>
-                                <h3>ابتدا حساب Pterodactyl را متصل کنید</h3>
-                                <p>برای دسترسی به Console باید Client API Key حساب مالک سرور را یک‌بار در بخش دسترسی پنل ثبت کنید.</p>
-                                <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>" data-ajax-nav data-slug="myservers">رفتن به اتصال API <i class="fa-solid fa-arrow-left"></i></a>
-                            </div>
-                        </section>
-                    <?php else: ?>
-                        <section class="fc-dashboard-card fc-console-card" id="fcConsole" data-service-id="<?= $selectedId ?>">
-                            <div class="fc-console-card__header">
-                                <div>
-                                    <div class="fc-console-card__title"><i class="fa-solid fa-terminal"></i><strong>Server Console</strong></div>
-                                    <span class="fc-console-card__status" data-console-status>Disconnected</span>
-                                </div>
-                                <div class="fc-console-card__actions">
-                                    <button type="button" data-console-connect><i class="fa-solid fa-plug"></i><span>اتصال</span></button>
-                                    <button type="button" data-console-clear><i class="fa-solid fa-eraser"></i><span>پاک‌کردن خروجی</span></button>
-                                </div>
-                            </div>
-                            <div class="fc-console-card__stats" dir="ltr">
-                                <div><span>CPU</span><strong data-console-cpu>—</strong></div>
-                                <div><span>MEMORY</span><strong data-console-memory>—</strong></div>
-                                <div><span>DISK</span><strong data-console-disk>—</strong></div>
-                                <div><span>STATE</span><strong data-console-state>—</strong></div>
-                            </div>
-                            <pre class="fc-console-card__output" data-console-output role="log" aria-live="polite">برای دریافت خروجی، روی «اتصال» کلیک کنید.</pre>
-                            <form method="post" action="" class="fc-console-card__command" data-console-command-form dir="ltr">
-                                <span aria-hidden="true">›</span>
-                                <input type="text" name="command" maxlength="2000" autocomplete="off" spellcheck="false" placeholder="Enter server command..." aria-label="Server command" required>
-                                <button type="submit" disabled data-console-send><i class="fa-solid fa-paper-plane"></i> Send</button>
-                            </form>
-                            <p class="fc-console-card__hint">اتصال زنده با توکن کوتاه‌عمر برقرار می‌شود؛ کلید Client API به مرورگر ارسال نمی‌شود.</p>
-                        </section>
-                    <?php endif; ?>
-
-                <?php elseif ($activeTab === 'files'): ?>
-                    <div class="fc-myservers__workspace-header">
-                        <div><h3>مدیریت فایل‌ها</h3><p>مرور، ویرایش، بارگذاری و مدیریت فایل‌های سرور</p></div>
-                    </div>
-                    <?php if (!$selectedServiceActive): ?>
-                        <section class="fc-dashboard-card fc-tool-connect-required">
-                            <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                            <div>
-                                <h3>این سرویس فعال نیست</h3>
-                                <p>برای مدیریت فایل‌ها، وضعیت سرویس باید در Paymenter فعال باشد. اطلاعات IP و Port همچنان قابل مشاهده است.</p>
-                            </div>
-                        </section>
-                    <?php elseif (!$selectedClientApiConnected): ?>
-                        <section class="fc-dashboard-card fc-tool-connect-required">
-                            <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
-                            <div>
-                                <h3>برای مدیریت فایل‌ها اتصال API لازم است</h3>
-                                <p>Client API Key حساب مالک را یک‌بار متصل کنید تا فایل‌های همین سرور از طریق مجوزهای Pterodactyl قابل مدیریت شوند.</p>
-                                <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>" data-ajax-nav data-slug="myservers">رفتن به اتصال API <i class="fa-solid fa-arrow-left"></i></a>
-                            </div>
-                        </section>
-                    <?php else: ?>
-                        <section class="fc-dashboard-card fc-file-manager" id="fcFileManager" data-service-id="<?= $selectedId ?>">
-                            <div class="fc-file-manager__toolbar">
-                                <div class="fc-file-manager__location">
-                                    <i class="fa-solid fa-folder-tree"></i>
-                                    <strong data-file-directory>/</strong>
-                                </div>
-                                <div class="fc-file-manager__actions">
-                                    <button type="button" data-file-up title="پوشه بالاتر"><i class="fa-solid fa-arrow-up"></i></button>
-                                    <button type="button" data-file-refresh title="تازه‌سازی"><i class="fa-solid fa-rotate"></i></button>
-                                    <button type="button" data-file-new-folder><i class="fa-solid fa-folder-plus"></i> پوشه جدید</button>
-                                    <button type="button" data-file-upload-trigger><i class="fa-solid fa-upload"></i> بارگذاری</button>
-                                    <input type="file" data-file-upload-input hidden multiple>
-                                </div>
-                            </div>
-                            <div class="fc-file-manager__breadcrumbs" data-file-breadcrumbs dir="ltr"></div>
-                            <div class="fc-file-manager__message" data-file-message role="status" aria-live="polite">در حال آماده‌سازی مدیریت فایل‌ها...</div>
-                            <div class="fc-file-manager__table-wrap" dir="ltr">
-                                <table class="fc-file-manager__table">
-                                    <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Modified</th><th>Actions</th></tr></thead>
-                                    <tbody data-file-list></tbody>
-                                </table>
-                            </div>
-                            <section class="fc-file-editor" data-file-editor hidden>
-                                <div class="fc-file-editor__header">
-                                    <div><i class="fa-solid fa-file-code"></i><strong data-file-editor-name>File editor</strong></div>
-                                    <div>
-                                        <button type="button" data-file-download><i class="fa-solid fa-download"></i> Download</button>
-                                        <button type="button" data-file-close><i class="fa-solid fa-xmark"></i> Close</button>
-                                    </div>
-                                </div>
-                                <textarea data-file-editor-content spellcheck="false" aria-label="File contents"></textarea>
-                                <div class="fc-file-editor__footer">
-                                    <span data-file-editor-message></span>
-                                    <button type="button" data-file-save><i class="fa-solid fa-floppy-disk"></i> ذخیره تغییرات</button>
-                                </div>
-                            </section>
-                        </section>
-                    <?php endif; ?>
-
                 <?php elseif ($activeTab === 'access'): ?>
                     <div class="fc-myservers__workspace-header">
                         <div><h3>دسترسی پنل</h3><p>اطلاعات ورود به حساب مدیریت سرورهای شما</p></div>
@@ -1089,50 +933,6 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                 <?php endif; ?>
                             </div>
                         </div>
-                    </section>
-
-                    <section class="fc-dashboard-card fc-client-api-card">
-                        <div class="fc-dashboard-card__heading">
-                            <div><h3>اتصال امن ابزارهای مدیریت</h3><p>دسترسی Console و File Manager با Client API حساب مالک</p></div>
-                            <span class="fc-client-api-card__state <?= $selectedClientApiConnected ? 'is-connected' : 'is-disconnected' ?>" data-client-api-state>
-                                <i class="fa-solid <?= $selectedClientApiConnected ? 'fa-circle-check' : 'fa-link' ?>"></i>
-                                <?= $selectedClientApiConnected ? 'متصل' : 'متصل نشده' ?>
-                            </span>
-                        </div>
-                        <p class="fc-client-api-card__description">
-                            یک Client API Key از حساب Pterodactyl خودتان بسازید. این کلید فقط برای حساب شماست و در Paymenter به‌صورت رمزنگاری‌شده نگهداری می‌شود. کلید در مرورگر ذخیره یا دوباره نمایش داده نمی‌شود.
-                        </p>
-                        <?php if ($selectedClientApiConnected): ?>
-                            <div class="fc-client-api-card__connected">
-                                <div><i class="fa-solid fa-shield-check"></i><span><strong>حساب Pterodactyl متصل است</strong><small>این اتصال برای تمام سرورهای CS2 متعلق به همین حساب مشترک استفاده می‌شود.</small></span></div>
-                                <button type="button" data-client-api-disconnect><i class="fa-solid fa-link-slash"></i> قطع اتصال</button>
-                            </div>
-                            <p class="fc-client-api-card__note">قطع اتصال در FragCity، کلید ذخیره‌شده را از Paymenter حذف می‌کند. برای باطل‌کردن خود کلید، آن را از Account → API Credentials در Pterodactyl نیز حذف کنید.</p>
-                        <?php elseif (!$selectedServiceActive): ?>
-                            <p class="fc-client-api-card__note">برای اتصال ابزارهای مدیریت، ابتدا سرویس باید در Paymenter فعال باشد. پس از تمدید یا فعال‌سازی می‌توانید Client API را متصل کنید.</p>
-                        <?php else: ?>
-                            <ol class="fc-client-api-card__steps">
-                                <li>وارد حساب Pterodactyl خود شوید.</li>
-                                <li>از بخش <strong>Account → API Credentials</strong> یک Client API Key ایجاد کنید؛ برای مثال با توضیح <code>FragCity My Servers</code>.</li>
-                                <li>کلید را فقط در فرم زیر وارد کنید. بعد از تأیید، مقدار آن پاک می‌شود.</li>
-                            </ol>
-                            <form method="post" action="" autocomplete="off" class="fc-client-api-connect-form" data-client-api-connect-form dir="ltr">
-                                <input type="hidden" name="service_id" value="<?= $selectedId ?>">
-                                <label>
-                                    <span>Client API Key</span>
-                                    <input type="password" name="api_token" autocomplete="new-password" autocapitalize="none" spellcheck="false" placeholder="ptlc_..." minlength="20" maxlength="255" required>
-                                </label>
-                                <label>
-                                    <span>رمز فعلی حساب FragCity</span>
-                                    <input type="password" name="current_password" autocomplete="current-password" required>
-                                </label>
-                                <div class="fc-client-api-connect-form__footer">
-                                    <span data-client-api-message role="status" aria-live="polite"></span>
-                                    <button type="submit"><i class="fa-solid fa-link"></i> اتصال حساب</button>
-                                </div>
-                            </form>
-                            <p class="fc-client-api-card__note">Client API Key متعلق به حساب پنل شماست و دسترسی‌های همان حساب را دارد. آن را در چت، تیکت یا پیام برای کسی ارسال نکنید.</p>
-                        <?php endif; ?>
                     </section>
 
                     <section class="fc-dashboard-card fc-password-card">
