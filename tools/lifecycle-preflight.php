@@ -125,9 +125,9 @@ $check(str_contains($proxy, "'revoke_recreation'")
     && str_contains($client, 'adminLifecycleRevokeRecreation')
     && str_contains($client, '/admin/lifecycle/revoke-recreation'),
     'Recovery revocation is wired from website proxy to Paymenter client');
-$check(str_contains($page, "$authorizationStatus === 'in_progress'")
+$check(str_contains($page, "\$authorizationStatus === 'in_progress'")
     && str_contains($page, 'data-lifecycle-revoke')
-    && str_contains($page, "$mapping['last_reconciled_at']"),
+    && str_contains($page, "\$mapping['last_reconciled_at']"),
     'Dashboard exposes claim state, revocation and last reconciliation');
 $check(str_contains($js, "'revoke_recreation'")
     && str_contains($js, 'data-lifecycle-revoke')
@@ -167,7 +167,7 @@ if ($paymenterRoot === '') {
         && str_contains($bridge, 'function upgraded(')
         && str_contains($bridge, 'ExtensionHelper::runMigrations'),
         'Paymenter bridge version and extension migration hooks');
-    $check(str_contains($bridge, "ExtensionHelper::callService($service, 'reconcileCustomerLifecycle')")
+    $check(str_contains($bridge, "ExtensionHelper::callService(\$service, 'reconcileCustomerLifecycle')")
         && str_contains($bridge, 'private function reconcileLifecycleBatch'),
         'Scheduled and administrator reconciliation use lifecycle engine');
     $check(str_contains($routes, 'adminLifecycleList')
