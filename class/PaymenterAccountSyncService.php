@@ -111,6 +111,7 @@ final class PaymenterAccountSyncService
         $statement = $pdo->prepare(
             "UPDATE users
              SET paymenter_sync_status = 'pending',
+                 paymenter_synced_at = NULL,
                  paymenter_sync_error = NULL
              WHERE steamid64 = ?
              LIMIT 1"
