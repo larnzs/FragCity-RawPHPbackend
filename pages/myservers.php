@@ -343,13 +343,18 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                         ];
                     }
                     $itemIdentifier = trim((string) ($item['identifier'] ?? ''));
+                    $itemReady = ($item['state'] ?? '') === 'ready';
                     $itemMemory = (int) ($itemLimits['memory'] ?? 0);
                     $itemCpu = (int) ($itemLimits['cpu'] ?? 0);
                     $itemIp = trim((string) ($itemServer['allocation_ip'] ?? ''));
+                    $itemAlias = trim((string) ($itemServer['allocation_alias'] ?? ''));
                     $itemPort = (int) ($itemServer['allocation_port'] ?? 0);
-                    $itemEndpoint = $itemIp !== ''
-                        ? $itemIp . ($itemPort > 0 ? ':' . $itemPort : '')
-                        : 'Not assigned';
+                    $itemHost = $itemIp !== '' ? $itemIp : $itemAlias;
+                    $itemEndpoint = !$itemReady
+                        ? 'Pending'
+                        : ($itemHost !== ''
+                            ? $itemHost . ($itemPort > 0 ? ':' . $itemPort : '')
+                            : 'Not assigned');
                     $itemPurchaseDate = $myServersDate($itemServer['service_created_at'] ?? '');
                     $itemExpiryPercent = max(0, min(100, (float) $itemExpiry['progress']));
                     ?>
@@ -385,11 +390,11 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                             </div>
                             <div class="fc-server-card__fact">
                                 <span>RAM</span>
-                                <strong><?= $itemMemory > 0 ? $myServersEscape($myServersMiB($itemMemory)) : 'Unlimited' ?></strong>
+                                <strong><?= !$itemReady ? 'Pending' : ($itemMemory > 0 ? $myServersEscape($myServersMiB($itemMemory)) : 'Unlimited') ?></strong>
                             </div>
                             <div class="fc-server-card__fact">
                                 <span>CPU</span>
-                                <strong><?= $itemCpu > 0 ? number_format($itemCpu) . '%' : 'Unlimited' ?></strong>
+                                <strong><?= !$itemReady ? 'Pending' : ($itemCpu > 0 ? number_format($itemCpu) . '%' : 'Unlimited') ?></strong>
                             </div>
                             <div class="fc-server-card__fact fc-server-card__fact--network">
                                 <span>IP / PORT</span>
