@@ -24,7 +24,7 @@ declare(strict_types=1);
             <span class="launcher-status-dot" aria-hidden="true"></span>
             در حال آماده‌سازی
         </span>
-        <a class="launcher-back-link" href="index.php?page=servers_vps" data-ajax-nav data-slug="servers_vps">
+        <a class="launcher-back-link" href="/servers/" data-ajax-nav data-slug="servers_vps">
             مشاهده سرورها
             <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
         </a>
