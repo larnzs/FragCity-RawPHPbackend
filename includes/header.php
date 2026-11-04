@@ -63,7 +63,7 @@ $isPageActive = static function (array $pages) use ($current_page): string {
     return in_array($current_page, $pages, true) ? 'active' : '';
 };
 
-$morePages = ['buyserveropen', 'buyserver', 'launcher', 'leaderboard', 'leaderboard_vps', 'banlist', 'vip', 'status'];
+$morePages = ['buyserveropen', 'buyserver', 'myservers', 'launcher', 'leaderboard', 'leaderboard_vps', 'banlist', 'vip', 'status'];
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
@@ -419,7 +419,7 @@ $mobileMoreNavItems = [
 
                             <div class="frag-drop-divider"></div>
                             <div class="frag-drop-actions">
-                                <a href="?page=buyserveropen" class="frag-drop-link" data-ajax-nav data-slug="buyserveropen">
+                                <a href="?page=myservers" class="frag-drop-link <?= $isPageActive(['myservers']) ?>" data-ajax-nav data-slug="myservers">
                                     <i class="fa-solid fa-server" aria-hidden="true"></i><span>سرورهای من</span>
                                 </a>
                                 <a href="?page=profile" class="frag-drop-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
@@ -516,6 +516,10 @@ $mobileMoreNavItems = [
         </details>
 
         <?php if ($isLoggedIn): ?>
+            <a href="?page=myservers" class="mobile-nav-link <?= $isPageActive(['myservers']) ?>" data-ajax-nav data-slug="myservers">
+                <i class="fas fa-server" aria-hidden="true"></i>
+                <span>سرورهای من</span>
+            </a>
             <a href="?page=profile" class="mobile-nav-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
                 <i class="fas fa-user-circle" aria-hidden="true"></i>
                 <span><?= htmlspecialchars((string) $displayName, ENT_QUOTES, 'UTF-8') ?></span>
