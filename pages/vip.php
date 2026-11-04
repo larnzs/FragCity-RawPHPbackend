@@ -404,7 +404,7 @@ $vipCurrentStatus = !$isLoggedIn
             <small id="vipSelectedMeta">قیمت تعیین نشده · مدت اشتراک مشخص نشده</small>
         </div>
         <div class="vip-checkout-actions">
-            <button type="button" class="vip-checkout-button" disabled>
+            <button type="button" class="vip-checkout-button" id="vipCheckoutButton" disabled>
                 خرید VIP فعلاً غیرفعال است
                 <i class="fas fa-lock" aria-hidden="true"></i>
             </button>
