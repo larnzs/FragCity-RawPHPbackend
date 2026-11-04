@@ -228,7 +228,7 @@ $vipCurrentStatus = !$isLoggedIn
                 شارژ کیف پول
             </button>
         <?php else: ?>
-            <a class="vip-wallet-shortcut" href="?page=login" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
+            <a class="vip-wallet-shortcut" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
                 <i class="fas fa-wallet" aria-hidden="true"></i>
                 ورود برای شارژ کیف پول
             </a>
@@ -287,7 +287,7 @@ $vipCurrentStatus = !$isLoggedIn
                 شارژ کیف پول
             </button>
         <?php else: ?>
-            <a class="vip-wallet-shortcut" href="?page=login" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
+            <a class="vip-wallet-shortcut" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
                 <i class="fas fa-wallet" aria-hidden="true"></i>
                 ورود برای شارژ کیف پول
             </a>
@@ -414,7 +414,7 @@ $vipCurrentStatus = !$isLoggedIn
                     شارژ کیف پول
                 </button>
             <?php else: ?>
-                <a href="?page=login" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" class="vip-checkout-wallet">
+                <a href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" class="vip-checkout-wallet">
                     <i class="fas fa-wallet" aria-hidden="true"></i>
                     ورود
                 </a>
