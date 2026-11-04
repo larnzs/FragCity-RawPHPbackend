@@ -313,6 +313,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
         $selectedLimits = $selectedServer['limits'];
         $selectedFeatures = $selectedServer['features'];
         $selectedCanManage = $selectedServer['state'] === 'ready';
+        $selectedServiceActive = ($selectedServer['service_status'] ?? '') === 'active';
         $selectedClientApiConnected = !empty($selectedServer['panel']['client_api_connected']);
         $selectedPasswordSet = $selectedServer['password_set'];
         ?>
@@ -908,7 +909,15 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     <div class="fc-myservers__workspace-header">
                         <div><h3>کنسول زنده</h3><p>مشاهده خروجی سرور و ارسال دستور از طریق اتصال امن Pterodactyl</p></div>
                     </div>
-                    <?php if (!$selectedClientApiConnected): ?>
+                    <?php if (!$selectedServiceActive): ?>
+                        <section class="fc-dashboard-card fc-tool-connect-required">
+                            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                            <div>
+                                <h3>این سرویس فعال نیست</h3>
+                                <p>برای استفاده از کنسول زنده، وضعیت سرویس باید در Paymenter فعال باشد. اطلاعات شبکه و مشخصات سرویس همچنان قابل مشاهده است.</p>
+                            </div>
+                        </section>
+                    <?php elseif (!$selectedClientApiConnected): ?>
                         <section class="fc-dashboard-card fc-tool-connect-required">
                             <i class="fa-solid fa-key" aria-hidden="true"></i>
                             <div>
@@ -949,7 +958,15 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     <div class="fc-myservers__workspace-header">
                         <div><h3>مدیریت فایل‌ها</h3><p>مرور، ویرایش، بارگذاری و مدیریت فایل‌های سرور</p></div>
                     </div>
-                    <?php if (!$selectedClientApiConnected): ?>
+                    <?php if (!$selectedServiceActive): ?>
+                        <section class="fc-dashboard-card fc-tool-connect-required">
+                            <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                            <div>
+                                <h3>این سرویس فعال نیست</h3>
+                                <p>برای مدیریت فایل‌ها، وضعیت سرویس باید در Paymenter فعال باشد. اطلاعات IP و Port همچنان قابل مشاهده است.</p>
+                            </div>
+                        </section>
+                    <?php elseif (!$selectedClientApiConnected): ?>
                         <section class="fc-dashboard-card fc-tool-connect-required">
                             <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
                             <div>
@@ -1052,6 +1069,8 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                 <button type="button" data-client-api-disconnect><i class="fa-solid fa-link-slash"></i> قطع اتصال</button>
                             </div>
                             <p class="fc-client-api-card__note">قطع اتصال در FragCity، کلید ذخیره‌شده را از Paymenter حذف می‌کند. برای باطل‌کردن خود کلید، آن را از Account → API Credentials در Pterodactyl نیز حذف کنید.</p>
+                        <?php elseif (!$selectedServiceActive): ?>
+                            <p class="fc-client-api-card__note">برای اتصال ابزارهای مدیریت، ابتدا سرویس باید در Paymenter فعال باشد. پس از تمدید یا فعال‌سازی می‌توانید Client API را متصل کنید.</p>
                         <?php else: ?>
                             <ol class="fc-client-api-card__steps">
                                 <li>وارد حساب Pterodactyl خود شوید.</li>
