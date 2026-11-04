@@ -34,7 +34,7 @@
 .fc-lifecycle__button {
     min-height: 42px; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
     border: 1px solid var(--lc-orange); border-radius: 10px; padding: 0 15px;
-    background: linear-gradient(135deg,#F97316,#C94C0A); color: #fff; font: 750 13px inherit;
+    background: linear-gradient(135deg,#F97316,#C94C0A); color: #fff; font-family: inherit; font-size: 13px; font-weight: 750;
     cursor: pointer; text-decoration: none; transition: .18s ease;
 }
 .fc-lifecycle__button:hover { filter: brightness(1.08); transform: translateY(-1px); color: #fff; }
@@ -53,7 +53,7 @@
 .fc-lifecycle__filters label > span, .fc-lifecycle__authorize label > span { color: var(--lc-muted); font-size: 11px; }
 .fc-lifecycle__filters input, .fc-lifecycle__filters select, .fc-lifecycle__authorize textarea {
     width: 100%; min-height: 42px; border: 1px solid var(--lc-border-strong); border-radius: 9px;
-    outline: none; background: #101010; color: var(--lc-text); padding: 9px 12px; font: 13px inherit;
+    outline: none; background: #101010; color: var(--lc-text); padding: 9px 12px; font-family: inherit; font-size: 13px;
 }
 .fc-lifecycle__filters input:focus, .fc-lifecycle__filters select:focus, .fc-lifecycle__authorize textarea:focus { border-color: var(--lc-orange); }
 .fc-lifecycle__search > div { position: relative; }
