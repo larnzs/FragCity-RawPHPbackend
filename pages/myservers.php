@@ -230,7 +230,7 @@ if ($selectedServer === null && $myServersServices !== []) {
     $selectedServer = $myServersServices[0];
 }
 
-$allowedTabs = ['overview', 'details', 'access'];
+$allowedTabs = ['overview', 'access'];
 $requestedTab = strtolower(trim((string) ($_GET['tab'] ?? 'overview')));
 $activeTab = in_array($requestedTab, $allowedTabs, true) ? $requestedTab : 'overview';
 
@@ -378,9 +378,10 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                 <strong><?= $myServersEscape($itemName) ?></strong>
                                 <span>CS2 GAME SERVER · SERVICE #<?= number_format($itemId) ?></span>
                             </div>
-                            <span class="fc-server-card__status fc-server-card__status--<?= $myServersEscape($item['status_class']) ?>">
-                                <?= $myServersEscape($item['status_label']) ?>
+                            <span class="fc-server-card__status fc-server-card__status--<?= $myServersEscape($item['status_class']) ?> <?= $itemId === $selectedId ? 'is-current' : '' ?>">
+                                <?= $itemId === $selectedId ? 'انتخاب شده' : $myServersEscape($item['status_label']) ?>
                             </span>
+                            <span class="fc-server-card__reveal" aria-hidden="true"><i class="fa-solid fa-chevron-down"></i></span>
                         </div>
 
                         <div class="fc-server-card__facts">
@@ -468,13 +469,6 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                         <span>نمای کلی</span>
                     </a>
 
-                    <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'details')) ?>"
-                       class="fc-myservers__nav-item <?= $activeTab === 'details' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
-                       <?= $activeTab === 'details' ? 'aria-current="page"' : '' ?>>
-                        <i class="fa-solid fa-circle-info"></i>
-                        <span>اطلاعات سرور</span>
-                    </a>
-
                     <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>"
                        class="fc-myservers__nav-item <?= $activeTab === 'access' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
                        <?= $activeTab === 'access' ? 'aria-current="page"' : '' ?>>
@@ -525,11 +519,9 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                 <?php elseif ($activeTab === 'overview'): ?>
                     <div class="fc-myservers__workspace-header">
                         <div>
-                            
                             <h3>نمای کلی سرور</h3>
-                            <p>وضعیت سرویس و منابع اختصاص‌یافته به سرور شما</p>
+                            <p>وضعیت سرویس، مشخصات فنی و منابع اختصاص‌یافته به سرور شما</p>
                         </div>
-                        <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'details')) ?>" class="fc-myservers__text-link" data-ajax-nav data-slug="myservers">مشاهده جزئیات <i class="fa-solid fa-arrow-left"></i></a>
                     </div>
 
                     <div class="fc-myservers__overview-grid">
@@ -543,10 +535,6 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                 <span class="fc-server-status fc-server-status--<?= $myServersEscape($selectedStatusClass) ?>"><i></i><?= $myServersEscape($selectedStatusLabel) ?></span>
                                 <span class="fc-dashboard-card__service-id">Service #<?= number_format($selectedId) ?></span>
                             </div>
-                            <div class="fc-dashboard-card__server-meta">
-                                <div><span>شناسه کوتاه</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['identifier'] !== '' ? $selectedServer['identifier'] : '—') ?></strong></div>
-                                <div><span>Node</span><strong><?= number_format((int) ($selectedServerData['node'] ?? 0)) ?></strong></div>
-                            </div>
                             <div class="fc-dashboard-card__footer">
                                 <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>" data-ajax-nav data-slug="myservers"><i class="fa-solid fa-key"></i> مدیریت دسترسی پنل</a>
                                 <?php if ($selectedServer['panel_url'] !== ''): ?>
@@ -555,16 +543,25 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                             </div>
                         </section>
 
-                        <section class="fc-dashboard-card fc-dashboard-card--identity">
-                            <div class="fc-dashboard-card__top">
-                                <div class="fc-dashboard-card__icon"><i class="fa-solid fa-fingerprint"></i></div>
-                                
+                        <section class="fc-dashboard-card fc-details-card fc-overview-identity">
+                            <div class="fc-dashboard-card__heading" dir="ltr">
+                                <div><h3>Server Information</h3></div>
+                                <i class="fa-solid fa-fingerprint" aria-hidden="true"></i>
                             </div>
-                            <div class="fc-dashboard-card__data-row"><span>شناسه Pterodactyl</span><strong>#<?= number_format((int) ($selectedServerData['id'] ?? 0)) ?></strong></div>
-                            <div class="fc-dashboard-card__data-row"><span>UUID</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['uuid'] !== '' ? $selectedServer['uuid'] : '—') ?></strong></div>
-                            <div class="fc-dashboard-card__data-row"><span>Identifier</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['identifier'] !== '' ? $selectedServer['identifier'] : '—') ?></strong></div>
-                            <div class="fc-dashboard-card__data-row"><span>تاریخ ایجاد</span><strong><?= $myServersEscape($myServersDate($selectedServerData['created_at'] ?? '')) ?></strong></div>
-                            <div class="fc-dashboard-card__data-row"><span>انقضای سرویس</span><strong><?= $myServersEscape($myServersDate($selectedServerData['expires_at'] ?? '')) ?></strong></div>
+                            <div class="fc-details-grid" dir="ltr">
+                                <div><span>Server Name</span><strong><?= $myServersEscape($selectedServerName) ?></strong></div>
+                                <div><span>Paymenter Service ID</span><strong class="fc-mono">#<?= number_format($selectedId) ?></strong></div>
+                                <div><span>Pterodactyl Server ID</span><strong class="fc-mono">#<?= number_format((int) ($selectedServerData['id'] ?? 0)) ?></strong></div>
+                                <div><span>UUID</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['uuid'] !== '' ? $selectedServer['uuid'] : '—') ?></strong></div>
+                                <div><span>Identifier</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['identifier'] !== '' ? $selectedServer['identifier'] : '—') ?></strong></div>
+                                <div><span>Node ID</span><strong class="fc-mono"><?= number_format((int) ($selectedServerData['node'] ?? 0)) ?></strong></div>
+                                <div><span>Allocation ID</span><strong class="fc-mono"><?= number_format((int) ($selectedServerData['allocation'] ?? 0)) ?></strong></div>
+                                <div><span>Status</span><strong><?= $myServersEscape($myServersDetailsStatus($selectedStatusClass)) ?></strong></div>
+                                <div><span>Server Created</span><strong><?= $myServersEscape($myServersDate($selectedServerData['created_at'] ?? '')) ?></strong></div>
+                                <div><span>Service Created</span><strong><?= $myServersEscape($myServersDate($selectedServerData['service_created_at'] ?? '')) ?></strong></div>
+                                <div><span>Expiration Date</span><strong><?= $myServersEscape($myServersDate($selectedServerData['expires_at'] ?? '')) ?></strong></div>
+                                <div><span>Installation Status</span><strong><?= $myServersEscape($myServersRuntimeLabel($selectedServer['runtime_status'])) ?></strong></div>
+                            </div>
                         </section>
                     </div>
 
@@ -616,7 +613,6 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                         <section class="fc-dashboard-card fc-dashboard-card--quick">
                             <div class="fc-dashboard-card__heading"><div><h3>دسترسی سریع</h3></div></div>
                             <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>" class="fc-quick-link" data-ajax-nav data-slug="myservers"><span><i class="fa-solid fa-key"></i></span><div><strong>اطلاعات ورود پنل</strong><small>مشاهده نام کاربری و تنظیم رمز</small></div><i class="fa-solid fa-chevron-left"></i></a>
-                            <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'details')) ?>" class="fc-quick-link" data-ajax-nav data-slug="myservers"><span><i class="fa-solid fa-circle-info"></i></span><div><strong>مشخصات کامل سرور</strong><small>UUID، شناسه و تاریخ‌های سرویس</small></div><i class="fa-solid fa-chevron-left"></i></a>
                             <?php if ($selectedServer['panel_url'] !== ''): ?>
                                 <a href="<?= $myServersEscape($selectedServer['panel_url']) ?>" target="_blank" rel="noopener noreferrer" class="fc-quick-link"><span><i class="fa-solid fa-arrow-up-right-from-square"></i></span><div><strong>ورود به Pterodactyl</strong><small>بازکردن صفحه همین سرور</small></div><i class="fa-solid fa-chevron-left"></i></a>
                             <?php endif; ?>
@@ -629,28 +625,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                         </section>
                     </div>
 
-                <?php elseif ($activeTab === 'details'): ?>
-                    <div class="fc-myservers__workspace-header">
-                        <div><h3>اطلاعات سرور</h3><p>شناسه‌ها و مشخصات فنی ثبت‌شده در Pterodactyl</p></div>
-                    </div>
-                    <section class="fc-dashboard-card fc-details-card">
-                        <div class="fc-dashboard-card__heading" dir="ltr"><div><h3>Server Identity</h3></div><i class="fa-solid fa-fingerprint"></i></div>
-                        <div class="fc-details-grid" dir="ltr">
-                            <div><span>Server Name</span><strong><?= $myServersEscape($selectedServerName) ?></strong></div>
-                            <div><span>Paymenter Service ID</span><strong class="fc-mono">#<?= number_format($selectedId) ?></strong></div>
-                            <div><span>Pterodactyl Server ID</span><strong class="fc-mono">#<?= number_format((int) ($selectedServerData['id'] ?? 0)) ?></strong></div>
-                            <div><span>UUID</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['uuid']) ?></strong></div>
-                            <div><span>Identifier</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['identifier']) ?></strong></div>
-                            <div><span>Node ID</span><strong class="fc-mono"><?= number_format((int) ($selectedServerData['node'] ?? 0)) ?></strong></div>
-                            <div><span>Allocation ID</span><strong class="fc-mono"><?= number_format((int) ($selectedServerData['allocation'] ?? 0)) ?></strong></div>
-                            <div><span>Status</span><strong><?= $myServersEscape($myServersDetailsStatus($selectedStatusClass)) ?></strong></div>
-                            <div><span>Server Created</span><strong><?= $myServersEscape($myServersDate($selectedServerData['created_at'] ?? '')) ?></strong></div>
-                            <div><span>Service Created</span><strong><?= $myServersEscape($myServersDate($selectedServerData['service_created_at'] ?? '')) ?></strong></div>
-                            <div><span>Expiration Date</span><strong><?= $myServersEscape($myServersDate($selectedServerData['expires_at'] ?? '')) ?></strong></div>
-                            <div><span>Installation Status</span><strong><?= $myServersEscape($myServersRuntimeLabel($selectedServer['runtime_status'])) ?></strong></div>
-                        </div>
-                    </section>
-
+                <?php elseif ($activeTab === 'access'): ?>
                 <?php elseif ($activeTab === 'access'): ?>
                     <div class="fc-myservers__workspace-header">
                         <div><h3>دسترسی پنل</h3><p>اطلاعات ورود به حساب مدیریت سرورهای شما</p></div>
@@ -672,8 +647,8 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                 <?php endif; ?>
                             </div>
                             <div class="fc-access-field">
-                                <span>Username</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['username']) ?></strong>
-                                <button type="button" data-copy-value="<?= $myServersEscape($selectedServer['username']) ?>" aria-label="Copy username"><i class="fa-regular fa-copy"></i></button>
+                                <span>Username</span><strong class="fc-mono" data-panel-username-value><?= $myServersEscape($selectedServer['username']) ?></strong>
+                                <button type="button" data-copy-value="<?= $myServersEscape($selectedServer['username']) ?>" data-panel-username-copy aria-label="Copy username"><i class="fa-regular fa-copy"></i></button>
                             </div>
                             <div class="fc-access-field">
                                 <span>Login Email</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['email']) ?></strong>
@@ -690,27 +665,54 @@ $myServersDetailsStatus = static function (string $statusClass): string {
 
                     <section class="fc-dashboard-card fc-password-card">
                         <div class="fc-dashboard-card__heading">
-                            <div><h3><?= $selectedPasswordSet ? 'تغییر رمز عبور پنل' : 'تنظیم رمز عبور پنل' ?></h3></div>
-                            <span class="fc-password-card__icon"><i class="fa-solid fa-lock"></i></span>
+                            <div><h3>تنظیمات حساب پنل</h3></div>
+                            <span class="fc-password-card__icon"><i class="fa-solid fa-user-gear"></i></span>
                         </div>
-                        <p class="fc-password-card__description">رمز پنل مستقل از رمز FragCity و Paymenter است. حساب ورود پنل بین تمام سرورهای CS2 این حساب مشترک است؛ تغییر رمز از این بخش برای همه آن‌ها اعمال می‌شود.</p>
+                        <p class="fc-password-card__description">نام کاربری و رمز عبور متعلق به حساب مشترک Pterodactyl شما هستند؛ تغییر هرکدام برای تمام سرورهای CS2 این حساب اعمال می‌شود.</p>
 
-                        <form class="fc-panel-password__form" data-panel-password-form>
-                            <input type="hidden" name="service_id" value="<?= $selectedId ?>">
-                            <label>
-                                <span>رمز فعلی FragCity برای تأیید هویت</span>
-                                <input type="password" name="current_password" autocomplete="current-password" minlength="8" required>
-                            </label>
-                            <div class="fc-panel-password__fields">
-                                <label><span>رمز جدید پنل</span><input type="password" name="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
-                                <label><span>تکرار رمز جدید</span><input type="password" name="password_confirm" autocomplete="new-password" minlength="12" maxlength="128" required></label>
+                        <div class="fc-panel-settings-section">
+                            <div class="fc-panel-settings-section__heading">
+                                <strong>نام کاربری پنل</strong>
+                                <span>قابل ویرایش</span>
                             </div>
-                            <p class="fc-panel-password__hint">حداقل ۱۲ کاراکتر، شامل حروف و عدد و بدون فاصله. رمز جدید باید با رمز FragCity متفاوت باشد. رمز فعلی پنل قابل بازیابی یا نمایش نیست؛ می‌توانید هر زمان رمز جدید تنظیم کنید.</p>
-                            <div class="fc-panel-password__footer">
-                                <span class="fc-panel-password__message" data-password-message role="status" aria-live="polite"></span>
-                                <button type="submit" class="fc-panel-password__submit"><i class="fa-solid fa-key"></i><span><?= $selectedPasswordSet ? 'ذخیره رمز جدید' : 'تنظیم رمز پنل' ?></span></button>
+                            <form class="fc-panel-username__form" data-panel-username-form>
+                                <input type="hidden" name="service_id" value="<?= $selectedId ?>">
+                                <label>
+                                    <span>Username جدید</span>
+                                    <input type="text" name="username" value="<?= $myServersEscape($selectedServer['username']) ?>" autocomplete="off" autocapitalize="none" spellcheck="false" minlength="3" maxlength="50" pattern="[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]" required>
+                                </label>
+                                <label>
+                                    <span>رمز فعلی FragCity برای تأیید</span>
+                                    <input type="password" name="current_password" autocomplete="current-password" minlength="8" required>
+                                </label>
+                                <div class="fc-panel-username__footer">
+                                    <span class="fc-panel-username__message" data-username-message role="status" aria-live="polite"></span>
+                                    <button type="submit" class="fc-panel-username__submit"><i class="fa-solid fa-floppy-disk"></i><span>ذخیره نام کاربری</span></button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="fc-panel-settings-divider"></div>
+
+                        <div class="fc-panel-settings-section">
+                            <div class="fc-panel-settings-section__heading">
+                                <strong><?= $selectedPasswordSet ? 'تغییر رمز عبور پنل' : 'تنظیم رمز عبور پنل' ?></strong>
+                                <span>امنیت حساب</span>
                             </div>
-                        </form>
+                            <form class="fc-panel-password__form" data-panel-password-form>
+                                <input type="hidden" name="service_id" value="<?= $selectedId ?>">
+                                <div class="fc-panel-password__fields">
+                                    <label><span>رمز فعلی FragCity</span><input type="password" name="current_password" autocomplete="current-password" minlength="8" required></label>
+                                    <label><span>رمز جدید پنل</span><input type="password" name="password" autocomplete="new-password" minlength="12" maxlength="128" required></label>
+                                    <label><span>تکرار رمز جدید</span><input type="password" name="password_confirm" autocomplete="new-password" minlength="12" maxlength="128" required></label>
+                                </div>
+                                <p class="fc-panel-password__hint">حداقل ۱۲ کاراکتر، شامل حروف و عدد و بدون فاصله. رمز جدید باید با رمز FragCity متفاوت باشد. رمز فعلی پنل قابل بازیابی یا نمایش نیست.</p>
+                                <div class="fc-panel-password__footer">
+                                    <span class="fc-panel-password__message" data-password-message role="status" aria-live="polite"></span>
+                                    <button type="submit" class="fc-panel-password__submit"><i class="fa-solid fa-key"></i><span><?= $selectedPasswordSet ? 'ذخیره رمز جدید' : 'تنظیم رمز پنل' ?></span></button>
+                                </div>
+                            </form>
+                        </div>
                     </section>
                 <?php endif; ?>
             </main>
