@@ -357,7 +357,7 @@ if (preg_match('/^[0-9]{17}$/D', $myServersSteamId)) {
                                         <i class="fa-solid fa-lock" aria-hidden="true"></i>
                                         <div>
                                             <strong><?= $passwordSet ? 'تغییر رمز عبور پنل' : 'تنظیم رمز عبور پنل' ?></strong>
-                                            <p>این رمز فقط برای ورود به Pterodactyl است و با رمز FragCity یا Paymenter تفاوت دارد.</p>
+                                            <p>رمز پنل مستقل از FragCity و Paymenter است. حساب ورود پنل بین تمام سرورهای CS2 همین حساب کاربری مشترک است؛ تغییر رمز در این بخش برای همه آن‌ها اعمال می‌شود.</p>
                                         </div>
                                     </div>
 
