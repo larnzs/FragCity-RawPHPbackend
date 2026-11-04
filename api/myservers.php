@@ -97,6 +97,10 @@ if (!hash_equals($newPassword, $passwordConfirm)) {
     $respond(['success' => false, 'error' => 'password_confirmation_mismatch'], 422);
 }
 
+if (hash_equals($newPassword, $currentPassword)) {
+    $respond(['success' => false, 'error' => 'panel_password_must_be_different'], 422);
+}
+
 if (
     strlen($newPassword) < 12
     || strlen($newPassword) > 128
@@ -131,9 +135,27 @@ try {
         $respond(['success' => false, 'error' => 'account_not_found'], 404);
     }
 
+    $attemptState = $_SESSION['panel_password_change_attempts'][$steamId] ?? [];
+    $attemptCount = is_array($attemptState) ? (int) ($attemptState['count'] ?? 0) : 0;
+    $attemptTime = is_array($attemptState) ? (int) ($attemptState['time'] ?? 0) : 0;
+
+    if ($attemptTime > 0 && (time() - $attemptTime) > 900) {
+        $attemptCount = 0;
+    }
+
+    if ($attemptCount >= 5 && $attemptTime > 0 && (time() - $attemptTime) <= 900) {
+        $respond(['success' => false, 'error' => 'panel_password_rate_limited'], 429);
+    }
+
     if (!password_verify($currentPassword, (string) ($account['password_hash'] ?? ''))) {
+        $_SESSION['panel_password_change_attempts'][$steamId] = [
+            'count' => $attemptCount + 1,
+            'time' => time(),
+        ];
         $respond(['success' => false, 'error' => 'current_password_incorrect'], 403);
     }
+
+    unset($_SESSION['panel_password_change_attempts'][$steamId]);
 
     if (
         (int) ($account['paymenter_user_id'] ?? 0) < 1
