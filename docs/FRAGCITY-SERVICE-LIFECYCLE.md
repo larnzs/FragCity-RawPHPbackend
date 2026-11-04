@@ -46,3 +46,14 @@ The Paymenter bridge retains the SteamID-to-customer UUID record when a Paymente
 4. Verify the My Servers page for active, suspended, missing and multiple-service cases.
 
 Do not deploy the website client before the bridge release it depends on: the updated client intentionally rejects an account-sync response that does not contain a valid `customer_uuid`.
+
+
+## Lifecycle reconciliation and administrative recovery
+
+Paymenter runs a bounded reconciliation worker and exposes the same operation to administrators. Paymenter service status is the desired-state authority; Pterodactyl Server state is the observed-state authority. Reconciliation verifies the stored Pterodactyl Client ID and its durable customer UUID, then verifies the Server's Paymenter service external ID and Client owner before any suspend/unsuspend operation.
+
+Reconciliation can align an already verified Server's suspended state with Paymenter's active/suspended status. It does not create missing Clients or Servers, repair Client profile fields, or delete remote resources. A missing Client, UUID mismatch or ownership mismatch becomes `review_required`. Only an authoritative Pterodactyl 404 is treated as missing; timeouts, authentication failures and 5xx responses remain retryable errors.
+
+The registry tracks `last_reconciled_at`. Failed scheduled or administrator-triggered checks are retried and generate audit events. Direct SQL deletion of a Paymenter service is treated as `paymenter_missing` for review only. It is never treated as implicit permission to delete a Pterodactyl Server.
+
+A missing external Server can be granted a one-shot recreation authorization by an administrator. The grant has an independent UUID, actor, reason and timestamp; it remains pending across failed CreateJob retries and is consumed only after a replacement Server is confirmed. A still-pending grant can be revoked with a reason. The website dashboard does not run CreateJob automatically.
