@@ -206,6 +206,35 @@ if ($paymenterRoot === '') {
         && !str_contains($ownerBody, 'ensurePterodactylClientUser(')
         && !str_contains($cs2, '$legacyPaymenterLink'),
         '404 vs transient errors, missing Client guard, read-only ownership checks and no blind legacy ID migration');
+
+    $summaryStart = strpos($cs2, 'private function getCustomerPanelSummaryLocked');
+    $summaryEnd = $summaryStart === false
+        ? false
+        : min(
+            ...array_filter([
+                strpos($cs2, "\n    private function ", $summaryStart + 1),
+                strpos($cs2, "\n    public function ", $summaryStart + 1),
+            ], static fn ($position): bool => $position !== false)
+        );
+    $summaryBody = ($summaryStart !== false && $summaryEnd !== false)
+        ? substr($cs2, $summaryStart, $summaryEnd - $summaryStart)
+        : '';
+    $readOnlyStart = strpos($cs2, 'private function getVerifiedPterodactylClientUserReadOnly');
+    $readOnlyEnd = $readOnlyStart === false
+        ? false
+        : strpos($cs2, "\n    private function ", $readOnlyStart + 1);
+    $readOnlyBody = ($readOnlyStart !== false && $readOnlyEnd !== false)
+        ? substr($cs2, $readOnlyStart, $readOnlyEnd - $readOnlyStart)
+        : '';
+    $check($summaryBody !== ''
+        && str_contains($summaryBody, 'getVerifiedPterodactylClientUserReadOnly(')
+        && !str_contains($summaryBody, 'ensurePterodactylClientUser(')
+        && $readOnlyBody !== ''
+        && str_contains($readOnlyBody, "requestApplicationApi('GET'")
+        && !str_contains($readOnlyBody, "requestApplicationApi('POST'")
+        && !str_contains($readOnlyBody, "requestApplicationApi('DELETE'")
+        && !str_contains($readOnlyBody, 'ensurePterodactylClientUser('),
+        'Customer inventory verifies the approved Client mapping without remote writes');
     $check(str_contains($cs2, '$this->claimRecreationAuthorization($service)')
         && str_contains($cs2, '$this->releaseRecreationAuthorizationClaim(')
         && str_contains($cs2, '$this->consumeRecreationAuthorization(')
