@@ -4,7 +4,7 @@ The public guide is a compact, searchable reference for the commands, game modes
 
 ## Route and files
 
-- Website route: `index.php?page=serverguide`
+- Canonical website route: `/serverguide/` (legacy `index.php?page=serverguide` URLs redirect permanently).
 - Page markup: `pages/serverguide.php`
 - Styles: `css/serverguide.css`
 - Interactions: `js/serverguide.js`
