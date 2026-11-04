@@ -9,10 +9,11 @@ DirectoryIndex index.php
 # Canonical host and HTTPS. Staging hosts keep their own hostname.
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteCond %{HTTPS} !=on
-  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
   RewriteCond %{HTTP_HOST} ^www\.fragcity\.ir$ [NC]
   RewriteRule ^ https://fragcity.ir%{REQUEST_URI} [R=301,L,NE]
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
 
   # Permanently redirect legacy query URLs when they contain only the page parameter.
   # Requests with functional parameters (auth tokens, tabs, completion flags) are preserved.
@@ -97,6 +98,13 @@ DirectoryIndex index.php
   RewriteCond %{THE_REQUEST} \s/+index\.php\?page=donations\s [NC,OR]
   RewriteCond %{THE_REQUEST} \s/\?page=donations\s [NC]
   RewriteRule ^(?:index\.php)?$ /donations/ [R=301,L,NE]
+
+  # Remove the legacy front-controller filename when it has no page query.
+  RewriteCond %{THE_REQUEST} \s/+index\.php\s [NC]
+  RewriteRule ^index\.php$ / [R=301,L,NE]
+
+  # Enforce one trailing-slash form for all clean page URLs.
+  RewriteRule ^(servers|skins|buy-server|launcher|server-manual|serverguide|status|about|support|login|register|profile|my-servers|vip|leaderboard|forgot-password|reset-password|rules|privacy|deadlock-servers|banlist|donations)$ /$1/ [R=301,L,NE]
 
   # Canonical, extension-free routes.
   RewriteRule ^servers/?$ index.php?page=servers_vps [QSA,L]
