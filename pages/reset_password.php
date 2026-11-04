@@ -34,7 +34,7 @@ declare(strict_types=1);
             </span>
         </div>
 
-        <a href="?page=login" class="btn-auth-submit">
+        <a href="/login/" class="btn-auth-submit">
             بازگشت به صفحه ورود
         </a>
     </div>
