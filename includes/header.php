@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/routes.php';
+
 if (defined('TOP_HEADER_RENDERED')) {
     return;
 }
@@ -251,27 +253,27 @@ $mobileMoreNavItems = [
 <header class="shock-header" id="siteHeader">
     <div class="shock-container">
         <div class="shock-brand">
-            <a href="index.php" class="shock-logo-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
+            <a href="<?= htmlspecialchars(fragcity_page_url('home'), ENT_QUOTES, 'UTF-8') ?>" class="shock-logo-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
                 <img src="/img/webp/newlogo.webp?v=20261102-2" onerror="this.onerror=null;this.src='/img/logoresponsive.png?v=20261102-2';" alt="FragCity" class="shock-logo-img">
             </a>
         </div>
 
         <nav class="shock-nav" aria-label="منوی اصلی">
-            <a href="?page=servers_vps"
+            <a href="<?= htmlspecialchars(fragcity_page_url('servers_vps'), ENT_QUOTES, 'UTF-8') ?>"
                class="shock-nav-item <?= $isPageActive(['servers_vps', 'servers']) ?>"
                data-ajax-nav data-slug="servers_vps">
                 <i class="fa-solid fa-server" aria-hidden="true"></i>
                 <span>لیست سرورها</span>
             </a>
 
-            <a href="?page=skins"
+            <a href="<?= htmlspecialchars(fragcity_page_url('skins'), ENT_QUOTES, 'UTF-8') ?>"
                class="shock-nav-item <?= $isPageActive(['skins', 'skins_vps']) ?>"
                data-ajax-nav data-slug="skins">
                 <i class="fa-solid fa-palette" aria-hidden="true"></i>
                 <span>انتخاب اسکین</span>
             </a>
 
-            <a href="?page=serverguide"
+            <a href="<?= htmlspecialchars(fragcity_page_url('serverguide'), ENT_QUOTES, 'UTF-8') ?>"
                class="shock-nav-item shock-nav-item--guide <?= $isPageActive(['serverguide']) ?>"
                data-ajax-nav data-slug="serverguide">
                 <i class="fa-solid fa-book-open" aria-hidden="true"></i>
@@ -290,22 +292,22 @@ $mobileMoreNavItems = [
                 </button>
 
                 <div class="frag-dropdown-menu" id="shockMoreMenu">
-                    <a href="?page=buyserveropen" class="frag-drop-link <?= $isPageActive(['buyserveropen', 'buyserver']) ?>" data-ajax-nav data-slug="buyserveropen">
+                    <a href="<?= htmlspecialchars(fragcity_page_url('buyserveropen'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['buyserveropen', 'buyserver']) ?>" data-ajax-nav data-slug="buyserveropen">
                         <i class="fas fa-shopping-cart"></i><span>خرید سرور</span>
                     </a>
-                    <a href="?page=launcher" class="frag-drop-link <?= $isPageActive(['launcher']) ?>" data-ajax-nav data-slug="launcher">
+                    <a href="<?= htmlspecialchars(fragcity_page_url('launcher'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['launcher']) ?>" data-ajax-nav data-slug="launcher">
                         <i class="fas fa-download"></i><span>دانلود لانچر</span>
                     </a>
-                    <a href="?page=leaderboard" class="frag-drop-link <?= $isPageActive(['leaderboard', 'leaderboard_vps']) ?>" data-ajax-nav data-slug="leaderboard">
+                    <a href="<?= htmlspecialchars(fragcity_page_url('leaderboard'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['leaderboard', 'leaderboard_vps']) ?>" data-ajax-nav data-slug="leaderboard">
                         <i class="fas fa-trophy"></i><span>لیدربورد</span>
                     </a>
-                    <a href="?page=banlist" class="frag-drop-link <?= $isPageActive(['banlist']) ?>" data-ajax-nav data-slug="banlist">
+                    <a href="<?= htmlspecialchars(fragcity_page_url('banlist'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['banlist']) ?>" data-ajax-nav data-slug="banlist">
                         <i class="fas fa-gavel"></i><span>لیست محرومیت‌ها</span>
                     </a>
-                    <a href="?page=vip" class="frag-drop-link <?= $isPageActive(['vip']) ?>" data-ajax-nav data-slug="vip">
+                    <a href="<?= htmlspecialchars(fragcity_page_url('vip'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['vip']) ?>" data-ajax-nav data-slug="vip">
                         <i class="fas fa-crown"></i><span>VIP</span>
                     </a>
-                    <a href="?page=status" class="frag-drop-link <?= $isPageActive(['status']) ?>" data-ajax-nav data-slug="status">
+                    <a href="<?= htmlspecialchars(fragcity_page_url('status'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['status']) ?>" data-ajax-nav data-slug="status">
                         <i class="fas fa-heart-pulse"></i><span>وضعیت سرویس‌ها</span>
                     </a>
                 </div>
@@ -419,10 +421,10 @@ $mobileMoreNavItems = [
 
                             <div class="frag-drop-divider"></div>
                             <div class="frag-drop-actions">
-                                <a href="?page=myservers" class="frag-drop-link <?= $isPageActive(['myservers']) ?>" data-ajax-nav data-slug="myservers">
+                                <a href="<?= htmlspecialchars(fragcity_page_url('myservers'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['myservers']) ?>" data-ajax-nav data-slug="myservers">
                                     <i class="fa-solid fa-server" aria-hidden="true"></i><span>سرورهای من</span>
                                 </a>
-                                <a href="?page=profile" class="frag-drop-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
+                                <a href="<?= htmlspecialchars(fragcity_page_url('profile'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
                                     <i class="fas fa-user" aria-hidden="true"></i><span>مشاهده پروفایل</span>
                                 </a>
                             </div>
@@ -439,7 +441,7 @@ $mobileMoreNavItems = [
                 </div>
 
             <?php else: ?>
-                <a href="?page=login"
+                <a href="<?= htmlspecialchars(fragcity_page_url('login'), ENT_QUOTES, 'UTF-8') ?>"
                    class="frag-login-btn <?= $isPageActive(['login', 'register']) ?>"
                    data-auth-modal-open
                    aria-haspopup="dialog"
@@ -466,7 +468,7 @@ $mobileMoreNavItems = [
 
 <nav class="mobile-nav" id="mobileNav" aria-label="منوی موبایل" aria-hidden="true">
     <div class="mobile-nav-header">
-        <a href="index.php" class="mobile-nav-logo" data-ajax-nav data-slug="home">
+        <a href="<?= htmlspecialchars(fragcity_page_url('home'), ENT_QUOTES, 'UTF-8') ?>" class="mobile-nav-logo" data-ajax-nav data-slug="home">
             <img src="/img/webp/newlogo.webp?v=20261102-2" onerror="this.onerror=null;this.src='/img/logoresponsive.png?v=20261102-2';" alt="FragCity">
             <span>FRAGCITY</span>
         </a>
@@ -487,7 +489,7 @@ $mobileMoreNavItems = [
             <span class="fc-motion-toggle__state" aria-hidden="true"></span>
         </button>
         <?php foreach ($mobileNavItems as [$slug, $label, $icon, $activePages]): ?>
-            <a href="?page=<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>"
+            <a href="<?= htmlspecialchars(fragcity_page_url($slug), ENT_QUOTES, 'UTF-8') ?>"
                class="mobile-nav-link <?= $isPageActive($activePages) ?>"
                data-ajax-nav
                data-slug="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
@@ -504,7 +506,7 @@ $mobileMoreNavItems = [
             </summary>
             <div class="mobile-nav-more-menu">
                 <?php foreach ($mobileMoreNavItems as [$slug, $label, $icon, $activePages]): ?>
-                    <a href="?page=<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>"
+                    <a href="<?= htmlspecialchars(fragcity_page_url($slug), ENT_QUOTES, 'UTF-8') ?>"
                        class="mobile-nav-link <?= $isPageActive($activePages) ?>"
                        data-ajax-nav
                        data-slug="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
@@ -516,11 +518,11 @@ $mobileMoreNavItems = [
         </details>
 
         <?php if ($isLoggedIn): ?>
-            <a href="?page=myservers" class="mobile-nav-link <?= $isPageActive(['myservers']) ?>" data-ajax-nav data-slug="myservers">
+            <a href="<?= htmlspecialchars(fragcity_page_url('myservers'), ENT_QUOTES, 'UTF-8') ?>" class="mobile-nav-link <?= $isPageActive(['myservers']) ?>" data-ajax-nav data-slug="myservers">
                 <i class="fas fa-server" aria-hidden="true"></i>
                 <span>سرورهای من</span>
             </a>
-            <a href="?page=profile" class="mobile-nav-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
+            <a href="<?= htmlspecialchars(fragcity_page_url('profile'), ENT_QUOTES, 'UTF-8') ?>" class="mobile-nav-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
                 <i class="fas fa-user-circle" aria-hidden="true"></i>
                 <span><?= htmlspecialchars((string) $displayName, ENT_QUOTES, 'UTF-8') ?></span>
             </a>
@@ -543,7 +545,7 @@ $mobileMoreNavItems = [
                 </button>
             </form>
         <?php else: ?>
-            <a href="?page=login"
+            <a href="<?= htmlspecialchars(fragcity_page_url('login'), ENT_QUOTES, 'UTF-8') ?>"
                class="mobile-nav-link mobile-steam-login-link <?= $isPageActive(['login', 'register']) ?>"
                data-auth-modal-open
                aria-haspopup="dialog"
