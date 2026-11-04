@@ -1,3 +1,5 @@
+> **ARCHIVED — NOT ACTIVE WITH THE CURRENT PAYMENTER EXTENSION.** This document describes a future FragCity service-lifecycle integration requiring a newer Paymenter bridge than the currently deployed FragCityAPI `1.4.0`. The active website integration supports only five bridge operations: ping, user sync, server list, panel password and panel username. Do not follow deployment or operational instructions here until both Paymenter extensions and the website client are upgraded together and explicitly re-enabled.
+
 # FragCity Lifecycle Integration Test Plan
 
 This matrix is for a disposable Paymenter/Pterodactyl test service only. Do not run destructive cases against a production customer service. The static preflight does not replace these live integration tests.
