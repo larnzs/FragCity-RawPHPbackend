@@ -77,7 +77,7 @@ final class PaymenterApiClient
      *   last_name:string,
      *   password:string
      * } $user
-     * @return array{user_id:int,created:bool,email:string}
+     * @return array{user_id:int,customer_uuid:string,created:bool,email:string}
      */
     public function syncUser(array $user): array
     {
@@ -89,12 +89,15 @@ final class PaymenterApiClient
             || !isset($data['user_id'])
             || !is_numeric($data['user_id'])
             || (int) $data['user_id'] < 1
+            || !is_string($data['customer_uuid'] ?? null)
+            || !preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iD', $data['customer_uuid'])
         ) {
             throw new RuntimeException('Paymenter bridge returned an invalid user synchronization response.');
         }
 
         return [
             'user_id' => (int) $data['user_id'],
+            'customer_uuid' => (string) $data['customer_uuid'],
             'created' => (bool) ($data['created'] ?? false),
             'email' => (string) ($data['email'] ?? ''),
         ];

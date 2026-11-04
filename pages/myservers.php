@@ -352,21 +352,23 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     $itemServer = is_array($item['server'] ?? null) ? $item['server'] : [];
                     $itemLimits = is_array($item['limits'] ?? null) ? $item['limits'] : [];
                     $itemName = $item['name'] !== '' ? $item['name'] : $item['product_name'] . ' #' . $itemId;
+                    $itemState = strtolower(trim((string) ($item['state'] ?? 'unavailable')));
+                    $itemMissing = $itemState === 'missing_external';
                     $itemExpiry = $myServersExpirySummary(
                         $itemServer['service_created_at'] ?? '',
                         $itemServer['expires_at'] ?? ''
                     );
-                    if (($item['state'] ?? '') !== 'ready') {
+                    if ($itemState !== 'ready') {
                         $itemExpiry = [
                             'has_expiry' => false,
                             'days_remaining' => null,
                             'progress' => 0,
                             'critical' => false,
-                            'label' => 'Pending',
+                            'label' => $itemMissing ? 'Unavailable' : 'Pending',
                         ];
                     }
                     $itemIdentifier = trim((string) ($item['identifier'] ?? ''));
-                    $itemReady = ($item['state'] ?? '') === 'ready';
+                    $itemReady = $itemState === 'ready';
                     $itemMemory = (int) ($itemLimits['memory'] ?? 0);
                     $itemCpu = (int) ($itemLimits['cpu'] ?? 0);
                     $itemIp = trim((string) ($itemServer['allocation_ip'] ?? ''));
@@ -376,11 +378,11 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     if (filter_var($itemHost, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
                         $itemHost = '[' . $itemHost . ']';
                     }
-                    $itemEndpoint = !$itemReady
-                        ? 'Pending'
-                        : ($itemHost !== ''
+                    $itemEndpoint = $itemReady
+                        ? ($itemHost !== ''
                             ? $itemHost . ($itemPort > 0 ? ':' . $itemPort : '')
-                            : 'Not assigned');
+                            : 'Not assigned')
+                        : ($itemMissing ? 'Not found in panel' : 'Pending');
                     $itemPurchaseDate = $myServersDate($itemServer['service_created_at'] ?? '');
                     $itemExpiryPercent = max(0, min(100, (float) $itemExpiry['progress']));
                     ?>
@@ -417,11 +419,11 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                             </div>
                             <div class="fc-server-card__fact">
                                 <span>RAM</span>
-                                <strong><?= !$itemReady ? 'Pending' : ($itemMemory > 0 ? $myServersEscape($myServersMiB($itemMemory)) : 'Unlimited') ?></strong>
+                                <strong><?= !$itemReady ? ($itemMissing ? '—' : 'Pending') : ($itemMemory > 0 ? $myServersEscape($myServersMiB($itemMemory)) : 'Unlimited') ?></strong>
                             </div>
                             <div class="fc-server-card__fact">
                                 <span>CPU</span>
-                                <strong><?= !$itemReady ? 'Pending' : ($itemCpu > 0 ? number_format($itemCpu) . '%' : 'Unlimited') ?></strong>
+                                <strong><?= !$itemReady ? ($itemMissing ? '—' : 'Pending') : ($itemCpu > 0 ? number_format($itemCpu) . '%' : 'Unlimited') ?></strong>
                             </div>
                             <div class="fc-server-card__fact fc-server-card__fact--network">
                                 <span>IP / PORT</span>
