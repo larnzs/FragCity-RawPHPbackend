@@ -18,6 +18,15 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
         <!-- HERO -->
         <section class="home-hero" aria-labelledby="homeHeroTitle">
             <div class="home-hero-copy">
+                <div class="home-hero-notice" role="note" data-fc-reveal="up">
+                    <span class="home-hero-notice-icon" aria-hidden="true"><i class="fa-solid fa-sparkles"></i></span>
+                    <span class="home-hero-notice-copy">
+                        <strong>یک فضای یکپارچه برای سرور و کامیونیتی تو</strong>
+                        <small>CS2 SERVER HOSTING <b>·</b> COMMUNITY <b>·</b> PLAYER TOOLS</small>
+                    </span>
+                    <span class="home-hero-notice-mark">FRAGCITY / 01</span>
+                </div>
+
                 <div class="home-eyebrow" data-fc-reveal="up">
                     <span class="home-eyebrow-mark"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>
                     <span>FRAGCITY</span>
@@ -26,22 +35,22 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                 </div>
 
                 <h1 id="homeHeroTitle" data-fc-reveal="up" data-fc-reveal-delay="70">
-                    سرور خودت را بساز؛
-                    <span>کامیونیتی خودت را شکل بده.</span>
+                    سرورت را راه‌اندازی کن؛
+                    <span>کامیونیتی خودت را بساز.</span>
                 </h1>
 
                 <p class="home-hero-description" data-fc-reveal="up" data-fc-reveal-delay="140">
-                    FragCity فضایی برای راه‌اندازی سرورهای بازی و رشد کامیونیتی‌های گیمینگ است؛
-                    از اولین قدم برای ساخت سرور تا تجربه‌ای که بازیکن‌ها کنار هم می‌سازند.
+                    از راه‌اندازی سرور CS2 تا پیدا کردن بازیکن‌ها و مدیریت تجربه‌ی کامیونیتی؛
+                    FragCity ابزارهای موردنیاز مسیرت را در یک فضای یکپارچه کنار هم می‌آورد.
                 </p>
 
                 <div class="home-hero-actions" data-fc-reveal="up" data-fc-reveal-delay="210">
                     <a class="home-button home-button-primary" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen">
-                        <span>شروع با FragCity</span>
+                        <span>ساخت سرور CS2</span>
                         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                     </a>
                     <a class="home-button home-button-secondary" href="#home-ecosystem">
-                        <span>آشنایی با سرویس‌ها</span>
+                        <span>کشف اکوسیستم</span>
                         <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
                     </a>
                     <a class="home-button home-button-guide" href="/index.php?page=serverguide" data-ajax-nav data-slug="serverguide">
@@ -51,9 +60,9 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                 </div>
 
                 <div class="home-hero-signals" data-fc-reveal="up" data-fc-reveal-delay="270">
-                    <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> برای دنیای گیمینگ</span>
-                    <span><i class="fa-solid fa-users" aria-hidden="true"></i> با محوریت کامیونیتی</span>
-                    <span><i class="fa-solid fa-layer-group" aria-hidden="true"></i> یک اکوسیستم یکپارچه</span>
+                    <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> میزبانی سرور CS2</span>
+                    <span><i class="fa-solid fa-users" aria-hidden="true"></i> بازیکن و کامیونیتی</span>
+                    <span><i class="fa-solid fa-layer-group" aria-hidden="true"></i> ابزارهای یکپارچه</span>
                 </div>
             </div>
 
