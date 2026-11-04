@@ -4687,3 +4687,772 @@ html.fc-no-animation .sl-hero-guy {
 #serverList .sl-metric--client-ping > strong[data-ping-state="unavailable"] {
     color: #737373;
 }
+
+
+/* =========================================================
+   FragCity Server Browser — compact layout / readable controls
+   Keep card data dense on desktop while increasing legibility.
+   ========================================================= */
+.serverlist-page {
+    min-height: 0;
+    padding-top: 14px;
+    padding-bottom: 40px;
+}
+
+.sl-page-shell {
+    width: min(1640px, calc(100% - 40px));
+}
+
+.sl-hero {
+    min-height: 258px;
+    gap: 22px;
+    padding: clamp(26px, 3.2vw, 44px);
+    border-radius: 21px;
+}
+
+.sl-hero h1 {
+    margin-top: 13px;
+    margin-bottom: 8px;
+}
+
+.sl-hero-copy > p {
+    font-size: .98rem;
+    line-height: 1.85;
+}
+
+.sl-hero-actions {
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.sl-primary-action,
+.sl-guide-action {
+    min-height: 46px;
+    padding: 10px 17px;
+    font-size: .9rem;
+}
+
+.sl-overview {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    margin: 12px 0 28px;
+}
+
+.sl-overview-card {
+    min-height: 80px;
+    gap: 11px;
+    padding: 12px 14px;
+    border-radius: 12px;
+}
+
+.sl-overview-icon {
+    width: 39px;
+    height: 39px;
+    flex-basis: 39px;
+    border-radius: 10px;
+    font-size: 1.02rem;
+}
+
+.sl-overview-copy > span {
+    font-size: .79rem;
+}
+
+.sl-overview-copy > strong {
+    font-size: 1.45rem;
+}
+
+.sl-overview-hint {
+    font-size: .58rem;
+}
+
+.sl-browser-layout {
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 14px;
+}
+
+.sl-filter-sidebar {
+    padding: 12px;
+    border-radius: 13px;
+}
+
+.sl-sidebar-heading {
+    margin-bottom: 9px;
+}
+
+.sl-sidebar-heading h3 {
+    font-size: 1.08rem;
+}
+
+.sl-reset-filters {
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: .72rem;
+}
+
+.sl-facet {
+    padding: 9px 0;
+}
+
+.sl-facet h4 {
+    gap: 9px;
+    margin-bottom: 8px;
+    font-size: .86rem;
+}
+
+.sl-facet h4 > i {
+    font-size: .82rem;
+}
+
+.sl-facet-options {
+    gap: 3px;
+}
+
+.sl-facet-option,
+.sl-map-option {
+    min-height: 35px;
+    padding: 7px 9px;
+    font-size: .76rem;
+}
+
+.sl-facet-option > span,
+.sl-map-option > b {
+    min-width: 25px;
+    font-size: .68rem;
+}
+
+.sl-facet-note {
+    font-size: .68rem;
+    line-height: 1.7;
+}
+
+.sl-toggle-option {
+    min-height: 35px;
+    font-size: .75rem;
+}
+
+.sl-toggle-option input {
+    width: 17px;
+    height: 17px;
+    flex-basis: 17px;
+}
+
+.sl-toggle-option b {
+    font-size: .68rem;
+}
+
+.sl-map-search {
+    min-height: 38px;
+}
+
+.sl-map-search input {
+    font-size: .74rem;
+}
+
+.sl-map-option > span {
+    font-size: .72rem;
+}
+
+.sl-browser-main .sl-filter-panel {
+    margin-bottom: 13px;
+    padding: 12px;
+}
+
+.sl-browser-main .sl-filter-top {
+    gap: 11px;
+}
+
+.sl-browser-main .sl-search {
+    min-height: 43px;
+    width: min(480px, 70%);
+    padding: 0 13px;
+}
+
+.sl-browser-main .sl-search input {
+    font-size: .82rem;
+}
+
+.sl-view-button {
+    min-height: 37px;
+    padding: 7px 12px;
+    font-size: .76rem;
+}
+
+.sl-browser-main .sl-sort-wrap {
+    min-width: 175px;
+    font-size: .75rem;
+}
+
+.sl-browser-main .sl-sort-wrap select {
+    min-height: 38px;
+    font-size: .76rem;
+}
+
+.sl-results-label {
+    font-size: .76rem;
+}
+
+.sl-section-heading {
+    margin-bottom: 14px;
+}
+
+.sl-section-heading h2 {
+    font-size: 1.48rem;
+}
+
+.sl-section-heading p {
+    font-size: .88rem;
+}
+
+.sl-directory-count {
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: .76rem;
+}
+
+.sl-directory-count strong {
+    font-size: .9rem;
+}
+
+.sl-server-group {
+    margin-bottom: 19px;
+}
+
+.sl-group-heading {
+    margin-bottom: 9px;
+}
+
+.sl-group-title h3 {
+    font-size: 1rem;
+}
+
+.sl-group-total {
+    padding: 4px 8px;
+    font-size: .7rem;
+}
+
+.sl-group-caption {
+    font-size: .62rem;
+}
+
+/* Grid view: shorter cover and denser card body. */
+.sl-server-grid {
+    gap: 10px;
+}
+
+#serverList[data-sl-view="grid"] .sl-card-cover {
+    min-height: 91px;
+    padding: 10px 12px;
+}
+
+#serverList[data-sl-view="grid"] .sl-cover-map-name {
+    font-size: clamp(1.1rem, 1.45vw, 1.4rem);
+}
+
+#serverList[data-sl-view="grid"] .sl-card-content {
+    padding: 12px;
+}
+
+#serverList[data-sl-view="grid"] .sl-card-title-wrap h4 {
+    font-size: .94rem;
+}
+
+#serverList[data-sl-view="grid"] .sl-card-mode {
+    margin-top: 4px;
+    font-size: .73rem;
+}
+
+#serverList[data-sl-view="grid"] .sl-status-badge {
+    padding: 5px 8px;
+    font-size: .68rem;
+}
+
+#serverList[data-sl-view="grid"] .sl-card-address {
+    margin-top: 8px;
+    padding: 7px 9px 7px 7px;
+}
+
+#serverList[data-sl-view="grid"] .sl-card-address code {
+    font-size: .72rem;
+}
+
+#serverList[data-sl-view="grid"] .sl-copy-btn {
+    width: 31px;
+    height: 30px;
+    flex-basis: 31px;
+}
+
+#serverList[data-sl-view="grid"] .sl-card-metrics {
+    gap: 6px;
+    margin-top: 8px;
+}
+
+#serverList[data-sl-view="grid"] .sl-metric {
+    padding: 8px 7px;
+}
+
+#serverList[data-sl-view="grid"] .sl-metric > span {
+    margin-bottom: 4px;
+    font-size: .66rem;
+}
+
+#serverList[data-sl-view="grid"] .sl-metric > strong {
+    font-size: .8rem;
+}
+
+#serverList[data-sl-view="grid"] .sl-capacity {
+    margin-top: 8px;
+}
+
+#serverList[data-sl-view="grid"] .sl-capacity-label {
+    margin-bottom: 5px;
+    font-size: .7rem;
+}
+
+#serverList[data-sl-view="grid"] .sl-capacity-label strong {
+    font-size: .73rem;
+}
+
+#serverList[data-sl-view="grid"] .sl-card-footer {
+    gap: 8px;
+    margin-top: 9px;
+    padding-top: 9px;
+}
+
+#serverList[data-sl-view="grid"] .sl-region {
+    font-size: .7rem;
+}
+
+/* List view: one compact row for the entire server on wide screens. */
+#serverList[data-sl-view="list"] .sl-server-grid {
+    gap: 9px;
+}
+
+#serverList[data-sl-view="list"] .sl-server-card {
+    min-height: 112px;
+    grid-template-columns: 116px minmax(0, 1fr);
+    border-radius: 12px;
+}
+
+#serverList[data-sl-view="list"] .sl-card-cover {
+    min-height: 112px;
+    padding: 10px;
+}
+
+#serverList[data-sl-view="list"] .sl-cover-topline {
+    font-size: .61rem;
+}
+
+#serverList[data-sl-view="list"] .sl-cover-map-name {
+    font-size: 1.18rem;
+}
+
+#serverList[data-sl-view="list"] .sl-cover-crosshair {
+    left: 11px;
+    top: 39px;
+    font-size: 2rem;
+}
+
+#serverList[data-sl-view="list"] .sl-card-content {
+    grid-template-columns:
+        minmax(145px, 1.05fr)
+        minmax(130px, .95fr)
+        minmax(205px, 1.35fr)
+        minmax(90px, .62fr)
+        minmax(185px, 1.2fr);
+    grid-template-areas: "heading address metrics capacity footer";
+    align-content: center;
+    align-items: center;
+    gap: 8px 10px;
+    padding: 10px 13px;
+}
+
+#serverList[data-sl-view="list"] .sl-card-title-wrap {
+    gap: 8px;
+}
+
+#serverList[data-sl-view="list"] .sl-card-title-wrap h4 {
+    font-size: .92rem;
+}
+
+#serverList[data-sl-view="list"] .sl-card-mode {
+    margin-top: 4px;
+    font-size: .72rem;
+}
+
+#serverList[data-sl-view="list"] .sl-status-dot {
+    width: 8px;
+    height: 8px;
+    flex-basis: 8px;
+    margin-top: 6px;
+}
+
+#serverList[data-sl-view="list"] .sl-status-badge {
+    padding: 5px 8px;
+    font-size: .68rem;
+}
+
+#serverList[data-sl-view="list"] .sl-card-address {
+    gap: 7px;
+    padding: 7px;
+}
+
+#serverList[data-sl-view="list"] .sl-card-address code {
+    font-size: .72rem;
+}
+
+#serverList[data-sl-view="list"] .sl-copy-btn {
+    width: 31px;
+    height: 30px;
+    flex-basis: 31px;
+}
+
+#serverList[data-sl-view="list"] .sl-card-metrics {
+    gap: 5px;
+    margin-top: 0;
+}
+
+#serverList[data-sl-view="list"] .sl-metric {
+    padding: 7px 6px;
+}
+
+#serverList[data-sl-view="list"] .sl-metric > span {
+    gap: 4px;
+    margin-bottom: 4px;
+    font-size: .62rem;
+}
+
+#serverList[data-sl-view="list"] .sl-metric > strong {
+    font-size: .78rem;
+}
+
+#serverList[data-sl-view="list"] .sl-capacity {
+    margin-top: 0;
+}
+
+#serverList[data-sl-view="list"] .sl-capacity-label {
+    margin-bottom: 6px;
+    font-size: .68rem;
+}
+
+#serverList[data-sl-view="list"] .sl-capacity-label strong {
+    font-size: .72rem;
+}
+
+#serverList[data-sl-view="list"] .sl-card-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    justify-content: initial;
+    gap: 6px;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+#serverList[data-sl-view="list"] .sl-region {
+    font-size: .67rem;
+}
+
+#serverList[data-sl-view="list"] .sl-connect-btn,
+#serverList[data-sl-view="list"] .sl-connect-disabled {
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: .73rem;
+}
+
+#serverList[data-sl-view="list"] .sl-players-btn {
+    min-height: 36px;
+    padding: 7px 9px;
+    font-size: .72rem;
+}
+
+#serverList[data-sl-view="list"] .sl-players-btn > span {
+    font-size: .68rem;
+}
+
+#serverList[data-sl-view="list"] .sl-card-content > .sl-faceit-average-row {
+    grid-column: 1 / -1;
+}
+
+/* The address, metrics and actions wrap cleanly before they begin to squeeze. */
+@media (max-width: 1240px) {
+    .sl-page-shell {
+        width: min(100% - 32px, 1640px);
+    }
+
+    .sl-browser-layout {
+        grid-template-columns: 238px minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    #serverList[data-sl-view="list"] .sl-server-card {
+        min-height: 142px;
+        grid-template-columns: 124px minmax(0, 1fr);
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-cover {
+        min-height: 142px;
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-content {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-areas:
+            "heading address"
+            "metrics capacity"
+            "footer footer";
+        gap: 8px 11px;
+        padding: 10px 12px;
+    }
+}
+
+@media (max-width: 900px) {
+    .sl-browser-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .sl-filter-sidebar {
+        position: static;
+        max-height: none;
+    }
+
+    #serverList[data-sl-view="list"] .sl-server-card {
+        min-height: 140px;
+        grid-template-columns: 116px minmax(0, 1fr);
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-cover {
+        min-height: 140px;
+    }
+}
+
+@media (max-width: 760px) {
+    .serverlist-page {
+        padding-top: 12px;
+        padding-bottom: 30px;
+    }
+
+    .sl-page-shell {
+        width: calc(100% - 24px);
+    }
+
+    .sl-hero {
+        padding: 24px 20px;
+        border-radius: 17px;
+    }
+
+    .sl-hero-copy > p {
+        font-size: .88rem;
+    }
+
+    .sl-overview {
+        gap: 8px;
+        margin-bottom: 22px;
+    }
+
+    .sl-overview-card {
+        min-height: 76px;
+        padding: 10px;
+    }
+
+    .sl-overview-copy > span {
+        font-size: .72rem;
+    }
+
+    .sl-overview-copy > strong {
+        font-size: 1.32rem;
+    }
+
+    .sl-filter-sidebar {
+        padding: 10px;
+    }
+
+    .sl-facet-option,
+    .sl-map-option {
+        min-height: 37px;
+        font-size: .78rem;
+    }
+
+    .sl-browser-main .sl-search {
+        min-height: 44px;
+        width: 100%;
+    }
+
+    .sl-browser-main .sl-search input {
+        font-size: .8rem;
+    }
+
+    #serverList[data-sl-view="list"] .sl-server-card {
+        min-height: 0;
+        grid-template-columns: 96px minmax(0, 1fr);
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-cover {
+        min-height: 100%;
+        padding: 10px 7px;
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-content {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-areas:
+            "heading address"
+            "metrics capacity"
+            "footer footer";
+        gap: 8px;
+        padding: 10px;
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-footer {
+        grid-template-columns: minmax(0, 1fr) auto auto;
+        gap: 6px;
+    }
+}
+
+@media (max-width: 560px) {
+    .sl-page-shell {
+        width: calc(100% - 18px);
+    }
+
+    .sl-hero {
+        padding: 22px 16px;
+    }
+
+    .sl-hero h1 {
+        font-size: 1.85rem;
+    }
+
+    .sl-hero-copy > p {
+        font-size: .82rem;
+    }
+
+    .sl-primary-action,
+    .sl-guide-action {
+        min-height: 43px;
+        padding: 9px 13px;
+        font-size: .82rem;
+    }
+
+    .sl-overview-card {
+        min-height: 72px;
+        gap: 8px;
+        padding: 9px;
+    }
+
+    .sl-overview-icon {
+        width: 33px;
+        height: 33px;
+        flex-basis: 33px;
+    }
+
+    .sl-overview-copy > span {
+        font-size: .67rem;
+    }
+
+    .sl-overview-copy > strong {
+        font-size: 1.2rem;
+    }
+
+    .sl-section-heading h2 {
+        font-size: 1.28rem;
+    }
+
+    .sl-directory-count {
+        font-size: .68rem;
+    }
+
+    #serverList[data-sl-view="list"] .sl-server-card {
+        grid-template-columns: 74px minmax(0, 1fr);
+        border-radius: 11px;
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-cover {
+        padding: 9px 5px;
+    }
+
+    #serverList[data-sl-view="list"] .sl-cover-topline > span:first-child {
+        display: none;
+    }
+
+    #serverList[data-sl-view="list"] .sl-cover-map-name {
+        font-size: .84rem;
+    }
+
+    #serverList[data-sl-view="list"] .sl-cover-crosshair {
+        left: 5px;
+        top: 38px;
+        font-size: 1.45rem;
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-content {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "heading"
+            "address"
+            "metrics"
+            "capacity"
+            "footer";
+        gap: 7px;
+        padding: 9px;
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-title-wrap h4 {
+        font-size: .85rem;
+    }
+
+    #serverList[data-sl-view="list"] .sl-card-mode {
+        font-size: .68rem;
+    }
+
+    #serverList[data-sl-view="list"] .sl-metric {
+        padding: 7px 4px;
+    }
+
+    #serverList[data-sl-view="list"] .sl-metric > span {
+        gap: 3px;
+        font-size: .59rem;
+    }
+
+    #serverList[data-sl-view="list"] .sl-metric > strong {
+        font-size: .72rem;
+    }
+
+    #serverList[data-sl-view="list"] .sl-capacity-label {
+        font-size: .66rem;
+    }
+
+    #serverList[data-sl-view="list"] .sl-region {
+        font-size: .63rem;
+    }
+
+    #serverList[data-sl-view="list"] .sl-connect-btn,
+    #serverList[data-sl-view="list"] .sl-connect-disabled,
+    #serverList[data-sl-view="list"] .sl-players-btn {
+        min-height: 33px;
+        padding: 6px 7px;
+        font-size: .66rem;
+    }
+}
+
+/* Keep card text and controls comfortable in the optional grid view too. */
+@media (max-width: 560px) {
+    #serverList[data-sl-view="grid"] .sl-card-title-wrap h4 {
+        font-size: .88rem;
+    }
+
+    #serverList[data-sl-view="grid"] .sl-metric > span {
+        font-size: .62rem;
+    }
+
+    #serverList[data-sl-view="grid"] .sl-metric > strong {
+        font-size: .76rem;
+    }
+
+    #serverList[data-sl-view="grid"] .sl-connect-btn,
+    #serverList[data-sl-view="grid"] .sl-players-btn {
+        min-height: 34px;
+        font-size: .69rem;
+    }
+}
