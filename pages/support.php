@@ -5,10 +5,19 @@
 require_once __DIR__ . '/../settings/loader.php';
 
 $isLoggedIn = (($_SESSION['user_logged_in'] ?? false) === true);
-$steamid    = $_SESSION['steamid'] ?? '';
+$steamid    = is_string($_SESSION['steamid'] ?? null) ? $_SESSION['steamid'] : '';
 $isAdmin    = ($_SESSION['role'] ?? '') === 'admin';
 $message    = '';
 $error      = '';
+
+$supportCsrfToken = $_SESSION['auth_csrf_token'] ?? '';
+if (
+    !is_string($supportCsrfToken)
+    || !preg_match('/^[a-f0-9]{64}$/D', $supportCsrfToken)
+) {
+    $supportCsrfToken = bin2hex(random_bytes(32));
+    $_SESSION['auth_csrf_token'] = $supportCsrfToken;
+}
 
 $supportSettings = fragcity_settings('files.pages.support', []);
 $supportProfile = isset($supportSettings['database_profile'])
@@ -16,36 +25,71 @@ $supportProfile = isset($supportSettings['database_profile'])
     : 'main';
 $pdo = fragcity_create_pdo($supportProfile);
 
-// Handle new ticket submission (only if logged in)
+// Handle new ticket submission (only if logged in and CSRF-verified).
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_ticket'])) {
+    $submittedCsrfToken = $_POST['csrf_token'] ?? '';
+
     if (!$isLoggedIn) {
         $error = 'برای ارسال تیکت باید وارد شوید.';
-    } elseif ($pdo) {
-        $subject = trim($_POST['subject'] ?? '');
-        $body    = trim($_POST['ticket_body'] ?? '');
-        if (empty($subject) || empty($body)) {
-            $error = 'موضوع و متن تیکت نمی‌تواند خالی باشد.';
-        } else {
-            try {
-                $pdo->beginTransaction();
-                $stmt = $pdo->prepare("INSERT INTO tickets (steamid, subject) VALUES (?, ?)");
-                $stmt->execute([$steamid, $subject]);
-                $ticketId = $pdo->lastInsertId();
+    } elseif (
+        !is_string($submittedCsrfToken)
+        || !hash_equals($supportCsrfToken, $submittedCsrfToken)
+    ) {
+        $error = 'درخواست معتبر نیست؛ صفحه را تازه‌سازی کنید و دوباره تلاش کنید.';
+    } elseif (!preg_match('/^[0-9]{17}$/D', $steamid)) {
+        $error = 'شناسه حساب معتبر نیست؛ دوباره وارد شوید.';
+    } elseif (!$pdo instanceof PDO) {
+        $error = 'خطا در اتصال به دیتابیس.';
+    } else {
+        $subjectInput = $_POST['subject'] ?? null;
+        $bodyInput = $_POST['ticket_body'] ?? null;
 
-                $stmt = $pdo->prepare("INSERT INTO ticket_replies (ticket_id, steamid, message) VALUES (?, ?, ?)");
-                $stmt->execute([$ticketId, $steamid, $body]);
-                $pdo->commit();
-                $message = '✅ تیکت شما با موفقیت ثبت شد.';
-            } catch (PDOException $e) {
-                if ($pdo->inTransaction()) {
-                    $pdo->rollBack();
+        if (!is_string($subjectInput) || !is_string($bodyInput)) {
+            $error = 'اطلاعات تیکت معتبر نیست.';
+        } else {
+            $subject = trim($subjectInput);
+            $body = trim($bodyInput);
+            $subjectLength = function_exists('mb_strlen')
+                ? mb_strlen($subject, 'UTF-8')
+                : strlen($subject);
+
+            if ($subject === '' || $body === '') {
+                $error = 'موضوع و متن تیکت نمی‌تواند خالی باشد.';
+            } elseif ($subjectLength > 191 || strlen($body) > 20000) {
+                $error = 'موضوع حداکثر ۱۹۱ کاراکتر و متن تیکت حداکثر ۲۰ هزار بایت باشد.';
+            } else {
+                try {
+                    $pdo->beginTransaction();
+
+                    $stmt = $pdo->prepare(
+                        'INSERT INTO tickets (steamid, subject) VALUES (?, ?)'
+                    );
+                    $stmt->execute([$steamid, $subject]);
+                    $ticketId = (int) $pdo->lastInsertId();
+
+                    if ($ticketId < 1) {
+                        throw new RuntimeException('support_ticket_id_missing');
+                    }
+
+                    $reply = $pdo->prepare(
+                        'INSERT INTO ticket_replies (ticket_id, steamid, message) VALUES (?, ?, ?)'
+                    );
+                    $reply->execute([$ticketId, $steamid, $body]);
+
+                    $pdo->commit();
+                    $message = '✅ تیکت شما با موفقیت ثبت شد.';
+                } catch (Throwable $e) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    error_log(
+                        '[FragCity] Support ticket creation failed ('
+                        . get_class($e) . ', code ' . (string) $e->getCode() . ').'
+                    );
+                    $error = 'در حال حاضر امکان ثبت تیکت وجود ندارد.';
                 }
-                error_log('[FragCity] Support ticket creation failed (SQLSTATE ' . $e->getCode() . ').');
-                $error = 'در حال حاضر امکان ثبت تیکت وجود ندارد.';
             }
         }
-    } else {
-        $error = 'خطا در اتصال به دیتابیس.';
     }
 }
 
@@ -184,6 +228,7 @@ $activeTab = $_GET['tab'] ?? 'contact';
                     <h3><i class="fas fa-plus-circle"></i> ارسال تیکت جدید</h3>
                     <form method="post" class="ticket-form">
                         <input type="hidden" name="new_ticket" value="1">
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($supportCsrfToken, ENT_QUOTES, 'UTF-8') ?>">
                         <div class="form-group">
                             <label>موضوع تیکت</label>
                             <input type="text" name="subject" placeholder="موضوع را خلاصه بنویسید" required>
@@ -204,12 +249,12 @@ $activeTab = $_GET['tab'] ?? 'contact';
                     <?php else: ?>
                         <div class="ticket-list">
                             <?php foreach ($tickets as $t): ?>
-                                <a href="/support/?tab=tickets&ticket_id=<?= $t['id'] ?>" class="ticket-row">
+                                <a href="/support/?tab=tickets&ticket_id=<?= (int) ($t['id'] ?? 0) ?>" class="ticket-row">
                                     <div class="ticket-info">
-                                        <strong>#<?= $t['id'] ?> – <?= htmlspecialchars($t['subject']) ?></strong>
-                                        <span class="ticket-date"><?= $t['created_at'] ?></span>
+                                        <strong>#<?= $t['id'] ?> – <?= htmlspecialchars((string) ($t['subject'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></strong>
+                                        <span class="ticket-date"><?= htmlspecialchars((string) ($t['created_at'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
                                     </div>
-                                    <span class="ticket-status <?= $t['status'] ?>"><?= $t['status'] ?></span>
+                                    <span class="ticket-status <?= htmlspecialchars((string) ($t['status'] ?? 'unknown'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"><?= $t['status'] ?></span>
                                 </a>
                             <?php endforeach; ?>
                         </div>
