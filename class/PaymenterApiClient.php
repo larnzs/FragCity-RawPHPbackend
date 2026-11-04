@@ -195,10 +195,155 @@ final class PaymenterApiClient
     }
 
     /**
+     * Connect a customer's own Pterodactyl Client API key. Paymenter validates
+     * server ownership and stores the key encrypted at rest.
+     *
+     * @return array{client_api_connected:bool}
+     */
+    public function connectCustomerClientApi(
+        string $steamId64,
+        int $serviceId,
+        string $apiToken
+    ): array {
+        $apiToken = trim($apiToken);
+        if (
+            !preg_match('/^[0-9]{17}$/D', $steamId64)
+            || $serviceId < 1
+            || strlen($apiToken) < 20
+            || strlen($apiToken) > 255
+            || preg_match('/[\r\n\x00-\x20\x7F]/', $apiToken)
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        $response = $this->post(
+            '/api/v1/fragcity/bridge/servers/client-api/connect',
+            [
+                'steamid64' => $steamId64,
+                'service_id' => $serviceId,
+                'api_token' => $apiToken,
+            ]
+        );
+
+        if (($response['data']['client_api_connected'] ?? false) !== true) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return ['client_api_connected' => true];
+    }
+
+    /**
+     * Remove the stored encrypted Client API credential for this customer.
+     *
+     * @return array{client_api_disconnected:bool}
+     */
+    public function disconnectCustomerClientApi(string $steamId64): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
+            throw new RuntimeException('invalid_steamid');
+        }
+
+        $response = $this->post(
+            '/api/v1/fragcity/bridge/servers/client-api/disconnect',
+            ['steamid64' => $steamId64]
+        );
+
+        if (($response['data']['client_api_disconnected'] ?? false) !== true) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return ['client_api_disconnected' => true];
+    }
+
+    /**
+     * Request a short-lived WebSocket credential for one owned CS2 service.
+     *
+     * @return array{socket:string,token:string,expires_in:int,identifier:string}
+     */
+    public function getCustomerConsoleCredentials(string $steamId64, int $serviceId): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $steamId64) || $serviceId < 1) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        $response = $this->post(
+            '/api/v1/fragcity/bridge/servers/console',
+            ['steamid64' => $steamId64, 'service_id' => $serviceId]
+        );
+        $data = $response['data'] ?? null;
+
+        if (
+            !is_array($data)
+            || !is_string($data['socket'] ?? null)
+            || !str_starts_with(strtolower($data['socket']), 'wss://')
+            || !is_string($data['token'] ?? null)
+            || $data['token'] === ''
+        ) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return [
+            'socket' => $data['socket'],
+            'token' => $data['token'],
+            'expires_in' => max(60, min(900, (int) ($data['expires_in'] ?? 600))),
+            'identifier' => (string) ($data['identifier'] ?? ''),
+        ];
+    }
+
+    /**
+     * Run one allow-listed file-manager action on an owned customer service.
+     *
+     * @param array<string,mixed> $input
+     * @return array<string,mixed>
+     */
+    public function customerFileAction(string $steamId64, int $serviceId, array $input): array
+    {
+        $allowedActions = [
+            'list',
+            'read',
+            'write',
+            'create_folder',
+            'rename',
+            'delete',
+            'download',
+            'upload_url',
+        ];
+        $fileAction = strtolower(trim((string) ($input['file_action'] ?? '')));
+
+        if (
+            !preg_match('/^[0-9]{17}$/D', $steamId64)
+            || $serviceId < 1
+            || !in_array($fileAction, $allowedActions, true)
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        $payload = array_merge($input, [
+            'steamid64' => $steamId64,
+            'service_id' => $serviceId,
+            'file_action' => $fileAction,
+        ]);
+
+        $timeout = $fileAction === 'write' ? 45 : 20;
+        $response = $this->post(
+            '/api/v1/fragcity/bridge/servers/files',
+            $payload,
+            $timeout
+        );
+        $data = $response['data'] ?? null;
+
+        if (!is_array($data)) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return $data;
+    }
+
+    /**
      * @param array<string,mixed> $payload
      * @return array<string,mixed>
      */
-    private function post(string $path, array $payload): array
+    private function post(string $path, array $payload, int $timeoutSeconds = 20): array
     {
         $body = json_encode(
             $payload,
@@ -226,7 +371,7 @@ final class PaymenterApiClient
             ],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 5,
-            CURLOPT_TIMEOUT => 20,
+            CURLOPT_TIMEOUT => max(5, min(60, $timeoutSeconds)),
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
@@ -281,6 +426,22 @@ final class PaymenterApiClient
                 'panel_username_already_in_use',
                 'panel_username_update_failed',
                 'panel_username_rate_limited',
+                'client_api_key_invalid',
+                'client_api_key_must_belong_to_server_owner',
+                'client_api_server_verification_failed',
+                'client_api_invalid_response',
+                'client_api_connection_failed',
+                'client_api_connect_rate_limited',
+                'client_api_not_connected',
+                'client_api_permission_denied',
+                'client_api_file_too_large_to_edit',
+                'client_api_invalid_file_content',
+                'client_api_invalid_file_name',
+                'client_api_invalid_file_list',
+                'client_api_invalid_file_path',
+                'client_api_invalid_file_action',
+                'customer_console_unavailable',
+                'customer_file_action_failed',
             ];
 
             if (!in_array($error, $safeErrors, true)) {
