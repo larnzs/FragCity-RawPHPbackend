@@ -350,7 +350,10 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     $itemIp = trim((string) ($itemServer['allocation_ip'] ?? ''));
                     $itemAlias = trim((string) ($itemServer['allocation_alias'] ?? ''));
                     $itemPort = (int) ($itemServer['allocation_port'] ?? 0);
-                    $itemHost = $itemIp !== '' ? $itemIp : $itemAlias;
+                    $itemHost = $itemAlias !== '' ? $itemAlias : $itemIp;
+                    if (filter_var($itemHost, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                        $itemHost = '[' . $itemHost . ']';
+                    }
                     $itemEndpoint = !$itemReady
                         ? 'Pending'
                         : ($itemHost !== ''
@@ -744,7 +747,10 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                         }
                                         $allocationIp = trim((string) ($allocation['ip'] ?? ''));
                                         $allocationAlias = trim((string) ($allocation['alias'] ?? ''));
-                                        $allocationHost = $allocationIp !== '' ? $allocationIp : $allocationAlias;
+                                        $allocationHost = $allocationAlias !== '' ? $allocationAlias : $allocationIp;
+                                        if (filter_var($allocationHost, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                                            $allocationHost = '[' . $allocationHost . ']';
+                                        }
                                         $allocationPort = (int) ($allocation['port'] ?? 0);
                                         $allocationEndpoint = $allocationHost !== ''
                                             ? $allocationHost . ($allocationPort > 0 ? ':' . $allocationPort : '')
