@@ -1,0 +1,75 @@
+name: FragCity Paymenter Bridge Compatibility
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "api/myservers.php"
+      - "class/PaymenterApiClient.php"
+      - "class/PaymenterAccountSyncService.php"
+      - "includes/header.php"
+      - "index.php"
+      - "js/myservers.js"
+      - "pages/myservers.php"
+      - "tools/paymenter-bridge-compatibility-check.php"
+      - ".github/workflows/fragcity-paymenter-bridge.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "api/myservers.php"
+      - "class/PaymenterApiClient.php"
+      - "class/PaymenterAccountSyncService.php"
+      - "includes/header.php"
+      - "index.php"
+      - "js/myservers.js"
+      - "pages/myservers.php"
+      - "tools/paymenter-bridge-compatibility-check.php"
+      - ".github/workflows/fragcity-paymenter-bridge.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compatibility:
+    name: PHP 8.3 and legacy bridge contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+
+      - name: Lint supported website integration
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(
+            "api/myservers.php"
+            "class/PaymenterApiClient.php"
+            "class/PaymenterAccountSyncService.php"
+            "includes/header.php"
+            "index.php"
+            "pages/myservers.php"
+            "tools/paymenter-bridge-compatibility-check.php"
+            "linuxapi/tools/architecture-check.php"
+          )
+          for file in "${files[@]}"; do
+            test -f "$file"
+            php -l "$file"
+          done
+
+      - name: Run Paymenter bridge compatibility checks
+        run: php tools/paymenter-bridge-compatibility-check.php
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check My Servers JavaScript
+        run: node --check js/myservers.js
