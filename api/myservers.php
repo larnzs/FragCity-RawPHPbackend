@@ -241,7 +241,9 @@ try {
     ];
 
     if (!in_array($safeError, $allowedErrors, true)) {
-        $safeError = 'panel_password_update_failed';
+        $safeError = $action === 'set_panel_username'
+            ? 'panel_username_update_failed'
+            : 'panel_password_update_failed';
     }
 
     error_log(
