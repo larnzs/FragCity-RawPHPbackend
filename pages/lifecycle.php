@@ -342,7 +342,7 @@ $kpis = [
                     <?php if ($selectedState === 'paymenter_missing'): ?>
                         <?php if (!empty($mapping['paymenter_missing_reviewed_at'])): ?>
                             <div class="fc-lifecycle__notice">
-                                <i class="fa-solid fa-shield-check"></i>
+                                <i class="fa-solid fa-circle-check"></i>
                                 <div>
                                     <strong>بررسی ادمین تکمیل شده؛ منبع خارجی حفظ می‌شود</strong>
                                     <p>بررسی‌کننده: <?= $escape($mapping['paymenter_missing_reviewed_username'] ?: $mapping['paymenter_missing_reviewed_by']) ?> · <?= $escape($formatDate($mapping['paymenter_missing_reviewed_at'])) ?></p>

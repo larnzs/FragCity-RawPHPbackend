@@ -273,6 +273,8 @@ if ($paymenterRoot === '') {
         'Lifecycle schema and recovery claim migrations contain required columns');
     $check(str_contains($bridge, 'adminLifecycleAcknowledgePaymenterMissing')
         && str_contains($bridge, 'admin_paymenter_missing_reviewed')
+        && str_contains($bridge, "DB::table('services')")
+        && str_contains($bridge, "'paymenter_missing_reviewed_at' => null")
         && str_contains($bridge, "'decision' => 'preserve_external'")
         && str_contains($orphanReviewMigration, 'paymenter_missing_reviewed_at')
         && str_contains($orphanReviewMigration, 'paymenter_missing_review_decision'),
