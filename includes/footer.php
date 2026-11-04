@@ -1,11 +1,12 @@
 <?php
 // includes/footer.php
+require_once __DIR__ . '/routes.php';
 ?>
 <footer class="site-footer" id="siteFooter" aria-label="FragCity footer">
     <div class="footer-content">
         <div class="footer-grid">
             <section class="footer-col footer-brand" aria-label="درباره FragCity">
-                <a href="/index.php?page=home" class="footer-brand-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
+                <a href="<?= htmlspecialchars(fragcity_page_url('home'), ENT_QUOTES, 'UTF-8') ?>" class="footer-brand-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
                     <img
                         src="/img/webp/newlogo.webp?v=20261102-2" onerror="this.onerror=null;this.src='/img/logoresponsive.png?v=20261102-2';"
                         alt="FragCity"
@@ -20,18 +21,20 @@
             </section>
 
             <nav class="footer-col" aria-label="دسترسی سریع">
-                <h2 class="footer-heading">دسترسی سریع</h2>
+                <p class="footer-heading">دسترسی سریع</p>
                 <ul class="footer-links">
-                    <li><a href="/index.php?page=servers_vps" data-ajax-nav data-slug="servers_vps">لیست سرورها</a></li>
-                    <li><a href="index.php?page=skins" data-ajax-nav data-slug="skins">اسکین‌ها</a></li>
-                    <li><a href="/index.php?page=launcher" data-ajax-nav data-slug="launcher">دانلود لانچر <span class="footer-link-soon">به‌زودی</span></a></li>
-                    <li><a href="/index.php?page=serverguide" data-ajax-nav data-slug="serverguide">راهنمای سرور و کامندها</a></li>
-                    <li><a href="/index.php?page=status" data-ajax-nav data-slug="status">وضعیت سرویس‌ها</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('servers_vps'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="servers_vps">لیست سرورها</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('serverguide'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="serverguide">راهنمای سرور CS2</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('buyserveropen'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="buyserveropen">خرید سرور</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('vip'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="vip">عضویت VIP</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('status'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="status">وضعیت سرویس‌ها</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('about'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="about">درباره FragCity</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('support'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="support">پشتیبانی</a></li>
                 </ul>
             </nav>
 
             <section class="footer-col footer-trust" aria-label="نشان‌های اعتماد">
-                <h2 class="footer-heading">نشان‌های اعتماد</h2>
+                <p class="footer-heading">نشان‌های اعتماد</p>
                 <div class="trust-badges">
                     <a
                         referrerpolicy="origin"
