@@ -425,11 +425,6 @@ $mobileMoreNavItems = [
                                 <a href="?page=profile" class="frag-drop-link <?= $isPageActive(['profile']) ?>" data-ajax-nav data-slug="profile">
                                     <i class="fas fa-user" aria-hidden="true"></i><span>مشاهده پروفایل</span>
                                 </a>
-                                <?php if ((string) ($_SESSION['role'] ?? '') === 'admin'): ?>
-                                    <a href="?page=lifecycle" class="frag-drop-link <?= $isPageActive(['lifecycle']) ?>" data-ajax-nav data-slug="lifecycle">
-                                        <i class="fa-solid fa-diagram-project" aria-hidden="true"></i><span>مدیریت Lifecycle</span>
-                                    </a>
-                                <?php endif; ?>
                             </div>
                             <div class="frag-drop-divider"></div>
                             <form action="index.php" method="post" class="frag-drop-logout-form">
@@ -529,12 +524,6 @@ $mobileMoreNavItems = [
                 <i class="fas fa-user-circle" aria-hidden="true"></i>
                 <span><?= htmlspecialchars((string) $displayName, ENT_QUOTES, 'UTF-8') ?></span>
             </a>
-            <?php if ((string) ($_SESSION['role'] ?? '') === 'admin'): ?>
-                <a href="?page=lifecycle" class="mobile-nav-link <?= $isPageActive(['lifecycle']) ?>" data-ajax-nav data-slug="lifecycle">
-                    <i class="fa-solid fa-diagram-project" aria-hidden="true"></i>
-                    <span>مدیریت Lifecycle</span>
-                </a>
-            <?php endif; ?>
             <div class="mobile-wallet-balance-row">
                 <span>
                     <i class="fa-solid fa-wallet" aria-hidden="true"></i>
