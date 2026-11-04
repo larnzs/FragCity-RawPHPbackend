@@ -41,10 +41,13 @@ html.fc-motion-enabled .fc-motion-interactive {
 }
 
 /* A polished page entrance after initial load and AJAX navigation. */
-.fc-motion-page-enter { animation: fc-page-enter 480ms var(--fc-ease-emphasized) both; }
+.fc-motion-page-enter {
+    animation: fc-page-enter 420ms var(--fc-ease-emphasized) both;
+    transform-origin: 50% 0;
+}
 @keyframes fc-page-enter {
-    from { opacity: 0; transform: translate3d(0, 12px, 0); }
-    to { opacity: 1; transform: translate3d(0, 0, 0); }
+    from { opacity: 0; transform: translate3d(0, 16px, 0) scale(.994); }
+    to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
 /* Viewport-based entrance for page sections and cards. */
@@ -75,16 +78,148 @@ html.fc-motion-ready [data-fc-reveal].is-visible {
     }
 }
 
-/* Keep AJAX departures short and page arrivals slightly more expressive. */
+/* Soft, consistent page departure while the destination is fetched. */
 .content-fader {
     transition:
-        opacity 240ms var(--fc-ease-standard),
-        transform 240ms var(--fc-ease-emphasized);
+        opacity 260ms cubic-bezier(.4, 0, .2, 1),
+        transform 260ms var(--fc-ease-emphasized);
 }
 .content-fader.fade-out {
     opacity: 0;
-    transform: translate3d(0, 8px, 0) scale(0.996);
+    transform: translate3d(0, 10px, 0) scale(.995);
     pointer-events: none;
+}
+body.fc-page-transition-active .content-fader {
+    will-change: opacity, transform;
+}
+
+/* Branded loading layer for every AJAX page transition. */
+.fc-page-transition {
+    position: fixed;
+    z-index: calc(var(--fc-z-modal, 1000) + 80);
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(6, 7, 9, .72);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+        opacity 260ms cubic-bezier(.22, 1, .36, 1),
+        visibility 0s linear 260ms;
+}
+.fc-page-transition::before {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #F97316 26%, #FFB347 50%, #F97316 74%, transparent);
+    content: "";
+    opacity: .9;
+}
+body.fc-page-transition-active .fc-page-transition {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 90ms, 0s;
+}
+.fc-page-transition__card {
+    display: grid;
+    justify-items: center;
+    width: min(100%, 292px);
+    padding: 25px 27px 22px;
+    border: 1px solid rgba(255, 255, 255, .09);
+    border-radius: 18px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(249, 115, 22, .12), transparent 58%),
+        linear-gradient(145deg, rgba(25, 25, 25, .98), rgba(15, 15, 15, .98));
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .48), 0 0 45px rgba(249, 115, 22, .06);
+    transform: translateY(12px) scale(.985);
+    transition: transform 320ms var(--fc-ease-emphasized);
+}
+body.fc-page-transition-active .fc-page-transition__card {
+    transform: translateY(0) scale(1);
+}
+.fc-page-transition__brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    direction: ltr;
+}
+.fc-page-transition__mark {
+    display: grid;
+    width: 39px;
+    height: 39px;
+    place-items: center;
+    border: 1px solid rgba(249, 115, 22, .34);
+    border-radius: 12px;
+    background: linear-gradient(145deg, rgba(249, 115, 22, .2), rgba(249, 115, 22, .07));
+    color: #FDBA74;
+    font-size: 1rem;
+    box-shadow: 0 0 24px rgba(249, 115, 22, .1);
+}
+.fc-page-transition__brand-copy {
+    display: grid;
+    gap: 2px;
+}
+.fc-page-transition__brand-copy strong {
+    color: #F5F5F5;
+    font: 900 .86rem/1.2 var(--fc-font-sans, sans-serif);
+    letter-spacing: .13em;
+}
+.fc-page-transition__brand-copy small {
+    color: #777;
+    font: 650 .52rem/1.2 var(--fc-font-sans, sans-serif);
+    letter-spacing: .12em;
+}
+.fc-page-transition__spinner {
+    width: 27px;
+    height: 27px;
+    margin-top: 25px;
+    border: 2px solid rgba(255, 255, 255, .1);
+    border-top-color: #F97316;
+    border-left-color: #FFB347;
+    border-radius: 50%;
+    animation: fc-page-loader-spin 850ms linear infinite;
+}
+.fc-page-transition__message {
+    margin-top: 12px;
+    color: #D4D4D4;
+    font: 700 .73rem/1.7 var(--fc-font-sans, sans-serif);
+}
+.fc-page-transition__progress {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 3px;
+    margin-top: 17px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, .08);
+    direction: ltr;
+}
+.fc-page-transition__progress > span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 34%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #F97316, #FFB347);
+    box-shadow: 0 0 12px rgba(249, 115, 22, .55);
+    animation: fc-page-loader-progress 1.15s cubic-bezier(.65, 0, .35, 1) infinite;
+}
+@keyframes fc-page-loader-spin {
+    to { transform: rotate(360deg); }
+}
+@keyframes fc-page-loader-progress {
+    0% { transform: translateX(-125%); }
+    55% { transform: translateX(95%); }
+    100% { transform: translateX(300%); }
 }
 
 @keyframes fc-fade-in { from { opacity: 0; } to { opacity: 1; } }
