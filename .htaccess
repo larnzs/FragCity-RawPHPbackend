@@ -1,25 +1,138 @@
-# Serve image assets with their correct MIME types.
+# FragCity URL handling and static asset MIME types.
 <IfModule mod_mime.c>
   AddType image/svg+xml .svg .svgz
   AddType image/webp .webp
 </IfModule>
 
+DirectoryIndex index.php
 
-# BEGIN WordPress
-# دستورالعمل‌های (خطوط) بین "BEGIN WordPress" و "END WordPress"
-# به طور پویا تولید شده‌اند، و فقط باید به وسیلهٔ صافی‌های وردرپرس ویرایش شوند.
-# هر تغییری در دستورالعمل‌های بین این نشان‌گرها بازنویشی خواهند شد.
+# Canonical host and HTTPS. Staging hosts keep their own hostname.
 <IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-RewriteBase /
-RewriteRule ^index\.php$ - [L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.php [L]
+  RewriteEngine On
+  RewriteCond %{HTTPS} !=on
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L,NE]
+  RewriteCond %{HTTP_HOST} ^www\.fragcity\.ir$ [NC]
+  RewriteRule ^ https://fragcity.ir%{REQUEST_URI} [R=301,L,NE]
+
+  # Permanently redirect legacy query URLs when they contain only the page parameter.
+  # Requests with functional parameters (auth tokens, tabs, completion flags) are preserved.
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=home\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=home\s [NC]
+  RewriteRule ^(?:index\.php)?$ / [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=servers_vps\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=servers_vps\s [NC]
+  RewriteRule ^(?:index\.php)?$ /servers/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=servers\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=servers\s [NC]
+  RewriteRule ^(?:index\.php)?$ /servers/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=skins\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=skins\s [NC]
+  RewriteRule ^(?:index\.php)?$ /skins/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=skins_vps\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=skins_vps\s [NC]
+  RewriteRule ^(?:index\.php)?$ /skins/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=buyserveropen\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=buyserveropen\s [NC]
+  RewriteRule ^(?:index\.php)?$ /buy-server/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=buyserver\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=buyserver\s [NC]
+  RewriteRule ^(?:index\.php)?$ /buy-server/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=launcher\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=launcher\s [NC]
+  RewriteRule ^(?:index\.php)?$ /launcher/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=usermanual\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=usermanual\s [NC]
+  RewriteRule ^(?:index\.php)?$ /server-manual/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=serverguide\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=serverguide\s [NC]
+  RewriteRule ^(?:index\.php)?$ /serverguide/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=status\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=status\s [NC]
+  RewriteRule ^(?:index\.php)?$ /status/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=about\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=about\s [NC]
+  RewriteRule ^(?:index\.php)?$ /about/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=support\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=support\s [NC]
+  RewriteRule ^(?:index\.php)?$ /support/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=login\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=login\s [NC]
+  RewriteRule ^(?:index\.php)?$ /login/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=register\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=register\s [NC]
+  RewriteRule ^(?:index\.php)?$ /register/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=profile\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=profile\s [NC]
+  RewriteRule ^(?:index\.php)?$ /profile/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=myservers\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=myservers\s [NC]
+  RewriteRule ^(?:index\.php)?$ /my-servers/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=vip\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=vip\s [NC]
+  RewriteRule ^(?:index\.php)?$ /vip/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=leaderboard\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=leaderboard\s [NC]
+  RewriteRule ^(?:index\.php)?$ /leaderboard/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=leaderboard_vps\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=leaderboard_vps\s [NC]
+  RewriteRule ^(?:index\.php)?$ /leaderboard/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=forgot_password\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=forgot_password\s [NC]
+  RewriteRule ^(?:index\.php)?$ /forgot-password/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=reset_password\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=reset_password\s [NC]
+  RewriteRule ^(?:index\.php)?$ /reset-password/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=rules\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=rules\s [NC]
+  RewriteRule ^(?:index\.php)?$ /rules/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=privacy\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=privacy\s [NC]
+  RewriteRule ^(?:index\.php)?$ /privacy/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=deadlock_servers_vps\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=deadlock_servers_vps\s [NC]
+  RewriteRule ^(?:index\.php)?$ /deadlock-servers/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=banlist\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=banlist\s [NC]
+  RewriteRule ^(?:index\.php)?$ /banlist/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=donations\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=donations\s [NC]
+  RewriteRule ^(?:index\.php)?$ /donations/ [R=301,L,NE]
+
+  # Canonical, extension-free routes.
+  RewriteRule ^servers/?$ index.php?page=servers_vps [QSA,L]
+  RewriteRule ^skins/?$ index.php?page=skins [QSA,L]
+  RewriteRule ^buy-server/?$ index.php?page=buyserveropen [QSA,L]
+  RewriteRule ^launcher/?$ index.php?page=launcher [QSA,L]
+  RewriteRule ^server-manual/?$ index.php?page=usermanual [QSA,L]
+  RewriteRule ^serverguide/?$ index.php?page=serverguide [QSA,L]
+  RewriteRule ^status/?$ index.php?page=status [QSA,L]
+  RewriteRule ^about/?$ index.php?page=about [QSA,L]
+  RewriteRule ^support/?$ index.php?page=support [QSA,L]
+  RewriteRule ^login/?$ index.php?page=login [QSA,L]
+  RewriteRule ^register/?$ index.php?page=register [QSA,L]
+  RewriteRule ^profile/?$ index.php?page=profile [QSA,L]
+  RewriteRule ^my-servers/?$ index.php?page=myservers [QSA,L]
+  RewriteRule ^vip/?$ index.php?page=vip [QSA,L]
+  RewriteRule ^leaderboard/?$ index.php?page=leaderboard [QSA,L]
+  RewriteRule ^forgot-password/?$ index.php?page=forgot_password [QSA,L]
+  RewriteRule ^reset-password/?$ index.php?page=reset_password [QSA,L]
+  RewriteRule ^rules/?$ index.php?page=rules [QSA,L]
+  RewriteRule ^privacy/?$ index.php?page=privacy [QSA,L]
+  RewriteRule ^deadlock-servers/?$ index.php?page=deadlock_servers_vps [QSA,L]
+  RewriteRule ^banlist/?$ index.php?page=banlist [QSA,L]
+  RewriteRule ^donations/?$ index.php?page=donations [QSA,L]
 </IfModule>
 
-# END WordPress
+# Retain the hosting provider's authorization forwarding and front-controller fallback.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+  RewriteBase /
+  RewriteRule ^index\.php$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.php [L]
+</IfModule>
 
 # php -- BEGIN cPanel-generated handler, do not edit
 # Set the “ea-php84” package as the default “PHP” programming language.
