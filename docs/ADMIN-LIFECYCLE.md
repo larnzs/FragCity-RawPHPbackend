@@ -20,7 +20,7 @@ All routes are POST and require the HMAC-SHA256 timestamp, nonce and signature h
 
 Paymenter service status is the desired-state authority; Pterodactyl is the observed-state authority. Only an authoritative Pterodactyl 404 is treated as missing. Network failures, timeouts, 401/403 and 5xx responses remain retryable failures and are never converted to `missing_external`.
 
-A manually deleted Server remains `missing_external`. Reconciliation can detect a Server that reappears with the same external ID and verified owner, but it never recreates missing infrastructure. A missing Client, UUID mismatch or ownership mismatch becomes `review_required`; reconciliation does not repair Client profile data.
+A manually deleted Server remains `missing_external`. Reconciliation can detect a Server that reappears with the same external ID and verified owner, but it never recreates missing infrastructure. A missing Client, UUID mismatch or ownership mismatch becomes `review_required`; reconciliation does not repair Client profile data. Suspend/unsuspend/delete operations verify Client ID + UUID with GET-only checks and never repair Client profile fields as a side effect. Legacy numeric Client `external_id` values are not automatically migrated to the customer UUID; they require explicit administrator identity review and mapping.
 
 The scheduled worker processes a bounded batch, records `last_reconciled_at`, retries transient failures, and writes lifecycle audit events. Paymenter service deletion through Eloquent remains synchronous: a remote delete failure blocks the service-row deletion. Direct SQL deletion bypasses model hooks and is marked `paymenter_missing` for review only; no remote deletion is inferred from that observation.
 

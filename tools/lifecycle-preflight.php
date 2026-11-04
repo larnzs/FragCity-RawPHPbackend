@@ -194,10 +194,18 @@ if ($paymenterRoot === '') {
         && !str_contains($reconcileBody, "'DELETE'"),
         'Reconciliation does not create/repair Client or create/delete Server');
 
+    $ownerStart = strpos($cs2, 'private function assertPterodactylServerOwner');
+    $ownerEnd = strpos($cs2, 'public function suspendServer', $ownerStart === false ? 0 : $ownerStart);
+    $ownerBody = ($ownerStart !== false && $ownerEnd !== false)
+        ? substr($cs2, $ownerStart, $ownerEnd - $ownerStart)
+        : '';
     $check(str_contains($cs2, 'if ($response->status() === 404)')
         && str_contains($cs2, 'Pterodactyl Application API request failed with HTTP')
-        && str_contains($cs2, 'Automatic Client recreation is blocked'),
-        '404 vs transient error distinction and missing Client guard');
+        && str_contains($cs2, 'Automatic Client recreation is blocked')
+        && $ownerBody !== ''
+        && !str_contains($ownerBody, 'ensurePterodactylClientUser(')
+        && !str_contains($cs2, '$legacyPaymenterLink'),
+        '404 vs transient errors, missing Client guard, read-only ownership checks and no blind legacy ID migration');
     $check(str_contains($cs2, '$this->claimRecreationAuthorization($service)')
         && str_contains($cs2, '$this->releaseRecreationAuthorizationClaim(')
         && str_contains($cs2, '$this->consumeRecreationAuthorization(')
