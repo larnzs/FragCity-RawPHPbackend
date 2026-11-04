@@ -10,6 +10,8 @@
         current_password_incorrect: 'رمز فعلی FragCity صحیح نیست.',
         password_confirmation_mismatch: 'رمز جدید و تکرار آن مطابقت ندارند.',
         panel_password_policy: 'رمز پنل باید حداقل ۱۲ کاراکتر، شامل حروف و عدد و بدون فاصله باشد.',
+        panel_password_must_be_different: 'رمز پنل باید با رمز FragCity متفاوت باشد.',
+        panel_password_rate_limited: 'تعداد تلاش‌های ناموفق زیاد بوده است. ۱۵ دقیقه بعد دوباره تلاش کنید.',
         required_fields_missing: 'تمام فیلدهای لازم را تکمیل کنید.',
         paymenter_account_not_linked: 'اتصال حساب سرور کامل نیست؛ ابتدا همگام‌سازی حساب را تکمیل کنید.',
         service_not_found: 'این سرویس برای حساب شما پیدا نشد.',
@@ -44,6 +46,11 @@
 
         if (password !== passwordConfirm) {
             showMessage(form, errorMessages.password_confirmation_mismatch, 'error');
+            return;
+        }
+
+        if (password === currentPassword) {
+            showMessage(form, errorMessages.panel_password_must_be_different, 'error');
             return;
         }
 
