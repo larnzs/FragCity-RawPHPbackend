@@ -1,6 +1,6 @@
 <?php
 // pages/profile.php - نسخه جداشده از frontend با پشتیبانی از هر دو فرمت SteamID
-if (!isset($_SESSION['user_logged_in'])) {
+if (($_SESSION['user_logged_in'] ?? false) !== true) {
     header('Location: index.php?page=login');
     exit;
 }
