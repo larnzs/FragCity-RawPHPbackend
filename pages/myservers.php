@@ -230,7 +230,7 @@ if ($selectedServer === null && $myServersServices !== []) {
     $selectedServer = $myServersServices[0];
 }
 
-$allowedTabs = ['overview', 'access'];
+$allowedTabs = ['overview', 'network', 'console', 'files', 'access'];
 $requestedTab = strtolower(trim((string) ($_GET['tab'] ?? 'overview')));
 $activeTab = in_array($requestedTab, $allowedTabs, true) ? $requestedTab : 'overview';
 
@@ -313,6 +313,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
         $selectedLimits = $selectedServer['limits'];
         $selectedFeatures = $selectedServer['features'];
         $selectedCanManage = $selectedServer['state'] === 'ready';
+        $selectedClientApiConnected = !empty($selectedServer['panel']['client_api_connected']);
         $selectedPasswordSet = $selectedServer['password_set'];
         ?>
 
@@ -484,12 +485,23 @@ $myServersDetailsStatus = static function (string $statusClass): string {
 
                 <div class="fc-myservers__sidebar-group">
                     <span class="fc-myservers__sidebar-caption">ابزارهای سرور</span>
-                    <button type="button" class="fc-myservers__nav-item is-disabled" disabled title="این بخش در نسخه بعدی فعال می‌شود">
-                        <i class="fa-solid fa-terminal"></i><span>کنسول</span><small>به‌زودی</small>
-                    </button>
-                    <button type="button" class="fc-myservers__nav-item is-disabled" disabled title="این بخش در نسخه بعدی فعال می‌شود">
-                        <i class="fa-solid fa-folder-open"></i><span>مدیریت فایل‌ها</span><small>به‌زودی</small>
-                    </button>
+                    <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'console')) ?>"
+                       class="fc-myservers__nav-item <?= $activeTab === 'console' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
+                       <?= $activeTab === 'console' ? 'aria-current="page"' : '' ?>>
+                        <i class="fa-solid fa-terminal"></i><span>کنسول زنده</span>
+                        <?php if (!$selectedClientApiConnected): ?><small>اتصال لازم</small><?php endif; ?>
+                    </a>
+                    <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'files')) ?>"
+                       class="fc-myservers__nav-item <?= $activeTab === 'files' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
+                       <?= $activeTab === 'files' ? 'aria-current="page"' : '' ?>>
+                        <i class="fa-solid fa-folder-open"></i><span>مدیریت فایل‌ها</span>
+                        <?php if (!$selectedClientApiConnected): ?><small>اتصال لازم</small><?php endif; ?>
+                    </a>
+                    <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'network')) ?>"
+                       class="fc-myservers__nav-item <?= $activeTab === 'network' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
+                       <?= $activeTab === 'network' ? 'aria-current="page"' : '' ?>>
+                        <i class="fa-solid fa-network-wired"></i><span>IP و پورت</span>
+                    </a>
                     <button type="button" class="fc-myservers__nav-item is-disabled" disabled title="این بخش در نسخه بعدی فعال می‌شود">
                         <i class="fa-solid fa-database"></i><span>پایگاه‌داده‌ها</span><small>به‌زودی</small>
                     </button>
@@ -771,6 +783,209 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                         </section>
                     </div>
 
+                <?php elseif ($activeTab === 'network'): ?>
+                    <?php
+                    $networkAllocations = is_array($selectedServerData['allocations'] ?? null)
+                        ? $selectedServerData['allocations']
+                        : [];
+                    $primaryAllocationId = (int) ($selectedServerData['allocation'] ?? 0);
+                    if ($networkAllocations === [] && (
+                        trim((string) ($selectedServerData['allocation_ip'] ?? '')) !== ''
+                        || trim((string) ($selectedServerData['allocation_alias'] ?? '')) !== ''
+                        || (int) ($selectedServerData['allocation_port'] ?? 0) > 0
+                    )) {
+                        $networkAllocations[] = [
+                            'id' => $primaryAllocationId,
+                            'ip' => (string) ($selectedServerData['allocation_ip'] ?? ''),
+                            'alias' => (string) ($selectedServerData['allocation_alias'] ?? ''),
+                            'port' => (int) ($selectedServerData['allocation_port'] ?? 0),
+                            'is_default' => true,
+                        ];
+                    }
+                    $networkPrimaryEndpoint = '';
+                    foreach ($networkAllocations as $networkAllocation) {
+                        if (!is_array($networkAllocation)) {
+                            continue;
+                        }
+                        $networkHost = trim((string) ($networkAllocation['ip'] ?? ''));
+                        if ($networkHost === '') {
+                            $networkHost = trim((string) ($networkAllocation['alias'] ?? ''));
+                        }
+                        $networkPort = (int) ($networkAllocation['port'] ?? 0);
+                        if (!empty($networkAllocation['is_default']) || (int) ($networkAllocation['id'] ?? 0) === $primaryAllocationId) {
+                            if ($networkHost !== '' && $networkPort > 0) {
+                                $networkPrimaryEndpoint = $networkHost . ':' . $networkPort;
+                                break;
+                            }
+                        }
+                    }
+                    if ($networkPrimaryEndpoint === '' && $networkAllocations !== []) {
+                        $firstAllocation = $networkAllocations[0];
+                        if (is_array($firstAllocation)) {
+                            $networkHost = trim((string) ($firstAllocation['ip'] ?? $firstAllocation['alias'] ?? ''));
+                            $networkPort = (int) ($firstAllocation['port'] ?? 0);
+                            if ($networkHost !== '' && $networkPort > 0) {
+                                $networkPrimaryEndpoint = $networkHost . ':' . $networkPort;
+                            }
+                        }
+                    }
+                    ?>
+                    <div class="fc-myservers__workspace-header">
+                        <div><h3>اتصال شبکه سرور</h3><p>آدرس‌های اختصاص‌یافته به این سرویس و پورت‌های قابل اتصال</p></div>
+                    </div>
+
+                    <section class="fc-dashboard-card fc-network-primary">
+                        <div class="fc-dashboard-card__heading">
+                            <div><h3>آدرس اصلی اتصال</h3><p>این Endpoint برای اتصال بازیکنان به سرور استفاده می‌شود.</p></div>
+                            <i class="fa-solid fa-globe" aria-hidden="true"></i>
+                        </div>
+                        <?php if ($networkPrimaryEndpoint !== ''): ?>
+                            <div class="fc-network-primary__endpoint" dir="ltr">
+                                <strong class="fc-mono"><?= $myServersEscape($networkPrimaryEndpoint) ?></strong>
+                                <button type="button" data-copy-value="<?= $myServersEscape($networkPrimaryEndpoint) ?>" aria-label="Copy IP and port"><i class="fa-regular fa-copy"></i></button>
+                            </div>
+                            <div class="fc-network-primary__actions">
+                                <button type="button" data-copy-value="<?= $myServersEscape('connect ' . $networkPrimaryEndpoint) ?>"><i class="fa-solid fa-gamepad"></i> کپی دستور اتصال CS2</button>
+                                <span><i class="fa-solid fa-circle-check"></i> Primary Allocation</span>
+                            </div>
+                        <?php else: ?>
+                            <p class="fc-server-allocations__empty">هنوز Allocation اصلی برای این سرور ثبت نشده است.</p>
+                        <?php endif; ?>
+                    </section>
+
+                    <section class="fc-dashboard-card fc-network-list">
+                        <div class="fc-dashboard-card__heading">
+                            <div><h3>تمامی Network Allocations</h3><p>تمام IP و Portهای متصل به این سرور</p></div>
+                            <span class="fc-network-list__count"><?= number_format(count($networkAllocations)) ?> تخصیص</span>
+                        </div>
+                        <?php if ($networkAllocations !== []): ?>
+                            <div class="fc-network-list__items" dir="ltr">
+                                <?php foreach ($networkAllocations as $networkAllocation): ?>
+                                    <?php
+                                    if (!is_array($networkAllocation)) {
+                                        continue;
+                                    }
+                                    $networkHost = trim((string) ($networkAllocation['ip'] ?? ''));
+                                    $networkAlias = trim((string) ($networkAllocation['alias'] ?? ''));
+                                    $networkDisplayHost = $networkHost !== '' ? $networkHost : $networkAlias;
+                                    $networkPort = (int) ($networkAllocation['port'] ?? 0);
+                                    $networkEndpoint = $networkDisplayHost !== ''
+                                        ? $networkDisplayHost . ($networkPort > 0 ? ':' . $networkPort : '')
+                                        : 'Unavailable';
+                                    $networkIsPrimary = !empty($networkAllocation['is_default'])
+                                        || (int) ($networkAllocation['id'] ?? 0) === $primaryAllocationId;
+                                    ?>
+                                    <div class="fc-network-list__item">
+                                        <div>
+                                            <span><?= $networkIsPrimary ? 'PRIMARY' : 'ADDITIONAL' ?> · ALLOCATION #<?= number_format((int) ($networkAllocation['id'] ?? 0)) ?></span>
+                                            <strong class="fc-mono"><?= $myServersEscape($networkEndpoint) ?></strong>
+                                            <?php if ($networkAlias !== '' && $networkHost !== '' && $networkAlias !== $networkHost): ?>
+                                                <small>Alias: <?= $myServersEscape($networkAlias) ?></small>
+                                            <?php endif; ?>
+                                        </div>
+                                        <button type="button" data-copy-value="<?= $myServersEscape($networkEndpoint) ?>" aria-label="Copy allocation"><i class="fa-regular fa-copy"></i></button>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="fc-server-allocations__empty">هیچ تخصیص شبکه‌ای برای این سرور دریافت نشد.</p>
+                        <?php endif; ?>
+                    </section>
+
+                <?php elseif ($activeTab === 'console'): ?>
+                    <div class="fc-myservers__workspace-header">
+                        <div><h3>کنسول زنده</h3><p>مشاهده خروجی سرور و ارسال دستور از طریق اتصال امن Pterodactyl</p></div>
+                    </div>
+                    <?php if (!$selectedClientApiConnected): ?>
+                        <section class="fc-dashboard-card fc-tool-connect-required">
+                            <i class="fa-solid fa-key" aria-hidden="true"></i>
+                            <div>
+                                <h3>ابتدا حساب Pterodactyl را متصل کنید</h3>
+                                <p>برای دسترسی به Console باید Client API Key حساب مالک سرور را یک‌بار در بخش دسترسی پنل ثبت کنید.</p>
+                                <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>" data-ajax-nav data-slug="myservers">رفتن به اتصال API <i class="fa-solid fa-arrow-left"></i></a>
+                            </div>
+                        </section>
+                    <?php else: ?>
+                        <section class="fc-dashboard-card fc-console-card" id="fcConsole" data-service-id="<?= $selectedId ?>">
+                            <div class="fc-console-card__header">
+                                <div>
+                                    <div class="fc-console-card__title"><i class="fa-solid fa-terminal"></i><strong>Server Console</strong></div>
+                                    <span class="fc-console-card__status" data-console-status>Disconnected</span>
+                                </div>
+                                <div class="fc-console-card__actions">
+                                    <button type="button" data-console-connect><i class="fa-solid fa-plug"></i><span>اتصال</span></button>
+                                    <button type="button" data-console-clear><i class="fa-solid fa-eraser"></i><span>پاک‌کردن خروجی</span></button>
+                                </div>
+                            </div>
+                            <div class="fc-console-card__stats" dir="ltr">
+                                <div><span>CPU</span><strong data-console-cpu>—</strong></div>
+                                <div><span>MEMORY</span><strong data-console-memory>—</strong></div>
+                                <div><span>DISK</span><strong data-console-disk>—</strong></div>
+                                <div><span>STATE</span><strong data-console-state>—</strong></div>
+                            </div>
+                            <pre class="fc-console-card__output" data-console-output role="log" aria-live="polite">برای دریافت خروجی، روی «اتصال» کلیک کنید.</pre>
+                            <form class="fc-console-card__command" data-console-command-form dir="ltr">
+                                <span aria-hidden="true">›</span>
+                                <input type="text" name="command" maxlength="2000" autocomplete="off" spellcheck="false" placeholder="Enter server command..." aria-label="Server command" required>
+                                <button type="submit" disabled data-console-send><i class="fa-solid fa-paper-plane"></i> Send</button>
+                            </form>
+                            <p class="fc-console-card__hint">اتصال زنده با توکن کوتاه‌عمر برقرار می‌شود؛ کلید Client API به مرورگر ارسال نمی‌شود.</p>
+                        </section>
+                    <?php endif; ?>
+
+                <?php elseif ($activeTab === 'files'): ?>
+                    <div class="fc-myservers__workspace-header">
+                        <div><h3>مدیریت فایل‌ها</h3><p>مرور، ویرایش، بارگذاری و مدیریت فایل‌های سرور</p></div>
+                    </div>
+                    <?php if (!$selectedClientApiConnected): ?>
+                        <section class="fc-dashboard-card fc-tool-connect-required">
+                            <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+                            <div>
+                                <h3>برای مدیریت فایل‌ها اتصال API لازم است</h3>
+                                <p>Client API Key حساب مالک را یک‌بار متصل کنید تا فایل‌های همین سرور از طریق مجوزهای Pterodactyl قابل مدیریت شوند.</p>
+                                <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>" data-ajax-nav data-slug="myservers">رفتن به اتصال API <i class="fa-solid fa-arrow-left"></i></a>
+                            </div>
+                        </section>
+                    <?php else: ?>
+                        <section class="fc-dashboard-card fc-file-manager" id="fcFileManager" data-service-id="<?= $selectedId ?>">
+                            <div class="fc-file-manager__toolbar">
+                                <div class="fc-file-manager__location">
+                                    <i class="fa-solid fa-folder-tree"></i>
+                                    <strong data-file-directory>/</strong>
+                                </div>
+                                <div class="fc-file-manager__actions">
+                                    <button type="button" data-file-up title="پوشه بالاتر"><i class="fa-solid fa-arrow-up"></i></button>
+                                    <button type="button" data-file-refresh title="تازه‌سازی"><i class="fa-solid fa-rotate"></i></button>
+                                    <button type="button" data-file-new-folder><i class="fa-solid fa-folder-plus"></i> پوشه جدید</button>
+                                    <button type="button" data-file-upload-trigger><i class="fa-solid fa-upload"></i> بارگذاری</button>
+                                    <input type="file" data-file-upload-input hidden multiple>
+                                </div>
+                            </div>
+                            <div class="fc-file-manager__breadcrumbs" data-file-breadcrumbs dir="ltr"></div>
+                            <div class="fc-file-manager__message" data-file-message role="status" aria-live="polite">در حال آماده‌سازی مدیریت فایل‌ها...</div>
+                            <div class="fc-file-manager__table-wrap" dir="ltr">
+                                <table class="fc-file-manager__table">
+                                    <thead><tr><th>Name</th><th>Type</th><th>Size</th><th>Modified</th><th>Actions</th></tr></thead>
+                                    <tbody data-file-list></tbody>
+                                </table>
+                            </div>
+                            <section class="fc-file-editor" data-file-editor hidden>
+                                <div class="fc-file-editor__header">
+                                    <div><i class="fa-solid fa-file-code"></i><strong data-file-editor-name>File editor</strong></div>
+                                    <div>
+                                        <button type="button" data-file-download><i class="fa-solid fa-download"></i> Download</button>
+                                        <button type="button" data-file-close><i class="fa-solid fa-xmark"></i> Close</button>
+                                    </div>
+                                </div>
+                                <textarea data-file-editor-content spellcheck="false" aria-label="File contents"></textarea>
+                                <div class="fc-file-editor__footer">
+                                    <span data-file-editor-message></span>
+                                    <button type="button" data-file-save><i class="fa-solid fa-floppy-disk"></i> ذخیره تغییرات</button>
+                                </div>
+                            </section>
+                        </section>
+                    <?php endif; ?>
+
                 <?php elseif ($activeTab === 'access'): ?>
                     <div class="fc-myservers__workspace-header">
                         <div><h3>دسترسی پنل</h3><p>اطلاعات ورود به حساب مدیریت سرورهای شما</p></div>
@@ -806,6 +1021,48 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                 <?php endif; ?>
                             </div>
                         </div>
+                    </section>
+
+                    <section class="fc-dashboard-card fc-client-api-card">
+                        <div class="fc-dashboard-card__heading">
+                            <div><h3>اتصال امن ابزارهای مدیریت</h3><p>دسترسی Console و File Manager با Client API حساب مالک</p></div>
+                            <span class="fc-client-api-card__state <?= $selectedClientApiConnected ? 'is-connected' : 'is-disconnected' ?>" data-client-api-state>
+                                <i class="fa-solid <?= $selectedClientApiConnected ? 'fa-circle-check' : 'fa-link' ?>"></i>
+                                <?= $selectedClientApiConnected ? 'متصل' : 'متصل نشده' ?>
+                            </span>
+                        </div>
+                        <p class="fc-client-api-card__description">
+                            یک Client API Key از حساب Pterodactyl خودتان بسازید. این کلید فقط برای حساب شماست و در Paymenter به‌صورت رمزنگاری‌شده نگهداری می‌شود. کلید در مرورگر ذخیره یا دوباره نمایش داده نمی‌شود.
+                        </p>
+                        <?php if ($selectedClientApiConnected): ?>
+                            <div class="fc-client-api-card__connected">
+                                <div><i class="fa-solid fa-shield-check"></i><span><strong>حساب Pterodactyl متصل است</strong><small>این اتصال برای تمام سرورهای CS2 متعلق به همین حساب مشترک استفاده می‌شود.</small></span></div>
+                                <button type="button" data-client-api-disconnect><i class="fa-solid fa-link-slash"></i> قطع اتصال</button>
+                            </div>
+                            <p class="fc-client-api-card__note">قطع اتصال در FragCity، کلید ذخیره‌شده را از Paymenter حذف می‌کند. برای باطل‌کردن خود کلید، آن را از Account → API Credentials در Pterodactyl نیز حذف کنید.</p>
+                        <?php else: ?>
+                            <ol class="fc-client-api-card__steps">
+                                <li>وارد حساب Pterodactyl خود شوید.</li>
+                                <li>از بخش <strong>Account → API Credentials</strong> یک Client API Key ایجاد کنید؛ برای مثال با توضیح <code>FragCity My Servers</code>.</li>
+                                <li>کلید را فقط در فرم زیر وارد کنید. بعد از تأیید، مقدار آن پاک می‌شود.</li>
+                            </ol>
+                            <form class="fc-client-api-connect-form" data-client-api-connect-form dir="ltr">
+                                <input type="hidden" name="service_id" value="<?= $selectedId ?>">
+                                <label>
+                                    <span>Client API Key</span>
+                                    <input type="password" name="api_token" autocomplete="new-password" autocapitalize="none" spellcheck="false" placeholder="ptlc_..." minlength="20" maxlength="255" required>
+                                </label>
+                                <label>
+                                    <span>رمز فعلی حساب FragCity</span>
+                                    <input type="password" name="current_password" autocomplete="current-password" required>
+                                </label>
+                                <div class="fc-client-api-connect-form__footer">
+                                    <span data-client-api-message role="status" aria-live="polite"></span>
+                                    <button type="submit"><i class="fa-solid fa-link"></i> اتصال حساب</button>
+                                </div>
+                            </form>
+                            <p class="fc-client-api-card__note">Client API Key متعلق به حساب پنل شماست و دسترسی‌های همان حساب را دارد. آن را در چت، تیکت یا پیام برای کسی ارسال نکنید.</p>
+                        <?php endif; ?>
                     </section>
 
                     <section class="fc-dashboard-card fc-password-card">
