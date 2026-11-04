@@ -426,7 +426,9 @@ $vipCurrentStatus = !$isLoggedIn
                 data-vip-summary="<?= htmlspecialchars($tier['summary'], ENT_QUOTES, 'UTF-8') ?>"
                 data-vip-summary-fa="<?= htmlspecialchars($tier['summary_fa'], ENT_QUOTES, 'UTF-8') ?>"
                 data-vip-available="<?= $tier['available'] ? '1' : '0' ?>"
+                role="button"
                 tabindex="0"
+                aria-pressed="false"
                 aria-label="<?= htmlspecialchars('Select ' . $tier['name'] . ' VIP to view its features', ENT_QUOTES, 'UTF-8') ?>"
                 data-price-label="<?= htmlspecialchars($tierPriceLabel, ENT_QUOTES, 'UTF-8') ?>"
                 data-duration-label="<?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?>"
@@ -481,10 +483,10 @@ $vipCurrentStatus = !$isLoggedIn
                     <small><?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?></small>
                 </div>
 
-                <button type="button" class="vip-plan-select" data-vip-select aria-pressed="false">
+                <span class="vip-plan-select" data-vip-select aria-hidden="true">
                     مشاهده قابلیت‌ها
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                </button>
+                </span>
             </article>
         <?php endforeach; ?>
     </section>
