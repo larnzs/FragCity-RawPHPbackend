@@ -143,15 +143,21 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 - فایل `database/migrations/20261104_client_name_fields.sql` را هم فقط یک‌بار روی همان دیتابیس اجرا کن؛ این Migration ستون‌های `first_name` و `last_name` را اضافه می‌کند. برای جلوگیری از پرشدن نام قانونی با نام نمایشی، رکوردهای قدیمی به‌صورت خودکار حدس زده یا backfill نمی‌شوند؛ کاربران قدیمی هنگام ورود بعدی فرم تکمیل حساب را می‌بینند.
 - نام کاربری در فرم ثبت‌نام و تکمیل حساب اجباری است: ۳ تا ۵۰ کاراکتر، فقط حروف انگلیسی، عدد، `_` و `-`، با حرف/عدد در ابتدا و انتها. نام و نام خانوادگی نیز اجباری‌اند.
 - Bridge مقدار Username را در Paymenter به‌صورت User Property با کلید `fragcity_username` ذخیره می‌کند؛ Paymenter فیلد native برای username ندارد. نام کوچک و نام خانوادگی در فیلدهای native Paymenter ذخیره می‌شوند.
-- افزونه `FragCityCS2` هنگام Provisioning، Username انتخابی و نام‌های native را با Application API در فیلدهای native کاربر Pterodactyl قرار می‌دهد، `external_id` را برابر شناسه کاربر Paymenter تنظیم می‌کند و سپس ساخت سرور را به پیاده‌سازی رسمی Paymenter واگذار می‌کند. Password پنل Pterodactyl همچنان مستقل است و در این مسیر منتقل نمی‌شود.
+- افزونه `FragCityCS2` هنگام Provisioning، Username انتخابی و نام‌های native را با Application API در فیلدهای native کاربر Pterodactyl قرار می‌دهد، `external_id` را برابر شناسه کاربر Paymenter تنظیم می‌کند و سپس ساخت سرور را به پیاده‌سازی رسمی Paymenter واگذار می‌کند.
+- صفحه محافظت‌شدهٔ `?page=myservers` سرویس‌های متعلق به SteamID واردشده را از Bridge می‌گیرد و کارت‌های سرور را با UUID، شناسه، وضعیت، منابع، تاریخ‌ها و اطلاعات ورود پنل نشان می‌دهد. کلیک روی کارت، جزئیات و فرم تنظیم رمز مستقل پنل را باز می‌کند.
+- Bridge نسخه ۱.۳ مسیرهای `POST /api/v1/fragcity/bridge/servers/list` و `POST /api/v1/fragcity/bridge/servers/password` را اضافه می‌کند. این درخواست‌ها فقط از backend سایت، با HMAC و HTTPS ارسال می‌شوند؛ مرورگر هیچ API Key یا HMAC Secret دریافت نمی‌کند.
+- مشتری برای تنظیم/تغییر رمز پنل، رمز فعلی FragCity را دوباره وارد می‌کند. رمز جدید باید حداقل ۱۲ کاراکتر، شامل حرف و عدد، بدون فاصله و متفاوت از رمز FragCity باشد. فقط زمان تنظیم رمز در Paymenter به‌صورت Property ذخیره می‌شود؛ رمز خام یا Hash آن در FragCity/Paymenter نگهداری نمی‌شود.
+- یک حساب Pterodactyl برای کاربر Paymenter مشترک است؛ بنابراین Username/Email و رمز پنل برای تمام سرورهای CS2 همان مشتری یکسان است. تغییر رمز از هر کارت، دسترسی همان حساب مشترک را تغییر می‌دهد. رمز فعلی قابل بازیابی/نمایش نیست؛ مشتری می‌تواند هر زمان رمز تازه‌ای تنظیم کند.
 - فایل‌های PHP جدید را پس از اعمال Migrationها منتشر کن و برای تست ساختار و اتصال از ریشه پروژه اجرا کن: `php tools/paymenter-api-preflight.php`.
 - پس از Deploy هر دو Extension و فایل‌های جدید سایت، فایل `database/migrations/20261104_paymenter_username_resync.sql` را فقط یک بار اجرا کن. این Query حساب‌های Paymenter لینک‌شده‌ی فعلی را به وضعیت `pending` می‌برد تا کاربران قدیمی نیز Property جدید `fragcity_username` را دریافت کنند؛ کاربران با ورود عادی و رمز خودکار Sync می‌شوند و نشست‌های Steam/Remember Me در ورود بعدی فرم تکمیل حساب را می‌بینند. این SQL را قبل از Deploy فرم جدید اجرا نکن.
 
 Endpointهای Bridge:
 - `POST /api/v1/fragcity/bridge/ping`
 - `POST /api/v1/fragcity/bridge/users/sync`
+- `POST /api/v1/fragcity/bridge/servers/list`
+- `POST /api/v1/fragcity/bridge/servers/password`
 
-هر درخواست با HMAC-SHA256، timestamp و nonce یک‌بارمصرف امضا می‌شود. رمز عبور فقط در حافظه و در درخواست HTTPS امضاشده منتقل می‌شود؛ در Session، لاگ، تنظیمات یا دیتابیس به‌صورت خام ذخیره نمی‌شود. Paymenter آن را با Hash استاندارد خودش نگهداری می‌کند.
+هر درخواست با HMAC-SHA256، timestamp و nonce یک‌بارمصرف امضا می‌شود. رمز حساب FragCity فقط در حافظه و در درخواست HTTPS امضاشدهٔ Sync منتقل می‌شود؛ رمز پنل نیز فقط در درخواست HTTPS امضاشدهٔ تغییر رمز از backend سایت به Paymenter فرستاده می‌شود. هیچ‌کدام در لاگ یا به‌صورت متن خام ذخیره نمی‌شوند. Paymenter رمز حساب خودش و Pterodactyl رمز پنل خودش را با Hash استاندارد ذخیره می‌کنند.
 
 برای جلوگیری از ساخت حساب تکراری، ستون `paymenter_user_id` در دیتابیس سایت شناسه حساب متناظر را نگه می‌دارد. تلفن و SteamID در Paymenter به‌صورت User Property ذخیره می‌شوند؛ Paymenter فیلد native شماره تلفن ندارد.
 
