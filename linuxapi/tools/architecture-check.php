@@ -82,6 +82,11 @@ try {
         : '';
     $footerMarkup = $read('includes/footer.php');
     $footerStylesheet = $read('css/footer.css');
+    $routesMarkup = $read('includes/routes.php');
+    $htaccessMarkup = $read('.htaccess');
+    $robotsMarkup = $read('robots.txt');
+    $sitemapMarkup = $read('sitemap.xml');
+    $notFoundMarkup = $read('pages/404.php');
     $launcherPage = $read('pages/launcher.php');
     $launcherStylesheet = $read('css/launcher.css');
     $supportPage = $read('pages/support.php');
@@ -672,19 +677,29 @@ $check(
 );
 
 $check(
-    'Footer shows only active public destinations and hides the deferred support/legal pages',
-    str_contains($footerMarkup, 'index.php?page=servers_vps')
-        && str_contains($footerMarkup, 'data-slug="servers_vps"')
-        && str_contains($footerMarkup, 'index.php?page=skins')
-        && str_contains($footerMarkup, 'index.php?page=launcher')
-        && !str_contains($footerMarkup, 'page=support')
-        && !str_contains($footerMarkup, 'page=usermanual')
-        && !str_contains($footerMarkup, 'page=rules')
-        && !str_contains($footerMarkup, 'page=privacy')
-        && !str_contains($footerMarkup, 'راهنما و پشتیبانی')
-        && is_file($root . '/pages/launcher.php')
+    'Footer exposes canonical public routes and keeps decorative labels out of the heading outline',
+    str_contains($footerMarkup, "fragcity_page_url('servers_vps')")
+        && str_contains($footerMarkup, "fragcity_page_url('serverguide')")
+        && str_contains($footerMarkup, "fragcity_page_url('buyserveropen')")
+        && str_contains($footerMarkup, "fragcity_page_url('vip')")
+        && str_contains($footerMarkup, "fragcity_page_url('status')")
+        && str_contains($footerMarkup, "fragcity_page_url('support')")
+        && str_contains($footerMarkup, '<p class="footer-heading">دسترسی سریع</p>')
+        && !str_contains($footerMarkup, '<h2 class="footer-heading">')
         && is_file($root . '/pages/serverlist.php')
         && is_file($root . '/pages/weaponpaints.php')
+);
+
+$check(
+    'Canonical URL routing, sitemap, robots policy, staging noindex and 404 handling are present',
+    str_contains($routesMarkup, 'function fragcity_page_url')
+        && str_contains($htaccessMarkup, 'RewriteRule ^serverguide/?$ index.php?page=serverguide')
+        && str_contains($htaccessMarkup, 'https://fragcity.ir')
+        && str_contains($websiteIndex, 'rel="canonical"')
+        && str_contains($websiteIndex, 'X-Robots-Tag: noindex')
+        && str_contains($robotsMarkup, 'Sitemap: https://fragcity.ir/sitemap.xml')
+        && str_contains($sitemapMarkup, 'https://fragcity.ir/serverguide/')
+        && str_contains($notFoundMarkup, 'FRAGCITY / 404')
 );
 
 $check(
@@ -959,7 +974,7 @@ $check(
         && str_contains($uptimeKumaNginx, 'proxy_set_header Upgrade')
         && str_contains($uptimeKumaDocs, 'does **not** provide a 90-day numeric uptime series')
         && str_contains($siteHeaderMarkup, "['status', 'وضعیت سرویس‌ها', 'fa-heart-pulse', ['status']]")
-        && str_contains($footerMarkup, '?page=status')
+        && str_contains($footerMarkup, "fragcity_page_url('status')")
 );
 
 $check(
@@ -981,7 +996,7 @@ $check(
         && str_contains($siteHeaderMarkup, "['serverguide', 'راهنمای سرور', 'fa-book-open', ['serverguide']]")
         && str_contains($homePage, 'home-button-guide')
         && str_contains($publicPage, 'sl-guide-action')
-        && str_contains($footerMarkup, "?page=serverguide")
+        && str_contains($footerMarkup, "fragcity_page_url('serverguide')")
 );
 
 $check(
