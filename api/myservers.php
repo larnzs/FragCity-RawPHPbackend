@@ -130,7 +130,9 @@ if ($action === 'set_panel_password') {
     if (!preg_match('/^[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]$/D', $panelUsername)) {
         $respond(['success' => false, 'error' => 'panel_username_invalid'], 422);
     }
+}
 
+$requiresCurrentPassword = true;
 
 try {
     $indexSettings = fragcity_settings('files.index', []);
