@@ -45,6 +45,63 @@ $myServersDate = static function ($value): string {
     }
 };
 
+$myServersExpirySummary = static function ($purchaseValue, $expiresValue): array {
+    $expiresValue = trim((string) $expiresValue);
+    if ($expiresValue === '') {
+        return [
+            'has_expiry' => false,
+            'days_remaining' => null,
+            'progress' => 0,
+            'critical' => false,
+            'label' => 'No Expiry',
+        ];
+    }
+
+    try {
+        $expiresAt = new DateTimeImmutable($expiresValue);
+        $now = new DateTimeImmutable('now', $expiresAt->getTimezone());
+        $remainingSeconds = $expiresAt->getTimestamp() - $now->getTimestamp();
+        $daysRemaining = $remainingSeconds > 0
+            ? (int) ceil($remainingSeconds / 86400)
+            : 0;
+
+        $progress = 0.0;
+        $purchaseValue = trim((string) $purchaseValue);
+        if ($purchaseValue !== '') {
+            try {
+                $purchasedAt = new DateTimeImmutable($purchaseValue);
+                $totalSeconds = $expiresAt->getTimestamp() - $purchasedAt->getTimestamp();
+                if ($totalSeconds > 0) {
+                    $progress = round(
+                        max(0, min(100, ($remainingSeconds / $totalSeconds) * 100)),
+                        1
+                    );
+                }
+            } catch (Throwable) {
+                $progress = 0.0;
+            }
+        }
+
+        return [
+            'has_expiry' => true,
+            'days_remaining' => $daysRemaining,
+            'progress' => $progress,
+            'critical' => $daysRemaining <= 5,
+            'label' => $daysRemaining === 0
+                ? 'Expired'
+                : $daysRemaining . ($daysRemaining === 1 ? ' day left' : ' days left'),
+        ];
+    } catch (Throwable) {
+        return [
+            'has_expiry' => false,
+            'days_remaining' => null,
+            'progress' => 0,
+            'critical' => false,
+            'label' => 'Unavailable',
+        ];
+    }
+};
+
 $myServersMiB = static function ($value): string {
     $value = (int) $value;
     if ($value <= 0) {
@@ -110,6 +167,14 @@ if (preg_match('/^[0-9]{17}$/D', $myServersSteamId)) {
                 ? $panelUrl
                 : '';
 
+            $panelBaseUrl = (string) ($panel['base_url'] ?? '');
+            $panelBaseUrlParts = parse_url($panelBaseUrl);
+            $safePanelBaseUrl = is_array($panelBaseUrlParts)
+                && strtolower((string) ($panelBaseUrlParts['scheme'] ?? '')) === 'https'
+                && !empty($panelBaseUrlParts['host'])
+                ? $panelBaseUrl
+                : '';
+
             $myServersServices[$serviceId] = [
                 'service_id' => $serviceId,
                 'product_name' => trim((string) ($row['product_name'] ?? 'CS2 Server')),
@@ -122,6 +187,7 @@ if (preg_match('/^[0-9]{17}$/D', $myServersSteamId)) {
                 'limits' => $limits,
                 'features' => $features,
                 'panel_url' => $safePanelUrl,
+                'panel_base_url' => $safePanelBaseUrl,
                 'name' => trim((string) ($server['name'] ?? '')),
                 'uuid' => trim((string) ($server['uuid'] ?? '')),
                 'identifier' => trim((string) ($server['identifier'] ?? '')),
@@ -204,10 +270,6 @@ $myServersDetailsStatus = static function (string $statusClass): string {
 
     <header class="fc-myservers__page-header">
         <div>
-            <div class="fc-myservers__eyebrow">
-                <span></span>
-                FRAGCITY SERVER CENTER
-            </div>
             <h1>مدیریت سرورهای من</h1>
             <p>از این بخش می‌توانید سرویس‌ها و دسترسی پنل سرورهای خود را مدیریت کنید.</p>
         </div>
@@ -231,7 +293,6 @@ $myServersDetailsStatus = static function (string $statusClass): string {
             <div class="fc-myservers__empty-orbit">
                 <i class="fa-solid fa-server" aria-hidden="true"></i>
             </div>
-            <span class="fc-myservers__empty-kicker">YOUR SERVERS</span>
             <h2>هنوز سروری ندارید</h2>
             <p>بعد از خرید و آماده‌سازی اولین سرویس CS2، داشبورد مدیریت آن در همین صفحه نمایش داده می‌شود.</p>
             <a href="?page=buyserveropen" class="fc-myservers__new-server fc-myservers__new-server--primary" data-ajax-nav data-slug="buyserveropen">
@@ -265,19 +326,101 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                 <?php foreach ($myServersServices as $item): ?>
                     <?php
                     $itemId = (int) $item['service_id'];
+                    $itemServer = is_array($item['server'] ?? null) ? $item['server'] : [];
+                    $itemLimits = is_array($item['limits'] ?? null) ? $item['limits'] : [];
                     $itemName = $item['name'] !== '' ? $item['name'] : $item['product_name'] . ' #' . $itemId;
+                    $itemExpiry = $myServersExpirySummary(
+                        $itemServer['service_created_at'] ?? '',
+                        $itemServer['expires_at'] ?? ''
+                    );
+                    if (($item['state'] ?? '') !== 'ready') {
+                        $itemExpiry = [
+                            'has_expiry' => false,
+                            'days_remaining' => null,
+                            'progress' => 0,
+                            'critical' => false,
+                            'label' => 'Pending',
+                        ];
+                    }
+                    $itemIdentifier = trim((string) ($item['identifier'] ?? ''));
+                    $itemMemory = (int) ($itemLimits['memory'] ?? 0);
+                    $itemCpu = (int) ($itemLimits['cpu'] ?? 0);
+                    $itemIp = trim((string) ($itemServer['allocation_ip'] ?? ''));
+                    $itemPort = (int) ($itemServer['allocation_port'] ?? 0);
+                    $itemEndpoint = $itemIp !== ''
+                        ? $itemIp . ($itemPort > 0 ? ':' . $itemPort : '')
+                        : 'Not assigned';
+                    $itemPurchaseDate = $myServersDate($itemServer['service_created_at'] ?? '');
+                    $itemExpiryPercent = max(0, min(100, (float) $itemExpiry['progress']));
                     ?>
                     <a
                         href="<?= $myServersEscape($myServersTabUrl($itemId, 'overview')) ?>"
-                        class="fc-myservers__server-chip <?= $itemId === $selectedId ? 'is-selected' : '' ?>" data-ajax-nav data-slug="myservers"
+                        class="fc-myservers__server-card <?= $itemId === $selectedId ? 'is-selected' : '' ?>"
+                        data-ajax-nav
+                        data-slug="myservers"
                         <?= $itemId === $selectedId ? 'aria-current="page"' : '' ?>
+                        dir="ltr"
                     >
-                        <span class="fc-myservers__server-chip-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
-                        <span class="fc-myservers__server-chip-text">
-                            <strong><?= $myServersEscape($itemName) ?></strong>
-                            <small>#<?= number_format($itemId) ?></small>
-                        </span>
-                        <span class="fc-myservers__server-chip-status fc-status-dot--<?= $myServersEscape($item['status_class']) ?>"></span>
+                        <div class="fc-server-card__top">
+                            <img
+                                class="fc-server-card__logo"
+                                src="/assets/images/logo/cs2.png"
+                                alt="Counter-Strike 2"
+                                width="52"
+                                height="52"
+                            >
+                            <div class="fc-server-card__identity">
+                                <strong><?= $myServersEscape($itemName) ?></strong>
+                                <span>CS2 GAME SERVER · SERVICE #<?= number_format($itemId) ?></span>
+                            </div>
+                            <span class="fc-server-card__status fc-server-card__status--<?= $myServersEscape($item['status_class']) ?>">
+                                <?= $myServersEscape($item['status_label']) ?>
+                            </span>
+                        </div>
+
+                        <div class="fc-server-card__facts">
+                            <div class="fc-server-card__fact">
+                                <span>UID</span>
+                                <strong class="fc-mono"><?= $myServersEscape($itemIdentifier !== '' ? $itemIdentifier : '—') ?></strong>
+                            </div>
+                            <div class="fc-server-card__fact">
+                                <span>RAM</span>
+                                <strong><?= $itemMemory > 0 ? $myServersEscape($myServersMiB($itemMemory)) : 'Unlimited' ?></strong>
+                            </div>
+                            <div class="fc-server-card__fact">
+                                <span>CPU</span>
+                                <strong><?= $itemCpu > 0 ? number_format($itemCpu) . '%' : 'Unlimited' ?></strong>
+                            </div>
+                            <div class="fc-server-card__fact fc-server-card__fact--network">
+                                <span>IP / PORT</span>
+                                <strong class="fc-mono"><?= $myServersEscape($itemEndpoint) ?></strong>
+                            </div>
+                            <div class="fc-server-card__fact fc-server-card__fact--purchase">
+                                <span>PURCHASED</span>
+                                <strong><?= $myServersEscape($itemPurchaseDate) ?></strong>
+                            </div>
+                        </div>
+
+                        <div class="fc-server-card__expiry <?= $itemExpiry['critical'] ? 'is-critical' : '' ?>">
+                            <div class="fc-server-card__expiry-heading">
+                                <span>REMAINING TIME</span>
+                                <strong><?= $myServersEscape($itemExpiry['label']) ?></strong>
+                            </div>
+                            <?php if ($itemExpiry['has_expiry']): ?>
+                                <div
+                                    class="fc-server-card__progress"
+                                    role="progressbar"
+                                    aria-label="Subscription time remaining"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                    aria-valuenow="<?= (int) round($itemExpiryPercent) ?>"
+                                >
+                                    <span style="width: <?= $itemExpiryPercent ?>%;"></span>
+                                </div>
+                            <?php else: ?>
+                                <div class="fc-server-card__no-expiry"></div>
+                            <?php endif; ?>
+                        </div>
                     </a>
                 <?php endforeach; ?>
             </div>
@@ -287,7 +430,6 @@ $myServersDetailsStatus = static function (string $statusClass): string {
             <div class="fc-myservers__dashboard-title">
                 <div class="fc-myservers__game-icon"><i class="fa-solid fa-gamepad" aria-hidden="true"></i></div>
                 <div>
-                    <div class="fc-myservers__dashboard-kicker">CS2 GAME SERVER · SERVICE #<?= number_format($selectedId) ?></div>
                     <h2><?= $myServersEscape($selectedServerName) ?></h2>
                     <div class="fc-myservers__dashboard-subtitle">
                         <span class="fc-server-status fc-server-status--<?= $myServersEscape($selectedStatusClass) ?>">
@@ -378,7 +520,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                 <?php elseif ($activeTab === 'overview'): ?>
                     <div class="fc-myservers__workspace-header">
                         <div>
-                            <span class="fc-myservers__section-kicker">SERVER OVERVIEW</span>
+                            
                             <h3>نمای کلی سرور</h3>
                             <p>وضعیت سرویس و منابع اختصاص‌یافته به سرور شما</p>
                         </div>
@@ -411,7 +553,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                         <section class="fc-dashboard-card fc-dashboard-card--identity">
                             <div class="fc-dashboard-card__top">
                                 <div class="fc-dashboard-card__icon"><i class="fa-solid fa-fingerprint"></i></div>
-                                <span class="fc-dashboard-card__label">SERVER IDENTIFIERS</span>
+                                
                             </div>
                             <div class="fc-dashboard-card__data-row"><span>شناسه Pterodactyl</span><strong>#<?= number_format((int) ($selectedServerData['id'] ?? 0)) ?></strong></div>
                             <div class="fc-dashboard-card__data-row"><span>UUID</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['uuid'] !== '' ? $selectedServer['uuid'] : '—') ?></strong></div>
@@ -422,7 +564,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     </div>
 
                     <div class="fc-myservers__section-heading">
-                        <div><span class="fc-myservers__section-kicker">ALLOCATED RESOURCES</span><h3>منابع اختصاص‌یافته</h3></div>
+                        <div><h3>منابع اختصاص‌یافته</h3></div>
                         <span class="fc-myservers__section-note">مقادیر پلن فعلی</span>
                     </div>
 
@@ -467,7 +609,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
 
                     <div class="fc-myservers__lower-grid">
                         <section class="fc-dashboard-card fc-dashboard-card--quick">
-                            <div class="fc-dashboard-card__heading"><div><span class="fc-myservers__section-kicker">QUICK ACCESS</span><h3>دسترسی سریع</h3></div></div>
+                            <div class="fc-dashboard-card__heading"><div><h3>دسترسی سریع</h3></div></div>
                             <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>" class="fc-quick-link" data-ajax-nav data-slug="myservers"><span><i class="fa-solid fa-key"></i></span><div><strong>اطلاعات ورود پنل</strong><small>مشاهده نام کاربری و تنظیم رمز</small></div><i class="fa-solid fa-chevron-left"></i></a>
                             <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'details')) ?>" class="fc-quick-link" data-ajax-nav data-slug="myservers"><span><i class="fa-solid fa-circle-info"></i></span><div><strong>مشخصات کامل سرور</strong><small>UUID، شناسه و تاریخ‌های سرویس</small></div><i class="fa-solid fa-chevron-left"></i></a>
                             <?php if ($selectedServer['panel_url'] !== ''): ?>
@@ -476,7 +618,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                         </section>
 
                         <section class="fc-dashboard-card fc-dashboard-card--notice">
-                            <div class="fc-dashboard-card__heading"><div><span class="fc-myservers__section-kicker">FRAGCITY PANEL</span><h3>مدیریت یکپارچه سرور</h3></div><i class="fa-solid fa-shield-halved"></i></div>
+                            <div class="fc-dashboard-card__heading"><div><h3>مدیریت یکپارچه سرور</h3></div><i class="fa-solid fa-shield-halved"></i></div>
                             <p>این داشبورد به‌تدریج امکانات مدیریت سرور را در خود FragCity در دسترس قرار می‌دهد. بخش‌های کنسول، فایل‌ها، بکاپ و تنظیمات پس از اتصال API مربوط به هر قابلیت فعال خواهند شد.</p>
                             <div class="fc-dashboard-card__notice-footer"><i class="fa-solid fa-circle-check"></i> اطلاعات مالکیت و سرویس از Paymenter تأیید می‌شود.</div>
                         </section>
@@ -484,10 +626,10 @@ $myServersDetailsStatus = static function (string $statusClass): string {
 
                 <?php elseif ($activeTab === 'details'): ?>
                     <div class="fc-myservers__workspace-header">
-                        <div><span class="fc-myservers__section-kicker">SERVER INFORMATION</span><h3>اطلاعات سرور</h3><p>شناسه‌ها و مشخصات فنی ثبت‌شده در Pterodactyl</p></div>
+                        <div><h3>اطلاعات سرور</h3><p>شناسه‌ها و مشخصات فنی ثبت‌شده در Pterodactyl</p></div>
                     </div>
                     <section class="fc-dashboard-card fc-details-card">
-                        <div class="fc-dashboard-card__heading" dir="ltr"><div><span class="fc-myservers__section-kicker">IDENTITY</span><h3>Server Identity</h3></div><i class="fa-solid fa-fingerprint"></i></div>
+                        <div class="fc-dashboard-card__heading" dir="ltr"><div><h3>Server Identity</h3></div><i class="fa-solid fa-fingerprint"></i></div>
                         <div class="fc-details-grid" dir="ltr">
                             <div><span>Server Name</span><strong><?= $myServersEscape($selectedServerName) ?></strong></div>
                             <div><span>Paymenter Service ID</span><strong class="fc-mono">#<?= number_format($selectedId) ?></strong></div>
@@ -506,7 +648,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
 
                 <?php elseif ($activeTab === 'access'): ?>
                     <div class="fc-myservers__workspace-header">
-                        <div><span class="fc-myservers__section-kicker">PTERODACTYL ACCOUNT</span><h3>دسترسی پنل</h3><p>اطلاعات ورود به حساب مدیریت سرورهای شما</p></div>
+                        <div><h3>دسترسی پنل</h3><p>اطلاعات ورود به حساب مدیریت سرورهای شما</p></div>
                     </div>
                     <section class="fc-dashboard-card fc-access-card">
                         <div class="fc-access-card__header" dir="ltr">
@@ -519,7 +661,10 @@ $myServersDetailsStatus = static function (string $statusClass): string {
 
                         <div class="fc-access-card__credentials" dir="ltr">
                             <div class="fc-access-field">
-                                <span>Panel URL</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['panel']['base_url'] ?? '') ?></strong>
+                                <span>Panel URL</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['panel_base_url'] ?? '') ?></strong>
+                                <?php if ($selectedServer['panel_base_url'] !== ''): ?>
+                                    <a href="<?= $myServersEscape($selectedServer['panel_base_url']) ?>" target="_blank" rel="noopener noreferrer" aria-label="Open panel website"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+                                <?php endif; ?>
                             </div>
                             <div class="fc-access-field">
                                 <span>Username</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['username']) ?></strong>
@@ -529,7 +674,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                 <span>Login Email</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['email']) ?></strong>
                                 <button type="button" data-copy-value="<?= $myServersEscape($selectedServer['email']) ?>" aria-label="Copy email"><i class="fa-regular fa-copy"></i></button>
                             </div>
-                            <div class="fc-access-field fc-access-field--wide">
+                            <div class="fc-access-field">
                                 <span>Direct Server URL</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['panel_url'] !== '' ? $selectedServer['panel_url'] : 'Unavailable') ?></strong>
                                 <?php if ($selectedServer['panel_url'] !== ''): ?>
                                     <a href="<?= $myServersEscape($selectedServer['panel_url']) ?>" target="_blank" rel="noopener noreferrer" aria-label="باز کردن پنل"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
@@ -540,7 +685,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
 
                     <section class="fc-dashboard-card fc-password-card">
                         <div class="fc-dashboard-card__heading">
-                            <div><span class="fc-myservers__section-kicker">PANEL SECURITY</span><h3><?= $selectedPasswordSet ? 'تغییر رمز عبور پنل' : 'تنظیم رمز عبور پنل' ?></h3></div>
+                            <div><h3><?= $selectedPasswordSet ? 'تغییر رمز عبور پنل' : 'تنظیم رمز عبور پنل' ?></h3></div>
                             <span class="fc-password-card__icon"><i class="fa-solid fa-lock"></i></span>
                         </div>
                         <p class="fc-password-card__description">رمز پنل مستقل از رمز FragCity و Paymenter است. حساب ورود پنل بین تمام سرورهای CS2 این حساب مشترک است؛ تغییر رمز از این بخش برای همه آن‌ها اعمال می‌شود.</p>
