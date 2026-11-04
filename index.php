@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/settings/session.php';
+require_once __DIR__ . '/includes/routes.php';
 ob_start();
 fragcity_start_session();
 
@@ -569,23 +570,27 @@ $allowedPages = [
     'donations',
 ];
 
-$requestedPage = trim(
-    (string) ($_GET['page'] ?? 'home')
-);
+$requestedPageValue = $_GET['page'] ?? 'home';
+$requestedPage = is_string($requestedPageValue)
+    ? trim($requestedPageValue)
+    : '__invalid__';
 
 // The standalone wallet route has been retired; normalize old bookmarks.
 if ($requestedPage === 'wallet') {
-    header('Location: index.php', true, 303);
+    header('Location: /', true, 301);
     exit;
 }
 
-$page = in_array(
-    $requestedPage,
-    $allowedPages,
-    true
-)
-    ? $requestedPage
-    : 'home';
+$requestPath = (string) (parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/');
+$isHomeRequest = $requestPath === '/' || $requestPath === '/index.php';
+$hasExplicitPage = array_key_exists('page', $_GET);
+$isKnownPage = $requestedPage === 'home' || in_array($requestedPage, $allowedPages, true);
+$isValidPageRequest = $isKnownPage && ($isHomeRequest || $hasExplicitPage);
+
+$page = $isValidPageRequest ? $requestedPage : '404';
+if (!$isValidPageRequest) {
+    http_response_code(404);
+}
 
 $current_page = $page;
 
@@ -979,6 +984,88 @@ $pageFile = match ($page) {
 };
 
 /* =========================================================
+ | Search metadata and canonical URL
+ ========================================================== */
+$fcSeoPages = [
+    'home' => [
+        'title' => 'FragCity | CS2 Servers, Hosting & Gaming Community',
+        'description' => 'FragCity brings Counter-Strike 2 game servers, community tools, player services, and server resources together in one place.',
+    ],
+    'servers' => [
+        'title' => 'Public CS2 Servers | FragCity',
+        'description' => 'Browse FragCity public Counter-Strike 2 servers, compare game modes, and find a server that fits your play style.',
+    ],
+    'servers_vps' => [
+        'title' => 'Public CS2 Servers | FragCity',
+        'description' => 'Browse FragCity public Counter-Strike 2 servers, compare game modes, and find a server that fits your play style.',
+    ],
+    'serverguide' => [
+        'title' => 'CS2 Server Guide: Commands, Modes & Settings | FragCity',
+        'description' => 'Explore the FragCity CS2 server guide: searchable commands, game modes, plugin settings, permissions, and availability notes.',
+    ],
+    'buyserveropen' => [
+        'title' => 'CS2 Game Server Hosting | FragCity',
+        'description' => 'Explore FragCity Counter-Strike 2 server hosting and configure a dedicated game server for your community.',
+    ],
+    'status' => [
+        'title' => 'FragCity Service Status',
+        'description' => 'View the current reported status and service information for FragCity.',
+    ],
+    'about' => [
+        'title' => 'About FragCity | CS2 Gaming Community',
+        'description' => 'Learn about FragCity, its Counter-Strike 2 services, community features, and gaming tools.',
+    ],
+    'support' => [
+        'title' => 'FragCity Support & Contact',
+        'description' => 'Contact FragCity support for help with accounts, game servers, and community services.',
+    ],
+    'vip' => [
+        'title' => 'FragCity VIP Memberships',
+        'description' => 'Compare FragCity VIP membership tiers and review the features currently configured for each level.',
+    ],
+    'leaderboard' => [
+        'title' => 'FragCity Player Leaderboard',
+        'description' => 'Explore the FragCity player leaderboard and community rankings.',
+    ],
+    'leaderboard_vps' => [
+        'title' => 'FragCity Player Leaderboard',
+        'description' => 'Explore the FragCity player leaderboard and community rankings.',
+    ],
+    'banlist' => [
+        'title' => 'FragCity Ban List',
+        'description' => 'Search the public FragCity ban list and review player moderation records.',
+    ],
+    'rules' => [
+        'title' => 'FragCity Server Rules',
+        'description' => 'Read the rules for playing on FragCity Counter-Strike 2 servers and participating in the community.',
+    ],
+    'privacy' => [
+        'title' => 'FragCity Privacy Policy',
+        'description' => 'Read how FragCity handles account information and privacy across its website and services.',
+    ],
+    'usermanual' => [
+        'title' => 'FragCity Server User Manual',
+        'description' => 'Read the FragCity server user manual and learn how to use available server and community features.',
+    ],
+];
+
+$fcSeoMetadata = $fcSeoPages[$page] ?? null;
+$fcRequestHost = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+$fcRequestHost = preg_replace('/:\\d+$/', '', $fcRequestHost);
+$fcIsProductionHost = $fcRequestHost === 'fragcity.ir';
+$fcCanIndexPage = is_array($fcSeoMetadata) && $fcIsProductionHost && !$openLoginModal;
+$fcSeoTitle = (string) ($fcSeoMetadata['title'] ?? 'FragCity | Gaming Community');
+$fcSeoDescription = (string) ($fcSeoMetadata['description'] ?? 'FragCity gaming community and Counter-Strike 2 services.');
+$fcCanonicalUrl = $fcCanIndexPage
+    ? 'https://fragcity.ir' . fragcity_page_url($page)
+    : '';
+
+if (!$fcCanIndexPage) {
+    header('X-Robots-Tag: noindex, nofollow, noarchive', true);
+}
+
+
+/* =========================================================
  | HTML
  ========================================================== */
 ?>
@@ -1027,7 +1114,19 @@ $pageFile = match ($page) {
     })();
     </script>
 
-    <title>FragCity | سرور CS2</title>
+    <title><?= htmlspecialchars($fcSeoTitle, ENT_QUOTES, 'UTF-8') ?></title>
+    <meta name="description" content="<?= htmlspecialchars($fcSeoDescription, ENT_QUOTES, 'UTF-8') ?>">
+    <meta name="robots" content="<?= $fcCanIndexPage ? 'index,follow,max-image-preview:large' : 'noindex,nofollow,noarchive' ?>">
+    <?php if ($fcCanonicalUrl !== ''): ?>
+        <link rel="canonical" href="<?= htmlspecialchars($fcCanonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
+        <link rel="alternate" hreflang="fa-IR" href="<?= htmlspecialchars($fcCanonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
+        <meta property="og:url" content="<?= htmlspecialchars($fcCanonicalUrl, ENT_QUOTES, 'UTF-8') ?>">
+    <?php endif; ?>
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="FragCity">
+    <meta property="og:title" content="<?= htmlspecialchars($fcSeoTitle, ENT_QUOTES, 'UTF-8') ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($fcSeoDescription, ENT_QUOTES, 'UTF-8') ?>">
+    <meta name="twitter:card" content="summary">
 
     <!-- Font Awesome: CDN only -->
     <link
