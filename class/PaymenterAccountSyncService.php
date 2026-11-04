@@ -161,6 +161,8 @@ final class PaymenterAccountSyncService
             'invalid_json_body',
             'validation_failed',
             'linked_paymenter_user_missing',
+            'paymenter_user_identity_conflict',
+            'customer_identity_storage_not_ready',
             'email_already_linked_to_another_paymenter_user',
             'paymenter_user_already_linked_to_another_steam_account',
             'email_already_in_use',
