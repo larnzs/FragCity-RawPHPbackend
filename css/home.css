@@ -2079,3 +2079,84 @@
         padding-inline: 5px;
     }
 }
+
+
+/* =========================================================
+   Homepage hero polish — announcement strip and clearer focus
+========================================================= */
+.home-hero{
+    min-height:710px;
+    gap:clamp(38px,5.3vw,78px);
+    padding-top:clamp(82px,10.5vw,140px);
+    padding-bottom:72px;
+}
+.home-hero-copy{max-width:680px}
+.home-hero-notice{
+    display:flex;align-items:center;gap:11px;width:fit-content;max-width:100%;
+    margin:0 0 23px;padding:10px 13px;
+    border:1px solid rgba(249,115,22,.2);border-radius:12px;
+    background:linear-gradient(100deg,rgba(249,115,22,.105),rgba(255,255,255,.025) 70%);
+    box-shadow:0 10px 28px rgba(0,0,0,.16),inset 0 1px rgba(255,255,255,.035);
+}
+.home-hero-notice-icon{
+    display:grid;flex:0 0 32px;width:32px;height:32px;place-items:center;
+    border:1px solid rgba(255,179,71,.22);border-radius:9px;
+    background:rgba(249,115,22,.11);color:#ffb347;font-size:.82rem;
+}
+.home-hero-notice-copy{display:flex;flex-direction:column;gap:3px;min-width:0}
+.home-hero-notice-copy strong{color:#f2e4d8;font-size:.72rem;font-weight:850;line-height:1.5}
+.home-hero-notice-copy small{color:#999;font:700 .53rem/1.4 var(--fc-font-sans,sans-serif);letter-spacing:.075em;direction:ltr;text-align:right}
+.home-hero-notice-copy b{padding:0 4px;color:#f97316}
+.home-hero-notice-mark{
+    margin-right:8px;padding-right:11px;border-right:1px solid rgba(255,255,255,.1);
+    color:#777;font:800 .53rem var(--fc-font-mono,monospace);letter-spacing:.06em;white-space:nowrap;direction:ltr
+}
+.home-hero h1{font-size:clamp(2.65rem,5.35vw,4.9rem);line-height:1.29;letter-spacing:-.035em}
+.home-hero-description{max-width:610px;margin-top:21px;color:#b9bbc4;line-height:2.05}
+.home-hero-actions{gap:10px;margin-top:29px}
+.home-button{min-height:54px;border-radius:13px}
+.home-button-guide{
+    color:#e5e5e8;border-color:rgba(255,255,255,.1);
+    background:rgba(255,255,255,.025)
+}
+.home-button-guide:hover{
+    color:#fff;border-color:rgba(249,115,22,.35);background:rgba(249,115,22,.07);
+    transform:translateY(-3px)
+}
+.home-hero-signals{gap:11px 17px;margin-top:30px}
+.home-hero-signals span{
+    padding:7px 10px;border:1px solid rgba(255,255,255,.055);border-radius:8px;
+    background:rgba(255,255,255,.018);color:#a0a3ad;font-size:.69rem
+}
+.home-hero-signals i{color:#ff9a4d}
+.home-hero-visual{min-height:510px}
+.home-visual-main-card{
+    box-shadow:0 30px 85px rgba(0,0,0,.38),0 0 70px rgba(249,115,22,.055),inset 0 1px rgba(255,255,255,.06)
+}
+@media(max-width:1000px){
+    .home-hero{min-height:0;padding-top:90px;gap:24px}
+    .home-hero h1{font-size:clamp(2.45rem,5.5vw,4rem)}
+}
+@media(max-width:760px){
+    .home-hero{padding-top:76px;padding-bottom:44px;gap:22px}
+    .home-hero-notice{width:100%;margin-bottom:19px;padding:9px 10px}
+    .home-hero-notice-mark{display:none}
+    .home-hero-notice-copy strong{font-size:.67rem}
+    .home-hero-notice-copy small{font-size:.48rem}
+    .home-hero h1{font-size:clamp(2.25rem,9vw,3.45rem);line-height:1.35;letter-spacing:-.025em}
+    .home-hero-description{font-size:.92rem;line-height:2}
+    .home-hero-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+    .home-hero-actions .home-button{min-width:0;min-height:49px;padding:10px 12px;font-size:.78rem}
+    .home-hero-actions .home-button-guide{grid-column:1/-1}
+    .home-hero-signals{gap:7px;margin-top:21px}
+    .home-hero-signals span{font-size:.62rem;padding:6px 8px}
+    .home-hero-visual{min-height:410px}
+}
+@media(max-width:420px){
+    .home-hero-actions{grid-template-columns:1fr}
+    .home-hero-actions .home-button-guide{grid-column:auto}
+    .home-hero-visual{min-height:365px}
+}
+@media(prefers-reduced-motion:reduce){
+    .home-hero-notice,.home-hero-notice *{transition:none!important;animation:none!important}
+}
