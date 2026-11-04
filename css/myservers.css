@@ -2269,3 +2269,135 @@
         font-size: .8rem;
     }
 }
+
+
+/* Compact, English/LTR identity and panel credential blocks. */
+.fc-details-card {
+    padding: 13px;
+}
+.fc-details-card > .fc-dashboard-card__heading {
+    direction: ltr;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    text-align: left;
+}
+.fc-details-card > .fc-dashboard-card__heading > div {
+    justify-items: start;
+    text-align: left;
+}
+.fc-details-card > .fc-dashboard-card__heading h3 {
+    text-align: left;
+}
+.fc-details-grid[dir="ltr"] {
+    direction: ltr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    text-align: left;
+}
+.fc-details-grid[dir="ltr"] > div {
+    direction: ltr;
+    justify-items: start;
+    gap: 4px;
+    padding: 9px 11px;
+    text-align: left;
+}
+.fc-details-grid[dir="ltr"] > div > span {
+    color: #858585;
+    font-size: .67rem;
+    line-height: 1.35;
+    text-align: left;
+}
+.fc-details-grid[dir="ltr"] > div > strong {
+    max-width: 100%;
+    color: #E7E7E7;
+    font-size: .76rem;
+    line-height: 1.45;
+    font-weight: 750;
+    text-align: left;
+}
+.fc-details-grid[dir="ltr"] > div > strong.fc-mono {
+    font-size: .72rem;
+    letter-spacing: .005em;
+}
+.fc-access-card__header[dir="ltr"] {
+    direction: ltr;
+    padding: 12px 15px;
+    text-align: left;
+}
+.fc-access-card__brand {
+    direction: ltr;
+}
+.fc-access-card__brand > div {
+    justify-items: start;
+    text-align: left;
+}
+.fc-access-card__brand small {
+    font-size: .65rem;
+}
+.fc-access-card__password-state {
+    direction: ltr;
+    font-size: .66rem;
+}
+.fc-access-card__credentials[dir="ltr"] {
+    direction: ltr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    padding: 11px 15px 14px;
+}
+.fc-access-card__credentials[dir="ltr"] .fc-access-field {
+    direction: ltr;
+    justify-items: start;
+    gap: 4px;
+    padding: 9px 11px;
+    text-align: left;
+}
+.fc-access-card__credentials[dir="ltr"] .fc-access-field > span {
+    color: #858585;
+    font-size: .68rem;
+    line-height: 1.35;
+    text-align: left;
+}
+.fc-access-card__credentials[dir="ltr"] .fc-access-field > strong {
+    max-width: 100%;
+    padding-left: 29px;
+    color: #E7E7E7;
+    font-size: .76rem;
+    line-height: 1.45;
+    text-align: left;
+}
+.fc-access-card__credentials[dir="ltr"] .fc-access-field > strong.fc-mono {
+    font-size: .72rem;
+}
+.fc-access-card__credentials[dir="ltr"] .fc-access-field > button,
+.fc-access-card__credentials[dir="ltr"] .fc-access-field > a {
+    left: 8px;
+    width: 25px;
+    height: 25px;
+}
+@media (max-width: 1180px) {
+    .fc-details-grid[dir="ltr"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 620px) {
+    .fc-details-card {
+        padding: 11px;
+    }
+    .fc-details-grid[dir="ltr"] {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 6px;
+    }
+    .fc-access-card__header[dir="ltr"] {
+        align-items: flex-start;
+        flex-direction: row;
+        gap: 8px;
+        padding: 11px;
+    }
+    .fc-access-card__credentials[dir="ltr"] {
+        grid-template-columns: minmax(0, 1fr);
+        padding: 9px 11px 12px;
+    }
+    .fc-access-card__credentials[dir="ltr"] .fc-access-field--wide {
+        grid-column: auto;
+    }
+}
