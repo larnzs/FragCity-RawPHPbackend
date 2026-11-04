@@ -50,7 +50,7 @@ if (
 }
 
 $contentLength = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
-if ($contentLength < 1 || $contentLength > 8192) {
+if ($contentLength > 8192) {
     $respond(['success' => false, 'error' => 'invalid_request'], 400);
 }
 
