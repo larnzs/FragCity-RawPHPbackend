@@ -860,7 +860,7 @@ if (!function_exists('formatPlaytime')) {
                     <i class="fa-solid fa-crosshairs" aria-hidden="true"></i>
                     <?= number_format($profileInventoryTotal) ?> اسکین گان
                 </span>
-                <a class="profile-inventory-card__view-all" href="?page=skins" data-ajax-nav data-slug="skins">
+                <a class="profile-inventory-card__view-all" href="/skins/" data-ajax-nav data-slug="skins">
                     مدیریت اسکین‌ها
                     <i class="fa-solid fa-arrow-up-left-from-circle" aria-hidden="true"></i>
                 </a>
@@ -875,7 +875,7 @@ if (!function_exists('formatPlaytime')) {
                         <strong>اطلاعات لوداوت موقتاً در دسترس نیست</strong>
                         <p>بقیهٔ پروفایل همچنان در دسترس است؛ کمی بعد دوباره امتحان کنید.</p>
                     </div>
-                    <a href="?page=skins" data-ajax-nav data-slug="skins">باز کردن مدیریت اسکین‌ها <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+                    <a href="/skins/" data-ajax-nav data-slug="skins">باز کردن مدیریت اسکین‌ها <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
                 </div>
             <?php else: ?>
                 <div class="profile-loadout-summary-grid" aria-label="خلاصه آیتم‌های ذخیره‌شده">
@@ -916,7 +916,7 @@ if (!function_exists('formatPlaytime')) {
                 </div>
                 <div class="profile-inventory-card__footer">
                     <span><i class="fa-solid fa-circle-info" aria-hidden="true"></i> برای افزودن یا تغییر آیتم‌ها وارد مدیریت اسکین‌ها شوید.</span>
-                    <a href="?page=skins" data-ajax-nav data-slug="skins">مدیریت لوداوت <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
+                    <a href="/skins/" data-ajax-nav data-slug="skins">مدیریت لوداوت <i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
                 </div>
             <?php endif; ?>
         </div>
