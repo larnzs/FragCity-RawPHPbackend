@@ -87,7 +87,7 @@ unset($_SESSION['auth_error']);
             <!-- Forgot Password -->
             <div class="form-group auth-links">
                 <a
-                    href="?page=forgot_password"
+                    href="/forgot-password/"
                     class="forgot-link"
                     data-ajax-nav
                     data-slug="forgot_password"
@@ -117,7 +117,7 @@ unset($_SESSION['auth_error']);
         <!-- Register Link -->
         <p class="auth-switch">
             حساب کاربری نداری؟
-            <a href="?page=register" data-ajax-nav data-slug="register">
+            <a href="/register/" data-ajax-nav data-slug="register">
                 ثبت‌نام کن
             </a>
         </p>
