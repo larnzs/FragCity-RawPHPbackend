@@ -10,7 +10,8 @@
         const selectedName = root.querySelector('#vipSelectedName');
         const selectedMeta = root.querySelector('#vipSelectedMeta');
         const detailName = root.querySelector('#vipDetailTierName');
-        const detailSummary = root.querySelector('#vipDetailTierSummary');
+        const detailSummaryFa = root.querySelector('#vipDetailTierSummaryFa');
+        const detailSummaryEn = root.querySelector('#vipDetailTierSummaryEn');
         const detailState = root.querySelector('#vipDetailTierState');
         const detailFeatures = root.querySelector('#vipDetailFeatures');
         const checkoutButton = root.querySelector('#vipCheckoutButton');
@@ -37,7 +38,8 @@
             const name = plan.dataset.vipName || 'VIP';
             const isAvailable = plan.dataset.vipAvailable === '1';
             const isCurrent = plan.classList.contains('is-current');
-            const summary = plan.dataset.vipSummary || '';
+            const summaryFa = plan.dataset.vipSummaryFa || '';
+            const summaryEn = plan.dataset.vipSummary || '';
 
             if (selectedName) selectedName.textContent = name;
             if (selectedMeta) {
@@ -47,12 +49,13 @@
                     (plan.dataset.durationLabel || 'مدت اشتراک مشخص نشده');
             }
             if (detailName) detailName.textContent = name;
-            if (detailSummary) detailSummary.textContent = summary;
+            if (detailSummaryFa) detailSummaryFa.textContent = summaryFa;
+            if (detailSummaryEn) detailSummaryEn.textContent = summaryEn;
 
             if (detailState) {
                 detailState.classList.toggle('is-locked', !isAvailable);
                 detailState.textContent = isAvailable
-                    ? (isCurrent ? 'CURRENT MEMBERSHIP' : 'PUBLIC CATALOG TIER')
+                    ? (isCurrent ? 'CURRENT MEMBERSHIP · اشتراک فعلی' : 'PUBLIC TIER · پلن قابل خرید')
                     : (isCurrent ? 'CURRENT MEMBER · LOCKED FOR NEW PURCHASES' : 'LOCKED · NOT AVAILABLE');
             }
 
@@ -77,8 +80,22 @@
 
         plans.forEach(function (plan) {
             const button = plan.querySelector('[data-vip-select]');
+
+            // The whole card selects the tier; the button remains a clear visual affordance.
+            plan.addEventListener('click', function () {
+                selectPlan(plan);
+            });
+
+            plan.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    selectPlan(plan);
+                }
+            });
+
             if (button) {
-                button.addEventListener('click', function () {
+                button.addEventListener('click', function (event) {
+                    event.stopPropagation();
                     selectPlan(plan);
                 });
             }
