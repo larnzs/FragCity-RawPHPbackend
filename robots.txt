@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Keep application internals and configuration out of search results.
+Disallow: /api/
+Disallow: /linuxapi/
+Disallow: /settings/
+Disallow: /class/
+Disallow: /includes/
+Disallow: /steam/
+Disallow: /database/
+Disallow: /tools/
+Disallow: /pages/
+Disallow: /data/
+
+Sitemap: https://fragcity.ir/sitemap.xml
