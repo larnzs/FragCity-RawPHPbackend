@@ -14,9 +14,34 @@ require_once __DIR__ . '/openid.php';
 $configuredDomain = defined('STEAM_DOMAIN_NAME')
     ? trim((string) STEAM_DOMAIN_NAME)
     : '';
-$domain = $configuredDomain !== ''
-    ? $configuredDomain
-    : (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
+
+if ($configuredDomain !== '') {
+    $domain = $configuredDomain;
+} else {
+    // Do not derive the OpenID trust root from an untrusted Host header.
+    // Use the configured canonical site origin when the explicit Steam domain
+    // has not been set for this environment.
+    $siteBaseUrl = trim((string) fragcity_settings('app.site_base_url', ''));
+    $siteBaseParts = parse_url($siteBaseUrl);
+    $domain = is_array($siteBaseParts)
+        && in_array(strtolower((string) ($siteBaseParts['scheme'] ?? '')), ['http', 'https'], true)
+        && !empty($siteBaseParts['host'])
+        && !isset($siteBaseParts['user'])
+        && !isset($siteBaseParts['pass'])
+        ? (string) $siteBaseParts['host']
+        : '';
+}
+
+$domainIsValid = $domain === 'localhost'
+    || filter_var($domain, FILTER_VALIDATE_IP) !== false
+    || filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
+
+if (!$domainIsValid || preg_match('/[\r\n\/\\?#@]/', $domain)) {
+    error_log('[FragCity] Steam OpenID is not configured with a valid canonical domain.');
+    $_SESSION['auth_error'] = 'تنظیمات ورود با Steam کامل نیست؛ لطفاً با پشتیبانی تماس بگیرید.';
+    header('Location: index.php?page=login', true, 303);
+    exit;
+}
 
 // آدرس‌های روت‌شده منطبق بر ساختار index.php شما
 
@@ -101,7 +126,7 @@ try {
 
             $id = $openid->identity;
 
-            preg_match('/^https?:\\/\\/steamcommunity\\.com\\/openid\\/id\\/(\\d{17,})/', $id, $matches);
+            preg_match('/\\Ahttps?:\\/\\/steamcommunity\\.com\\/openid\\/id\\/([0-9]{17})\\z/iD', $id, $matches);
 
             $steamid64 = $matches[1] ?? null;
 
@@ -171,8 +196,10 @@ try {
 
                 // Prevent session fixation when elevating an anonymous session to an authenticated one.
                 session_regenerate_id(true);
-                $_SESSION['user_logged_in'] = true;
+                $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
+                unset($_SESSION['steam_temp']);
 
+                $_SESSION['user_logged_in'] = true;
                 $_SESSION['steamid'] = $steamid64;
 
                 $_SESSION['username'] = $user['username'] ?: ($steamProfile['personaname'] ?? $steamid64);
