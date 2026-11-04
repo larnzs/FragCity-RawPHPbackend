@@ -73,7 +73,13 @@ try {
     $headerJavascript = $read('js/header.js');
     $motionController = $read('js/motion.js');
     $websiteIndex = $read('index.php');
-    $testHarnessIndex = $read('tst/index.php');
+    // The legacy test harness is intentionally absent in current deployments.
+    // Keep the retired-route regression assertion optional instead of failing
+    // the entire architecture check when the optional file is not present.
+    $testHarnessPath = $root . DIRECTORY_SEPARATOR . 'tst' . DIRECTORY_SEPARATOR . 'index.php';
+    $testHarnessIndex = is_file($testHarnessPath) && is_readable($testHarnessPath)
+        ? (string) file_get_contents($testHarnessPath)
+        : '';
     $footerMarkup = $read('includes/footer.php');
     $footerStylesheet = $read('css/footer.css');
     $launcherPage = $read('pages/launcher.php');
