@@ -1560,3 +1560,712 @@
         transition-duration: .01ms !important;
     }
 }
+
+
+/* =========================================================
+   My Servers — compact spacing, larger readable type
+   Matched to the updated Server List control scale.
+   ========================================================= */
+.fc-myservers {
+    padding-top: calc(var(--fc-header-overlap-height, 72px) + 16px);
+    padding-bottom: 34px;
+}
+
+/* Page title and primary actions */
+.fc-myservers__page-header {
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.fc-myservers__page-header h1 {
+    font-size: clamp(1.8rem, 2.8vw, 2.2rem);
+}
+
+.fc-myservers__page-header p {
+    font-size: .9rem;
+}
+
+.fc-myservers__eyebrow,
+.fc-myservers__dashboard-kicker,
+.fc-myservers__section-kicker,
+.fc-myservers__empty-kicker {
+    font-size: .68rem;
+}
+
+.fc-myservers__new-server,
+.fc-myservers__panel-button {
+    min-height: 46px;
+    padding: 0 17px;
+    font-size: .82rem;
+    border-radius: 10px;
+}
+
+/* Server selector: a more legible, shorter strip. */
+.fc-myservers__server-switcher {
+    gap: 9px;
+    margin-bottom: 16px;
+    padding: 11px 13px 12px;
+}
+
+.fc-myservers__switcher-label {
+    font-size: .84rem;
+}
+
+.fc-myservers__switcher-label > span {
+    min-width: 23px;
+    height: 23px;
+    font-size: .7rem;
+}
+
+.fc-myservers__server-list {
+    gap: 8px;
+}
+
+.fc-myservers__server-chip {
+    min-width: 195px;
+    padding: 8px 10px;
+    border-radius: 9px;
+}
+
+.fc-myservers__server-chip-icon {
+    width: 36px;
+    height: 36px;
+    flex-basis: 36px;
+    font-size: .9rem;
+}
+
+.fc-myservers__server-chip-text strong {
+    font-size: .82rem;
+}
+
+.fc-myservers__server-chip-text small {
+    font-size: .68rem;
+}
+
+/* Selected server heading */
+.fc-myservers__dashboard-heading {
+    gap: 14px;
+    margin-bottom: 12px;
+    padding: 13px 16px;
+    border-radius: 12px;
+}
+
+.fc-myservers__dashboard-title {
+    gap: 11px;
+}
+
+.fc-myservers__game-icon {
+    width: 45px;
+    height: 45px;
+    flex-basis: 45px;
+    border-radius: 11px;
+    font-size: 1rem;
+}
+
+.fc-myservers__dashboard-title h2 {
+    font-size: 1.14rem;
+}
+
+.fc-myservers__dashboard-subtitle {
+    gap: 12px;
+}
+
+.fc-server-status {
+    font-size: .76rem;
+}
+
+.fc-myservers__identifier {
+    font-size: .7rem;
+}
+
+.fc-myservers__panel-button {
+    min-height: 40px;
+    padding: 0 14px;
+    font-size: .78rem;
+}
+
+/* Navigation and workspace */
+.fc-myservers__dashboard-layout {
+    grid-template-columns: 238px minmax(0, 1fr);
+    gap: 14px;
+}
+
+.fc-myservers__sidebar {
+    gap: 10px;
+    padding: 11px 9px;
+    border-radius: 12px;
+}
+
+.fc-myservers__sidebar-group {
+    gap: 3px;
+}
+
+.fc-myservers__sidebar-caption {
+    padding: 4px 9px 6px;
+    font-size: .7rem;
+}
+
+.fc-myservers__nav-item {
+    min-height: 44px;
+    padding: 0 11px;
+    gap: 10px;
+    border-radius: 8px;
+    font-size: .82rem;
+}
+
+.fc-myservers__nav-item > i {
+    width: 19px;
+    font-size: .92rem;
+}
+
+.fc-myservers__nav-item small {
+    font-size: .64rem;
+}
+
+.fc-myservers__sidebar-footer {
+    gap: 8px;
+    padding: 9px 8px 3px;
+}
+
+.fc-myservers__sidebar-footer-icon {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+    font-size: .82rem;
+}
+
+.fc-myservers__sidebar-footer strong {
+    font-size: .73rem;
+}
+
+.fc-myservers__sidebar-footer span {
+    font-size: .68rem;
+}
+
+.fc-myservers__workspace {
+    gap: 12px;
+}
+
+.fc-myservers__workspace-header {
+    gap: 12px;
+}
+
+.fc-myservers__workspace-header h3,
+.fc-myservers__section-heading h3 {
+    font-size: 1.12rem;
+}
+
+.fc-myservers__workspace-header p {
+    font-size: .82rem;
+}
+
+.fc-myservers__text-link {
+    font-size: .78rem;
+}
+
+/* Overview cards: trim excess padding, increase type hierarchy. */
+.fc-myservers__overview-grid {
+    gap: 10px;
+}
+
+.fc-dashboard-card {
+    padding: 14px;
+    border-radius: 12px;
+}
+
+.fc-dashboard-card__top {
+    gap: 9px;
+    margin-bottom: 10px;
+}
+
+.fc-dashboard-card__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    font-size: .9rem;
+}
+
+.fc-dashboard-card__label {
+    font-size: .62rem;
+}
+
+.fc-dashboard-card--server h3 {
+    margin-bottom: 8px;
+    font-size: 1.08rem;
+}
+
+.fc-dashboard-card__service-id {
+    font-size: .7rem;
+}
+
+.fc-dashboard-card__server-meta {
+    gap: 7px;
+    margin-top: 13px;
+    padding-top: 10px;
+}
+
+.fc-dashboard-card__server-meta span,
+.fc-dashboard-card__data-row > span {
+    font-size: .74rem;
+}
+
+.fc-dashboard-card__server-meta strong {
+    font-size: .82rem;
+}
+
+.fc-dashboard-card__footer {
+    gap: 10px;
+    margin: 11px -14px -14px;
+    padding: 9px 14px;
+}
+
+.fc-dashboard-card__footer a {
+    font-size: .76rem;
+}
+
+.fc-dashboard-card__footer a:last-child {
+    width: 30px;
+    height: 30px;
+}
+
+.fc-dashboard-card__data-row {
+    gap: 9px;
+    padding: 7px 0;
+}
+
+.fc-dashboard-card__data-row strong {
+    max-width: 72%;
+    font-size: .76rem;
+}
+
+/* Resource cards: compact blocks, readable values and labels. */
+.fc-myservers__section-heading {
+    margin: 5px 0 -1px;
+}
+
+.fc-myservers__section-note {
+    font-size: .7rem;
+}
+
+.fc-myservers__resource-grid {
+    gap: 9px;
+}
+
+.fc-resource-card {
+    gap: 6px;
+    padding: 11px 12px;
+    border-radius: 10px;
+}
+
+.fc-resource-card__icon {
+    width: 33px;
+    height: 33px;
+    border-radius: 8px;
+    font-size: .88rem;
+}
+
+.fc-resource-card__label {
+    font-size: .76rem;
+}
+
+.fc-resource-card > strong {
+    font-size: 1.12rem;
+}
+
+.fc-resource-card > small {
+    font-size: .68rem;
+}
+
+/* Quick access and secondary information. */
+.fc-myservers__lower-grid {
+    gap: 11px;
+}
+
+.fc-dashboard-card__heading {
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.fc-dashboard-card__heading h3 {
+    font-size: .96rem;
+}
+
+.fc-quick-link {
+    gap: 9px;
+    padding: 8px 0;
+}
+
+.fc-quick-link > span {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    font-size: .84rem;
+}
+
+.fc-quick-link strong {
+    font-size: .8rem;
+}
+
+.fc-quick-link small {
+    font-size: .7rem;
+}
+
+.fc-quick-link > i {
+    font-size: .72rem;
+}
+
+.fc-dashboard-card--notice > p {
+    font-size: .8rem;
+    line-height: 1.8;
+}
+
+.fc-dashboard-card__notice-footer {
+    margin-top: 12px;
+    padding-top: 9px;
+    font-size: .7rem;
+}
+
+/* Details and access tabs. */
+.fc-details-card {
+    padding: 15px;
+}
+
+.fc-details-grid {
+    gap: 8px;
+}
+
+.fc-details-grid > div {
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 8px;
+}
+
+.fc-details-grid > div > span,
+.fc-access-field > span {
+    font-size: .74rem;
+}
+
+.fc-details-grid > div > strong {
+    font-size: .82rem;
+}
+
+.fc-access-card__header {
+    padding: 13px 15px;
+}
+
+.fc-access-card__brand {
+    gap: 9px;
+}
+
+.fc-access-card__brand > span {
+    width: 40px;
+    height: 40px;
+}
+
+.fc-access-card__brand strong {
+    font-size: .92rem;
+}
+
+.fc-access-card__brand small {
+    font-size: .72rem;
+}
+
+.fc-access-card__password-state {
+    padding: 7px 11px;
+    font-size: .72rem;
+}
+
+.fc-access-card__credentials {
+    gap: 8px;
+    padding: 12px 15px 14px;
+}
+
+.fc-access-field {
+    gap: 6px;
+    padding: 10px 12px;
+}
+
+.fc-access-field > strong {
+    font-size: .82rem;
+}
+
+.fc-access-field > button,
+.fc-access-field > a {
+    width: 31px;
+    height: 31px;
+    font-size: .78rem;
+}
+
+/* Password form: larger input and submit targets without growing the card. */
+.fc-password-card {
+    padding: 15px;
+}
+
+.fc-password-card__icon {
+    width: 37px;
+    height: 37px;
+}
+
+.fc-password-card__description {
+    margin-bottom: 12px;
+    font-size: .8rem;
+    line-height: 1.8;
+}
+
+.fc-panel-password__form {
+    gap: 10px;
+}
+
+.fc-panel-password__form label {
+    gap: 6px;
+    font-size: .78rem;
+}
+
+.fc-panel-password__form input {
+    height: 46px;
+    padding: 0 13px;
+    border-radius: 8px;
+    font-size: .86rem;
+}
+
+.fc-panel-password__fields {
+    gap: 9px;
+}
+
+.fc-panel-password__hint {
+    font-size: .72rem;
+    line-height: 1.8;
+}
+
+.fc-panel-password__message {
+    font-size: .76rem;
+}
+
+.fc-panel-password__submit {
+    min-height: 46px;
+    padding: 0 17px;
+    border-radius: 9px;
+    font-size: .8rem;
+}
+
+/* Empty/error states follow the same readable type scale. */
+.fc-myservers__state-card {
+    gap: 11px;
+    padding: 14px 16px;
+}
+
+.fc-myservers__state-card strong {
+    font-size: .9rem;
+}
+
+.fc-myservers__state-card p {
+    font-size: .8rem;
+}
+
+.fc-myservers__empty {
+    max-width: none;
+    padding: 42px 22px;
+}
+
+.fc-myservers__empty h2 {
+    font-size: 1.3rem;
+}
+
+.fc-myservers__empty p {
+    max-width: 560px;
+    font-size: .86rem;
+}
+
+/* Maintain the type scale and touch targets on narrow screens. */
+@media (max-width: 1080px) {
+    .fc-myservers__dashboard-layout {
+        grid-template-columns: 215px minmax(0, 1fr);
+        gap: 12px;
+    }
+}
+
+@media (max-width: 820px) {
+    .fc-myservers__dashboard-layout {
+        gap: 11px;
+    }
+
+    .fc-myservers__sidebar {
+        padding: 9px;
+    }
+
+    .fc-myservers__nav-item {
+        min-height: 42px;
+        padding: 0 12px;
+        font-size: .8rem;
+    }
+
+    .fc-myservers__overview-grid {
+        gap: 9px;
+    }
+}
+
+@media (max-width: 620px) {
+    .fc-myservers {
+        padding:
+            calc(var(--fc-header-overlap-height, 66px) + 14px)
+            10px
+            28px;
+    }
+
+    .fc-myservers__page-header {
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .fc-myservers__page-header h1 {
+        font-size: 1.72rem;
+    }
+
+    .fc-myservers__page-header p {
+        font-size: .82rem;
+    }
+
+    .fc-myservers__new-server {
+        min-height: 42px;
+        padding: 0 14px;
+        font-size: .8rem;
+    }
+
+    .fc-myservers__server-switcher {
+        gap: 8px;
+        margin-bottom: 12px;
+        padding: 10px;
+    }
+
+    .fc-myservers__server-chip {
+        min-width: 180px;
+        padding: 8px 9px;
+    }
+
+    .fc-myservers__server-chip-text strong {
+        font-size: .78rem;
+    }
+
+    .fc-myservers__dashboard-heading {
+        gap: 10px;
+        padding: 12px;
+    }
+
+    .fc-myservers__dashboard-title h2 {
+        font-size: 1rem;
+    }
+
+    .fc-myservers__dashboard-subtitle {
+        gap: 8px;
+    }
+
+    .fc-myservers__panel-button {
+        min-height: 42px;
+        font-size: .8rem;
+    }
+
+    .fc-myservers__nav-item {
+        min-height: 40px;
+        padding: 0 11px;
+        font-size: .78rem;
+    }
+
+    .fc-myservers__workspace {
+        gap: 10px;
+    }
+
+    .fc-myservers__workspace-header h3,
+    .fc-myservers__section-heading h3 {
+        font-size: 1.02rem;
+    }
+
+    .fc-myservers__workspace-header p {
+        font-size: .78rem;
+    }
+
+    .fc-dashboard-card {
+        padding: 12px;
+    }
+
+    .fc-dashboard-card__footer {
+        margin-right: -12px;
+        margin-left: -12px;
+        margin-bottom: -12px;
+        padding: 9px 12px;
+    }
+
+    .fc-dashboard-card__footer a {
+        font-size: .72rem;
+    }
+
+    .fc-myservers__resource-grid {
+        gap: 8px;
+    }
+
+    .fc-resource-card {
+        gap: 5px;
+        padding: 10px;
+    }
+
+    .fc-resource-card__label {
+        font-size: .72rem;
+    }
+
+    .fc-resource-card > strong {
+        font-size: 1.02rem;
+    }
+
+    .fc-resource-card > small {
+        font-size: .64rem;
+    }
+
+    .fc-details-card,
+    .fc-password-card {
+        padding: 12px;
+    }
+
+    .fc-details-grid > div {
+        padding: 10px;
+    }
+
+    .fc-details-grid > div > span,
+    .fc-access-field > span {
+        font-size: .72rem;
+    }
+
+    .fc-details-grid > div > strong,
+    .fc-access-field > strong {
+        font-size: .78rem;
+    }
+
+    .fc-access-card__header {
+        padding: 12px;
+    }
+
+    .fc-access-card__credentials {
+        padding: 10px 12px 12px;
+    }
+
+    .fc-panel-password__form label {
+        font-size: .76rem;
+    }
+
+    .fc-panel-password__form input {
+        height: 45px;
+        font-size: .84rem;
+    }
+
+    .fc-panel-password__submit {
+        min-height: 45px;
+        font-size: .8rem;
+    }
+
+    .fc-myservers__empty {
+        padding: 34px 16px;
+    }
+
+    .fc-myservers__empty p {
+        font-size: .8rem;
+    }
+}
