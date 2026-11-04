@@ -3279,3 +3279,896 @@
         min-width: 0;
     }
 }
+
+
+/* =========================================================
+   FragCity My Servers — Console / Files / Network / API Link
+   ========================================================= */
+
+.fc-myservers__nav-item small {
+    margin-inline-start: auto;
+    color: #A1A1AA;
+    font-size: .56rem;
+    font-weight: 750;
+    white-space: nowrap;
+}
+
+.fc-network-primary,
+.fc-network-list,
+.fc-client-api-card,
+.fc-console-card,
+.fc-file-manager {
+    display: grid;
+    gap: 15px;
+}
+
+.fc-network-primary__endpoint {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+    padding: 15px 17px;
+    border: 1px solid rgba(249, 115, 22, .24);
+    border-radius: 11px;
+    background: linear-gradient(110deg, rgba(249, 115, 22, .11), rgba(255, 179, 71, .035));
+}
+
+.fc-network-primary__endpoint > strong {
+    color: #FFF7ED;
+    font-size: clamp(1rem, 2.2vw, 1.45rem);
+    font-weight: 900;
+    letter-spacing: .015em;
+    overflow-wrap: anywhere;
+}
+
+.fc-network-primary__endpoint > button,
+.fc-network-list__item > button {
+    display: inline-grid;
+    flex: 0 0 auto;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .045);
+    color: #FDBA74;
+    cursor: pointer;
+    transition: background 150ms ease, border-color 150ms ease;
+}
+
+.fc-network-primary__endpoint > button:hover,
+.fc-network-list__item > button:hover {
+    border-color: rgba(249, 115, 22, .35);
+    background: rgba(249, 115, 22, .12);
+}
+
+.fc-network-primary__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.fc-network-primary__actions > button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+    padding: 0 11px;
+    border: 1px solid rgba(249, 115, 22, .22);
+    border-radius: 8px;
+    background: rgba(249, 115, 22, .075);
+    color: #FDBA74;
+    font: inherit;
+    font-size: .68rem;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.fc-network-primary__actions > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #A3A3A3;
+    font-size: .62rem;
+    font-weight: 750;
+}
+
+.fc-network-primary__actions > span i {
+    color: #4ADE80;
+}
+
+.fc-network-list__count {
+    display: inline-flex;
+    align-items: center;
+    min-height: 25px;
+    padding: 0 9px;
+    border: 1px solid rgba(249, 115, 22, .2);
+    border-radius: 8px;
+    background: rgba(249, 115, 22, .07);
+    color: #FDBA74;
+    font-size: .62rem;
+    font-weight: 800;
+}
+
+.fc-network-list__items {
+    display: grid;
+    gap: 8px;
+}
+
+.fc-network-list__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
+    padding: 11px 12px;
+    border: 1px solid rgba(255, 255, 255, .06);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .02);
+}
+
+.fc-network-list__item > div {
+    display: grid;
+    min-width: 0;
+    gap: 5px;
+}
+
+.fc-network-list__item > div > span {
+    color: #8A8A8A;
+    font-size: .56rem;
+    font-weight: 850;
+    letter-spacing: .06em;
+}
+
+.fc-network-list__item > div > strong {
+    color: #E5E5E5;
+    font-size: .76rem;
+    overflow-wrap: anywhere;
+}
+
+.fc-network-list__item > div > small {
+    color: #737373;
+    font-size: .6rem;
+}
+
+.fc-tool-connect-required {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    padding: 19px;
+    border-color: rgba(249, 115, 22, .2);
+    background:
+        radial-gradient(ellipse at 0% 0%, rgba(249, 115, 22, .09), transparent 55%),
+        var(--fc-ms-panel);
+}
+
+.fc-tool-connect-required > i {
+    display: grid;
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 1px solid rgba(249, 115, 22, .25);
+    border-radius: 11px;
+    background: rgba(249, 115, 22, .09);
+    color: #FB923C;
+    font-size: 1rem;
+}
+
+.fc-tool-connect-required > div {
+    display: grid;
+    gap: 7px;
+}
+
+.fc-tool-connect-required h3 {
+    margin: 0;
+    color: #F5F5F5;
+    font-size: .9rem;
+    font-weight: 850;
+}
+
+.fc-tool-connect-required p {
+    margin: 0;
+    color: #A3A3A3;
+    font-size: .72rem;
+    line-height: 1.8;
+}
+
+.fc-tool-connect-required a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    width: fit-content;
+    margin-top: 2px;
+    color: #FDBA74 !important;
+    font-size: .7rem;
+    font-weight: 850;
+    text-decoration: none !important;
+}
+
+.fc-client-api-card__state {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    border: 1px solid rgba(255, 255, 255, .09);
+    border-radius: 999px;
+    font-size: .62rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+
+.fc-client-api-card__state.is-connected {
+    border-color: rgba(74, 222, 128, .22);
+    background: rgba(34, 197, 94, .07);
+    color: #86EFAC;
+}
+
+.fc-client-api-card__state.is-disconnected {
+    border-color: rgba(249, 115, 22, .2);
+    background: rgba(249, 115, 22, .07);
+    color: #FDBA74;
+}
+
+.fc-client-api-card__description,
+.fc-client-api-card__note {
+    margin: 0;
+    color: #A3A3A3;
+    font-size: .7rem;
+    line-height: 1.85;
+}
+
+.fc-client-api-card__steps {
+    display: grid;
+    gap: 7px;
+    margin: 0;
+    padding: 0 20px 0 0;
+    color: #BDBDBD;
+    font-size: .68rem;
+    line-height: 1.8;
+}
+
+.fc-client-api-card__steps strong,
+.fc-client-api-card__steps code {
+    color: #FDBA74;
+}
+
+.fc-client-api-connect-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+    padding: 13px;
+    border: 1px solid rgba(255, 255, 255, .065);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .018);
+}
+
+.fc-client-api-connect-form label {
+    display: grid;
+    min-width: 0;
+    gap: 7px;
+}
+
+.fc-client-api-connect-form label > span {
+    color: #A3A3A3;
+    font-size: .62rem;
+    font-weight: 800;
+}
+
+.fc-client-api-connect-form input {
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    padding: 0 11px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 8px;
+    outline: none;
+    background: #0C0C0C;
+    color: #E5E5E5;
+    font: inherit;
+    font-size: .7rem;
+}
+
+.fc-client-api-connect-form input:focus {
+    border-color: rgba(249, 115, 22, .55);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, .08);
+}
+
+.fc-client-api-connect-form__footer {
+    display: flex;
+    grid-column: 1 / -1;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.fc-client-api-connect-form__footer > span {
+    color: #A3A3A3;
+    font-size: .66rem;
+}
+
+.fc-client-api-connect-form__footer > span.is-error {
+    color: #FCA5A5;
+}
+
+.fc-client-api-connect-form__footer > span.is-success {
+    color: #86EFAC;
+}
+
+.fc-client-api-connect-form__footer > button,
+.fc-client-api-card__connected > button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 37px;
+    padding: 0 13px;
+    border: 1px solid rgba(249, 115, 22, .3);
+    border-radius: 8px;
+    background: linear-gradient(120deg, #F97316, #EA580C);
+    color: #FFF;
+    font: inherit;
+    font-size: .67rem;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.fc-client-api-connect-form__footer > button:disabled,
+.fc-client-api-card__connected > button:disabled {
+    opacity: .55;
+    cursor: wait;
+}
+
+.fc-client-api-card__connected {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 13px;
+    padding: 12px;
+    border: 1px solid rgba(74, 222, 128, .17);
+    border-radius: 9px;
+    background: rgba(34, 197, 94, .045);
+}
+
+.fc-client-api-card__connected > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.fc-client-api-card__connected > div > i {
+    color: #86EFAC;
+    font-size: 1rem;
+}
+
+.fc-client-api-card__connected > div > span {
+    display: grid;
+    gap: 4px;
+}
+
+.fc-client-api-card__connected strong {
+    color: #E5E5E5;
+    font-size: .7rem;
+}
+
+.fc-client-api-card__connected small {
+    color: #8B8B8B;
+    font-size: .6rem;
+}
+
+.fc-client-api-card__connected > button {
+    border-color: rgba(248, 113, 113, .25);
+    background: rgba(127, 29, 29, .22);
+    color: #FCA5A5;
+}
+
+.fc-console-card {
+    gap: 0;
+    overflow: hidden;
+    border-color: rgba(255, 255, 255, .09);
+    background: #090B0E;
+}
+
+.fc-console-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 13px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    background: #11151A;
+}
+
+.fc-console-card__header > div:first-child {
+    display: grid;
+    gap: 6px;
+}
+
+.fc-console-card__title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #E5E7EB;
+    font-size: .77rem;
+}
+
+.fc-console-card__title > i {
+    color: #FB923C;
+}
+
+.fc-console-card__status {
+    width: fit-content;
+    color: #9CA3AF;
+    font-size: .59rem;
+    font-weight: 800;
+    letter-spacing: .04em;
+}
+
+.fc-console-card__status[data-state="connected"] {
+    color: #86EFAC;
+}
+
+.fc-console-card__status[data-state="error"] {
+    color: #FCA5A5;
+}
+
+.fc-console-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.fc-console-card__actions button,
+.fc-file-manager__actions button,
+.fc-file-editor__header button,
+.fc-file-editor__footer button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 32px;
+    padding: 0 10px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, .045);
+    color: #D4D4D4;
+    font: inherit;
+    font-size: .62rem;
+    font-weight: 750;
+    cursor: pointer;
+}
+
+.fc-console-card__actions button:first-child {
+    border-color: rgba(249, 115, 22, .32);
+    background: rgba(249, 115, 22, .1);
+    color: #FDBA74;
+}
+
+.fc-console-card__actions button:disabled,
+.fc-file-manager button:disabled,
+.fc-file-editor button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.fc-console-card__stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, .06);
+    background: rgba(255, 255, 255, .06);
+}
+
+.fc-console-card__stats > div {
+    display: grid;
+    gap: 5px;
+    padding: 10px 12px;
+    background: #0E1217;
+}
+
+.fc-console-card__stats > div > span {
+    color: #737B86;
+    font-size: .54rem;
+    font-weight: 850;
+    letter-spacing: .08em;
+}
+
+.fc-console-card__stats > div > strong {
+    color: #D1D5DB;
+    font-size: .69rem;
+    font-weight: 850;
+    overflow-wrap: anywhere;
+}
+
+.fc-console-card__output {
+    min-height: 340px;
+    max-height: 560px;
+    margin: 0;
+    padding: 14px;
+    overflow: auto;
+    background: #07090C;
+    color: #D1D5DB;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: .68rem;
+    line-height: 1.75;
+    text-align: left;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    direction: ltr;
+}
+
+.fc-console-card__command {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    padding: 10px 12px;
+    border-top: 1px solid rgba(255, 255, 255, .07);
+    background: #11151A;
+    direction: ltr;
+}
+
+.fc-console-card__command > span {
+    color: #FB923C;
+    font-family: ui-monospace, monospace;
+    font-size: 1.15rem;
+    font-weight: 900;
+}
+
+.fc-console-card__command input {
+    flex: 1;
+    min-width: 0;
+    height: 36px;
+    padding: 0 9px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 7px;
+    outline: none;
+    background: #080B0F;
+    color: #F3F4F6;
+    font-family: ui-monospace, monospace;
+    font-size: .68rem;
+}
+
+.fc-console-card__command input:focus {
+    border-color: rgba(249, 115, 22, .4);
+}
+
+.fc-console-card__command button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 34px;
+    padding: 0 11px;
+    border: 1px solid rgba(249, 115, 22, .3);
+    border-radius: 7px;
+    background: #C2410C;
+    color: #FFF;
+    font-size: .62rem;
+    font-weight: 850;
+    cursor: pointer;
+}
+
+.fc-console-card__command button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.fc-console-card__hint {
+    margin: 0;
+    padding: 8px 12px 10px;
+    color: #6B7280;
+    font-size: .58rem;
+    line-height: 1.6;
+}
+
+.fc-file-manager {
+    gap: 0;
+    overflow: hidden;
+}
+
+.fc-file-manager__toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px;
+    border-bottom: 1px solid var(--fc-ms-border);
+    background: rgba(255, 255, 255, .018);
+}
+
+.fc-file-manager__location {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: #FDBA74;
+}
+
+.fc-file-manager__location strong {
+    color: #D4D4D4;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: .68rem;
+    overflow-wrap: anywhere;
+}
+
+.fc-file-manager__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.fc-file-manager__actions button:last-of-type {
+    border-color: rgba(249, 115, 22, .25);
+    background: rgba(249, 115, 22, .08);
+    color: #FDBA74;
+}
+
+.fc-file-manager__breadcrumbs {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--fc-ms-border);
+    background: rgba(0, 0, 0, .12);
+    direction: ltr;
+}
+
+.fc-file-manager__breadcrumbs button {
+    border: 0;
+    background: transparent;
+    color: #A3A3A3;
+    font-family: ui-monospace, monospace;
+    font-size: .61rem;
+    cursor: pointer;
+}
+
+.fc-file-manager__breadcrumbs button:not(:last-child)::after {
+    content: "/";
+    margin-left: 7px;
+    color: #555;
+}
+
+.fc-file-manager__breadcrumbs button:last-child {
+    color: #FDBA74;
+}
+
+.fc-file-manager__message {
+    padding: 9px 12px;
+    color: #9CA3AF;
+    font-size: .62rem;
+}
+
+.fc-file-manager__message.is-error {
+    color: #FCA5A5;
+}
+
+.fc-file-manager__table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.fc-file-manager__table {
+    width: 100%;
+    min-width: 620px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.fc-file-manager__table th {
+    padding: 9px 11px;
+    border-top: 1px solid rgba(255, 255, 255, .045);
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+    background: rgba(255, 255, 255, .025);
+    color: #737373;
+    font-size: .56rem;
+    font-weight: 850;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+}
+
+.fc-file-manager__table td {
+    padding: 9px 11px;
+    border-bottom: 1px solid rgba(255, 255, 255, .045);
+    color: #A3A3A3;
+    font-size: .62rem;
+    vertical-align: middle;
+}
+
+.fc-file-manager__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+    padding: 2px 0;
+    border: 0;
+    background: transparent;
+    color: #E5E5E5;
+    font: inherit;
+    font-size: .66rem;
+    font-weight: 750;
+    cursor: pointer;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+.fc-file-manager__name i {
+    flex: 0 0 auto;
+    color: #FDBA74;
+}
+
+.fc-file-manager__row-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.fc-file-manager__row-actions button {
+    display: inline-grid;
+    width: 29px;
+    height: 29px;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .025);
+    color: #A3A3A3;
+    cursor: pointer;
+}
+
+.fc-file-manager__row-actions button:hover {
+    border-color: rgba(249, 115, 22, .25);
+    color: #FDBA74;
+}
+
+.fc-file-editor {
+    display: grid;
+    gap: 9px;
+    margin: 12px;
+    padding: 11px;
+    border: 1px solid rgba(249, 115, 22, .18);
+    border-radius: 9px;
+    background: #0A0C0F;
+}
+
+.fc-file-editor[hidden] {
+    display: none;
+}
+
+.fc-file-editor__header,
+.fc-file-editor__header > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.fc-file-editor__header > div:first-child {
+    justify-content: flex-start;
+    color: #FDBA74;
+    font-size: .67rem;
+}
+
+.fc-file-editor textarea {
+    width: 100%;
+    min-height: 260px;
+    resize: vertical;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, .09);
+    border-radius: 7px;
+    outline: none;
+    background: #050608;
+    color: #D1D5DB;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: .66rem;
+    line-height: 1.7;
+    direction: ltr;
+    text-align: left;
+    tab-size: 4;
+}
+
+.fc-file-editor textarea:focus {
+    border-color: rgba(249, 115, 22, .35);
+}
+
+.fc-file-editor__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 9px;
+}
+
+.fc-file-editor__footer > span {
+    color: #9CA3AF;
+    font-size: .6rem;
+}
+
+.fc-file-editor__footer > button {
+    border-color: rgba(249, 115, 22, .28);
+    background: rgba(249, 115, 22, .1);
+    color: #FDBA74;
+}
+
+@media (max-width: 760px) {
+    .fc-client-api-connect-form {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .fc-console-card__stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .fc-network-primary__endpoint {
+        padding: 12px;
+    }
+
+    .fc-network-primary__endpoint > strong {
+        font-size: .95rem;
+    }
+}
+
+@media (max-width: 520px) {
+    .fc-console-card__header {
+        align-items: flex-start;
+    }
+
+    .fc-console-card__actions {
+        width: 100%;
+    }
+
+    .fc-console-card__actions button {
+        flex: 1 1 auto;
+    }
+
+    .fc-console-card__output {
+        min-height: 280px;
+        padding: 10px;
+        font-size: .61rem;
+    }
+
+    .fc-console-card__command {
+        flex-wrap: wrap;
+    }
+
+    .fc-console-card__command input {
+        flex-basis: calc(100% - 35px);
+    }
+
+    .fc-console-card__command button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .fc-client-api-card__connected {
+        align-items: flex-start;
+    }
+
+    .fc-client-api-card__connected > button {
+        width: 100%;
+    }
+
+    .fc-tool-connect-required {
+        padding: 14px;
+    }
+
+    .fc-file-manager__toolbar {
+        align-items: flex-start;
+    }
+
+    .fc-file-manager__actions {
+        width: 100%;
+    }
+
+    .fc-file-manager__actions button {
+        flex: 1 1 auto;
+    }
+}
