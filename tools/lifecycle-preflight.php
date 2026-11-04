@@ -233,8 +233,10 @@ if ($paymenterRoot === '') {
         && str_contains($readOnlyBody, "requestApplicationApi('GET'")
         && !str_contains($readOnlyBody, "requestApplicationApi('POST'")
         && !str_contains($readOnlyBody, "requestApplicationApi('DELETE'")
-        && !str_contains($readOnlyBody, 'ensurePterodactylClientUser('),
-        'Customer inventory verifies the approved Client mapping without remote writes');
+        && !str_contains($readOnlyBody, 'ensurePterodactylClientUser(')
+        && str_contains($cs2, 'identity_mapping_conflict')
+        && !str_contains($cs2, 'catch (Exception $e)'),
+        'Customer inventory verifies the approved Client mapping without remote writes and lifecycle identity conflicts fail closed');
     $check(str_contains($cs2, '$this->claimRecreationAuthorization($service)')
         && str_contains($cs2, '$this->releaseRecreationAuthorizationClaim(')
         && str_contains($cs2, '$this->consumeRecreationAuthorization(')
