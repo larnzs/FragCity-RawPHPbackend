@@ -127,16 +127,22 @@ $check(str_contains($proxy, "'revoke_recreation'")
     && str_contains($client, '/admin/lifecycle/revoke-recreation')
     && str_contains($proxy, 'acknowledge_paymenter_missing')
     && str_contains($client, 'adminLifecycleAcknowledgePaymenterMissing')
-    && str_contains($client, '/admin/lifecycle/acknowledge-paymenter-missing'),
+    && str_contains($client, '/admin/lifecycle/acknowledge-paymenter-missing')
+    && str_contains($proxy, 'verify_client_identity')
+    && str_contains($client, 'adminLifecycleVerifyClientIdentity')
+    && str_contains($client, '/admin/lifecycle/verify-client-identity'),
     'Recovery revocation is wired from website proxy to Paymenter client');
 $check(str_contains($page, "\$authorizationStatus === 'in_progress'")
     && str_contains($page, 'data-lifecycle-revoke')
+    && str_contains($page, 'data-lifecycle-client-verify')
     && str_contains($page, "\$mapping['last_reconciled_at']"),
     'Dashboard exposes claim state, revocation and last reconciliation');
 $check(str_contains($js, "'revoke_recreation'")
     && str_contains($js, 'data-lifecycle-revoke')
     && str_contains($js, 'acknowledge_paymenter_missing')
     && str_contains($js, 'data-lifecycle-orphan-review')
+    && str_contains($js, 'verify_client_identity')
+    && str_contains($js, 'data-lifecycle-client-verify')
     && str_contains($js, 'window.confirm'),
     'Dashboard JavaScript confirms reconciliation and handles revocation');
 
@@ -171,7 +177,7 @@ if ($paymenterRoot === '') {
     $uniqueNamedFunctions($bridge, 'FragCityAPI.php');
     $uniqueNamedFunctions($cs2, 'FragCityCS2.php');
 
-    $check(str_contains($bridge, "version: '1.10.0'")
+    $check(str_contains($bridge, "version: '1.11.0'")
         && str_contains($bridge, 'function upgraded(')
         && str_contains($bridge, 'ExtensionHelper::runMigrations'),
         'Paymenter bridge version and extension migration hooks');
@@ -183,8 +189,9 @@ if ($paymenterRoot === '') {
         && str_contains($routes, 'adminLifecycleReconcile')
         && str_contains($routes, 'adminLifecycleAuthorizeRecreation')
         && str_contains($routes, 'adminLifecycleRevokeRecreation')
-        && str_contains($routes, 'adminLifecycleAcknowledgePaymenterMissing'),
-        'All six administrator lifecycle routes are registered');
+        && str_contains($routes, 'adminLifecycleAcknowledgePaymenterMissing')
+        && str_contains($routes, 'adminLifecycleVerifyClientIdentity'),
+        'All seven administrator lifecycle routes are registered');
     $check(str_contains($cs2, 'function reconcileCustomerLifecycle')
         && str_contains($cs2, 'function claimRecreationAuthorization')
         && str_contains($cs2, 'function releaseRecreationAuthorizationClaim')
@@ -279,6 +286,13 @@ if ($paymenterRoot === '') {
         && str_contains($orphanReviewMigration, 'paymenter_missing_reviewed_at')
         && str_contains($orphanReviewMigration, 'paymenter_missing_review_decision'),
         'Paymenter-missing review is one-shot, audited and never authorizes remote deletion');
+    $check(str_contains($bridge, 'adminLifecycleVerifyClientIdentity')
+        && str_contains($cs2, 'adminVerifyPterodactylClientIdentity')
+        && str_contains($cs2, "requestApplicationApi('PATCH'")
+        && str_contains($cs2, "'external_id' => $customerUuid")
+        && str_contains($cs2, 'admin_pterodactyl_client_identity_verified')
+        && str_contains($bridge, 'admin_lifecycle_identity_conflict'),
+        'Administrator Client verification is email-bound, audited and only changes the durable external_id');
 }
 
 echo "\nChecks: {$checks}; failures: " . count($failures) . "\n";

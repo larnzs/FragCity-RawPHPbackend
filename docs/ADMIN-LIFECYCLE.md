@@ -16,6 +16,7 @@ All routes are POST and require the HMAC-SHA256 timestamp, nonce and signature h
 - `/api/v1/fragcity/bridge/admin/lifecycle/authorize-recreation` — records a reasoned, one-shot grant for a service in `missing_external`. It does not dispatch CreateJob; an administrator must retry the exact same Paymenter service's CreateJob separately after reviewing backup/data-loss implications.
 - `/api/v1/fragcity/bridge/admin/lifecycle/revoke-recreation` — revokes a still-pending grant with a mandatory reason. Consumed grants cannot be revoked.
 - `/api/v1/fragcity/bridge/admin/lifecycle/acknowledge-paymenter-missing` — records an administrator's reasoned decision to preserve an orphaned external mapping. It never deletes or mutates a Pterodactyl resource.
+- `/api/v1/fragcity/bridge/admin/lifecycle/verify-client-identity` — verifies an existing Pterodactyl Client selected by numeric ID. It requires an exact email match with the Paymenter customer, rejects another customer's UUID or arbitrary external ID, and changes only the Client `external_id` to the durable customer UUID.
 
 ## Reconciliation contract
 
@@ -25,6 +26,10 @@ A manually deleted Server remains `missing_external`. Reconciliation can detect 
 
 A directly deleted Paymenter service row is marked `paymenter_missing`. The dashboard now allows an administrator to acknowledge the review with a mandatory reason and the fixed `preserve_external` decision. This records the reviewer, timestamp, reason and audit event, while leaving the external Pterodactyl Server untouched. There is deliberately no remote-delete action in this acknowledgement flow.
 
+## Administrator Client identity recovery
+
+For a service in `review_required` due to `missing_client`, `client_identity_conflict` or `identity_mapping_conflict`, the dashboard exposes a separate Client verification form. The administrator supplies the existing numeric Pterodactyl Client ID and a reason. The server extension verifies that the Client exists, its email exactly matches the Paymenter customer, it is not already mapped to another FragCity UUID, and its current `external_id` is either empty, a numeric legacy value, or the same UUID. If permitted, only `external_id` is patched to the durable customer UUID and then read back for verification. No Client is created and no password, username or profile field is changed. Every linked service mapping receives an audit event; the administrator must run Lifecycle Reconcile afterward to verify each Server's ownership and state.
+
 The scheduled worker processes a bounded batch, records `last_reconciled_at`, retries transient failures, and writes lifecycle audit events. Paymenter service deletion through Eloquent remains synchronous: a remote delete failure blocks the service-row deletion. Direct SQL deletion bypasses model hooks and is marked `paymenter_missing` for review only; no remote deletion is inferred from that observation.
 
 ## Recovery authorization state
@@ -33,9 +38,9 @@ Authorization is independent from `desired_state` and has a unique authorization
 
 ## Runtime prerequisites and checks
 
-The Paymenter FragCityAPI extension is version 1.10.0. Its upgrade hook runs the additive migrations `2026_11_04_000003_add_lifecycle_reconciliation_and_recreation_authorization_columns.php`, `2026_11_04_000004_add_recreation_authorization_claim_columns.php` and `2026_11_04_000005_add_paymenter_missing_review_fields.php`; earlier migration files must not be edited or rerun manually.
+The Paymenter FragCityAPI extension is version 1.11.0. Its upgrade hook runs the additive migrations `2026_11_04_000003_add_lifecycle_reconciliation_and_recreation_authorization_columns.php`, `2026_11_04_000004_add_recreation_authorization_claim_columns.php` and `2026_11_04_000005_add_paymenter_missing_review_fields.php`; earlier migration files must not be edited or rerun manually.
 
-Before any production rollout, verify the extension migration has applied, inspect the six lifecycle route names with `php artisan route:list`, and exercise active, suspended, drift, missing Client, missing Server, transient API failure, grant, grant-revoke, grant-consume and Paymenter-missing acknowledgement cases against a disposable test service. These are validation steps, not a deployment request.
+Before any production rollout, verify the extension migration has applied, inspect the seven lifecycle route names with `php artisan route:list`, and exercise active, suspended, drift, missing Client, missing Server, transient API failure, grant, grant-revoke, grant-consume and Paymenter-missing acknowledgement and manual Client identity verification cases against a disposable test service. These are validation steps, not a deployment request.
 
 ## Trust boundary
 

@@ -38,6 +38,8 @@ The page never deletes, recreates, suspends or unsuspends a server directly. Tho
 
 The customer inventory read is also read-only with respect to Pterodactyl Client accounts. It verifies the pre-approved Client ID and durable customer UUID with GET requests only. It does not search by email, create a Client, or synchronize Client profile fields. Missing or conflicting identity mappings fail closed and require administrator review. The local lifecycle registry may still record observed server state and reconciliation timestamps.
 
+Legacy or missing Pterodactyl Client mappings can be resolved only through the administrator Client identity verification flow. The administrator selects an existing numeric Client ID and provides a reason. Paymenter must exactly match the Client email and confirms that neither the UUID nor Client ID belongs to another customer. Only an empty or numeric legacy `external_id` may be replaced with the durable customer UUID; arbitrary values and another UUID are rejected. The flow never creates a Client or changes its password/profile. After the mapping is recorded, the administrator must run Reconcile to verify the Server owner and desired suspend state.
+
 ## Account deletion and recovery
 
 The Paymenter bridge retains the SteamID-to-customer UUID record when a Paymenter user is deleted. A subsequent authenticated website sync for that same SteamID can securely attach a replacement Paymenter user to the existing UUID. If the old email is already attached to another Paymenter account, the existing password and Steam link ownership checks still apply; the bridge does not claim accounts by email alone.
