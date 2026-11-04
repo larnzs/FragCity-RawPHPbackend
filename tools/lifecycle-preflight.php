@@ -237,7 +237,7 @@ if ($paymenterRoot === '') {
         && str_contains($cs2, 'identity_mapping_conflict')
         && str_contains($cs2, 'assertPaymenterServiceOwnerMapping')
         && str_contains($cs2, 'paymenter_service_owner_conflict')
-        && str_contains($cs2, "strtolower((string) (\\$parts['scheme'] ?? '')) !== 'https'")
+        && str_contains($cs2, "strtolower((string) (\$parts['scheme'] ?? '')) !== 'https'")
         && str_contains($bridge, 'mb_strlen($reason) < 8')
         && !str_contains($cs2, 'catch (Exception $e)'),
         'Customer inventory verifies the approved Client mapping without remote writes and lifecycle identity conflicts fail closed');
