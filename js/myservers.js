@@ -852,6 +852,18 @@
         const form = event.target;
         if (!(form instanceof HTMLFormElement)) return;
 
+        if (form.matches('[data-client-api-connect-form]')) {
+            event.preventDefault();
+            submitClientApiForm(form);
+            return;
+        }
+
+        if (form.matches('[data-console-command-form]')) {
+            event.preventDefault();
+            submitConsoleCommand(form);
+            return;
+        }
+
         if (form.matches('[data-panel-password-form]')) {
             event.preventDefault();
             submitPasswordForm(form);
@@ -865,7 +877,182 @@
     });
 
     document.addEventListener('click', async function (event) {
-        const button = event.target.closest('[data-copy-value]');
+        const target = event.target instanceof Element
+            ? event.target
+            : event.target?.parentElement;
+        if (!target) return;
+
+        const disconnectButton = target.closest('[data-client-api-disconnect]');
+        if (disconnectButton) {
+            event.preventDefault();
+            disconnectClientApi(disconnectButton);
+            return;
+        }
+
+        const fileManager = target.closest('#fcFileManager');
+        if (fileManager) {
+            const goPath = target.closest('[data-file-go-path]');
+            if (goPath) {
+                event.preventDefault();
+                loadFileDirectory(fileManager, goPath.dataset.fileGoPath || '/');
+                return;
+            }
+
+            const openButton = target.closest('[data-file-open]');
+            if (openButton) {
+                event.preventDefault();
+                const name = openButton.dataset.fileOpen || '';
+                if (openButton.dataset.fileIsFile === '1') {
+                    await openFileForEdit(fileManager, name);
+                } else {
+                    loadFileDirectory(fileManager, joinFilePath(fileManager.dataset.currentDirectory || '/', name));
+                }
+                return;
+            }
+
+            const editButton = target.closest('[data-file-edit]');
+            if (editButton) {
+                event.preventDefault();
+                await openFileForEdit(fileManager, editButton.dataset.fileEdit || '');
+                return;
+            }
+
+            const downloadButton = target.closest('[data-file-download]');
+            if (downloadButton) {
+                event.preventDefault();
+                let name = downloadButton.dataset.fileDownload || '';
+                if (!name) {
+                    const editingFile = fileManager.dataset.editingFile || '';
+                    name = editingFile.split('/').filter(Boolean).pop() || '';
+                    if (editingFile) {
+                        await downloadServerFile(fileManager, name);
+                    }
+                } else {
+                    await downloadServerFile(fileManager, name);
+                }
+                return;
+            }
+
+            const renameButton = target.closest('[data-file-rename]');
+            if (renameButton) {
+                event.preventDefault();
+                const from = renameButton.dataset.fileRename || '';
+                const to = window.prompt('نام جدید فایل یا پوشه را وارد کنید:', from);
+                if (to && to.trim() && to.trim() !== from) {
+                    try {
+                        await fileManagerRequest(fileManager, 'rename', {
+                            from: joinFilePath(fileManager.dataset.currentDirectory || '/', from),
+                            to: to.trim()
+                        });
+                        await loadFileDirectory(fileManager, fileManager.dataset.currentDirectory || '/');
+                    } catch (error) {
+                        const code = error instanceof Error ? error.message : 'customer_file_action_failed';
+                        fileManagerMessage(fileManager, errorMessages[code] || errorMessages.customer_file_action_failed, true);
+                    }
+                }
+                return;
+            }
+
+            const deleteButton = target.closest('[data-file-delete]');
+            if (deleteButton) {
+                event.preventDefault();
+                const name = deleteButton.dataset.fileDelete || '';
+                if (window.confirm('فایل یا پوشه «' + name + '» حذف شود؟ این عملیات قابل بازگشت نیست.')) {
+                    try {
+                        await fileManagerRequest(fileManager, 'delete', { files: [name] });
+                        const editor = fileManager.querySelector('[data-file-editor]');
+                        const deletingPath = joinFilePath(fileManager.dataset.currentDirectory || '/', name);
+                        if (fileManager.dataset.editingFile === deletingPath) {
+                            if (editor) editor.hidden = true;
+                            delete fileManager.dataset.editingFile;
+                        }
+                        await loadFileDirectory(fileManager, fileManager.dataset.currentDirectory || '/');
+                    } catch (error) {
+                        const code = error instanceof Error ? error.message : 'customer_file_action_failed';
+                        fileManagerMessage(fileManager, errorMessages[code] || errorMessages.customer_file_action_failed, true);
+                    }
+                }
+                return;
+            }
+
+            if (target.closest('[data-file-up]')) {
+                event.preventDefault();
+                const currentPath = fileManager.dataset.currentDirectory || '/';
+                const parts = currentPath.split('/').filter(Boolean);
+                parts.pop();
+                loadFileDirectory(fileManager, parts.length ? '/' + parts.join('/') : '/');
+                return;
+            }
+
+            if (target.closest('[data-file-refresh]')) {
+                event.preventDefault();
+                loadFileDirectory(fileManager, fileManager.dataset.currentDirectory || '/');
+                return;
+            }
+
+            if (target.closest('[data-file-new-folder]')) {
+                event.preventDefault();
+                const name = window.prompt('نام پوشه جدید را وارد کنید:');
+                if (name && name.trim()) {
+                    try {
+                        await fileManagerRequest(fileManager, 'create_folder', { name: name.trim() });
+                        await loadFileDirectory(fileManager, fileManager.dataset.currentDirectory || '/');
+                    } catch (error) {
+                        const code = error instanceof Error ? error.message : 'customer_file_action_failed';
+                        fileManagerMessage(fileManager, errorMessages[code] || errorMessages.customer_file_action_failed, true);
+                    }
+                }
+                return;
+            }
+
+            if (target.closest('[data-file-upload-trigger]')) {
+                event.preventDefault();
+                fileManager.querySelector('[data-file-upload-input]')?.click();
+                return;
+            }
+
+            if (target.closest('[data-file-save]')) {
+                event.preventDefault();
+                const file = fileManager.dataset.editingFile || '';
+                const textarea = fileManager.querySelector('[data-file-editor-content]');
+                const save = target.closest('[data-file-save]');
+                if (!file || !textarea || !save) return;
+
+                save.disabled = true;
+                const message = fileManager.querySelector('[data-file-editor-message]');
+                if (message) message.textContent = 'در حال ذخیره...';
+
+                try {
+                    await fileManagerRequest(fileManager, 'write', { file: file, content: textarea.value });
+                    if (message) message.textContent = 'ذخیره شد.';
+                    fileManagerMessage(fileManager, 'تغییرات فایل ذخیره شد.');
+                } catch (error) {
+                    const code = error instanceof Error ? error.message : 'customer_file_action_failed';
+                    if (message) message.textContent = errorMessages[code] || errorMessages.customer_file_action_failed;
+                } finally {
+                    save.disabled = false;
+                }
+                return;
+            }
+
+            if (target.closest('[data-file-close]')) {
+                event.preventDefault();
+                const editor = fileManager.querySelector('[data-file-editor]');
+                if (editor) editor.hidden = true;
+                delete fileManager.dataset.editingFile;
+                return;
+            }
+        }
+
+        if (target.closest('[data-ajax-nav]')) {
+            const currentConsole = document.getElementById('fcConsole');
+            if (activeConsoleSocket && currentConsole && !target.closest('#fcConsole')) {
+                closeConsoleConnection(false);
+                activeConsoleRoot = null;
+            }
+        }
+
+        const button = target.closest('[data-copy-value]');
         if (!button) return;
 
         const value = button.getAttribute('data-copy-value') || '';
@@ -890,5 +1077,17 @@
                 selection.addRange(range);
             }
         }
+    });
+
+    document.addEventListener('change', function (event) {
+        const input = event.target;
+        if (!(input instanceof HTMLInputElement) || !input.matches('[data-file-upload-input]')) return;
+
+        const root = input.closest('#fcFileManager');
+        if (!root || !input.files || !input.files.length) return;
+
+        const files = input.files;
+        uploadServerFiles(root, files);
+        input.value = '';
     });
 })();
