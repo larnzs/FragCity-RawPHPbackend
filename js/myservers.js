@@ -657,7 +657,8 @@
             if (!tbody) return;
             tbody.replaceChildren();
 
-            const items = Array.isArray(data.items) ? data.items.slice(0, 250) : [];
+            const allItems = Array.isArray(data.items) ? data.items : [];
+            const items = allItems.slice(0, 250);
             items.sort((a, b) => {
                 if (Boolean(a.is_file) !== Boolean(b.is_file)) return a.is_file ? 1 : -1;
                 return String(a.name || '').localeCompare(String(b.name || ''));
@@ -671,6 +672,7 @@
                 openButton.className = 'fc-file-manager__name';
                 openButton.dataset.fileOpen = item.name;
                 openButton.dataset.fileIsFile = item.is_file ? '1' : '0';
+                openButton.dataset.fileEditable = item.is_editable && !item.is_symlink ? '1' : '0';
                 openButton.textContent = item.name;
                 const icon = document.createElement('i');
                 icon.className = item.is_file ? 'fa-regular fa-file' : 'fa-solid fa-folder';
@@ -726,7 +728,10 @@
                 tbody.appendChild(row);
             }
 
-            fileManagerMessage(root, items.length + ' مورد در ' + root.dataset.currentDirectory + ' نمایش داده شد.');
+            const listingSummary = items.length < allItems.length
+                ? items.length + ' مورد از ' + allItems.length + ' مورد در ' + root.dataset.currentDirectory + ' نمایش داده شد؛ برای محدودیت رابط، فقط ۲۵۰ مورد اول نشان داده می‌شود.'
+                : items.length + ' مورد در ' + root.dataset.currentDirectory + ' نمایش داده شد.';
+            fileManagerMessage(root, listingSummary);
         } catch (error) {
             const code = error instanceof Error ? error.message : 'customer_file_action_failed';
             fileManagerMessage(root, errorMessages[code] || errorMessages.customer_file_action_failed, true);
@@ -919,7 +924,14 @@
                 event.preventDefault();
                 const name = openButton.dataset.fileOpen || '';
                 if (openButton.dataset.fileIsFile === '1') {
-                    await openFileForEdit(fileManager, name);
+                    if (openButton.dataset.fileEditable === '1') {
+                        await openFileForEdit(fileManager, name);
+                    } else {
+                        fileManagerMessage(
+                            fileManager,
+                            'این فایل در ویرایشگر مرورگر پشتیبانی نمی‌شود؛ برای دریافت آن از دکمه دانلود استفاده کنید.'
+                        );
+                    }
                 } else {
                     loadFileDirectory(fileManager, joinFilePath(fileManager.dataset.currentDirectory || '/', name));
                 }
