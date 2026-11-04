@@ -2636,3 +2636,150 @@
         font-size: .7rem;
     }
 }
+
+
+/* Final compact pass: keep the CS2 selector card content-sized. */
+.fc-myservers__server-switcher {
+    display: grid;
+    gap: 9px;
+    margin-bottom: 15px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.fc-myservers__switcher-label {
+    justify-self: start;
+    gap: 8px;
+    margin: 0;
+    font-size: .8rem;
+}
+.fc-myservers__switcher-label > span {
+    min-width: 21px;
+    height: 21px;
+    font-size: .66rem;
+}
+.fc-myservers__server-list {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    overflow: visible;
+    direction: ltr;
+}
+.fc-myservers__server-card {
+    flex: 0 1 390px;
+    width: min(100%, 390px);
+    max-width: 390px;
+    align-self: stretch;
+}
+
+/* Password settings: cap the card and form width instead of stretching
+   credentials across the entire workspace. */
+.fc-password-card {
+    width: min(100%, 700px);
+    max-width: 700px;
+    justify-self: start;
+    padding: 14px;
+}
+.fc-password-card .fc-dashboard-card__heading {
+    margin-bottom: 7px;
+}
+.fc-password-card__description {
+    max-width: 630px;
+    margin-bottom: 10px;
+    font-size: .74rem;
+    line-height: 1.75;
+}
+.fc-panel-password__form {
+    width: 100%;
+    max-width: 620px;
+    gap: 8px;
+}
+.fc-panel-password__form label {
+    gap: 5px;
+    font-size: .74rem;
+}
+.fc-panel-password__form input {
+    height: 42px;
+    padding: 0 11px;
+    border-radius: 8px;
+    font-size: .8rem;
+}
+.fc-panel-password__fields {
+    gap: 8px;
+}
+.fc-panel-password__hint {
+    max-width: 620px;
+    font-size: .68rem;
+    line-height: 1.7;
+}
+.fc-panel-password__footer {
+    gap: 8px;
+    margin-top: 0;
+}
+.fc-panel-password__message {
+    font-size: .72rem;
+}
+.fc-panel-password__submit {
+    min-height: 42px;
+    padding: 0 15px;
+    font-size: .76rem;
+}
+
+@media (max-width: 900px) {
+    .fc-myservers__server-card {
+        flex-basis: 370px;
+        width: min(100%, 370px);
+        max-width: 370px;
+    }
+    .fc-password-card {
+        width: min(100%, 660px);
+        max-width: 660px;
+    }
+}
+@media (max-width: 620px) {
+    .fc-myservers__server-switcher {
+        gap: 8px;
+        margin-bottom: 13px;
+    }
+    .fc-myservers__server-list {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 9px;
+    }
+    .fc-myservers__server-card {
+        flex: 0 1 auto;
+        width: 100%;
+        max-width: 100%;
+    }
+    .fc-password-card {
+        width: 100%;
+        max-width: 100%;
+        padding: 12px;
+    }
+    .fc-password-card__description {
+        font-size: .72rem;
+    }
+    .fc-panel-password__form {
+        max-width: 100%;
+        gap: 8px;
+    }
+    .fc-panel-password__form input {
+        height: 42px;
+    }
+    .fc-panel-password__fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .fc-panel-password__footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .fc-panel-password__submit {
+        width: 100%;
+    }
+}
