@@ -356,11 +356,11 @@ try {
 
     $status = match ($safeError) {
         'service_not_found' => 404,
-        'panel_username_already_in_use' => 409,
-        'panel_username_invalid' => 422,
+        'panel_username_already_in_use', 'client_api_not_connected' => 409,
+        'panel_username_invalid', 'client_api_key_invalid' => 422,
         'panel_username_rate_limited', 'panel_password_rate_limited', 'client_api_connect_rate_limited' => 429,
-        'client_api_key_invalid' => 422,
-        'client_api_key_must_belong_to_server_owner' => 403,
+        'client_api_key_must_belong_to_server_owner', 'client_api_permission_denied' => 403,
+        'client_api_file_too_large_to_edit' => 413,
         'client_api_invalid_file_content', 'client_api_invalid_file_name', 'client_api_invalid_file_path',
         'client_api_invalid_file_list', 'client_api_invalid_file_action' => 422,
         default => 502,
