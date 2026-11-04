@@ -260,6 +260,10 @@ if (preg_match('/^[0-9]{17}$/D', $myServersSteamId)) {
                                     <strong class="fc-server-info__mono"><?= $myServersEscape($identifier) ?></strong>
                                 </div>
                                 <div class="fc-server-info">
+                                    <span>وضعیت اجرای پنل</span>
+                                    <strong><?= $myServersEscape($serverRuntimeLabel) ?></strong>
+                                </div>
+                                <div class="fc-server-info">
                                     <span>Node ID</span>
                                     <strong><?= number_format((int) ($server['node'] ?? 0)) ?></strong>
                                 </div>
