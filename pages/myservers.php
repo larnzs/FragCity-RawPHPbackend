@@ -655,6 +655,10 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     $selectedThreads = trim((string) ($selectedLimits['threads'] ?? ''));
                     $selectedThreadsLabel = $selectedThreads !== '' ? $selectedThreads : 'Default';
                     $selectedIo = (int) ($selectedLimits['io'] ?? 0);
+                    $selectedSwap = (int) ($selectedLimits['swap'] ?? -1);
+                    $selectedSwapLabel = $selectedSwap < 0
+                        ? 'Unlimited'
+                        : ($selectedSwap === 0 ? 'Disabled' : $myServersMiB($selectedSwap));
                     $selectedUpdatedAt = $myServersDate($selectedServerData['updated_at'] ?? '');
                     $selectedDescription = trim((string) ($selectedServerData['description'] ?? ''));
                     $selectedNodeMaintenance = $selectedServerData['node_maintenance_mode'] ?? null;
@@ -699,7 +703,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                             <div><span>Egg</span><strong><?= $myServersEscape($selectedEggLabel) ?></strong></div>
                             <div><span>Docker Image</span><strong class="fc-mono"><?= $myServersEscape($selectedDockerImage !== '' ? $selectedDockerImage : '—') ?></strong></div>
                             <div><span>Installation</span><strong><?= $myServersEscape($selectedInstallLabel) ?></strong></div>
-                            <div><span>Swap</span><strong><?= $myServersEscape($myServersMiB($selectedLimits['swap'] ?? 0)) ?></strong></div>
+                            <div><span>Swap</span><strong><?= $myServersEscape($selectedSwapLabel) ?></strong></div>
                             <div><span>I/O Weight</span><strong><?= $selectedIo > 0 ? number_format($selectedIo) : '—' ?></strong></div>
                             <div><span>CPU Pinning</span><strong class="fc-mono"><?= $myServersEscape($selectedThreadsLabel) ?></strong></div>
                             <div><span>OOM Killer</span><strong><?= $myServersEscape($selectedOomLabel) ?></strong></div>
