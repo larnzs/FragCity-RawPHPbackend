@@ -273,7 +273,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
             <h1>مدیریت سرورهای من</h1>
             <p>از این بخش می‌توانید سرویس‌ها و دسترسی پنل سرورهای خود را مدیریت کنید.</p>
         </div>
-        <a href="?page=buyserveropen" class="fc-myservers__new-server" data-ajax-nav data-slug="buyserveropen">
+        <a href="/buy-server/" class="fc-myservers__new-server" data-ajax-nav data-slug="buyserveropen">
             <i class="fa-solid fa-plus" aria-hidden="true"></i>
             خرید سرور جدید
         </a>
@@ -295,7 +295,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
             </div>
             <h2>هنوز سروری ندارید</h2>
             <p>بعد از خرید و آماده‌سازی اولین سرویس CS2، داشبورد مدیریت آن در همین صفحه نمایش داده می‌شود.</p>
-            <a href="?page=buyserveropen" class="fc-myservers__new-server fc-myservers__new-server--primary" data-ajax-nav data-slug="buyserveropen">
+            <a href="/buy-server/" class="fc-myservers__new-server fc-myservers__new-server--primary" data-ajax-nav data-slug="buyserveropen">
                 <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
                 مشاهده پلن‌های سرور
             </a>
