@@ -39,7 +39,9 @@ $stateOptions = [
     'ready' => 'آماده',
     'active' => 'فعال',
     'provisioning' => 'در حال ساخت',
+    'suspending' => 'در حال تعلیق',
     'suspended' => 'معلق',
+    'unsuspending' => 'در حال فعال‌سازی',
     'missing_external' => 'سرور در Pterodactyl نیست',
     'paymenter_missing' => 'سرویس در Paymenter نیست',
     'review_required' => 'نیازمند بررسی',
@@ -104,6 +106,7 @@ $service = is_array($detail['service'] ?? null) ? $detail['service'] : [];
 $history = is_array($detail['history'] ?? null) ? $detail['history'] : [];
 $selectedState = (string) ($mapping['lifecycle_state'] ?? '');
 $desiredState = (string) ($mapping['desired_state'] ?? '');
+$authorizationStatus = (string) ($mapping['recreation_authorization_status'] ?? 'none');
 $hasSelection = $mapping !== [];
 
 $buildUrl = static function (array $override = []) use ($state, $search, $perPage, $currentPage, $selectedServiceId): string {
@@ -229,7 +232,7 @@ $kpis = [
                                 <td><strong><?= $escape($item['customer_name'] ?: 'مشتری نامشخص') ?></strong><small><?= $escape($item['customer_email'] ?? '') ?></small></td>
                                 <td><span class="fc-lifecycle__state fc-lifecycle__state--<?= $escape($itemStatusClass) ?>"><?= $escape($stateLabels[$itemState] ?? $itemState) ?></span><small><?= $escape($item['paymenter_service_status'] ?? 'Paymenter missing') ?></small></td>
                                 <td><strong><?= (int) ($item['pterodactyl_server_id'] ?? 0) > 0 ? '#' . number_format((int) $item['pterodactyl_server_id']) : '—' ?></strong><small>Client #<?= number_format((int) ($item['pterodactyl_user_id'] ?? 0)) ?></small></td>
-                                <td><small><?= $escape($formatDate($item['updated_at'] ?? '')) ?></small></td>
+                                <td><small><?= $escape($formatDate($item['last_reconciled_at'] ?? '')) ?></small></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -261,6 +264,7 @@ $kpis = [
                     <div><span>Pterodactyl Server</span><strong>#<?= number_format((int) ($mapping['pterodactyl_server_id'] ?? 0)) ?></strong></div>
                     <div><span>Identifier</span><strong class="fc-lifecycle__mono"><?= $escape($mapping['server_identifier'] ?? '—') ?></strong></div>
                     <div><span>Last Seen</span><strong><?= $escape($formatDate($mapping['last_seen_at'] ?? '')) ?></strong></div>
+                    <div><span>Last Reconciled</span><strong><?= $escape($formatDate($mapping['last_reconciled_at'] ?? '')) ?></strong></div>
                     <div><span>Next Reconcile</span><strong><?= $escape($formatDate($mapping['next_reconcile_at'] ?? '')) ?></strong></div>
                     <div><span>Expires At</span><strong><?= $escape($formatDate($service['expires_at'] ?? '')) ?></strong></div>
                 </div>
@@ -279,22 +283,42 @@ $kpis = [
                 <?php endif; ?>
 
                 <div class="fc-lifecycle__actions">
-                    <?php if ($selectedState !== 'deleted'): ?>
+                    <?php if ($selectedState !== 'deleted' && $selectedState !== 'paymenter_missing'): ?>
                         <button type="button" class="fc-lifecycle__button fc-lifecycle__button--quiet" data-lifecycle-reconcile data-service-id="<?= (int) $mapping['service_id'] ?>">
-                            <i class="fa-solid fa-rotate"></i><span>بررسی مجدد وضعیت</span>
+                            <i class="fa-solid fa-arrows-rotate"></i><span>همگام‌سازی و بررسی وضعیت</span>
                         </button>
+                        <p class="fc-lifecycle__action-hint">این عملیات وضعیت واقعی سرور را با وضعیت سرویس Paymenter هماهنگ می‌کند؛ ممکن است سرور را Suspend یا Unsuspend کند. ساخت یا حذف سرور انجام نمی‌دهد.</p>
                     <?php endif; ?>
 
-                    <?php if ($selectedState === 'missing_external' && $desiredState !== 'recreate_authorized'): ?>
+                    <?php if ($authorizationStatus === 'pending'): ?>
+                        <div class="fc-lifecycle__notice fc-lifecycle__notice--warning">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <div>
+                                <strong>مجوز ساخت مجدد در انتظار اجرا</strong>
+                                <p>ثبت‌کننده: <?= $escape($mapping['recreation_authorized_username'] ?: $mapping['recreation_authorized_by']) ?> · <?= $escape($formatDate($mapping['recreation_authorized_at'] ?? '')) ?></p>
+                                <p>دلیل: <?= $escape($mapping['recreation_authorization_reason'] ?? '') ?></p>
+                                <p>مجوز تا زمان تأیید موفق Server جایگزین معتبر می‌ماند و با Retry ناموفق مصرف نمی‌شود.</p>
+                            </div>
+                        </div>
+                        <form class="fc-lifecycle__authorize" data-lifecycle-revoke data-service-id="<?= (int) $mapping['service_id'] ?>">
+                            <strong>لغو مجوز ساخت مجدد</strong>
+                            <label><span>دلیل لغو (اجباری)</span><textarea name="reason" rows="2" minlength="8" maxlength="500" required placeholder="علت لغو مجوز را بنویسید..."></textarea></label>
+                            <button type="submit" class="fc-lifecycle__button fc-lifecycle__button--quiet"><i class="fa-solid fa-ban"></i><span>لغو مجوز</span></button>
+                        </form>
+                    <?php elseif ($selectedState === 'missing_external'): ?>
                         <form class="fc-lifecycle__authorize" data-lifecycle-authorize data-service-id="<?= (int) $mapping['service_id'] ?>">
                             <strong>مجوز ساخت مجدد سرور</strong>
-                            <p>این کار فقط مجوز را ثبت می‌کند. اجرای CreateJob باید جداگانه و پس از بررسی Backup/Data Loss توسط ادمین انجام شود.</p>
+                            <p>این کار فقط یک مجوز یک‌بارمصرف ثبت می‌کند. اجرای CreateJob باید جداگانه و پس از بررسی Backup/Data Loss توسط ادمین انجام شود.</p>
                             <label><span>دلیل تأیید (اجباری)</span><textarea name="reason" rows="3" minlength="8" maxlength="500" required placeholder="علت تأیید ساخت مجدد این سرویس را بنویسید..."></textarea></label>
                             <button type="submit" class="fc-lifecycle__button fc-lifecycle__button--warning"><i class="fa-solid fa-shield-halved"></i><span>ثبت مجوز ساخت مجدد</span></button>
                         </form>
-                    <?php elseif ($selectedState === 'missing_external' && $desiredState === 'recreate_authorized'): ?>
-                        <div class="fc-lifecycle__notice fc-lifecycle__notice--warning"><i class="fa-solid fa-circle-info"></i><div><strong>ساخت مجدد مجاز شده است</strong><p>اکنون ادمین باید CreateJob همان Paymenter Service را به‌صورت دستی Retry کند. این داشبورد Job را اجرا نمی‌کند.</p></div></div>
-                    <?php elseif ($selectedState === 'paymenter_missing'): ?>
+                    <?php elseif ($authorizationStatus === 'consumed'): ?>
+                        <div class="fc-lifecycle__notice"><i class="fa-solid fa-circle-check"></i><div><strong>مجوز بازیابی مصرف شده است</strong><p>ساخت جایگزین پس از تأیید Pterodactyl ثبت شده است.</p></div></div>
+                    <?php elseif ($authorizationStatus === 'revoked'): ?>
+                        <div class="fc-lifecycle__notice"><i class="fa-solid fa-circle-info"></i><div><strong>مجوز بازیابی لغو شده است</strong><p>دلیل لغو: <?= $escape($mapping['recreation_authorization_revoke_reason'] ?? '') ?></p></div></div>
+                    <?php endif; ?>
+
+                    <?php if ($selectedState === 'paymenter_missing'): ?>
                         <div class="fc-lifecycle__notice fc-lifecycle__notice--warning"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>رکورد Paymenter پیدا نشد</strong><p>این نگاشت برای بررسی نگه داشته شده است. هیچ سرور خارجی به‌صورت خودکار حذف نمی‌شود.</p></div></div>
                     <?php endif; ?>
                 </div>
