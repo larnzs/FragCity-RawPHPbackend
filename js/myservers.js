@@ -100,8 +100,8 @@
             form.reset();
             showMessage(form, 'رمز اختصاصی پنل با موفقیت تنظیم شد. رمز جدید را در جای امن نگه دارید.', 'success');
 
-            const accessCard = form.closest('.fc-access-card');
-            const status = accessCard?.querySelector('[data-password-status]');
+            const dashboard = document.getElementById('fcMyServers');
+            const status = dashboard?.querySelector('[data-password-status]');
             if (status) {
                 status.classList.remove('is-pending');
                 status.classList.add('is-set');
