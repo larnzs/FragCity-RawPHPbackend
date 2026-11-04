@@ -156,6 +156,45 @@ final class PaymenterApiClient
     }
 
     /**
+     * Update the Pterodactyl username for one service owned by this customer.
+     * The bridge verifies service ownership and keeps the panel identity in sync.
+     *
+     * @return array{username_updated:bool,username:string}
+     */
+    public function setCustomerPanelUsername(
+        string $steamId64,
+        int $serviceId,
+        string $username
+    ): array {
+        $username = strtolower(trim($username));
+        if (
+            !preg_match('/^[0-9]{17}$/D', $steamId64)
+            || $serviceId < 1
+            || !preg_match('/^[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]$/D', $username)
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        $response = $this->post(
+            '/api/v1/fragcity/bridge/servers/username',
+            [
+                'steamid64' => $steamId64,
+                'service_id' => $serviceId,
+                'username' => $username,
+            ]
+        );
+
+        if (($response['data']['username_updated'] ?? false) !== true) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return [
+            'username_updated' => true,
+            'username' => (string) ($response['data']['username'] ?? $username),
+        ];
+    }
+
+    /**
      * @param array<string,mixed> $payload
      * @return array<string,mixed>
      */
@@ -238,6 +277,10 @@ final class PaymenterApiClient
                 'service_not_found',
                 'panel_password_update_failed',
                 'panel_password_rate_limited',
+                'panel_username_invalid',
+                'panel_username_already_in_use',
+                'panel_username_update_failed',
+                'panel_username_rate_limited',
             ];
 
             if (!in_array($error, $safeErrors, true)) {
