@@ -555,7 +555,6 @@ $allowedPages = [
     'register',
     'profile',
     'myservers',
-    'lifecycle',
     'vip',
     'leaderboard',
     'forgot_password',
@@ -635,7 +634,6 @@ $protectedPages = [
     'skins_vps',
     'profile',
     'myservers',
-    'lifecycle',
 ];
 
 if (
@@ -650,13 +648,6 @@ if (
         true,
         303
     );
-    exit;
-}
-
-if ($page === 'lifecycle' && (string) ($_SESSION['role'] ?? '') !== 'admin') {
-    http_response_code(403);
-    header('Content-Type: text/plain; charset=UTF-8');
-    echo '403 Forbidden';
     exit;
 }
 
@@ -786,15 +777,6 @@ $pageAssets = [
             '/js/myservers.js?v=' . asset_version(
                 __DIR__ . '/js/myservers.js'
             ),
-        ],
-    ],
-
-    'lifecycle' => [
-        'css' => [
-            '/css/lifecycle.css?v=' . asset_version(__DIR__ . '/css/lifecycle.css'),
-        ],
-        'js' => [
-            '/js/lifecycle.js?v=' . asset_version(__DIR__ . '/js/lifecycle.js'),
         ],
     ],
 
