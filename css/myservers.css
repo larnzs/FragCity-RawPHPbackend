@@ -2401,3 +2401,238 @@
         grid-column: auto;
     }
 }
+
+
+/* CS2 service selector cards: compact game identity, limits and expiry. */
+.fc-myservers__server-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+    align-items: stretch;
+    gap: 10px;
+    overflow: visible;
+    padding: 0;
+}
+.fc-myservers__server-card {
+    display: grid;
+    min-width: 0;
+    gap: 13px;
+    padding: 14px;
+    border: 1px solid rgba(255, 255, 255, .075);
+    border-radius: 14px;
+    background:
+        radial-gradient(ellipse at 0% 0%, rgba(249, 115, 22, .075), transparent 48%),
+        linear-gradient(145deg, rgba(25, 25, 25, .98), rgba(15, 15, 15, .98));
+    color: #E5E5E5 !important;
+    text-align: left;
+    text-decoration: none !important;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .13);
+    transition: border-color 160ms ease, background 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+.fc-myservers__server-card:hover {
+    border-color: rgba(249, 115, 22, .35);
+    transform: translateY(-2px);
+}
+.fc-myservers__server-card.is-selected {
+    border-color: rgba(249, 115, 22, .58);
+    background:
+        radial-gradient(ellipse at 0% 0%, rgba(249, 115, 22, .13), transparent 54%),
+        linear-gradient(145deg, rgba(29, 25, 22, .99), rgba(16, 16, 16, .99));
+    box-shadow: inset 0 0 0 1px rgba(249, 115, 22, .08), 0 12px 30px rgba(0, 0, 0, .2);
+}
+.fc-server-card__top {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+}
+.fc-server-card__logo {
+    display: block;
+    flex: 0 0 52px;
+    width: 52px;
+    height: 52px;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 13px;
+    background: #111;
+    object-fit: contain;
+}
+.fc-server-card__identity {
+    display: grid;
+    flex: 1 1 auto;
+    min-width: 0;
+    gap: 4px;
+}
+.fc-server-card__identity strong {
+    overflow: hidden;
+    color: #F5F5F5;
+    font-size: .88rem;
+    font-weight: 850;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.fc-server-card__identity span {
+    color: #A3A3A3;
+    font-size: .62rem;
+    font-weight: 750;
+    letter-spacing: .055em;
+}
+.fc-server-card__status {
+    flex: 0 0 auto;
+    max-width: 112px;
+    padding: 5px 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, .035);
+    color: #CFCFCF;
+    font-size: .63rem;
+    font-weight: 750;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.fc-server-card__status--active {
+    border-color: rgba(74, 222, 128, .2);
+    background: rgba(74, 222, 128, .07);
+    color: #86EFAC;
+}
+.fc-server-card__status--suspended,
+.fc-server-card__status--unavailable {
+    border-color: rgba(248, 113, 113, .2);
+    background: rgba(248, 113, 113, .07);
+    color: #FCA5A5;
+}
+.fc-server-card__facts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+}
+.fc-server-card__fact {
+    display: grid;
+    align-content: center;
+    min-width: 0;
+    min-height: 54px;
+    gap: 4px;
+    padding: 8px 9px;
+    border: 1px solid rgba(255, 255, 255, .055);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .022);
+}
+.fc-server-card__fact > span {
+    color: #858585;
+    font-size: .59rem;
+    font-weight: 800;
+    letter-spacing: .06em;
+}
+.fc-server-card__fact > strong {
+    overflow: hidden;
+    color: #EAEAEA;
+    font-size: .76rem;
+    font-weight: 800;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.fc-server-card__fact--network {
+    grid-column: span 2;
+}
+.fc-server-card__fact--purchase {
+    grid-column: span 1;
+}
+.fc-server-card__expiry {
+    display: grid;
+    gap: 8px;
+    padding-top: 11px;
+    border-top: 1px solid rgba(255, 255, 255, .07);
+}
+.fc-server-card__expiry-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+.fc-server-card__expiry-heading > span {
+    color: #929292;
+    font-size: .61rem;
+    font-weight: 800;
+    letter-spacing: .07em;
+}
+.fc-server-card__expiry-heading > strong {
+    color: #FDBA74;
+    font-size: .76rem;
+    font-weight: 850;
+}
+.fc-server-card__expiry.is-critical .fc-server-card__expiry-heading > strong {
+    color: #F87171;
+}
+.fc-server-card__progress,
+.fc-server-card__no-expiry {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .085);
+}
+.fc-server-card__progress > span {
+    display: block;
+    height: 100%;
+    min-width: 2px;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #F97316, #FFB347);
+    box-shadow: 0 0 12px rgba(249, 115, 22, .28);
+    transition: width 240ms ease;
+}
+.fc-server-card__expiry.is-critical .fc-server-card__progress > span {
+    background: linear-gradient(90deg, #DC2626, #F87171);
+    box-shadow: 0 0 12px rgba(248, 113, 113, .25);
+}
+.fc-server-card__no-expiry {
+    height: 4px;
+    background: rgba(255, 255, 255, .055);
+}
+
+/* Shorter access metadata fields, with room for the redirect controls. */
+.fc-access-card__credentials[dir="ltr"] {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+@media (max-width: 1280px) {
+    .fc-access-card__credentials[dir="ltr"] {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+@media (max-width: 620px) {
+    .fc-myservers__server-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    .fc-myservers__server-card {
+        gap: 11px;
+        padding: 11px;
+    }
+    .fc-server-card__top {
+        gap: 9px;
+    }
+    .fc-server-card__logo {
+        flex-basis: 46px;
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+    }
+    .fc-server-card__identity strong {
+        font-size: .82rem;
+    }
+    .fc-server-card__status {
+        max-width: 88px;
+        padding: 5px 6px;
+        font-size: .58rem;
+    }
+    .fc-server-card__facts {
+        gap: 6px;
+    }
+    .fc-server-card__fact {
+        min-height: 50px;
+        padding: 7px;
+    }
+    .fc-server-card__fact > strong {
+        font-size: .7rem;
+    }
+}
