@@ -16,7 +16,12 @@
         lifecycle_storage_not_ready: 'ذخیره‌سازی Lifecycle کامل نیست؛ Migrationهای افزونه Paymenter بررسی شوند.',
         admin_lifecycle_unavailable: 'سرویس مدیریت Lifecycle فعلاً در دسترس نیست.',
         paymenter_unreachable: 'اتصال به Paymenter برقرار نشد.',
-        paymenter_invalid_response: 'پاسخ Paymenter معتبر نیست.'
+        paymenter_invalid_response: 'پاسخ Paymenter معتبر نیست.',
+        bridge_not_configured: 'تنظیم HMAC در Paymenter ناقص است.',
+        bridge_ip_allowlist_invalid: 'فهرست IPهای مجاز در Paymenter نامعتبر است.',
+        source_ip_not_allowed: 'IP خروجی Website در Allowlist مربوط به Paymenter مجاز نیست.',
+        https_required: 'ارتباط امن HTTPS برای Bridge الزامی است.',
+        request_too_large: 'اندازه درخواست از محدودیت مجاز API بیشتر است.'
     };
 
     function feedback(root, message, isError) {
