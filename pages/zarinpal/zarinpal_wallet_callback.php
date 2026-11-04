@@ -1,113 +1,254 @@
 <?php
-require_once __DIR__ . '/../../settings/loader.php';
-$zarinpalSettings=fragcity_settings('integrations.zarinpal',array());
-// pages/zarinpal/zarinpal_wallet_callback.php
-session_start();
+declare(strict_types=1);
 
-$authority = $_GET['Authority'] ?? '';
-$status = $_GET['Status'] ?? '';
+require_once __DIR__ . '/../../settings/loader.php';
+
+$zarinpalSettings = fragcity_settings('integrations.zarinpal', []);
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 
 $is_success = false;
 $error_message = '';
 $amount = 0;
 $ref_id = '';
 
-$fileSettings=fragcity_settings('files.pages.zarinpal.wallet_callback',array());$dbProfile=isset($fileSettings['database_profile'])?$fileSettings['database_profile']:'main';$pdo=fragcity_create_pdo($dbProfile);if(!$pdo){http_response_code(503);exit('Database unavailable or not configured.');}
+$authorityInput = $_GET['Authority'] ?? '';
+$gatewayStatus = $_GET['Status'] ?? '';
+$authority = is_string($authorityInput) ? trim($authorityInput) : '';
 
-if ($status !== 'OK' || empty($authority)) {
-    $is_success = false;
-    $error_message = 'تراکنش توسط شما لغو شد یا با خطا مواجه گردید.';
+$databaseProfile = fragcity_settings('files.index.database_profile', 'main');
+$databaseProfile = is_string($databaseProfile) && trim($databaseProfile) !== ''
+    ? trim($databaseProfile)
+    : 'main';
+$pdo = fragcity_create_pdo($databaseProfile);
 
-    // در صورت لغو تراکنش توسط کاربر، وضعیت failed شود
-    if (!empty($authority)) {
-        $pdo->prepare("UPDATE wallet_transactions SET status = 'failed' WHERE authority = ?")
-            ->execute([$authority]);
-    }
+if (!$pdo instanceof PDO) {
+    http_response_code(503);
+    exit('Database unavailable.');
+}
+
+if (
+    $gatewayStatus !== 'OK'
+    || !preg_match('/^[A-Za-z0-9_-]{1,128}$/D', $authority)
+) {
+    // The browser's Status query parameter is not proof of payment state.
+    // Do not mutate a pending transaction based only on a cancel/failure redirect.
+    $error_message = 'تراکنش توسط شما لغو شد یا اطلاعات بازگشت از درگاه معتبر نیست.';
 } else {
-    $merchant_id=isset($zarinpalSettings['merchant_id'])?(string)$zarinpalSettings['merchant_id']:'';
+    try {
+        $transactionQuery = $pdo->prepare(
+            'SELECT id, steamid, amount, type, status, ref_id
+             FROM wallet_transactions
+             WHERE authority = ?
+             LIMIT 1'
+        );
+        $transactionQuery->execute([$authority]);
+        $transaction = $transactionQuery->fetch(PDO::FETCH_ASSOC);
 
-    // پیدا کردن تراکنش
-    $stmt = $pdo->prepare("SELECT * FROM wallet_transactions WHERE authority = ? LIMIT 1");
-    $stmt->execute([$authority]);
-    $transaction = $stmt->fetch();
-
-    if (!$transaction) {
-        $is_success = false;
-        $error_message = 'تراکنش یافت نشد.';
-    } else {
-        $amount  = (int)$transaction['amount'];
-        $steamid = $transaction['steamid'];
-        $currentStatus = $transaction['status'];
-
-        // جلوگیری از شارژ مجدد کیف پول با رفرش صفحه
-        if ($currentStatus === 'success') {
+        if (!is_array($transaction)) {
+            $error_message = 'تراکنش یافت نشد.';
+        } elseif (
+            (string) ($transaction['type'] ?? '') !== 'deposit'
+            || !preg_match('/^[0-9]{17}$/D', (string) ($transaction['steamid'] ?? ''))
+            || (int) ($transaction['amount'] ?? 0) < 1
+        ) {
+            $error_message = 'اطلاعات تراکنش معتبر نیست.';
+        } elseif ((string) ($transaction['status'] ?? '') === 'success') {
             $is_success = true;
-            $ref_id = $transaction['ref_id'] ?? '';
+            $amount = (int) $transaction['amount'];
+            $ref_id = (string) ($transaction['ref_id'] ?? '');
+        } elseif ((string) ($transaction['status'] ?? '') !== 'pending') {
+            $error_message = 'این تراکنش دیگر در وضعیت قابل تأیید نیست.';
         } else {
-            // تأیید نهایی پرداخت با زرین‌پال
-            $data = [
-                "merchant_id" => $merchant_id,
-                "amount"      => $amount * 10,
-                "authority"   => $authority
-            ];
+            $merchantId = is_array($zarinpalSettings)
+                ? trim((string) ($zarinpalSettings['merchant_id'] ?? ''))
+                : '';
+            $verifyUrl = is_array($zarinpalSettings)
+                ? trim((string) ($zarinpalSettings['verify_url'] ?? ''))
+                : '';
+            $verifyUrlParts = parse_url($verifyUrl);
 
-            $curl = curl_init();
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => (isset($zarinpalSettings['verify_url']) ? $zarinpalSettings['verify_url'] : ''),
+            if (
+                $merchantId === ''
+                || !is_array($verifyUrlParts)
+                || strtolower((string) ($verifyUrlParts['scheme'] ?? '')) !== 'https'
+                || empty($verifyUrlParts['host'])
+                || isset($verifyUrlParts['user'])
+                || isset($verifyUrlParts['pass'])
+            ) {
+                throw new RuntimeException('zarinpal_verify_configuration_invalid');
+            }
+
+            $verifyPayload = [
+                'merchant_id' => $merchantId,
+                'amount' => ((int) $transaction['amount']) * 10,
+                'authority' => $authority,
+            ];
+            $verifyBody = json_encode(
+                $verifyPayload,
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+            );
+
+            $curl = curl_init($verifyUrl);
+            if ($curl === false) {
+                throw new RuntimeException('zarinpal_verify_curl_init_failed');
+            }
+
+            curl_setopt_array($curl, [
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => $verifyBody,
+                CURLOPT_HTTPHEADER => [
+                    'Content-Type: application/json',
+                    'Accept: application/json',
+                ],
                 CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING       => '',
-                CURLOPT_MAXREDIRS      => 10,
-                CURLOPT_TIMEOUT        => 0,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
-                CURLOPT_CUSTOMREQUEST  => 'POST',
-                CURLOPT_POSTFIELDS     => json_encode($data),
-                CURLOPT_HTTPHEADER     => array('Content-Type: application/json', 'Accept: application/json'),
-            ));
+                CURLOPT_CONNECTTIMEOUT => 5,
+                CURLOPT_TIMEOUT => 15,
+                CURLOPT_FOLLOWLOCATION => false,
+                CURLOPT_SSL_VERIFYPEER => true,
+                CURLOPT_SSL_VERIFYHOST => 2,
+                CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
+            ]);
 
             $response = curl_exec($curl);
+            $curlError = curl_errno($curl);
+            $httpStatus = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
             curl_close($curl);
-            $result = json_decode($response, true);
 
-            if (isset($result['data']['code']) && ($result['data']['code'] == 100 || $result['data']['code'] == 101)) {
-                $ref_id = $result['data']['ref_id'];
+            if (!is_string($response) || $curlError !== 0 || $httpStatus < 200 || $httpStatus >= 300) {
+                throw new RuntimeException('zarinpal_verify_transport_failed');
+            }
 
-                try {
-                    // شروع Transaction دیتابیس برای ایمنی موجودی کیف پول
-                    $pdo->beginTransaction();
+            $gatewayResponse = json_decode($response, true, 32, JSON_THROW_ON_ERROR);
+            $gatewayCode = filter_var($gatewayResponse['data']['code'] ?? null, FILTER_VALIDATE_INT);
 
-                    $walletStmt = $pdo->prepare("SELECT steamid FROM user_wallets WHERE steamid = ? LIMIT 1");
-                    $walletStmt->execute([$steamid]);
-                    
-                    if ($walletStmt->fetch()) {
-                        // آپدیت موجودی
-                        $pdo->prepare("UPDATE user_wallets SET balance = balance + ? WHERE steamid = ?")
-                            ->execute([$amount, $steamid]);
-                    } else {
-                        // ایجاد کیف پول جدید در صورت عدم وجود
-                        $pdo->prepare("INSERT INTO user_wallets (steamid, balance) VALUES (?, ?)")
-                            ->execute([$steamid, $amount]);
+            if ($gatewayCode !== 100 && $gatewayCode !== 101) {
+                $markFailed = $pdo->prepare(
+                    "UPDATE wallet_transactions
+                     SET status = 'failed'
+                     WHERE id = ? AND status = 'pending' AND type = 'deposit'"
+                );
+                $markFailed->execute([(int) $transaction['id']]);
+                $error_message = 'پرداخت توسط بانک تأیید نشد. لطفاً در صورت کسر وجه با پشتیبانی تماس بگیرید.';
+            } else {
+                $gatewayRefId = $gatewayResponse['data']['ref_id'] ?? null;
+                if (!is_string($gatewayRefId) && !is_int($gatewayRefId)) {
+                    throw new RuntimeException('zarinpal_verify_reference_missing');
+                }
+                $gatewayRefId = trim((string) $gatewayRefId);
+                if ($gatewayRefId === '' || strlen($gatewayRefId) > 255) {
+                    throw new RuntimeException('zarinpal_verify_reference_invalid');
+                }
+
+                // The gateway verification is external. Lock and re-check the
+                // local transaction before crediting; concurrent callbacks then
+                // serialize on this row and only one can change pending -> success.
+                $pdo->beginTransaction();
+
+                $lockTransaction = $pdo->prepare(
+                    'SELECT id, steamid, amount, type, status, ref_id
+                     FROM wallet_transactions
+                     WHERE id = ?
+                     LIMIT 1
+                     FOR UPDATE'
+                );
+                $lockTransaction->execute([(int) $transaction['id']]);
+                $lockedTransaction = $lockTransaction->fetch(PDO::FETCH_ASSOC);
+
+                if (!is_array($lockedTransaction)) {
+                    throw new RuntimeException('wallet_transaction_disappeared');
+                }
+
+                $lockedStatus = (string) ($lockedTransaction['status'] ?? '');
+                if ($lockedStatus === 'success') {
+                    // Another callback already credited this verified payment.
+                    $pdo->commit();
+                    $is_success = true;
+                    $amount = (int) $lockedTransaction['amount'];
+                    $ref_id = (string) ($lockedTransaction['ref_id'] ?? '');
+                } elseif (
+                    $lockedStatus !== 'pending'
+                    || (string) ($lockedTransaction['type'] ?? '') !== 'deposit'
+                    || (string) ($lockedTransaction['steamid'] ?? '') !== (string) $transaction['steamid']
+                    || (int) ($lockedTransaction['amount'] ?? 0) !== (int) $transaction['amount']
+                ) {
+                    throw new RuntimeException('wallet_transaction_state_changed');
+                } else {
+                    $steamId = (string) $lockedTransaction['steamid'];
+                    $creditAmount = (int) $lockedTransaction['amount'];
+
+                    // A stable user-row lock also serializes simultaneous first
+                    // deposits for the same user before a wallet row exists.
+                    $userLock = $pdo->prepare(
+                        'SELECT steamid64
+                         FROM users
+                         WHERE steamid64 = ?
+                         LIMIT 1
+                         FOR UPDATE'
+                    );
+                    $userLock->execute([$steamId]);
+                    if ($userLock->fetchColumn() === false) {
+                        throw new RuntimeException('wallet_owner_not_found');
                     }
 
-                    // به‌روزرسانی تراکنش به موفق
-                    $pdo->prepare("UPDATE wallet_transactions SET status = 'success', ref_id = ? WHERE authority = ?")
-                        ->execute([$ref_id, $authority]);
+                    $walletLock = $pdo->prepare(
+                        'SELECT steamid
+                         FROM user_wallets
+                         WHERE steamid = ?
+                         LIMIT 1
+                         FOR UPDATE'
+                    );
+                    $walletLock->execute([$steamId]);
+
+                    if ($walletLock->fetch(PDO::FETCH_ASSOC)) {
+                        $credit = $pdo->prepare(
+                            'UPDATE user_wallets
+                             SET balance = balance + ?
+                             WHERE steamid = ?'
+                        );
+                        $credit->execute([$creditAmount, $steamId]);
+                        if ($credit->rowCount() !== 1) {
+                            throw new RuntimeException('wallet_balance_update_failed');
+                        }
+                    } else {
+                        $createWallet = $pdo->prepare(
+                            'INSERT INTO user_wallets (steamid, balance)
+                             VALUES (?, ?)'
+                        );
+                        $createWallet->execute([$steamId, $creditAmount]);
+                    }
+
+                    $markSuccess = $pdo->prepare(
+                        "UPDATE wallet_transactions
+                         SET status = 'success', ref_id = ?
+                         WHERE id = ? AND status = 'pending' AND type = 'deposit'"
+                    );
+                    $markSuccess->execute([
+                        $gatewayRefId,
+                        (int) $lockedTransaction['id'],
+                    ]);
+                    if ($markSuccess->rowCount() !== 1) {
+                        throw new RuntimeException('wallet_transaction_success_transition_failed');
+                    }
 
                     $pdo->commit();
                     $is_success = true;
-
-                } catch (Exception $e) {
-                    $pdo->rollBack();
-                    $is_success = false;
-                    $error_message = 'خطا در ثبت اطلاعات مالی در دیتابیس.';
+                    $amount = $creditAmount;
+                    $ref_id = $gatewayRefId;
                 }
-            } else {
-                $pdo->prepare("UPDATE wallet_transactions SET status = 'failed' WHERE authority = ?")
-                    ->execute([$authority]);
-                $is_success = false;
-                $error_message = 'پرداخت توسط بانک تأیید نشد. لطفاً در صورت کسر وجه منتظر بازگشت آن باشید.';
             }
         }
+    } catch (Throwable $e) {
+        if ($pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+
+        error_log(
+            '[FragCity] ZarinPal wallet callback failed ('
+            . get_class($e) . ', code ' . (string) $e->getCode() . ').'
+        );
+        $is_success = false;
+        $error_message = 'تأیید یا ثبت تراکنش با خطا مواجه شد. اگر مبلغ از حساب شما کسر شده، با پشتیبانی تماس بگیرید.';
     }
 }
 ?>
@@ -150,7 +291,7 @@ if ($status !== 'OK' || empty($authority)) {
                 <div class="amount"><?= number_format($amount) ?> تومان</div>
                 <?php if ($ref_id): ?>
                 <div>شماره پیگیری</div>
-                <div class="ref-id"><?= htmlspecialchars($ref_id) ?></div>
+                <div class="ref-id"><?= htmlspecialchars($ref_id, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
                 <?php endif; ?>
             </div>
             <div class="progress-container">
