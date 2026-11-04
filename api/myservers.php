@@ -72,10 +72,6 @@ $action = is_array($payload) && is_string($payload['action'] ?? null)
 if (!in_array($action, [
     'set_panel_password',
     'set_panel_username',
-    'connect_client_api',
-    'disconnect_client_api',
-    'console_connect',
-    'files',
 ], true)) {
     $respond(['success' => false, 'error' => 'invalid_action'], 400);
 }
@@ -102,23 +98,9 @@ $passwordConfirm = is_string($payload['password_confirm'] ?? null)
 $panelUsername = is_string($payload['username'] ?? null)
     ? strtolower(trim($payload['username']))
     : '';
-$clientApiToken = is_string($payload['api_token'] ?? null)
-    ? trim($payload['api_token'])
-    : '';
-$fileAction = is_string($payload['file_action'] ?? null)
-    ? strtolower(trim($payload['file_action']))
-    : '';
 
-$requiresService = $action !== 'disconnect_client_api';
-$requiresCurrentPassword = in_array(
-    $action,
-    ['set_panel_password', 'set_panel_username', 'connect_client_api'],
-    true
-);
 
-if (($requiresService && $serviceId === false)
-    || ($requiresCurrentPassword && $currentPassword === '')
-) {
+if ($serviceId === false || $currentPassword === '') {
     $respond(['success' => false, 'error' => 'required_fields_missing'], 422);
 }
 
@@ -148,34 +130,7 @@ if ($action === 'set_panel_password') {
     if (!preg_match('/^[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]$/D', $panelUsername)) {
         $respond(['success' => false, 'error' => 'panel_username_invalid'], 422);
     }
-} elseif ($action === 'connect_client_api') {
-    if (
-        strlen($clientApiToken) < 20
-        || strlen($clientApiToken) > 255
-        || preg_match('/[\r\n\x00-\x20\x7F]/', $clientApiToken)
-    ) {
-        $respond(['success' => false, 'error' => 'client_api_key_invalid'], 422);
-    }
-} elseif ($action === 'files') {
-    $allowedFileActions = [
-        'list',
-        'read',
-        'write',
-        'create_folder',
-        'rename',
-        'delete',
-        'download',
-        'upload_url',
-    ];
 
-    if (!in_array($fileAction, $allowedFileActions, true)) {
-        $respond(['success' => false, 'error' => 'client_api_invalid_file_action'], 422);
-    }
-
-    if (isset($payload['content']) && (!is_string($payload['content']) || strlen($payload['content']) > 262144)) {
-        $respond(['success' => false, 'error' => 'client_api_invalid_file_content'], 422);
-    }
-}
 
 try {
     $indexSettings = fragcity_settings('files.index', []);
@@ -202,11 +157,9 @@ try {
     }
 
     if ($requiresCurrentPassword) {
-        $attemptBucket = match ($action) {
-            'set_panel_username' => 'panel_username_change_attempts',
-            'connect_client_api' => 'panel_client_api_connect_attempts',
-            default => 'panel_password_change_attempts',
-        };
+        $attemptBucket = $action === 'set_panel_username'
+            ? 'panel_username_change_attempts'
+            : 'panel_password_change_attempts';
         $attemptState = $_SESSION[$attemptBucket][$steamId] ?? [];
         $attemptCount = is_array($attemptState) ? (int) ($attemptState['count'] ?? 0) : 0;
         $attemptTime = is_array($attemptState) ? (int) ($attemptState['time'] ?? 0) : 0;
@@ -218,11 +171,9 @@ try {
         if ($attemptCount >= 5 && $attemptTime > 0 && (time() - $attemptTime) <= 900) {
             $respond([
                 'success' => false,
-                'error' => match ($action) {
-                    'set_panel_username' => 'panel_username_rate_limited',
-                    'connect_client_api' => 'client_api_connect_rate_limited',
-                    default => 'panel_password_rate_limited',
-                },
+                'error' => $action === 'set_panel_username'
+                    ? 'panel_username_rate_limited'
+                    : 'panel_password_rate_limited',
             ], 429);
         }
 
@@ -247,30 +198,6 @@ try {
     require_once dirname(__DIR__) . '/class/PaymenterApiClient.php';
 
     $client = new PaymenterApiClient();
-
-    if ($action === 'disconnect_client_api') {
-        $result = $client->disconnectCustomerClientApi($steamId);
-        $respond(['success' => true, 'data' => $result]);
-    }
-
-    if ($action === 'connect_client_api') {
-        $result = $client->connectCustomerClientApi(
-            $steamId,
-            (int) $serviceId,
-            $clientApiToken
-        );
-        $respond(['success' => true, 'data' => $result]);
-    }
-
-    if ($action === 'console_connect') {
-        $result = $client->getCustomerConsoleCredentials($steamId, (int) $serviceId);
-        $respond(['success' => true, 'data' => $result]);
-    }
-
-    if ($action === 'files') {
-        $result = $client->customerFileAction($steamId, (int) $serviceId, $payload);
-        $respond(['success' => true, 'data' => $result]);
-    }
 
     if ($action === 'set_panel_password') {
         $result = $client->setCustomerPanelPassword(
@@ -312,7 +239,6 @@ try {
         'request_replayed',
         'validation_failed',
         'service_not_found',
-        'service_not_active',
         'panel_password_update_failed',
         'customer_servers_unavailable',
         'panel_password_rate_limited',
@@ -320,34 +246,12 @@ try {
         'panel_username_already_in_use',
         'panel_username_update_failed',
         'panel_username_rate_limited',
-        'client_api_key_invalid',
-        'client_api_key_must_belong_to_server_owner',
-        'client_api_server_verification_failed',
-        'client_api_invalid_response',
-        'client_api_connection_failed',
-        'client_api_connect_rate_limited',
-        'client_api_not_connected',
-        'client_api_storage_not_ready',
-        'client_api_permission_denied',
-        'client_api_file_too_large_to_edit',
-        'client_api_file_not_editable',
-        'client_api_invalid_file_content',
-        'client_api_invalid_file_name',
-        'client_api_invalid_file_list',
-        'client_api_invalid_file_path',
-        'client_api_invalid_file_action',
-        'customer_console_unavailable',
-        'customer_file_action_failed',
     ];
 
     if (!in_array($safeError, $allowedErrors, true)) {
-        $safeError = match ($action) {
-            'set_panel_username' => 'panel_username_update_failed',
-            'connect_client_api' => 'client_api_connection_failed',
-            'console_connect' => 'customer_console_unavailable',
-            'files' => 'customer_file_action_failed',
-            default => 'panel_password_update_failed',
-        };
+        $safeError = $action === 'set_panel_username'
+            ? 'panel_username_update_failed'
+            : 'panel_password_update_failed';
     }
 
     error_log(
@@ -359,13 +263,9 @@ try {
 
     $status = match ($safeError) {
         'service_not_found' => 404,
-        'service_not_active', 'panel_username_already_in_use', 'client_api_not_connected' => 409,
-        'panel_username_invalid', 'client_api_key_invalid' => 422,
-        'panel_username_rate_limited', 'panel_password_rate_limited', 'client_api_connect_rate_limited' => 429,
-        'client_api_key_must_belong_to_server_owner', 'client_api_permission_denied' => 403,
-        'client_api_file_too_large_to_edit' => 413,
-        'client_api_invalid_file_content', 'client_api_invalid_file_name', 'client_api_invalid_file_path',
-        'client_api_invalid_file_list', 'client_api_invalid_file_action', 'client_api_file_not_editable' => 422,
+        'panel_username_already_in_use' => 409,
+        'panel_username_invalid' => 422,
+        'panel_username_rate_limited', 'panel_password_rate_limited' => 429,
         default => 502,
     };
     $respond(['success' => false, 'error' => $safeError], $status);
