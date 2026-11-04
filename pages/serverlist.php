@@ -7,7 +7,7 @@
  * This page does not scan ports, access the Pterodactyl token, or send UDP.
  */
 if (!defined('FRAGCITY_INDEX_RENDER')) {
-    header('Location: /index.php?page=servers_vps', true, 303);
+    header('Location: //servers/', true, 303);
     exit;
 }
 
@@ -257,11 +257,11 @@ $faceitIconVersion = function_exists('asset_version')
                         <i class="fa-solid fa-heart-pulse" aria-hidden="true"></i>
                         وضعیت سرویس‌ها
                     </a>
-                    <a class="sl-secondary-action" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen">
+                    <a class="sl-secondary-action" href="//buy-server/" data-ajax-nav data-slug="buyserveropen">
                         سرور اختصاصی خودت را بساز
                         <i class="fa-solid fa-arrow-up-left" aria-hidden="true"></i>
                     </a>
-                    <a class="sl-guide-action" href="/index.php?page=serverguide" data-ajax-nav data-slug="serverguide">
+                    <a class="sl-guide-action" href="//serverguide/" data-ajax-nav data-slug="serverguide">
                         <i class="fa-solid fa-book-open" aria-hidden="true"></i>
                         راهنمای سرور
                     </a>
