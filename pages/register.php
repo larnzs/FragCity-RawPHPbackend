@@ -349,10 +349,10 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
             <?php if ($isAccountCompletion): ?>
                 <a href="index.php">بازگشت به سایت</a>
             <?php elseif ($isSteamRegister): ?>
-                <a href="?page=login" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" aria-expanded="false">ورود به حساب دیگر</a>
+                <a href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" aria-expanded="false">ورود به حساب دیگر</a>
             <?php else: ?>
                 قبلاً ثبت‌نام کرده‌اید؟
-                <a href="?page=login" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" aria-expanded="false">ورود</a>
+                <a href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" aria-expanded="false">ورود</a>
             <?php endif; ?>
         </p>
 
