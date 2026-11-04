@@ -45,7 +45,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                 </p>
 
                 <div class="home-hero-actions" data-fc-reveal="up" data-fc-reveal-delay="210">
-                    <a class="home-button home-button-primary" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen">
+                    <a class="home-button home-button-primary" href="//buy-server/" data-ajax-nav data-slug="buyserveropen">
                         <span>ساخت سرور CS2</span>
                         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                     </a>
@@ -53,7 +53,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                         <span>کشف اکوسیستم</span>
                         <i class="fa-solid fa-arrow-down" aria-hidden="true"></i>
                     </a>
-                    <a class="home-button home-button-guide" href="/index.php?page=serverguide" data-ajax-nav data-slug="serverguide">
+                    <a class="home-button home-button-guide" href="//serverguide/" data-ajax-nav data-slug="serverguide">
                         <i class="fa-solid fa-book-open" aria-hidden="true"></i>
                         <span>راهنمای سرور</span>
                     </a>
@@ -140,7 +140,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                     ما می‌خواهیم ابزارهای موردنیاز یک کامیونیتی، به‌جای پراکنده بودن،
                     در یک تجربه‌ی واحد کنار هم قرار بگیرند.
                 </p>
-                <a class="home-text-link" href="/index.php?page=about" data-ajax-nav data-slug="about">
+                <a class="home-text-link" href="//about/" data-ajax-nav data-slug="about">
                     بیشتر درباره FragCity
                     <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                 </a>
@@ -200,7 +200,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
             </div>
 
             <div class="home-ecosystem-grid">
-                <a class="home-ecosystem-card home-ecosystem-card-featured fc-glass-surface" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen" data-fc-reveal="up">
+                <a class="home-ecosystem-card home-ecosystem-card-featured fc-glass-surface" href="//buy-server/" data-ajax-nav data-slug="buyserveropen" data-fc-reveal="up">
                     <div class="home-ecosystem-art home-ecosystem-art-server" aria-hidden="true">
                         <span class="home-ecosystem-art-orbit"></span>
                         <i class="fa-solid fa-server"></i>
@@ -216,7 +216,7 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                     <i class="fa-solid fa-arrow-up-left home-ecosystem-arrow" aria-hidden="true"></i>
                 </a>
 
-                <a class="home-ecosystem-card fc-glass-surface" href="/index.php?page=servers_vps" data-ajax-nav data-slug="servers_vps" data-fc-reveal="up" data-fc-reveal-delay="90">
+                <a class="home-ecosystem-card fc-glass-surface" href="//servers/" data-ajax-nav data-slug="servers_vps" data-fc-reveal="up" data-fc-reveal-delay="90">
                     <div class="home-ecosystem-art home-ecosystem-art-browser" aria-hidden="true">
                         <span class="home-browser-line"></span><span class="home-browser-line"></span><span class="home-browser-line"></span>
                         <i class="fa-solid fa-tower-broadcast"></i>
@@ -355,11 +355,11 @@ if (!defined('FRAGCITY_INDEX_RENDER')) {
                 <p>از اولین سرور شروع کن و فضایی بساز که بازیکن‌ها دوست داشته باشند به آن برگردند.</p>
             </div>
             <div class="home-final-cta-actions">
-                <a class="home-button home-button-primary" href="/index.php?page=buyserveropen" data-ajax-nav data-slug="buyserveropen">
+                <a class="home-button home-button-primary" href="//buy-server/" data-ajax-nav data-slug="buyserveropen">
                     <span>شروع با FragCity</span>
                     <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                 </a>
-                <a class="home-final-link" href="/index.php?page=servers_vps" data-ajax-nav data-slug="servers_vps">یا سرورهای عمومی را ببین</a>
+                <a class="home-final-link" href="//servers/" data-ajax-nav data-slug="servers_vps">یا سرورهای عمومی را ببین</a>
             </div>
         </section>
     </div>
