@@ -12,6 +12,7 @@ final class PaymenterApiClient
 {
     private string $baseUrl;
     private string $sharedSecret;
+    private const EXPECTED_BRIDGE_VERSION = '1.11.1';
     private array $lastLifecycleAlerts = [];
 
     public function __construct(?string $baseUrl = null, ?string $sharedSecret = null)
@@ -57,11 +58,17 @@ final class PaymenterApiClient
     public function testConnection(): array
     {
         $response = $this->post('/api/v1/fragcity/bridge/ping', []);
+        $service = (string) ($response['service'] ?? '');
+        $version = (string) ($response['version'] ?? '');
+
+        if ($service !== 'FragCityAPI' || $version !== self::EXPECTED_BRIDGE_VERSION) {
+            throw new RuntimeException('paymenter_bridge_version_mismatch');
+        }
 
         return [
             'http_status' => 200,
-            'service' => (string) ($response['service'] ?? ''),
-            'version' => (string) ($response['version'] ?? ''),
+            'service' => $service,
+            'version' => $version,
         ];
     }
 
@@ -599,6 +606,9 @@ final class PaymenterApiClient
 
             $safeErrors = [
                 'bridge_not_configured',
+                'bridge_ip_allowlist_invalid',
+                'https_required',
+                'request_too_large',
                 'source_ip_not_allowed',
                 'invalid_signature_headers',
                 'invalid_signature',
@@ -614,6 +624,8 @@ final class PaymenterApiClient
                 'paymenter_user_already_linked_to_another_steam_account',
                 'email_already_in_use',
                 'account_sync_failed',
+                'customer_identity_storage_not_ready',
+                'paymenter_user_identity_conflict',
                 'invalid_steamid',
                 'customer_servers_unavailable',
                 'service_not_found',
@@ -647,6 +659,10 @@ final class PaymenterApiClient
                 'admin_lifecycle_action_not_allowed',
                 'admin_lifecycle_unavailable',
                 'admin_lifecycle_reconcile_failed',
+                'admin_pterodactyl_client_not_found',
+                'admin_lifecycle_identity_conflict',
+                'admin_lifecycle_identity_verification_failed',
+                'paymenter_bridge_version_mismatch',
             ];
 
             if (!in_array($error, $safeErrors, true)) {
