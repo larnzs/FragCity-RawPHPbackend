@@ -100,6 +100,62 @@ final class PaymenterApiClient
     }
 
     /**
+     * Retrieve CS2 services owned by the authenticated FragCity Steam account.
+     *
+     * @return list<array<string,mixed>>
+     */
+    public function getCustomerServers(string $steamId64): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
+            throw new RuntimeException('invalid_steamid');
+        }
+
+        $response = $this->post(
+            '/api/v1/fragcity/bridge/servers/list',
+            ['steamid64' => $steamId64]
+        );
+        $servers = $response['data']['servers'] ?? null;
+
+        if (!is_array($servers)) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return array_values(array_filter($servers, 'is_array'));
+    }
+
+    /**
+     * Set a customer-selected Pterodactyl password for one owned service.
+     * The password is transported only over the signed HTTPS bridge and is
+     * never persisted or returned by this client.
+     *
+     * @return array{password_updated:bool}
+     */
+    public function setCustomerPanelPassword(
+        string $steamId64,
+        int $serviceId,
+        string $password
+    ): array {
+        if (!preg_match('/^[0-9]{17}$/D', $steamId64) || $serviceId < 1) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        $response = $this->post(
+            '/api/v1/fragcity/bridge/servers/password',
+            [
+                'steamid64' => $steamId64,
+                'service_id' => $serviceId,
+                'password' => $password,
+            ]
+        );
+
+        if (($response['data']['password_updated'] ?? false) !== true) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return ['password_updated' => true];
+    }
+
+    /**
      * @param array<string,mixed> $payload
      * @return array<string,mixed>
      */
@@ -177,6 +233,11 @@ final class PaymenterApiClient
                 'paymenter_user_already_linked_to_another_steam_account',
                 'email_already_in_use',
                 'account_sync_failed',
+                'invalid_steamid',
+                'customer_servers_unavailable',
+                'service_not_found',
+                'panel_password_update_failed',
+                'linked_paymenter_user_missing',
             ];
 
             if (!in_array($error, $safeErrors, true)) {
