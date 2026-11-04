@@ -16,6 +16,10 @@
         paymenter_account_not_linked: 'اتصال حساب سرور کامل نیست؛ ابتدا همگام‌سازی حساب را تکمیل کنید.',
         service_not_found: 'این سرویس برای حساب شما پیدا نشد.',
         panel_password_update_failed: 'تغییر رمز پنل انجام نشد. تنظیمات اتصال پنل را بررسی کنید.',
+        panel_username_invalid: 'نام کاربری باید ۳ تا ۵۰ کاراکتر و شامل حروف کوچک انگلیسی، عدد، خط تیره یا زیرخط باشد.',
+        panel_username_already_in_use: 'این نام کاربری قبلاً در Pterodactyl استفاده شده است.',
+        panel_username_rate_limited: 'تعداد تلاش‌های تغییر نام کاربری زیاد بوده است. ۱۵ دقیقه بعد دوباره تلاش کنید.',
+        panel_username_update_failed: 'ذخیره نام کاربری پنل انجام نشد. تنظیمات اتصال پنل را بررسی کنید.',
         paymenter_unreachable: 'ارتباط با سرویس مدیریت سرورها برقرار نشد.',
         paymenter_invalid_response: 'پاسخ سرویس مدیریت سرورها معتبر نیست.'
     };
@@ -27,6 +31,107 @@
         target.textContent = message;
         target.classList.remove('is-error', 'is-success');
         if (type) target.classList.add(type === 'success' ? 'is-success' : 'is-error');
+    }
+
+    function showUsernameMessage(form, message, type) {
+        const target = form.querySelector('[data-username-message]');
+        if (!target) return;
+
+        target.textContent = message;
+        target.classList.remove('is-error', 'is-success');
+        if (type) target.classList.add(type === 'success' ? 'is-success' : 'is-error');
+    }
+
+    async function submitUsernameForm(form) {
+        const root = document.getElementById('fcMyServers');
+        if (!root) return;
+
+        const serviceId = Number(form.querySelector('[name="service_id"]')?.value || 0);
+        const usernameInput = form.querySelector('[name="username"]');
+        const currentPasswordInput = form.querySelector('[name="current_password"]');
+        const username = (usernameInput?.value || '').trim().toLowerCase();
+        const currentPassword = currentPasswordInput?.value || '';
+        const submit = form.querySelector('button[type="submit"]');
+
+        if (!serviceId || !username || !currentPassword) {
+            showUsernameMessage(form, 'تمام فیلدها را تکمیل کنید.', 'error');
+            return;
+        }
+
+        if (!/^[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]$/.test(username)) {
+            showUsernameMessage(form, errorMessages.panel_username_invalid, 'error');
+            return;
+        }
+
+        const originalLabel = submit?.querySelector('span')?.textContent || 'ذخیره نام کاربری';
+        if (submit) {
+            submit.disabled = true;
+            const label = submit.querySelector('span');
+            if (label) label.textContent = 'در حال ذخیره...';
+        }
+        showUsernameMessage(form, 'در حال بررسی و به‌روزرسانی نام کاربری پنل...', '');
+
+        try {
+            const response = await fetch('/api/myservers.php', {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-FragCity-CSRF': root.dataset.csrf || ''
+                },
+                body: JSON.stringify({
+                    action: 'set_panel_username',
+                    service_id: serviceId,
+                    current_password: currentPassword,
+                    username: username
+                })
+            });
+
+            let result = {};
+            try {
+                result = await response.json();
+            } catch (error) {
+                throw new Error('paymenter_invalid_response');
+            }
+
+            if (!response.ok || result.success !== true || result.data?.username_updated !== true) {
+                const errorCode = typeof result.error === 'string'
+                    ? result.error
+                    : 'panel_username_update_failed';
+                throw new Error(errorCode);
+            }
+
+            const savedUsername = typeof result.data.username === 'string'
+                ? result.data.username
+                : username;
+
+            if (usernameInput) usernameInput.value = savedUsername;
+            if (currentPasswordInput) currentPasswordInput.value = '';
+
+            const usernameDisplay = document.querySelector('[data-panel-username-value]');
+            if (usernameDisplay) usernameDisplay.textContent = savedUsername;
+
+            const copyButton = document.querySelector('[data-panel-username-copy]');
+            if (copyButton) copyButton.setAttribute('data-copy-value', savedUsername);
+
+            showUsernameMessage(form, 'نام کاربری پنل با موفقیت ذخیره شد.', 'success');
+        } catch (error) {
+            const code = error instanceof Error ? error.message : 'panel_username_update_failed';
+            showUsernameMessage(
+                form,
+                errorMessages[code] || errorMessages.panel_username_update_failed,
+                'error'
+            );
+        } finally {
+            if (submit) {
+                submit.disabled = false;
+                const label = submit.querySelector('span');
+                if (label && label.textContent === 'در حال ذخیره...') {
+                    label.textContent = originalLabel;
+                }
+            }
+        }
     }
 
     async function submitPasswordForm(form) {
@@ -129,9 +234,18 @@
 
     document.addEventListener('submit', function (event) {
         const form = event.target;
-        if (!(form instanceof HTMLFormElement) || !form.matches('[data-panel-password-form]')) return;
-        event.preventDefault();
-        submitPasswordForm(form);
+        if (!(form instanceof HTMLFormElement)) return;
+
+        if (form.matches('[data-panel-password-form]')) {
+            event.preventDefault();
+            submitPasswordForm(form);
+            return;
+        }
+
+        if (form.matches('[data-panel-username-form]')) {
+            event.preventDefault();
+            submitUsernameForm(form);
+        }
     });
 
     document.addEventListener('click', async function (event) {
