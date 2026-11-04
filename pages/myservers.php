@@ -930,7 +930,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                 <div><span>STATE</span><strong data-console-state>—</strong></div>
                             </div>
                             <pre class="fc-console-card__output" data-console-output role="log" aria-live="polite">برای دریافت خروجی، روی «اتصال» کلیک کنید.</pre>
-                            <form class="fc-console-card__command" data-console-command-form dir="ltr">
+                            <form method="post" action="" class="fc-console-card__command" data-console-command-form dir="ltr">
                                 <span aria-hidden="true">›</span>
                                 <input type="text" name="command" maxlength="2000" autocomplete="off" spellcheck="false" placeholder="Enter server command..." aria-label="Server command" required>
                                 <button type="submit" disabled data-console-send><i class="fa-solid fa-paper-plane"></i> Send</button>
@@ -1052,7 +1052,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                 <li>از بخش <strong>Account → API Credentials</strong> یک Client API Key ایجاد کنید؛ برای مثال با توضیح <code>FragCity My Servers</code>.</li>
                                 <li>کلید را فقط در فرم زیر وارد کنید. بعد از تأیید، مقدار آن پاک می‌شود.</li>
                             </ol>
-                            <form class="fc-client-api-connect-form" data-client-api-connect-form dir="ltr">
+                            <form method="post" action="" autocomplete="off" class="fc-client-api-connect-form" data-client-api-connect-form dir="ltr">
                                 <input type="hidden" name="service_id" value="<?= $selectedId ?>">
                                 <label>
                                     <span>Client API Key</span>
