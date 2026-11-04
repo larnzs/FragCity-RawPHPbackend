@@ -174,13 +174,23 @@ $myServersTabUrl = static function (int $serviceId, string $tab): string {
 
 $myServersRuntimeLabel = static function (string $status): string {
     return match ($status) {
-        'installing' => 'در حال نصب',
-        'install_failed' => 'خطای نصب',
-        'reinstall_failed' => 'خطای نصب مجدد',
-        'restoring_backup' => 'در حال بازیابی',
-        'suspended' => 'معلق',
-        'running' => 'در حال اجرا',
-        default => 'وضعیت از پنل دریافت می‌شود',
+        'installing' => 'Installing',
+        'install_failed' => 'Installation Failed',
+        'reinstall_failed' => 'Reinstallation Failed',
+        'restoring_backup' => 'Restoring Backup',
+        'suspended' => 'Suspended',
+        'running' => 'Running',
+        default => 'Status synced from panel',
+    };
+};
+
+$myServersDetailsStatus = static function (string $statusClass): string {
+    return match ($statusClass) {
+        'active' => 'Active',
+        'provisioning' => 'Provisioning',
+        'suspended' => 'Suspended',
+        'pending' => 'Pending',
+        default => 'Action Required',
     };
 };
 ?>
@@ -201,7 +211,7 @@ $myServersRuntimeLabel = static function (string $status): string {
             <h1>مدیریت سرورهای من</h1>
             <p>از این بخش می‌توانید سرویس‌ها و دسترسی پنل سرورهای خود را مدیریت کنید.</p>
         </div>
-        <a href="?page=buyserveropen" class="fc-myservers__new-server">
+        <a href="?page=buyserveropen" class="fc-myservers__new-server" data-ajax-nav data-slug="buyserveropen">
             <i class="fa-solid fa-plus" aria-hidden="true"></i>
             خرید سرور جدید
         </a>
@@ -224,7 +234,7 @@ $myServersRuntimeLabel = static function (string $status): string {
             <span class="fc-myservers__empty-kicker">YOUR SERVERS</span>
             <h2>هنوز سروری ندارید</h2>
             <p>بعد از خرید و آماده‌سازی اولین سرویس CS2، داشبورد مدیریت آن در همین صفحه نمایش داده می‌شود.</p>
-            <a href="?page=buyserveropen" class="fc-myservers__new-server fc-myservers__new-server--primary">
+            <a href="?page=buyserveropen" class="fc-myservers__new-server fc-myservers__new-server--primary" data-ajax-nav data-slug="buyserveropen">
                 <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
                 مشاهده پلن‌های سرور
             </a>
@@ -259,7 +269,7 @@ $myServersRuntimeLabel = static function (string $status): string {
                     ?>
                     <a
                         href="<?= $myServersEscape($myServersTabUrl($itemId, 'overview')) ?>"
-                        class="fc-myservers__server-chip <?= $itemId === $selectedId ? 'is-selected' : '' ?>"
+                        class="fc-myservers__server-chip <?= $itemId === $selectedId ? 'is-selected' : '' ?>" data-ajax-nav data-slug="myservers"
                         <?= $itemId === $selectedId ? 'aria-current="page"' : '' ?>
                     >
                         <span class="fc-myservers__server-chip-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
@@ -305,21 +315,21 @@ $myServersRuntimeLabel = static function (string $status): string {
                     <span class="fc-myservers__sidebar-caption">مدیریت سرور</span>
 
                     <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'overview')) ?>"
-                       class="fc-myservers__nav-item <?= $activeTab === 'overview' ? 'is-active' : '' ?>"
+                       class="fc-myservers__nav-item <?= $activeTab === 'overview' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
                        <?= $activeTab === 'overview' ? 'aria-current="page"' : '' ?>>
                         <i class="fa-solid fa-house"></i>
                         <span>نمای کلی</span>
                     </a>
 
                     <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'details')) ?>"
-                       class="fc-myservers__nav-item <?= $activeTab === 'details' ? 'is-active' : '' ?>"
+                       class="fc-myservers__nav-item <?= $activeTab === 'details' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
                        <?= $activeTab === 'details' ? 'aria-current="page"' : '' ?>>
                         <i class="fa-solid fa-circle-info"></i>
                         <span>اطلاعات سرور</span>
                     </a>
 
                     <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>"
-                       class="fc-myservers__nav-item <?= $activeTab === 'access' ? 'is-active' : '' ?>"
+                       class="fc-myservers__nav-item <?= $activeTab === 'access' ? 'is-active' : '' ?>" data-ajax-nav data-slug="myservers"
                        <?= $activeTab === 'access' ? 'aria-current="page"' : '' ?>>
                         <i class="fa-solid fa-key"></i>
                         <span>دسترسی پنل</span>
@@ -372,7 +382,7 @@ $myServersRuntimeLabel = static function (string $status): string {
                             <h3>نمای کلی سرور</h3>
                             <p>وضعیت سرویس و منابع اختصاص‌یافته به سرور شما</p>
                         </div>
-                        <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'details')) ?>" class="fc-myservers__text-link">مشاهده جزئیات <i class="fa-solid fa-arrow-left"></i></a>
+                        <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'details')) ?>" class="fc-myservers__text-link" data-ajax-nav data-slug="myservers">مشاهده جزئیات <i class="fa-solid fa-arrow-left"></i></a>
                     </div>
 
                     <div class="fc-myservers__overview-grid">
@@ -391,7 +401,7 @@ $myServersRuntimeLabel = static function (string $status): string {
                                 <div><span>Node</span><strong><?= number_format((int) ($selectedServerData['node'] ?? 0)) ?></strong></div>
                             </div>
                             <div class="fc-dashboard-card__footer">
-                                <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>"><i class="fa-solid fa-key"></i> مدیریت دسترسی پنل</a>
+                                <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>" data-ajax-nav data-slug="myservers"><i class="fa-solid fa-key"></i> مدیریت دسترسی پنل</a>
                                 <?php if ($selectedServer['panel_url'] !== ''): ?>
                                     <a href="<?= $myServersEscape($selectedServer['panel_url']) ?>" target="_blank" rel="noopener noreferrer" aria-label="باز کردن پنل"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                 <?php endif; ?>
@@ -458,8 +468,8 @@ $myServersRuntimeLabel = static function (string $status): string {
                     <div class="fc-myservers__lower-grid">
                         <section class="fc-dashboard-card fc-dashboard-card--quick">
                             <div class="fc-dashboard-card__heading"><div><span class="fc-myservers__section-kicker">QUICK ACCESS</span><h3>دسترسی سریع</h3></div></div>
-                            <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>" class="fc-quick-link"><span><i class="fa-solid fa-key"></i></span><div><strong>اطلاعات ورود پنل</strong><small>مشاهده نام کاربری و تنظیم رمز</small></div><i class="fa-solid fa-chevron-left"></i></a>
-                            <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'details')) ?>" class="fc-quick-link"><span><i class="fa-solid fa-circle-info"></i></span><div><strong>مشخصات کامل سرور</strong><small>UUID، شناسه و تاریخ‌های سرویس</small></div><i class="fa-solid fa-chevron-left"></i></a>
+                            <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'access')) ?>" class="fc-quick-link" data-ajax-nav data-slug="myservers"><span><i class="fa-solid fa-key"></i></span><div><strong>اطلاعات ورود پنل</strong><small>مشاهده نام کاربری و تنظیم رمز</small></div><i class="fa-solid fa-chevron-left"></i></a>
+                            <a href="<?= $myServersEscape($myServersTabUrl($selectedId, 'details')) ?>" class="fc-quick-link" data-ajax-nav data-slug="myservers"><span><i class="fa-solid fa-circle-info"></i></span><div><strong>مشخصات کامل سرور</strong><small>UUID، شناسه و تاریخ‌های سرویس</small></div><i class="fa-solid fa-chevron-left"></i></a>
                             <?php if ($selectedServer['panel_url'] !== ''): ?>
                                 <a href="<?= $myServersEscape($selectedServer['panel_url']) ?>" target="_blank" rel="noopener noreferrer" class="fc-quick-link"><span><i class="fa-solid fa-arrow-up-right-from-square"></i></span><div><strong>ورود به Pterodactyl</strong><small>بازکردن صفحه همین سرور</small></div><i class="fa-solid fa-chevron-left"></i></a>
                             <?php endif; ?>
@@ -477,20 +487,20 @@ $myServersRuntimeLabel = static function (string $status): string {
                         <div><span class="fc-myservers__section-kicker">SERVER INFORMATION</span><h3>اطلاعات سرور</h3><p>شناسه‌ها و مشخصات فنی ثبت‌شده در Pterodactyl</p></div>
                     </div>
                     <section class="fc-dashboard-card fc-details-card">
-                        <div class="fc-dashboard-card__heading"><div><span class="fc-myservers__section-kicker">IDENTITY</span><h3>شناسه و وضعیت</h3></div><i class="fa-solid fa-fingerprint"></i></div>
-                        <div class="fc-details-grid">
-                            <div><span>نام سرور</span><strong><?= $myServersEscape($selectedServerName) ?></strong></div>
-                            <div><span>شناسه سرویس Paymenter</span><strong class="fc-mono">#<?= number_format($selectedId) ?></strong></div>
-                            <div><span>شناسه Pterodactyl</span><strong class="fc-mono">#<?= number_format((int) ($selectedServerData['id'] ?? 0)) ?></strong></div>
+                        <div class="fc-dashboard-card__heading" dir="ltr"><div><span class="fc-myservers__section-kicker">IDENTITY</span><h3>Server Identity</h3></div><i class="fa-solid fa-fingerprint"></i></div>
+                        <div class="fc-details-grid" dir="ltr">
+                            <div><span>Server Name</span><strong><?= $myServersEscape($selectedServerName) ?></strong></div>
+                            <div><span>Paymenter Service ID</span><strong class="fc-mono">#<?= number_format($selectedId) ?></strong></div>
+                            <div><span>Pterodactyl Server ID</span><strong class="fc-mono">#<?= number_format((int) ($selectedServerData['id'] ?? 0)) ?></strong></div>
                             <div><span>UUID</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['uuid']) ?></strong></div>
                             <div><span>Identifier</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['identifier']) ?></strong></div>
                             <div><span>Node ID</span><strong class="fc-mono"><?= number_format((int) ($selectedServerData['node'] ?? 0)) ?></strong></div>
                             <div><span>Allocation ID</span><strong class="fc-mono"><?= number_format((int) ($selectedServerData['allocation'] ?? 0)) ?></strong></div>
-                            <div><span>وضعیت</span><strong><?= $myServersEscape($selectedStatusLabel) ?></strong></div>
-                            <div><span>تاریخ ایجاد سرور</span><strong><?= $myServersEscape($myServersDate($selectedServerData['created_at'] ?? '')) ?></strong></div>
-                            <div><span>تاریخ ایجاد سرویس</span><strong><?= $myServersEscape($myServersDate($selectedServerData['service_created_at'] ?? '')) ?></strong></div>
-                            <div><span>تاریخ انقضا</span><strong><?= $myServersEscape($myServersDate($selectedServerData['expires_at'] ?? '')) ?></strong></div>
-                            <div><span>وضعیت نصب</span><strong><?= $myServersEscape($myServersRuntimeLabel($selectedServer['runtime_status'])) ?></strong></div>
+                            <div><span>Status</span><strong><?= $myServersEscape($myServersDetailsStatus($selectedStatusClass)) ?></strong></div>
+                            <div><span>Server Created</span><strong><?= $myServersEscape($myServersDate($selectedServerData['created_at'] ?? '')) ?></strong></div>
+                            <div><span>Service Created</span><strong><?= $myServersEscape($myServersDate($selectedServerData['service_created_at'] ?? '')) ?></strong></div>
+                            <div><span>Expiration Date</span><strong><?= $myServersEscape($myServersDate($selectedServerData['expires_at'] ?? '')) ?></strong></div>
+                            <div><span>Installation Status</span><strong><?= $myServersEscape($myServersRuntimeLabel($selectedServer['runtime_status'])) ?></strong></div>
                         </div>
                     </section>
 
@@ -499,28 +509,28 @@ $myServersRuntimeLabel = static function (string $status): string {
                         <div><span class="fc-myservers__section-kicker">PTERODACTYL ACCOUNT</span><h3>دسترسی پنل</h3><p>اطلاعات ورود به حساب مدیریت سرورهای شما</p></div>
                     </div>
                     <section class="fc-dashboard-card fc-access-card">
-                        <div class="fc-access-card__header">
-                            <div class="fc-access-card__brand"><span><i class="fa-solid fa-server"></i></span><div><strong>Pterodactyl Panel</strong><small>حساب مستقل مدیریت سرور</small></div></div>
+                        <div class="fc-access-card__header" dir="ltr">
+                            <div class="fc-access-card__brand"><span><i class="fa-solid fa-server"></i></span><div><strong>Pterodactyl Panel</strong><small>Independent server management account</small></div></div>
                             <span class="fc-access-card__password-state <?= $selectedPasswordSet ? 'is-set' : 'is-pending' ?>" data-password-status>
                                 <i class="fa-solid <?= $selectedPasswordSet ? 'fa-circle-check' : 'fa-key' ?>" aria-hidden="true"></i>
-                                <?= $selectedPasswordSet ? 'رمز تنظیم شده' : 'نیازمند تنظیم رمز' ?>
+                                <?= $selectedPasswordSet ? 'Password Set' : 'Password Required' ?>
                             </span>
                         </div>
 
-                        <div class="fc-access-card__credentials">
+                        <div class="fc-access-card__credentials" dir="ltr">
                             <div class="fc-access-field">
-                                <span>آدرس پنل</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['panel']['base_url'] ?? '') ?></strong>
+                                <span>Panel URL</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['panel']['base_url'] ?? '') ?></strong>
                             </div>
                             <div class="fc-access-field">
-                                <span>نام کاربری</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['username']) ?></strong>
-                                <button type="button" data-copy-value="<?= $myServersEscape($selectedServer['username']) ?>" aria-label="کپی نام کاربری"><i class="fa-regular fa-copy"></i></button>
+                                <span>Username</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['username']) ?></strong>
+                                <button type="button" data-copy-value="<?= $myServersEscape($selectedServer['username']) ?>" aria-label="Copy username"><i class="fa-regular fa-copy"></i></button>
                             </div>
                             <div class="fc-access-field">
-                                <span>ایمیل ورود</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['email']) ?></strong>
-                                <button type="button" data-copy-value="<?= $myServersEscape($selectedServer['email']) ?>" aria-label="کپی ایمیل"><i class="fa-regular fa-copy"></i></button>
+                                <span>Login Email</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['email']) ?></strong>
+                                <button type="button" data-copy-value="<?= $myServersEscape($selectedServer['email']) ?>" aria-label="Copy email"><i class="fa-regular fa-copy"></i></button>
                             </div>
                             <div class="fc-access-field fc-access-field--wide">
-                                <span>آدرس مستقیم همین سرور</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['panel_url'] !== '' ? $selectedServer['panel_url'] : 'در دسترس نیست') ?></strong>
+                                <span>Direct Server URL</span><strong class="fc-mono"><?= $myServersEscape($selectedServer['panel_url'] !== '' ? $selectedServer['panel_url'] : 'Unavailable') ?></strong>
                                 <?php if ($selectedServer['panel_url'] !== ''): ?>
                                     <a href="<?= $myServersEscape($selectedServer['panel_url']) ?>" target="_blank" rel="noopener noreferrer" aria-label="باز کردن پنل"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
                                 <?php endif; ?>
