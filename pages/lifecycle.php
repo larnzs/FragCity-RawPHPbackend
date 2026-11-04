@@ -290,7 +290,17 @@ $kpis = [
                         <p class="fc-lifecycle__action-hint">این عملیات وضعیت واقعی سرور را با وضعیت سرویس Paymenter هماهنگ می‌کند؛ ممکن است سرور را Suspend یا Unsuspend کند. ساخت یا حذف سرور انجام نمی‌دهد.</p>
                     <?php endif; ?>
 
-                    <?php if ($authorizationStatus === 'pending'): ?>
+                    <?php if ($authorizationStatus === 'in_progress'): ?>
+                        <div class="fc-lifecycle__notice fc-lifecycle__notice--warning">
+                            <i class="fa-solid fa-spinner fa-spin"></i>
+                            <div>
+                                <strong>عملیات ساخت مجدد در حال اجرا است</strong>
+                                <p>مجوز توسط CreateJob همین سرویس Claim شده است. لغو مجوز تا پایان عملیات یا انقضای مهلت Claim غیرفعال است.</p>
+                                <p>مهلت Claim: <?= $escape($formatDate($mapping['recreation_authorization_claim_expires_at'] ?? '')) ?></p>
+                                <p>ثبت‌کننده: <?= $escape($mapping['recreation_authorized_username'] ?: $mapping['recreation_authorized_by']) ?> · <?= $escape($formatDate($mapping['recreation_authorized_at'] ?? '')) ?></p>
+                            </div>
+                        </div>
+                    <?php elseif ($authorizationStatus === 'pending'): ?>
                         <div class="fc-lifecycle__notice fc-lifecycle__notice--warning">
                             <i class="fa-solid fa-shield-halved"></i>
                             <div>
@@ -306,6 +316,17 @@ $kpis = [
                             <button type="submit" class="fc-lifecycle__button fc-lifecycle__button--quiet"><i class="fa-solid fa-ban"></i><span>لغو مجوز</span></button>
                         </form>
                     <?php elseif ($selectedState === 'missing_external'): ?>
+                        <?php if ($authorizationStatus === 'revoked'): ?>
+                            <div class="fc-lifecycle__notice">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <div><strong>مجوز قبلی لغو شده است</strong><p>دلیل لغو: <?= $escape($mapping['recreation_authorization_revoke_reason'] ?? '') ?></p></div>
+                            </div>
+                        <?php elseif ($authorizationStatus === 'consumed'): ?>
+                            <div class="fc-lifecycle__notice">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <div><strong>مجوز قبلی مصرف شده است؛ سرور دوباره مفقود شده</strong><p>برای بازیابی مجدد باید مجوز تازه‌ای ثبت شود.</p></div>
+                            </div>
+                        <?php endif; ?>
                         <form class="fc-lifecycle__authorize" data-lifecycle-authorize data-service-id="<?= (int) $mapping['service_id'] ?>">
                             <strong>مجوز ساخت مجدد سرور</strong>
                             <p>این کار فقط یک مجوز یک‌بارمصرف ثبت می‌کند. اجرای CreateJob باید جداگانه و پس از بررسی Backup/Data Loss توسط ادمین انجام شود.</p>

@@ -98,6 +98,7 @@
 .fc-lifecycle__last-error p { margin: 7px 0 0; color: #E8C2BE; font: 11px/1.8 ui-monospace,monospace; white-space: pre-wrap; overflow-wrap: anywhere; direction: ltr; text-align: left; }
 .fc-lifecycle__actions { display: grid; gap: 12px; padding: 13px 0; border-top: 1px solid var(--lc-border); }
 .fc-lifecycle__actions > .fc-lifecycle__button { justify-self: start; }
+.fc-lifecycle__action-hint { margin: -5px 0 0; color: var(--lc-muted); font-size: 10px; line-height: 1.8; }
 .fc-lifecycle__authorize { display: grid; gap: 9px; padding: 13px; border: 1px solid rgba(255,179,71,.2); border-radius: 11px; background: rgba(125,75,20,.08); }
 .fc-lifecycle__authorize > strong { color: #FFD08A; font-size: 12px; }
 .fc-lifecycle__authorize p { margin: 0; color: var(--lc-muted); font-size: 10px; line-height: 1.8; }
