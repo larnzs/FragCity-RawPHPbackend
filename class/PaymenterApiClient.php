@@ -12,6 +12,7 @@ final class PaymenterApiClient
 {
     private string $baseUrl;
     private string $sharedSecret;
+    private array $lastLifecycleAlerts = [];
 
     public function __construct(?string $baseUrl = null, ?string $sharedSecret = null)
     {
@@ -115,12 +116,25 @@ final class PaymenterApiClient
             ['steamid64' => $steamId64]
         );
         $servers = $response['data']['servers'] ?? null;
+        $alerts = $response['data']['lifecycle_alerts'] ?? [];
+        $this->lastLifecycleAlerts = is_array($alerts) ? $alerts : [];
 
         if (!is_array($servers)) {
             throw new RuntimeException('paymenter_invalid_response');
         }
 
         return array_values(array_filter($servers, 'is_array'));
+    }
+
+    /**
+     * Lifecycle warnings detected by the Paymenter bridge while reading the
+     * customer server list. These are informational and never trigger deletes.
+     *
+     * @return array<string,int>
+     */
+    public function getLifecycleAlerts(): array
+    {
+        return array_map('intval', $this->lastLifecycleAlerts);
     }
 
     /**

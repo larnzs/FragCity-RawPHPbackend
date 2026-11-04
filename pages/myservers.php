@@ -25,6 +25,7 @@ require_once dirname(__DIR__) . '/class/PaymenterApiClient.php';
 
 $myServers = [];
 $myServersError = false;
+$myServersLifecycleAlerts = [];
 $myServersSteamId = (string) ($_SESSION['steamid'] ?? '');
 $myServersCsrf = (string) ($_SESSION['auth_csrf_token'] ?? '');
 
@@ -121,8 +122,17 @@ $myServersStatus = static function (array $row): array {
     $server = is_array($row['server'] ?? null) ? $row['server'] : [];
     $suspended = !empty($server['suspended']) || $serviceStatus === 'suspended';
 
-    if ($state === 'provisioning') {
-        return ['در حال آماده‌سازی', 'provisioning'];
+    if ($state === 'provisioning' || $state === 'suspending' || $state === 'unsuspending' || $state === 'deleting') {
+        return [$state === 'deleting' ? 'در حال حذف' : 'در حال پردازش', 'provisioning'];
+    }
+    if ($state === 'missing_external') {
+        return ['سرور در پنل پیدا نشد', 'unavailable'];
+    }
+    if ($state === 'paymenter_missing') {
+        return ['نیازمند بررسی مالکیت سرویس', 'unavailable'];
+    }
+    if ($state === 'deleted') {
+        return ['حذف شده', 'unavailable'];
     }
     if ($state !== 'ready') {
         return ['نیازمند بررسی', 'unavailable'];
@@ -143,6 +153,7 @@ if (preg_match('/^[0-9]{17}$/D', $myServersSteamId)) {
     try {
         $myServersClient = new PaymenterApiClient();
         $myServers = $myServersClient->getCustomerServers($myServersSteamId);
+        $myServersLifecycleAlerts = $myServersClient->getLifecycleAlerts();
 
         foreach ($myServers as $row) {
             if (!is_array($row)) {
@@ -278,6 +289,16 @@ $myServersDetailsStatus = static function (string $statusClass): string {
             خرید سرور جدید
         </a>
     </header>
+
+    <?php if ((int) ($myServersLifecycleAlerts['paymenter_missing'] ?? 0) > 0): ?>
+        <div class="fc-myservers__state-card fc-myservers__state-card--error" role="status">
+            <span class="fc-myservers__state-icon"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i></span>
+            <div>
+                <strong>یک نگاشت سرویس نیازمند بررسی است</strong>
+                <p>یک یا چند رکورد سرویس در Paymenter حذف شده، اما سابقه اتصال آن باقی مانده است. این مورد برای جلوگیری از حذف ناخواسته سرورهای پنل به بررسی پشتیبانی نیاز دارد.</p>
+            </div>
+        </div>
+        <?php endif; ?>
 
     <?php if ($myServersError): ?>
         <div class="fc-myservers__state-card fc-myservers__state-card--error" role="alert">
@@ -528,8 +549,18 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     <div class="fc-myservers__workspace-state fc-myservers__workspace-state--<?= $myServersEscape($selectedStatusClass) ?>">
                         <div class="fc-myservers__workspace-state-icon"><i class="fa-solid fa-clock" aria-hidden="true"></i></div>
                         <div>
-                            <h3><?= $selectedServer['state'] === 'provisioning' ? 'سرور در حال آماده‌سازی است' : 'اطلاعات سرور فعلاً در دسترس نیست' ?></h3>
-                            <p><?= $selectedServer['state'] === 'provisioning' ? 'بعد از تکمیل ساخت سرور در Pterodactyl، اطلاعات و دسترسی‌ها در این داشبورد فعال می‌شوند.' : 'سرویس ثبت شده است، اما اطلاعات پنل قابل تأیید نیست. در صورت تداوم مشکل با پشتیبانی تماس بگیرید.' ?></p>
+                            <h3><?= match ($selectedServer['state']) {
+                                'provisioning' => 'سرور در حال آماده‌سازی است',
+                                'missing_external' => 'سرور در Pterodactyl پیدا نشد',
+                                'deleting' => 'درخواست حذف سرور در حال پردازش است',
+                                default => 'اطلاعات سرور فعلاً در دسترس نیست',
+                            } ?></h3>
+                            <p><?= match ($selectedServer['state']) {
+                                'provisioning' => 'بعد از تکمیل ساخت سرور در Pterodactyl، اطلاعات و دسترسی‌ها در این داشبورد فعال می‌شوند.',
+                                'missing_external' => 'رکورد سرویس در Paymenter وجود دارد، اما Pterodactyl برای آن سرور پاسخ 404 داده است. سرور به‌صورت خودکار دوباره ساخته نمی‌شود؛ برای بررسی یا بازیابی با پشتیبانی تماس بگیرید.',
+                                'deleting' => 'عملیات حذف ثبت شده است. پس از تأیید حذف از Pterodactyl، سابقه سرویس به‌روزرسانی می‌شود.',
+                                default => 'سرویس ثبت شده است، اما اطلاعات پنل قابل تأیید نیست. در صورت تداوم مشکل با پشتیبانی تماس بگیرید.',
+                            } ?></p>
                         </div>
                     </div>
                 <?php elseif ($activeTab === 'overview'): ?>
