@@ -5456,3 +5456,37 @@ html.fc-no-animation .sl-hero-guy {
         font-size: .69rem;
     }
 }
+
+
+/* Consistent hit-area and type scale across both server-card views. */
+.sl-connect-btn,
+.sl-connect-disabled {
+    min-height: 36px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: .73rem;
+}
+
+.sl-players-btn {
+    min-height: 36px;
+    padding: 7px 11px;
+    border-radius: 8px;
+    font-size: .72rem;
+}
+
+.sl-copy-btn {
+    width: 31px;
+    height: 30px;
+    flex-basis: 31px;
+}
+
+.sl-favorite-toggle {
+    width: 32px;
+    height: 32px;
+    font-size: .8rem;
+}
+
+.sl-status-badge {
+    padding: 5px 8px;
+    font-size: .68rem;
+}
