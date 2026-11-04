@@ -5,9 +5,8 @@ declare(strict_types=1);
  * Admin-only AJAX endpoint for live Pterodactyl node and CS2 server monitoring.
  * Secrets and Pterodactyl credentials remain server-side.
  */
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+require_once dirname(__DIR__) . '/settings/session.php';
+fragcity_start_session();
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
