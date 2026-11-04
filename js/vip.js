@@ -25,10 +25,10 @@
                 const selected = item === plan;
                 item.classList.toggle('is-selected', selected);
 
-                const button = item.querySelector('[data-vip-select]');
-                if (button) {
-                    button.setAttribute('aria-pressed', selected ? 'true' : 'false');
-                    button.innerHTML = selected
+                item.setAttribute('aria-pressed', selected ? 'true' : 'false');
+                const indicator = item.querySelector('[data-vip-select]');
+                if (indicator) {
+                    indicator.innerHTML = selected
                         ? 'قابلیت‌های این سطح <i class="fas fa-check" aria-hidden="true"></i>'
                         : 'مشاهده قابلیت‌ها <i class="fas fa-arrow-left" aria-hidden="true"></i>';
                 }
@@ -79,9 +79,7 @@
         }
 
         plans.forEach(function (plan) {
-            const button = plan.querySelector('[data-vip-select]');
-
-            // The whole card selects the tier; the button remains a clear visual affordance.
+            // The whole card is one accessible control (Enter / Space / pointer).
             plan.addEventListener('click', function () {
                 selectPlan(plan);
             });
@@ -92,13 +90,6 @@
                     selectPlan(plan);
                 }
             });
-
-            if (button) {
-                button.addEventListener('click', function (event) {
-                    event.stopPropagation();
-                    selectPlan(plan);
-                });
-            }
         });
 
         const initialPlan = plans.find(function (plan) {
