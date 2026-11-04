@@ -136,6 +136,13 @@ $check(str_contains($client, "private const EXPECTED_BRIDGE_VERSION = '1.11.1'")
     && str_contains($client, "paymenter_bridge_version_mismatch")
     && str_contains($client, "'/api/v1/fragcity/bridge/servers/username'"),
     'Website bridge client enforces the API version and exposes the panel-username endpoint');
+$check(str_contains($proxy, "'bridge_ip_allowlist_invalid'")
+    && str_contains($proxy, "'https_required'")
+    && str_contains($proxy, "'request_too_large'")
+    && str_contains($js, 'bridge_ip_allowlist_invalid')
+    && str_contains($js, 'https_required')
+    && str_contains($js, 'source_ip_not_allowed'),
+    'Admin lifecycle proxy and UI preserve secure bridge configuration errors');
 $check(str_contains($client, "'customer_identity_storage_not_ready'")
     && str_contains($client, "'paymenter_user_identity_conflict'")
     && str_contains($client, "'admin_pterodactyl_client_not_found'")
