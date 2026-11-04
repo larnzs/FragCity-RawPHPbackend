@@ -988,64 +988,64 @@ $pageFile = match ($page) {
  ========================================================== */
 $fcSeoPages = [
     'home' => [
-        'title' => 'FragCity | CS2 Servers, Hosting & Gaming Community',
-        'description' => 'FragCity brings Counter-Strike 2 game servers, community tools, player services, and server resources together in one place.',
+        'title' => 'فرگ‌سیتی | سرور بازی CS2 و کامیونیتی گیمینگ',
+        'description' => 'فرگ‌سیتی سرورهای بازی CS2، ابزارهای کامیونیتی، خدمات بازیکنان و منابع مدیریت سرور را در یک پلتفرم گرد هم می‌آورد.',
     ],
     'servers' => [
-        'title' => 'Public CS2 Servers | FragCity',
-        'description' => 'Browse FragCity public Counter-Strike 2 servers, compare game modes, and find a server that fits your play style.',
+        'title' => 'لیست سرورهای عمومی CS2 | FragCity',
+        'description' => 'سرورهای عمومی کانتر استرایک ۲ فرگ‌سیتی را ببین، مودهای بازی را مقایسه کن و سرور مناسب سبک بازی‌ات را پیدا کن.',
     ],
     'servers_vps' => [
-        'title' => 'Public CS2 Servers | FragCity',
-        'description' => 'Browse FragCity public Counter-Strike 2 servers, compare game modes, and find a server that fits your play style.',
+        'title' => 'لیست سرورهای عمومی CS2 | FragCity',
+        'description' => 'سرورهای عمومی کانتر استرایک ۲ فرگ‌سیتی را ببین، مودهای بازی را مقایسه کن و سرور مناسب سبک بازی‌ات را پیدا کن.',
     ],
     'serverguide' => [
-        'title' => 'CS2 Server Guide: Commands, Modes & Settings | FragCity',
-        'description' => 'Explore the FragCity CS2 server guide: searchable commands, game modes, plugin settings, permissions, and availability notes.',
+        'title' => 'راهنمای سرور CS2 | دستورات، مودها و تنظیمات | FragCity',
+        'description' => 'در راهنمای سرور CS2 فرگ‌سیتی، دستورات، مودهای بازی، تنظیمات پلاگین‌ها، سطح دسترسی و وضعیت فعال بودن قابلیت‌ها را جست‌وجو کن.',
     ],
     'buyserveropen' => [
-        'title' => 'CS2 Game Server Hosting | FragCity',
-        'description' => 'Explore FragCity Counter-Strike 2 server hosting and configure a dedicated game server for your community.',
+        'title' => 'میزبانی سرور CS2 | FragCity',
+        'description' => 'امکانات میزبانی سرور CS2 فرگ‌سیتی را بررسی کن و سرور اختصاصی کامیونیتی خودت را پیکربندی کن.',
     ],
     'status' => [
-        'title' => 'FragCity Service Status',
-        'description' => 'View the current reported status and service information for FragCity.',
+        'title' => 'وضعیت سرویس‌های FragCity',
+        'description' => 'وضعیت گزارش‌شده و اطلاعات سرویس‌های فرگ‌سیتی را مشاهده کن.',
     ],
     'about' => [
-        'title' => 'About FragCity | CS2 Gaming Community',
-        'description' => 'Learn about FragCity, its Counter-Strike 2 services, community features, and gaming tools.',
+        'title' => 'درباره FragCity | کامیونیتی کانتر استرایک ۲',
+        'description' => 'با فرگ‌سیتی، خدمات کانتر استرایک ۲، قابلیت‌های کامیونیتی و ابزارهای گیمینگ آن آشنا شو.',
     ],
     'support' => [
-        'title' => 'FragCity Support & Contact',
-        'description' => 'Contact FragCity support for help with accounts, game servers, and community services.',
+        'title' => 'پشتیبانی و تماس با FragCity',
+        'description' => 'برای دریافت راهنمایی درباره حساب کاربری، سرورهای بازی و خدمات کامیونیتی با پشتیبانی فرگ‌سیتی تماس بگیر.',
     ],
     'vip' => [
-        'title' => 'FragCity VIP Memberships',
-        'description' => 'Compare FragCity VIP membership tiers and review the features currently configured for each level.',
+        'title' => 'سطح‌های VIP فرگ‌سیتی',
+        'description' => 'سطح‌های عضویت VIP فرگ‌سیتی را مقایسه کن و قابلیت‌های پیکربندی‌شده برای هر سطح را ببین.',
     ],
     'leaderboard' => [
-        'title' => 'FragCity Player Leaderboard',
-        'description' => 'Explore the FragCity player leaderboard and community rankings.',
+        'title' => 'لیدربورد بازیکنان FragCity',
+        'description' => 'جدول رتبه‌بندی بازیکنان و جایگاه اعضای کامیونیتی فرگ‌سیتی را مشاهده کن.',
     ],
     'leaderboard_vps' => [
-        'title' => 'FragCity Player Leaderboard',
-        'description' => 'Explore the FragCity player leaderboard and community rankings.',
+        'title' => 'لیدربورد بازیکنان FragCity',
+        'description' => 'جدول رتبه‌بندی بازیکنان و جایگاه اعضای کامیونیتی فرگ‌سیتی را مشاهده کن.',
     ],
     'banlist' => [
-        'title' => 'FragCity Ban List',
-        'description' => 'Search the public FragCity ban list and review player moderation records.',
+        'title' => 'لیست محرومیت‌های FragCity',
+        'description' => 'در فهرست عمومی محرومیت‌های فرگ‌سیتی جست‌وجو و سوابق مدیریت بازیکنان را بررسی کن.',
     ],
     'rules' => [
-        'title' => 'FragCity Server Rules',
-        'description' => 'Read the rules for playing on FragCity Counter-Strike 2 servers and participating in the community.',
+        'title' => 'قوانین سرورهای FragCity',
+        'description' => 'قوانین بازی در سرورهای کانتر استرایک ۲ فرگ‌سیتی و حضور در کامیونیتی را مطالعه کن.',
     ],
     'privacy' => [
-        'title' => 'FragCity Privacy Policy',
-        'description' => 'Read how FragCity handles account information and privacy across its website and services.',
+        'title' => 'سیاست حفظ حریم خصوصی FragCity',
+        'description' => 'با نحوه نگهداری اطلاعات حساب و رعایت حریم خصوصی در وب‌سایت و سرویس‌های فرگ‌سیتی آشنا شو.',
     ],
     'usermanual' => [
-        'title' => 'FragCity Server User Manual',
-        'description' => 'Read the FragCity server user manual and learn how to use available server and community features.',
+        'title' => 'راهنمای کاربری سرور FragCity',
+        'description' => 'راهنمای کاربری فرگ‌سیتی را بخوان و با قابلیت‌های موجود سرور و کامیونیتی آشنا شو.',
     ],
 ];
 
@@ -1055,7 +1055,7 @@ $fcRequestHost = preg_replace('/:\\d+$/', '', $fcRequestHost);
 $fcIsProductionHost = $fcRequestHost === 'fragcity.ir';
 $fcCanIndexPage = is_array($fcSeoMetadata) && $fcIsProductionHost && !$openLoginModal;
 $fcSeoTitle = (string) ($fcSeoMetadata['title'] ?? 'FragCity | Gaming Community');
-$fcSeoDescription = (string) ($fcSeoMetadata['description'] ?? 'FragCity gaming community and Counter-Strike 2 services.');
+$fcSeoDescription = (string) ($fcSeoMetadata['description'] ?? 'کامیونیتی گیمینگ فرگ‌سیتی و خدمات سرور کانتر استرایک ۲.');
 $fcCanonicalUrl = $fcCanIndexPage
     ? 'https://fragcity.ir' . fragcity_page_url($page)
     : '';
