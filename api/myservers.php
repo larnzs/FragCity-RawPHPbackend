@@ -193,6 +193,7 @@ try {
         'service_not_found',
         'panel_password_update_failed',
         'customer_servers_unavailable',
+        'panel_password_rate_limited',
     ];
 
     if (!in_array($safeError, $allowedErrors, true)) {
