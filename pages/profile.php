@@ -197,6 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (isset($_FILES['banner']) || array_
                 "UPDATE users
                  SET username = ?, email = ?, phone = ?,
                      paymenter_sync_status = 'pending',
+                     paymenter_synced_at = NULL,
                      paymenter_sync_error = NULL
                  WHERE steamid64 = ?
                  LIMIT 1"
