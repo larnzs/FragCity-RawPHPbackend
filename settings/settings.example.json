@@ -171,12 +171,12 @@
       }
     },
     "pages.forgot_password": {
-      "_comment": "Compatibility database profile for password-reset requests. Keep aligned with the users table actually used by the site.",
-      "database_profile": "legacy_services"
+      "_comment": "Password recovery remains disabled until verified-email delivery is implemented. When enabled, use the same main database profile as FragCity authentication.",
+      "database_profile": "main"
     },
     "pages.reset_password": {
-      "_comment": "Compatibility database profile for password-reset completion.",
-      "database_profile": "legacy_services"
+      "_comment": "Password reset remains fail-closed until verified-email ownership and atomic password/token updates are implemented. Use the main FragCity authentication database.",
+      "database_profile": "main"
     },
     "tst.index": {
       "_comment": "Database profile used by the optional TST page.",
