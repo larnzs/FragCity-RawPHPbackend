@@ -70,11 +70,17 @@ if (
 }
 
 $amountInput = $_POST['amount'] ?? null;
+$maximumSafeTomanAmount = intdiv(PHP_INT_MAX, 10);
 $validatedAmount = is_string($amountInput)
-    ? filter_var($amountInput, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1000]])
+    ? filter_var($amountInput, FILTER_VALIDATE_INT, [
+        'options' => [
+            'min_range' => 1000,
+            'max_range' => $maximumSafeTomanAmount,
+        ],
+    ])
     : false;
 if ($validatedAmount === false) {
-    terminateRequest('حداقل مبلغ شارژ ۱,۰۰۰ تومان است و مبلغ باید عدد صحیح باشد.', 422);
+    terminateRequest('مبلغ شارژ باید عدد صحیح، حداقل ۱,۰۰۰ تومان و در محدوده معتبر باشد.', 422);
 }
 $amount = (int) $validatedAmount;
 $steamId = $_SESSION['steamid'];
