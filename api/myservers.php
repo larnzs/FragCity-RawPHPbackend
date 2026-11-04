@@ -328,6 +328,7 @@ try {
         'client_api_not_connected',
         'client_api_permission_denied',
         'client_api_file_too_large_to_edit',
+        'client_api_file_not_editable',
         'client_api_invalid_file_content',
         'client_api_invalid_file_name',
         'client_api_invalid_file_list',
@@ -362,7 +363,7 @@ try {
         'client_api_key_must_belong_to_server_owner', 'client_api_permission_denied' => 403,
         'client_api_file_too_large_to_edit' => 413,
         'client_api_invalid_file_content', 'client_api_invalid_file_name', 'client_api_invalid_file_path',
-        'client_api_invalid_file_list', 'client_api_invalid_file_action' => 422,
+        'client_api_invalid_file_list', 'client_api_invalid_file_action', 'client_api_file_not_editable' => 422,
         default => 502,
     };
     $respond(['success' => false, 'error' => $safeError], $status);
