@@ -237,6 +237,7 @@ final class PaymenterApiClient
                 'customer_servers_unavailable',
                 'service_not_found',
                 'panel_password_update_failed',
+                'panel_password_rate_limited',
             ];
 
             if (!in_array($error, $safeErrors, true)) {
