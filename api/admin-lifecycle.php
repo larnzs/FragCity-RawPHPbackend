@@ -61,7 +61,7 @@ if (!is_array($payload)) {
 }
 
 $action = is_string($payload['action'] ?? null) ? $payload['action'] : '';
-if (!in_array($action, ['list', 'detail', 'reconcile', 'authorize_recreation'], true)) {
+if (!in_array($action, ['list', 'detail', 'reconcile', 'authorize_recreation', 'revoke_recreation'], true)) {
     $respond(['success' => false, 'error' => 'invalid_action'], 422);
 }
 
@@ -109,6 +109,18 @@ try {
                 $respond(['success' => false, 'error' => 'validation_failed'], 422);
             }
             $result = $client->adminLifecycleAuthorizeRecreation(
+                $actorSteamId,
+                $actorUsername,
+                (int) $serviceId,
+                $payload['reason']
+            );
+            break;
+
+        case 'revoke_recreation':
+            if ($serviceId === false || !is_string($payload['reason'] ?? null)) {
+                $respond(['success' => false, 'error' => 'validation_failed'], 422);
+            }
+            $result = $client->adminLifecycleRevokeRecreation(
                 $actorSteamId,
                 $actorUsername,
                 (int) $serviceId,

@@ -229,6 +229,31 @@ final class PaymenterApiClient
         ]);
     }
 
+    /** @return array<string,mixed> */
+    public function adminLifecycleRevokeRecreation(
+        string $actorSteamId,
+        string $actorUsername,
+        int $serviceId,
+        string $reason
+    ): array {
+        $reason = trim($reason);
+        if (
+            !preg_match('/^[0-9]{17}$/D', $actorSteamId)
+            || $serviceId < 1
+            || mb_strlen($reason) < 8
+            || mb_strlen($reason) > 500
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        return $this->adminLifecyclePost('/api/v1/fragcity/bridge/admin/lifecycle/revoke-recreation', [
+            'actor_steamid64' => $actorSteamId,
+            'actor_username' => mb_substr(trim($actorUsername), 0, 64),
+            'service_id' => $serviceId,
+            'reason' => $reason,
+        ]);
+    }
+
     /** @param array<string,mixed> $payload
      *  @return array<string,mixed>
      */
