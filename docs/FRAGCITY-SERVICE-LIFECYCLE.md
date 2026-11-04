@@ -27,7 +27,7 @@ The page interprets the bridge's lifecycle state and service status separately:
 - suspended service or suspended Pterodactyl Server: Console/File and other management links are disabled until reactivation.
 - `provisioning`: show preparation state.
 - `missing_external`: show that Pterodactyl no longer has the Server; do not automatically create another one.
-- `paymenter_missing`: show a support/admin-review warning for an orphaned mapping.
+- `paymenter_missing`: show an orphaned-mapping warning. An administrator may record a reasoned `preserve_external` review acknowledgement; this is audit-only and does not delete or mutate Pterodactyl resources.
 - other unavailable/review states: hide management controls and show a safe unavailable state.
 
 A Pterodactyl 404 is not silently converted into provisioning. A timeout, 401/403 or 5xx is an operational failure and remains unavailable/retryable.
@@ -58,6 +58,6 @@ Paymenter runs a bounded reconciliation worker and exposes the same operation to
 
 Reconciliation can align an already verified Server's suspended state with Paymenter's active/suspended status. It does not create missing Clients or Servers, repair Client profile fields, or delete remote resources. Suspend/unsuspend/delete lifecycle mutations verify the stored Client ID and UUID through read-only Application API checks. Legacy numeric Client external IDs are not rewritten automatically; they require an explicit administrator-approved identity mapping. A missing Client, UUID mismatch or ownership mismatch becomes `review_required`. Only an authoritative Pterodactyl 404 is treated as missing; timeouts, authentication failures and 5xx responses remain retryable errors.
 
-The registry tracks `last_reconciled_at`. Failed scheduled or administrator-triggered checks are retried and generate audit events. Direct SQL deletion of a Paymenter service is treated as `paymenter_missing` for review only. It is never treated as implicit permission to delete a Pterodactyl Server.
+The registry tracks `last_reconciled_at`. Failed scheduled or administrator-triggered checks are retried and generate audit events. Direct SQL deletion of a Paymenter service is treated as `paymenter_missing` for review only. The admin dashboard can record a one-shot `preserve_external` acknowledgement with actor, timestamp and reason. This does not delete or mutate a Pterodactyl Server and is never treated as implicit permission to clean up the external resource.
 
 A missing external Server can be granted a one-shot recreation authorization by an administrator. The grant has an independent UUID, actor, reason and timestamp; it remains pending across failed CreateJob retries and is consumed only after a replacement Server is confirmed. A still-pending grant can be revoked with a reason. Before the same service's CreateJob begins, it atomically claims the authorization with a two-hour lease. Revocation is rejected while that lease is active; failed attempts release the claim, and a crashed worker permits retry after lease expiration. The website dashboard does not run CreateJob automatically.

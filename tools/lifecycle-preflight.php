@@ -124,7 +124,10 @@ $check(str_contains($proxy, "'role'] ?? '') !== 'admin'")
     'Website admin session and CSRF boundary');
 $check(str_contains($proxy, "'revoke_recreation'")
     && str_contains($client, 'adminLifecycleRevokeRecreation')
-    && str_contains($client, '/admin/lifecycle/revoke-recreation'),
+    && str_contains($client, '/admin/lifecycle/revoke-recreation')
+    && str_contains($proxy, 'acknowledge_paymenter_missing')
+    && str_contains($client, 'adminLifecycleAcknowledgePaymenterMissing')
+    && str_contains($client, '/admin/lifecycle/acknowledge-paymenter-missing'),
     'Recovery revocation is wired from website proxy to Paymenter client');
 $check(str_contains($page, "\$authorizationStatus === 'in_progress'")
     && str_contains($page, 'data-lifecycle-revoke')
@@ -132,6 +135,8 @@ $check(str_contains($page, "\$authorizationStatus === 'in_progress'")
     'Dashboard exposes claim state, revocation and last reconciliation');
 $check(str_contains($js, "'revoke_recreation'")
     && str_contains($js, 'data-lifecycle-revoke')
+    && str_contains($js, 'acknowledge_paymenter_missing')
+    && str_contains($js, 'data-lifecycle-orphan-review')
     && str_contains($js, 'window.confirm'),
     'Dashboard JavaScript confirms reconciliation and handles revocation');
 
@@ -145,6 +150,7 @@ if ($paymenterRoot === '') {
         'extensions/Others/FragCityAPI/database/migrations/2026_11_04_000002_create_fragcity_identity_and_service_lifecycle_tables.php',
         'extensions/Others/FragCityAPI/database/migrations/2026_11_04_000003_add_lifecycle_reconciliation_and_recreation_authorization_columns.php',
         'extensions/Others/FragCityAPI/database/migrations/2026_11_04_000004_add_recreation_authorization_claim_columns.php',
+        'extensions/Others/FragCityAPI/database/migrations/2026_11_04_000005_add_paymenter_missing_review_fields.php',
     ];
 
     $paymenterSources = [];
@@ -160,11 +166,12 @@ if ($paymenterRoot === '') {
     $identityMigration = $paymenterSources['extensions/Others/FragCityAPI/database/migrations/2026_11_04_000002_create_fragcity_identity_and_service_lifecycle_tables.php'] ?? '';
     $authMigration = $paymenterSources['extensions/Others/FragCityAPI/database/migrations/2026_11_04_000003_add_lifecycle_reconciliation_and_recreation_authorization_columns.php'] ?? '';
     $claimMigration = $paymenterSources['extensions/Others/FragCityAPI/database/migrations/2026_11_04_000004_add_recreation_authorization_claim_columns.php'] ?? '';
+    $orphanReviewMigration = $paymenterSources['extensions/Others/FragCityAPI/database/migrations/2026_11_04_000005_add_paymenter_missing_review_fields.php'] ?? '';
 
     $uniqueNamedFunctions($bridge, 'FragCityAPI.php');
     $uniqueNamedFunctions($cs2, 'FragCityCS2.php');
 
-    $check(str_contains($bridge, "version: '1.9.0'")
+    $check(str_contains($bridge, "version: '1.10.0'")
         && str_contains($bridge, 'function upgraded(')
         && str_contains($bridge, 'ExtensionHelper::runMigrations'),
         'Paymenter bridge version and extension migration hooks');
@@ -175,8 +182,9 @@ if ($paymenterRoot === '') {
         && str_contains($routes, 'adminLifecycleDetail')
         && str_contains($routes, 'adminLifecycleReconcile')
         && str_contains($routes, 'adminLifecycleAuthorizeRecreation')
-        && str_contains($routes, 'adminLifecycleRevokeRecreation'),
-        'All five administrator lifecycle routes are registered');
+        && str_contains($routes, 'adminLifecycleRevokeRecreation')
+        && str_contains($routes, 'adminLifecycleAcknowledgePaymenterMissing'),
+        'All six administrator lifecycle routes are registered');
     $check(str_contains($cs2, 'function reconcileCustomerLifecycle')
         && str_contains($cs2, 'function claimRecreationAuthorization')
         && str_contains($cs2, 'function releaseRecreationAuthorizationClaim')
@@ -263,6 +271,12 @@ if ($paymenterRoot === '') {
         && str_contains($claimMigration, 'recreation_authorization_claimed_at')
         && str_contains($claimMigration, 'recreation_authorization_claim_expires_at'),
         'Lifecycle schema and recovery claim migrations contain required columns');
+    $check(str_contains($bridge, 'adminLifecycleAcknowledgePaymenterMissing')
+        && str_contains($bridge, 'admin_paymenter_missing_reviewed')
+        && str_contains($bridge, "'decision' => 'preserve_external'")
+        && str_contains($orphanReviewMigration, 'paymenter_missing_reviewed_at')
+        && str_contains($orphanReviewMigration, 'paymenter_missing_review_decision'),
+        'Paymenter-missing review is one-shot, audited and never authorizes remote deletion');
 }
 
 echo "\nChecks: {$checks}; failures: " . count($failures) . "\n";
