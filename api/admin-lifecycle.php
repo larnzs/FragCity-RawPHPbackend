@@ -181,6 +181,14 @@ try {
         'admin_pterodactyl_client_not_found',
         'admin_lifecycle_identity_conflict',
         'admin_lifecycle_identity_verification_failed',
+        'bridge_not_configured',
+        'bridge_ip_allowlist_invalid',
+        'https_required',
+        'request_too_large',
+        'source_ip_not_allowed',
+        'invalid_signature_headers',
+        'invalid_signature',
+        'request_replayed',
     ];
     if (!in_array($safeError, $allowedErrors, true)) $safeError = 'admin_lifecycle_unavailable';
 
@@ -195,7 +203,9 @@ try {
         'admin_pterodactyl_client_not_found' => 404,
         'admin_lifecycle_identity_verification_failed' => 502,
         'validation_failed' => 422,
-        'paymenter_unreachable', 'bridge_not_configured', 'source_ip_not_allowed' => 503,
+        'paymenter_unreachable', 'bridge_not_configured', 'bridge_ip_allowlist_invalid' => 503,
+        'source_ip_not_allowed', 'https_required', 'request_too_large',
+        'invalid_signature_headers', 'invalid_signature', 'request_replayed' => 502,
         default => 502,
     };
     $respond(['success' => false, 'error' => $safeError], $status);
