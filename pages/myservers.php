@@ -333,8 +333,10 @@ $myServersDetailsStatus = static function (string $statusClass): string {
         $selectedServerData = $selectedServer['server'];
         $selectedLimits = $selectedServer['limits'];
         $selectedFeatures = $selectedServer['features'];
-        $selectedCanManage = $selectedServer['state'] === 'ready';
         $selectedServiceActive = ($selectedServer['service_status'] ?? '') === 'active';
+        $selectedCanManage = $selectedServer['state'] === 'ready'
+            && $selectedServiceActive
+            && empty($selectedServerData['suspended']);
         $selectedClientApiConnected = !empty($selectedServer['panel']['client_api_connected']);
         $selectedPasswordSet = $selectedServer['password_set'];
         ?>
@@ -551,18 +553,22 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     <div class="fc-myservers__workspace-state fc-myservers__workspace-state--<?= $myServersEscape($selectedStatusClass) ?>">
                         <div class="fc-myservers__workspace-state-icon"><i class="fa-solid fa-clock" aria-hidden="true"></i></div>
                         <div>
-                            <h3><?= match ($selectedServer['state']) {
-                                'provisioning' => 'سرور در حال آماده‌سازی است',
-                                'missing_external' => 'سرور در Pterodactyl پیدا نشد',
-                                'deleting' => 'درخواست حذف سرور در حال پردازش است',
-                                default => 'اطلاعات سرور فعلاً در دسترس نیست',
-                            } ?></h3>
-                            <p><?= match ($selectedServer['state']) {
-                                'provisioning' => 'بعد از تکمیل ساخت سرور در Pterodactyl، اطلاعات و دسترسی‌ها در این داشبورد فعال می‌شوند.',
-                                'missing_external' => 'رکورد سرویس در Paymenter وجود دارد، اما Pterodactyl برای آن سرور پاسخ 404 داده است. سرور به‌صورت خودکار دوباره ساخته نمی‌شود؛ برای بررسی یا بازیابی با پشتیبانی تماس بگیرید.',
-                                'deleting' => 'عملیات حذف ثبت شده است. پس از تأیید حذف از Pterodactyl، سابقه سرویس به‌روزرسانی می‌شود.',
-                                default => 'سرویس ثبت شده است، اما اطلاعات پنل قابل تأیید نیست. در صورت تداوم مشکل با پشتیبانی تماس بگیرید.',
-                            } ?></p>
+                            <h3><?= !$selectedServiceActive || !empty($selectedServerData['suspended'])
+                                ? 'سرویس شما موقتاً معلق است'
+                                : match ($selectedServer['state']) {
+                                    'provisioning' => 'سرور در حال آماده‌سازی است',
+                                    'missing_external' => 'سرور در Pterodactyl پیدا نشد',
+                                    'deleting' => 'درخواست حذف سرور در حال پردازش است',
+                                    default => 'اطلاعات سرور فعلاً در دسترس نیست',
+                                } ?></h3>
+                            <p><?= !$selectedServiceActive || !empty($selectedServerData['suspended'])
+                                ? 'سرویس در وضعیت Suspend قرار دارد و ابزارهای مدیریتی آن تا زمان فعال‌سازی مجدد غیرفعال هستند.'
+                                : match ($selectedServer['state']) {
+                                    'provisioning' => 'بعد از تکمیل ساخت سرور در Pterodactyl، اطلاعات و دسترسی‌ها در این داشبورد فعال می‌شوند.',
+                                    'missing_external' => 'رکورد سرویس در Paymenter وجود دارد، اما Pterodactyl برای آن سرور پاسخ 404 داده است. سرور به‌صورت خودکار دوباره ساخته نمی‌شود؛ برای بررسی یا بازیابی با پشتیبانی تماس بگیرید.',
+                                    'deleting' => 'عملیات حذف ثبت شده است. پس از تأیید حذف از Pterodactyl، سابقه سرویس به‌روزرسانی می‌شود.',
+                                    default => 'سرویس ثبت شده است، اما اطلاعات پنل قابل تأیید نیست. در صورت تداوم مشکل با پشتیبانی تماس بگیرید.',
+                                } ?></p>
                         </div>
                     </div>
                 <?php elseif ($activeTab === 'overview'): ?>
