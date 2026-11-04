@@ -21,7 +21,7 @@
     width: 100%;
     min-height: calc(100svh - var(--fc-header-overlap-height, 72px));
     margin: 0;
-    padding: calc(var(--fc-header-overlap-height, 72px) + 28px) clamp(14px, 3vw, 38px) 72px;
+    padding: calc(var(--fc-header-overlap-height, 72px) + 18px) clamp(16px, 1.5vw, 28px) 42px;
     overflow: hidden;
     direction: rtl;
     color: var(--fc-ms-text);
@@ -59,7 +59,7 @@
 .fc-myservers__empty {
     position: relative;
     width: 100%;
-    max-width: 1320px;
+    max-width: none;
     margin-right: auto;
     margin-left: auto;
 }
@@ -381,9 +381,9 @@
 /* Main dashboard layout — sidebar is the first RTL column, so it sits right. */
 .fc-myservers__dashboard-layout {
     display: grid;
-    grid-template-columns: 228px minmax(0, 1fr);
+    grid-template-columns: 248px minmax(0, 1fr);
     align-items: start;
-    gap: 15px;
+    gap: 18px;
     direction: rtl;
 }
 
@@ -1353,6 +1353,17 @@
 }
 
 /* Responsive */
+@media (min-width: 1500px) {
+    .fc-myservers__resource-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .fc-resource-card {
+        padding: 16px;
+    }
+}
+
 @media (max-width: 1080px) {
     .fc-myservers__dashboard-layout {
         grid-template-columns: 205px minmax(0, 1fr);
@@ -1414,9 +1425,9 @@
 @media (max-width: 620px) {
     .fc-myservers {
         padding:
-            calc(var(--fc-header-overlap-height, 66px) + 22px)
+            calc(var(--fc-header-overlap-height, 66px) + 16px)
             12px
-            46px;
+            34px;
     }
 
     .fc-myservers__page-header {
