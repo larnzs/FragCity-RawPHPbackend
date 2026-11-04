@@ -65,7 +65,11 @@ try {
     $respond(['success' => false, 'error' => 'invalid_request'], 400);
 }
 
-if (!is_array($payload) || ($payload['action'] ?? '') !== 'set_panel_password') {
+$action = is_array($payload) && is_string($payload['action'] ?? null)
+    ? $payload['action']
+    : '';
+
+if (!in_array($action, ['set_panel_password', 'set_panel_username'], true)) {
     $respond(['success' => false, 'error' => 'invalid_action'], 400);
 }
 
@@ -88,27 +92,38 @@ $newPassword = is_string($payload['password'] ?? null)
 $passwordConfirm = is_string($payload['password_confirm'] ?? null)
     ? $payload['password_confirm']
     : '';
+$panelUsername = is_string($payload['username'] ?? null)
+    ? strtolower(trim($payload['username']))
+    : '';
 
-if ($serviceId === false || $currentPassword === '' || $newPassword === '') {
+if ($serviceId === false || $currentPassword === '') {
     $respond(['success' => false, 'error' => 'required_fields_missing'], 422);
 }
 
-if (!hash_equals($newPassword, $passwordConfirm)) {
-    $respond(['success' => false, 'error' => 'password_confirmation_mismatch'], 422);
-}
+if ($action === 'set_panel_password') {
+    if ($newPassword === '') {
+        $respond(['success' => false, 'error' => 'required_fields_missing'], 422);
+    }
 
-if (hash_equals($newPassword, $currentPassword)) {
-    $respond(['success' => false, 'error' => 'panel_password_must_be_different'], 422);
-}
+    if (!hash_equals($newPassword, $passwordConfirm)) {
+        $respond(['success' => false, 'error' => 'password_confirmation_mismatch'], 422);
+    }
 
-if (
-    strlen($newPassword) < 12
-    || strlen($newPassword) > 128
-    || preg_match('/\s/u', $newPassword)
-    || preg_match('/\p{L}/u', $newPassword) !== 1
-    || preg_match('/[0-9]/', $newPassword) !== 1
-) {
-    $respond(['success' => false, 'error' => 'panel_password_policy'], 422);
+    if (hash_equals($newPassword, $currentPassword)) {
+        $respond(['success' => false, 'error' => 'panel_password_must_be_different'], 422);
+    }
+
+    if (
+        strlen($newPassword) < 12
+        || strlen($newPassword) > 128
+        || preg_match('/\s/u', $newPassword)
+        || preg_match('/\p{L}/u', $newPassword) !== 1
+        || preg_match('/[0-9]/', $newPassword) !== 1
+    ) {
+        $respond(['success' => false, 'error' => 'panel_password_policy'], 422);
+    }
+} elseif (!preg_match('/^[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]$/D', $panelUsername)) {
+    $respond(['success' => false, 'error' => 'panel_username_invalid'], 422);
 }
 
 try {
@@ -135,7 +150,10 @@ try {
         $respond(['success' => false, 'error' => 'account_not_found'], 404);
     }
 
-    $attemptState = $_SESSION['panel_password_change_attempts'][$steamId] ?? [];
+    $attemptBucket = $action === 'set_panel_username'
+        ? 'panel_username_change_attempts'
+        : 'panel_password_change_attempts';
+    $attemptState = $_SESSION[$attemptBucket][$steamId] ?? [];
     $attemptCount = is_array($attemptState) ? (int) ($attemptState['count'] ?? 0) : 0;
     $attemptTime = is_array($attemptState) ? (int) ($attemptState['time'] ?? 0) : 0;
 
@@ -144,18 +162,23 @@ try {
     }
 
     if ($attemptCount >= 5 && $attemptTime > 0 && (time() - $attemptTime) <= 900) {
-        $respond(['success' => false, 'error' => 'panel_password_rate_limited'], 429);
+        $respond([
+            'success' => false,
+            'error' => $action === 'set_panel_username'
+                ? 'panel_username_rate_limited'
+                : 'panel_password_rate_limited',
+        ], 429);
     }
 
     if (!password_verify($currentPassword, (string) ($account['password_hash'] ?? ''))) {
-        $_SESSION['panel_password_change_attempts'][$steamId] = [
+        $_SESSION[$attemptBucket][$steamId] = [
             'count' => $attemptCount + 1,
             'time' => time(),
         ];
         $respond(['success' => false, 'error' => 'current_password_incorrect'], 403);
     }
 
-    unset($_SESSION['panel_password_change_attempts'][$steamId]);
+    unset($_SESSION[$attemptBucket][$steamId]);
 
     if (
         (int) ($account['paymenter_user_id'] ?? 0) < 1
@@ -167,16 +190,33 @@ try {
     require_once dirname(__DIR__) . '/class/PaymenterApiClient.php';
 
     $client = new PaymenterApiClient();
-    $result = $client->setCustomerPanelPassword(
+
+    if ($action === 'set_panel_password') {
+        $result = $client->setCustomerPanelPassword(
+            $steamId,
+            (int) $serviceId,
+            $newPassword
+        );
+
+        $respond([
+            'success' => true,
+            'data' => [
+                'password_updated' => (bool) ($result['password_updated'] ?? false),
+            ],
+        ]);
+    }
+
+    $result = $client->setCustomerPanelUsername(
         $steamId,
         (int) $serviceId,
-        $newPassword
+        $panelUsername
     );
 
     $respond([
         'success' => true,
         'data' => [
-            'password_updated' => (bool) ($result['password_updated'] ?? false),
+            'username_updated' => (bool) ($result['username_updated'] ?? false),
+            'username' => (string) ($result['username'] ?? $panelUsername),
         ],
     ]);
 } catch (Throwable $e) {
@@ -194,6 +234,10 @@ try {
         'panel_password_update_failed',
         'customer_servers_unavailable',
         'panel_password_rate_limited',
+        'panel_username_invalid',
+        'panel_username_already_in_use',
+        'panel_username_update_failed',
+        'panel_username_rate_limited',
     ];
 
     if (!in_array($safeError, $allowedErrors, true)) {
@@ -201,12 +245,18 @@ try {
     }
 
     error_log(
-        '[FragCity] Panel password action failed; steam_hash='
+        '[FragCity] Panel account settings action failed; steam_hash='
         . substr(hash('sha256', $steamId), 0, 16)
         . '; service_id=' . (int) $serviceId
         . '; error=' . $safeError . '.'
     );
 
-    $status = $safeError === 'service_not_found' ? 404 : 502;
+    $status = match ($safeError) {
+        'service_not_found' => 404,
+        'panel_username_already_in_use' => 409,
+        'panel_username_invalid' => 422,
+        'panel_username_rate_limited', 'panel_password_rate_limited' => 429,
+        default => 502,
+    };
     $respond(['success' => false, 'error' => $safeError], $status);
 }
