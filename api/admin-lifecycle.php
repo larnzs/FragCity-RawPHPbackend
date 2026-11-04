@@ -61,7 +61,7 @@ if (!is_array($payload)) {
 }
 
 $action = is_string($payload['action'] ?? null) ? $payload['action'] : '';
-if (!in_array($action, ['list', 'detail', 'reconcile', 'authorize_recreation', 'revoke_recreation', 'acknowledge_paymenter_missing'], true)) {
+if (!in_array($action, ['list', 'detail', 'reconcile', 'authorize_recreation', 'revoke_recreation', 'acknowledge_paymenter_missing', 'verify_client_identity'], true)) {
     $respond(['success' => false, 'error' => 'invalid_action'], 422);
 }
 
@@ -140,6 +140,22 @@ try {
             );
             break;
 
+        case 'verify_client_identity':
+            $pterodactylUserId = filter_var($payload['pterodactyl_user_id'] ?? null, FILTER_VALIDATE_INT, [
+                'options' => ['min_range' => 1],
+            ]);
+            if ($serviceId === false || $pterodactylUserId === false || !is_string($payload['reason'] ?? null)) {
+                $respond(['success' => false, 'error' => 'validation_failed'], 422);
+            }
+            $result = $client->adminLifecycleVerifyClientIdentity(
+                $actorSteamId,
+                $actorUsername,
+                (int) $serviceId,
+                (int) $pterodactylUserId,
+                $payload['reason']
+            );
+            break;
+
         default:
             $respond(['success' => false, 'error' => 'invalid_action'], 422);
     }
@@ -162,6 +178,9 @@ try {
         'admin_lifecycle_action_not_allowed',
         'admin_lifecycle_unavailable',
         'admin_lifecycle_reconcile_failed',
+        'admin_pterodactyl_client_not_found',
+        'admin_lifecycle_identity_conflict',
+        'admin_lifecycle_identity_verification_failed',
     ];
     if (!in_array($safeError, $allowedErrors, true)) $safeError = 'admin_lifecycle_unavailable';
 
@@ -172,6 +191,9 @@ try {
     $status = match ($safeError) {
         'admin_lifecycle_record_not_found' => 404,
         'admin_lifecycle_action_not_allowed' => 409,
+        'admin_lifecycle_identity_conflict' => 409,
+        'admin_pterodactyl_client_not_found' => 404,
+        'admin_lifecycle_identity_verification_failed' => 502,
         'validation_failed' => 422,
         'paymenter_unreachable', 'bridge_not_configured', 'source_ip_not_allowed' => 503,
         default => 502,

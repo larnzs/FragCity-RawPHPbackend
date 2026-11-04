@@ -106,6 +106,7 @@ $service = is_array($detail['service'] ?? null) ? $detail['service'] : [];
 $history = is_array($detail['history'] ?? null) ? $detail['history'] : [];
 $selectedState = (string) ($mapping['lifecycle_state'] ?? '');
 $desiredState = (string) ($mapping['desired_state'] ?? '');
+$observedState = (string) ($mapping['observed_state'] ?? '');
 $authorizationStatus = (string) ($mapping['recreation_authorization_status'] ?? 'none');
 $hasSelection = $mapping !== [];
 
@@ -283,6 +284,31 @@ $kpis = [
                 <?php endif; ?>
 
                 <div class="fc-lifecycle__actions">
+                    <?php if (
+                        $selectedState === 'review_required'
+                        && in_array($observedState, ['missing_client', 'client_identity_conflict', 'identity_mapping_conflict'], true)
+                    ): ?>
+                        <div class="fc-lifecycle__notice fc-lifecycle__notice--warning">
+                            <i class="fa-solid fa-user-shield"></i>
+                            <div>
+                                <strong>تأیید دستی هویت Pterodactyl Client</strong>
+                                <p>شناسه Client موجود را وارد کنید. سیستم فقط در صورت تطابق دقیق ایمیل با Paymenter و نبودن UUID متعلق به مشتری دیگر، external_id را به Customer UUID تغییر می‌دهد. ساخت Client جدید یا تغییر رمز و مشخصات حساب انجام نمی‌شود.</p>
+                            </div>
+                        </div>
+                        <form class="fc-lifecycle__authorize" data-lifecycle-client-verify data-service-id="<?= (int) $mapping['service_id'] ?>">
+                            <label>
+                                <span>شناسه عددی Pterodactyl Client</span>
+                                <input type="number" name="pterodactyl_user_id" min="1" step="1" required value="<?= (int) ($mapping['pterodactyl_user_id'] ?? 0) > 0 ? (int) $mapping['pterodactyl_user_id'] : '' ?>" placeholder="مثلاً 42">
+                            </label>
+                            <label>
+                                <span>دلیل تأیید ادمین (اجباری)</span>
+                                <textarea name="reason" rows="3" minlength="8" maxlength="500" required placeholder="منبع تطبیق هویت و علت تأیید این Client را بنویسید..."></textarea>
+                            </label>
+                            <button type="submit" class="fc-lifecycle__button fc-lifecycle__button--warning">
+                                <i class="fa-solid fa-user-check"></i><span>تأیید هویت و ثبت نگاشت Client</span>
+                            </button>
+                        </form>
+                    <?php endif; ?>
                     <?php if ($selectedState !== 'deleted' && $selectedState !== 'paymenter_missing'): ?>
                         <button type="button" class="fc-lifecycle__button fc-lifecycle__button--quiet" data-lifecycle-reconcile data-service-id="<?= (int) $mapping['service_id'] ?>">
                             <i class="fa-solid fa-arrows-rotate"></i><span>همگام‌سازی و بررسی وضعیت</span>
