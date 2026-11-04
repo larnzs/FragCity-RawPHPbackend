@@ -340,7 +340,29 @@ $kpis = [
                     <?php endif; ?>
 
                     <?php if ($selectedState === 'paymenter_missing'): ?>
-                        <div class="fc-lifecycle__notice fc-lifecycle__notice--warning"><i class="fa-solid fa-triangle-exclamation"></i><div><strong>رکورد Paymenter پیدا نشد</strong><p>این نگاشت برای بررسی نگه داشته شده است. هیچ سرور خارجی به‌صورت خودکار حذف نمی‌شود.</p></div></div>
+                        <?php if (!empty($mapping['paymenter_missing_reviewed_at'])): ?>
+                            <div class="fc-lifecycle__notice">
+                                <i class="fa-solid fa-shield-check"></i>
+                                <div>
+                                    <strong>بررسی ادمین تکمیل شده؛ منبع خارجی حفظ می‌شود</strong>
+                                    <p>بررسی‌کننده: <?= $escape($mapping['paymenter_missing_reviewed_username'] ?: $mapping['paymenter_missing_reviewed_by']) ?> · <?= $escape($formatDate($mapping['paymenter_missing_reviewed_at'])) ?></p>
+                                    <p>تصمیم: <?= $escape($mapping['paymenter_missing_review_decision'] ?? 'preserve_external') ?></p>
+                                    <p>دلیل: <?= $escape($mapping['paymenter_missing_review_reason'] ?? '') ?></p>
+                                    <p>هیچ درخواست حذف یا تغییر به Pterodactyl ارسال نشده است.</p>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="fc-lifecycle__notice fc-lifecycle__notice--warning">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <div><strong>رکورد Paymenter پیدا نشد</strong><p>این نگاشت برای بررسی نگه داشته شده است. هیچ سرور خارجی به‌صورت خودکار حذف نمی‌شود.</p></div>
+                            </div>
+                            <form class="fc-lifecycle__authorize" data-lifecycle-orphan-review data-service-id="<?= (int) $mapping['service_id'] ?>">
+                                <strong>ثبت نتیجه بررسی ادمین</strong>
+                                <p>این اقدام فقط ثبت می‌کند که مورد بررسی شده و منبع خارجی باید حفظ شود. هیچ Server یا Client در Pterodactyl حذف یا تغییر داده نمی‌شود.</p>
+                                <label><span>دلیل تصمیم (اجباری)</span><textarea name="reason" rows="3" minlength="8" maxlength="500" required placeholder="نتیجه بررسی و دلیل حفظ منبع خارجی را بنویسید..."></textarea></label>
+                                <button type="submit" class="fc-lifecycle__button fc-lifecycle__button--quiet"><i class="fa-solid fa-clipboard-check"></i><span>ثبت بررسی و حفظ منبع خارجی</span></button>
+                            </form>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
 

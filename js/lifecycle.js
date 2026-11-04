@@ -77,13 +77,14 @@
     });
 
     document.addEventListener('submit', async function (event) {
-        const form = event.target.closest('[data-lifecycle-authorize], [data-lifecycle-revoke]');
+        const form = event.target.closest('[data-lifecycle-authorize], [data-lifecycle-revoke], [data-lifecycle-orphan-review]');
         if (!form) return;
         event.preventDefault();
         const root = form.closest('#fcLifecycleDashboard');
         if (!root) return;
 
         const isRevocation = form.matches('[data-lifecycle-revoke]');
+        const isOrphanReview = form.matches('[data-lifecycle-orphan-review]');
         const serviceId = Number(form.dataset.serviceId || 0);
         const reason = (form.querySelector('[name="reason"]')?.value || '').trim();
         const submit = form.querySelector('button[type="submit"]');
@@ -93,7 +94,9 @@
         }
         const confirmation = isRevocation
             ? 'مجوز ساخت مجدد این سرویس لغو می‌شود. ادامه می‌دهید؟'
-            : 'این اقدام مجوز ساخت مجدد همین سرویس را ثبت می‌کند. پیش از ادامه از وضعیت Backup و احتمال از دست رفتن داده مطمئن شده‌اید؟';
+            : (isOrphanReview
+                ? 'فقط نتیجه بررسی ثبت می‌شود و تصمیم حفظ منبع خارجی ثبت خواهد شد. هیچ سروری حذف یا تغییر نمی‌کند. ادامه می‌دهید؟'
+                : 'این اقدام مجوز ساخت مجدد همین سرویس را ثبت می‌کند. پیش از ادامه از وضعیت Backup و احتمال از دست رفتن داده مطمئن شده‌اید؟');
         if (!window.confirm(confirmation)) return;
 
         const original = submit?.innerHTML || '';
@@ -101,21 +104,32 @@
             submit.disabled = true;
             submit.innerHTML = isRevocation
                 ? '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال لغو مجوز...</span>'
-                : '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال ثبت مجوز...</span>';
+                : (isOrphanReview
+                    ? '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال ثبت بررسی...</span>'
+                    : '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال ثبت مجوز...</span>');
         }
-        feedback(root, isRevocation ? 'در حال لغو مجوز و ثبت Audit Event...' : 'در حال ثبت مجوز و Audit Event...', false);
+        feedback(root, isRevocation
+            ? 'در حال لغو مجوز و ثبت Audit Event...'
+            : (isOrphanReview ? 'در حال ثبت نتیجه بررسی و Audit Event...' : 'در حال ثبت مجوز و Audit Event...'), false);
 
         try {
+            const action = isRevocation
+                ? 'revoke_recreation'
+                : (isOrphanReview ? 'acknowledge_paymenter_missing' : 'authorize_recreation');
             const result = await request(root, {
-                action: isRevocation ? 'revoke_recreation' : 'authorize_recreation',
+                action: action,
                 service_id: serviceId,
                 reason: reason
             });
             const message = isRevocation
                 ? 'مجوز ساخت مجدد با موفقیت لغو شد.'
-                : (result.already_authorized
-                    ? 'این سرویس قبلاً مجوز ساخت مجدد گرفته است.'
-                    : 'مجوز ثبت شد. اجرای CreateJob همچنان باید جداگانه توسط ادمین انجام شود.');
+                : (isOrphanReview
+                    ? (result.already_reviewed
+                        ? 'این رکورد قبلاً بررسی و برای حفظ منبع خارجی ثبت شده است.'
+                        : 'نتیجه بررسی ثبت شد؛ هیچ منبع خارجی حذف یا تغییر نکرد.')
+                    : (result.already_authorized
+                        ? 'این سرویس قبلاً مجوز ساخت مجدد گرفته است.'
+                        : 'مجوز ثبت شد. اجرای CreateJob همچنان باید جداگانه توسط ادمین انجام شود.'));
             feedback(root, message, false);
             window.location.reload();
         } catch (error) {

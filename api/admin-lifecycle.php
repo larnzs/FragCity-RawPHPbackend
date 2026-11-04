@@ -61,7 +61,7 @@ if (!is_array($payload)) {
 }
 
 $action = is_string($payload['action'] ?? null) ? $payload['action'] : '';
-if (!in_array($action, ['list', 'detail', 'reconcile', 'authorize_recreation', 'revoke_recreation'], true)) {
+if (!in_array($action, ['list', 'detail', 'reconcile', 'authorize_recreation', 'revoke_recreation', 'acknowledge_paymenter_missing'], true)) {
     $respond(['success' => false, 'error' => 'invalid_action'], 422);
 }
 
@@ -121,6 +121,18 @@ try {
                 $respond(['success' => false, 'error' => 'validation_failed'], 422);
             }
             $result = $client->adminLifecycleRevokeRecreation(
+                $actorSteamId,
+                $actorUsername,
+                (int) $serviceId,
+                $payload['reason']
+            );
+            break;
+
+        case 'acknowledge_paymenter_missing':
+            if ($serviceId === false || !is_string($payload['reason'] ?? null)) {
+                $respond(['success' => false, 'error' => 'validation_failed'], 422);
+            }
+            $result = $client->adminLifecycleAcknowledgePaymenterMissing(
                 $actorSteamId,
                 $actorUsername,
                 (int) $serviceId,
