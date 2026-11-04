@@ -394,6 +394,31 @@ $guideCategoryCount = count($guideCategoryMap);
             </div>
 
             <div class="sg-toast" id="sgToast" role="status" aria-live="polite"></div>
+
+            <aside class="sg-related" aria-labelledby="sgRelatedTitle">
+                <div class="sg-related-copy">
+                    <span class="sg-section-kicker">EXPLORE FRAGCITY</span>
+                    <h2 id="sgRelatedTitle">قدم بعدی در کامیونیتی FragCity</h2>
+                    <p>بعد از بررسی دستورات و تنظیمات، سرورهای عمومی را کشف کن، برای کامیونیتی خودت سرور بساز یا برای راهنمایی با پشتیبانی در ارتباط باش.</p>
+                </div>
+                <nav class="sg-related-links" aria-label="صفحات مرتبط FragCity">
+                    <a href="/servers/" data-ajax-nav data-slug="servers_vps">
+                        <i class="fa-solid fa-server" aria-hidden="true"></i>
+                        <span>مشاهده سرورهای عمومی</span>
+                        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                    </a>
+                    <a href="/buy-server/" data-ajax-nav data-slug="buyserveropen">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                        <span>ساخت سرور اختصاصی</span>
+                        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                    </a>
+                    <a href="/support/" data-ajax-nav data-slug="support">
+                        <i class="fa-solid fa-headset" aria-hidden="true"></i>
+                        <span>دریافت راهنمایی</span>
+                        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                    </a>
+                </nav>
+            </aside>
         </section>
     </div>
 </section>
