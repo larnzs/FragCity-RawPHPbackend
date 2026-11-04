@@ -624,6 +624,11 @@ $mobileMoreNavItems = [
                 method="POST"
                 class="fc-wallet-charge-modal__form"
             >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="<?= htmlspecialchars((string) ($authCsrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                >
                 <label for="fcWalletChargeAmount">مبلغ شارژ (تومان)</label>
                 <div class="fc-wallet-charge-modal__input-wrap">
                     <i class="fa-solid fa-coins" aria-hidden="true"></i>
