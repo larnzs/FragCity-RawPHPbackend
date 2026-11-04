@@ -80,10 +80,10 @@ $activeTab = $_GET['tab'] ?? 'contact';
     </div>
 
     <div class="support-tabs">
-        <a href="?page=support&tab=contact" class="support-tab <?= $activeTab === 'contact' ? 'active' : '' ?>">
+        <a href="/support/?tab=contact" class="support-tab <?= $activeTab === 'contact' ? 'active' : '' ?>">
             <i class="fas fa-address-book"></i> تماس با ما
         </a>
-        <a href="?page=support&tab=tickets" class="support-tab <?= $activeTab === 'tickets' ? 'active' : '' ?>">
+        <a href="/support/?tab=tickets" class="support-tab <?= $activeTab === 'tickets' ? 'active' : '' ?>">
             <i class="fas fa-ticket-alt"></i> تیکت‌ها
         </a>
     </div>
@@ -176,7 +176,7 @@ $activeTab = $_GET['tab'] ?? 'contact';
 
             <?php if (!$isLoggedIn): ?>
                 <div class="auth-message error support-login-message">
-                    <i class="fas fa-lock"></i> برای مشاهده و ارسال تیکت باید <a href="?page=login" class="support-login-link">وارد شوید</a>.
+                    <i class="fas fa-lock"></i> برای مشاهده و ارسال تیکت باید <a href="/login/" class="support-login-link">وارد شوید</a>.
                 </div>
             <?php else: ?>
                 <!-- فرم ارسال تیکت -->
@@ -204,7 +204,7 @@ $activeTab = $_GET['tab'] ?? 'contact';
                     <?php else: ?>
                         <div class="ticket-list">
                             <?php foreach ($tickets as $t): ?>
-                                <a href="?page=support&tab=tickets&ticket_id=<?= $t['id'] ?>" class="ticket-row">
+                                <a href="/support/?tab=tickets&ticket_id=<?= $t['id'] ?>" class="ticket-row">
                                     <div class="ticket-info">
                                         <strong>#<?= $t['id'] ?> – <?= htmlspecialchars($t['subject']) ?></strong>
                                         <span class="ticket-date"><?= $t['created_at'] ?></span>
