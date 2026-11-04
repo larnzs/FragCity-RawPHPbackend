@@ -85,16 +85,8 @@
         pageTransition.setAttribute('aria-hidden', 'true');
         pageTransition.innerHTML = [
             '<div class="fc-page-transition__card" role="status" aria-live="polite">',
-                '<div class="fc-page-transition__brand">',
-                    '<span class="fc-page-transition__mark"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>',
-                    '<span class="fc-page-transition__brand-copy">',
-                        '<strong>FRAGCITY</strong>',
-                        '<small>GAME SERVER CONTROL</small>',
-                    '</span>',
-                '</div>',
                 '<span class="fc-page-transition__spinner" aria-hidden="true"></span>',
                 '<span class="fc-page-transition__message">در حال بارگذاری صفحه</span>',
-                '<span class="fc-page-transition__progress" aria-hidden="true"><span></span></span>',
             '</div>'
         ].join('');
         body.appendChild(pageTransition);
