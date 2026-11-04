@@ -420,6 +420,7 @@ final class PaymenterApiClient
                 'invalid_steamid',
                 'customer_servers_unavailable',
                 'service_not_found',
+                'service_not_active',
                 'panel_password_update_failed',
                 'panel_password_rate_limited',
                 'panel_username_invalid',
