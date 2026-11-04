@@ -100,15 +100,15 @@
             form.reset();
             showMessage(form, 'رمز اختصاصی پنل با موفقیت تنظیم شد. رمز جدید را در جای امن نگه دارید.', 'success');
 
-            const card = form.closest('.fc-server-card');
-            const status = card?.querySelector('[data-password-status]');
+            const accessCard = form.closest('.fc-access-card');
+            const status = accessCard?.querySelector('[data-password-status]');
             if (status) {
                 status.classList.remove('is-pending');
                 status.classList.add('is-set');
-                status.textContent = 'رمز اختصاصی تنظیم شده';
+                status.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i> رمز تنظیم شده';
             }
 
-            const heading = form.closest('.fc-panel-password')?.querySelector('.fc-panel-password__heading strong');
+            const heading = form.closest('.fc-password-card')?.querySelector('.fc-dashboard-card__heading h3');
             if (heading) heading.textContent = 'تغییر رمز عبور پنل';
 
             const label = submit?.querySelector('span');
