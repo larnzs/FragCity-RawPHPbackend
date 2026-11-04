@@ -554,6 +554,7 @@ $allowedPages = [
     'login',
     'register',
     'profile',
+    'myservers',
     'vip',
     'leaderboard',
     'forgot_password',
@@ -632,6 +633,7 @@ $protectedPages = [
     'skins',
     'skins_vps',
     'profile',
+    'myservers',
 ];
 
 if (
@@ -761,6 +763,19 @@ $pageAssets = [
             'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js',
             '/js/profile.js?v=' . asset_version(
                 __DIR__ . '/js/profile.js'
+            ),
+        ],
+    ],
+
+    'myservers' => [
+        'css' => [
+            '/css/myservers.css?v=' . asset_version(
+                __DIR__ . '/css/myservers.css'
+            ),
+        ],
+        'js' => [
+            '/js/myservers.js?v=' . asset_version(
+                __DIR__ . '/js/myservers.js'
             ),
         ],
     ],
