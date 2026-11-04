@@ -1,27 +1,21 @@
-case 'request_withdraw':
-    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        echo json_encode(['error' => 'Method not allowed']);
-        exit;
-    }
-    $amount = (int)($_POST['amount'] ?? 0);
-    $card   = trim($_POST['card'] ?? '');
-    if ($amount < 10000) {
-        echo json_encode(['error' => 'حداقل مبلغ برداشت ۱۰,۰۰۰ تومان است.']);
-        exit;
-    }
-    if (empty($card)) {
-        echo json_encode(['error' => 'شماره کارت / شبا الزامی است.']);
-        exit;
-    }
-    // بررسی موجودی
-    $wallet = $db->select("SELECT balance FROM user_wallets WHERE steamid = ?", [$steamid]);
-    $balance = $wallet ? (int)$wallet[0]['balance'] : 0;
-    if ($balance < $amount) {
-        echo json_encode(['error' => 'موجودی کافی نیست.']);
-        exit;
-    }
-    // درج درخواست برداشت
-    $db->query("INSERT INTO withdraw_requests (steamid, amount, card_number, status) VALUES (?, ?, ?, 'pending')", [$steamid, $amount, $card]);
-    // (اختیاری) می‌توان موجودی را موقتاً کم کرد یا تا زمان تأیید ادمین دست نزد
-    echo json_encode(['success' => true, 'message' => 'درخواست شما ثبت شد.']);
-    break;
+<?php
+declare(strict_types=1);
+
+/**
+ * Retired legacy wallet withdrawal fragment.
+ *
+ * The original file was an unreferenced switch-case snippet without PHP tags.
+ * It was not a working API endpoint and is intentionally fail-closed.
+ */
+header('Content-Type: application/json; charset=UTF-8');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('X-Content-Type-Options: nosniff');
+http_response_code(410);
+
+echo json_encode([
+    'success' => false,
+    'error' => 'legacy_wallet_api_retired',
+    'message' => 'این مسیر قدیمی غیرفعال است.',
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE);
+
+exit;
