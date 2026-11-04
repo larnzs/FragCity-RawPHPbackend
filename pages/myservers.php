@@ -626,7 +626,6 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                     </div>
 
                 <?php elseif ($activeTab === 'access'): ?>
-                <?php elseif ($activeTab === 'access'): ?>
                     <div class="fc-myservers__workspace-header">
                         <div><h3>دسترسی پنل</h3><p>اطلاعات ورود به حساب مدیریت سرورهای شما</p></div>
                     </div>
@@ -679,7 +678,7 @@ $myServersDetailsStatus = static function (string $statusClass): string {
                                 <input type="hidden" name="service_id" value="<?= $selectedId ?>">
                                 <label>
                                     <span>Username جدید</span>
-                                    <input type="text" name="username" value="<?= $myServersEscape($selectedServer['username']) ?>" autocomplete="off" autocapitalize="none" spellcheck="false" minlength="3" maxlength="50" pattern="[a-z0-9][a-z0-9_-]{1,48}[a-z0-9]" required>
+                                    <input type="text" name="username" value="<?= $myServersEscape($selectedServer['username']) ?>" autocomplete="off" autocapitalize="none" spellcheck="false" minlength="3" maxlength="50" pattern="[A-Za-z0-9][A-Za-z0-9_-]{1,48}[A-Za-z0-9]" required>
                                 </label>
                                 <label>
                                     <span>رمز فعلی FragCity برای تأیید</span>
