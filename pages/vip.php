@@ -37,102 +37,44 @@ $vipNames = [0 => 'ندارد', 1 => 'برنزی', 2 => 'نقره‌ای', 3 => 
 $vipLevels = [
     1 => ['name' => 'برنزی', 'fa_icon' => 'fas fa-medal', 'color' => '#cd7f32', 'gradient' => 'linear-gradient(135deg, #cd7f32, #a0522d)'],
     2 => ['name' => 'نقره‌ای', 'fa_icon' => 'fas fa-medal', 'color' => '#c0c0c0', 'gradient' => 'linear-gradient(135deg, #c0c0c0, #808080)'],
-    3 => ['name' => 'طلایی', 'fa_icon' => 'fas fa-crown', 'color' => '#F5B042', 'gradient' => 'linear-gradient(135deg, #F5B042, #E68A2E)'],
-    4 => ['name' => 'پلاتینیوم', 'fa_icon' => 'fas fa-gem', 'color' => '#3498db', 'gradient' => 'linear-gradient(135deg, #3498db, #2980b9)'],
-    5 => ['name' => 'امرالد', 'fa_icon' => 'fas fa-leaf', 'color' => '#2ecc71', 'gradient' => 'linear-gradient(135deg, #2ecc71, #27ae60)'],
-    6 => ['name' => 'دایموند', 'fa_icon' => 'fas fa-gem', 'color' => '#9b59b6', 'gradient' => 'linear-gradient(135deg, #9b59b6, #8e44ad)']
+    3 => ['name' => 'طلایی', 'fa_icon' => 'fas fa-crown', 'color' => '#F5B042', 'gradient' => 'linear-gradient(135deg, #F5B042, #E68A2E)']
 ];
 
+// فقط سه سطح اول در فروشگاه عمومی نمایش داده می‌شوند.
+// Tierهای 4 تا 6 در سیستم VIP و وضعیت اشتراک کاربران همچنان معتبر هستند، اما در کاتالوگ فروش عمومی نیستند.
 $vipFeaturesData = [
     1 => [
-        ['icon' => 'fas fa-shield', 'title' => 'زره اضافه', 'desc' => '۵۰ واحد زره'],
-        ['icon' => 'fas fa-heart', 'title' => 'سلامتی', 'desc' => '۱۱۰ واحد'],
-        ['icon' => 'fas fa-coins', 'title' => 'پول شروع', 'desc' => '۱۰۰۰ دلار'],
-        ['icon' => 'fas fa-tag', 'title' => 'تگ', 'desc' => 'VIP : BRONZE']
+        ['icon' => 'fas fa-heart-pulse', 'title' => 'HealShot هم‌تیمی', 'desc' => 'درمان هم‌تیمی با شلیک'],
+        ['icon' => 'fas fa-coins', 'title' => 'پول اضافه', 'desc' => '۱۰۰۰ دلار'],
+        ['icon' => 'fas fa-tag', 'title' => 'تگ اختصاصی', 'desc' => 'VIP : BRONZE']
     ],
     2 => [
-        ['icon' => 'fas fa-shield', 'title' => 'زره کامل', 'desc' => '۱۰۰ واحد'],
-        ['icon' => 'fas fa-heart', 'title' => 'سلامتی', 'desc' => '۱۲۰ واحد'],
-        ['icon' => 'fas fa-coins', 'title' => 'پول شروع', 'desc' => '۱۵۰۰ دلار'],
+        ['icon' => 'fas fa-shield', 'title' => 'زره', 'desc' => '۱۲۵ واحد'],
+        ['icon' => 'fas fa-coins', 'title' => 'پول اضافه', 'desc' => '۲۰۰۰ دلار'],
         ['icon' => 'fas fa-bomb', 'title' => 'دیفیوزر', 'desc' => 'رایگان'],
-        ['icon' => 'fas fa-rabbit', 'title' => 'Bunny Hop', 'desc' => 'پرش متوالی'],
-        ['icon' => 'fas fa-bolt', 'title' => 'ریلود سریع', 'desc' => 'سرعت ریلود'],
-        ['icon' => 'fas fa-tag', 'title' => 'تگ', 'desc' => 'VIP : SILVER']
+        ['icon' => 'fas fa-droplet', 'title' => 'Vampirism', 'desc' => '۳٪'],
+        ['icon' => 'fas fa-smog', 'title' => 'Smoke Color', 'desc' => 'رنگ تصادفی دود'],
+        ['icon' => 'fas fa-desktop', 'title' => 'Kill Screen', 'desc' => 'افکت نمایشی'],
+        ['icon' => 'fas fa-heart-pulse', 'title' => 'HealShot هم‌تیمی', 'desc' => 'درمان هم‌تیمی با شلیک'],
+        ['icon' => 'fas fa-tag', 'title' => 'تگ اختصاصی', 'desc' => 'VIP : SILVER']
     ],
     3 => [
-        ['icon' => 'fas fa-shield', 'title' => 'زره کامل', 'desc' => '۱۰۰ واحد'],
-        ['icon' => 'fas fa-heart', 'title' => 'سلامتی', 'desc' => '۱۳۰ واحد'],
-        ['icon' => 'fas fa-coins', 'title' => 'پول شروع', 'desc' => '۲۰۰۰ دلار'],
-        ['icon' => 'fas fa-bomb', 'title' => 'دیفیوزر', 'desc' => 'رایگان'],
-        ['icon' => 'fas fa-rabbit', 'title' => 'Bunny Hop', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-feather', 'title' => 'بدون آسیب سقوط', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-bolt', 'title' => 'ریلود سریع', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-stopwatch', 'title' => 'دیفیوز سریع', 'desc' => 'سرعت دیفیوز'],
-        ['icon' => 'fas fa-globe', 'title' => 'جاذبه کمتر', 'desc' => '۰.۹۵'],
-        ['icon' => 'fas fa-tag', 'title' => 'تگ', 'desc' => 'VIP : GOLD']
-    ],
-    4 => [
+        ['icon' => 'fas fa-heart', 'title' => 'سلامتی', 'desc' => '۱۰۰ HP'],
         ['icon' => 'fas fa-shield', 'title' => 'زره', 'desc' => '۱۵۰ واحد'],
-        ['icon' => 'fas fa-heart', 'title' => 'سلامتی', 'desc' => '۱۵۰ واحد'],
-        ['icon' => 'fas fa-coins', 'title' => 'پول شروع', 'desc' => '۳۰۰۰ دلار'],
+        ['icon' => 'fas fa-coins', 'title' => 'پول اضافه', 'desc' => '۳۰۰۰ دلار'],
         ['icon' => 'fas fa-bomb', 'title' => 'دیفیوزر', 'desc' => 'رایگان'],
-        ['icon' => 'fas fa-rabbit', 'title' => 'Bunny Hop', 'desc' => 'فعال'],
         ['icon' => 'fas fa-feather', 'title' => 'بدون آسیب سقوط', 'desc' => 'فعال'],
         ['icon' => 'fas fa-bolt', 'title' => 'ریلود سریع', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-stopwatch', 'title' => 'دیفیوز سریع', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-bomb', 'title' => 'بمب‌گذاری سریع', 'desc' => 'سرعت نصب'],
-        ['icon' => 'fas fa-globe', 'title' => 'جاذبه', 'desc' => '۰.۹'],
-        ['icon' => 'fas fa-heart-pulse', 'title' => 'بازیابی سلامتی', 'desc' => '۲ HP/s'],
-        ['icon' => 'fas fa-shield-virus', 'title' => 'بازیابی زره', 'desc' => '۲ AP/s'],
-        ['icon' => 'fas fa-lightbulb', 'title' => 'مقاومت فلش', 'desc' => '۳۰٪'],
-        ['icon' => 'fas fa-tag', 'title' => 'تگ', 'desc' => 'VIP : PLATINUM']
-    ],
-    5 => [
-        ['icon' => 'fas fa-shield', 'title' => 'زره', 'desc' => '۲۰۰ واحد'],
-        ['icon' => 'fas fa-heart', 'title' => 'سلامتی', 'desc' => '۱۸۰ واحد'],
-        ['icon' => 'fas fa-coins', 'title' => 'پول شروع', 'desc' => '۵۰۰۰ دلار'],
-        ['icon' => 'fas fa-bomb', 'title' => 'دیفیوزر', 'desc' => 'رایگان'],
-        ['icon' => 'fas fa-rabbit', 'title' => 'Bunny Hop', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-feather', 'title' => 'بدون آسیب سقوط', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-bolt', 'title' => 'ریلود سریع', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-stopwatch', 'title' => 'دیفیوز سریع', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-bomb', 'title' => 'بمب‌گذاری سریع', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-globe', 'title' => 'جاذبه', 'desc' => '۰.۸۵'],
-        ['icon' => 'fas fa-infinity', 'title' => 'مهمات نامحدود', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-heart-pulse', 'title' => 'بازیابی سلامتی', 'desc' => '۴ HP/s'],
-        ['icon' => 'fas fa-shield-virus', 'title' => 'بازیابی زره', 'desc' => '۴ AP/s'],
-        ['icon' => 'fas fa-droplet', 'title' => 'خون‌آشامی', 'desc' => '۱۵٪'],
-        ['icon' => 'fas fa-lightbulb', 'title' => 'مقاومت فلش', 'desc' => '۵۰٪'],
-        ['icon' => 'fas fa-gun', 'title' => 'منوی اسلحه', 'desc' => 'اختصاصی'],
-        ['icon' => 'fas fa-bolt-lightning', 'title' => 'شوکر نامحدود', 'desc' => 'Zeus'],
-        ['icon' => 'fas fa-tag', 'title' => 'تگ', 'desc' => 'VIP : EMERALD']
-    ],
-    6 => [
-        ['icon' => 'fas fa-shield', 'title' => 'زره', 'desc' => '۳۰۰ واحد'],
-        ['icon' => 'fas fa-heart', 'title' => 'سلامتی', 'desc' => '۳۰۰ واحد'],
-        ['icon' => 'fas fa-coins', 'title' => 'پول شروع', 'desc' => '۲۰,۰۰۰ دلار'],
-        ['icon' => 'fas fa-bomb', 'title' => 'دیفیوزر', 'desc' => 'رایگان'],
-        ['icon' => 'fas fa-rabbit', 'title' => 'Bunny Hop', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-feather', 'title' => 'بدون آسیب سقوط', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-bolt', 'title' => 'ریلود سریع', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-stopwatch', 'title' => 'دیفیوز سریع', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-bomb', 'title' => 'بمب‌گذاری سریع', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-globe', 'title' => 'جاذبه', 'desc' => '۰.۷۵'],
-        ['icon' => 'fas fa-infinity', 'title' => 'مهمات نامحدود', 'desc' => 'فعال'],
-        ['icon' => 'fas fa-heart-pulse', 'title' => 'بازیابی سلامتی', 'desc' => '۱۵ HP/s'],
-        ['icon' => 'fas fa-shield-virus', 'title' => 'بازیابی زره', 'desc' => '۱۵ AP/s'],
-        ['icon' => 'fas fa-droplet', 'title' => 'خون‌آشامی', 'desc' => '۴۰٪'],
-        ['icon' => 'fas fa-lightbulb', 'title' => 'مقاومت کامل فلش', 'desc' => '۱۰۰٪'],
-        ['icon' => 'fas fa-gun', 'title' => 'منوی اسلحه', 'desc' => 'اختصاصی'],
-        ['icon' => 'fas fa-bolt-lightning', 'title' => 'شوکر نامحدود', 'desc' => 'Zeus'],
-        ['icon' => 'fas fa-rotate', 'title' => 'ریسپاون', 'desc' => 'بعد از مرگ'],
-        ['icon' => 'fas fa-burst', 'title' => 'افزایش آسیب', 'desc' => '۱.۳۵x'],
-        ['icon' => 'fas fa-rainbow', 'title' => 'مدل رنگین‌کمان', 'desc' => 'بازیکن'],
-        ['icon' => 'fas fa-smog', 'title' => 'دود رنگین‌کمان', 'desc' => 'Smoke'],
-        ['icon' => 'fas fa-desktop', 'title' => 'صفحه کشتن', 'desc' => 'Kill Screen'],
-        ['icon' => 'fas fa-moon', 'title' => 'دید در شب', 'desc' => 'Night Vision'],
-        ['icon' => 'fas fa-handshake', 'title' => 'درمان هم‌تیمی', 'desc' => '۱۰ HP'],
-        ['icon' => 'fas fa-tag', 'title' => 'تگ', 'desc' => 'VIP : DIAMOND']
+        ['icon' => 'fas fa-droplet', 'title' => 'Vampirism', 'desc' => '۵٪'],
+        ['icon' => 'fas fa-burst', 'title' => 'افزایش آسیب', 'desc' => '۱.۰۵ برابر'],
+        ['icon' => 'fas fa-bolt-lightning', 'title' => 'Zeus', 'desc' => 'دریافت در شروع راند'],
+        ['icon' => 'fas fa-stopwatch', 'title' => 'دیفیوز سریع', 'desc' => '۱۰٪ کاهش زمان'],
+        ['icon' => 'fas fa-globe', 'title' => 'جاذبه', 'desc' => '۰.۹۵'],
+        ['icon' => 'fas fa-smog', 'title' => 'Smoke Color', 'desc' => 'رنگ تصادفی دود'],
+        ['icon' => 'fas fa-rainbow', 'title' => 'Rainbow Character', 'desc' => 'مدل رنگین‌کمان'],
+        ['icon' => 'fas fa-desktop', 'title' => 'Kill Screen', 'desc' => 'افکت نمایشی'],
+        ['icon' => 'fas fa-heart-pulse', 'title' => 'HealShot هم‌تیمی', 'desc' => 'درمان هم‌تیمی با شلیک'],
+        ['icon' => 'fas fa-tag', 'title' => 'تگ اختصاصی', 'desc' => 'VIP : GOLD']
     ]
 ];
 
@@ -172,7 +114,7 @@ $vipCurrentStatus = !$isLoggedIn
         </div>
         <div class="vip-store-hero-aside">
             <i class="fas fa-shield-halved" aria-hidden="true"></i>
-            <span>۶ سطح عضویت</span>
+            <span>۳ سطح قابل خرید</span>
         </div>
     </header>
 
@@ -215,11 +157,11 @@ $vipCurrentStatus = !$isLoggedIn
         <span class="vip-competitive-note-icon" aria-hidden="true"><i class="fas fa-scale-balanced"></i></span>
         <span>
             <strong>حفظ تعادل رقابتی سرورها</strong>
-            <small>برای تجربه‌ای رقابتی و منصفانه، قابلیت‌های VIP هنگام فعال بودن مودهای Competitive، Wingman، Deathmatch و سایر مودهای رقابتی غیرفعال هستند.</small>
+            <small>قابلیت‌های VIP بر اساس مود فعال سرور مدیریت می‌شوند؛ مودهای رقابتی می‌توانند تنظیمات محدودکننده و قوانین اختصاصی خودشان را داشته باشند.</small>
         </span>
     </aside>
 
-    <section class="vip-plans-grid" aria-label="پلن‌های قابل انتخاب VIP">
+    <section class="vip-plans-grid" aria-label="سه پلن قابل خرید VIP">
         <?php foreach ($vipLevels as $lvl => $tier): ?>
             <?php
                 $package = is_array($vipPurchasePackages[(string) $lvl] ?? null)
