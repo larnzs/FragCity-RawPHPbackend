@@ -140,6 +140,108 @@ final class PaymenterApiClient
         return array_map('intval', $this->lastLifecycleAlerts);
     }
 
+
+    /**
+     * Administrator-only inventory through the private Paymenter bridge.
+     * The browser never receives the bridge secret or calls Paymenter directly.
+     *
+     * @param array{page?:int,per_page?:int,state?:string,search?:string} $filters
+     * @return array<string,mixed>
+     */
+    public function adminLifecycleInventory(string $actorSteamId, string $actorUsername, array $filters = []): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $actorSteamId)) {
+            throw new RuntimeException('invalid_steamid');
+        }
+
+        $page = max(1, min(100000, (int) ($filters['page'] ?? 1)));
+        $perPage = (int) ($filters['per_page'] ?? 25);
+        if (!in_array($perPage, [10, 25, 50], true)) $perPage = 25;
+
+        $state = strtolower(trim((string) ($filters['state'] ?? 'all')));
+        $allowedStates = [
+            'all', 'pending', 'provisioning', 'active', 'suspending', 'suspended',
+            'unsuspending', 'deleting', 'deleted', 'missing_external',
+            'paymenter_missing', 'review_required', 'failed', 'ready',
+        ];
+        if (!in_array($state, $allowedStates, true)) $state = 'all';
+
+        $search = trim((string) ($filters['search'] ?? ''));
+        $search = mb_substr($search, 0, 100);
+
+        return $this->adminLifecyclePost('/api/v1/fragcity/bridge/admin/lifecycle/list', [
+            'actor_steamid64' => $actorSteamId,
+            'actor_username' => mb_substr(trim($actorUsername), 0, 64),
+            'page' => $page,
+            'per_page' => $perPage,
+            'state' => $state,
+            'search' => $search,
+        ]);
+    }
+
+    /** @return array<string,mixed> */
+    public function adminLifecycleDetail(string $actorSteamId, string $actorUsername, int $serviceId): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $actorSteamId) || $serviceId < 1) {
+            throw new RuntimeException('validation_failed');
+        }
+        return $this->adminLifecyclePost('/api/v1/fragcity/bridge/admin/lifecycle/detail', [
+            'actor_steamid64' => $actorSteamId,
+            'actor_username' => mb_substr(trim($actorUsername), 0, 64),
+            'service_id' => $serviceId,
+        ]);
+    }
+
+    /** @return array<string,mixed> */
+    public function adminLifecycleReconcile(string $actorSteamId, string $actorUsername, int $serviceId): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $actorSteamId) || $serviceId < 1) {
+            throw new RuntimeException('validation_failed');
+        }
+        return $this->adminLifecyclePost('/api/v1/fragcity/bridge/admin/lifecycle/reconcile', [
+            'actor_steamid64' => $actorSteamId,
+            'actor_username' => mb_substr(trim($actorUsername), 0, 64),
+            'service_id' => $serviceId,
+        ]);
+    }
+
+    /** @return array<string,mixed> */
+    public function adminLifecycleAuthorizeRecreation(
+        string $actorSteamId,
+        string $actorUsername,
+        int $serviceId,
+        string $reason
+    ): array {
+        $reason = trim($reason);
+        if (
+            !preg_match('/^[0-9]{17}$/D', $actorSteamId)
+            || $serviceId < 1
+            || mb_strlen($reason) < 8
+            || mb_strlen($reason) > 500
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+        return $this->adminLifecyclePost('/api/v1/fragcity/bridge/admin/lifecycle/authorize-recreation', [
+            'actor_steamid64' => $actorSteamId,
+            'actor_username' => mb_substr(trim($actorUsername), 0, 64),
+            'service_id' => $serviceId,
+            'reason' => $reason,
+        ]);
+    }
+
+    /** @param array<string,mixed> $payload
+     *  @return array<string,mixed>
+     */
+    private function adminLifecyclePost(string $path, array $payload): array
+    {
+        $response = $this->post($path, $payload);
+        $data = $response['data'] ?? null;
+        if (!is_array($data)) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+        return $data;
+    }
+
     /**
      * Set a customer-selected Pterodactyl password for one owned service.
      * The password is transported only over the signed HTTPS bridge and is
@@ -462,6 +564,11 @@ final class PaymenterApiClient
                 'client_api_invalid_file_action',
                 'customer_console_unavailable',
                 'customer_file_action_failed',
+                'lifecycle_storage_not_ready',
+                'admin_lifecycle_record_not_found',
+                'admin_lifecycle_action_not_allowed',
+                'admin_lifecycle_unavailable',
+                'admin_lifecycle_reconcile_failed',
             ];
 
             if (!in_array($error, $safeErrors, true)) {
