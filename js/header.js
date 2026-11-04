@@ -68,6 +68,53 @@
     const pageAssets = window.FragCityPageAssets || {};
     const authLoginModal = document.getElementById('fcLoginModal');
     const authLoginModalContent = document.getElementById('fcLoginModalContent');
+
+    /*
+     * Global page-transition layer.
+     * The overlay is created once and reused for AJAX navigation, so page
+     * swaps get a consistent branded loading state without touching page HTML.
+     */
+    let activeNavigationId = 0;
+    let activeNavigationController = null;
+
+    let pageTransition = document.getElementById('fcPageTransition');
+    if (!pageTransition) {
+        pageTransition = document.createElement('div');
+        pageTransition.id = 'fcPageTransition';
+        pageTransition.className = 'fc-page-transition';
+        pageTransition.setAttribute('aria-hidden', 'true');
+        pageTransition.innerHTML = [
+            '<div class="fc-page-transition__card" role="status" aria-live="polite">',
+                '<div class="fc-page-transition__brand">',
+                    '<span class="fc-page-transition__mark"><i class="fa-solid fa-bolt" aria-hidden="true"></i></span>',
+                    '<span class="fc-page-transition__brand-copy">',
+                        '<strong>FRAGCITY</strong>',
+                        '<small>GAME SERVER CONTROL</small>',
+                    '</span>',
+                '</div>',
+                '<span class="fc-page-transition__spinner" aria-hidden="true"></span>',
+                '<span class="fc-page-transition__message">در حال بارگذاری صفحه</span>',
+                '<span class="fc-page-transition__progress" aria-hidden="true"><span></span></span>',
+            '</div>'
+        ].join('');
+        body.appendChild(pageTransition);
+    }
+
+    function beginPageTransition() {
+        pageTransition.setAttribute('aria-hidden', 'false');
+        body.classList.add('fc-page-transition-active');
+
+        const mainContent = document.getElementById('mainContent');
+        if (mainContent) mainContent.setAttribute('aria-busy', 'true');
+    }
+
+    function finishPageTransition() {
+        body.classList.remove('fc-page-transition-active');
+        pageTransition.setAttribute('aria-hidden', 'true');
+
+        const mainContent = document.getElementById('mainContent');
+        if (mainContent) mainContent.removeAttribute('aria-busy');
+    }
     let authLoginReturnFocus = null;
     let authLoginOpenPromise = null;
 
@@ -610,16 +657,20 @@
             return;
         }
 
+        const navigationId = ++activeNavigationId;
+        if (activeNavigationController) {
+            activeNavigationController.abort();
+        }
+
+        const controller = new AbortController();
+        activeNavigationController = controller;
         const slug = targetSlug || slugFromUrl(url);
+        let keepTransitionVisible = false;
 
         /*
          * Some pages (e.g. Weapon Paints) relocate their modals to be
-         * direct children of <body> so they can render above
-         * everything else. Those elements live outside #contentFader,
-         * so swapping this fader's content never touches them. Left
-         * behind, a modal that was open (or its backdrop) stays fixed
-         * over the next page's content. Since we're leaving this page
-         * entirely, clear any of them out first.
+         * direct children of <body>. Clear page-owned overlays before
+         * replacing the current route.
          */
         document
             .querySelectorAll('body > .wp-modal, body > .wp-modal-backdrop')
@@ -629,6 +680,7 @@
 
         document.body.classList.remove('wp-modal-open', 'modal-open');
 
+        beginPageTransition();
         fader.classList.add('fade-out');
 
         try {
@@ -636,21 +688,19 @@
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                credentials: 'same-origin'
+                credentials: 'same-origin',
+                signal: controller.signal
             });
+
+            if (navigationId !== activeNavigationId) return;
 
             if (!response.ok) {
                 throw new Error('HTTP ' + response.status);
             }
 
             /*
-             * fetch() silently follows server-side redirects (e.g. an
-             * auth guard sending an unauthenticated request from
-             * ?page=skins to ?page=login). response.url reflects the
-             * FINAL destination in that case. Without this, the
-             * address bar, active nav link, and page-specific CSS/JS
-             * would all keep pointing at the originally requested
-             * page even though different content was actually loaded.
+             * fetch() follows server redirects. response.url is therefore
+             * the authoritative destination for protected-page redirects.
              */
             const finalUrl = response.url || url;
             const requestedFinalSlug = response.redirected
@@ -660,6 +710,8 @@
             const finalSlug = shouldOpenLogin ? 'home' : requestedFinalSlug;
 
             const html = await response.text();
+            if (navigationId !== activeNavigationId) return;
+
             const documentCopy = new DOMParser().parseFromString(html, 'text/html');
             const incomingContent = documentCopy.querySelector('#contentFader');
 
@@ -670,8 +722,6 @@
             syncPageStyles(finalSlug);
             replaceContent(fader, incomingContent.innerHTML);
 
-            // Home is a full-bleed route; keep its layout state in sync when
-            // the page is entered through AJAX navigation as well as direct load.
             const isHomePage = finalSlug === 'home';
             body.classList.toggle('site-body--home', isHomePage);
             const mainContent = document.getElementById('mainContent');
@@ -681,6 +731,7 @@
             fader.classList.toggle('content-fader--home', isHomePage);
 
             await loadPageScripts(finalSlug);
+            if (navigationId !== activeNavigationId) return;
 
             if (pushState) {
                 history.pushState({}, '', finalUrl);
@@ -707,10 +758,28 @@
                 await openAuthLoginModal();
             }
         } catch (error) {
+            if (navigationId !== activeNavigationId) return;
+
+            if (error && error.name === 'AbortError') {
+                return;
+            }
+
+            console.error('[FragCity] AJAX page navigation failed:', error);
+            keepTransitionVisible = true;
             window.location.href = url;
             return;
         } finally {
-            fader.classList.remove('fade-out');
+            if (navigationId === activeNavigationId) {
+                fader.classList.remove('fade-out');
+
+                if (!keepTransitionVisible) {
+                    finishPageTransition();
+                }
+
+                if (activeNavigationController === controller) {
+                    activeNavigationController = null;
+                }
+            }
         }
     }
 
