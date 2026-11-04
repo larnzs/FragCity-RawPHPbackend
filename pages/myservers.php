@@ -158,6 +158,15 @@ if (preg_match('/^[0-9]{17}$/D', $myServersSteamId)) {
                 $serverName = trim((string) ($server['name'] ?? ''));
                 $uuid = trim((string) ($server['uuid'] ?? ''));
                 $identifier = trim((string) ($server['identifier'] ?? ''));
+                $serverRuntimeStatus = strtolower(trim((string) ($server['server_status'] ?? '')));
+                $serverRuntimeLabel = match ($serverRuntimeStatus) {
+                    'installing' => 'در حال نصب',
+                    'install_failed' => 'خطای نصب',
+                    'reinstall_failed' => 'خطای نصب مجدد',
+                    'restoring_backup' => 'در حال بازیابی بکاپ',
+                    'suspended' => 'معلق',
+                    default => 'آماده',
+                };
                 $panelUsername = trim((string) ($panel['username'] ?? ''));
                 $panelEmail = trim((string) ($panel['email'] ?? ''));
                 $panelUrl = (string) ($panel['server_url'] ?? '');
