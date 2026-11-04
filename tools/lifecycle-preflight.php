@@ -132,6 +132,19 @@ $check(str_contains($proxy, "'revoke_recreation'")
     && str_contains($client, 'adminLifecycleVerifyClientIdentity')
     && str_contains($client, '/admin/lifecycle/verify-client-identity'),
     'Recovery revocation is wired from website proxy to Paymenter client');
+$check(str_contains($client, "private const EXPECTED_BRIDGE_VERSION = '1.11.1'")
+    && str_contains($client, "paymenter_bridge_version_mismatch")
+    && str_contains($client, "'/api/v1/fragcity/bridge/servers/username'"),
+    'Website bridge client enforces the API version and exposes the panel-username endpoint');
+$check(str_contains($client, "'customer_identity_storage_not_ready'")
+    && str_contains($client, "'paymenter_user_identity_conflict'")
+    && str_contains($client, "'admin_pterodactyl_client_not_found'")
+    && str_contains($client, "'admin_lifecycle_identity_conflict'")
+    && str_contains($client, "'admin_lifecycle_identity_verification_failed'")
+    && str_contains($client, "'request_too_large'")
+    && str_contains($client, "'https_required'")
+    && str_contains($client, "'bridge_ip_allowlist_invalid'"),
+    'Website bridge client preserves safe identity, lifecycle and transport error codes');
 $check(str_contains($page, "\$authorizationStatus === 'in_progress'")
     && str_contains($page, 'data-lifecycle-revoke')
     && str_contains($page, 'data-lifecycle-client-verify')
