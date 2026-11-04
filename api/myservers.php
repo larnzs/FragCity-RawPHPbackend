@@ -326,6 +326,7 @@ try {
         'client_api_connection_failed',
         'client_api_connect_rate_limited',
         'client_api_not_connected',
+        'client_api_storage_not_ready',
         'client_api_permission_denied',
         'client_api_file_too_large_to_edit',
         'client_api_file_not_editable',
