@@ -26,11 +26,11 @@ The scheduled worker processes a bounded batch, records `last_reconciled_at`, re
 
 ## Recovery authorization state
 
-Authorization is independent from `desired_state` and has a unique authorization UUID, approver SteamID64/username, reason and timestamp. A grant remains pending across transient CreateJob failures and is consumed only after Pterodactyl confirms the replacement Server. A pending grant can be revoked, with actor and reason recorded as a separate event. The dashboard does not automatically execute CreateJob.
+Authorization is independent from `desired_state` and has a unique authorization UUID, approver SteamID64/username, reason and timestamp. A grant remains pending across transient CreateJob failures and is consumed only after Pterodactyl confirms the replacement Server. A pending grant can be revoked, with actor and reason recorded as a separate event. Before provisioning starts, CreateJob must atomically claim the authorization with a two-hour lease. Revocation is rejected during an active claim; a failed CreateJob releases the claim, while a crashed process allows its lease to expire. The dashboard does not automatically execute CreateJob.
 
 ## Runtime prerequisites and checks
 
-The Paymenter FragCityAPI extension is version 1.8.0. Its upgrade hook runs additive migration `2026_11_04_000003_add_lifecycle_reconciliation_and_recreation_authorization_columns.php`; earlier migration files must not be edited or rerun manually.
+The Paymenter FragCityAPI extension is version 1.9.0. Its upgrade hook runs the additive migrations `2026_11_04_000003_add_lifecycle_reconciliation_and_recreation_authorization_columns.php` and `2026_11_04_000004_add_recreation_authorization_claim_columns.php`; earlier migration files must not be edited or rerun manually.
 
 Before any production rollout, verify the extension migration has applied, inspect the five route names with `php artisan route:list`, and exercise active, suspended, drift, missing Client, missing Server, transient API failure, grant, grant-revoke and grant-consume cases against a disposable test service. These are validation steps, not a deployment request.
 
