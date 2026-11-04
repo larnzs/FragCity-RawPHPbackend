@@ -400,14 +400,22 @@
     function closeConsoleConnection(updateUi = true) {
         intentionalConsoleClose = true;
         activeConsoleAuthenticated = false;
-        if (activeConsoleSocket) {
+
+        const socket = activeConsoleSocket;
+        activeConsoleSocket = null;
+        if (socket) {
+            // Detach callbacks before closing so a deliberate close cannot be
+            // mistaken for a network failure after the navigation has changed.
+            socket.onopen = null;
+            socket.onmessage = null;
+            socket.onerror = null;
+            socket.onclose = null;
             try {
-                activeConsoleSocket.close(1000, 'FragCity console closed');
+                socket.close(1000, 'FragCity console closed');
             } catch (error) {
                 // Ignore already-closed sockets.
             }
         }
-        activeConsoleSocket = null;
 
         if (updateUi && activeConsoleRoot?.isConnected) {
             consoleStatus(activeConsoleRoot, 'Disconnected', 'idle');
@@ -497,6 +505,12 @@
                     case 'auth error':
                         appendConsoleOutput(root, '[Pterodactyl] ' + String(args[0] || 'Authentication failed'));
                         consoleStatus(root, 'Authentication failed', 'error');
+                        if (button) {
+                            button.disabled = false;
+                            button.innerHTML = '<i class="fa-solid fa-plug"></i><span>تلاش مجدد</span>';
+                        }
+                        if (send) send.disabled = true;
+                        activeConsoleAuthenticated = false;
                         break;
                     case 'console output':
                         appendConsoleOutput(root, args[0] || '');
