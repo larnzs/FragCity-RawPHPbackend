@@ -463,7 +463,7 @@ function leaderboardBuildUrl(array $params = []): string
             </div>
         </div>
 
-        <div class="leaderboard-hero-art" aria-hidden="true" data-fc-reveal="left" data-fc-reveal-delay="120">
+        <div class="leaderboard-hero-art" aria-hidden="true">
             <span class="lb-hero-grid"></span>
             <span class="lb-hero-orbit lb-hero-orbit--outer"></span>
             <span class="lb-hero-orbit lb-hero-orbit--inner"></span>
