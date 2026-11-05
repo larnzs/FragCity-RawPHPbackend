@@ -52,7 +52,6 @@ try {
     $ranksSmokeTest = $read('tools/ranks-smoke-test.php');
     $leaderboardPage = $read('pages/leaderboard.php');
     $profilePage = $read('pages/profile.php');
-    $apiClient = $read('class/FragCityLinuxApiClient.php');
     $vipCoreSiteRepository = $read('class/VipCoreRepository.php');
     $vipCoreSiteEndpoint = $read('api/vip-test-purchase.php');
     $vipCorePage = $read('pages/vip.php');

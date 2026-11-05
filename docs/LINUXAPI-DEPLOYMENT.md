@@ -11,7 +11,6 @@
 | POST | `/v1/simpleadmin` | Read-only SimpleAdmin lookups and Ban List data | Root `shared_secret` |
 | POST | `/v1/vipcore` | VIPCore status and temporary no-payment test grants | Same root `shared_secret` |
 | POST | `/v1/ranks` | Read-only Ranks leaderboard and player statistics | Same root `shared_secret` |
-| POST | `/v1/vipcore` | VIPCore status and temporary no-payment test grants | Same root `shared_secret` |
 | POST | `/v1/pterodactyl-standby` | Public CS2 Server Browser snapshot | `pterodactyl_standby.shared_secret` |
 | POST | `/v1/pterodactyl-monitoring` | Node and CS2-container resource snapshot | `pterodactyl_monitoring.shared_secret` |
 | any | `/v1/agent/*` | Retired Windows-Agent compatibility route | Returns HTTP 410 |

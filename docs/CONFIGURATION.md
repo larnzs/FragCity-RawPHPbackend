@@ -128,7 +128,6 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 - ریشهٔ `shared_secret`: مشترک بین WeaponPaints، SimpleAdmin، VIPCore و Ranks.
 - `simpleadmin.database.name`: نام دیتابیس `GLOBAL_simpleadmin`؛ Username، Password، Host و Port از همان Plugin DB connection موجود در `database` استفاده می‌شوند.
 - `ranks.database`: اتصال مستقل و فقط‌خواندنی به `GLOBAL_ranks` با حساب `fragcity_ranks_api`؛ فقط دسترسی `SELECT` روی `lvl_base` لازم است.
-- `simpleadmin.database.name`: نام دیتابیس `GLOBAL_simpleadmin`؛ Username، Password، Host و Port از همان Plugin DB connection موجود در `database` استفاده می‌شوند.
 - `pterodactyl_standby.shared_secret`: مخصوص Server Browser.
 - `pterodactyl_monitoring.shared_secret`: مخصوص Monitoring.
 - `pterodactyl_standby.pterodactyl.application_api_key` و `pterodactyl_monitoring.pterodactyl.application_api_key`: توکن Application API فقط‌خواندنی Pterodactyl؛ فقط روی Linux.

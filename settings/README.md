@@ -80,7 +80,6 @@ The matching Linux-side template is `linuxapi/config.example.php`. It documents:
 - root shared HMAC secret for WeaponPaints, SimpleAdmin, VIPCore and Ranks, plus the Linux-local MariaDB connection;
 - a dedicated least-privilege `vipcore` database connection for `GLOBAL_vip.vip_users`;
 - a dedicated read-only `ranks` database connection for `GLOBAL_ranks.lvl_base`;
-- a dedicated least-privilege `vipcore` database connection for `GLOBAL_vip.vip_users`;
 - an independent `pterodactyl_standby` block, including cache, internal A2S query host, public connect host, Node ID, allowlists and read-only Application API token;
 - an independent `pterodactyl_monitoring` block, including Node allowlist, host metrics options, Wings URL overrides and the read-only Application API token.
 
