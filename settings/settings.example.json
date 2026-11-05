@@ -137,10 +137,9 @@
       "database_profile": "main"
     },
     "pages.vip": {
-      "_comment": "Website DB profile for VIP status and purchase records.",
-      "database_profile": "main",
+      "_comment": "VIP status and entitlements are read from VIPCore through the signed Linux API. This section contains storefront display metadata only.",
       "purchase_catalog": {
-        "_comment": "VIP storefront display metadata only. Keep checkout disabled until secure wallet purchase and game-server entitlement delivery are implemented.",
+        "_comment": "Display metadata only. The temporary test button grants one hour in VIPCore without payment; production checkout is a separate step.",
         "currency": "تومان",
         "packages": {
           "1": {
