@@ -47,6 +47,29 @@ $domainIsValid = in_array($originScheme, ['http', 'https'], true)
     && !isset($siteBaseParts['fragment'])
     && (!isset($siteBaseParts['path']) || $siteBaseParts['path'] === '' || $siteBaseParts['path'] === '/');
 
+$requestScheme = !empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off'
+    ? 'https'
+    : (strtolower(trim((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''))) === 'https' ? 'https' : 'http');
+$requestHostHeader = trim((string) ($_SERVER['HTTP_HOST'] ?? ''));
+$requestAuthority = parse_url($requestScheme . '://' . $requestHostHeader);
+$requestHost = is_array($requestAuthority)
+    ? strtolower((string) ($requestAuthority['host'] ?? ''))
+    : '';
+$requestPort = is_array($requestAuthority) && isset($requestAuthority['port'])
+    ? (int) $requestAuthority['port']
+    : null;
+$defaultOriginPort = $originPort ?? ($originScheme === 'https' ? 443 : 80);
+$defaultRequestPort = $requestPort ?? ($requestScheme === 'https' ? 443 : 80);
+$requestMatchesConfiguredOrigin = $requestScheme === $originScheme
+    && $requestHost !== ''
+    && $requestHost === $originHost
+    && $defaultRequestPort === $defaultOriginPort;
+
+if (!$requestMatchesConfiguredOrigin) {
+    $domainIsValid = false;
+    error_log('[FragCity] Steam OpenID request origin does not match app.site_base_url; refusing mismatched callback.');
+}
+
 if ($configuredDomain !== '' && $configuredDomain !== $originHost) {
     $domainIsValid = false;
     error_log('[FragCity] Steam domain_name does not match app.site_base_url host.');
