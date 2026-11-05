@@ -18,7 +18,7 @@ declare(strict_types=1);
 return [
     /*
      * Shared endpoint authentication:
-     * POST /v1/weaponpaints and POST /v1/simpleadmin
+     * POST /v1/weaponpaints, POST /v1/simpleadmin and POST /v1/vipcore
      *
      * Generate a 64-character lowercase hex key with:
      *   openssl rand -hex 32
@@ -67,6 +67,30 @@ return [
         // Only the target schema differs; no additional username/password are needed.
         'database' => [
             'name' => 'GLOBAL_simpleadmin',
+        ],
+    ],
+
+    /*
+     * VIPCore entitlement API:
+     * POST /v1/vipcore, authenticated by the existing root shared_secret above.
+     * Use a dedicated MariaDB user, never the plugin or WeaponPaints API account.
+     * Required privileges: SELECT, INSERT and UPDATE on GLOBAL_vip.vip_users only.
+     * ServerId must match the VIPCore vip_core.json setting.
+     */
+    'vipcore' => [
+        'enabled' => false,
+        'database' => [
+            'host' => '127.0.0.1',
+            'port' => 3306,
+            'name' => 'GLOBAL_vip',
+            'username' => 'fragcity_vip_api',
+            'password' => 'REPLACE_WITH_UNIQUE_VIPCORE_API_DATABASE_PASSWORD',
+            'charset' => 'utf8mb4',
+        ],
+        'server_id' => 0,
+        'test_mode' => [
+            'enabled' => false,
+            'duration_seconds' => 3600,
         ],
     ],
 
