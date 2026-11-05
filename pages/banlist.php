@@ -89,6 +89,43 @@ try {
     $pageEndIndex = 0;
 }
 
+/*
+ * Populate the shared, verified local Steam avatar cache for the records
+ * currently visible in Banlist. The service batches IDs and skips cached or
+ * recently checked profiles, so the page never builds an invalid CDN URL from
+ * a SteamID64.
+ */
+$banlistAvatarSteamIds = [];
+$banlistAvatarFields = [
+    'player_steamid',
+    'admin_steamid',
+    'unban_admin_steamid',
+    'unmute_admin_steamid',
+    'steamid',
+];
+
+foreach ($data as $avatarRecord) {
+    if (!is_array($avatarRecord)) {
+        continue;
+    }
+
+    foreach ($banlistAvatarFields as $avatarField) {
+        $avatarSteamId = trim((string)($avatarRecord[$avatarField] ?? ''));
+        if (preg_match('/^[0-9]{17}$/D', $avatarSteamId) === 1) {
+            $banlistAvatarSteamIds[$avatarSteamId] = $avatarSteamId;
+        }
+    }
+}
+
+if ($banlistAvatarSteamIds !== []) {
+    try {
+        require_once __DIR__ . '/../class/SteamProfileService.php';
+        SteamProfileService::cacheAvatarsForSteamIds(array_values($banlistAvatarSteamIds));
+    } catch (Throwable $avatarError) {
+        error_log('[FragCity] Banlist Steam avatar cache update failed (' . get_class($avatarError) . ').');
+    }
+}
+
 /* =========================================================
    Helper Functions
 ========================================================= */
@@ -119,17 +156,30 @@ function formatDuration($minutes): string
 
 function getUserAvatar($steamid): string
 {
-    $steamid = (string)$steamid;
-    if ($steamid !== '') {
-        $localAvatarPath = __DIR__ . '/../img/avatars/avatar_' . $steamid . '.jpg';
-        if (file_exists($localAvatarPath)) {
-            return 'img/avatars/avatar_' . $steamid . '.jpg?' . filemtime($localAvatarPath);
-        }
-
-        return 'https://avatars.steamstatic.com/' . rawurlencode($steamid) . '?size=medium';
+    $steamid = trim((string)$steamid);
+    if (preg_match('/^[0-9]{17}$/D', $steamid) !== 1) {
+        return '/img/logoresponsive.png';
     }
 
-    return 'assets/images/default_avatar.png';
+    // A user-uploaded FragCity avatar takes priority over the Steam avatar.
+    $customAvatarPath = __DIR__ . '/../img/avatars/avatar_' . $steamid . '.jpg';
+    if (is_file($customAvatarPath)) {
+        return '/img/avatars/avatar_' . rawurlencode($steamid) . '.jpg?v='
+            . (int)filemtime($customAvatarPath);
+    }
+
+    // Steam CDN URLs need the avatar hash returned by Steam, not the SteamID.
+    // SteamProfileService stores verified copies under this deterministic path.
+    foreach (['webp', 'jpg', 'png'] as $extension) {
+        $filename = 'steam_' . $steamid . '.' . $extension;
+        $steamAvatarPath = __DIR__ . '/../img/steam-avatars/' . $filename;
+        if (is_file($steamAvatarPath)) {
+            return '/img/steam-avatars/' . rawurlencode($filename) . '?v='
+                . (int)filemtime($steamAvatarPath);
+        }
+    }
+
+    return '/img/logoresponsive.png';
 }
 
 function renderPlayerCell(string $name, string $steamid): string
@@ -141,7 +191,7 @@ function renderPlayerCell(string $name, string $steamid): string
         <div class="ban-player">
             <img src="' . esc($avatar) . '" alt="' . esc($name) . '"
                  class="ban-avatar"
-                 onerror="this.src=\'assets/images/default_avatar.png\'">
+                 onerror="this.onerror=null;this.src=\'/img/logoresponsive.png\'">
             <div class="ban-player-info">
                 <span class="ban-player-name">' . esc($name) . '</span>
                 ' . ($steamShort !== '' ? '
@@ -161,7 +211,7 @@ function renderAdminCell(string $name, string $steamid): string
         <div class="ban-player ban-admin">
             <img src="' . esc($avatar) . '" alt="' . esc($name) . '"
                  class="ban-avatar"
-                 onerror="this.src=\'assets/images/default_avatar.png\'">
+                 onerror="this.onerror=null;this.src=\'/img/logoresponsive.png\'">
             <div class="ban-player-info">
                 <span class="ban-player-name">' . esc($name) . '</span>
                 ' . ($steamShort !== '' ? '
@@ -199,14 +249,13 @@ $activeTab = $tabs[$type] ?? $tabs['bans'];
 function banlistBuildUrl(array $params = []): string
 {
     $query = array_merge([
-        'page' => 'banlist',
         'type' => $GLOBALS['type'] ?? 'bans',
         'q' => $GLOBALS['search'] ?? '',
         'per_page' => $GLOBALS['perPage'] ?? 15,
         'page_num' => $GLOBALS['pageNum'] ?? 1,
     ], $params);
 
-    return '?' . http_build_query($query);
+    return '/banlist/?' . http_build_query($query);
 }
 ?>
 
@@ -344,7 +393,6 @@ function banlistBuildUrl(array $params = []): string
             </div>
 
             <form class="banlist-search-form" method="get" role="search" aria-label="جستجو در سوابق">
-                <input type="hidden" name="page" value="banlist">
                 <input type="hidden" name="type" value="<?= esc($type) ?>">
                 <input type="hidden" name="per_page" value="<?= (int)$perPage ?>">
                 <input type="hidden" name="page_num" value="1">
