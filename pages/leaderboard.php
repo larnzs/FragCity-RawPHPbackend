@@ -423,6 +423,11 @@ $currentSortIcon =
 
 $topMaxPoints = max(1, (int)($leaderboardStats['max_points'] ?? 0));
 
+$leaderboardGuyAssetPath = dirname(__DIR__) . '/img/webp/leaderboardguy.webp';
+$leaderboardGuyAssetVersion = is_file($leaderboardGuyAssetPath) && function_exists('asset_version')
+    ? (string) asset_version($leaderboardGuyAssetPath)
+    : '1';
+
 
 function leaderboardBuildUrl(array $params = []): string
 {
@@ -602,52 +607,84 @@ function leaderboardBuildUrl(array $params = []): string
          HEADER
     ====================================================== -->
 
-    <header class="leaderboard-header">
-
-        <div class="leaderboard-heading">
-
-            <div class="leaderboard-heading-icon">
-
-                <i class="fas fa-trophy"></i>
-
+    <header class="leaderboard-header leaderboard-hero" aria-labelledby="leaderboardHeroTitle">
+        <div class="leaderboard-hero-copy">
+            <div class="leaderboard-eyebrow" data-fc-reveal="up">
+                <span class="leaderboard-hero-eyebrow-mark" aria-hidden="true"></span>
+                FRAGCITY <span>/</span> CS2 COMPETITIVE
             </div>
 
-            <div>
+            <h1 id="leaderboardHeroTitle" data-fc-reveal="up" data-fc-reveal-delay="70">
+                رقابت برای <span>صدر جدول</span>
+            </h1>
 
-                <div class="leaderboard-eyebrow">
-                    FragCity Competitive Rankings
+            <p data-fc-reveal="up" data-fc-reveal-delay="130">
+                عملکرد بازیکنان FragCity را دنبال کن، آمار را مقایسه کن و جایگاهت را بین بهترین‌های میدان پیدا کن.
+            </p>
+
+            <div class="leaderboard-hero-meta" data-fc-reveal="up" data-fc-reveal-delay="180">
+                <span><i class="fa-solid fa-users" aria-hidden="true"></i> <?= number_format($totalPlayers) ?> بازیکن رتبه‌بندی‌شده</span>
+                <span><i class="fa-solid fa-chart-line" aria-hidden="true"></i> ۷ معیار رقابتی</span>
+                <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> آمار ثبت‌شده سرورها</span>
+            </div>
+
+            <div class="leaderboard-hero-bottom" data-fc-reveal="up" data-fc-reveal-delay="230">
+                <a class="leaderboard-hero-action" href="#leaderboardTable">
+                    <i class="fa-solid fa-ranking-star" aria-hidden="true"></i>
+                    مشاهده جدول رتبه‌بندی
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                </a>
+
+                <div class="leaderboard-current-sort" aria-label="مرتب‌سازی فعلی">
+                    <span>
+                        <i class="fas <?= leaderboardEscape($currentSortIcon) ?>" aria-hidden="true"></i>
+                        مرتب‌سازی بر اساس
+                    </span>
+                    <strong><?= leaderboardEscape($currentSortLabel) ?></strong>
+                    <i class="fas <?= $orderDir === 'ASC' ? 'fa-arrow-up' : 'fa-arrow-down' ?>" aria-hidden="true"></i>
                 </div>
+            </div>
+        </div>
 
-                <h1>
-                    Leaderboard
-                </h1>
+        <div class="leaderboard-hero-art" aria-hidden="true" data-fc-reveal="left" data-fc-reveal-delay="120">
+            <span class="lb-hero-grid"></span>
+            <span class="lb-hero-orbit lb-hero-orbit--outer"></span>
+            <span class="lb-hero-orbit lb-hero-orbit--inner"></span>
+            <span class="lb-hero-light"></span>
 
-                <p>
-                    رتبه‌بندی بازیکنان بر اساس عملکرد واقعی در سرورهای FragCity
-                </p>
-
+            <div class="lb-hero-emblem">
+                <span>01</span>
+                <i class="fa-solid fa-trophy"></i>
             </div>
 
+            <?php if (is_file($leaderboardGuyAssetPath)): ?>
+                <img
+                    class="lb-hero-character"
+                    src="/img/webp/leaderboardguy.webp?v=<?= rawurlencode($leaderboardGuyAssetVersion) ?>"
+                    alt=""
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
+                >
+            <?php else: ?>
+                <div class="lb-hero-character-placeholder">
+                    <i class="fa-solid fa-user-ninja"></i>
+                    <span>PLAYER ART SLOT</span>
+                </div>
+            <?php endif; ?>
+
+            <span class="lb-hero-tag lb-hero-tag--top">FRAGCITY / ELITE</span>
+            <span class="lb-hero-tag lb-hero-tag--bottom">CS2 // RANKED</span>
+
+            <div class="lb-hero-float-card lb-hero-float-card--top">
+                <i class="fa-solid fa-crown" aria-hidden="true"></i>
+                <span>HALL OF FAME</span>
+            </div>
+            <div class="lb-hero-float-card lb-hero-float-card--bottom">
+                <span class="lb-hero-float-number">#1</span>
+                <span>OWN THE TOP</span>
+            </div>
         </div>
-
-
-        <div class="leaderboard-current-sort">
-
-            <span>
-                <i class="fas <?= leaderboardEscape($currentSortIcon) ?>"></i>
-                مرتب‌سازی بر اساس
-            </span>
-
-            <strong>
-                <?= leaderboardEscape($currentSortLabel) ?>
-            </strong>
-
-            <i class="fas <?= $orderDir === 'ASC'
-                ? 'fa-arrow-up'
-                : 'fa-arrow-down' ?>"></i>
-
-        </div>
-
     </header>
 
 
@@ -655,7 +692,7 @@ function leaderboardBuildUrl(array $params = []): string
          STATS
     ====================================================== -->
 
-    <section class="leaderboard-stats-grid">
+    <section class="leaderboard-stats-grid" id="leaderboardStats" aria-label="آمار کلی رتبه‌بندی">
 
         <article class="leaderboard-stat-card">
 
@@ -751,7 +788,7 @@ function leaderboardBuildUrl(array $params = []): string
          MAIN CONTAINER
     ====================================================== -->
 
-    <section class="leaderboard-container">
+    <section class="leaderboard-container" id="leaderboardTable">
 
 
         <!-- =================================================
