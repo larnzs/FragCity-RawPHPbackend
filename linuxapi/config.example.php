@@ -4,200 +4,321 @@ declare(strict_types=1);
 /**
  * FragCity Linux API private runtime configuration example.
  *
- * Copy this file to /etc/fragcity-api/config.php only during a fresh install.
- * For an existing installation, merge individual keys carefully; do not replace
- * the live config because it contains the real database password and HMAC secrets.
+ * Copy this file to /etc/fragcity-api/config.php only for a fresh install.
+ * For an existing installation, merge individual keys carefully; never replace
+ * a live config without preserving its database credentials and HMAC secrets.
  *
- * PHP-FPM (www-data) needs READ access to the private file but must not be able
- * to write it. Never place this file below the public document root or commit it.
+ * Keep the runtime file outside the public document root and out of Git.
+ * PHP-FPM (www-data) needs read access but must not be able to write it.
  *
- * This Linux API owns WeaponPaints, read-only SimpleAdmin and Ranks lookups, VIPCore entitlement
- * access, and the server-side Pterodactyl integrations. It must never connect to the FragCity website DB
- * (kyonxcbt_fragcity_services) or receive the website's database credentials.
+ * This API must never connect to the FragCity website database or receive
+ * the website database credentials.
+ *
+ * IMPORTANT:
+ * Every REPLACE_WITH_* value below is a placeholder, not a working credential.
+ * Fill these values locally on the server. Never commit the completed runtime
+ * config and never paste real passwords, tokens or HMAC keys into Git.
  */
+
+
+/*
+|--------------------------------------------------------------------------
+| Shared credentials
+|--------------------------------------------------------------------------
+|
+| These variables keep repeated credentials consistent across the integrations.
+| Use the existing values from the private runtime config when migrating.
+|
+*/
+
+// Existing MariaDB account shared by WeaponPaints, VIPCore and Ranks.
+$pluginsDbPassword = 'REPLACE_WITH_EXISTING_PLUGINS_DATABASE_PASSWORD';
+
+// Shared by WeaponPaints, SimpleAdmin, VIPCore and Ranks.
+// Must match integrations.weaponpaints_api.shared_secret on the website.
+$rootSharedSecret = 'REPLACE_WITH_WEAPONPAINTS_64_HEX_SECRET';
+
+// Independent HMAC key for Pterodactyl Monitoring.
+$monitoringSharedSecret = 'REPLACE_WITH_MONITORING_64_HEX_SECRET';
+
+// Independent HMAC key for Pterodactyl Standby / Server Browser.
+$standbySharedSecret = 'REPLACE_WITH_STANDBY_64_HEX_SECRET';
+
+// Read-only Pterodactyl Application API token for Monitoring.
+// Monitoring is disabled by default; configure and enable only after validation.
+$monitoringApplicationApiKey = 'REPLACE_WITH_READ_ONLY_MONITORING_APPLICATION_API_TOKEN';
+
+// Read-only Pterodactyl Application API token for Standby.
+// It requires permission to read Servers and Allocations.
+$standbyApplicationApiKey = 'REPLACE_WITH_READ_ONLY_STANDBY_APPLICATION_API_TOKEN';
+
+
 return [
-    /*
-     * Shared endpoint authentication:
-     * POST /v1/weaponpaints, /v1/simpleadmin, /v1/vipcore and /v1/ranks
-     *
-     * Generate a 64-character lowercase hex key with:
-     *   openssl rand -hex 32
-     * Put the matching value in the website's integrations.weaponpaints_api.shared_secret.
-     * WeaponPaints, SimpleAdmin, VIPCore and Ranks intentionally share this key.
-     * Pterodactyl Standby and Monitoring keep their own independent HMAC keys.
-     */
-    'shared_secret' => 'REPLACE_WITH_WEAPONPAINTS_64_HEX_SECRET',
 
     /*
-     * Linux-local WeaponPaints database and API nonce store.
-     * The same existing Plugin DB account configured below is reused for the
-     * read-only GLOBAL_simpleadmin schema. It needs schema-wide SELECT on
-     * GLOBAL_simpleadmin.*; no second DB user or write privileges are required.
-     * Keep TCP/3306 private; the API should use the local listener.
-     */
+    |--------------------------------------------------------------------------
+    | Shared API authentication
+    |--------------------------------------------------------------------------
+    |
+    | Used by:
+    | - POST /v1/weaponpaints
+    | - POST /v1/simpleadmin
+    | - POST /v1/vipcore
+    | - POST /v1/ranks
+    |
+    | Must match:
+    | settings/settings.json
+    | integrations.weaponpaints_api.shared_secret
+    |
+    */
+
+    'shared_secret' => $rootSharedSecret,
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | WeaponPaints database and API nonce store
+    |--------------------------------------------------------------------------
+    |
+    | Existing MariaDB account: plugins
+    | Database: GLOBAL_weaponpaints
+    |
+    | The same account is reused for the SimpleAdmin, VIPCore and Ranks
+    | databases. Its MariaDB grants must cover the required schemas/tables.
+    |
+    */
+
     'database' => [
-        'host' => '127.0.0.1', // MariaDB loopback listener on the API host.
-        'port' => 3306,        // Confirm with: sudo ss -lntp | grep 3306
+        'host' => '127.0.0.1',
+        'port' => 3306,
         'name' => 'GLOBAL_weaponpaints',
-        'username' => 'fragcity_weaponpaints_api',
-        'password' => 'REPLACE_WITH_THE_EXISTING_UNIQUE_DATABASE_PASSWORD',
+        'username' => 'plugins',
+        'password' => $pluginsDbPassword,
         'charset' => 'utf8mb4',
     ],
 
-    /*
-     * Read-only SimpleAdmin data integration:
-     * POST /v1/simpleadmin, authenticated with the root shared_secret above.
-     *
-     * The integration is intended for the full GLOBAL_simpleadmin schema:
-     * Ban List datasets (bans/unbans, mutes/unmutes, warns), player identity
-     * and player history. The API must expose only purpose-built allowlisted
-     * actions and selected fields, never arbitrary SQL or raw table dumps.
-     *
-     * Read-only actions: resolve_player_names and get_records. The latter
-     * provides paginated bans, unbans, mutes, unmutes, warns and administrator-only
-     * player IP history. Public Ban List requests never receive IP columns.
-     * The identity resolver itself only reads name, steamid and used_at.
-     *
-     * Reuses the root Plugin DB account with schema-wide SELECT on
-     * GLOBAL_simpleadmin.*. No INSERT, UPDATE or DELETE privileges are needed.
-     */
-    'simpleadmin' => [
-        'enabled' => false, // Enable after schema-wide SELECT permissions and the identity index are verified.
-        // Reuses the existing Plugin DB account from the root 'database' settings above.
-        // Only the target schema differs; no additional username/password are needed.
-        'database' => [
-            'name' => 'GLOBAL_simpleadmin',
-        ],
-    ],
 
     /*
-     * VIPCore entitlement API:
-     * POST /v1/vipcore, authenticated by the existing root shared_secret above.
-     * Use a dedicated MariaDB user, never the plugin or WeaponPaints API account.
-     * Required privileges: SELECT, INSERT and UPDATE on GLOBAL_vip.vip_users only.
-     * ServerId must match the VIPCore vip_core.json setting.
-     */
+    |--------------------------------------------------------------------------
+    | VIPCore API
+    |--------------------------------------------------------------------------
+    |
+    | Endpoint: POST /v1/vipcore
+    | Database: GLOBAL_vip
+    | Table: vip_users
+    |
+    | Uses the existing plugins MariaDB account.
+    | Required operations: SELECT, INSERT and UPDATE on vip_users.
+    |
+    */
+
     'vipcore' => [
-        'enabled' => false,
+
+        'enabled' => true,
+
         'database' => [
             'host' => '127.0.0.1',
             'port' => 3306,
             'name' => 'GLOBAL_vip',
-            'username' => 'fragcity_vip_api',
-            'password' => 'REPLACE_WITH_UNIQUE_VIPCORE_API_DATABASE_PASSWORD',
+            'username' => 'plugins',
+            'password' => $pluginsDbPassword,
             'charset' => 'utf8mb4',
         ],
+
+        // Must match ServerId in the VIPCore vip_core.json configuration.
         'server_id' => 0,
+
+        // Temporary no-payment test grants remain disabled by default.
         'test_mode' => [
             'enabled' => false,
             'duration_seconds' => 3600,
-            // Empty means no free test grants. Add exact 17-digit SteamID64s only
-            // for trusted test accounts; this allowlist is checked on Linux.
+
+            // Keep empty to disallow every test grant.
+            // If test grants are deliberately enabled, add exact 17-digit
+            // SteamID64 values for explicitly authorized test accounts only.
             'allowed_steamids' => [],
         ],
+
     ],
 
+
     /*
-     * Read-only Ranks leaderboard:
-     * POST /v1/ranks, authenticated by the existing root shared_secret above.
-     * Use a dedicated MariaDB account with SELECT on GLOBAL_ranks.lvl_base only.
-     * Do not reuse WeaponPaints, VIPCore or game-plugin database credentials.
-     */
+    |--------------------------------------------------------------------------
+    | Ranks API
+    |--------------------------------------------------------------------------
+    |
+    | Endpoint: POST /v1/ranks
+    | Database: GLOBAL_ranks
+    | Table: lvl_base
+    |
+    | API operations are read-only and use the existing plugins account.
+    | Required privilege: SELECT on GLOBAL_ranks.lvl_base.
+    |
+    */
+
     'ranks' => [
-        'enabled' => false,
+
+        'enabled' => true,
+
         'database' => [
             'host' => '127.0.0.1',
             'port' => 3306,
             'name' => 'GLOBAL_ranks',
-            'username' => 'fragcity_ranks_api',
-            'password' => 'REPLACE_WITH_UNIQUE_RANKS_API_DATABASE_PASSWORD',
+            'username' => 'plugins',
+            'password' => $pluginsDbPassword,
             'charset' => 'utf8mb4',
         ],
+
     ],
 
+
     /*
-     * Pterodactyl Monitoring endpoint:
-     * POST /v1/pterodactyl-monitoring
-     *
-     * Returns allowlisted Node and CS2-container resource metrics. Monitoring is
-     * independent from the public Server Browser. Leave enabled=false until every
-     * node ID, Application API permission and Wings connection has been verified.
-     */
+    |--------------------------------------------------------------------------
+    | SimpleAdmin API
+    |--------------------------------------------------------------------------
+    |
+    | Endpoint: POST /v1/simpleadmin
+    | Database: GLOBAL_simpleadmin
+    |
+    | Reuses the root database connection above; only the schema name changes.
+    | The API exposes allowlisted actions and selected fields, not arbitrary SQL.
+    |
+    */
+
+    'simpleadmin' => [
+
+        'enabled' => true,
+
+        'database' => [
+            'name' => 'GLOBAL_simpleadmin',
+        ],
+
+    ],
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pterodactyl Monitoring API
+    |--------------------------------------------------------------------------
+    |
+    | Endpoint: POST /v1/pterodactyl-monitoring
+    |
+    | Monitoring is disabled by default. Configure the independent HMAC key,
+    | read-only Application API token, authorized Node IDs and any Wings
+    | overrides before enabling it.
+    |
+    */
+
     'pterodactyl_monitoring' => [
-        'enabled' => false, // Set true only after configuring the fields below.
-        // Generate independently with: openssl rand -hex 32
-        // Copy the same value to integrations.pterodactyl_monitoring_api.shared_secret on the website.
-        'shared_secret' => 'REPLACE_WITH_MONITORING_64_HEX_SECRET',
-        'max_servers' => 100, // Hard-bounded by the service (1–250).
-        // Set to the real numeric Node ID ONLY if this API process runs on that same Wings host.
-        // Leave 0 when the API host is not the monitored node; remote host CPU/disk values are not fabricated.
+
+        'enabled' => false,
+
+        'shared_secret' => $monitoringSharedSecret,
+
+        'max_servers' => 100,
+
+        // Set only when this API process runs on the monitored Wings node.
+        // Leave 0 when the API host is not itself the monitored node.
         'local_node_id' => 0,
-        // Optional path override for host disk sampling. Empty uses the system.data path returned by Wings.
+
+        // Optional host disk sampling path. Empty uses the Wings system.data path.
         'host_metrics_disk_path' => '',
+
         'pterodactyl' => [
-            'base_url' => 'https://panel.fragcity.ir', // Panel origin only; no /api path.
-            // Read-only Application API token. It must be able to read Node records/config and server records.
-            // Never copy this token to the website settings or browser.
-            'application_api_key' => 'REPLACE_WITH_READ_ONLY_APPLICATION_API_TOKEN',
-            // Explicit numeric Node IDs allowed for Monitoring. Example: [1].
-            // Empty means no nodes are authorized; do not use guessed IDs.
+
+            'base_url' => 'https://panel.fragcity.ir',
+
+            // Read-only Application API token. Never expose it to the website
+            // frontend or browser. Configure the required read permissions.
+            'application_api_key' => $monitoringApplicationApiKey,
+
+            // Explicit numeric Node IDs authorized for Monitoring.
+            // Empty means no Nodes are authorized.
             'allowed_node_ids' => [],
-            // Optional Egg ID allowlist. Combine with Docker image allowlist as needed.
+
+            // Optional Egg ID allowlist.
             'allowed_egg_ids' => [],
+
             'allowed_docker_images' => [
                 'ghcr.io/k4ryuu/cs2-egg-go',
             ],
+
         ],
+
         // Optional Wings URL overrides keyed by numeric Node ID.
-        // Prefer HTTPS with a valid certificate. Plain HTTP is permitted only for loopback/private IPs.
-        // Example when API and Wings are on the same host: [1 => 'http://127.0.0.1:8080'].
+        // Prefer HTTPS with a valid certificate. Plain HTTP is permitted
+        // only for loopback or private IP addresses.
         'wings_base_urls' => [],
+
     ],
 
+
     /*
-     * Public CS2 Server Browser endpoint:
-     * POST /v1/pterodactyl-standby
-     *
-     * The Linux API discovers servers through Pterodactyl Application API, selects
-     * their DEFAULT game Allocations and queries those exact UDP ports with A2S_INFO.
- * Player details are queried on-demand with A2S_PLAYER after a visitor opens a server modal.
-     * No arbitrary port-range scan and no Cron job are used by the active browser.
-     * The current discovery implementation is intentionally single-Node.
-     */
+    |--------------------------------------------------------------------------
+    | Pterodactyl Standby / Public CS2 Server Browser API
+    |--------------------------------------------------------------------------
+    |
+    | Endpoint: POST /v1/pterodactyl-standby
+    |
+    | Discovers eligible servers through the Pterodactyl Application API,
+    | resolves their default game allocations and queries those exact UDP
+    | ports with A2S_INFO. Player details are queried on demand with A2S_PLAYER.
+    |
+    | No arbitrary port-range scanning or Cron job is used by the active browser.
+    | The current discovery implementation is intentionally single-Node.
+    |
+    */
+
     'pterodactyl_standby' => [
-        'enabled' => false, // Set true after completing the settings and manual tests.
-        // Generate independently with: openssl rand -hex 32
-        // Copy the same value to integrations.pterodactyl_standby_api.shared_secret on the website.
-        'shared_secret' => 'REPLACE_WITH_STANDBY_64_HEX_SECRET',
-        // Absolute local path. Ensure PHP-FPM can write to its directory:
-        // sudo install -d -o www-data -g www-data -m 0750 /var/cache/fragcity-api
+
+        'enabled' => true,
+
+        'shared_secret' => $standbySharedSecret,
+
+        // Ensure PHP-FPM can write to the cache directory.
+        // Example:
+        // install -d -o www-data -g www-data -m 0750 /var/cache/fragcity-api
         'cache_file' => '/var/cache/fragcity-api/pterodactyl-standby.json',
-        'cache_ttl_seconds' => 10,       // Refresh on the first website request after this TTL (3–120 seconds).
-        'cache_max_stale_seconds' => 180, // Serve last good snapshot during temporary upstream failure (max 3600).
-        // Public address and game port shown in steam://connect links; must be reachable by players.
-        'public_connect_host' => '85.185.40.85',
-        // Private/internal IP reachable by THIS Linux API host over UDP A2S.
-        // Do not put the public API hostname here unless UDP query really routes there.
-        'query_host' => '192.168.2.3',
-        // Optional per-Node overrides, keyed by numeric Pterodactyl Node ID:
-        // 'node_public_connect_hosts' => [1 => '85.185.40.85'],
-        // 'node_query_hosts' => [1 => '192.168.2.3'],
-        'query_timeout_ms' => 1500, // Per-server A2S timeout.
-        'max_servers' => 40,        // Upper-bounded by discovery (1–100).
-        'region' => '',             // Optional display metadata; does not affect discovery.
+
+        'cache_ttl_seconds' => 10,
+
+        'cache_max_stale_seconds' => 180,
+
+        // Public address shown in steam://connect links.
+        'public_connect_host' => 'REPLACE_WITH_PUBLIC_GAME_HOST',
+
+        // Private/internal address reachable by this Linux API host over UDP A2S.
+        'query_host' => 'REPLACE_WITH_PRIVATE_GAME_QUERY_HOST',
+
+        'query_timeout_ms' => 1500,
+
+        'max_servers' => 40,
+
+        'region' => '',
+
         'pterodactyl' => [
-            'base_url' => 'https://panel.fragcity.ir', // Pterodactyl Panel origin only.
-            // Read-only Application API token. It needs Servers: Read and Allocations: Read
-            // so the API can resolve each server's primary Allocation ID and port.
-            // It may be shared with Monitoring if permissions cover both; HMAC secrets stay separate.
-            'application_api_key' => 'REPLACE_WITH_READ_ONLY_APPLICATION_API_TOKEN',
-            'node_id' => 0, // REQUIRED: replace with the real numeric Node ID from Admin → Nodes.
-            // Add the exact Egg IDs used by CS2 servers where possible. Empty is allowed only when
-            // the Docker image allowlist below identifies the eligible CS2 servers.
+
+            'base_url' => 'https://panel.fragcity.ir',
+
+            // Read-only Application API token. It needs Servers: Read and
+            // Allocations: Read so the API can resolve each primary allocation.
+            // Never expose this token to the website frontend or browser.
+            'application_api_key' => $standbyApplicationApiKey,
+
+            // REQUIRED: replace with the real numeric Node ID from Admin -> Nodes.
+            'node_id' => 0,
+
+            // Add exact Egg IDs where possible.
+            // Empty is permitted only when the Docker image allowlist identifies
+            // the eligible CS2 servers.
             'allowed_egg_ids' => [],
+
             'allowed_docker_images' => [
                 'ghcr.io/k4ryuu/cs2-egg-go',
             ],
+
         ],
+
     ],
+
 ];
