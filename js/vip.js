@@ -18,14 +18,17 @@
         const detailHomeMarker = root.querySelector('#vipDetailPanelHome');
         const mobileQuery = window.matchMedia('(max-width: 700px)');
         let activePlan = null;
+        let mobileDetailsOpen = false;
         const checkoutButton = root.querySelector('#vipCheckoutButton');
 
         if (!plans.length) return;
 
         function syncDetailPanelPosition() {
-            if (!detailPanel || !detailHomeMarker || !activePlan) return;
+            if (!detailPanel || !detailHomeMarker) return;
 
-            if (mobileQuery.matches) {
+            const inlineOpen = mobileQuery.matches && activePlan && mobileDetailsOpen;
+
+            if (inlineOpen) {
                 const planItem = activePlan.parentElement;
                 if (
                     planItem &&
@@ -34,30 +37,46 @@
                 ) {
                     planItem.appendChild(detailPanel);
                 }
-                return;
+                detailPanel.hidden = false;
+            } else {
+                const home = detailHomeMarker.parentElement;
+                if (home && detailPanel.parentElement !== home) {
+                    home.insertBefore(detailPanel, detailHomeMarker.nextSibling);
+                }
+                detailPanel.hidden = mobileQuery.matches;
             }
 
-            const home = detailHomeMarker.parentElement;
-            if (home && detailPanel.parentElement !== home) {
-                home.insertBefore(detailPanel, detailHomeMarker.nextSibling);
-            }
+            plans.forEach(function (item) {
+                const selected = item === activePlan;
+                const expanded = selected && (!mobileQuery.matches || mobileDetailsOpen);
+                item.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+
+                const indicator = item.querySelector('[data-vip-select]');
+                if (indicator) {
+                    indicator.innerHTML = expanded
+                        ? 'قابلیت‌های این سطح <i class="fas fa-check" aria-hidden="true"></i>'
+                        : 'مشاهده قابلیت‌ها <i class="fas fa-arrow-left" aria-hidden="true"></i>';
+                }
+            });
         }
 
-        function selectPlan(plan) {
+        function selectPlan(plan, userInitiated) {
             if (!plan) return;
+            const wasActivePlan = activePlan === plan;
             activePlan = plan;
+
+            if (mobileQuery.matches) {
+                mobileDetailsOpen = userInitiated
+                    ? (wasActivePlan ? !mobileDetailsOpen : true)
+                    : false;
+            } else {
+                mobileDetailsOpen = true;
+            }
 
             plans.forEach(function (item) {
                 const selected = item === plan;
                 item.classList.toggle('is-selected', selected);
-
                 item.setAttribute('aria-pressed', selected ? 'true' : 'false');
-                const indicator = item.querySelector('[data-vip-select]');
-                if (indicator) {
-                    indicator.innerHTML = selected
-                        ? 'قابلیت‌های این سطح <i class="fas fa-check" aria-hidden="true"></i>'
-                        : 'مشاهده قابلیت‌ها <i class="fas fa-arrow-left" aria-hidden="true"></i>';
-                }
             });
 
             const level = plan.dataset.level || '';
@@ -106,22 +125,27 @@
             }
         }
 
+        function handleViewportChange() {
+            mobileDetailsOpen = false;
+            syncDetailPanelPosition();
+        }
+
         if (typeof mobileQuery.addEventListener === 'function') {
-            mobileQuery.addEventListener('change', syncDetailPanelPosition);
+            mobileQuery.addEventListener('change', handleViewportChange);
         } else if (typeof mobileQuery.addListener === 'function') {
-            mobileQuery.addListener(syncDetailPanelPosition);
+            mobileQuery.addListener(handleViewportChange);
         }
 
         plans.forEach(function (plan) {
             // The whole card is one accessible control (Enter / Space / pointer).
             plan.addEventListener('click', function () {
-                selectPlan(plan);
+                selectPlan(plan, true);
             });
 
             plan.addEventListener('keydown', function (event) {
                 if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
-                    selectPlan(plan);
+                    selectPlan(plan, true);
                 }
             });
         });
@@ -130,7 +154,7 @@
             return plan.classList.contains('is-current');
         }) || plans[0];
 
-        selectPlan(initialPlan);
+        selectPlan(initialPlan, false);
     }
 
     if (document.readyState === 'loading') {
