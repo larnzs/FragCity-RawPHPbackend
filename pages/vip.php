@@ -418,7 +418,8 @@ $vipCurrentStatus = !$isLoggedIn
                     : ($tierDuration !== null ? number_format($tierDuration) . ' روز' : 'مدت اشتراک مشخص نشده');
                 $isCurrentTier = $vipHasActiveMembership && $vipCurrentLevel === (int) $lvl;
             ?>
-            <article
+            <div class="vip-plan-item">
+                <article
                 class="vip-plan-card<?= $isCurrentTier ? ' is-current' : '' ?><?= !$tier['available'] ? ' is-locked' : '' ?>"
                 data-vip-plan
                 data-level="<?= (int) $lvl ?>"
@@ -487,10 +488,12 @@ $vipCurrentStatus = !$isLoggedIn
                     مشاهده قابلیت‌ها
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                 </span>
-            </article>
+                </article>
+            </div>
         <?php endforeach; ?>
     </section>
 
+    <span id="vipDetailPanelHome" hidden aria-hidden="true"></span>
     <section class="vip-feature-panel" aria-labelledby="vipDetailTierName" aria-live="polite">
         <div class="vip-feature-panel-head">
             <div class="vip-feature-panel-title">
