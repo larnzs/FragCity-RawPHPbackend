@@ -236,7 +236,7 @@
 
             // Clean URLs have no ?page= query. Resolve their root-level
             // path so redirects and browser Back/Forward keep the right page.
-            const cleanSlug = parsed.pathname.replace(/^\\/+|\\/+$/g, '');
+            const cleanSlug = parsed.pathname.replace(/^\/+|\/+$/g, '');
             const cleanRoutes = {
                 '': 'home',
                 'servers': 'servers_vps',
