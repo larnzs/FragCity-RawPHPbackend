@@ -3751,9 +3751,9 @@ body.site-body:has(.leaderboard-page) {
     }
 
     .leaderboard-page .leaderboard-search-form .leaderboard-search-btn {
-        height: 42px !important;
-        min-height: 42px !important;
-        max-height: 42px;
+        height: 46px !important;
+        min-height: 46px !important;
+        max-height: 46px;
     }
 
     .leaderboard-page .leaderboard-search-field {
