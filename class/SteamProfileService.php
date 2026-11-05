@@ -87,6 +87,140 @@ final class SteamProfileService
     }
 
     /**
+     * Populate the shared local avatar cache for leaderboard SteamID64 values.
+     *
+     * Steam's GetPlayerSummaries endpoint returns the actual avatar URL/hash.
+     * A SteamID itself is not a valid Steam CDN avatar path.
+     *
+     * @param array<int, string> $steamids64
+     */
+    public static function cacheAvatarsForSteamIds(array $steamids64): void
+    {
+        $validIds = [];
+        foreach ($steamids64 as $candidate) {
+            $steamid64 = trim((string)$candidate);
+            if (preg_match('/^[0-9]{17}$/D', $steamid64)) {
+                $validIds[$steamid64] = $steamid64;
+            }
+        }
+
+        if ($validIds === []) {
+            return;
+        }
+
+        $avatarDirectory = dirname(__DIR__) . '/img/steam-avatars';
+        if (
+            !is_dir($avatarDirectory)
+            && !@mkdir($avatarDirectory, 0755, true)
+            && !is_dir($avatarDirectory)
+        ) {
+            return;
+        }
+
+        // Keep negative lookups outside the public web root to avoid repeated
+        // API calls for private profiles that do not return an avatar.
+        $lookupDirectory = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
+            . DIRECTORY_SEPARATOR . 'fragcity-steam-avatar-lookups';
+        $canMarkLookups = is_dir($lookupDirectory)
+            || @mkdir($lookupDirectory, 0700, true);
+
+        $missingIds = [];
+        foreach ($validIds as $steamid64) {
+            if (self::findCachedAvatarPath($steamid64) !== '') {
+                continue;
+            }
+
+            $marker = $lookupDirectory . DIRECTORY_SEPARATOR . $steamid64 . '.checked';
+            if (
+                $canMarkLookups
+                && is_file($marker)
+                && (int)@filemtime($marker) >= time() - 1800
+            ) {
+                continue;
+            }
+
+            $missingIds[] = $steamid64;
+        }
+
+        if ($missingIds === []) {
+            return;
+        }
+
+        $apiKey = defined('STEAM_API_KEY') ? trim((string)STEAM_API_KEY) : '';
+        if ($apiKey === '') {
+            return;
+        }
+
+        // Steam GetPlayerSummaries accepts batches of up to 100 SteamIDs.
+        foreach (array_chunk($missingIds, 100) as $batch) {
+            $url = 'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?'
+                . http_build_query([
+                    'key' => $apiKey,
+                    'steamids' => implode(',', $batch),
+                ]);
+
+            $json = self::requestJson($url);
+            if ($json === null) {
+                continue;
+            }
+
+            $decoded = json_decode($json, true);
+            $players = is_array($decoded)
+                ? ($decoded['response']['players'] ?? null)
+                : null;
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($players)) {
+                error_log('[FragCity] Steam leaderboard avatar lookup returned an invalid response.');
+                continue;
+            }
+
+            $requestedIds = array_fill_keys($batch, true);
+            foreach ($players as $rawPlayer) {
+                if (!is_array($rawPlayer)) {
+                    continue;
+                }
+
+                $steamid64 = (string)($rawPlayer['steamid'] ?? '');
+                if (!isset($requestedIds[$steamid64])) {
+                    continue;
+                }
+
+                $avatarUrl = '';
+                foreach (['avatarfull', 'avatarmedium', 'avatar'] as $avatarField) {
+                    $candidateUrl = self::safeAvatarUrl((string)($rawPlayer[$avatarField] ?? ''));
+                    if ($candidateUrl !== '') {
+                        $avatarUrl = $candidateUrl;
+                        break;
+                    }
+                }
+
+                if ($avatarUrl !== '') {
+                    self::cacheAvatarImage($avatarUrl, $steamid64);
+                }
+            }
+
+            // Cache successful lookups, including private/missing profiles, for 30 minutes.
+            if ($canMarkLookups) {
+                foreach ($batch as $steamid64) {
+                    @touch($lookupDirectory . DIRECTORY_SEPARATOR . $steamid64 . '.checked');
+                }
+            }
+        }
+    }
+
+    private static function findCachedAvatarPath(string $steamid64): string
+    {
+        $directory = dirname(__DIR__) . '/img/steam-avatars';
+        foreach (['webp', 'jpg', 'png'] as $extension) {
+            $path = $directory . '/steam_' . $steamid64 . '.' . $extension;
+            if (is_file($path)) {
+                return $path;
+            }
+        }
+
+        return '';
+    }
+
+    /**
      * Save normalized public Steam profile fields for an existing user.
      * The caller catches schema/DB errors so OpenID authentication is not blocked.
      */
