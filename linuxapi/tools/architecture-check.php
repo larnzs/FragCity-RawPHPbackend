@@ -51,6 +51,7 @@ try {
     $ranksServiceTest = $read('linuxapi/tests/ranks-service-test.php');
     $ranksSmokeTest = $read('tools/ranks-smoke-test.php');
     $leaderboardPage = $read('pages/leaderboard.php');
+    $leaderboardStylesheet = $read('css/leaderboard.css');
     $profilePage = $read('pages/profile.php');
     $profileJavascript = $read('js/profile.js');
     $profileStylesheet = $read('css/profile.css');
@@ -290,6 +291,10 @@ $check(
         && str_contains($nginxApiBootstrap, 'location = /v1/ranks')
         && str_contains($nginxApi, 'location = /v1/ranks')
         && str_contains($leaderboardPage, 'new RanksRepository()')
+        && str_contains($leaderboardPage, 'leaderboard-hero-art')
+        && str_contains($leaderboardPage, '/img/webp/leaderboardguy.webp')
+        && str_contains($leaderboardStylesheet, '.leaderboard-hero')
+        && str_contains($leaderboardStylesheet, '@keyframes lbHeroOrbit')
         && !str_contains($leaderboardPage, 'RemoteRanksDatabase')
         && !str_contains($profilePage, 'RemoteRanksDatabase')
         && str_contains($profilePage, 'new RanksRepository()')
