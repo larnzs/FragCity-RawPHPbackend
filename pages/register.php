@@ -128,7 +128,7 @@ $safeSyncErrorCode = preg_match('/^[a-z0-9_]{1,64}$/D', $completionSyncError)
         <?php endif; ?>
 
         <?php if (!$isSteamRegister && !$isAccountCompletion): ?>
-            <a href="steam/steam_login.php" class="auth-steam-button">
+            <a href="/steam/steam_login.php" class="auth-steam-button">
                 <i class="fab fa-steam"></i>
                 ثبت‌نام سریع با Steam
             </a>
