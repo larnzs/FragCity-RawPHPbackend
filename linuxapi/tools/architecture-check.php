@@ -786,6 +786,26 @@ $check(
 );
 
 $check(
+    'Profile images use root-absolute paths and FACEIT/Ranks API states are visible to the account owner',
+    str_contains($profilePage, "'/img/banners/banner_'")
+        && str_contains($profilePage, "'/img/avatars/avatar_'")
+        && str_contains($profilePage, "'/img/steam-avatars/'")
+        && str_contains($profilePage, "data-banner-url=\"<?= htmlspecialchars(\$bannerUrl,")
+        && !str_contains($profilePage, "'assets/images/default_banner.jpg'")
+        && str_contains($profilePage, 'new FaceitApiClient()')
+        && str_contains($profilePage, 'data-api="faceit"')
+        && str_contains($profilePage, 'data-api="ranks"')
+        && str_contains($profilePage, "\$ranksApiStatus = 'player_not_found';")
+        && str_contains($profilePage, "\$faceitApiStatusLabel")
+        && str_contains($profilePage, "this.src='/img/logoresponsive.png';")
+        && str_contains($siteHeaderMarkup, "return '/img/logoresponsive.png';")
+        && str_contains($siteHeaderMarkup, "action=\"/\"")
+        && str_contains($siteHeaderMarkup, "this.src='/img/logoresponsive.png';")
+        && str_contains($profileStylesheet, '.profile-api-status[data-state="available"]')
+        && str_contains($profileStylesheet, '.profile-api-status[data-state="api_unavailable"]')
+);
+
+$check(
     'Canonical URL routing, sitemap, robots policy, staging noindex and 404 handling are present',
     str_contains($routesMarkup, 'function fragcity_page_url')
         && str_contains($htaccessMarkup, 'RewriteRule ^serverguide/?$ index.php?page=serverguide')
