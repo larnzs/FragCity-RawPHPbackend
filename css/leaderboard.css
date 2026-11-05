@@ -3262,3 +3262,328 @@ body.site-body:has(.leaderboard-page) .main-content {
         transition: none !important;
     }
 }
+
+/* =========================================================
+   Final layout correction — full canvas, LTR flow, compact hero
+========================================================= */
+body.site-body:has(.leaderboard-page),
+body.site-body:has(.leaderboard-page) .app-container,
+body.site-body:has(.leaderboard-page) .main-content,
+body.site-body:has(.leaderboard-page) .content-fader {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    padding: 0 !important;
+    background: #0D0D0D !important;
+}
+
+body.site-body:has(.leaderboard-page) {
+    min-width: 320px;
+    overflow-x: hidden;
+}
+
+.leaderboard-page {
+    --lb-shell-width: 1450px;
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100vh;
+    margin: 0 !important;
+    padding: 96px 0 56px !important;
+    box-sizing: border-box;
+    overflow: visible;
+    direction: ltr !important;
+    color: #F5F5F5;
+    background:
+        radial-gradient(ellipse at 80% 0%, rgba(249, 115, 22, .085), transparent 34%),
+        radial-gradient(ellipse at 8% 35%, rgba(255, 179, 71, .035), transparent 32%),
+        #0D0D0D !important;
+}
+
+/* One shared content width: the banner, stats and table now line up exactly. */
+.leaderboard-page > .leaderboard-hero,
+.leaderboard-page > .leaderboard-stats-grid,
+.leaderboard-page > .leaderboard-container {
+    width: min(var(--lb-shell-width), calc(100% - 48px)) !important;
+    max-width: var(--lb-shell-width) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box;
+}
+
+.leaderboard-page > .leaderboard-hero {
+    min-height: 244px;
+    margin-top: 0 !important;
+    margin-bottom: 20px !important;
+    padding: clamp(22px, 2.7vw, 34px) clamp(24px, 3.1vw, 42px);
+    grid-template-columns: minmax(0, 1.12fr) minmax(230px, .72fr);
+    gap: clamp(16px, 2.4vw, 32px);
+    align-items: center !important;
+    direction: ltr;
+    text-align: left;
+}
+
+.leaderboard-page .leaderboard-hero-copy {
+    min-width: 0;
+    direction: rtl;
+    text-align: left;
+}
+
+.leaderboard-page .leaderboard-hero h1,
+.leaderboard-page .leaderboard-hero-copy > p {
+    direction: rtl;
+    text-align: left;
+}
+
+.leaderboard-page .leaderboard-hero-meta {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    direction: ltr;
+}
+
+.leaderboard-page .leaderboard-hero-meta > span {
+    direction: rtl;
+    text-align: left;
+}
+
+.leaderboard-page .leaderboard-hero-bottom {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    direction: ltr;
+}
+
+.leaderboard-page .leaderboard-hero-action,
+.leaderboard-page .leaderboard-current-sort {
+    direction: ltr;
+}
+
+.leaderboard-page .leaderboard-hero-art {
+    width: 100%;
+    max-width: 330px;
+    min-width: 0;
+    min-height: 205px;
+    height: 205px;
+    justify-self: end;
+    align-self: center;
+    margin: 0;
+}
+
+.leaderboard-page .lb-hero-character {
+    height: 108%;
+    max-height: 108%;
+}
+
+.leaderboard-page .lb-hero-tag--top {
+    right: 2%;
+}
+
+.leaderboard-page .lb-hero-tag--bottom {
+    left: 2%;
+}
+
+.leaderboard-page > .leaderboard-stats-grid {
+    margin-top: 0 !important;
+    margin-bottom: 20px !important;
+    direction: ltr;
+}
+
+.leaderboard-page .leaderboard-stat-card {
+    direction: ltr;
+}
+
+.leaderboard-page .leaderboard-stat-copy {
+    direction: ltr;
+    text-align: left;
+}
+
+.leaderboard-page > .leaderboard-container {
+    direction: ltr !important;
+}
+
+/* Keep all layout rows, table columns and control groups left-to-right. */
+.leaderboard-page .leaderboard-podium,
+.leaderboard-page .leaderboard-toolbar,
+.leaderboard-page .leaderboard-toolbar-controls,
+.leaderboard-page .leaderboard-search-form,
+.leaderboard-page .leaderboard-sort-form,
+.leaderboard-page .leaderboard-footer-controls,
+.leaderboard-page .leaderboard-page-size,
+.leaderboard-page .leaderboard-paging {
+    direction: ltr !important;
+}
+
+.leaderboard-page .leaderboard-toolbar-heading,
+.leaderboard-page .leaderboard-toolbar-copy {
+    direction: ltr;
+    text-align: left;
+}
+
+.leaderboard-page .leaderboard-table-scroll {
+    direction: ltr !important;
+}
+
+.leaderboard-page .leaderboard-table {
+    direction: ltr !important;
+    text-align: left;
+}
+
+.leaderboard-page .leaderboard-table thead th,
+.leaderboard-page .leaderboard-table tbody td {
+    direction: ltr;
+    text-align: left;
+}
+
+.leaderboard-page .leaderboard-table .rank-cell,
+.leaderboard-page .leaderboard-table .number-cell,
+.leaderboard-page .leaderboard-table .kd-cell,
+.leaderboard-page .leaderboard-table .playtime-cell {
+    text-align: center !important;
+}
+
+.leaderboard-page .player-wrapper {
+    direction: ltr !important;
+    justify-content: flex-start;
+}
+
+.leaderboard-page .player-info,
+.leaderboard-page .player-name-row,
+.leaderboard-page .player-meta {
+    direction: ltr;
+    text-align: left;
+    justify-content: flex-start;
+}
+
+.leaderboard-page .player-steam {
+    direction: ltr;
+    text-align: left;
+}
+
+/* The input itself needs an explicit reset: the site/browser search-field
+   defaults must not paint a white rectangle inside the dark search shell. */
+.leaderboard-page label.leaderboard-search-field {
+    direction: ltr;
+    background-color: #121212 !important;
+    background-image: linear-gradient(110deg, #101010, #151413) !important;
+}
+
+.leaderboard-page input#leaderboardSearch,
+.leaderboard-page input.leaderboard-search,
+.leaderboard-page .leaderboard-search-field input[type="search"] {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    margin: 0;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    outline: 0 !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    color: #F5F1EC !important;
+    -webkit-text-fill-color: #F5F1EC;
+    font: 600 .76rem var(--fc-font-sans, sans-serif);
+    direction: rtl;
+    text-align: right;
+    color-scheme: dark;
+}
+
+.leaderboard-page input#leaderboardSearch::placeholder,
+.leaderboard-page input.leaderboard-search::placeholder {
+    color: #77716B !important;
+    -webkit-text-fill-color: #77716B;
+    opacity: 1;
+}
+
+.leaderboard-page input#leaderboardSearch:focus,
+.leaderboard-page input.leaderboard-search:focus {
+    border: 0 !important;
+    outline: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.leaderboard-page input#leaderboardSearch::-webkit-search-cancel-button,
+.leaderboard-page input.leaderboard-search::-webkit-search-cancel-button {
+    filter: grayscale(1) brightness(1.8);
+}
+
+@media (max-width: 900px) {
+    .leaderboard-page {
+        padding-top: 92px !important;
+    }
+
+    .leaderboard-page > .leaderboard-hero {
+        min-height: 230px;
+        grid-template-columns: minmax(0, 1.1fr) minmax(200px, .7fr);
+        padding: 22px 24px;
+    }
+
+    .leaderboard-page .leaderboard-hero-art {
+        min-height: 190px;
+        height: 190px;
+        max-width: 290px;
+    }
+}
+
+@media (max-width: 700px) {
+    .leaderboard-page {
+        padding-top: 88px !important;
+    }
+
+    .leaderboard-page > .leaderboard-hero,
+    .leaderboard-page > .leaderboard-stats-grid,
+    .leaderboard-page > .leaderboard-container {
+        width: calc(100% - 28px) !important;
+    }
+
+    .leaderboard-page > .leaderboard-hero {
+        min-height: 0;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+        padding: 22px 18px 14px;
+    }
+
+    .leaderboard-page .leaderboard-hero-copy {
+        width: 100%;
+        text-align: left;
+    }
+
+    .leaderboard-page .leaderboard-hero-art {
+        width: min(100%, 300px);
+        max-width: 300px;
+        min-height: 185px;
+        height: 185px;
+        justify-self: center;
+        margin: 0 auto;
+    }
+
+    .leaderboard-page .leaderboard-hero-meta {
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+
+    .leaderboard-page .leaderboard-hero-bottom {
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .leaderboard-page {
+        padding-top: 84px !important;
+    }
+
+    .leaderboard-page > .leaderboard-hero,
+    .leaderboard-page > .leaderboard-stats-grid,
+    .leaderboard-page > .leaderboard-container {
+        width: calc(100% - 20px) !important;
+    }
+}
