@@ -45,7 +45,7 @@ There are three independent signed API clients. Keep their secrets different:
 
 | Website setting | Matching Linux setting | Endpoint |
 |---|---|---|
-| `integrations.weaponpaints_api.shared_secret` | top-level `shared_secret` | `POST /v1/weaponpaints` |
+| `integrations.weaponpaints_api.shared_secret` | top-level `shared_secret` | `POST /v1/weaponpaints`, `/v1/simpleadmin`, `/v1/vipcore` |
 | `integrations.pterodactyl_standby_api.shared_secret` | `pterodactyl_standby.shared_secret` | `POST /v1/pterodactyl-standby` |
 | `integrations.pterodactyl_monitoring_api.shared_secret` | `pterodactyl_monitoring.shared_secret` | `POST /v1/pterodactyl-monitoring` |
 
@@ -59,9 +59,9 @@ openssl rand -hex 32
 
 Do not paste secrets into chat, Git, issue trackers or browser JavaScript. The website stores only the matching HMAC secret for each integration. It must never store the Pterodactyl Application API token or a Wings token.
 
-### WeaponPaints and SimpleAdmin
+### WeaponPaints, SimpleAdmin and VIPCore
 
-Use `settings/weaponpaints-api.integration.example.json` as a small reference fragment, or use the complete template. The website's `files.database.weaponpaints_plugin.transport` must remain `api`. Its secret matches the root `shared_secret` in `/etc/fragcity-api/config.php`; the same signed client is used for `/v1/simpleadmin`. SimpleAdmin's `GLOBAL_simpleadmin` schema is accessed only by the Linux API, reusing the existing Plugin DB account with schema-wide read-only SELECT. The website must not connect directly to it.
+Use `settings/weaponpaints-api.integration.example.json` as a small reference fragment, or use the complete template. The website's `files.database.weaponpaints_plugin.transport` must remain `api`. Its secret matches the root `shared_secret` in `/etc/fragcity-api/config.php`; the same signed client is used for `/v1/simpleadmin` and `/v1/vipcore`. SimpleAdmin's `GLOBAL_simpleadmin` schema remains read-only through Linux API. VIPCore status and test grants use `GLOBAL_vip.vip_users` via a separate MariaDB account `fragcity_vip_api`; do not reuse the plugin or WeaponPaints DB credentials, and do not configure a direct website-side VIP database profile. The configured `ServerId` must match VIPCore's `vip_core.json`. Test grants are limited to Bronze/Silver/Gold for one hour and do not charge the wallet.
 
 ### Public Server Browser / Standby
 
@@ -75,7 +75,8 @@ Use `settings/pterodactyl-monitoring.integration.example.json`. Its secret match
 
 The matching Linux-side template is `linuxapi/config.example.php`. It documents:
 
-- root WeaponPaints `shared_secret` and the Linux-local MariaDB connection;
+- root shared HMAC secret for WeaponPaints, SimpleAdmin and VIPCore, plus the Linux-local MariaDB connection;
+- a dedicated least-privilege `vipcore` database connection for `GLOBAL_vip.vip_users`;
 - an independent `pterodactyl_standby` block, including cache, internal A2S query host, public connect host, Node ID, allowlists and read-only Application API token;
 - an independent `pterodactyl_monitoring` block, including Node allowlist, host metrics options, Wings URL overrides and the read-only Application API token.
 
