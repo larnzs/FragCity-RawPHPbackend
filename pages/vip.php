@@ -430,6 +430,8 @@ $vipCurrentStatus = !$isLoggedIn
                 role="button"
                 tabindex="0"
                 aria-pressed="false"
+                aria-expanded="false"
+                aria-controls="vipFeaturePanel"
                 aria-label="<?= htmlspecialchars('Select ' . $tier['name'] . ' VIP to view its features', ENT_QUOTES, 'UTF-8') ?>"
                 data-price-label="<?= htmlspecialchars($tierPriceLabel, ENT_QUOTES, 'UTF-8') ?>"
                 data-duration-label="<?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?>"
@@ -494,7 +496,7 @@ $vipCurrentStatus = !$isLoggedIn
     </section>
 
     <span id="vipDetailPanelHome" hidden aria-hidden="true"></span>
-    <section class="vip-feature-panel" aria-labelledby="vipDetailTierName" aria-live="polite">
+    <section class="vip-feature-panel" id="vipFeaturePanel" aria-labelledby="vipDetailTierName" aria-live="polite" hidden>
         <div class="vip-feature-panel-head">
             <div class="vip-feature-panel-title">
                 <span class="vip-store-eyebrow">TIER DETAILS</span>
