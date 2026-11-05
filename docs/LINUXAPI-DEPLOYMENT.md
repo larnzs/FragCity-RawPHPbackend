@@ -1,6 +1,6 @@
 # FragCity Linux API — Deployment Notes
 
-> Current architecture: WeaponPaints, the on-demand Pterodactyl/A2S Server Browser, and Pterodactyl/Wings Monitoring are served by the Linux API. The website keeps its own database on shared hosting (or a local Laragon copy). The retired Windows-Agent API returns HTTP 410.
+> Current architecture: WeaponPaints, VIPCore entitlements, the on-demand Pterodactyl/A2S Server Browser, and Pterodactyl/Wings Monitoring are served by the Linux API. The website keeps its own database on shared hosting (or a local Laragon copy). The retired Windows-Agent API returns HTTP 410.
 
 ## Active and retired endpoints
 
@@ -8,11 +8,13 @@
 |---|---|---|---|
 | GET | `/health` | Public service health only | None |
 | POST | `/v1/weaponpaints` | WeaponPaints read/write operations | Root `shared_secret` |
+| POST | `/v1/simpleadmin` | Read-only SimpleAdmin lookups and Ban List data | Root `shared_secret` |
+| POST | `/v1/vipcore` | VIPCore status and temporary no-payment test grants | Same root `shared_secret` |
 | POST | `/v1/pterodactyl-standby` | Public CS2 Server Browser snapshot | `pterodactyl_standby.shared_secret` |
 | POST | `/v1/pterodactyl-monitoring` | Node and CS2-container resource snapshot | `pterodactyl_monitoring.shared_secret` |
 | any | `/v1/agent/*` | Retired Windows-Agent compatibility route | Returns HTTP 410 |
 
-All POST endpoints use timestamped HMAC-SHA256 signatures and nonce replay protection. Each endpoint has an independent HMAC secret. The Linux API records request nonces in `GLOBAL_weaponpaints.fragcity_api_nonces`.
+All POST endpoints use timestamped HMAC-SHA256 signatures and nonce replay protection. WeaponPaints, SimpleAdmin and VIPCore intentionally share the existing root `shared_secret`; Pterodactyl Standby and Monitoring retain their independent secrets. The Linux API records request nonces in `GLOBAL_weaponpaints.fragcity_api_nonces`.
 
 ## Configuration files
 
@@ -41,6 +43,29 @@ The website `base_url` values must be the HTTPS origin `https://api.fragcity.ir`
 The Linux API connects to `GLOBAL_weaponpaints` via `127.0.0.1:3306`. It must never connect to `kyonxcbt_fragcity_services` or receive the website database credentials. The website's `databases.main` profile is independent.
 
 The website uses `class/FragCityLinuxApiClient.php` and `class/WeaponPaintsRepository.php`. Keep `files.database.weaponpaints_plugin.transport` set to `api`; do not create a direct website-side WeaponPaints DB profile.
+
+### VIPCore entitlements
+
+The Linux API reads and writes the existing VIPCore-owned table `GLOBAL_vip.vip_users`; it does not create or alter the plugin schema. The table is keyed by `(account_id, sid)`, stores the uppercase VIP group and an absolute Unix `expires` timestamp (0 means permanent). The website sends SteamID64; Linux converts it to Steam Account ID and supplies the configured `ServerId`. That value must match `ServerId` in the live VIPCore `vip_core.json` (the repository currently documents `0`; verify before enabling).
+
+Use a dedicated MariaDB account. Do not reuse the WeaponPaints API account or VIPCore's game-plugin account. Grant only the permissions used by this endpoint:
+
+```sql
+CREATE USER 'fragcity_vip_api'@'127.0.0.1' IDENTIFIED BY 'REPLACE_WITH_A_NEW_RANDOM_PASSWORD';
+GRANT SELECT, INSERT, UPDATE ON GLOBAL_vip.vip_users
+TO 'fragcity_vip_api'@'127.0.0.1';
+SHOW GRANTS FOR 'fragcity_vip_api'@'127.0.0.1';
+```
+
+Generate the password locally with `openssl rand -hex 32`; use it only in SQL and the private Linux config. Never send it to chat or Git. If the account already exists, inspect `SHOW GRANTS` first rather than blindly recreating it. Verify the real VIPCore table before applying grants:
+
+```sql
+SHOW CREATE TABLE GLOBAL_vip.vip_users;
+```
+
+Merge the `vipcore` block from `linuxapi/config.example.php` into the existing `/etc/fragcity-api/config.php`; do not replace that live file or its existing secrets. Set `enabled => true`, the dedicated DB credentials, and `server_id => 0` only after confirming the running VIPCore config. Temporarily set `test_mode.enabled => true` and `duration_seconds => 3600`. The endpoint rejects tiers 4-6 and refuses to overwrite an active or permanent membership. It does not read prices, debit the wallet, or call ZarinPal.
+
+The fixed API actions are `ping_db`, `get_status` and `grant_test_vip`. The website's VIP page now reads its membership status from VIPCore rather than the legacy `users.vip_level/vip_expire` fields.
 
 ### Public CS2 Server Browser
 
@@ -95,6 +120,10 @@ From the website repository root on Laragon:
 ```powershell
 php -l class/FragCityLinuxApiClient.php
 php -l class/WeaponPaintsRepository.php
+php -l class/VipCoreRepository.php
+php -l api/vip-test-purchase.php
+php -l linuxapi/src/VIPCore/VipCoreService.php
+php -l linuxapi/tests/vipcore-service-test.php
 php -l class/PterodactylStandbyApiClient.php
 php -l class/PterodactylStandbyRepository.php
 php -l class/PterodactylMonitoringApiClient.php
@@ -102,6 +131,7 @@ php -l class/PterodactylMonitoringRepository.php
 php -l linuxapi/public/index.php
 php -l linuxapi/config.example.php
 php linuxapi/tests/pterodactyl-primary-allocation-test.php
+php linuxapi/tests/vipcore-service-test.php
 php linuxapi/tools/architecture-check.php
 ```
 
