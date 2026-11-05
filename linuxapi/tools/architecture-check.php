@@ -299,7 +299,7 @@ $check(
         && str_contains($steamProfileService, 'public static function cacheAvatarsForSteamIds')
         && str_contains($steamProfileService, 'array_chunk($missingIds, 100)')
         && str_contains($steamProfileService, 'private static function findCachedAvatarPath')
-        && str_contains($leaderboardPage, 'اسم یا SteamID رو بگرد...')
+        && str_contains($leaderboardPage, 'اسم بازیکن یا SteamID...')
         && str_contains($leaderboardStylesheet, '.leaderboard-page .leaderboard-hero')
         && str_contains($leaderboardStylesheet, '.leaderboard-page .metric-progress')
         && str_contains($leaderboardStylesheet, '.leaderboard-hero')
