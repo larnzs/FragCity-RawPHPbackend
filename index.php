@@ -570,7 +570,43 @@ $allowedPages = [
     'donations',
 ];
 
-$requestedPageValue = $_GET['page'] ?? 'home';
+$requestPath = (string) (parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/');
+$isHomeRequest = $requestPath === '/' || $requestPath === '/index.php';
+
+/*
+ * Resolve canonical clean URLs in PHP as a fallback as well as in .htaccess.
+ * Some shared-hosting rewrite configurations forward the request to index.php
+ * but do not preserve the internal page query parameter. Without this fallback
+ * every clean child route is incorrectly treated as the 404 page.
+ */
+$cleanRoutePages = [
+    'servers' => 'servers_vps',
+    'skins' => 'skins',
+    'buy-server' => 'buyserveropen',
+    'launcher' => 'launcher',
+    'server-manual' => 'usermanual',
+    'serverguide' => 'serverguide',
+    'status' => 'status',
+    'about' => 'about',
+    'support' => 'support',
+    'login' => 'login',
+    'register' => 'register',
+    'profile' => 'profile',
+    'my-servers' => 'myservers',
+    'vip' => 'vip',
+    'leaderboard' => 'leaderboard',
+    'forgot-password' => 'forgot_password',
+    'reset-password' => 'reset_password',
+    'rules' => 'rules',
+    'privacy' => 'privacy',
+    'deadlock-servers' => 'deadlock_servers_vps',
+    'banlist' => 'banlist',
+    'donations' => 'donations',
+];
+$cleanRouteSlug = trim($requestPath, '/');
+$cleanRoutePage = $cleanRoutePages[$cleanRouteSlug] ?? null;
+
+$requestedPageValue = $_GET['page'] ?? ($cleanRoutePage ?? 'home');
 $requestedPage = is_string($requestedPageValue)
     ? trim($requestedPageValue)
     : '__invalid__';
@@ -581,11 +617,13 @@ if ($requestedPage === 'wallet') {
     exit;
 }
 
-$requestPath = (string) (parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/');
-$isHomeRequest = $requestPath === '/' || $requestPath === '/index.php';
 $hasExplicitPage = array_key_exists('page', $_GET);
 $isKnownPage = $requestedPage === 'home' || in_array($requestedPage, $allowedPages, true);
-$isValidPageRequest = $isKnownPage && ($isHomeRequest || $hasExplicitPage);
+$isValidPageRequest = $isKnownPage && (
+    $isHomeRequest ||
+    $hasExplicitPage ||
+    $cleanRoutePage !== null
+);
 
 $page = $isValidPageRequest ? $requestedPage : '404';
 if (!$isValidPageRequest) {
