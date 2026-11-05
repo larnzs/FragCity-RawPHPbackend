@@ -511,6 +511,16 @@ $check(
         && str_contains($banlistJavascript, 'currentStats.innerHTML = incomingStats.innerHTML;')
         && str_contains($banlistJavascript, 'currentHeroMeta.innerHTML = incomingHeroMeta.innerHTML;')
         && str_contains($banlistJavascript, "tab.setAttribute('aria-current', isActive ? 'page' : 'false');")
+        && str_contains($banlistPage, "return '/banlist/?' . http_build_query($query);")
+        && !str_contains($banlistPage, "'page' => 'banlist'")
+        && !str_contains($banlistPage, 'name="page" value="banlist"')
+        && str_contains($banlistPage, 'SteamProfileService::cacheAvatarsForSteamIds')
+        && str_contains($banlistPage, '/img/steam-avatars/')
+        && !str_contains($banlistPage, 'avatars.steamstatic.com/')
+        && str_contains($banlistPage, '/img/logoresponsive.png')
+        && str_contains($banlistJavascript, 'syncSearchControlsFromUrl(url);')
+        && str_contains($banlistJavascript, 'loadBanlistTab(destination.href, true);')
+        && str_contains($banlistJavascript, '.banlist-pagination .ban-page-btn, .banlist-page-size .ban-size-btn')
 );
 
 $check(
