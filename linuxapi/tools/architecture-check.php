@@ -52,6 +52,8 @@ try {
     $ranksSmokeTest = $read('tools/ranks-smoke-test.php');
     $leaderboardPage = $read('pages/leaderboard.php');
     $leaderboardStylesheet = $read('css/leaderboard.css');
+    $leaderboardJavascript = $read('js/leaderboard.js');
+    $motionJavascript = $read('js/motion.js');
     $steamProfileService = $read('class/SteamProfileService.php');
     $profilePage = $read('pages/profile.php');
     $profileJavascript = $read('js/profile.js');
@@ -325,6 +327,17 @@ $check(
         && str_contains($leaderboardStylesheet, '.leaderboard-page .leaderboard-stat-copy > strong')
         && str_contains($leaderboardStylesheet, '.leaderboard-page .leaderboard-table {')
         && str_contains($leaderboardStylesheet, '.leaderboard-page .leaderboard-table thead th,')
+        && str_contains($leaderboardPage, "return '/leaderboard/?' . http_build_query($query);")
+        && !str_contains($leaderboardPage, '<input type="hidden" name="page" value="leaderboard">')
+        && !str_contains($leaderboardPage, 'data-fc-reveal="left" data-fc-reveal-delay="120"')
+        && str_contains($leaderboardStylesheet, 'grid-template-areas: "art copy";')
+        && str_contains($leaderboardStylesheet, 'grid-area: art;')
+        && str_contains($leaderboardStylesheet, 'height: 46px !important;')
+        && str_contains($leaderboardJavascript, 'a.leaderboard-page-btn, a.leaderboard-size-btn')
+        && str_contains($leaderboardJavascript, "currentUrl.pathname = '/leaderboard/';")
+        && str_contains($leaderboardJavascript, "currentUrl.searchParams.delete('page');")
+        && str_contains($leaderboardJavascript, 'window.history.pushState(')
+        && str_contains($motionJavascript, "'.leaderboard-header:not(.leaderboard-hero)'")
         && !str_contains($leaderboardPage, 'RemoteRanksDatabase')
         && !str_contains($profilePage, 'RemoteRanksDatabase')
         && str_contains($profilePage, 'new RanksRepository()')
