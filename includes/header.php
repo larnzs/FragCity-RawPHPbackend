@@ -20,7 +20,7 @@ if (!function_exists('getUserAvatarHeader')) {
             $avatarDiskPath = dirname(__DIR__) . '/img/avatars/' . $avatarFile;
 
             if (is_file($avatarDiskPath)) {
-                return 'img/avatars/' . rawurlencode($avatarFile) . '?v=' . filemtime($avatarDiskPath);
+                return '/img/avatars/' . rawurlencode($avatarFile) . '?v=' . filemtime($avatarDiskPath);
             }
 
             $digits = preg_replace('/[^0-9]/', '', $steamid);
@@ -32,7 +32,7 @@ if (!function_exists('getUserAvatarHeader')) {
                     $steamAvatarFile = 'steam_' . $digits . '.' . $extension;
                     $steamAvatarDiskPath = dirname(__DIR__) . '/img/steam-avatars/' . $steamAvatarFile;
                     if (is_file($steamAvatarDiskPath)) {
-                        return 'img/steam-avatars/' . rawurlencode($steamAvatarFile)
+                        return '/img/steam-avatars/' . rawurlencode($steamAvatarFile)
                             . '?v=' . filemtime($steamAvatarDiskPath);
                     }
                 }
@@ -57,7 +57,7 @@ if (!function_exists('getUserAvatarHeader')) {
             }
         }
 
-        return 'assets/images/default_avatar.png';
+        return '/assets/images/default_avatar.png';
     }
 }
 
