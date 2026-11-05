@@ -53,6 +53,7 @@ try {
     $leaderboardPage = $read('pages/leaderboard.php');
     $profilePage = $read('pages/profile.php');
     $profileJavascript = $read('js/profile.js');
+    $profileStylesheet = $read('css/profile.css');
     $vipCoreSiteRepository = $read('class/VipCoreRepository.php');
     $vipCoreSiteEndpoint = $read('api/vip-test-purchase.php');
     $vipCorePage = $read('pages/vip.php');
