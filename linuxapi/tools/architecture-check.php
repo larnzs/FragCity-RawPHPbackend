@@ -129,6 +129,8 @@ try {
     $simpleAdminLookup = $read('linuxapi/src/SimpleAdmin/SimpleAdminPlayerLookup.php');
     $simpleAdminBanlist = $read('linuxapi/src/SimpleAdmin/SimpleAdminBanlist.php');
     $banlistPage = $read('pages/banlist.php');
+    $banlistStylesheet = $read('css/banlist.css');
+    $banlistJavascript = $read('js/banlist.js');
     $simpleAdminDocs = $read('docs/CONFIGURATION.md');
     $simpleAdminMigration = $read('linuxapi/migrations/20261031_simpleadmin_player_lookup.sql');
     $faceitApiClient = $read('class/FaceitApiClient.php');
@@ -489,6 +491,26 @@ $check(
         && str_contains($nginxApi, 'location = /v1/simpleadmin')
         && str_contains($standbySitePlayersEndpoint, 'new SimpleAdminRepository()')
         && str_contains($standbySitePlayersEndpoint, 'new FaceitApiClient()')
+);
+
+$check(
+    'Banlist moderation dashboard uses the new design while preserving protected IP access and AJAX tab state',
+    !str_contains($banlistPage, '<style>')
+        && str_contains($banlistPage, 'class="banlist-hero"')
+        && str_contains($banlistPage, 'class="banlist-stats-grid"')
+        && str_contains($banlistPage, 'class="banlist-search-field"')
+        && str_contains($banlistPage, 'id="banlistRecords"')
+        && str_contains($banlistPage, '$activeTab[\\'label\\']')
+        && str_contains($banlistPage, '$type === \\'playerips\\' && !$canViewPlayerIps')
+        && str_contains($banlistPage, '$showSensitiveData = $canViewPlayerIps;')
+        && str_contains($banlistStylesheet, '.banlist-page > .banlist-hero')
+        && str_contains($banlistStylesheet, '.banlist-page > .banlist-stats-grid')
+        && str_contains($banlistStylesheet, '.banlist-page .banlist-search-field')
+        && str_contains($banlistStylesheet, '.banlist-page .ban-table thead th')
+        && str_contains($banlistStylesheet, '@media (max-width: 760px)')
+        && str_contains($banlistJavascript, 'currentStats.innerHTML = incomingStats.innerHTML;')
+        && str_contains($banlistJavascript, 'currentHeroMeta.innerHTML = incomingHeroMeta.innerHTML;')
+        && str_contains($banlistJavascript, 'tab.setAttribute(\\'aria-current\\', isActive ? \\'page\\' : \\'false\\');')
 );
 
 $check(
