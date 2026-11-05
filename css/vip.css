@@ -773,3 +773,143 @@ button.vip-checkout-wallet {
         padding: 17px;
     }
 }
+
+/* Collapsible section for inactive VIP tiers. */
+.vip-locked-section {
+    width: min(100%, 1440px);
+    margin: 18px auto 0;
+}
+.vip-locked-toggle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 76px;
+    gap: 14px;
+    padding: 15px 19px;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 16px;
+    background: linear-gradient(115deg, rgba(255,255,255,.055), rgba(22,22,22,.96) 48%, rgba(13,13,13,.98));
+    color: #c2c2c2;
+    text-align: right;
+    cursor: pointer;
+    transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+.vip-locked-toggle:hover {
+    border-color: rgba(255,255,255,.26);
+    background: linear-gradient(115deg, rgba(255,255,255,.075), rgba(25,25,25,.98) 48%, rgba(15,15,15,.98));
+}
+.vip-locked-toggle:focus-visible {
+    outline: 2px solid rgba(255,255,255,.55);
+    outline-offset: 3px;
+}
+.vip-locked-toggle-emblem {
+    display: grid;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 12px;
+    background: rgba(255,255,255,.055);
+    color: #a3a3a3;
+    font-size: 1rem;
+}
+.vip-locked-toggle-copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-width: 0;
+    gap: 3px;
+}
+.vip-locked-toggle-copy strong {
+    color: #ededed;
+    font-size: .95rem;
+    font-weight: 900;
+}
+.vip-locked-toggle-copy small {
+    color: #888;
+    font-size: .72rem;
+    direction: ltr;
+    text-align: right;
+}
+.vip-locked-toggle-status {
+    padding: 6px 9px;
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 7px;
+    background: rgba(255,255,255,.035);
+    color: #999;
+    font-size: .68rem;
+    font-weight: 800;
+    white-space: nowrap;
+}
+.vip-locked-toggle-count {
+    color: #aaa;
+    font-size: .76rem;
+    font-weight: 850;
+    white-space: nowrap;
+}
+.vip-locked-chevron {
+    flex: 0 0 auto;
+    color: #a5a5a5;
+    transition: transform .2s ease;
+}
+.vip-locked-toggle[aria-expanded="true"] .vip-locked-chevron {
+    transform: rotate(180deg);
+}
+.vip-inactive-grid {
+    margin-top: 13px;
+}
+.vip-inactive-grid[hidden] {
+    display: none !important;
+}
+.vip-plan-card.is-locked {
+    filter: grayscale(1) saturate(0);
+    opacity: .68;
+    cursor: pointer;
+}
+.vip-plan-card.is-locked:hover {
+    transform: none;
+    border-color: rgba(255,255,255,.17);
+    box-shadow: 0 12px 28px rgba(0,0,0,.17);
+}
+.vip-plan-card.is-locked.is-selected {
+    border-color: rgba(255,255,255,.28);
+    background: linear-gradient(150deg, #1a1a1a, #101010 75%);
+    box-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 12px 28px rgba(0,0,0,.17);
+}
+
+/* Reduce the visual scale of the complete VIP page by approximately 10%. */
+.vip-page {
+    zoom: .9;
+    width: 111.111111%;
+    margin-inline: -5.555555%;
+}
+
+@media (max-width: 700px) {
+    .vip-locked-section {
+        margin-top: 14px;
+    }
+    .vip-locked-toggle {
+        min-height: 68px;
+        gap: 10px;
+        padding: 12px 13px;
+        border-radius: 13px;
+    }
+    .vip-locked-toggle-emblem {
+        flex-basis: 36px;
+        width: 36px;
+        height: 36px;
+    }
+    .vip-locked-toggle-status {
+        display: none;
+    }
+    .vip-locked-toggle-copy strong {
+        font-size: .88rem;
+    }
+    .vip-locked-toggle-copy small {
+        font-size: .65rem;
+    }
+    .vip-locked-toggle-count {
+        font-size: .7rem;
+    }
+}
