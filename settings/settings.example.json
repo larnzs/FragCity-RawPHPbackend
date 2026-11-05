@@ -55,7 +55,7 @@
       "startpay_base_url": "https://payment.zarinpal.com/pg/StartPay/"
     },
     "weaponpaints_api": {
-      "_comment": "Signed Linux API for WeaponPaints and the read-only SimpleAdmin name-to-SteamID lookup. Its secret matches the root shared_secret in /etc/fragcity-api/config.php. Both endpoints share this key; Pterodactyl secrets remain separate.",
+      "_comment": "Signed Linux API for WeaponPaints, SimpleAdmin and VIPCore. Its secret matches the root shared_secret in /etc/fragcity-api/config.php. All three endpoints share this key; Pterodactyl secrets remain separate.",
       "base_url": "https://api.fragcity.ir",
       "shared_secret": "REPLACE_WITH_WEAPONPAINTS_LINUX_API_SECRET"
     },
