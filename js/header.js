@@ -231,7 +231,39 @@
     function slugFromUrl(url) {
         try {
             const parsed = new URL(url, window.location.href);
-            return parsed.searchParams.get('page') || 'home';
+            const queryPage = parsed.searchParams.get('page');
+            if (queryPage) return queryPage;
+
+            // Clean URLs have no ?page= query. Resolve their root-level
+            // path so redirects and browser Back/Forward keep the right page.
+            const cleanSlug = parsed.pathname.replace(/^\\/+|\\/+$/g, '');
+            const cleanRoutes = {
+                '': 'home',
+                'servers': 'servers_vps',
+                'skins': 'skins',
+                'buy-server': 'buyserveropen',
+                'launcher': 'launcher',
+                'server-manual': 'usermanual',
+                'serverguide': 'serverguide',
+                'status': 'status',
+                'about': 'about',
+                'support': 'support',
+                'login': 'login',
+                'register': 'register',
+                'profile': 'profile',
+                'my-servers': 'myservers',
+                'vip': 'vip',
+                'leaderboard': 'leaderboard',
+                'forgot-password': 'forgot_password',
+                'reset-password': 'reset_password',
+                'rules': 'rules',
+                'privacy': 'privacy',
+                'deadlock-servers': 'deadlock_servers_vps',
+                'banlist': 'banlist',
+                'donations': 'donations'
+            };
+
+            return cleanRoutes[cleanSlug] || 'home';
         } catch (e) {
             return 'home';
         }
