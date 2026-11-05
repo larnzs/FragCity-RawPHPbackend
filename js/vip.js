@@ -7,8 +7,9 @@
         root.dataset.vipStoreReady = '1';
 
         const plans = Array.from(root.querySelectorAll('[data-vip-plan]'));
-        const selectedName = root.querySelector('#vipSelectedName');
-        const selectedMeta = root.querySelector('#vipSelectedMeta');
+        const inactiveToggle = root.querySelector('#vipLockedToggle');
+        const inactivePlans = root.querySelector('#vipInactivePlans');
+        let inactiveExpanded = Boolean(inactiveToggle && inactiveToggle.getAttribute('aria-expanded') === 'true');
         const detailName = root.querySelector('#vipDetailTierName');
         const detailSummaryFa = root.querySelector('#vipDetailTierSummaryFa');
         const detailSummaryEn = root.querySelector('#vipDetailTierSummaryEn');
@@ -19,7 +20,6 @@
         const mobileQuery = window.matchMedia('(max-width: 700px)');
         let activePlan = null;
         let mobileDetailsOpen = false;
-        const checkoutButton = root.querySelector('#vipCheckoutButton');
 
         if (!plans.length) return;
 
@@ -86,13 +86,6 @@
             const summaryFa = plan.dataset.vipSummaryFa || '';
             const summaryEn = plan.dataset.vipSummary || '';
 
-            if (selectedName) selectedName.textContent = name;
-            if (selectedMeta) {
-                selectedMeta.textContent =
-                    (plan.dataset.priceLabel || 'قیمت تعیین نشده') +
-                    ' · ' +
-                    (plan.dataset.durationLabel || 'مدت اشتراک مشخص نشده');
-            }
             if (detailName) detailName.textContent = name;
             if (detailSummaryFa) detailSummaryFa.textContent = summaryFa;
             if (detailSummaryEn) detailSummaryEn.textContent = summaryEn;
@@ -117,12 +110,14 @@
 
             syncDetailPanelPosition();
 
-            if (checkoutButton) {
-                checkoutButton.textContent = isAvailable
-                    ? 'خرید VIP فعلاً غیرفعال است'
-                    : 'این سطح در حال حاضر قابل خرید نیست';
-                checkoutButton.disabled = true;
-            }
+        }
+
+        function setInactiveExpanded(expanded) {
+            if (!inactiveToggle || !inactivePlans) return;
+            inactiveExpanded = Boolean(expanded);
+            inactiveToggle.setAttribute('aria-expanded', inactiveExpanded ? 'true' : 'false');
+            inactivePlans.setAttribute('aria-hidden', inactiveExpanded ? 'false' : 'true');
+            inactivePlans.hidden = !inactiveExpanded;
         }
 
         function handleViewportChange() {
@@ -134,6 +129,28 @@
             mobileQuery.addEventListener('change', handleViewportChange);
         } else if (typeof mobileQuery.addListener === 'function') {
             mobileQuery.addListener(handleViewportChange);
+        }
+
+        if (inactiveToggle && inactivePlans) {
+            inactiveToggle.addEventListener('click', function () {
+                const nextExpanded = !inactiveExpanded;
+
+                // Never leave the detail panel inside a grid that is being hidden.
+                if (
+                    !nextExpanded &&
+                    activePlan &&
+                    activePlan.dataset.vipAvailable !== '1'
+                ) {
+                    const firstPublicPlan = plans.find(function (plan) {
+                        return plan.dataset.vipAvailable === '1';
+                    });
+                    if (firstPublicPlan) {
+                        selectPlan(firstPublicPlan, false);
+                    }
+                }
+
+                setInactiveExpanded(nextExpanded);
+            });
         }
 
         plans.forEach(function (plan) {
@@ -152,6 +169,8 @@
 
         const initialPlan = plans.find(function (plan) {
             return plan.classList.contains('is-current');
+        }) || plans.find(function (plan) {
+            return plan.dataset.vipAvailable === '1';
         }) || plans[0];
 
         selectPlan(initialPlan, false);
