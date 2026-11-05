@@ -57,7 +57,7 @@ if (!function_exists('getUserAvatarHeader')) {
             }
         }
 
-        return '/assets/images/default_avatar.png';
+        return '/img/logoresponsive.png';
     }
 }
 
@@ -118,7 +118,7 @@ if ($isLoggedIn && $headerSteamId64 !== '' && isset($pdo) && $pdo instanceof PDO
 }
 $headerSteamPersonaName = trim((string)($headerSteamProfile['personaname'] ?? '')) ?: trim((string)$displayName);
 if ($headerSteamPersonaName === '') $headerSteamPersonaName = 'Steam Player';
-if ($isLoggedIn && $avatarSrc === 'assets/images/default_avatar.png') {
+if ($isLoggedIn && $avatarSrc === '/img/logoresponsive.png') {
     $avatarCandidate = trim((string)($headerSteamProfile['avatarfull'] ?? ''));
     $avatarParts = $avatarCandidate !== '' ? parse_url($avatarCandidate) : false;
     $avatarHost = is_array($avatarParts) ? strtolower((string)($avatarParts['host'] ?? '')) : '';
@@ -336,7 +336,7 @@ $mobileMoreNavItems = [
                             <img src="<?= htmlspecialchars($avatarSrc, ENT_QUOTES, 'UTF-8') ?>"
                                  class="frag-avatar"
                                  alt="آواتار <?= htmlspecialchars((string) $displayName, ENT_QUOTES, 'UTF-8') ?>"
-                                 onerror="this.onerror=null;this.src='assets/images/default_avatar.png';">
+                                 onerror="this.onerror=null;this.src='/img/logoresponsive.png';">
                             <span class="frag-username"><?= htmlspecialchars((string) $displayName, ENT_QUOTES, 'UTF-8') ?></span>
                             <i class="fas fa-chevron-down frag-arrow" aria-hidden="true"></i>
                         </button>
@@ -347,7 +347,7 @@ $mobileMoreNavItems = [
                                     <img src="<?= htmlspecialchars($avatarSrc, ENT_QUOTES, 'UTF-8') ?>"
                                          class="frag-drop-avatar"
                                          alt=""
-                                         onerror="this.onerror=null;this.src='assets/images/default_avatar.png';">
+                                         onerror="this.onerror=null;this.src='/img/logoresponsive.png';">
                                 </span>
                                 <div class="frag-drop-info">
                                     <span class="frag-drop-eyebrow">اکانت استیم فعلی</span>
@@ -429,7 +429,7 @@ $mobileMoreNavItems = [
                                 </a>
                             </div>
                             <div class="frag-drop-divider"></div>
-                            <form action="index.php" method="post" class="frag-drop-logout-form">
+                            <form action="/" method="post" class="frag-drop-logout-form">
                                 <input type="hidden" name="auth_action" value="logout">
                                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($headerCsrfToken, ENT_QUOTES, 'UTF-8') ?>">
                                 <button type="submit" class="frag-drop-link logout">
@@ -536,7 +536,7 @@ $mobileMoreNavItems = [
                     <i class="fa-solid fa-plus" aria-hidden="true"></i>
                 </button>
             </div>
-            <form action="index.php" method="post" class="mobile-nav-logout-form">
+            <form action="/" method="post" class="mobile-nav-logout-form">
                 <input type="hidden" name="auth_action" value="logout">
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($headerCsrfToken, ENT_QUOTES, 'UTF-8') ?>">
                 <button type="submit" class="mobile-nav-link logout-link">
