@@ -67,6 +67,21 @@
          * =====================================================
          */
 
+        function syncSearchControlsFromUrl(url) {
+            const parsedUrl = new URL(url, window.location.href);
+            const perPageInput = root.querySelector('.banlist-search-form input[name="per_page"]');
+            const pageNumInput = root.querySelector('.banlist-search-form input[name="page_num"]');
+
+            if (perPageInput) {
+                perPageInput.value = parsedUrl.searchParams.get('per_page') || '15';
+            }
+
+            if (pageNumInput) {
+                pageNumInput.value = parsedUrl.searchParams.get('page_num') || '1';
+            }
+        }
+
+
         function getTypeFromUrl(
             url
         ) {
@@ -233,6 +248,10 @@
                     currentHeroMeta.innerHTML = incomingHeroMeta.innerHTML;
                 }
 
+                // Keep the search form's hidden pagination fields aligned with
+                // the URL after an AJAX page-size or page-number change.
+                syncSearchControlsFromUrl(url);
+
                 /*
                  * فقط محتوای Table Wrapper عوض می‌شود.
                  *
@@ -396,6 +415,48 @@
 
             }
         );
+
+
+        /*
+         * =====================================================
+         * AJAX pagination and page-size controls
+         * =====================================================
+         * These links stay on the canonical /banlist/ route and replace only
+         * the table area instead of triggering a complete document reload.
+         */
+        root.addEventListener('click', function (event) {
+            const target = event.target instanceof Element ? event.target : null;
+            const link = target
+                ? target.closest('.banlist-pagination .ban-page-btn, .banlist-page-size .ban-size-btn')
+                : null;
+
+            if (!link || !root.contains(link)) {
+                return;
+            }
+
+            if (
+                event.ctrlKey
+                || event.metaKey
+                || event.shiftKey
+                || event.altKey
+                || event.button !== 0
+            ) {
+                return;
+            }
+
+            if (link.classList.contains('disabled')) {
+                event.preventDefault();
+                return;
+            }
+
+            const destination = new URL(link.href, window.location.href);
+            if (destination.origin !== window.location.origin) {
+                return;
+            }
+
+            event.preventDefault();
+            loadBanlistTab(destination.href, true);
+        });
 
 
         /*
