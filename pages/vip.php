@@ -303,6 +303,8 @@ $vipCurrentName = $vipNames[$vipCurrentLevel] ?? 'نامشخص';
 $vipCurrentStatus = !$isLoggedIn
     ? 'برای مشاهده وضعیت وارد شوید'
     : ($vipHasActiveMembership ? 'اشتراک فعال' : 'بدون اشتراک فعال');
+$vipLockedExpanded = $vipHasActiveMembership
+    && in_array($vipCurrentLevel, [4, 5, 6], true);
 ?>
 <main class="vip-page" id="vipStorefront">
     <header class="vip-store-hero">
@@ -393,7 +395,7 @@ $vipCurrentStatus = !$isLoggedIn
         <?php endif; ?>
     </div>
 
-    <section class="vip-plans-grid" aria-label="شش سطح VIP">
+    <section class="vip-plans-grid" aria-label="سه سطح VIP عمومی">
         <?php foreach ($vipLevels as $lvl => $tier): ?>
             <?php
                 $package = is_array($vipPurchasePackages[(string) $lvl] ?? null)
@@ -415,6 +417,36 @@ $vipCurrentStatus = !$isLoggedIn
                     : ($tierDuration !== null ? number_format($tierDuration) . ' روز' : 'مدت اشتراک مشخص نشده');
                 $isCurrentTier = $vipHasActiveMembership && $vipCurrentLevel === (int) $lvl;
             ?>
+            <?php if ((int) $lvl === 4): ?>
+            </section>
+
+            <section class="vip-locked-section" aria-label="سطح‌های VIP غیرفعال">
+                <button
+                    type="button"
+                    class="vip-locked-toggle"
+                    id="vipLockedToggle"
+                    aria-expanded="<?= $vipLockedExpanded ? 'true' : 'false' ?>"
+                    aria-controls="vipInactivePlans"
+                >
+                    <span class="vip-locked-toggle-emblem" aria-hidden="true">
+                        <i class="fas fa-lock"></i>
+                    </span>
+                    <span class="vip-locked-toggle-copy">
+                        <strong>پلن‌های غیرفعال</strong>
+                        <small>Platinum · Emerald · Diamond</small>
+                    </span>
+                    <span class="vip-locked-toggle-status">غیرفعال برای خرید</span>
+                    <span class="vip-locked-toggle-count">۳ سطح</span>
+                    <i class="fas fa-chevron-down vip-locked-chevron" aria-hidden="true"></i>
+                </button>
+
+                <div
+                    class="vip-plans-grid vip-inactive-grid"
+                    id="vipInactivePlans"
+                    aria-hidden="<?= $vipLockedExpanded ? 'false' : 'true' ?>"
+                    <?= $vipLockedExpanded ? '' : 'hidden' ?>
+                >
+            <?php endif; ?>
             <div class="vip-plan-item">
                 <article
                 class="vip-plan-card<?= $isCurrentTier ? ' is-current' : '' ?><?= !$tier['available'] ? ' is-locked' : '' ?>"
@@ -490,7 +522,8 @@ $vipCurrentStatus = !$isLoggedIn
                 </article>
             </div>
         <?php endforeach; ?>
-    </section>
+                </div>
+            </section>
 
     <span id="vipDetailPanelHome" hidden aria-hidden="true"></span>
     <section class="vip-feature-panel" id="vipFeaturePanel" aria-labelledby="vipDetailTierName" aria-live="polite" hidden>
@@ -526,37 +559,7 @@ $vipCurrentStatus = !$isLoggedIn
         </template>
     <?php endforeach; ?>
 
-    <aside class="vip-checkout-bar" aria-label="خلاصه پلن انتخاب‌شده">
-        <div class="vip-checkout-selection">
-            <span class="vip-checkout-label">
-                <i class="fas fa-bag-shopping" aria-hidden="true"></i>
-                پلن انتخاب‌شده
-            </span>
-            <strong id="vipSelectedName">Bronze</strong>
-            <small id="vipSelectedMeta">قیمت تعیین نشده · مدت اشتراک مشخص نشده</small>
-        </div>
-        <div class="vip-checkout-actions">
-            <button type="button" class="vip-checkout-button" id="vipCheckoutButton" disabled>
-                خرید VIP فعلاً غیرفعال است
-                <i class="fas fa-lock" aria-hidden="true"></i>
-            </button>
-            <?php if ($isLoggedIn): ?>
-                <button type="button" class="vip-checkout-wallet" data-fc-wallet-charge-open>
-                    <i class="fas fa-wallet" aria-hidden="true"></i>
-                    شارژ کیف پول
-                </button>
-            <?php else: ?>
-                <a href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal" class="vip-checkout-wallet">
-                    <i class="fas fa-wallet" aria-hidden="true"></i>
-                    ورود
-                </a>
-            <?php endif; ?>
-        </div>
-    </aside>
 
-    <p class="vip-checkout-note">
-        انتخاب سطح فقط برای مشاهده جزئیات است. تا زمان تکمیل مسیر پرداخت امن و اعمال خودکار اشتراک روی سرور، هیچ خریدی از این صفحه ثبت نمی‌شود.
-    </p>
 </main>
 
 
