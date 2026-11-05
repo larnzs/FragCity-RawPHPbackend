@@ -66,7 +66,7 @@ final class VipCoreService
 
     public function ping(): array
     {
-        $count = (int)$this->pdo->query('SELECT COUNT(*) FROM \`vip_users\`')->fetchColumn();
+        $count = (int)$this->pdo->query('SELECT COUNT(*) FROM `vip_users`')->fetchColumn();
 
         return [
             'database' => 'ok',
@@ -80,9 +80,9 @@ final class VipCoreService
     {
         $accountId = self::accountIdFromSteamId64($steamId64);
         $statement = $this->pdo->prepare(
-            'SELECT \`group\`, \`expires\`
-             FROM \`vip_users\`
-             WHERE \`account_id\` = :account_id AND \`sid\` = :server_id
+            'SELECT `group`, `expires`
+             FROM `vip_users`
+             WHERE `account_id` = :account_id AND `sid` = :server_id
              LIMIT 1'
         );
         $statement->execute([
@@ -142,9 +142,9 @@ final class VipCoreService
         $this->pdo->beginTransaction();
         try {
             $existingStatement = $this->pdo->prepare(
-                'SELECT \`group\`, \`expires\`
-                 FROM \`vip_users\`
-                 WHERE \`account_id\` = :account_id AND \`sid\` = :server_id
+                'SELECT `group`, `expires`
+                 FROM `vip_users`
+                 WHERE `account_id` = :account_id AND `sid` = :server_id
                  LIMIT 1 FOR UPDATE'
             );
             $existingStatement->execute([
@@ -162,15 +162,15 @@ final class VipCoreService
 
             // Match VIPCore's own upsert semantics.
             $insert = $this->pdo->prepare(
-                'INSERT INTO \`vip_users\`
-                    (\`account_id\`, \`name\`, \`lastvisit\`, \`sid\`, \`group\`, \`expires\`)
+                'INSERT INTO `vip_users`
+                    (`account_id`, `name`, `lastvisit`, `sid`, `group`, `expires`)
                  VALUES
                     (:account_id, :name, :lastvisit, :server_id, :vip_group, :expires)
                  ON DUPLICATE KEY UPDATE
-                    \`name\` = VALUES(\`name\`),
-                    \`lastvisit\` = VALUES(\`lastvisit\`),
-                    \`group\` = VALUES(\`group\`),
-                    \`expires\` = VALUES(\`expires\`)'
+                    `name` = VALUES(`name`),
+                    `lastvisit` = VALUES(`lastvisit`),
+                    `group` = VALUES(`group`),
+                    `expires` = VALUES(`expires`)'
             );
             $insert->execute([
                 ':account_id' => $accountId,
@@ -182,9 +182,9 @@ final class VipCoreService
             ]);
 
             $verify = $this->pdo->prepare(
-                'SELECT \`group\`, \`expires\`
-                 FROM \`vip_users\`
-                 WHERE \`account_id\` = :account_id AND \`sid\` = :server_id
+                'SELECT `group`, `expires`
+                 FROM `vip_users`
+                 WHERE `account_id` = :account_id AND `sid` = :server_id
                  LIMIT 1'
             );
             $verify->execute([
