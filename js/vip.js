@@ -17,6 +17,9 @@
         const detailFeatures = root.querySelector('#vipDetailFeatures');
         const detailPanel = root.querySelector('.vip-feature-panel');
         const detailHomeMarker = root.querySelector('#vipDetailPanelHome');
+        const testPurchaseButton = root.querySelector('[data-vip-test-purchase]');
+        const testLoginLink = root.querySelector('[data-vip-test-login]');
+        const testFeedback = root.querySelector('[data-vip-test-feedback]');
         const mobileQuery = window.matchMedia('(max-width: 700px)');
         let activePlan = null;
         let mobileDetailsOpen = false;
@@ -108,6 +111,24 @@
                 }
             }
 
+            if (testPurchaseButton) {
+                const hasActiveMembership = root.dataset.vipHasActive === '1';
+                testPurchaseButton.dataset.level = level;
+                testPurchaseButton.hidden = !isAvailable;
+                testPurchaseButton.disabled = !isAvailable || hasActiveMembership;
+                testPurchaseButton.textContent = hasActiveMembership
+                    ? 'برای این حساب VIP فعال ثبت شده است'
+                    : 'ثبت آزمایشی VIP بدون پرداخت';
+                if (testFeedback) {
+                    testFeedback.hidden = true;
+                    testFeedback.textContent = '';
+                    testFeedback.classList.remove('is-error', 'is-success');
+                }
+            }
+            if (testLoginLink) {
+                testLoginLink.hidden = !isAvailable;
+            }
+
             syncDetailPanelPosition();
 
         }
@@ -150,6 +171,75 @@
                 }
 
                 setInactiveExpanded(nextExpanded);
+            });
+        }
+
+        if (testPurchaseButton) {
+            testPurchaseButton.addEventListener('click', async function () {
+                const level = Number(testPurchaseButton.dataset.level || 0);
+                if (testPurchaseButton.disabled || ![1, 2, 3].includes(level)) return;
+
+                const previousLabel = testPurchaseButton.textContent;
+                testPurchaseButton.disabled = true;
+                testPurchaseButton.textContent = 'در حال ثبت در VIPCore...';
+                if (testFeedback) {
+                    testFeedback.hidden = false;
+                    testFeedback.classList.remove('is-error', 'is-success');
+                    testFeedback.textContent = 'درخواست ثبت عضویت آزمایشی ارسال شد.';
+                }
+
+                try {
+                    const response = await fetch('/api/vip-test-purchase.php', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        cache: 'no-store',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-FragCity-CSRF': testPurchaseButton.dataset.csrfToken || ''
+                        },
+                        body: JSON.stringify({ level: level })
+                    });
+
+                    let payload = null;
+                    try {
+                        payload = await response.json();
+                    } catch (parseError) {
+                        throw new Error('پاسخ سرور قابل خواندن نیست.');
+                    }
+
+                    if (!response.ok || !payload || payload.success !== true) {
+                        const message = payload && typeof payload.message === 'string'
+                            ? payload.message
+                            : 'ثبت آزمایشی VIP ناموفق بود.';
+                        throw new Error(message);
+                    }
+
+                    if (testFeedback) {
+                        testFeedback.hidden = false;
+                        testFeedback.classList.add('is-success');
+                        testFeedback.textContent = payload.data && payload.data.message
+                            ? payload.data.message + ' صفحه برای نمایش وضعیت جدید تازه‌سازی می‌شود.'
+                            : 'VIP با موفقیت در دیتابیس ثبت شد.';
+                    }
+                    root.dataset.vipHasActive = '1';
+                    testPurchaseButton.textContent = 'VIP ثبت شد';
+                    window.setTimeout(function () {
+                        window.location.reload();
+                    }, 1300);
+                } catch (error) {
+                    if (testFeedback) {
+                        testFeedback.hidden = false;
+                        testFeedback.classList.add('is-error');
+                        testFeedback.textContent = error instanceof Error
+                            ? error.message
+                            : 'ارتباط با سرویس VIPCore برقرار نشد.';
+                    }
+                    testPurchaseButton.disabled = root.dataset.vipHasActive === '1';
+                    testPurchaseButton.textContent = root.dataset.vipHasActive === '1'
+                        ? 'برای این حساب VIP فعال ثبت شده است'
+                        : previousLabel;
+                }
             });
         }
 
