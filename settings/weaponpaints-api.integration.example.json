@@ -1,8 +1,8 @@
 {
-  "_comment": "Merge this fragment into integrations in the private settings/settings.json. WeaponPaints, SimpleAdmin and VIPCore share this key; _comment is ignored by the application.",
+  "_comment": "OPTIONAL DUMMY REFERENCE FRAGMENT — not a runtime config file and never loaded automatically. Merge this object into integrations in the private settings/settings.json only if the settings are not already present. Placeholder values only; do not store real secrets here.",
   "integrations": {
     "weaponpaints_api": {
-      "_comment": "Signed HTTPS client for the Linux WeaponPaints, SimpleAdmin and VIPCore endpoints. Match this secret to the top-level shared_secret in /etc/fragcity-api/config.php. It must not be reused for either Pterodactyl integration.",
+      "_comment": "Signed HTTPS client for the Linux WeaponPaints, SimpleAdmin, VIPCore and Ranks endpoints. Match the real runtime secret to the top-level shared_secret in /etc/fragcity-api/config.php. This one key is shared by these four endpoints; it must not be reused for either Pterodactyl integration.",
       "base_url": "https://api.fragcity.ir",
       "shared_secret": "REPLACE_WITH_WEAPONPAINTS_LINUX_API_SECRET"
     }
