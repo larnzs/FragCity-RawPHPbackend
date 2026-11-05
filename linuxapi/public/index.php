@@ -718,6 +718,12 @@ try {
             if (!is_string($steamId64) || !is_string($playerName)) {
                 throw new InvalidArgumentException('Invalid VIP test grant identity.');
             }
+            $allowedSteamIds = is_array($testConfig['allowed_steamids'] ?? null)
+                ? $testConfig['allowed_steamids']
+                : [];
+            if (!VipCoreService::isTestGrantAllowed($steamId64, $allowedSteamIds)) {
+                apiRespond(403, ['success' => false, 'error' => 'test_grant_not_allowed']);
+            }
             $level = apiInt($body['level'] ?? null, 'level', 1, 3);
 
             $grant = $vipService->grantTestMembership($steamId64, $playerName, $level);

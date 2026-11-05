@@ -64,7 +64,7 @@ Generate the password locally with `openssl rand -hex 32`; use it only in SQL an
 SHOW CREATE TABLE GLOBAL_vip.vip_users;
 ```
 
-Merge the `vipcore` block from `linuxapi/config.example.php` into the existing `/etc/fragcity-api/config.php`; do not replace that live file or its existing secrets. Set `enabled => true`, the dedicated DB credentials, and `server_id => 0` only after confirming the running VIPCore config. Temporarily set `test_mode.enabled => true` and `duration_seconds => 3600`. The endpoint rejects tiers 4-6 and refuses to overwrite an active or permanent membership. It does not read prices, debit the wallet, or call ZarinPal.
+Merge the `vipcore` block from `linuxapi/config.example.php` into the existing `/etc/fragcity-api/config.php`; do not replace that live file or its existing secrets. Set `enabled => true`, the dedicated DB credentials, and `server_id => 0` only after confirming the running VIPCore config. Temporarily set `test_mode.enabled => true` and `duration_seconds => 3600`. The endpoint rejects tiers 4-6 and refuses to overwrite an active or permanent membership. Temporary no-payment grants are fail-closed: only an authenticated site admin whose SteamID64 appears in Linux `test_mode.allowed_steamids` can receive a grant. Keep the list empty until a designated test account is chosen. It does not read prices, debit the wallet, or call ZarinPal.
 
 The fixed API actions are `ping_db`, `get_status` and `grant_test_vip`. The website's VIP page now reads its membership status from VIPCore rather than the legacy `users.vip_level/vip_expire` fields.
 

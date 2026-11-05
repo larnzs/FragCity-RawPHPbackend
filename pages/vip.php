@@ -4,6 +4,8 @@ require_once __DIR__ . '/../class/VipCoreRepository.php';
 
 $steamid64 = (string) ($_SESSION['steamid'] ?? '');
 $isLoggedIn = ($_SESSION['user_logged_in'] ?? false) === true;
+$isVipTestAdmin = $isLoggedIn && (string)($_SESSION['role'] ?? '') === 'admin';
+
 $userVip = [
     'vip_level' => 0,
     'vip_expire' => null,
@@ -553,8 +555,8 @@ $vipLockedExpanded = $vipHasActiveMembership
             <span class="vip-detail-state" id="vipDetailTierState">PUBLIC TIER</span>
         </div>
         <div class="vip-detail-feature-grid" id="vipDetailFeatures"></div>
+        <?php if ($isVipTestAdmin): ?>
         <div class="vip-test-purchase" data-vip-test-purchase-box>
-            <?php if ($isLoggedIn): ?>
                 <button
                     type="button"
                     class="vip-test-purchase-button"
@@ -565,21 +567,10 @@ $vipLockedExpanded = $vipHasActiveMembership
                 >
                     ثبت آزمایشی VIP بدون پرداخت
                 </button>
-            <?php else: ?>
-                <a
-                    class="vip-test-purchase-button"
-                    href="/login/"
-                    data-vip-test-login
-                    data-auth-modal-open
-                    aria-haspopup="dialog"
-                    aria-controls="fcLoginModal"
-                >
-                    برای فعال‌سازی آزمایشی وارد شوید
-                </a>
-            <?php endif; ?>
-            <small class="vip-test-purchase-note">اعتبار تست: یک ساعت · فقط Bronze، Silver و Gold · بدون برداشت از کیف پول</small>
+            <small class="vip-test-purchase-note">حالت آزمایشی فقط برای حساب مدیر و SteamIDهای مجاز در Linux فعال است.</small>
             <p class="vip-test-purchase-feedback" data-vip-test-feedback role="status" aria-live="polite" hidden></p>
         </div>
+        <?php endif; ?>
     </section>
 
     <?php foreach ($vipFeaturesData as $featureLevel => $features): ?>

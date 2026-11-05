@@ -31,6 +31,10 @@ if (($_SESSION['user_logged_in'] ?? false) !== true) {
     $respond(['success' => false, 'error' => 'authentication_required'], 401);
 }
 
+if ((string)($_SESSION['role'] ?? '') !== 'admin') {
+    $respond(['success' => false, 'error' => 'admin_required'], 403);
+}
+
 $steamId64 = (string)($_SESSION['steamid'] ?? '');
 if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
     $respond(['success' => false, 'error' => 'invalid_session'], 401);
@@ -119,6 +123,7 @@ try {
     $messages = [
         'membership_already_active' => 'این حساب در حال حاضر اشتراک VIP فعال دارد؛ اشتراک قبلی تغییر نکرد.',
         'test_mode_disabled' => 'حالت آزمایشی VIP روی سرور فعال نشده است.',
+        'test_grant_not_allowed' => 'این حساب در فهرست حساب‌های مجاز تست VIP نیست.',
         'vipcore_disabled' => 'اتصال VIPCore روی سرور فعال نشده است.',
         'vipcore_not_configured' => 'تنظیمات اتصال VIPCore کامل نیست.',
         'invalid_request' => 'درخواست ثبت VIP معتبر نیست.',
@@ -127,7 +132,7 @@ try {
     ];
     $safeCode = array_key_exists($e->errorCode, $messages) ? $e->errorCode : 'vipcore_unavailable';
     $status = match ($safeCode) {
-        'membership_already_active' => 409,
+        'membership_already_active', 'test_grant_not_allowed' => 403,
         'invalid_request', 'invalid_vip_tier' => 422,
         'test_mode_disabled', 'vipcore_disabled', 'vipcore_not_configured',
         'vipcore_unavailable' => 503,

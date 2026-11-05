@@ -59,6 +59,27 @@ final class VipCoreService
         return self::TEST_GROUPS[$level];
     }
 
+    /**
+     * Temporary no-payment grants are fail-closed unless an exact SteamID64
+     * is explicitly listed in the private Linux runtime configuration.
+     */
+    public static function isTestGrantAllowed(string $steamId64, array $allowedSteamIds): bool
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
+            return false;
+        }
+
+        foreach ($allowedSteamIds as $allowedSteamId) {
+            if (is_string($allowedSteamId)
+                && preg_match('/^[0-9]{17}$/D', $allowedSteamId)
+                && hash_equals($allowedSteamId, $steamId64)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static function levelForGroup(string $group): int
     {
         return self::GROUPS[strtoupper(trim($group))] ?? 0;

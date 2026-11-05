@@ -32,6 +32,14 @@ $check(
     && VipCoreService::levelForGroup('DIAMOND') === 6
 );
 
+$check(
+    'VIP test grants require an exact allowlisted SteamID64',
+    VipCoreService::isTestGrantAllowed('76561197960265729', ['76561197960265729'])
+    && !VipCoreService::isTestGrantAllowed('76561197960265729', [])
+    && !VipCoreService::isTestGrantAllowed('76561197960265730', ['76561197960265729'])
+    && !VipCoreService::isTestGrantAllowed('invalid', ['invalid'])
+);
+
 $invalidSteamIdRejected = false;
 try {
     VipCoreService::accountIdFromSteamId64('not-a-steamid');

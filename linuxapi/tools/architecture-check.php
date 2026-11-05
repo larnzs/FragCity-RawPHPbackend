@@ -58,6 +58,8 @@ try {
     $vipCoreJavascript = $read('js/vip.js');
     $vipCoreService = $read('linuxapi/src/VIPCore/VipCoreService.php');
     $vipCoreServiceTest = $read('linuxapi/tests/vipcore-service-test.php');
+    $vipTestPurchaseEndpoint = $read('api/vip-test-purchase.php');
+    $vipStorefrontPage = $read('pages/vip.php');
     $vipCoreSmokeTest = $read('tools/vipcore-smoke-test.php');
     $settingsLoader = $read('settings/loader.php');
 
@@ -247,6 +249,17 @@ $check(
         && str_contains($vipCoreServiceTest, 'Inactive tier 4 cannot be granted')
         && str_contains($websiteSettingsRaw, 'VIP status and entitlements are read from VIPCore')
         && !isset($websiteSettings['files']['pages.vip']['database_profile'])
+);
+
+$check(
+    'Free VIP test grants are restricted to admin sessions and explicit Linux SteamID allowlist',
+    str_contains($index, 'isTestGrantAllowed')
+        && str_contains($index, 'allowed_steamids')
+        && str_contains($linuxConfig, "'allowed_steamids' => []")
+        && str_contains($vipTestPurchaseEndpoint, "!== 'admin'")
+        && str_contains($vipStorefrontPage, '$isVipTestAdmin')
+        && str_contains($vipTestPurchaseEndpoint, 'test_grant_not_allowed')
+        && str_contains($vipCoreServiceTest, 'require an exact allowlisted SteamID64')
 );
 
 $check(

@@ -91,6 +91,9 @@ return [
         'test_mode' => [
             'enabled' => false,
             'duration_seconds' => 3600,
+            // Empty means no free test grants. Add exact 17-digit SteamID64s only
+            // for trusted test accounts; this allowlist is checked on Linux.
+            'allowed_steamids' => [],
         ],
     ],
 
