@@ -500,8 +500,8 @@ $check(
         && str_contains($banlistPage, 'class="banlist-stats-grid"')
         && str_contains($banlistPage, 'class="banlist-search-field"')
         && str_contains($banlistPage, 'id="banlistRecords"')
-        && str_contains($banlistPage, '$activeTab[\\'label\\']')
-        && str_contains($banlistPage, '$type === \\'playerips\\' && !$canViewPlayerIps')
+        && str_contains($banlistPage, "\$activeTab['label']")
+        && str_contains($banlistPage, "\$type === 'playerips' && !\$canViewPlayerIps")
         && str_contains($banlistPage, '$showSensitiveData = $canViewPlayerIps;')
         && str_contains($banlistStylesheet, '.banlist-page > .banlist-hero')
         && str_contains($banlistStylesheet, '.banlist-page > .banlist-stats-grid')
@@ -510,7 +510,7 @@ $check(
         && str_contains($banlistStylesheet, '@media (max-width: 760px)')
         && str_contains($banlistJavascript, 'currentStats.innerHTML = incomingStats.innerHTML;')
         && str_contains($banlistJavascript, 'currentHeroMeta.innerHTML = incomingHeroMeta.innerHTML;')
-        && str_contains($banlistJavascript, 'tab.setAttribute(\\'aria-current\\', isActive ? \\'page\\' : \\'false\\');')
+        && str_contains($banlistJavascript, "tab.setAttribute('aria-current', isActive ? 'page' : 'false');")
 );
 
 $check(
