@@ -398,7 +398,6 @@ $leaderboardGuyAssetVersion = is_file($leaderboardGuyAssetPath) && function_exis
 function leaderboardBuildUrl(array $params = []): string
 {
     $query = [
-        'page' => 'leaderboard',
         'sort' => $GLOBALS['sort'] ?? 'points',
         'order' => $GLOBALS['orderDir'] ?? 'DESC',
         'q' => $GLOBALS['search'] ?? '',
@@ -410,7 +409,7 @@ function leaderboardBuildUrl(array $params = []): string
         $query[$key] = $value;
     }
 
-    return '?' . http_build_query($query);
+    return '/leaderboard/?' . http_build_query($query);
 }
 ?>
 
@@ -627,7 +626,6 @@ function leaderboardBuildUrl(array $params = []): string
 
             <div class="leaderboard-toolbar-controls">
                 <form class="leaderboard-search-form" method="get" role="search">
-                    <input type="hidden" name="page" value="leaderboard">
                     <input type="hidden" name="sort" value="<?= leaderboardEscape($sort) ?>">
                     <input type="hidden" name="order" value="<?= leaderboardEscape($orderDir) ?>">
                     <input type="hidden" name="per_page" value="<?= (int)$perPage ?>">
@@ -665,7 +663,6 @@ function leaderboardBuildUrl(array $params = []): string
                 </form>
 
                 <form class="leaderboard-sort-form" method="get">
-                    <input type="hidden" name="page" value="leaderboard">
                     <input type="hidden" name="q" value="<?= leaderboardEscape($search) ?>">
                     <input type="hidden" name="per_page" value="<?= (int)$perPage ?>">
                     <input type="hidden" name="page_num" value="1">
