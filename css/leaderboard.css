@@ -3669,3 +3669,96 @@ body.site-body:has(.leaderboard-page) {
         justify-content: flex-start;
     }
 }
+
+/* Hero composition: artwork left, Persian copy right. */
+.leaderboard-page > .leaderboard-hero {
+    grid-template-columns: minmax(230px, .72fr) minmax(0, 1.12fr);
+    grid-template-areas: "art copy";
+}
+
+.leaderboard-page .leaderboard-hero-art {
+    grid-area: art;
+    justify-self: start;
+    align-self: center;
+}
+
+.leaderboard-page .leaderboard-hero-copy {
+    grid-area: copy;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-self: stretch;
+    direction: rtl;
+    text-align: right;
+}
+
+.leaderboard-page .leaderboard-hero .leaderboard-eyebrow,
+.leaderboard-page .leaderboard-hero h1,
+.leaderboard-page .leaderboard-hero-copy > p,
+.leaderboard-page .leaderboard-hero-meta,
+.leaderboard-page .leaderboard-hero-bottom {
+    align-self: stretch;
+    width: 100%;
+    text-align: right;
+}
+
+.leaderboard-page .leaderboard-hero-meta,
+.leaderboard-page .leaderboard-hero-bottom {
+    direction: rtl;
+    justify-content: flex-start;
+}
+
+/* Search submit button and search field share an exact control height. */
+.leaderboard-page .leaderboard-search-form .leaderboard-search-btn {
+    height: 46px !important;
+    min-height: 46px !important;
+    max-height: 46px;
+    align-self: stretch;
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    margin: 0;
+    padding-block: 0;
+    line-height: 1;
+}
+
+.leaderboard-page .leaderboard-search-field {
+    height: 46px;
+    min-height: 46px;
+    max-height: 46px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+    .leaderboard-page > .leaderboard-hero {
+        grid-template-columns: minmax(200px, .7fr) minmax(0, 1.1fr);
+        grid-template-areas: "art copy";
+    }
+}
+
+@media (max-width: 700px) {
+    .leaderboard-page > .leaderboard-hero {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "copy"
+            "art";
+    }
+
+    .leaderboard-page .leaderboard-hero-art {
+        justify-self: center;
+    }
+
+    .leaderboard-page .leaderboard-search-form .leaderboard-search-btn {
+        height: 42px !important;
+        min-height: 42px !important;
+        max-height: 42px;
+    }
+
+    .leaderboard-page .leaderboard-search-field {
+        height: 46px;
+        min-height: 46px;
+        max-height: 46px;
+    }
+}
