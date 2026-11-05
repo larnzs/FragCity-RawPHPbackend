@@ -46,6 +46,13 @@ try {
     $weaponPaintsStylesheet = $read('css/weaponpaints.css');
     $pinCatalog = json_decode($read('data/collectibles_en.json'), true, 512, JSON_THROW_ON_ERROR);
     $apiClient = $read('class/FragCityLinuxApiClient.php');
+    $vipCoreSiteRepository = $read('class/VipCoreRepository.php');
+    $vipCoreSiteEndpoint = $read('api/vip-test-purchase.php');
+    $vipCorePage = $read('pages/vip.php');
+    $vipCoreJavascript = $read('js/vip.js');
+    $vipCoreService = $read('linuxapi/src/VIPCore/VipCoreService.php');
+    $vipCoreServiceTest = $read('linuxapi/tests/vipcore-service-test.php');
+    $vipCoreSmokeTest = $read('tools/vipcore-smoke-test.php');
     $settingsLoader = $read('settings/loader.php');
 
     // Runtime settings examples are tracked templates, never live credentials.
@@ -207,6 +214,33 @@ $check(
         && str_contains($apiClient, "hash_hmac('sha256'")
         && str_contains($apiClient, 'CURLOPT_SSL_VERIFYPEER => true')
         && !str_contains($weaponRepo, 'new PDO')
+);
+
+$check(
+    'VIPCore entitlements stay behind the signed Linux API and dedicated GLOBAL_vip account',
+    str_contains($index, "'/v1/vipcore'")
+        && str_contains($linuxConfig, "'name' => 'GLOBAL_vip'")
+        && str_contains($linuxConfig, "'fragcity_vip_api'")
+        && str_contains($linuxConfig, "'duration_seconds' => 3600")
+        && str_contains($apiClient, "'/v1/vipcore'")
+        && str_contains($apiClient, "hash_hmac('sha256'")
+        && str_contains($vipCoreService, "FROM `vip_users`")
+        && str_contains($vipCoreService, "INSERT INTO `vip_users`")
+        && str_contains($vipCoreService, "76561197960265728")
+        && str_contains($vipCoreService, "membership_already_active")
+        && !str_contains($vipCoreSiteRepository, 'new PDO')
+        && str_contains($vipCoreSiteEndpoint, 'X_FRAGCITY_CSRF')
+        && str_contains($vipCoreSiteEndpoint, 'user_logged_in')
+        && str_contains($vipCorePage, 'new VipCoreRepository()')
+        && !str_contains($vipCorePage, 'SELECT vip_level, vip_expire FROM users')
+        && str_contains($vipCoreJavascript, '/api/vip-test-purchase.php')
+        && str_contains($vipCoreJavascript, '[1, 2, 3]')
+        && str_contains($vipCoreSmokeTest, "'/v1/vipcore'")
+        && str_contains($nginxApiBootstrap, 'location = /v1/vipcore')
+        && str_contains($nginxApi, 'location = /v1/vipcore')
+        && str_contains($vipCoreServiceTest, 'Inactive tier 4 cannot be granted')
+        && str_contains($websiteSettingsRaw, 'VIP status and entitlements are read from VIPCore')
+        && !str_contains($websiteSettingsRaw, '"database_profile": "main"')
 );
 
 $check(
