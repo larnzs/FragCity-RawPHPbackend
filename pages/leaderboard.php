@@ -695,12 +695,9 @@ function leaderboardBuildUrl(array $params = []): string
                         </span>
                     </div>
 
-                    <a
+                    <button
                         id="leaderboardOrder"
-                        href="<?= leaderboardBuildUrl([
-                            'order' => $orderDir === 'ASC' ? 'DESC' : 'ASC',
-                            'page_num' => 1
-                        ]) ?>"
+                        type="button"
                         class="leaderboard-order-btn"
                         data-order="<?= leaderboardEscape($orderDir) ?>"
                         title="تغییر ترتیب مرتب‌سازی"
@@ -708,7 +705,7 @@ function leaderboardBuildUrl(array $params = []): string
                     >
                         <i class="fa-solid <?= $orderDir === 'ASC' ? 'fa-arrow-up-wide-short' : 'fa-arrow-down-wide-short' ?>" aria-hidden="true"></i>
                         <span><?= $orderDir === 'ASC' ? 'صعودی' : 'نزولی' ?></span>
-                    </a>
+                    </button>
                 </form>
             </div>
         </div>
