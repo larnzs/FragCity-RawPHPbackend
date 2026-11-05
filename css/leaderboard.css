@@ -3587,3 +3587,85 @@ body.site-body:has(.leaderboard-page) {
         width: calc(100% - 20px) !important;
     }
 }
+
+/* Persian copy alignment inside the LTR leaderboard shell. */
+.leaderboard-page .leaderboard-hero-copy {
+    direction: rtl;
+    text-align: right;
+    align-items: flex-end;
+}
+
+.leaderboard-page .leaderboard-hero .leaderboard-eyebrow {
+    align-self: stretch;
+    justify-content: flex-start;
+    direction: rtl;
+    text-align: right;
+}
+
+.leaderboard-page .leaderboard-hero h1,
+.leaderboard-page .leaderboard-hero-copy > p {
+    width: 100%;
+    direction: rtl;
+    text-align: right;
+}
+
+.leaderboard-page .leaderboard-hero-meta {
+    width: 100%;
+    direction: rtl;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.leaderboard-page .leaderboard-hero-meta > span {
+    direction: rtl;
+    text-align: right;
+}
+
+.leaderboard-page .leaderboard-hero-bottom {
+    width: 100%;
+    direction: rtl;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.leaderboard-page .leaderboard-hero-action,
+.leaderboard-page .leaderboard-current-sort {
+    direction: rtl;
+    text-align: right;
+}
+
+.leaderboard-page .leaderboard-current-sort > span {
+    direction: rtl;
+    text-align: right;
+}
+
+.leaderboard-page .leaderboard-stat-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+    direction: rtl;
+    align-items: flex-end;
+    text-align: right;
+}
+
+.leaderboard-page .leaderboard-stat-copy > span,
+.leaderboard-page .leaderboard-stat-copy > strong {
+    width: 100%;
+    direction: rtl;
+    text-align: right;
+}
+
+@media (max-width: 700px) {
+    .leaderboard-page .leaderboard-hero-meta {
+        direction: rtl;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+
+    .leaderboard-page .leaderboard-hero-bottom {
+        direction: rtl;
+        flex-direction: row;
+        justify-content: flex-start;
+    }
+}
