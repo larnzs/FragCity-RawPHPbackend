@@ -65,7 +65,7 @@ Use `settings/weaponpaints-api.integration.example.json` as a small reference fr
 
 The `/v1/ranks` endpoint is read-only. The site leaderboard keeps its current filters, sorting, Top 3, aggregate cards and page controls, while PHP requests only the current page and Top 3 from the signed API. The API also serves the profile's single-player stats and global place. `GLOBAL_ranks.lvl_base` remains plugin-owned and unchanged; a dedicated `fragcity_ranks_api` account receives `SELECT` on that table only. Steam2 values in `lvl_base.steam` are converted to SteamID64 server-side for profile lookups. The old website-side `ranks_plugin` DB profile is deprecated and must not be configured.
 
-### Public Server Browser / Standby### Public Server Browser / Standby
+### Public Server Browser / Standby
 
 Use `settings/pterodactyl-standby.integration.example.json`. Its secret matches Linux `pterodactyl_standby.shared_secret`. The website receives a sanitized server snapshot; the Linux API owns the read-only Pterodactyl Application API token and sends A2S_INFO to the selected default Allocations. The live implementation is single-Node for now and refreshes its 10-second cache on demand; no Cron job is needed.
 

@@ -86,7 +86,7 @@ Generate the password locally with `openssl rand -hex 32`; keep it only in SQL a
 
 After deploying the new API files and fixed Nginx route, run `nginx -t`, reload Nginx, then run `php tools/ranks-smoke-test.php` from the website repository root. The smoke test checks HMAC authentication, database access, and a first leaderboard page. The site leaderboard and profile pages use `class/RanksRepository.php`; they no longer require a direct website-side connection to `GLOBAL_ranks`.
 
-### Public CS2 Server Browser### Public CS2 Server Browser
+### Public CS2 Server Browser
 
 The active public page `pages/serverlist.php` uses `PterodactylStandbyRepository`. The website sends a signed request to Linux API; Linux reads the allowlisted CS2 server inventory through the read-only Pterodactyl Application API, selects each server's default Allocation, then performs A2S_INFO over UDP to the configured internal `query_host`.
 

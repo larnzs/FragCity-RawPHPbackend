@@ -52,7 +52,7 @@ Exampleهای جزئی:
 
 صفحه‌های `pages/leaderboard.php` و `pages/profile.php` آمار بازی را از `RanksRepository` و مسیر امضاشدهٔ `POST /v1/ranks` می‌گیرند. Linux API به `GLOBAL_ranks.lvl_base` با حساب مستقل `fragcity_ranks_api` و دسترسی `SELECT` وصل می‌شود. Schema متعلق به پلاگین است و برای این اتصال هیچ Migration یا تغییری در جدول لازم نیست. تبدیل SteamID64 به کلید Steam2 فقط روی Linux انجام می‌شود.
 
-### پروفایل‌های Plugin### پروفایل‌های Plugin
+### پروفایل‌های Plugin
 
 `plugin_sync` فقط زمانی باید به دیتابیس مستقل اشاره کند که Schema و دسترسی‌های لازم آن واقعاً ایجاد شده باشد. پروفایل `ranks_plugin` قدیمی و صرفاً برای سازگاری باقی مانده؛ Leaderboard و آمار پروفایل از Linux API می‌آیند و نباید اتصال مستقیم سایت به `GLOBAL_ranks` پیکربندی شود. SimpleAdmin از طریق Linux API و با همان حساب Plugin سمت لینوکس خوانده می‌شود؛ پروفایل مستقیم `simpleadmin_plugin` در تنظیمات وب‌سایت دیگر استفاده نمی‌شود.
 
