@@ -49,22 +49,18 @@ The website uses `class/FragCityLinuxApiClient.php` and `class/WeaponPaintsRepos
 
 The Linux API reads and writes the existing VIPCore-owned table `GLOBAL_vip.vip_users`; it does not create or alter the plugin schema. The table is keyed by `(account_id, sid)`, stores the uppercase VIP group and an absolute Unix `expires` timestamp (0 means permanent). The website sends SteamID64; Linux converts it to Steam Account ID and supplies the configured `ServerId`. That value must match `ServerId` in the live VIPCore `vip_core.json` (the repository currently documents `0`; verify before enabling).
 
-Use a dedicated MariaDB account. Do not reuse the WeaponPaints API account or VIPCore's game-plugin account. Grant only the permissions used by this endpoint:
+The current FragCity deployment reuses the existing MariaDB account `plugins`@ `%` for WeaponPaints, SimpleAdmin, VIPCore and Ranks. Do not create `fragcity_vip_api`, generate another database password, or change the existing account as part of this integration. The private Linux config uses the same `$pluginsDbPassword` variable for the WeaponPaints, VIPCore and Ranks connections.
+
+The VIPCore service itself only executes `SELECT`, `INSERT` and `UPDATE` against `GLOBAL_vip.vip_users`; it does not need DDL, DELETE or arbitrary SQL. However, the current shared `plugins` account has broader schema-level permissions (including `WITH GRANT OPTION`) than this endpoint requires. This is an explicit compatibility choice for the existing installation, not a least-privilege design. Keep the account private to the host and do not expose its password. A future move to separate restricted service accounts should be handled as a coordinated credential migration, not by changing grants during this deployment.
+
+Inspect the existing account without changing it:
 
 ```sql
-CREATE USER 'fragcity_vip_api'@'127.0.0.1' IDENTIFIED BY 'REPLACE_WITH_A_NEW_RANDOM_PASSWORD';
-GRANT SELECT, INSERT, UPDATE ON GLOBAL_vip.vip_users
-TO 'fragcity_vip_api'@'127.0.0.1';
-SHOW GRANTS FOR 'fragcity_vip_api'@'127.0.0.1';
-```
-
-Generate the password locally with `openssl rand -hex 32`; use it only in SQL and the private Linux config. Never send it to chat or Git. If the account already exists, inspect `SHOW GRANTS` first rather than blindly recreating it. Verify the real VIPCore table before applying grants:
-
-```sql
+SHOW GRANTS FOR 'plugins'@'%';
 SHOW CREATE TABLE GLOBAL_vip.vip_users;
 ```
 
-Merge the `vipcore` block from `linuxapi/config.example.php` into the existing `/etc/fragcity-api/config.php`; do not replace that live file or its existing secrets. Set `enabled => true`, the dedicated DB credentials, and `server_id => 0` only after confirming the running VIPCore config. Temporarily set `test_mode.enabled => true` and `duration_seconds => 3600`. The endpoint rejects tiers 4-6 and refuses to overwrite an active or permanent membership. Temporary no-payment grants are fail-closed: only an authenticated site admin whose SteamID64 appears in Linux `test_mode.allowed_steamids` can receive a grant. Keep the list empty until a designated test account is chosen. It does not read prices, debit the wallet, or call ZarinPal.
+Merge the `vipcore` block from `linuxapi/config.example.php` into the existing `/etc/fragcity-api/config.php`; do not replace that live file or its existing secrets. Set `enabled => true`, reuse the existing `plugins` credentials, and keep `server_id => 0` only while it matches the running VIPCore configuration. Leave `test_mode.enabled => false` for connection checks. If a designated test grant is later approved, temporarily enable test mode and allowlist only that exact test SteamID64. The endpoint rejects tiers 4-6 and refuses to overwrite an active or permanent membership. Test grants do not read prices, debit the wallet, or call ZarinPal.
 
 The fixed API actions are `ping_db`, `get_status` and `grant_test_vip`. The website's VIP page now reads its membership status from VIPCore rather than the legacy `users.vip_level/vip_expire` fields.
 
@@ -72,16 +68,15 @@ The fixed API actions are `ping_db`, `get_status` and `grant_test_vip`. The webs
 
 The website reads the existing `GLOBAL_ranks.lvl_base` table only through the signed `POST /v1/ranks` route. The table schema is owned by the game plugin: do not create, alter, truncate or seed it as part of this integration. The API exposes three fixed actions: `ping_db`, `get_leaderboard` and `get_player`. The leaderboard action performs allowlisted sorting, literal search, filtered aggregates, Top 3 and bounded pagination on Linux; it does not accept SQL fragments or arbitrary column names. The player action accepts SteamID64 and converts it to the Steam2 value stored in `lvl_base.steam`.
 
-Create a dedicated read-only MariaDB account. Do not reuse the WeaponPaints, VIPCore or game-plugin credentials:
+The Ranks service executes read-only `SELECT` queries against `GLOBAL_ranks.lvl_base`. In the current FragCity deployment it reuses the same existing `plugins`@ `%` MariaDB account as WeaponPaints and VIPCore. Do not create `fragcity_ranks_api` or add another database password.
+
+The existing shared account has broader grants across its plugin schemas than the Ranks endpoint needs, and includes `WITH GRANT OPTION`. This is a known security trade-off of reusing the current plugin account; it is not least-privilege isolation. No GRANT or REVOKE is required for the already verified installation. Inspect the existing permissions with:
 
 ```sql
-CREATE USER 'fragcity_ranks_api'@'127.0.0.1' IDENTIFIED BY 'REPLACE_WITH_A_NEW_RANDOM_PASSWORD';
-GRANT SELECT ON GLOBAL_ranks.lvl_base
-    TO 'fragcity_ranks_api'@'127.0.0.1';
-SHOW GRANTS FOR 'fragcity_ranks_api'@'127.0.0.1';
+SHOW GRANTS FOR 'plugins'@'%';
 ```
 
-Generate the password locally with `openssl rand -hex 32`; keep it only in SQL and the private Linux runtime config. If the account already exists, inspect `SHOW GRANTS` before changing it. Merge the `ranks` block from `linuxapi/config.example.php` into `/etc/fragcity-api/config.php`, set `enabled => true`, and fill the dedicated database password. Never replace the whole live config or rotate its root HMAC secret. The route uses the existing WeaponPaints root HMAC key; the website's `integrations.weaponpaints_api.shared_secret` remains the single matching secret.
+Merge the `ranks` block from `linuxapi/config.example.php` into `/etc/fragcity-api/config.php`, set `enabled => true`, and reuse the existing `plugins` password. Never replace the whole live config or rotate its root HMAC secret. The route uses the existing WeaponPaints root HMAC key; the website's `integrations.weaponpaints_api.shared_secret` remains the single matching secret.
 
 After deploying the new API files and fixed Nginx route, run `nginx -t`, reload Nginx, then run `php tools/ranks-smoke-test.php` from the website repository root. The smoke test checks HMAC authentication, database access, and a first leaderboard page. The site leaderboard and profile pages use `class/RanksRepository.php`; they no longer require a direct website-side connection to `GLOBAL_ranks`.
 
@@ -107,7 +102,7 @@ The PHP runtime config must remain outside the document root:
 /etc/fragcity-api/config.php
 ```
 
-The file should be owned by root and readable by the PHP-FPM group, but not writable by the web process. Keep the API's MariaDB account least-privileged and MariaDB port 3306 private. Do not use the MariaDB root account.
+The file should be owned by root and readable by the PHP-FPM group, but not writable by the web process. Keep MariaDB port 3306 private and never use the MariaDB root account from PHP. The current FragCity host intentionally reuses the existing `plugins` account, whose grants are broader than the minimum permissions required by each endpoint; treat it as a high-impact private credential.
 
 For the current Debian service, PHP-FPM runs as `www-data`. The Standby snapshot cache directory can be prepared with:
 
