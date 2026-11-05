@@ -414,155 +414,7 @@ function leaderboardBuildUrl(array $params = []): string
 }
 ?>
 
-<style>
-    .leaderboard-toolbar,
-    .leaderboard-footer-controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: space-between;
-        align-items: center;
-        margin: 18px 0 16px;
-        padding: 14px 16px;
-        background: rgba(11, 18, 32, 0.88);
-        border: 1px solid rgba(51, 65, 85, 0.68);
-        border-radius: 20px;
-        box-shadow: 0 14px 34px rgba(2, 6, 23, 0.18);
-    }
-    .leaderboard-search-form,
-    .leaderboard-sort-form {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-    }
-    .leaderboard-search-wrap {
-        display: flex;
-        flex: 1 1 380px;
-        gap: 8px;
-        align-items: center;
-    }
-    .leaderboard-search,
-    .leaderboard-sort-select {
-        height: 48px;
-        padding: 0 14px;
-        border-radius: 13px;
-        background: #111111;
-        border: 1px solid #263653;
-        color: #f8fafc;
-        font: inherit;
-        outline: none;
-    }
-    .leaderboard-search {
-        flex: 1 1 auto;
-        min-width: 220px;
-    }
-    .leaderboard-search:focus,
-    .leaderboard-sort-select:focus {
-        border-color: #F97316;
-        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.14);
-    }
-    .leaderboard-search-btn,
-    .leaderboard-order-btn,
-    .leaderboard-page-btn,
-    .leaderboard-size-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 44px;
-        padding: 0 14px;
-        border-radius: 13px;
-        border: 1px solid #263653;
-        background: #111111;
-        color: #cbd5e1;
-        text-decoration: none;
-        font-size: 0.86rem;
-        font-weight: 700;
-        transition: 0.2s ease;
-    }
-    .leaderboard-search-btn:hover,
-    .leaderboard-order-btn:hover,
-    .leaderboard-page-btn:hover,
-    .leaderboard-size-btn:hover {
-        border-color: rgba(249, 115, 22, 0.48);
-        background: rgba(15, 23, 42, 0.96);
-        color: #fff;
-    }
-    .leaderboard-toolbar-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-        justify-content: flex-end;
-    }
-    .sort-caption {
-        color: #94a3b8;
-        font-size: 0.82rem;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .leaderboard-page-size {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: center;
-        justify-content: flex-end;
-    }
-    .leaderboard-page-size span,
-    .leaderboard-range {
-        color: #94a3b8;
-        font-size: 0.85rem;
-        font-weight: 700;
-    }
-    .leaderboard-size-btn.active,
-    .leaderboard-page-btn.active {
-        border-color: rgba(96, 165, 250, 0.42);
-        background: linear-gradient(135deg, rgba(249, 115, 22, 0.10), rgba(15, 23, 42, 0.96));
-        color: #f8fafc;
-    }
-    .leaderboard-page-btn.disabled {
-        opacity: 0.45;
-        pointer-events: none;
-    }
-    .leaderboard-paging {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: center;
-        justify-content: flex-end;
-    }
-    .leaderboard-toolbar .clear-search {
-        height: 44px;
-        width: 44px;
-    }
-    .leaderboard-result-bar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px 18px;
-        align-items: center;
-        justify-content: space-between;
-    }
-    @media (max-width: 900px) {
-        .leaderboard-toolbar,
-        .leaderboard-footer-controls {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        .leaderboard-search-wrap,
-        .leaderboard-toolbar-actions,
-        .leaderboard-page-size,
-        .leaderboard-paging {
-            justify-content: flex-start;
-        }
-        .leaderboard-search {
-            min-width: 0;
-            width: 100%;
-        }
-    }
-</style>
+
 <div
     class="leaderboard-page"
     data-current-sort="<?= leaderboardEscape($sort) ?>"
@@ -762,91 +614,104 @@ function leaderboardBuildUrl(array $params = []): string
         ================================================== -->
 
         <div class="leaderboard-toolbar">
+            <div class="leaderboard-toolbar-heading">
+                <span class="leaderboard-toolbar-icon" aria-hidden="true">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </span>
+                <div class="leaderboard-toolbar-copy">
+                    <span class="leaderboard-toolbar-kicker">PLAYER FINDER</span>
+                    <strong>بازیکن موردنظرت رو پیدا کن</strong>
+                    <small>اسم بازیکن یا SteamID رو وارد کن و آمارش رو ببین.</small>
+                </div>
+            </div>
 
-            <form class="leaderboard-search-form" method="get">
-                <input type="hidden" name="page" value="leaderboard">
-                <input type="hidden" name="sort" value="<?= leaderboardEscape($sort) ?>">
-                <input type="hidden" name="order" value="<?= leaderboardEscape($orderDir) ?>">
-                <input type="hidden" name="per_page" value="<?= (int)$perPage ?>">
-                <input type="hidden" name="page_num" value="1">
+            <div class="leaderboard-toolbar-controls">
+                <form class="leaderboard-search-form" method="get" role="search">
+                    <input type="hidden" name="page" value="leaderboard">
+                    <input type="hidden" name="sort" value="<?= leaderboardEscape($sort) ?>">
+                    <input type="hidden" name="order" value="<?= leaderboardEscape($orderDir) ?>">
+                    <input type="hidden" name="per_page" value="<?= (int)$perPage ?>">
+                    <input type="hidden" name="page_num" value="1">
 
-                <div class="leaderboard-search-wrap">
-                    <i class="fas fa-search"></i>
-
-                    <input
-                        type="search"
-                        name="q"
-                        value="<?= leaderboardEscape($search) ?>"
-                        class="leaderboard-search"
-                        placeholder="اسم یا SteamID رو بگرد..."
-                        autocomplete="off"
-                    >
+                    <label class="leaderboard-search-field" for="leaderboardSearch">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input
+                            id="leaderboardSearch"
+                            type="search"
+                            name="q"
+                            value="<?= leaderboardEscape($search) ?>"
+                            placeholder="اسم بازیکن یا SteamID..."
+                            autocomplete="off"
+                            aria-label="جستجوی بازیکن بر اساس نام یا SteamID"
+                        >
+                        <kbd>/</kbd>
+                    </label>
 
                     <button type="submit" class="leaderboard-search-btn">
-                        <i class="fas fa-search"></i>
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
                         بگرد
                     </button>
 
                     <?php if ($search !== ''): ?>
-                        <a href="<?= leaderboardBuildUrl(['q' => '', 'page_num' => 1]) ?>" class="leaderboard-search-btn">
-                            <i class="fas fa-times"></i>
+                        <a
+                            id="clearLeaderboardSearch"
+                            href="<?= leaderboardBuildUrl(['q' => '', 'page_num' => 1]) ?>"
+                            class="leaderboard-clear-btn"
+                        >
+                            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                             پاک کردن
                         </a>
                     <?php endif; ?>
-                </div>
-            </form>
+                </form>
 
+                <form class="leaderboard-sort-form" method="get">
+                    <input type="hidden" name="page" value="leaderboard">
+                    <input type="hidden" name="q" value="<?= leaderboardEscape($search) ?>">
+                    <input type="hidden" name="per_page" value="<?= (int)$perPage ?>">
+                    <input type="hidden" name="page_num" value="1">
 
-            <form class="leaderboard-sort-form" method="get">
-                <input type="hidden" name="page" value="leaderboard">
-                <input type="hidden" name="q" value="<?= leaderboardEscape($search) ?>">
-                <input type="hidden" name="per_page" value="<?= (int)$perPage ?>">
-                <input type="hidden" name="page_num" value="1">
-
-                <div class="leaderboard-toolbar-actions">
-
-                    <span class="sort-caption">
-                        <i class="fas fa-filter"></i>
-                        مرتب‌سازی با
-                    </span>
-
-                    <select
-                        name="sort"
-                        class="leaderboard-sort-select"
-                        aria-label="مرتب‌سازی لیدربورد"
-                        onchange="this.form.submit()"
-                    >
-                        <?php foreach (
-                            $sortLabels
-                            as $sortKey =>
-                            $sortItem
-                        ): ?>
-                            <option
-                                value="<?= leaderboardEscape($sortKey) ?>"
-                                <?= $sort === $sortKey ? 'selected' : '' ?>
+                    <div class="leaderboard-sort-field">
+                        <label class="sort-caption" for="leaderboardSort">
+                            <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+                            مرتب‌سازی
+                        </label>
+                        <span class="leaderboard-select-wrap">
+                            <select
+                                id="leaderboardSort"
+                                name="sort"
+                                class="leaderboard-sort-select"
+                                aria-label="مرتب‌سازی بازیکن‌ها"
                             >
-                                <?= leaderboardEscape($sortItem['label']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                                <?php foreach ($sortLabels as $sortKey => $sortItem): ?>
+                                    <option
+                                        value="<?= leaderboardEscape($sortKey) ?>"
+                                        <?= $sort === $sortKey ? 'selected' : '' ?>
+                                    >
+                                        <?= leaderboardEscape($sortItem['label']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                            <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                        </span>
+                    </div>
 
                     <a
+                        id="leaderboardOrder"
                         href="<?= leaderboardBuildUrl([
                             'order' => $orderDir === 'ASC' ? 'DESC' : 'ASC',
                             'page_num' => 1
                         ]) ?>"
                         class="leaderboard-order-btn"
+                        data-order="<?= leaderboardEscape($orderDir) ?>"
                         title="تغییر ترتیب مرتب‌سازی"
+                        aria-label="مرتب‌سازی <?= $orderDir === 'ASC' ? 'نزولی' : 'صعودی' ?>"
                     >
-                        <i class="fas <?= $orderDir === 'ASC' ? 'fa-arrow-up' : 'fa-arrow-down' ?>"></i>
+                        <i class="fa-solid <?= $orderDir === 'ASC' ? 'fa-arrow-up-wide-short' : 'fa-arrow-down-wide-short' ?>" aria-hidden="true"></i>
                         <span><?= $orderDir === 'ASC' ? 'صعودی' : 'نزولی' ?></span>
                     </a>
-
-                </div>
-            </form>
-
+                </form>
+            </div>
         </div>
-
 
         <!-- =================================================
              DYNAMIC CONTENT
