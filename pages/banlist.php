@@ -194,6 +194,8 @@ if (!$canViewPlayerIps) {
     unset($tabs['playerips']);
 }
 
+$activeTab = $tabs[$type] ?? $tabs['bans'];
+
 function banlistBuildUrl(array $params = []): string
 {
     $query = array_merge([
@@ -208,183 +210,94 @@ function banlistBuildUrl(array $params = []): string
 }
 ?>
 
-<style>
-    .banlist-toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: space-between;
-        align-items: center;
-        margin: 18px 0 16px;
-        padding: 14px 16px;
-        background: rgba(11, 18, 32, 0.88);
-        border: 1px solid rgba(48, 48, 48, 0.68);
-        border-radius: 20px;
-        box-shadow: 0 14px 34px rgba(2, 6, 23, 0.18);
-    }
-    .banlist-search-form {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        align-items: center;
-        flex: 1 1 420px;
-    }
-    .banlist-search-input {
-        min-width: 220px;
-        flex: 1 1 260px;
-        height: 48px;
-        padding: 0 14px;
-        border-radius: 13px;
-        background: #111111;
-        border: 1px solid #303030;
-        color: #f8fafc;
-        font: inherit;
-        outline: none;
-    }
-    .banlist-search-input:focus {
-        border-color: #F97316;
-        box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.14);
-    }
-    .banlist-search-btn,
-    .banlist-clear-btn,
-    .ban-page-btn,
-    .ban-size-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 44px;
-        padding: 0 14px;
-        border-radius: 13px;
-        border: 1px solid #303030;
-        background: #111111;
-        color: #cbd5e1;
-        text-decoration: none;
-        font-size: 0.86rem;
-        font-weight: 700;
-        transition: 0.2s ease;
-    }
-    .banlist-search-btn:hover,
-    .banlist-clear-btn:hover,
-    .ban-page-btn:hover,
-    .ban-size-btn:hover {
-        border-color: rgba(249, 115, 22, 0.48);
-        background: rgba(23, 23, 23, 0.96);
-        color: #fff;
-    }
-    .banlist-page-size {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px;
-        justify-content: flex-end;
-    }
-    .banlist-page-size span {
-        color: #94a3b8;
-        font-size: 0.82rem;
-        font-weight: 700;
-    }
-    .ban-size-btn.active {
-        border-color: rgba(249, 115, 22, 0.42);
-        background: linear-gradient(135deg, rgba(249, 115, 22, 0.10), rgba(23, 23, 23, 0.96));
-        color: #f8fafc;
-    }
-    .banlist-footer-controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 16px;
-        padding: 14px 0 0;
-        border-top: 1px solid rgba(48, 48, 48, 0.55);
-    }
-    .banlist-range {
-        color: #94a3b8;
-        font-size: 0.85rem;
-    }
-    .banlist-pagination {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: center;
-        justify-content: flex-end;
-    }
-    .ban-page-btn.active {
-        border-color: rgba(249, 115, 22, 0.42);
-        background: linear-gradient(135deg, rgba(249, 115, 22, 0.10), rgba(23, 23, 23, 0.96));
-        color: #f8fafc;
-    }
-    .ban-page-btn.disabled {
-        opacity: 0.45;
-        pointer-events: none;
-    }
-    .ban-tab {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .ban-tab.active {
-        background: rgba(194, 65, 12, 0.14) !important;
-        color: #FB923C !important;
-        border-color: rgba(249, 115, 22, 0.30) !important;
-    }
-    @media (max-width: 768px) {
-        .banlist-toolbar,
-        .banlist-footer-controls {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        .banlist-page-size,
-        .banlist-pagination {
-            justify-content: flex-start;
-        }
-        .banlist-search-input {
-            min-width: 0;
-            width: 100%;
-        }
-    }
-</style>
+
 <div class="banlist-page">
 
     <!-- =========================================
          Page Header
     ========================================== -->
 
-    <div class="banlist-header">
+    <section class="banlist-hero" aria-labelledby="banlistHeroTitle">
+        <div class="banlist-hero-art" aria-hidden="true">
+            <span class="ban-hero-grid"></span>
+            <span class="ban-hero-orbit ban-hero-orbit--outer"></span>
+            <span class="ban-hero-orbit ban-hero-orbit--inner"></span>
+            <span class="ban-hero-glow"></span>
 
-        <div class="banlist-title-wrap">
-
-            <div class="banlist-title-icon">
-
-                <i class="fas fa-gavel"></i>
-
+            <div class="ban-hero-emblem">
+                <span>FC / 02</span>
+                <i class="fa-solid fa-gavel"></i>
             </div>
 
-            <div>
+            <span class="ban-hero-tag ban-hero-tag--top">FRAGCITY / MODERATION</span>
+            <span class="ban-hero-tag ban-hero-tag--bottom">CS2 // COMMUNITY</span>
 
-                <h1>
-                    لیست محرومیت‌ها
-                </h1>
+            <div class="ban-hero-float-card ban-hero-float-card--top">
+                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                <span>FAIR PLAY</span>
+            </div>
+            <div class="ban-hero-float-card ban-hero-float-card--bottom">
+                <span class="ban-hero-status-dot"></span>
+                <span>SERVER RECORDS</span>
+            </div>
+        </div>
 
-                <p>
-                    بن‌ها، میوت‌ها، اخطارها و سوابق رفع محرومیت
-                </p>
-
+        <div class="banlist-hero-copy">
+            <div class="banlist-hero-eyebrow">
+                <span class="banlist-hero-eyebrow-mark" aria-hidden="true"></span>
+                FRAGCITY <span class="banlist-hero-slash">/</span> MODERATION
             </div>
 
+            <h1 id="banlistHeroTitle">سوابق سرورها، <span>همه یه‌جا</span></h1>
+
+            <p>
+                بن، رفع بن، میوت و اخطارها رو ببین؛ دنبال اسم بازیکن یا SteamID بگرد و سریع به سابقه‌ای که می‌خوای برس.
+            </p>
+
+            <div class="banlist-hero-meta">
+                <span><i class="fa-solid fa-list-check" aria-hidden="true"></i> بخش فعلی: <strong><?= esc($activeTab['label']) ?></strong></span>
+                <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> سوابق ثبت‌شده در سرورهای FragCity</span>
+            </div>
+
+            <div class="banlist-hero-bottom">
+                <a class="banlist-hero-action" href="#banlistRecords">
+                    <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+                    دیدن سوابق
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                </a>
+                <span class="banlist-hero-note">
+                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                    اطلاعات حساس فقط برای افراد مجاز
+                </span>
+            </div>
         </div>
+    </section>
 
-        <div class="banlist-header-badge">
+    <section class="banlist-stats-grid" aria-label="آمار بخش فعلی">
+        <article class="banlist-stat-card">
+            <span class="banlist-stat-icon"><i class="fa-solid fa-database" aria-hidden="true"></i></span>
+            <div class="banlist-stat-copy">
+                <span>نتیجه‌های این بخش</span>
+                <strong><?= number_format($totalItems) ?></strong>
+            </div>
+        </article>
 
-            <i class="fas fa-shield-halved"></i>
+        <article class="banlist-stat-card">
+            <span class="banlist-stat-icon"><i class="fa-solid fa-eye" aria-hidden="true"></i></span>
+            <div class="banlist-stat-copy">
+                <span>نمایش در این صفحه</span>
+                <strong><?= number_format(count($data)) ?></strong>
+            </div>
+        </article>
 
-            FragCity Moderation
-
-        </div>
-
-    </div>
-
+        <article class="banlist-stat-card">
+            <span class="banlist-stat-icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></span>
+            <div class="banlist-stat-copy">
+                <span>صفحه فعلی</span>
+                <strong><?= number_format($pageNum) ?> <small>/ <?= number_format($totalPages) ?></small></strong>
+            </div>
+        </article>
+    </section>
 
     <!-- =========================================
          Main Card
@@ -406,6 +319,7 @@ function banlistBuildUrl(array $params = []): string
 <a
     href="<?= banlistBuildUrl(['type' => $key, 'page_num' => 1]) ?>"
     class="ban-tab <?= $type === $key ? 'active' : '' ?>"
+    aria-current="<?= $type === $key ? 'page' : 'false' ?>"
     data-ban-tab
     data-type="<?= esc($key) ?>"
 >
@@ -418,38 +332,56 @@ function banlistBuildUrl(array $params = []): string
         </div>
 
         <div class="banlist-toolbar">
-            <form class="banlist-search-form" method="get">
+            <div class="banlist-toolbar-heading">
+                <span class="banlist-toolbar-icon" aria-hidden="true">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                </span>
+                <div class="banlist-toolbar-copy">
+                    <span class="banlist-toolbar-kicker">RECORD FINDER</span>
+                    <strong>دنبال چی می‌گردی؟</strong>
+                    <small>اسم، SteamID، دلیل یا اطلاعات قابل‌دسترسی رو جستجو کن.</small>
+                </div>
+            </div>
+
+            <form class="banlist-search-form" method="get" role="search" aria-label="جستجو در سوابق">
                 <input type="hidden" name="page" value="banlist">
                 <input type="hidden" name="type" value="<?= esc($type) ?>">
                 <input type="hidden" name="per_page" value="<?= (int)$perPage ?>">
                 <input type="hidden" name="page_num" value="1">
-                <input
-                    type="search"
-                    name="q"
-                    value="<?= esc($search) ?>"
-                    class="banlist-search-input"
-                    placeholder="<?= $showSensitiveData ? 'جستجو در نام، SteamID، IP، دلیل و ادمین...' : 'جستجو در نام، SteamID، دلیل و ادمین...' ?>"
-                    autocomplete="off"
-                >
+
+                <label class="banlist-search-field" for="banlistSearch">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input
+                        id="banlistSearch"
+                        type="search"
+                        name="q"
+                        value="<?= esc($search) ?>"
+                        class="banlist-search-input"
+                        placeholder="<?= $showSensitiveData ? 'اسم بازیکن، SteamID، IP، دلیل یا ادمین...' : 'اسم بازیکن، SteamID، دلیل یا ادمین...' ?>"
+                        autocomplete="off"
+                    >
+                    <kbd>/</kbd>
+                </label>
+
                 <button type="submit" class="banlist-search-btn">
-                    <i class="fas fa-search"></i>
-                    جستجو
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    بگرد
                 </button>
+
                 <?php if ($search !== ''): ?>
                     <a href="<?= banlistBuildUrl(['q' => '', 'page_num' => 1]) ?>" class="banlist-clear-btn">
-                        <i class="fas fa-times"></i>
+                        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
                         پاک کردن
                     </a>
                 <?php endif; ?>
             </form>
-</div>
-
+        </div>
 
         <!-- =====================================
              Table Area
         ====================================== -->
 
-        <div class="banlist-table-wrapper">
+        <div class="banlist-table-wrapper" id="banlistRecords">
 
 
             <?php if ($error): ?>
