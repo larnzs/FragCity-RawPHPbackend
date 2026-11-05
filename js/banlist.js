@@ -117,10 +117,10 @@
                         'bans';
 
 
-                    tab.classList.toggle(
-                        'active',
-                        tabType === type
-                    );
+                    const isActive = tabType === type;
+
+                    tab.classList.toggle('active', isActive);
+                    tab.setAttribute('aria-current', isActive ? 'page' : 'false');
 
                 }
             );
@@ -210,22 +210,28 @@
                     );
 
 
-                const incomingWrapper =
-                    doc.querySelector(
-                        '.banlist-table-wrapper'
-                    );
+                const incomingWrapper = doc.querySelector('.banlist-table-wrapper');
+                const incomingStats = doc.querySelector('.banlist-stats-grid');
+                const incomingHeroMeta = doc.querySelector('.banlist-hero-meta');
 
-
-                if (
-                    !incomingWrapper
-                ) {
-
-                    throw new Error(
-                        'Banlist table wrapper not found.'
-                    );
-
+                if (!incomingWrapper) {
+                    throw new Error('Banlist table wrapper not found.');
                 }
 
+                /*
+                 * Keep the summary in sync with the selected record type.
+                 * The authorization decision remains server-rendered.
+                 */
+                const currentStats = root.querySelector('.banlist-stats-grid');
+                const currentHeroMeta = root.querySelector('.banlist-hero-meta');
+
+                if (incomingStats && currentStats) {
+                    currentStats.innerHTML = incomingStats.innerHTML;
+                }
+
+                if (incomingHeroMeta && currentHeroMeta) {
+                    currentHeroMeta.innerHTML = incomingHeroMeta.innerHTML;
+                }
 
                 /*
                  * فقط محتوای Table Wrapper عوض می‌شود.
