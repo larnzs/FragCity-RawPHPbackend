@@ -47,9 +47,17 @@ $domainIsValid = in_array($originScheme, ['http', 'https'], true)
     && !isset($siteBaseParts['fragment'])
     && (!isset($siteBaseParts['path']) || $siteBaseParts['path'] === '' || $siteBaseParts['path'] === '/');
 
-$requestScheme = !empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off'
-    ? 'https'
-    : (strtolower(trim((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''))) === 'https' ? 'https' : 'http');
+$forwardedProto = strtolower(trim(explode(
+    ',',
+    (string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')
+)[0] ?? ''));
+
+$requestScheme = (
+    (!empty($_SERVER['HTTPS']) && strtolower(trim((string) $_SERVER['HTTPS'])) !== 'off')
+    || strtolower(trim((string) ($_SERVER['REQUEST_SCHEME'] ?? ''))) === 'https'
+    || $forwardedProto === 'https'
+    || strtolower(trim((string) ($_SERVER['HTTP__WSSC'] ?? ''))) === 'https'
+) ? 'https' : 'http';
 $requestHostHeader = trim((string) ($_SERVER['HTTP_HOST'] ?? ''));
 $requestAuthority = parse_url($requestScheme . '://' . $requestHostHeader);
 $requestHost = is_array($requestAuthority)
