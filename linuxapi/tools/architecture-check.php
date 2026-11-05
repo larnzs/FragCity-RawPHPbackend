@@ -240,7 +240,7 @@ $check(
         && str_contains($nginxApi, 'location = /v1/vipcore')
         && str_contains($vipCoreServiceTest, 'Inactive tier 4 cannot be granted')
         && str_contains($websiteSettingsRaw, 'VIP status and entitlements are read from VIPCore')
-        && !str_contains($websiteSettingsRaw, '"database_profile": "main"')
+        && !isset($websiteSettings['files']['pages.vip']['database_profile'])
 );
 
 $check(
