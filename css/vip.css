@@ -752,3 +752,24 @@ button.vip-checkout-wallet {
         width: 100%;
     }
 }
+
+/* Responsive VIP details placement: inline on single-column phones, shared on wider layouts. */
+.vip-plan-item {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.vip-plan-item > .vip-plan-card {
+    width: 100%;
+    flex: 1 1 auto;
+}
+#vipDetailPanelHome {
+    display: none !important;
+}
+@media (max-width: 700px) {
+    .vip-plan-item > .vip-feature-panel {
+        width: 100%;
+        margin: 12px 0 0;
+        padding: 17px;
+    }
+}
