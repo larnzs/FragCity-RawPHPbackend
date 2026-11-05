@@ -264,18 +264,17 @@ $check(
         && !str_contains($ranksService, 'UPDATE `lvl_base`')
         && !str_contains($ranksService, 'INSERT INTO `lvl_base`')
         && str_contains($ranksServiceTest, 'STEAM_1:1:127247282')
-        && str_contains($ranksSmokeTest, "'/v1/ranks'")
+        && str_contains($ranksSmokeTest, 'new RanksRepository()')
         && str_contains($nginxApiBootstrap, 'location = /v1/ranks')
         && str_contains($nginxApi, 'location = /v1/ranks')
         && str_contains($leaderboardPage, 'new RanksRepository()')
         && !str_contains($leaderboardPage, 'RemoteRanksDatabase')
         && !str_contains($profilePage, 'RemoteRanksDatabase')
         && str_contains($profilePage, 'new RanksRepository()')
-        && str_contains($websiteSettingsRaw, 'signed Linux API')
+        && str_contains($websiteSettingsRaw, 'Signed Linux API')
 );
 
 $check(
-    'Pin catalog preserves each pin ID after pagination converts the catalog to a numeric list',$check(
     'Pin catalog preserves each pin ID after pagination converts the catalog to a numeric list',
     str_contains($weaponPaintsUtils, '\'id\'        => (int)$id')
         && str_contains($weaponPaintsPage, "\$pin['id']")

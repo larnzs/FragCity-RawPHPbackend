@@ -11,7 +11,7 @@ declare(strict_types=1);
  * PHP-FPM (www-data) needs READ access to the private file but must not be able
  * to write it. Never place this file below the public document root or commit it.
  *
- * This Linux API owns WeaponPaints, the read-only SimpleAdmin lookup, VIPCore entitlement
+ * This Linux API owns WeaponPaints, read-only SimpleAdmin and Ranks lookups, VIPCore entitlement
  * access, and the server-side Pterodactyl integrations. It must never connect to the FragCity website DB
  * (kyonxcbt_fragcity_services) or receive the website's database credentials.
  */

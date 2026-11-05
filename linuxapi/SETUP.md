@@ -5,6 +5,7 @@ This is the repeatable setup guide for the files in this directory. Follow it on
 ## Active data paths and retired Agent bridge
 
 - **WeaponPaints:** the Linux API connects to the Linux-local MariaDB database `GLOBAL_weaponpaints` through `127.0.0.1:3306`. Keep this DB and API path unchanged.
+- **Ranks:** the signed `/v1/ranks` route uses a separate read-only MariaDB account for `GLOBAL_ranks.lvl_base`; the website leaderboard and profile do not connect directly to this schema.
 - **Website data:** the main website database `kyonxcbt_fragcity_services` stays on shared hosting; Laragon uses a local copy. The confirmed website schema consists of `donations`, `password_resets`, `tickets`, `ticket_replies`, `users`, `user_wallets`, `vip_codes`, `vip_usage`, `wallet_transactions`, and `withdraw_requests`.
 - The Linux API must never open a MySQL connection to `kyonxcbt_fragcity_services`, receive its credentials, or expose MariaDB port 3306.
 - **Windows Agent API:** retired. `/v1/agent/*` returns HTTP 410; `api/internal_agent_bridge.php` is a fail-closed retired endpoint. Do not configure `website_bridge`, set `integrations.linuxapi_site_bridge`, create bridge-specific tables, or execute the former `site-bridge-schema.sql`.
