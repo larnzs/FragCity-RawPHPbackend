@@ -11,8 +11,8 @@ declare(strict_types=1);
  * PHP-FPM (www-data) needs READ access to the private file but must not be able
  * to write it. Never place this file below the public document root or commit it.
  *
- * This Linux API owns the WeaponPaints service and the read-only SimpleAdmin lookup,
- * plus the server-side Pterodactyl integrations. It must never connect to the FragCity website DB
+ * This Linux API owns WeaponPaints, the read-only SimpleAdmin lookup, VIPCore entitlement
+ * access, and the server-side Pterodactyl integrations. It must never connect to the FragCity website DB
  * (kyonxcbt_fragcity_services) or receive the website's database credentials.
  */
 return [
@@ -23,7 +23,7 @@ return [
      * Generate a 64-character lowercase hex key with:
      *   openssl rand -hex 32
      * Put the matching value in the website's integrations.weaponpaints_api.shared_secret.
-     * WeaponPaints and the read-only SimpleAdmin lookup intentionally share this key.
+     * WeaponPaints, SimpleAdmin and VIPCore intentionally share this key.
      * Pterodactyl Standby and Monitoring keep their own independent HMAC keys.
      */
     'shared_secret' => 'REPLACE_WITH_WEAPONPAINTS_64_HEX_SECRET',
