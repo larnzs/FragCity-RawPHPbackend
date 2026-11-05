@@ -54,6 +54,10 @@ try {
     $profilePage = $read('pages/profile.php');
     $profileJavascript = $read('js/profile.js');
     $profileStylesheet = $read('css/profile.css');
+    $steamLoginPage = $read('steam/steam_login.php');
+    $steamLoginView = $read('pages/login.php');
+    $steamRegisterView = $read('pages/register.php');
+    $profileIntegrationsSmokeTest = $read('tools/profile-integrations-smoke-test.php');
     $vipCoreSiteRepository = $read('class/VipCoreRepository.php');
     $vipCoreSiteEndpoint = $read('api/vip-test-purchase.php');
     $vipCorePage = $read('pages/vip.php');
@@ -804,6 +808,28 @@ $check(
         && str_contains($siteHeaderMarkup, "this.src='/img/logoresponsive.png';")
         && str_contains($profileStylesheet, '.profile-api-status[data-state="available"]')
         && str_contains($profileStylesheet, '.profile-api-status[data-state="api_unavailable"]')
+);
+
+$check(
+    'Steam OpenID uses the configured canonical origin and login/register links are root-absolute',
+    str_contains($steamLoginPage, "fragcity_settings('app.site_base_url'")
+        && str_contains($steamLoginPage, "new LightOpenID(\$openidOrigin)")
+        && str_contains($steamLoginPage, "integrations.steam.domain_name")
+        && !str_contains($steamLoginPage, 'new LightOpenID(\$domain)')
+        && str_contains($steamLoginView, 'href="/steam/steam_login.php"')
+        && str_contains($steamRegisterView, 'href="/steam/steam_login.php"')
+        && str_contains($steamLoginView, 'action="/?page=login&amp;auth_modal=1"')
+);
+
+$check(
+    'Profile integration diagnostics are CLI-only, test both APIs, and do not print runtime secrets',
+    str_contains($profileIntegrationsSmokeTest, "PHP_SAPI !== 'cli'")
+        && str_contains($profileIntegrationsSmokeTest, "new RanksRepository()")
+        && str_contains($profileIntegrationsSmokeTest, "new FaceitApiClient()")
+        && str_contains($profileIntegrationsSmokeTest, 'integrations.faceit_api.api_key')
+        && str_contains($profileIntegrationsSmokeTest, 'integrations.weaponpaints_api.shared_secret')
+        && !str_contains($profileIntegrationsSmokeTest, 'echo $faceitKey')
+        && !str_contains($profileIntegrationsSmokeTest, 'echo $linuxSecret')
 );
 
 $check(
