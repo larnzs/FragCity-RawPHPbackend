@@ -25,7 +25,7 @@
         '.stat-card', '.profile-inventory-card', '.profile-loadout-summary', '.profile-settings-card',
         '.serverlist-page .sl-page-head', '.serverlist-page .sl-empty-state',
         '.sl-toolbar', '.sl-group-head', '.sl-server-card', '.sl-empty',
-        '.leaderboard-header', '.leaderboard-stat-card', '.podium-card', '.leaderboard-table-scroll',
+        '.leaderboard-header:not(.leaderboard-hero)', '.leaderboard-stat-card', '.podium-card', '.leaderboard-table-scroll',
         '.banlist-header', '.banlist-table-wrapper', '.banlist-state',
         '.privacy-card', '.rules-card', '.manual-card', '.faq-item', '.warning-card',
         '.mode-grid > *', '.command-grid > *', '.command-grid-2 > *',
