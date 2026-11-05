@@ -876,6 +876,16 @@ $pageAssets = [
         ],
     ],
 
+    'vip' => [
+        'css' => [
+            '/css/pages-base.css?v=' . asset_version(__DIR__ . '/css/pages-base.css'),
+            '/css/vip.css?v=' . asset_version(__DIR__ . '/css/vip.css'),
+        ],
+        'js' => [
+            '/js/vip.js?v=' . asset_version(__DIR__ . '/js/vip.js'),
+        ],
+    ],
+
     'about' => [
         'css' => [
             '/css/pages-base.css?v=' . asset_version(__DIR__ . '/css/pages-base.css'),
