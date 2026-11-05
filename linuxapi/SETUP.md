@@ -4,9 +4,10 @@ This is the repeatable setup guide for the files in this directory. Follow it on
 
 ## Active data paths and retired Agent bridge
 
-- **WeaponPaints:** the Linux API connects to the Linux-local MariaDB database `GLOBAL_weaponpaints` through `127.0.0.1:3306`. Keep this DB and API path unchanged.
-- **Ranks:** the signed `/v1/ranks` route uses a separate read-only MariaDB account for `GLOBAL_ranks.lvl_base`; the website leaderboard and profile do not connect directly to this schema.
-- **VIPCore:** the signed `/v1/vipcore` route reads and grants only in the existing `GLOBAL_vip.vip_users` table through a dedicated account. The grant action is test-only, admin-only, and requires an explicit Linux SteamID64 allowlist; it does not implement payment.
+- **WeaponPaints:** the Linux API connects to the Linux-local MariaDB database `GLOBAL_weaponpaints` through `127.0.0.1:3306`.
+- **Ranks:** the signed `/v1/ranks` route reads the plugin-owned table `GLOBAL_ranks.lvl_base`. The website leaderboard and profile do not connect directly to this schema.
+- **VIPCore:** the signed `/v1/vipcore` route reads the existing `GLOBAL_vip.vip_users` table and exposes a restricted, test-only grant action. The grant action is admin-only, requires an explicit Linux SteamID64 allowlist, and does not implement payment.
+- **Shared MariaDB identity (current FragCity deployment):** WeaponPaints, VIPCore and Ranks reuse the existing `plugins`@ `%` account and one password variable in the private runtime config. Do not create `fragcity_vip_api` or `fragcity_ranks_api` users for this deployment. The account's current grants are broader than the individual endpoints require and include `WITH GRANT OPTION`; this is a known compatibility trade-off, not a least-privilege boundary. Keep the credential private and do not broaden or alter grants during routine deployment.
 - **Website data:** the main website database `kyonxcbt_fragcity_services` stays on shared hosting; Laragon uses a local copy. The confirmed website schema consists of `donations`, `password_resets`, `tickets`, `ticket_replies`, `users`, `user_wallets`, `vip_codes`, `vip_usage`, `wallet_transactions`, and `withdraw_requests`.
 - The Linux API must never open a MySQL connection to `kyonxcbt_fragcity_services`, receive its credentials, or expose MariaDB port 3306.
 - **Windows Agent API:** retired. `/v1/agent/*` returns HTTP 410; `api/internal_agent_bridge.php` is a fail-closed retired endpoint. Do not configure `website_bridge`, set `integrations.linuxapi_site_bridge`, create bridge-specific tables, or execute the former `site-bridge-schema.sql`.
@@ -46,7 +47,7 @@ This section records the state of the existing `server1` install so a future ope
 - The correct application database is `GLOBAL_weaponpaints`, shared by the CS2 plugin containers. `GLOBAL_simpleadmin` is not the API target, and `s2_weaponpaints` is not the website API target.
 - The existing six plugin tables and their primary keys were inspected. No plugin table was altered.
 - `GLOBAL_weaponpaints.fragcity_api_nonces` was created and its definition verified.
-- Account `fragcity_weaponpaints_api`@ `127.0.0.1` exists. The granted permissions were inspected. It has table-specific permissions only; it is not a MariaDB root account.
+- Historical note (2026-10-27): the initial setup used `fragcity_weaponpaints_api`@ `127.0.0.1` with table-specific grants. This account arrangement was superseded on 2026-11-05 for the current FragCity deployment: the live private config now uses the existing `plugins`@ `%` account for WeaponPaints, VIPCore and Ranks.
 - A permission check executed as `www-data` passed for database `GLOBAL_weaponpaints`, the required plugin-table SELECT checks, and Nonce INSERT/DELETE within a transaction that was rolled back.
 - The signed `ping_db` smoke test passed with HTTP 200 and `data.database: ok`.
 - The signed read-only `get_selection` smoke test passed with HTTP 200 and populated data for `skins`, `knife`, `agents`, `music`, and `pins`; the test player's SteamID and actual selected items are intentionally not recorded here.
@@ -172,136 +173,65 @@ sudo mariadb -t -e "SHOW CREATE TABLE GLOBAL_weaponpaints.wp_player_skin_invento
 
 The schema uses CREATE TABLE IF NOT EXISTS. It does not recreate or replace any of the six existing plugin tables.
 
-## 4. Fresh-install account and private config
+## 4. Existing plugins account and private config
 
-Use this section only on a fresh install where both the private config and the MariaDB account do not already exist. If either exists, inspect it and use the recovery section below instead of overwriting it.
+The current FragCity deployment already has the MariaDB account `plugins`@ `%`. Reuse this account for the Linux API connections to `GLOBAL_weaponpaints`, `GLOBAL_vip` and `GLOBAL_ranks`; the SimpleAdmin block also inherits the root database credentials and changes only the schema name.
 
-**Do not paste this whole installation block directly at an interactive SSH prompt.** A guard intentionally uses `exit 1` when the config/user already exists; pasted directly into the interactive shell, that can end the shell session. Save the script section to a root-owned file (for example `/root/setup-fragcity-api.sh`) and run it as a child process with `bash /root/setup-fragcity-api.sh`. This way its `exit` only stops the script, not your SSH session. Review the generated file before running it. The script generates a unique database password and HMAC secret, keeps temporary SQL/config files restricted, and does not print either secret.
+Do not create new `fragcity_weaponpaints_api`, `fragcity_vip_api` or `fragcity_ranks_api` accounts for the current deployment. Do not reset the existing account password. The private runtime config uses one `$pluginsDbPassword` variable for all three explicit database connections.
+
+Before configuring a new server, verify that the expected account and schemas exist:
 
 ~~~bash
-set -euo pipefail
-
-CONFIG="/etc/fragcity-api/config.php"
-
-if [ -e "$CONFIG" ]; then
-    echo "STOP: API config already exists; inspect it before proceeding."
-    exit 1
-fi
-
-EXISTING_USER="$(mariadb --batch --skip-column-names -e "SELECT COUNT(*) FROM mysql.user WHERE User='fragcity_weaponpaints_api';")"
-if [ "$EXISTING_USER" != "0" ]; then
-    echo "STOP: an account with this username already exists; use recovery steps."
-    exit 1
-fi
-
-TABLE_COUNT="$(mariadb --batch --skip-column-names -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='GLOBAL_weaponpaints' AND table_name IN ('wp_player_skins','wp_player_gloves','wp_player_knife','wp_player_agents','wp_player_music','wp_player_pins','wp_player_skin_inventory','fragcity_api_nonces');")"
-if [ "$TABLE_COUNT" != "8" ]; then
-    echo "STOP: expected six plugin tables, wp_player_skin_inventory and fragcity_api_nonces in GLOBAL_weaponpaints."
-    exit 1
-fi
-
-install -d -o root -g www-data -m 0750 /etc/fragcity-api
-
-DB_PASS="$(openssl rand -hex 32)"
-API_SECRET="$(openssl rand -hex 32)"
-SQL_FILE="$(mktemp /run/fragcity-api-grants.XXXXXX)"
-CONFIG_TMP="$(mktemp /etc/fragcity-api/config.php.tmp.XXXXXX)"
-
-cleanup() {
-    if [ -n "$SQL_FILE" ]; then rm -f -- "$SQL_FILE"; fi
-    if [ -n "$CONFIG_TMP" ]; then rm -f -- "$CONFIG_TMP"; fi
-}
-trap cleanup EXIT
-
-chmod 0600 "$SQL_FILE"
-
-cat > "$SQL_FILE" <<SQL
-CREATE USER 'fragcity_weaponpaints_api'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON GLOBAL_weaponpaints.wp_player_skins TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-GRANT SELECT, INSERT, UPDATE, DELETE ON GLOBAL_weaponpaints.wp_player_skin_inventory TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-GRANT INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_gloves TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_knife TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_agents TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_music TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-GRANT SELECT, INSERT, UPDATE ON GLOBAL_weaponpaints.wp_player_pins TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-
-GRANT SELECT, INSERT, DELETE ON GLOBAL_weaponpaints.fragcity_api_nonces TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-SQL
-
-mariadb < "$SQL_FILE"
-rm -f -- "$SQL_FILE"
-SQL_FILE=""
-
-cat > "$CONFIG_TMP" <<PHP
-<?php
-declare(strict_types=1);
-
-return [
-    'shared_secret' => '$API_SECRET',
-    'database' => [
-        'host' => '127.0.0.1',
-        'port' => 3306,
-        'name' => 'GLOBAL_weaponpaints',
-        'username' => 'fragcity_weaponpaints_api',
-        'password' => '$DB_PASS',
-        'charset' => 'utf8mb4',
-    ],
-];
-PHP
-
-chown root:www-data "$CONFIG_TMP"
-chmod 0640 "$CONFIG_TMP"
-mv "$CONFIG_TMP" "$CONFIG"
-CONFIG_TMP=""
-
-unset DB_PASS API_SECRET
-echo "API account and private config created; secrets were not printed."
+sudo mariadb -e "SELECT User, Host FROM mysql.user WHERE User='plugins';"
+sudo mariadb -e "SHOW GRANTS FOR 'plugins'@'%';"
+sudo mariadb -e "SHOW CREATE TABLE GLOBAL_weaponpaints.fragcity_api_nonces\\G"
+sudo mariadb -e "SHOW CREATE TABLE GLOBAL_vip.vip_users\\G"
+sudo mariadb -e "SHOW CREATE TABLE GLOBAL_ranks.lvl_base\\G"
 ~~~
 
-The nonce table grant includes SELECT intentionally. The API cleanup query checks created_at, and the validation below deletes by nonce_hash; MariaDB requires SELECT permission for columns used by these WHERE conditions in addition to DELETE.
+The account currently has broad schema-level grants across plugin databases, including `WITH GRANT OPTION`. This exceeds the minimum operations required by these API routes. It is an explicit reuse decision for the existing installation, not least-privilege isolation. Do not attempt to reduce these grants during this deployment because other plugin integrations may rely on them. A future move to restricted per-service accounts needs a separate planned credential migration and verification of every consumer.
 
-## 5. Repair the current account if it already exists
+For a fresh installation, create the private runtime config from the tracked example only when the private file does not already exist:
 
-The current installation created the account and config before this guide was added. Do not recreate the user or overwrite the existing config. After creating `wp_player_skin_inventory` with the schema migration above, grant the existing API account access to it. Preserve the nonce permissions as well:
+~~~bash
+if [ -e /etc/fragcity-api/config.php ]; then
+    echo "STOP: private API config already exists; merge changes instead of replacing it."
+    exit 1
+fi
+
+sudo install -d -o root -g www-data -m 0750 /etc/fragcity-api
+sudo install -o root -g www-data -m 0640 linuxapi/config.example.php /etc/fragcity-api/config.php
+sudo nano /etc/fragcity-api/config.php
+~~~
+
+Replace every placeholder locally with the existing database password, the matching HMAC secrets, and the real Pterodactyl token/host values required by enabled integrations. Never commit this completed runtime file or paste its secrets into chat.
+
+For an existing installation, merge only the missing keys from `linuxapi/config.example.php`; do not replace the live file. Preserve the existing root HMAC key, Standby HMAC key, Application API token and database password.
+
+The private config should be owned by `root:www-data` and mode `0640`:
+
+~~~bash
+sudo chown root:www-data /etc/fragcity-api/config.php
+sudo chmod 0640 /etc/fragcity-api/config.php
+php -l /etc/fragcity-api/config.php
+sudo -u www-data test -r /etc/fragcity-api/config.php
+~~~
+
+## 5. Verify shared-account access without changing grants
+
+Inspect the current account's grants; do not run `CREATE USER`, `ALTER USER`, `GRANT` or `REVOKE` as part of this reuse path:
 
 ~~~sql
-GRANT SELECT, INSERT, UPDATE, DELETE
-ON GLOBAL_weaponpaints.wp_player_skin_inventory
-TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-
-GRANT SELECT, INSERT, UPDATE, DELETE
-ON GLOBAL_weaponpaints.wp_player_skins
-TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-
-GRANT SELECT, INSERT, DELETE
-ON GLOBAL_weaponpaints.fragcity_api_nonces
-TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-
-SHOW GRANTS FOR 'fragcity_weaponpaints_api'@'127.0.0.1';
+SHOW GRANTS FOR 'plugins'@'%';
 ~~~
 
-Run that SQL in MariaDB (for example, via sudo mariadb). If MariaDB reports that this exact account/host does not exist, inspect mysql.user and SHOW GRANTS first; do not create an additional host entry by guesswork.
+The route adapters keep their own fixed schemas, actions and SQL:
+- WeaponPaints uses its allowlisted read/write operations and nonce replay table in `GLOBAL_weaponpaints`.
+- VIPCore reads membership state and its restricted test grant writes only to `GLOBAL_vip.vip_users`.
+- Ranks performs read-only queries against `GLOBAL_ranks.lvl_base`.
+- SimpleAdmin reads allowlisted records from `GLOBAL_simpleadmin`.
 
-### Skin inventory delete permissions
-
-The website's Inventory X action removes exactly one row by SteamID, team, weapon defindex and paint ID. The API also removes the matching active `wp_player_skins` row only when that row points to the same paint. It does not touch other paints, teams or players.
-
-For an existing installation, the API account needs DELETE permission on only these two WeaponPaints tables in addition to its existing read/write grants:
-
-~~~sql
-GRANT SELECT, INSERT, UPDATE, DELETE
-ON GLOBAL_weaponpaints.wp_player_skin_inventory
-TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-
-GRANT SELECT, INSERT, UPDATE, DELETE
-ON GLOBAL_weaponpaints.wp_player_skins
-TO 'fragcity_weaponpaints_api'@'127.0.0.1';
-
-SHOW GRANTS FOR 'fragcity_weaponpaints_api'@'127.0.0.1';
-~~~
-
-Run once in MariaDB after reviewing the existing account. Do not recreate the account or change its password/config for this permission update.
+The current MariaDB account has wider privileges than the SQL operations above require. Application-layer action allowlists do not turn a broad MariaDB grant into least-privilege isolation; treat the shared password as a high-impact secret and keep it server-side.
 
 ## 6. Deploy the updated API runtime files
 
