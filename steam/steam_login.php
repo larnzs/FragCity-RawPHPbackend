@@ -73,14 +73,39 @@ $requestMatchesConfiguredOrigin = $requestScheme === $originScheme
     && $requestHost === $originHost
     && $defaultRequestPort === $defaultOriginPort;
 
+$safeLogValue = static function (string $value): string {
+    $value = preg_replace('/[^a-z0-9.\\-:\\[\\]]/i', '?', $value) ?? '';
+    return substr($value, 0, 120);
+};
+
 if (!$requestMatchesConfiguredOrigin) {
     $domainIsValid = false;
-    error_log('[FragCity] Steam OpenID request origin does not match app.site_base_url; refusing mismatched callback.');
+    $configuredPortForLog = $originPort ?? ($originScheme === 'https' ? 443 : 80);
+    $requestPortForLog = $requestPort ?? ($requestScheme === 'https' ? 443 : 80);
+    $forwardedProtoForLog = in_array($forwardedProto, ['http', 'https'], true)
+        ? $forwardedProto
+        : ($forwardedProto === '' ? 'missing' : 'other');
+    error_log(
+        '[FragCity] Steam OpenID origin mismatch diagnostics:'
+        . ' configured_scheme=' . $safeLogValue($originScheme)
+        . ' configured_host=' . $safeLogValue($originHost)
+        . ' configured_port=' . $configuredPortForLog
+        . ' request_scheme=' . $safeLogValue($requestScheme)
+        . ' request_host=' . $safeLogValue($requestHost)
+        . ' request_port=' . $requestPortForLog
+        . ' server_https=' . (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off' ? 'on' : 'off')
+        . ' request_scheme_var=' . $safeLogValue(strtolower(trim((string) ($_SERVER['REQUEST_SCHEME'] ?? 'missing'))))
+        . ' forwarded_proto=' . $forwardedProtoForLog
+    );
 }
 
 if ($configuredDomain !== '' && $configuredDomain !== $originHost) {
     $domainIsValid = false;
-    error_log('[FragCity] Steam domain_name does not match app.site_base_url host.');
+    error_log(
+        '[FragCity] Steam domain mismatch diagnostics: configured_domain='
+        . $safeLogValue($configuredDomain)
+        . ' configured_origin_host=' . $safeLogValue($originHost)
+    );
 }
 
 $openidOrigin = $domainIsValid
