@@ -375,22 +375,39 @@ if (
 $steamIdForDisplay = $steamid64 !== '' ? $steamid64 : (string)$steamid;
 
 // Ranking data is optional; an unavailable Ranks API must not hide Steam profile data.
+// Keep transport failure distinct from a valid API response with no player row.
 $playerStats = null;
 $globalPlace = 0;
+$ranksApiStatus = $steamid64 !== '' ? 'api_unavailable' : 'steam_id_missing';
 try {
     if ($steamid64 !== '') {
         require_once __DIR__ . '/../class/RanksRepository.php';
         $rankResult = (new RanksRepository())->getPlayer($steamid64);
+
         if (($rankResult['found'] ?? false) === true && is_array($rankResult['player'] ?? null)) {
             $playerStats = [$rankResult['player']];
             $globalPlace = (int)($rankResult['global_place'] ?? 0);
+            $ranksApiStatus = 'available';
+        } elseif (($rankResult['found'] ?? null) === false) {
+            $ranksApiStatus = 'player_not_found';
+        } else {
+            throw new RuntimeException('Ranks API returned an unrecognized player result.');
         }
     }
 } catch (Throwable $e) {
-    error_log('[FragCity] Profile ranking data is unavailable.');
+    error_log('[FragCity] Profile Ranks API lookup is unavailable (' . get_class($e) . ').');
     $playerStats = null;
     $globalPlace = 0;
+    $ranksApiStatus = 'api_unavailable';
 }
+
+$ranksApiStatusLabels = [
+    'available' => 'API رنک متصل است · آمار بازیکن دریافت شد',
+    'player_not_found' => 'API رنک متصل است · هنوز رکوردی برای این بازیکن ثبت نشده',
+    'api_unavailable' => 'ارتباط با API رنک موقتاً در دسترس نیست',
+    'steam_id_missing' => 'SteamID معتبر برای دریافت آمار موجود نیست',
+];
+$ranksApiStatusLabel = $ranksApiStatusLabels[$ranksApiStatus] ?? $ranksApiStatusLabels['api_unavailable'];
 
 $stats = $playerStats[0] ?? null;
 $hasRankStats = is_array($stats);
@@ -435,10 +452,10 @@ $bannerKey = $steamid64 !== '' ? $steamid64 : preg_replace('/[^0-9]/', '', (stri
 $bannerFile = $bannerKey !== '' ? __DIR__ . '/../img/banners/banner_' . $bannerKey . '.jpg' : '';
 $avatarFile = $bannerKey !== '' ? __DIR__ . '/../img/avatars/avatar_' . $bannerKey . '.jpg' : '';
 $bannerUrl = $bannerFile !== '' && is_file($bannerFile)
-    ? 'img/banners/banner_' . rawurlencode($bannerKey) . '.jpg?v=' . filemtime($bannerFile)
+    ? '/img/banners/banner_' . rawurlencode($bannerKey) . '.jpg?v=' . filemtime($bannerFile)
     : '';
 $avatarUrl = $avatarFile !== '' && is_file($avatarFile)
-    ? 'img/avatars/avatar_' . rawurlencode($bannerKey) . '.jpg?v=' . filemtime($avatarFile)
+    ? '/img/avatars/avatar_' . rawurlencode($bannerKey) . '.jpg?v=' . filemtime($avatarFile)
     : '';
 
 $steamAvatarUrl = '';
@@ -450,7 +467,7 @@ $allowedStoredSteamPath = $steamid64 !== ''
 if ($allowedStoredSteamPath) {
     $storedSteamDiskPath = __DIR__ . '/../' . $storedSteamAvatarPath;
     if (is_file($storedSteamDiskPath)) {
-        $steamAvatarUrl = $storedSteamAvatarPath . '?v=' . filemtime($storedSteamDiskPath);
+        $steamAvatarUrl = '/' . ltrim($storedSteamAvatarPath, '/') . '?v=' . filemtime($storedSteamDiskPath);
     }
 }
 if ($steamAvatarUrl === '' && $steamid64 !== '') {
@@ -458,20 +475,37 @@ if ($steamAvatarUrl === '' && $steamid64 !== '') {
         $steamAvatarFilename = 'steam_' . $steamid64 . '.' . $steamAvatarExtension;
         $steamAvatarDiskPath = __DIR__ . '/../img/steam-avatars/' . $steamAvatarFilename;
         if (is_file($steamAvatarDiskPath)) {
-            $steamAvatarUrl = 'img/steam-avatars/' . rawurlencode($steamAvatarFilename)
+            $steamAvatarUrl = '/img/steam-avatars/' . rawurlencode($steamAvatarFilename)
                 . '?v=' . filemtime($steamAvatarDiskPath);
             break;
         }
     }
 }
-$steamCardAvatarUrl = $steamAvatarUrl !== ''
-    ? $steamAvatarUrl
-    : (string)($steamProfile['avatarfull'] ?? '');
+$steamCardAvatarUrl = $steamAvatarUrl;
+if ($steamCardAvatarUrl === '') {
+    $remoteSteamAvatar = trim((string)($steamProfile['avatarfull'] ?? ''));
+    $remoteAvatarParts = $remoteSteamAvatar !== '' ? parse_url($remoteSteamAvatar) : false;
+    $remoteAvatarHost = is_array($remoteAvatarParts)
+        ? strtolower((string)($remoteAvatarParts['host'] ?? ''))
+        : '';
+    $isTrustedSteamAvatarHost = $remoteAvatarHost === 'steamstatic.com'
+        || str_ends_with($remoteAvatarHost, '.steamstatic.com')
+        || $remoteAvatarHost === 'akamaihd.net'
+        || str_ends_with($remoteAvatarHost, '.akamaihd.net');
+
+    if (
+        is_array($remoteAvatarParts)
+        && strtolower((string)($remoteAvatarParts['scheme'] ?? '')) === 'https'
+        && $isTrustedSteamAvatarHost
+    ) {
+        $steamCardAvatarUrl = $remoteSteamAvatar;
+    }
+}
 if ($avatarUrl === '') $avatarUrl = $steamCardAvatarUrl;
 // Read the same cached FACEIT player profile used by the header and server list.
 // This returns both skill_level and faceit_elo without exposing the API key.
 $faceitProfileData = [];
-$faceitStatus = 'api_unavailable';
+$faceitStatus = $steamid64 !== '' ? 'api_unavailable' : 'steam_id_missing';
 if ($steamid64 !== '') {
     try {
         require_once __DIR__ . '/../class/FaceitApiClient.php';
@@ -483,8 +517,22 @@ if ($steamid64 !== '') {
             : [];
         $faceitStatus = (string)($faceitProfileData['faceit_status'] ?? 'api_unavailable');
     } catch (Throwable $faceitError) {
-        error_log('[FragCity] Profile FACEIT lookup unavailable.');
+        error_log('[FragCity] Profile FACEIT lookup unavailable (' . get_class($faceitError) . ').');
+        $faceitStatus = 'api_unavailable';
     }
+}
+
+$allowedFaceitStatuses = [
+    'available',
+    'unranked',
+    'no_cs2_profile',
+    'profile_not_found',
+    'api_not_configured',
+    'api_unavailable',
+    'steam_id_missing',
+];
+if (!in_array($faceitStatus, $allowedFaceitStatuses, true)) {
+    $faceitStatus = 'api_unavailable';
 }
 
 $faceitLevelCandidate = $faceitProfileData['faceit_level'] ?? null;
@@ -556,6 +604,17 @@ if ($faceitLevel !== null && $faceitElo !== null) {
 }
 
 $faceitDisplayLevel = $faceitLevel ?? 0;
+
+$faceitApiStatusLabels = [
+    'available' => 'اتصال FACEIT برقرار است',
+    'unranked' => 'اتصال برقرار است · هنوز رتبه‌ای ثبت نشده',
+    'no_cs2_profile' => 'اتصال برقرار است · پروفایل CS2 پیدا نشد',
+    'profile_not_found' => 'اکانت FACEIT برای این Steam پیدا نشد',
+    'api_not_configured' => 'کلید FACEIT API در تنظیمات سایت ثبت نشده',
+    'api_unavailable' => 'سرویس FACEIT موقتاً پاسخ‌گو نیست',
+    'steam_id_missing' => 'SteamID معتبر برای بررسی FACEIT موجود نیست',
+];
+$faceitApiStatusLabel = $faceitApiStatusLabels[$faceitStatus] ?? $faceitApiStatusLabels['api_unavailable'];
 $faceitRankColors = [
     0 => '#CDCDCD',
     1 => '#EEEEEE',
@@ -660,7 +719,7 @@ if (!function_exists('formatPlaytime')) {
     <div
         class="banner-section"
         id="bannerSection"
-        data-banner-url="<?= htmlspecialchars($bannerUrl ?: 'assets/images/default_banner.jpg', ENT_QUOTES, 'UTF-8') ?>"
+        data-banner-url="<?= htmlspecialchars($bannerUrl, ENT_QUOTES, 'UTF-8') ?>"
     >
         <div class="banner-overlay"></div>
         <button type="button" class="upload-btn banner-upload" id="uploadBannerBtn" aria-label="تغییر بنر">
@@ -754,9 +813,14 @@ if (!function_exists('formatPlaytime')) {
                             aria-valuenow="<?= htmlspecialchars((string) round($xpProgress, 2), ENT_QUOTES, 'UTF-8') ?>"
                         ></div>
                     </div>
+                    <span class="profile-api-status" data-state="<?= htmlspecialchars($ranksApiStatus, ENT_QUOTES, 'UTF-8') ?>" data-api="ranks" role="status">
+                        <span class="profile-api-status__dot" aria-hidden="true"></span>
+                        <?= htmlspecialchars($ranksApiStatusLabel, ENT_QUOTES, 'UTF-8') ?>
+                    </span>
                 </div>
                 <div
                     class="profile-progress-item profile-progress-item--faceit"
+                    data-faceit-status="<?= htmlspecialchars($faceitStatus, ENT_QUOTES, 'UTF-8') ?>"
                     style="--faceit-rank-color: <?= htmlspecialchars($faceitRankColor, ENT_QUOTES, 'UTF-8') ?>;"
                 >
                     <div class="profile-progress-head">
@@ -787,6 +851,10 @@ if (!function_exists('formatPlaytime')) {
                     <?php if ($faceitNextLevelText !== ''): ?>
                         <span class="profile-faceit-next"><?= htmlspecialchars($faceitNextLevelText, ENT_QUOTES, 'UTF-8') ?></span>
                     <?php endif; ?>
+                    <span class="profile-api-status" data-state="<?= htmlspecialchars($faceitStatus, ENT_QUOTES, 'UTF-8') ?>" data-api="faceit" role="status">
+                        <span class="profile-api-status__dot" aria-hidden="true"></span>
+                        <?= htmlspecialchars($faceitApiStatusLabel, ENT_QUOTES, 'UTF-8') ?>
+                    </span>
                 </div>
             </div>
         </div>
