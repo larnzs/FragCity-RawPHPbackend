@@ -3,6 +3,17 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../settings/loader.php';
 
+/** Safe machine-readable failure returned by the trusted Linux API. */
+final class FragCityLinuxApiException extends RuntimeException
+{
+    public function __construct(
+        public readonly int $httpStatus,
+        public readonly string $errorCode
+    ) {
+        parent::__construct('Linux API request failed (' . $httpStatus . '; ' . $errorCode . ').');
+    }
+}
+
 /** Server-to-server client. Do not use this class from browser JavaScript. */
 final class FragCityLinuxApiClient
 {
@@ -38,7 +49,7 @@ final class FragCityLinuxApiClient
 
     public function request(array $payload, string $path = '/v1/weaponpaints'): array
     {
-        if (!in_array($path, ['/v1/weaponpaints', '/v1/simpleadmin'], true)) {
+        if (!in_array($path, ['/v1/weaponpaints', '/v1/simpleadmin', '/v1/vipcore'], true)) {
             throw new InvalidArgumentException('Unsupported Linux API path.');
         }
         try {
@@ -109,10 +120,7 @@ final class FragCityLinuxApiClient
         if ($status < 200 || $status >= 300 || ($decoded['success'] ?? false) !== true) {
             $code = is_string($decoded['error'] ?? null) ? $decoded['error'] : 'request_failed';
             error_log('[FragCity] Linux API request failed; HTTP=' . $status . '; code=' . $code);
-            if (PHP_SAPI === 'cli') {
-                throw new RuntimeException('Linux API request failed (HTTP ' . $status . '; code=' . $code . ').');
-            }
-            throw new RuntimeException('Linux API request failed.');
+            throw new FragCityLinuxApiException($status, $code);
         }
 
         return is_array($decoded['data'] ?? null) ? $decoded['data'] : [];
