@@ -818,6 +818,8 @@ $check(
         && str_contains($steamLoginPage, 'new LightOpenID($openidOrigin)')
         && str_contains($steamLoginPage, "REQUEST_SCHEME")
         && str_contains($steamLoginPage, "HTTP_X_FORWARDED_PROTO")
+        && str_contains($steamLoginPage, "origin mismatch diagnostics")
+        && str_contains($steamLoginPage, "domain mismatch diagnostics")
         && str_contains($steamLoginPage, "explode(")
         && !str_contains($steamLoginPage, 'new LightOpenID($domain)')
         && str_contains($steamLoginView, 'href="/steam/steam_login.php"')
