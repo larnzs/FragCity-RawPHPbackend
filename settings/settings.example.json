@@ -1,5 +1,5 @@
 {
-  "_comment": "FRAGCITY WEBSITE RUNTIME TEMPLATE. Copy this file once to settings/settings.json and edit that private copy. This tracked example contains placeholders only. The application ignores every _comment field; these fields are readable inline notes while keeping the file valid JSON.",
+  "_comment": "FULL DUMMY WEBSITE SETTINGS TEMPLATE. Copy manually to settings/settings.json only when creating a new private runtime config. This tracked example contains placeholders only and is never loaded directly by the application. Never replace an existing runtime settings.json with it.",
   "app": {
     "_comment": "General website runtime behavior. Keep a different settings/settings.json for Laragon and Production.",
     "environment": "local",
