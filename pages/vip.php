@@ -304,9 +304,6 @@ $vipCurrentStatus = !$isLoggedIn
     ? 'برای مشاهده وضعیت وارد شوید'
     : ($vipHasActiveMembership ? 'اشتراک فعال' : 'بدون اشتراک فعال');
 ?>
-<link rel="stylesheet" href="/css/pages-base.css?v=<?= htmlspecialchars(asset_version(__DIR__ . '/../css/pages-base.css'), ENT_QUOTES, 'UTF-8') ?>">
-<link rel="stylesheet" href="/css/vip.css?v=<?= htmlspecialchars(asset_version(__DIR__ . '/../css/vip.css'), ENT_QUOTES, 'UTF-8') ?>">
-
 <main class="vip-page" id="vipStorefront">
     <header class="vip-store-hero">
         <div class="vip-store-hero-icon" aria-hidden="true"><i class="fas fa-crown"></i></div>
@@ -562,4 +559,4 @@ $vipCurrentStatus = !$isLoggedIn
     </p>
 </main>
 
-<script src="js/vip.js" defer></script>
+
