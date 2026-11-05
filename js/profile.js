@@ -194,7 +194,7 @@
                     submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> در حال ذخیره...';
                 }
 
-                fetch('?page=profile', {
+                fetch('/profile/', {
                     method: 'POST',
                     body: new FormData(profileSettingsForm),
                     headers: {
@@ -305,7 +305,7 @@
                     );
 
                     fetch(
-                        '?page=profile',
+                        '/profile/',
                         {
                             method: 'POST',
                             body: formData,
@@ -445,7 +445,7 @@
                         );
 
                     fetch(
-                        '?page=profile',
+                        '/profile/',
                         {
                             method: 'POST',
                             headers: {
