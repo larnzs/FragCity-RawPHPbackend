@@ -777,6 +777,7 @@ $check(
     'Profile clean route, root-anchored redirects, and profile actions stay reachable',
     str_contains($routesMarkup, "'profile' => 'profile'")
         && str_contains($htaccessMarkup, 'RewriteRule ^profile/?$ index.php?page=profile')
+        && str_contains($websiteIndex, "\$target = trim(\$fallback);")
         && str_contains($websiteIndex, "return '/' . ltrim(\$target, '/');")
         && str_contains($websiteIndex, "'profile' => 'profile'")
         && str_contains($headerJavascript, "'profile': 'profile'")
