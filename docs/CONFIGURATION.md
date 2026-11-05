@@ -50,7 +50,9 @@ Exampleهای جزئی:
 
 ### Ranks leaderboard
 
-صفحه‌های `pages/leaderboard.php` و `pages/profile.php` آمار بازی را از `RanksRepository` و مسیر امضاشدهٔ `POST /v1/ranks` می‌گیرند. Linux API به `GLOBAL_ranks.lvl_base` با حساب مستقل `fragcity_ranks_api` و دسترسی `SELECT` وصل می‌شود. Schema متعلق به پلاگین است و برای این اتصال هیچ Migration یا تغییری در جدول لازم نیست. تبدیل SteamID64 به کلید Steam2 فقط روی Linux انجام می‌شود.
+صفحه‌های `pages/leaderboard.php` و `pages/profile.php` آمار بازی را از `RanksRepository` و مسیر امضاشدهٔ `POST /v1/ranks` می‌گیرند. Linux API به `GLOBAL_ranks.lvl_base` با همان حساب MariaDB موجود `plugins` وصل می‌شود که برای WeaponPaints و VIPCore استفاده شده است؛ سرویس Ranks فقط Queryهای `SELECT` اجرا می‌کند. Schema متعلق به پلاگین است و برای این اتصال هیچ Migration یا تغییری در جدول لازم نیست. تبدیل SteamID64 به کلید Steam2 فقط روی Linux انجام می‌شود.
+
+در نصب فعلی، حساب مشترک `plugins` مجوزهای گسترده‌تری از نیاز endpointها دارد و روی چند Schema به‌صورت schema-wide مجوز گرفته است؛ این انتخاب برای سازگاری با حساب موجود انجام شده و least-privilege محسوب نمی‌شود. در صورت جداسازی امنیتی آینده، باید مهاجرت حساب‌ها و تنظیمات به‌صورت هماهنگ انجام شود.
 
 ### پروفایل‌های Plugin
 
@@ -127,7 +129,7 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 
 - ریشهٔ `shared_secret`: مشترک بین WeaponPaints، SimpleAdmin، VIPCore و Ranks.
 - `simpleadmin.database.name`: نام دیتابیس `GLOBAL_simpleadmin`؛ Username، Password، Host و Port از همان Plugin DB connection موجود در `database` استفاده می‌شوند.
-- `ranks.database`: اتصال مستقل و فقط‌خواندنی به `GLOBAL_ranks` با حساب `fragcity_ranks_api`؛ فقط دسترسی `SELECT` روی `lvl_base` لازم است.
+- `vipcore.database` و `ranks.database`: هر دو از حساب موجود `plugins` و همان رمز تعریف‌شده در `database` استفاده می‌کنند؛ نام Schema به‌ترتیب `GLOBAL_vip` و `GLOBAL_ranks` است. کد API برای VIPCore فقط عملیات لازم روی `vip_users` و برای Ranks فقط Queryهای خواندنی روی `lvl_base` را اجرا می‌کند.
 - `pterodactyl_standby.shared_secret`: مخصوص Server Browser.
 - `pterodactyl_monitoring.shared_secret`: مخصوص Monitoring.
 - `pterodactyl_standby.pterodactyl.application_api_key` و `pterodactyl_monitoring.pterodactyl.application_api_key`: توکن Application API فقط‌خواندنی Pterodactyl؛ فقط روی Linux.
