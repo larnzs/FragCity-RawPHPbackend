@@ -52,6 +52,7 @@ try {
     $ranksSmokeTest = $read('tools/ranks-smoke-test.php');
     $leaderboardPage = $read('pages/leaderboard.php');
     $leaderboardStylesheet = $read('css/leaderboard.css');
+    $steamProfileService = $read('class/SteamProfileService.php');
     $profilePage = $read('pages/profile.php');
     $profileJavascript = $read('js/profile.js');
     $profileStylesheet = $read('css/profile.css');
@@ -293,6 +294,14 @@ $check(
         && str_contains($leaderboardPage, 'new RanksRepository()')
         && str_contains($leaderboardPage, 'leaderboard-hero-art')
         && str_contains($leaderboardPage, '/img/webp/leaderboardguy.webp')
+        && str_contains($leaderboardPage, 'SteamProfileService::cacheAvatarsForSteamIds')
+        && !str_contains($leaderboardPage, 'avatars.steamstatic.com/')
+        && str_contains($steamProfileService, 'public static function cacheAvatarsForSteamIds')
+        && str_contains($steamProfileService, 'array_chunk($missingIds, 100)')
+        && str_contains($steamProfileService, 'private static function findCachedAvatarPath')
+        && str_contains($leaderboardPage, 'اسم یا SteamID رو بگرد...')
+        && str_contains($leaderboardStylesheet, '.leaderboard-page .leaderboard-hero')
+        && str_contains($leaderboardStylesheet, '.leaderboard-page .metric-progress')
         && str_contains($leaderboardStylesheet, '.leaderboard-hero')
         && str_contains($leaderboardStylesheet, '@keyframes lbHeroOrbit')
         && !str_contains($leaderboardPage, 'RemoteRanksDatabase')
