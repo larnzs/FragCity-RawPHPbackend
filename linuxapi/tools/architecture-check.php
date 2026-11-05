@@ -814,8 +814,9 @@ $check(
     'Steam OpenID uses the configured canonical origin and login/register links are root-absolute',
     str_contains($steamLoginPage, "fragcity_settings('app.site_base_url'")
         && str_contains($steamLoginPage, "new LightOpenID(\$openidOrigin)")
-        && str_contains($steamLoginPage, "integrations.steam.domain_name")
-        && !str_contains($steamLoginPage, 'new LightOpenID(\$domain)')
+        && str_contains($steamLoginPage, 'STEAM_DOMAIN_NAME')
+        && str_contains($steamLoginPage, 'new LightOpenID($openidOrigin)')
+        && !str_contains($steamLoginPage, 'new LightOpenID($domain)')
         && str_contains($steamLoginView, 'href="/steam/steam_login.php"')
         && str_contains($steamRegisterView, 'href="/steam/steam_login.php"')
         && str_contains($steamLoginView, 'action="/?page=login&amp;auth_modal=1"')
