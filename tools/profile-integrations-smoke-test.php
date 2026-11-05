@@ -90,7 +90,7 @@ if (!$linuxUrlValid || !$linuxSecretConfigured || !function_exists('curl_init'))
                 . '; points=' . (int) ($player['points'] ?? 0)
                 . '; kills=' . (int) ($player['kills'] ?? 0));
         } elseif (($playerResult['found'] ?? null) === false) {
-            $print('Ranks player lookup', false, 'API is reachable, but no row matched this SteamID64');
+            $print('Ranks player lookup response', true, 'API is reachable; no row matched this SteamID64');
         } else {
             $print('Ranks player lookup', false, 'unexpected API response');
         }
@@ -117,8 +117,12 @@ if (!$faceitConfigured) {
         $level = $faceit['faceit_level'] ?? null;
         $elo = $faceit['faceit_elo'] ?? null;
 
-        $isAvailable = $status === 'available'
-            && (is_int($level) || is_int($elo));
+        $apiResponded = in_array($status, [
+            'available',
+            'unranked',
+            'no_cs2_profile',
+            'profile_not_found',
+        ], true);
         $detail = 'status=' . $status;
         if (is_int($level)) {
             $detail .= '; level=' . $level;
@@ -126,7 +130,7 @@ if (!$faceitConfigured) {
         if (is_int($elo)) {
             $detail .= '; elo=' . $elo;
         }
-        $print('FACEIT player lookup', $isAvailable, $detail);
+        $print('FACEIT API response', $apiResponded, $detail);
     } catch (Throwable $e) {
         $print('FACEIT player lookup', false, get_class($e) . ': ' . $e->getMessage());
     }
