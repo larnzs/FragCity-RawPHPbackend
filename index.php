@@ -86,17 +86,24 @@ if (!function_exists('safe_local_redirect')) {
     {
         $target = trim((string) $target);
 
-        if ($target === '') {
-            return $fallback;
-        }
-
-        // Only accept local paths. Never redirect to an external host.
+        // A missing or unsafe target must never fall back to a relative URL.
         if (
+            $target === '' ||
             preg_match('#^https?://#i', $target) ||
             str_starts_with($target, '//') ||
             preg_match('/^[a-z][a-z0-9+.-]*:/i', $target)
         ) {
-            return $fallback;
+            $target = trim($fallback);
+        }
+
+        // Fallbacks are normalized and validated by the same rules.
+        if (
+            $target === '' ||
+            preg_match('#^https?://#i', $target) ||
+            str_starts_with($target, '//') ||
+            preg_match('/^[a-z][a-z0-9+.-]*:/i', $target)
+        ) {
+            $target = 'index.php';
         }
 
         // Always anchor local redirects at the site root. Returning "profile/"
