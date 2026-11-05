@@ -225,10 +225,12 @@ $check(
 );
 
 $check(
-    'VIPCore entitlements stay behind the signed Linux API and dedicated GLOBAL_vip account',
+    'VIPCore entitlements stay behind the signed Linux API and reuse the existing plugins database account',
     str_contains($index, "'/v1/vipcore'")
         && str_contains($linuxConfig, "'name' => 'GLOBAL_vip'")
-        && str_contains($linuxConfig, "'fragcity_vip_api'")
+        && str_contains($linuxConfig, "'username' => 'plugins'")
+        && substr_count($linuxConfig, "'password' => $pluginsDbPassword") >= 3
+        && !str_contains($linuxConfig, 'fragcity_vip_api')
         && str_contains($linuxConfig, "'duration_seconds' => 3600")
         && str_contains($apiClient, "'/v1/vipcore'")
         && str_contains($apiClient, "hash_hmac('sha256'")
@@ -263,10 +265,12 @@ $check(
 );
 
 $check(
-    'Ranks leaderboard and profile use the signed read-only Linux API',
+    'Ranks leaderboard and profile use the signed read-only Linux API and reuse the existing plugins database account',
     str_contains($index, "'/v1/ranks'")
         && str_contains($linuxConfig, "'name' => 'GLOBAL_ranks'")
-        && str_contains($linuxConfig, "'fragcity_ranks_api'")
+        && str_contains($linuxConfig, "'username' => 'plugins'")
+        && substr_count($linuxConfig, "'password' => $pluginsDbPassword") >= 3
+        && !str_contains($linuxConfig, 'fragcity_ranks_api')
         && str_contains($apiClient, "'/v1/ranks'")
         && str_contains($ranksRepository, "'/v1/ranks'")
         && !str_contains($ranksRepository, 'new PDO')
