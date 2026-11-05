@@ -14,12 +14,38 @@
         const detailSummaryEn = root.querySelector('#vipDetailTierSummaryEn');
         const detailState = root.querySelector('#vipDetailTierState');
         const detailFeatures = root.querySelector('#vipDetailFeatures');
+        const detailPanel = root.querySelector('.vip-feature-panel');
+        const detailHomeMarker = root.querySelector('#vipDetailPanelHome');
+        const mobileQuery = window.matchMedia('(max-width: 700px)');
+        let activePlan = null;
         const checkoutButton = root.querySelector('#vipCheckoutButton');
 
         if (!plans.length) return;
 
+        function syncDetailPanelPosition() {
+            if (!detailPanel || !detailHomeMarker || !activePlan) return;
+
+            if (mobileQuery.matches) {
+                const planItem = activePlan.parentElement;
+                if (
+                    planItem &&
+                    planItem.classList.contains('vip-plan-item') &&
+                    detailPanel.parentElement !== planItem
+                ) {
+                    planItem.appendChild(detailPanel);
+                }
+                return;
+            }
+
+            const home = detailHomeMarker.parentElement;
+            if (home && detailPanel.parentElement !== home) {
+                home.insertBefore(detailPanel, detailHomeMarker.nextSibling);
+            }
+        }
+
         function selectPlan(plan) {
             if (!plan) return;
+            activePlan = plan;
 
             plans.forEach(function (item) {
                 const selected = item === plan;
@@ -70,12 +96,20 @@
                 }
             }
 
+            syncDetailPanelPosition();
+
             if (checkoutButton) {
                 checkoutButton.textContent = isAvailable
                     ? 'خرید VIP فعلاً غیرفعال است'
                     : 'این سطح در حال حاضر قابل خرید نیست';
                 checkoutButton.disabled = true;
             }
+        }
+
+        if (typeof mobileQuery.addEventListener === 'function') {
+            mobileQuery.addEventListener('change', syncDetailPanelPosition);
+        } else if (typeof mobileQuery.addListener === 'function') {
+            mobileQuery.addListener(syncDetailPanelPosition);
         }
 
         plans.forEach(function (plan) {
