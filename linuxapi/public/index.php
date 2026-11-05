@@ -677,6 +677,7 @@ try {
         $testConfig = is_array($vipConfig['test_mode'] ?? null) ? $vipConfig['test_mode'] : [];
         $testDuration = apiInt($testConfig['duration_seconds'] ?? 3600, 'vipcore.test_duration_seconds', 300, 86400);
 
+        require_once __DIR__ . '/../src/VIPCore/VipCoreService.php';
         try {
             $vipPdo = new PDO(
                 'mysql:host=' . $vipHost . ';port=' . $vipPort
@@ -690,7 +691,6 @@ try {
                 ]
             );
 
-            require_once __DIR__ . '/../src/VIPCore/VipCoreService.php';
             $vipService = new VipCoreService($vipPdo, $vipServerId, $testDuration);
 
             if ($action === 'ping_db') {
