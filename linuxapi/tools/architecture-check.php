@@ -327,7 +327,7 @@ $check(
         && str_contains($leaderboardStylesheet, '.leaderboard-page .leaderboard-stat-copy > strong')
         && str_contains($leaderboardStylesheet, '.leaderboard-page .leaderboard-table {')
         && str_contains($leaderboardStylesheet, '.leaderboard-page .leaderboard-table thead th,')
-        && str_contains($leaderboardPage, "return '/leaderboard/?' . http_build_query($query);")
+        && str_contains($leaderboardPage, "return '/leaderboard/?' . http_build_query(\$query);")
         && !str_contains($leaderboardPage, '<input type="hidden" name="page" value="leaderboard">')
         && !str_contains($leaderboardPage, 'data-fc-reveal="left" data-fc-reveal-delay="120"')
         && str_contains($leaderboardStylesheet, 'grid-template-areas: "art copy";')
