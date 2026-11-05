@@ -12,36 +12,57 @@ require_once __DIR__ . '/../class/RememberMeService.php';
 require_once __DIR__ . '/openid.php';
 
 $configuredDomain = defined('STEAM_DOMAIN_NAME')
-    ? trim((string) STEAM_DOMAIN_NAME)
+    ? strtolower(trim((string) STEAM_DOMAIN_NAME))
     : '';
 
-if ($configuredDomain !== '') {
-    $domain = $configuredDomain;
-} else {
-    // Do not derive the OpenID trust root from an untrusted Host header.
-    // Use the configured canonical site origin when the explicit Steam domain
-    // has not been set for this environment.
-    $siteBaseUrl = trim((string) fragcity_settings('app.site_base_url', ''));
-    $siteBaseParts = parse_url($siteBaseUrl);
-    $domain = is_array($siteBaseParts)
-        && in_array(strtolower((string) ($siteBaseParts['scheme'] ?? '')), ['http', 'https'], true)
-        && !empty($siteBaseParts['host'])
-        && !isset($siteBaseParts['user'])
-        && !isset($siteBaseParts['pass'])
-        ? (string) $siteBaseParts['host']
-        : '';
+/*
+ * Use the configured environment origin as the OpenID trust root.
+ * This keeps the protocol, hostname and optional port identical to the
+ * public callback URL. Do not infer the callback host from an untrusted
+ * HTTP_HOST header or let the current proxy scheme silently change it.
+ */
+$siteBaseUrl = trim((string) fragcity_settings('app.site_base_url', ''));
+$siteBaseParts = parse_url($siteBaseUrl);
+$originScheme = is_array($siteBaseParts)
+    ? strtolower((string) ($siteBaseParts['scheme'] ?? ''))
+    : '';
+$originHost = is_array($siteBaseParts)
+    ? strtolower((string) ($siteBaseParts['host'] ?? ''))
+    : '';
+$originPort = is_array($siteBaseParts) && isset($siteBaseParts['port'])
+    ? (int) $siteBaseParts['port']
+    : null;
+
+$domainIsValid = in_array($originScheme, ['http', 'https'], true)
+    && $originHost !== ''
+    && (
+        $originHost === 'localhost'
+        || filter_var($originHost, FILTER_VALIDATE_IP) !== false
+        || filter_var($originHost, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false
+    )
+    && ($originPort === null || ($originPort >= 1 && $originPort <= 65535))
+    && !isset($siteBaseParts['user'])
+    && !isset($siteBaseParts['pass'])
+    && !isset($siteBaseParts['query'])
+    && !isset($siteBaseParts['fragment'])
+    && (!isset($siteBaseParts['path']) || $siteBaseParts['path'] === '' || $siteBaseParts['path'] === '/');
+
+if ($configuredDomain !== '' && $configuredDomain !== $originHost) {
+    $domainIsValid = false;
+    error_log('[FragCity] Steam domain_name does not match app.site_base_url host.');
 }
 
-$domainIsValid = $domain === 'localhost'
-    || filter_var($domain, FILTER_VALIDATE_IP) !== false
-    || filter_var($domain, FILTER_VALIDATE_DOMAIN, FILTER_FLAG_HOSTNAME) !== false;
+$openidOrigin = $domainIsValid
+    ? $originScheme . '://' . $originHost . ($originPort !== null ? ':' . $originPort : '')
+    : '';
 
-if (!$domainIsValid || preg_match('/[\r\n\/\\?#@]/', $domain)) {
-    error_log('[FragCity] Steam OpenID is not configured with a valid canonical domain.');
-    $_SESSION['auth_error'] = 'تنظیمات ورود با Steam کامل نیست؛ لطفاً با پشتیبانی تماس بگیرید.';
-    header('Location: index.php?page=login', true, 303);
+if (!$domainIsValid) {
+    error_log('[FragCity] Steam OpenID requires a valid app.site_base_url and matching Steam domain_name.');
+    $_SESSION['auth_error'] = 'آدرس اصلی سایت با تنظیمات ورود Steam هماهنگ نیست؛ تنظیمات محیط سایت را بررسی کنید.';
+    header('Location: /login/', true, 303);
     exit;
 }
+
 
 // آدرس‌های روت‌شده منطبق بر ساختار index.php شما
 
@@ -89,7 +110,7 @@ $accountCompletionPage = $resolveSteamRoute(
 
 try {
 
-    $openid = new LightOpenID($domain);
+    $openid = new LightOpenID($openidOrigin);
 
     
 
