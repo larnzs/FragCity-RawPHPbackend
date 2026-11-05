@@ -743,6 +743,7 @@ if (!function_exists('formatPlaytime')) {
                         alt="Avatar"
                         class="main-avatar"
                         id="currentAvatar"
+                        onerror="this.onerror=null;this.src='/img/logoresponsive.png';"
                     >
                 <?php else: ?>
                     <div class="main-avatar-placeholder" id="currentAvatar" aria-label="آواتار پیش‌فرض">
