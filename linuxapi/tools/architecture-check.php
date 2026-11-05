@@ -52,6 +52,7 @@ try {
     $ranksSmokeTest = $read('tools/ranks-smoke-test.php');
     $leaderboardPage = $read('pages/leaderboard.php');
     $profilePage = $read('pages/profile.php');
+    $profileJavascript = $read('js/profile.js');
     $vipCoreSiteRepository = $read('class/VipCoreRepository.php');
     $vipCoreSiteEndpoint = $read('api/vip-test-purchase.php');
     $vipCorePage = $read('pages/vip.php');
@@ -770,6 +771,17 @@ $check(
         && !str_contains($footerMarkup, '<h2 class="footer-heading">')
         && is_file($root . '/pages/serverlist.php')
         && is_file($root . '/pages/weaponpaints.php')
+);
+
+$check(
+    'Profile clean route, root-anchored redirects, and profile actions stay reachable',
+    str_contains($routesMarkup, "'profile' => 'profile'")
+        && str_contains($htaccessMarkup, 'RewriteRule ^profile/?$ index.php?page=profile')
+        && str_contains($websiteIndex, "return '/' . ltrim(\$target, '/');")
+        && str_contains($websiteIndex, "'profile' => 'profile'")
+        && str_contains($headerJavascript, "'profile': 'profile'")
+        && str_contains($profilePage, 'action="/profile/"')
+        && substr_count($profileJavascript, "'/profile/'") >= 3
 );
 
 $check(
