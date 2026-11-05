@@ -1,12 +1,18 @@
 <?php
 require_once __DIR__ . '/../settings/loader.php';
+require_once __DIR__ . '/../class/VipCoreRepository.php';
 
 $steamid64 = (string) ($_SESSION['steamid'] ?? '');
-$isLoggedIn = isset($_SESSION['user_logged_in']);
-$userVip = ['vip_level' => 0, 'vip_expire' => null];
+$isLoggedIn = ($_SESSION['user_logged_in'] ?? false) === true;
+$userVip = [
+    'vip_level' => 0,
+    'vip_expire' => null,
+    'vip_active' => false,
+    'vip_permanent' => false,
+];
+$vipStatusUnavailable = false;
 
 $vipSettings = fragcity_settings('files.pages.vip', []);
-$vipProfile = (string) ($vipSettings['database_profile'] ?? 'main');
 $vipPurchaseCatalog = is_array($vipSettings['purchase_catalog'] ?? null)
     ? $vipSettings['purchase_catalog']
     : [];
@@ -17,18 +23,22 @@ $vipCurrency = (string) ($vipPurchaseCatalog['currency'] ?? 'تومان');
 
 if ($isLoggedIn && $steamid64 !== '') {
     try {
-        $pdo = fragcity_create_pdo($vipProfile);
-        if (!$pdo) {
-            throw new PDOException('VIP database is unavailable.');
-        }
+        $vipStatus = (new VipCoreRepository())->getStatus($steamid64);
+        $vipExpires = $vipStatus['expires'];
 
-        $stmt = $pdo->prepare(
-            'SELECT vip_level, vip_expire FROM users WHERE steamid64 = ? LIMIT 1'
-        );
-        $stmt->execute([$steamid64]);
-        $userVip = $stmt->fetch(PDO::FETCH_ASSOC) ?: $userVip;
+        $userVip = [
+            'vip_level' => $vipStatus['active'] ? $vipStatus['level'] : 0,
+            'vip_expire' => $vipExpires !== null && $vipExpires > 0 ? $vipExpires : null,
+            'vip_active' => $vipStatus['active'],
+            'vip_permanent' => $vipStatus['active'] && $vipExpires === 0,
+        ];
     } catch (Throwable $e) {
-        error_log('[FragCity VIP storefront] ' . $e->getMessage());
+        $vipStatusUnavailable = true;
+        error_log(
+            '[FragCity VIP storefront] VIPCore status lookup failed; steam_hash='
+            . substr(hash('sha256', $steamid64), 0, 16)
+            . '; type=' . get_class($e)
+        );
     }
 }
 
@@ -282,17 +292,16 @@ $vipModeEnabled = [
 ];
 
 $vipCurrentLevel = max(0, (int) ($userVip['vip_level'] ?? 0));
-$vipActive = false;
+$vipActive = !empty($userVip['vip_active']);
 $vipExpiryLabel = '—';
 
-if (!empty($userVip['vip_expire'])) {
+if ($vipActive && !empty($userVip['vip_permanent'])) {
+    $vipExpiryLabel = 'دائمی';
+} elseif ($vipActive && !empty($userVip['vip_expire'])) {
     try {
-        $vipExpiry = new DateTimeImmutable((string) $userVip['vip_expire']);
-        $vipActive = $vipExpiry > new DateTimeImmutable('now');
+        $vipExpiry = (new DateTimeImmutable('@' . (int)$userVip['vip_expire']))
+            ->setTimezone(new DateTimeZone(date_default_timezone_get()));
         $vipExpiryLabel = $vipExpiry->format('Y/m/d H:i');
-        if (!$vipActive) {
-            $vipExpiryLabel .= ' · منقضی شده';
-        }
     } catch (Throwable $e) {
         $vipExpiryLabel = 'نامشخص';
     }
@@ -302,11 +311,18 @@ $vipHasActiveMembership = $vipActive && $vipCurrentLevel > 0;
 $vipCurrentName = $vipNames[$vipCurrentLevel] ?? 'نامشخص';
 $vipCurrentStatus = !$isLoggedIn
     ? 'برای مشاهده وضعیت وارد شوید'
-    : ($vipHasActiveMembership ? 'اشتراک فعال' : 'بدون اشتراک فعال');
+    : ($vipStatusUnavailable
+        ? 'وضعیت VIPCore فعلاً در دسترس نیست'
+        : ($vipHasActiveMembership ? 'اشتراک فعال' : 'بدون اشتراک فعال'));
 $vipLockedExpanded = $vipHasActiveMembership
     && in_array($vipCurrentLevel, [4, 5, 6], true);
 ?>
-<main class="vip-page" id="vipStorefront">
+<main
+    class="vip-page"
+    id="vipStorefront"
+    data-vip-has-active="<?= $vipHasActiveMembership ? '1' : '0' ?>"
+    data-vip-current-level="<?= $vipCurrentLevel ?>"
+>
     <header class="vip-store-hero">
         <div class="vip-store-hero-icon" aria-hidden="true"><i class="fas fa-crown"></i></div>
         <div class="vip-store-hero-copy">
@@ -372,7 +388,7 @@ $vipLockedExpanded = $vipHasActiveMembership
                 </span>
             </div>
             <p>سطح‌های Bronze، Silver و Gold در کاتالوگ عمومی قرار دارند. سطح‌های Platinum، Emerald و Diamond فقط برای مشاهده جزئیات نمایش داده می‌شوند و فعلاً قابل خرید نیستند.</p>
-            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> پرداخت آنلاین و اعمال خودکار VIP هنوز فعال نشده است؛ انتخاب سطح در این صفحه به‌تنهایی خریدی انجام نمی‌دهد.</p>
+            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> در حالت آزمایشی، دکمهٔ ثبت VIP یک اعتبار موقت را مستقیماً در VIPCore ثبت می‌کند و هیچ پرداختی انجام نمی‌شود. فعال‌سازی فقط برای حساب بدون VIP فعال و سه سطح عمومی مجاز است.</p>
         </aside>
     </section>
 
@@ -537,6 +553,33 @@ $vipLockedExpanded = $vipHasActiveMembership
             <span class="vip-detail-state" id="vipDetailTierState">PUBLIC TIER</span>
         </div>
         <div class="vip-detail-feature-grid" id="vipDetailFeatures"></div>
+        <div class="vip-test-purchase" data-vip-test-purchase-box>
+            <?php if ($isLoggedIn): ?>
+                <button
+                    type="button"
+                    class="vip-test-purchase-button"
+                    data-vip-test-purchase
+                    data-csrf-token="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                    data-level="1"
+                    disabled
+                >
+                    ثبت آزمایشی VIP بدون پرداخت
+                </button>
+            <?php else: ?>
+                <a
+                    class="vip-test-purchase-button"
+                    href="/login/"
+                    data-vip-test-login
+                    data-auth-modal-open
+                    aria-haspopup="dialog"
+                    aria-controls="fcLoginModal"
+                >
+                    برای فعال‌سازی آزمایشی وارد شوید
+                </a>
+            <?php endif; ?>
+            <small class="vip-test-purchase-note">اعتبار تست: یک ساعت · فقط Bronze، Silver و Gold · بدون برداشت از کیف پول</small>
+            <p class="vip-test-purchase-feedback" data-vip-test-feedback role="status" aria-live="polite" hidden></p>
+        </div>
     </section>
 
     <?php foreach ($vipFeaturesData as $featureLevel => $features): ?>
