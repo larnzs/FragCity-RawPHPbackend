@@ -99,12 +99,9 @@ if (!function_exists('safe_local_redirect')) {
             return $fallback;
         }
 
-        if (!str_starts_with($target, '/')) {
-            return $target;
-        }
-
-        // Convert absolute same-site paths to a relative path for Location headers.
-        return ltrim($target, '/');
+        // Always anchor local redirects at the site root. Returning "profile/"
+        // from /profile/ would resolve to /profile/profile/ in the browser.
+        return '/' . ltrim($target, '/');
     }
 }
 
