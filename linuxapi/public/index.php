@@ -452,8 +452,9 @@ $isPterodactylStandbyRequest = $path === '/v1/pterodactyl-standby';
 $isPterodactylMonitoringRequest = $path === '/v1/pterodactyl-monitoring';
 $isWeaponPaintsRequest = $path === '/v1/weaponpaints';
 $isSimpleAdminRequest = $path === '/v1/simpleadmin';
+$isVipCoreRequest = $path === '/v1/vipcore';
 if (!$isPterodactylStandbyRequest && !$isPterodactylMonitoringRequest
-    && !$isWeaponPaintsRequest && !$isSimpleAdminRequest) {
+    && !$isWeaponPaintsRequest && !$isSimpleAdminRequest && !$isVipCoreRequest) {
     apiRespond(404, ['success' => false, 'error' => 'not_found']);
 }
 if ($method !== 'POST') {
@@ -648,6 +649,91 @@ try {
             apiRespond(503, ['success' => false, 'error' => 'simpleadmin_unavailable']);
         }
     }
+    if ($isVipCoreRequest) {
+        if (!in_array($action, ['ping_db', 'get_status', 'grant_test_vip'], true)) {
+            apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
+        }
+
+        $vipConfig = is_array($config['vipcore'] ?? null) ? $config['vipcore'] : [];
+        if (empty($vipConfig['enabled'])) {
+            apiRespond(503, ['success' => false, 'error' => 'vipcore_disabled']);
+        }
+
+        $vipDatabase = is_array($vipConfig['database'] ?? null) ? $vipConfig['database'] : [];
+        $vipHost = trim((string)($vipDatabase['host'] ?? '127.0.0.1'));
+        $vipPort = (int)($vipDatabase['port'] ?? 3306);
+        $vipName = trim((string)($vipDatabase['name'] ?? ''));
+        $vipUser = trim((string)($vipDatabase['username'] ?? ''));
+        $vipPass = (string)($vipDatabase['password'] ?? '');
+        $vipCharset = trim((string)($vipDatabase['charset'] ?? 'utf8mb4'));
+
+        if ($vipHost !== '127.0.0.1' || $vipPort < 1 || $vipPort > 65535
+            || $vipName !== 'GLOBAL_vip' || $vipUser === '' || $vipPass === ''
+            || !preg_match('/^[A-Za-z0-9_]+$/D', $vipCharset)) {
+            apiRespond(503, ['success' => false, 'error' => 'vipcore_not_configured']);
+        }
+
+        $vipServerId = apiInt($vipConfig['server_id'] ?? 0, 'vipcore.server_id', 0, 2147483647);
+        $testConfig = is_array($vipConfig['test_mode'] ?? null) ? $vipConfig['test_mode'] : [];
+        $testDuration = apiInt($testConfig['duration_seconds'] ?? 3600, 'vipcore.test_duration_seconds', 300, 86400);
+
+        try {
+            $vipPdo = new PDO(
+                'mysql:host=' . $vipHost . ';port=' . $vipPort
+                    . ';dbname=' . $vipName . ';charset=' . $vipCharset,
+                $vipUser,
+                $vipPass,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ]
+            );
+
+            require_once __DIR__ . '/../src/VIPCore/VipCoreService.php';
+            $vipService = new VipCoreService($vipPdo, $vipServerId, $testDuration);
+
+            if ($action === 'ping_db') {
+                apiRespond(200, ['success' => true, 'data' => $vipService->ping()]);
+            }
+
+            if ($action === 'get_status') {
+                $steamId64 = $body['steamid64'] ?? null;
+                if (!is_string($steamId64)) {
+                    throw new InvalidArgumentException('Invalid SteamID64.');
+                }
+                apiRespond(200, [
+                    'success' => true,
+                    'data' => $vipService->getStatus($steamId64),
+                ]);
+            }
+
+            if (empty($testConfig['enabled'])) {
+                apiRespond(503, ['success' => false, 'error' => 'test_mode_disabled']);
+            }
+
+            $steamId64 = $body['steamid64'] ?? null;
+            $playerName = $body['player_name'] ?? null;
+            if (!is_string($steamId64) || !is_string($playerName)) {
+                throw new InvalidArgumentException('Invalid VIP test grant identity.');
+            }
+            $level = apiInt($body['level'] ?? null, 'level', 1, 3);
+
+            $grant = $vipService->grantTestMembership($steamId64, $playerName, $level);
+            apiRespond(200, ['success' => true, 'data' => $grant]);
+        } catch (VipCoreMembershipConflict $e) {
+            apiRespond(409, ['success' => false, 'error' => 'membership_already_active']);
+        } catch (InvalidArgumentException $e) {
+            apiRespond(400, ['success' => false, 'error' => 'invalid_request']);
+        } catch (PDOException $e) {
+            error_log('[FragCity API] VIPCore database request failed; SQLSTATE ' . $e->getCode());
+            apiRespond(503, ['success' => false, 'error' => 'vipcore_unavailable']);
+        } catch (Throwable $e) {
+            error_log('[FragCity API] VIPCore request failed; type=' . get_class($e));
+            apiRespond(503, ['success' => false, 'error' => 'vipcore_unavailable']);
+        }
+    }
+
     if ($isPterodactylMonitoringRequest) {
         if ($action !== 'get_snapshot') {
             apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
