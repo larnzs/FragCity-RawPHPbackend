@@ -374,29 +374,17 @@ if (
 
 $steamIdForDisplay = $steamid64 !== '' ? $steamid64 : (string)$steamid;
 
-// Ranking data is optional; its database being unavailable must not hide Steam data.
+// Ranking data is optional; an unavailable Ranks API must not hide Steam profile data.
 $playerStats = null;
 $globalPlace = 0;
 try {
-    require_once __DIR__ . '/../database/kyonxcbt_ranks_plugin.php';
-    $ranksDb = new RemoteRanksDatabase();
-    $sql = "SELECT steam, name, value AS points, kills, deaths, assists, headshots, round_win AS wins, playtime
-            FROM lvl_base WHERE steam = :steam LIMIT 1";
     if ($steamid64 !== '') {
-        $result = $ranksDb->select($sql, [':steam' => $steamid64]);
-        if (!empty($result)) $playerStats = $result;
-    }
-    if (empty($playerStats) && $steam2 !== '') {
-        $result = $ranksDb->select($sql, [':steam' => $steam2]);
-        if (!empty($result)) $playerStats = $result;
-    }
-    $statsForPlace = $playerStats[0] ?? null;
-    if (is_array($statsForPlace)) {
-        $placeResult = $ranksDb->select(
-            "SELECT COUNT(*) + 1 as place FROM lvl_base WHERE value > :points",
-            [':points' => (int)($statsForPlace['points'] ?? 0)]
-        );
-        $globalPlace = (int)($placeResult[0]['place'] ?? 0);
+        require_once __DIR__ . '/../class/RanksRepository.php';
+        $rankResult = (new RanksRepository())->getPlayer($steamid64);
+        if (($rankResult['found'] ?? false) === true && is_array($rankResult['player'] ?? null)) {
+            $playerStats = [$rankResult['player']];
+            $globalPlace = (int)($rankResult['global_place'] ?? 0);
+        }
     }
 } catch (Throwable $e) {
     error_log('[FragCity] Profile ranking data is unavailable.');

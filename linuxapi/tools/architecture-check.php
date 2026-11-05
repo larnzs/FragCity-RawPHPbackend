@@ -46,6 +46,13 @@ try {
     $weaponPaintsStylesheet = $read('css/weaponpaints.css');
     $pinCatalog = json_decode($read('data/collectibles_en.json'), true, 512, JSON_THROW_ON_ERROR);
     $apiClient = $read('class/FragCityLinuxApiClient.php');
+    $ranksRepository = $read('class/RanksRepository.php');
+    $ranksService = $read('linuxapi/src/Ranks/RanksService.php');
+    $ranksServiceTest = $read('linuxapi/tests/ranks-service-test.php');
+    $ranksSmokeTest = $read('tools/ranks-smoke-test.php');
+    $leaderboardPage = $read('pages/leaderboard.php');
+    $profilePage = $read('pages/profile.php');
+    $apiClient = $read('class/FragCityLinuxApiClient.php');
     $vipCoreSiteRepository = $read('class/VipCoreRepository.php');
     $vipCoreSiteEndpoint = $read('api/vip-test-purchase.php');
     $vipCorePage = $read('pages/vip.php');
@@ -244,6 +251,31 @@ $check(
 );
 
 $check(
+    'Ranks leaderboard and profile use the signed read-only Linux API',
+    str_contains($index, "'/v1/ranks'")
+        && str_contains($linuxConfig, "'name' => 'GLOBAL_ranks'")
+        && str_contains($linuxConfig, "'fragcity_ranks_api'")
+        && str_contains($apiClient, "'/v1/ranks'")
+        && str_contains($ranksRepository, "'/v1/ranks'")
+        && !str_contains($ranksRepository, 'new PDO')
+        && str_contains($ranksService, 'FROM `lvl_base`')
+        && str_contains($ranksService, 'steamId64ToSteam2')
+        && str_contains($ranksService, 'ORDER BY')
+        && !str_contains($ranksService, 'UPDATE `lvl_base`')
+        && !str_contains($ranksService, 'INSERT INTO `lvl_base`')
+        && str_contains($ranksServiceTest, 'STEAM_1:1:127247282')
+        && str_contains($ranksSmokeTest, "'/v1/ranks'")
+        && str_contains($nginxApiBootstrap, 'location = /v1/ranks')
+        && str_contains($nginxApi, 'location = /v1/ranks')
+        && str_contains($leaderboardPage, 'new RanksRepository()')
+        && !str_contains($leaderboardPage, 'RemoteRanksDatabase')
+        && !str_contains($profilePage, 'RemoteRanksDatabase')
+        && str_contains($profilePage, 'new RanksRepository()')
+        && str_contains($websiteSettingsRaw, 'signed Linux API')
+);
+
+$check(
+    'Pin catalog preserves each pin ID after pagination converts the catalog to a numeric list',$check(
     'Pin catalog preserves each pin ID after pagination converts the catalog to a numeric list',
     str_contains($weaponPaintsUtils, '\'id\'        => (int)$id')
         && str_contains($weaponPaintsPage, "\$pin['id']")

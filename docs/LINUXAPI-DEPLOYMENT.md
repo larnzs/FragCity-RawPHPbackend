@@ -1,6 +1,6 @@
 # FragCity Linux API — Deployment Notes
 
-> Current architecture: WeaponPaints, VIPCore entitlements, the on-demand Pterodactyl/A2S Server Browser, and Pterodactyl/Wings Monitoring are served by the Linux API. The website keeps its own database on shared hosting (or a local Laragon copy). The retired Windows-Agent API returns HTTP 410.
+> Current architecture: WeaponPaints, SimpleAdmin, VIPCore entitlements, the read-only Ranks leaderboard, the on-demand Pterodactyl/A2S Server Browser, and Pterodactyl/Wings Monitoring are served by the Linux API. The website keeps its own database on shared hosting (or a local Laragon copy). The retired Windows-Agent API returns HTTP 410.
 
 ## Active and retired endpoints
 
@@ -10,11 +10,13 @@
 | POST | `/v1/weaponpaints` | WeaponPaints read/write operations | Root `shared_secret` |
 | POST | `/v1/simpleadmin` | Read-only SimpleAdmin lookups and Ban List data | Root `shared_secret` |
 | POST | `/v1/vipcore` | VIPCore status and temporary no-payment test grants | Same root `shared_secret` |
+| POST | `/v1/ranks` | Read-only Ranks leaderboard and player statistics | Same root `shared_secret` |
+| POST | `/v1/vipcore` | VIPCore status and temporary no-payment test grants | Same root `shared_secret` |
 | POST | `/v1/pterodactyl-standby` | Public CS2 Server Browser snapshot | `pterodactyl_standby.shared_secret` |
 | POST | `/v1/pterodactyl-monitoring` | Node and CS2-container resource snapshot | `pterodactyl_monitoring.shared_secret` |
 | any | `/v1/agent/*` | Retired Windows-Agent compatibility route | Returns HTTP 410 |
 
-All POST endpoints use timestamped HMAC-SHA256 signatures and nonce replay protection. WeaponPaints, SimpleAdmin and VIPCore intentionally share the existing root `shared_secret`; Pterodactyl Standby and Monitoring retain their independent secrets. The Linux API records request nonces in `GLOBAL_weaponpaints.fragcity_api_nonces`.
+All POST endpoints use timestamped HMAC-SHA256 signatures and nonce replay protection. WeaponPaints, SimpleAdmin, VIPCore and Ranks intentionally share the existing root `shared_secret`; Pterodactyl Standby and Monitoring retain their independent secrets. The Linux API records request nonces in `GLOBAL_weaponpaints.fragcity_api_nonces`.
 
 ## Configuration files
 
@@ -67,7 +69,24 @@ Merge the `vipcore` block from `linuxapi/config.example.php` into the existing `
 
 The fixed API actions are `ping_db`, `get_status` and `grant_test_vip`. The website's VIP page now reads its membership status from VIPCore rather than the legacy `users.vip_level/vip_expire` fields.
 
-### Public CS2 Server Browser
+### Ranks leaderboard
+
+The website reads the existing `GLOBAL_ranks.lvl_base` table only through the signed `POST /v1/ranks` route. The table schema is owned by the game plugin: do not create, alter, truncate or seed it as part of this integration. The API exposes three fixed actions: `ping_db`, `get_leaderboard` and `get_player`. The leaderboard action performs allowlisted sorting, literal search, filtered aggregates, Top 3 and bounded pagination on Linux; it does not accept SQL fragments or arbitrary column names. The player action accepts SteamID64 and converts it to the Steam2 value stored in `lvl_base.steam`.
+
+Create a dedicated read-only MariaDB account. Do not reuse the WeaponPaints, VIPCore or game-plugin credentials:
+
+```sql
+CREATE USER 'fragcity_ranks_api'@'127.0.0.1' IDENTIFIED BY 'REPLACE_WITH_A_NEW_RANDOM_PASSWORD';
+GRANT SELECT ON GLOBAL_ranks.lvl_base
+    TO 'fragcity_ranks_api'@'127.0.0.1';
+SHOW GRANTS FOR 'fragcity_ranks_api'@'127.0.0.1';
+```
+
+Generate the password locally with `openssl rand -hex 32`; keep it only in SQL and the private Linux runtime config. If the account already exists, inspect `SHOW GRANTS` before changing it. Merge the `ranks` block from `linuxapi/config.example.php` into `/etc/fragcity-api/config.php`, set `enabled => true`, and fill the dedicated database password. Never replace the whole live config or rotate its root HMAC secret. The route uses the existing WeaponPaints root HMAC key; the website's `integrations.weaponpaints_api.shared_secret` remains the single matching secret.
+
+After deploying the new API files and fixed Nginx route, run `nginx -t`, reload Nginx, then run `php tools/ranks-smoke-test.php` from the website repository root. The smoke test checks HMAC authentication, database access, and a first leaderboard page. The site leaderboard and profile pages use `class/RanksRepository.php`; they no longer require a direct website-side connection to `GLOBAL_ranks`.
+
+### Public CS2 Server Browser### Public CS2 Server Browser
 
 The active public page `pages/serverlist.php` uses `PterodactylStandbyRepository`. The website sends a signed request to Linux API; Linux reads the allowlisted CS2 server inventory through the read-only Pterodactyl Application API, selects each server's default Allocation, then performs A2S_INFO over UDP to the configured internal `query_host`.
 

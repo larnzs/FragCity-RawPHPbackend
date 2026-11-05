@@ -15,11 +15,11 @@ JSON کامنت استاندارد ندارد؛ برای همین Example کام
 
 ## ۲. Integrationهای Website ↔ Linux API
 
-`base_url` فقط Origin است؛ مسیر `/v1/...` را به آن اضافه نکن. WeaponPaints و SimpleAdmin عمداً از یک HMAC Secret مشترک استفاده می‌کنند؛ کلیدهای Pterodactyl جدا می‌مانند.
+`base_url` فقط Origin است؛ مسیر `/v1/...` را به آن اضافه نکن. WeaponPaints، SimpleAdmin، VIPCore و Ranks از یک HMAC Secret مشترک استفاده می‌کنند؛ کلیدهای Pterodactyl جدا می‌مانند.
 
 | تنظیم وب‌سایت | Secret متناظر در Linux | مسیر |
 |---|---|---|
-| `integrations.weaponpaints_api` | ریشهٔ `shared_secret` مشترک | `POST /v1/weaponpaints` و `POST /v1/simpleadmin` |
+| `integrations.weaponpaints_api` | ریشهٔ `shared_secret` مشترک | `POST /v1/weaponpaints`, `/v1/simpleadmin`, `/v1/vipcore`, `/v1/ranks` |
 | `integrations.pterodactyl_standby_api` | `pterodactyl_standby.shared_secret` | `POST /v1/pterodactyl-standby` |
 | `integrations.pterodactyl_monitoring_api` | `pterodactyl_monitoring.shared_secret` | `POST /v1/pterodactyl-monitoring` |
 
@@ -29,7 +29,7 @@ JSON کامنت استاندارد ندارد؛ برای همین Example کام
 openssl rand -hex 32
 ```
 
-مقدار `integrations.weaponpaints_api.shared_secret` را با `shared_secret` ریشهٔ فایل Linux یکسان نگه دار؛ همین کلید برای دو مسیر WeaponPaints و SimpleAdmin استفاده می‌شود. آن را با Standby یا Monitoring یکی نکن. Pterodactyl Application API token و Wings token فقط در فایل Runtime لینوکس هستند؛ هیچ‌وقت آن‌ها را در تنظیمات سایت یا JavaScript قرار نده.
+مقدار `integrations.weaponpaints_api.shared_secret` را با `shared_secret` ریشهٔ فایل Linux یکسان نگه دار؛ همین کلید برای مسیرهای WeaponPaints، SimpleAdmin، VIPCore و Ranks استفاده می‌شود. آن را با Standby یا Monitoring یکی نکن. Pterodactyl Application API token و Wings token فقط در فایل Runtime لینوکس هستند؛ هیچ‌وقت آن‌ها را در تنظیمات سایت یا JavaScript قرار نده.
 
 Exampleهای جزئی:
 
@@ -48,9 +48,13 @@ Exampleهای جزئی:
 
 دیتابیس `GLOBAL_weaponpaints` روی سرور Linux قرار دارد. سایت فقط با `class/FragCityLinuxApiClient.php` و `class/WeaponPaintsRepository.php` و مسیر امضاشدهٔ `/v1/weaponpaints` به آن دسترسی دارد. در `settings.json` پروفایل مستقیم `databases.weaponpaints` نساز و `files.database.weaponpaints_plugin.transport` را روی `api` نگه دار.
 
-### پروفایل‌های Plugin
+### Ranks leaderboard
 
-`plugin_sync` و `ranks_plugin` فقط زمانی باید به دیتابیس مستقل اشاره کنند که Schema و دسترسی‌های لازم آن‌ها واقعاً ایجاد شده باشند. SimpleAdmin از طریق Linux API و با همان حساب Plugin سمت لینوکس خوانده می‌شود؛ پروفایل مستقیم `simpleadmin_plugin` در تنظیمات وب‌سایت دیگر استفاده نمی‌شود.
+صفحه‌های `pages/leaderboard.php` و `pages/profile.php` آمار بازی را از `RanksRepository` و مسیر امضاشدهٔ `POST /v1/ranks` می‌گیرند. Linux API به `GLOBAL_ranks.lvl_base` با حساب مستقل `fragcity_ranks_api` و دسترسی `SELECT` وصل می‌شود. Schema متعلق به پلاگین است و برای این اتصال هیچ Migration یا تغییری در جدول لازم نیست. تبدیل SteamID64 به کلید Steam2 فقط روی Linux انجام می‌شود.
+
+### پروفایل‌های Plugin### پروفایل‌های Plugin
+
+`plugin_sync` فقط زمانی باید به دیتابیس مستقل اشاره کند که Schema و دسترسی‌های لازم آن واقعاً ایجاد شده باشد. پروفایل `ranks_plugin` قدیمی و صرفاً برای سازگاری باقی مانده؛ Leaderboard و آمار پروفایل از Linux API می‌آیند و نباید اتصال مستقیم سایت به `GLOBAL_ranks` پیکربندی شود. SimpleAdmin از طریق Linux API و با همان حساب Plugin سمت لینوکس خوانده می‌شود؛ پروفایل مستقیم `simpleadmin_plugin` در تنظیمات وب‌سایت دیگر استفاده نمی‌شود.
 
 ## ۴. Pterodactyl Server Browser
 
@@ -121,7 +125,9 @@ Copy-Item .\settings\settings.example.json .\settings\settings.json
 
 نمونهٔ کامل PHP در `linuxapi/config.example.php` است. آن را فقط برای نصب تازه به `/etc/fragcity-api/config.php` کپی کن. برای سرور موجود، بلوک‌های جدید را Merge کن؛ جایگزین‌کردن کل فایل باعث از بین‌رفتن Database password و Secretهای فعلی می‌شود.
 
-- ریشهٔ `shared_secret`: مشترک بین WeaponPaints و SimpleAdmin.
+- ریشهٔ `shared_secret`: مشترک بین WeaponPaints، SimpleAdmin، VIPCore و Ranks.
+- `simpleadmin.database.name`: نام دیتابیس `GLOBAL_simpleadmin`؛ Username، Password، Host و Port از همان Plugin DB connection موجود در `database` استفاده می‌شوند.
+- `ranks.database`: اتصال مستقل و فقط‌خواندنی به `GLOBAL_ranks` با حساب `fragcity_ranks_api`؛ فقط دسترسی `SELECT` روی `lvl_base` لازم است.
 - `simpleadmin.database.name`: نام دیتابیس `GLOBAL_simpleadmin`؛ Username، Password، Host و Port از همان Plugin DB connection موجود در `database` استفاده می‌شوند.
 - `pterodactyl_standby.shared_secret`: مخصوص Server Browser.
 - `pterodactyl_monitoring.shared_secret`: مخصوص Monitoring.

@@ -85,5 +85,10 @@ jobs:
       - name: Run VIPCore service contract tests
         run: php linuxapi/tests/vipcore-service-test.php
 
+      - name: Run Ranks service contract tests
+        run: php linuxapi/tests/ranks-service-test.php
+      - name: Run VIPCore service contract tests
+        run: php linuxapi/tests/vipcore-service-test.php
+
       - name: Validate settings JSON
         run: php -r "json_decode(file_get_contents('settings/settings.example.json'), true, 512, JSON_THROW_ON_ERROR); echo 'settings JSON OK', PHP_EOL;"

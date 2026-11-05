@@ -49,7 +49,7 @@ final class FragCityLinuxApiClient
 
     public function request(array $payload, string $path = '/v1/weaponpaints'): array
     {
-        if (!in_array($path, ['/v1/weaponpaints', '/v1/simpleadmin', '/v1/vipcore'], true)) {
+        if (!in_array($path, ['/v1/weaponpaints', '/v1/simpleadmin', '/v1/vipcore', '/v1/ranks'], true)) {
             throw new InvalidArgumentException('Unsupported Linux API path.');
         }
         try {

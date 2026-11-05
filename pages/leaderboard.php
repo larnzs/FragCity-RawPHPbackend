@@ -3,15 +3,18 @@
 
 $pageTitle = "Leaderboard | Top Players";
 
-require_once __DIR__ . '/../database/kyonxcbt_ranks_plugin.php';
+require_once __DIR__ . '/../class/RanksRepository.php';
 
-$db = new RemoteRanksDatabase();
-
-$sort = $_GET['sort'] ?? 'points';
-$order = $_GET['order'] ?? 'DESC';
-$search = trim((string)($_GET['q'] ?? ''));
-$pageNum = max(1, (int)($_GET['page_num'] ?? 1));
-$perPage = (int)($_GET['per_page'] ?? 15);
+$sortInput = $_GET['sort'] ?? 'points';
+$sort = is_string($sortInput) ? $sortInput : 'points';
+$orderInput = $_GET['order'] ?? 'DESC';
+$order = is_string($orderInput) ? $orderInput : 'DESC';
+$searchInput = $_GET['q'] ?? '';
+$search = is_string($searchInput) ? trim($searchInput) : '';
+$pageInput = $_GET['page_num'] ?? 1;
+$pageNum = is_scalar($pageInput) ? max(1, (int)$pageInput) : 1;
+$perPageInput = $_GET['per_page'] ?? 15;
+$perPage = is_scalar($perPageInput) ? (int)$perPageInput : 15;
 
 $allowedSorts = [
     'points',
@@ -36,65 +39,52 @@ $orderDir = ($order === 'ASC')
     ? 'ASC'
     : 'DESC';
 
-$fieldMap = [
-    'points'    => 'points',
-    'kills'     => 'kills',
-    'deaths'    => 'deaths',
-    'assists'   => 'assists',
-    'headshots' => 'headshots',
-    'wins'      => 'wins',
-    'playtime'  => 'playtime'
+$leaderboardError = false;
+$leaderboardStats = [
+    'total_players' => 0,
+    'total_kills' => 0,
+    'total_points' => 0,
+    'total_playtime' => 0,
+    'max_points' => 0,
 ];
+$totalPlayers = 0;
+$totalKills = 0;
+$totalPoints = 0;
+$totalPlaytime = 0;
+$totalPages = 1;
+$offset = 0;
+$players = [];
+$topThreePlayers = [];
+$visiblePlayerCount = 0;
+$topMaxPoints = 1;
 
-$orderField = $fieldMap[$sort];
+try {
+    $ranksRepository = new RanksRepository();
+    $leaderboardResponse = $ranksRepository->getLeaderboard(
+        $sort,
+        $orderDir,
+        $search,
+        $pageNum,
+        $perPage
+    );
 
-$searchBindings = [];
-$searchClause = '';
-
-if ($search !== '') {
-    $searchBindings[':search'] = '%' . $search . '%';
-    $searchClause = " WHERE steam LIKE :search OR name LIKE :search";
+    $leaderboardStats = $leaderboardResponse['stats'];
+    $pagination = $leaderboardResponse['pagination'];
+    $totalPlayers = (int)$leaderboardStats['total_players'];
+    $totalKills = (int)$leaderboardStats['total_kills'];
+    $totalPoints = (int)$leaderboardStats['total_points'];
+    $totalPlaytime = (int)$leaderboardStats['total_playtime'];
+    $totalPages = (int)$pagination['total_pages'];
+    $pageNum = (int)$pagination['page'];
+    $offset = (int)$pagination['offset'];
+    $players = $leaderboardResponse['players'];
+    $topThreePlayers = $leaderboardResponse['top_three'];
+    $visiblePlayerCount = count($players);
+    $topMaxPoints = max(1, (int)$leaderboardStats['max_points']);
+} catch (Throwable $e) {
+    error_log('[FragCity] Leaderboard Ranks API is unavailable (' . get_class($e) . ').');
+    $leaderboardError = true;
 }
-
-$sql = "
-    SELECT
-        steam,
-        name,
-        value AS points,
-        kills,
-        deaths,
-        assists,
-        headshots,
-        round_win AS wins,
-        playtime
-    FROM lvl_base
-    $searchClause
-    ORDER BY $orderField $orderDir
-";
-
-$db = new RemoteRanksDatabase();
-
-$allPlayers = $db->select($sql, $searchBindings);
-if (!is_array($allPlayers)) {
-    $allPlayers = [];
-}
-
-$totalPlayers = count($allPlayers);
-$totalKills = array_sum(array_map('intval', array_column($allPlayers, 'kills')));
-$totalPoints = array_sum(array_map('intval', array_column($allPlayers, 'points')));
-$totalPlaytime = array_sum(array_map('intval', array_column($allPlayers, 'playtime')));
-
-$totalPages = max(1, (int)ceil(max(1, $totalPlayers) / $perPage));
-$pageNum = min($pageNum, $totalPages);
-$offset = ($pageNum - 1) * $perPage;
-
-$players = array_slice($allPlayers, $offset, $perPage);
-$topThreePlayers = array_slice($allPlayers, 0, 3);
-$visiblePlayerCount = count($players);
-
-$topMaxPoints = !empty($allPlayers)
-    ? max(1, (int)($allPlayers[0]['points'] ?? 1))
-    : 1;
 
 /* =========================================================
    Helper Functions
@@ -431,13 +421,7 @@ $currentSortIcon =
     ?? 'fa-star';
 
 
-$topMaxPoints =
-    !empty($allPlayers)
-        ? max(
-            1,
-            (int)$allPlayers[0]['points']
-        )
-        : 1;
+$topMaxPoints = max(1, (int)($leaderboardStats['max_points'] ?? 0));
 
 
 function leaderboardBuildUrl(array $params = []): string
@@ -869,6 +853,16 @@ function leaderboardBuildUrl(array $params = []): string
             class="leaderboard-dynamic-content"
             data-leaderboard-dynamic
         >
+
+            <?php if ($leaderboardError): ?>
+                <div class="leaderboard-empty-state" role="alert">
+                    <div class="leaderboard-empty-icon">
+                        <i class="fas fa-triangle-exclamation"></i>
+                    </div>
+                    <h3>Leaderboard موقتاً در دسترس نیست</h3>
+                    <p>اتصال به سرویس آمار سرور برقرار نشد. لطفاً کمی بعد دوباره تلاش کنید.</p>
+                </div>
+            <?php else: ?>
 
 
             <!-- =============================================
@@ -1611,6 +1605,8 @@ function leaderboardBuildUrl(array $params = []): string
 
             <?php endif; ?>
 
+
+            <?php endif; ?>
 
         </div>
 

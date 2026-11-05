@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 /**
  * FragCity Linux API v1.
- * Active routes: WeaponPaints, read-only SimpleAdmin lookup, on-demand Pterodactyl Server Browser,
- * and Pterodactyl Monitoring. FACEIT requests stay on the shared-hosting website.
+ * Active routes: WeaponPaints, SimpleAdmin, VIPCore, read-only Ranks leaderboard,
+ * on-demand Pterodactyl Server Browser and Pterodactyl Monitoring. FACEIT stays on the website.
  * Legacy Windows-Agent routes are retired.
  * Only this file under public/ is routed by Nginx. Runtime settings are kept
  * outside the app and outside Git, normally at /etc/fragcity-api/config.php.
@@ -453,8 +453,9 @@ $isPterodactylMonitoringRequest = $path === '/v1/pterodactyl-monitoring';
 $isWeaponPaintsRequest = $path === '/v1/weaponpaints';
 $isSimpleAdminRequest = $path === '/v1/simpleadmin';
 $isVipCoreRequest = $path === '/v1/vipcore';
+$isRanksRequest = $path === '/v1/ranks';
 if (!$isPterodactylStandbyRequest && !$isPterodactylMonitoringRequest
-    && !$isWeaponPaintsRequest && !$isSimpleAdminRequest && !$isVipCoreRequest) {
+    && !$isWeaponPaintsRequest && !$isSimpleAdminRequest && !$isVipCoreRequest && !$isRanksRequest) {
     apiRespond(404, ['success' => false, 'error' => 'not_found']);
 }
 if ($method !== 'POST') {
@@ -731,6 +732,89 @@ try {
         } catch (Throwable $e) {
             error_log('[FragCity API] VIPCore request failed; type=' . get_class($e));
             apiRespond(503, ['success' => false, 'error' => 'vipcore_unavailable']);
+        }
+    }
+
+    if ($isRanksRequest) {
+        if (!in_array($action, ['ping_db', 'get_leaderboard', 'get_player'], true)) {
+            apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
+        }
+
+        $ranksConfig = is_array($config['ranks'] ?? null) ? $config['ranks'] : [];
+        if (empty($ranksConfig['enabled'])) {
+            apiRespond(503, ['success' => false, 'error' => 'ranks_disabled']);
+        }
+
+        $ranksDatabase = is_array($ranksConfig['database'] ?? null)
+            ? $ranksConfig['database']
+            : [];
+        $ranksHost = trim((string)($ranksDatabase['host'] ?? '127.0.0.1'));
+        $ranksPort = (int)($ranksDatabase['port'] ?? 3306);
+        $ranksName = trim((string)($ranksDatabase['name'] ?? ''));
+        $ranksUser = trim((string)($ranksDatabase['username'] ?? ''));
+        $ranksPass = (string)($ranksDatabase['password'] ?? '');
+        $ranksCharset = trim((string)($ranksDatabase['charset'] ?? 'utf8mb4'));
+
+        if ($ranksHost !== '127.0.0.1' || $ranksPort < 1 || $ranksPort > 65535
+            || $ranksName !== 'GLOBAL_ranks' || $ranksUser === '' || $ranksPass === ''
+            || !preg_match('/^[A-Za-z0-9_]+$/D', $ranksCharset)) {
+            apiRespond(503, ['success' => false, 'error' => 'ranks_not_configured']);
+        }
+
+        require_once __DIR__ . '/../src/Ranks/RanksService.php';
+        try {
+            $ranksPdo = new PDO(
+                'mysql:host=' . $ranksHost . ';port=' . $ranksPort
+                    . ';dbname=' . $ranksName . ';charset=' . $ranksCharset,
+                $ranksUser,
+                $ranksPass,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false,
+                ]
+            );
+
+            $ranksService = new RanksService($ranksPdo);
+
+            if ($action === 'ping_db') {
+                apiRespond(200, ['success' => true, 'data' => $ranksService->ping()]);
+            }
+
+            if ($action === 'get_player') {
+                $steamId64 = $body['steamid64'] ?? null;
+                if (!is_string($steamId64)) {
+                    throw new InvalidArgumentException('Invalid SteamID64.');
+                }
+
+                apiRespond(200, [
+                    'success' => true,
+                    'data' => $ranksService->getPlayer($steamId64),
+                ]);
+            }
+
+            $sort = $body['sort'] ?? 'points';
+            $order = $body['order'] ?? 'DESC';
+            $search = $body['search'] ?? '';
+            if (!is_string($sort) || !is_string($order) || !is_string($search)) {
+                throw new InvalidArgumentException('Invalid Ranks leaderboard filters.');
+            }
+
+            $page = apiInt($body['page'] ?? 1, 'ranks.page', 1, 1000000);
+            $perPage = apiInt($body['per_page'] ?? 15, 'ranks.per_page', 1, 100);
+
+            apiRespond(200, [
+                'success' => true,
+                'data' => $ranksService->getLeaderboard($sort, $order, $search, $page, $perPage),
+            ]);
+        } catch (InvalidArgumentException $e) {
+            apiRespond(400, ['success' => false, 'error' => 'invalid_ranks_request']);
+        } catch (PDOException $e) {
+            error_log('[FragCity API] Ranks database request failed; SQLSTATE ' . $e->getCode());
+            apiRespond(503, ['success' => false, 'error' => 'ranks_unavailable']);
+        } catch (Throwable $e) {
+            error_log('[FragCity API] Ranks request failed; type=' . get_class($e));
+            apiRespond(503, ['success' => false, 'error' => 'ranks_unavailable']);
         }
     }
 

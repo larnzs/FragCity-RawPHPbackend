@@ -29,7 +29,7 @@ The complete template documents these sections:
 | `databases.main` | FragCity website database connection for the current environment |
 | `databases.plugin_sync` | Optional isolated plugin-sync schema |
 | `databases.legacy_services` | Compatibility profile for older site pages |
-| `databases.ranks_plugin` | Optional Ranks plugin schema |
+| `databases.ranks_plugin` | Deprecated compatibility profile; active Ranks reads use Linux API |
 | `integrations.steam` | Steam Web API and OpenID-related site settings |
 | `integrations.zarinpal` | Payment gateway URLs and merchant identity |
 | `integrations.weaponpaints_api` | Signed Linux WeaponPaints API client |
@@ -37,7 +37,7 @@ The complete template documents these sections:
 | `integrations.pterodactyl_monitoring_api` | Signed admin Monitoring API client |
 | `files` | Per-page, class and plugin behavior/settings |
 
-Every database profile referenced by `files.*.database_profile` must exist under `databases`. A profile with an empty schema name is intentionally unconfigured. SimpleAdmin and WeaponPaints are accessed through the signed Linux API; do not configure website-side `databases.simpleadmin_plugin` or `databases.weaponpaints` connections.
+Every database profile referenced by `files.*.database_profile` must exist under `databases`. A profile with an empty schema name is intentionally unconfigured. SimpleAdmin, WeaponPaints, VIPCore and Ranks are accessed through the signed Linux API; do not configure direct website-side plugin database connections for these integrations.
 
 ## Website-to-Linux API credentials
 
@@ -45,7 +45,7 @@ There are three independent signed API clients. Keep their secrets different:
 
 | Website setting | Matching Linux setting | Endpoint |
 |---|---|---|
-| `integrations.weaponpaints_api.shared_secret` | top-level `shared_secret` | `POST /v1/weaponpaints`, `/v1/simpleadmin`, `/v1/vipcore` |
+| `integrations.weaponpaints_api.shared_secret` | top-level `shared_secret` | `POST /v1/weaponpaints`, `/v1/simpleadmin`, `/v1/vipcore`, `/v1/ranks` |
 | `integrations.pterodactyl_standby_api.shared_secret` | `pterodactyl_standby.shared_secret` | `POST /v1/pterodactyl-standby` |
 | `integrations.pterodactyl_monitoring_api.shared_secret` | `pterodactyl_monitoring.shared_secret` | `POST /v1/pterodactyl-monitoring` |
 
@@ -57,13 +57,15 @@ Each shared secret must be 64 lowercase hexadecimal characters or longer (up to 
 openssl rand -hex 32
 ```
 
-Do not paste secrets into chat, Git, issue trackers or browser JavaScript. WeaponPaints, SimpleAdmin and VIPCore intentionally share the one root `shared_secret`; Standby and Monitoring each use their own key. The website must never store the Pterodactyl Application API token or a Wings token.
+Do not paste secrets into chat, Git, issue trackers or browser JavaScript. WeaponPaints, SimpleAdmin, VIPCore and Ranks intentionally share the one root `shared_secret`; Standby and Monitoring each use their own key. The website must never store the Pterodactyl Application API token or a Wings token.
 
-### WeaponPaints, SimpleAdmin and VIPCore
+### WeaponPaints, SimpleAdmin, VIPCore and Ranks
 
-Use `settings/weaponpaints-api.integration.example.json` as a small reference fragment, or use the complete template. The website's `files.database.weaponpaints_plugin.transport` must remain `api`. Its secret matches the root `shared_secret` in `/etc/fragcity-api/config.php`; the same signed client is used for `/v1/simpleadmin` and `/v1/vipcore`. SimpleAdmin's `GLOBAL_simpleadmin` schema remains read-only through Linux API. VIPCore status and test grants use `GLOBAL_vip.vip_users` via a separate MariaDB account `fragcity_vip_api`; do not reuse the plugin or WeaponPaints DB credentials, and do not configure a direct website-side VIP database profile. The configured `ServerId` must match VIPCore's `vip_core.json`. Test grants are limited to Bronze/Silver/Gold for one hour and do not charge the wallet.
+Use `settings/weaponpaints-api.integration.example.json` as a small reference fragment, or use the complete template. The website's `files.database.weaponpaints_plugin.transport` must remain `api`. Its secret matches the root `shared_secret` in `/etc/fragcity-api/config.php`; the same signed client is used for `/v1/simpleadmin`, `/v1/vipcore` and `/v1/ranks`. SimpleAdmin's `GLOBAL_simpleadmin` schema remains read-only through Linux API. VIPCore status and test grants use `GLOBAL_vip.vip_users` via a separate MariaDB account `fragcity_vip_api`; do not reuse the plugin or WeaponPaints DB credentials, and do not configure a direct website-side VIP database profile. The configured `ServerId` must match VIPCore's `vip_core.json`. Test grants are limited to Bronze/Silver/Gold for one hour and do not charge the wallet.
 
-### Public Server Browser / Standby
+The `/v1/ranks` endpoint is read-only. The site leaderboard keeps its current filters, sorting, Top 3, aggregate cards and page controls, while PHP requests only the current page and Top 3 from the signed API. The API also serves the profile's single-player stats and global place. `GLOBAL_ranks.lvl_base` remains plugin-owned and unchanged; a dedicated `fragcity_ranks_api` account receives `SELECT` on that table only. Steam2 values in `lvl_base.steam` are converted to SteamID64 server-side for profile lookups. The old website-side `ranks_plugin` DB profile is deprecated and must not be configured.
+
+### Public Server Browser / Standby### Public Server Browser / Standby
 
 Use `settings/pterodactyl-standby.integration.example.json`. Its secret matches Linux `pterodactyl_standby.shared_secret`. The website receives a sanitized server snapshot; the Linux API owns the read-only Pterodactyl Application API token and sends A2S_INFO to the selected default Allocations. The live implementation is single-Node for now and refreshes its 10-second cache on demand; no Cron job is needed.
 
@@ -75,7 +77,9 @@ Use `settings/pterodactyl-monitoring.integration.example.json`. Its secret match
 
 The matching Linux-side template is `linuxapi/config.example.php`. It documents:
 
-- root shared HMAC secret for WeaponPaints, SimpleAdmin and VIPCore, plus the Linux-local MariaDB connection;
+- root shared HMAC secret for WeaponPaints, SimpleAdmin, VIPCore and Ranks, plus the Linux-local MariaDB connection;
+- a dedicated least-privilege `vipcore` database connection for `GLOBAL_vip.vip_users`;
+- a dedicated read-only `ranks` database connection for `GLOBAL_ranks.lvl_base`;
 - a dedicated least-privilege `vipcore` database connection for `GLOBAL_vip.vip_users`;
 - an independent `pterodactyl_standby` block, including cache, internal A2S query host, public connect host, Node ID, allowlists and read-only Application API token;
 - an independent `pterodactyl_monitoring` block, including Node allowlist, host metrics options, Wings URL overrides and the read-only Application API token.

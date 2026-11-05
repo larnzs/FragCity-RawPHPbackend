@@ -29,7 +29,7 @@
       "extends": "main"
     },
     "ranks_plugin": {
-      "_comment": "Optional Ranks plugin database. Leave name empty to avoid accidentally pointing the plugin at the website DB.",
+      "_comment": "Deprecated compatibility profile only. Active Ranks leaderboard and profile stats use the signed Linux API; do not configure a direct website DB connection for GLOBAL_ranks.",
       "extends": "main",
       "name": ""
     }
@@ -55,7 +55,7 @@
       "startpay_base_url": "https://payment.zarinpal.com/pg/StartPay/"
     },
     "weaponpaints_api": {
-      "_comment": "Signed Linux API for WeaponPaints, SimpleAdmin and VIPCore. Its secret matches the root shared_secret in /etc/fragcity-api/config.php. All three endpoints share this key; Pterodactyl secrets remain separate.",
+      "_comment": "Signed Linux API for WeaponPaints, SimpleAdmin, VIPCore and the read-only Ranks leaderboard. Its secret matches the root shared_secret in /etc/fragcity-api/config.php. These endpoints share this key; Pterodactyl secrets remain separate.",
       "base_url": "https://api.fragcity.ir",
       "shared_secret": "REPLACE_WITH_WEAPONPAINTS_LINUX_API_SECRET"
     },
@@ -182,7 +182,7 @@
       "database_profile": "main"
     },
     "database.ranks_plugin": {
-      "_comment": "Database profile for the Ranks plugin adapter.",
+      "_comment": "Deprecated compatibility profile. Active Ranks reads use the signed Linux API; this profile is not used by leaderboard.php or profile.php.",
       "database_profile": "ranks_plugin"
     },
     "database.weaponpaints_plugin": {

@@ -18,12 +18,12 @@ declare(strict_types=1);
 return [
     /*
      * Shared endpoint authentication:
-     * POST /v1/weaponpaints, POST /v1/simpleadmin and POST /v1/vipcore
+     * POST /v1/weaponpaints, /v1/simpleadmin, /v1/vipcore and /v1/ranks
      *
      * Generate a 64-character lowercase hex key with:
      *   openssl rand -hex 32
      * Put the matching value in the website's integrations.weaponpaints_api.shared_secret.
-     * WeaponPaints, SimpleAdmin and VIPCore intentionally share this key.
+     * WeaponPaints, SimpleAdmin, VIPCore and Ranks intentionally share this key.
      * Pterodactyl Standby and Monitoring keep their own independent HMAC keys.
      */
     'shared_secret' => 'REPLACE_WITH_WEAPONPAINTS_64_HEX_SECRET',
@@ -91,6 +91,24 @@ return [
         'test_mode' => [
             'enabled' => false,
             'duration_seconds' => 3600,
+        ],
+    ],
+
+    /*
+     * Read-only Ranks leaderboard:
+     * POST /v1/ranks, authenticated by the existing root shared_secret above.
+     * Use a dedicated MariaDB account with SELECT on GLOBAL_ranks.lvl_base only.
+     * Do not reuse WeaponPaints, VIPCore or game-plugin database credentials.
+     */
+    'ranks' => [
+        'enabled' => false,
+        'database' => [
+            'host' => '127.0.0.1',
+            'port' => 3306,
+            'name' => 'GLOBAL_ranks',
+            'username' => 'fragcity_ranks_api',
+            'password' => 'REPLACE_WITH_UNIQUE_RANKS_API_DATABASE_PASSWORD',
+            'charset' => 'utf8mb4',
         ],
     ],
 
