@@ -1,7 +1,7 @@
 <?php
 // pages/profile.php - نسخه جداشده از frontend با پشتیبانی از هر دو فرمت SteamID
 if (($_SESSION['user_logged_in'] ?? false) !== true) {
-    header('Location: index.php?page=login');
+    header('Location: /login/', true, 303);
     exit;
 }
 
@@ -950,7 +950,7 @@ if (!function_exists('formatPlaytime')) {
                 </p>
             <?php endif; ?>
 
-            <form id="profileSettingsForm" class="profile-settings-form" method="post" novalidate>
+            <form id="profileSettingsForm" class="profile-settings-form" method="post" action="/profile/" novalidate>
                 <input type="hidden" name="profile_settings_action" value="save">
 
                 <div class="profile-settings-fields">
