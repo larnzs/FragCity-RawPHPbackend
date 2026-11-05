@@ -47,16 +47,16 @@ $leaderboardStats = [
     'total_playtime' => 0,
     'max_points' => 0,
 ];
-$totalبازیکنs = 0;
-$totalکشت = 0;
-$totalامتیاز = 0;
-$totalزمان بازی = 0;
+$totalPlayers = 0;
+$totalKills = 0;
+$totalPoints = 0;
+$totalPlaytime = 0;
 $totalPages = 1;
 $offset = 0;
 $players = [];
-$topThreeبازیکنs = [];
-$visibleبازیکنCount = 0;
-$topMaxامتیاز = 1;
+$topThreePlayers = [];
+$visiblePlayerCount = 0;
+$topMaxPoints = 1;
 
 try {
     $ranksRepository = new RanksRepository();
@@ -70,17 +70,17 @@ try {
 
     $leaderboardStats = $leaderboardResponse['stats'];
     $pagination = $leaderboardResponse['pagination'];
-    $totalبازیکنs = (int)$leaderboardStats['total_players'];
-    $totalکشت = (int)$leaderboardStats['total_kills'];
-    $totalامتیاز = (int)$leaderboardStats['total_points'];
-    $totalزمان بازی = (int)$leaderboardStats['total_playtime'];
+    $totalPlayers = (int)$leaderboardStats['total_players'];
+    $totalKills = (int)$leaderboardStats['total_kills'];
+    $totalPoints = (int)$leaderboardStats['total_points'];
+    $totalPlaytime = (int)$leaderboardStats['total_playtime'];
     $totalPages = (int)$pagination['total_pages'];
     $pageNum = (int)$pagination['page'];
     $offset = (int)$pagination['offset'];
     $players = $leaderboardResponse['players'];
-    $topThreeبازیکنs = $leaderboardResponse['top_three'];
-    $visibleبازیکنCount = count($players);
-    $topMaxامتیاز = max(1, (int)$leaderboardStats['max_points']);
+    $topThreePlayers = $leaderboardResponse['top_three'];
+    $visiblePlayerCount = count($players);
+    $topMaxPoints = max(1, (int)$leaderboardStats['max_points']);
 } catch (Throwable $e) {
     error_log('[FragCity] Leaderboard Ranks API is unavailable (' . get_class($e) . ').');
     $leaderboardError = true;
@@ -90,7 +90,7 @@ try {
    Helper Functions
 ========================================================= */
 
-function leaderboardFormatزمان بازی($seconds)
+function leaderboardFormatPlaytime($seconds)
 {
     $seconds = (int)$seconds;
 
@@ -330,10 +330,10 @@ if ($leaderboardAvatarSteamIds !== []) {
    Stats
 ========================================================= */
 
-$totalبازیکنs = (int)$totalبازیکنs;
-$totalکشت = (int)$totalکشت;
-$totalامتیاز = (int)$totalامتیاز;
-$totalزمان بازی = (int)$totalزمان بازی;
+$totalPlayers = (int)$totalPlayers;
+$totalKills = (int)$totalKills;
+$totalPoints = (int)$totalPoints;
+$totalPlaytime = (int)$totalPlaytime;
 
 /* =========================================================
    Sort Labels
@@ -387,7 +387,7 @@ $currentSortIcon =
     ?? 'fa-star';
 
 
-$topMaxامتیاز = max(1, (int)($leaderboardStats['max_points'] ?? 0));
+$topMaxPoints = max(1, (int)($leaderboardStats['max_points'] ?? 0));
 
 $leaderboardGuyAssetPath = dirname(__DIR__) . '/img/webp/leaderboardguy.webp';
 $leaderboardGuyAssetVersion = is_file($leaderboardGuyAssetPath) && function_exists('asset_version')
@@ -589,7 +589,7 @@ function leaderboardBuildUrl(array $params = []): string
             </p>
 
             <div class="leaderboard-hero-meta" data-fc-reveal="up" data-fc-reveal-delay="180">
-                <span><i class="fa-solid fa-users" aria-hidden="true"></i> <?= number_format($totalبازیکنs) ?> بازیکن توی جدول</span>
+                <span><i class="fa-solid fa-users" aria-hidden="true"></i> <?= number_format($totalPlayers) ?> بازیکن توی جدول</span>
                 <span><i class="fa-solid fa-chart-line" aria-hidden="true"></i> ۷ جور آمار</span>
                 <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> آمار واقعی سرورها</span>
             </div>
@@ -673,7 +673,7 @@ function leaderboardBuildUrl(array $params = []): string
                 </span>
 
                 <strong>
-                    <?= number_format($totalبازیکنs) ?>
+                    <?= number_format($totalPlayers) ?>
                 </strong>
 
             </div>
@@ -694,7 +694,7 @@ function leaderboardBuildUrl(array $params = []): string
                 </span>
 
                 <strong>
-                    <?= number_format($totalکشت) ?>
+                    <?= number_format($totalKills) ?>
                 </strong>
 
             </div>
@@ -715,7 +715,7 @@ function leaderboardBuildUrl(array $params = []): string
                 </span>
 
                 <strong>
-                    <?= number_format($totalامتیاز) ?>
+                    <?= number_format($totalPoints) ?>
                 </strong>
 
             </div>
@@ -737,8 +737,8 @@ function leaderboardBuildUrl(array $params = []): string
 
                 <strong>
                     <?= leaderboardEscape(
-                        leaderboardFormatزمان بازی(
-                            $totalزمان بازی
+                        leaderboardFormatPlaytime(
+                            $totalPlaytime
                         )
                     ) ?>
                 </strong>
@@ -872,7 +872,7 @@ function leaderboardBuildUrl(array $params = []): string
                  TOP 3
             ============================================== -->
 
-            <?php if (!empty($topThreeبازیکنs)): ?>
+            <?php if (!empty($topThreePlayers)): ?>
 
                 <section class="leaderboard-podium">
 
@@ -890,11 +890,11 @@ function leaderboardBuildUrl(array $params = []): string
                     ): ?>
 
                         <?php
-                        $podiumبازیکن =
-                            $topThreeبازیکنs[$podiumIndex]
+                        $podiumPlayer =
+                            $topThreePlayers[$podiumIndex]
                             ?? null;
 
-                        if (!$podiumبازیکن) {
+                        if (!$podiumPlayer) {
                             continue;
                         }
 
@@ -903,21 +903,21 @@ function leaderboardBuildUrl(array $params = []): string
 
                         $podiumAvatar =
                             leaderboardGetUserAvatar(
-                                $podiumبازیکن['steam']
+                                $podiumPlayer['steam']
                             );
 
                         $podiumKd =
                             leaderboardGetKd(
-                                $podiumبازیکن['kills'],
-                                $podiumبازیکن['deaths']
+                                $podiumPlayer['kills'],
+                                $podiumPlayer['deaths']
                             );
 
                         $podiumHsPercent =
-                            $podiumبازیکن['kills'] > 0
+                            $podiumPlayer['kills'] > 0
                                 ? round(
                                     (
-                                        $podiumبازیکن['headshots'] /
-                                        $podiumبازیکن['kills']
+                                        $podiumPlayer['headshots'] /
+                                        $podiumPlayer['kills']
                                     ) * 100
                                 )
                                 : 0;
@@ -955,7 +955,7 @@ function leaderboardBuildUrl(array $params = []): string
                                 <img
                                     src="<?= leaderboardEscape($podiumAvatar) ?>"
                                     alt="<?= leaderboardEscape(
-                                        $podiumبازیکن['name']
+                                        $podiumPlayer['name']
                                     ) ?>"
                                     class="podium-avatar"
                                     width="78"
@@ -975,7 +975,7 @@ function leaderboardBuildUrl(array $params = []): string
                             <h3>
 
                                 <?= leaderboardEscape(
-                                    $podiumبازیکن['name']
+                                    $podiumPlayer['name']
                                     ?: 'بازیکن ناشناس'
                                 ) ?>
 
@@ -986,7 +986,7 @@ function leaderboardBuildUrl(array $params = []): string
 
                                 <?= leaderboardEscape(
                                     leaderboardGetSteamShort(
-                                        $podiumبازیکن['steam']
+                                        $podiumPlayer['steam']
                                     )
                                 ) ?>
 
@@ -996,7 +996,7 @@ function leaderboardBuildUrl(array $params = []): string
                             <strong class="podium-points">
 
                                 <?= number_format(
-                                    (int)$podiumبازیکن['points']
+                                    (int)$podiumPlayer['points']
                                 ) ?>
 
                                 <span>
@@ -1013,7 +1013,7 @@ function leaderboardBuildUrl(array $params = []): string
                                     <i class="fas fa-skull-crossbones"></i>
 
                                     <?= number_format(
-                                        (int)$podiumبازیکن['kills']
+                                        (int)$podiumPlayer['kills']
                                     ) ?>
 
                                 </span>
@@ -1063,11 +1063,11 @@ function leaderboardBuildUrl(array $params = []): string
                     <i class="fas fa-users"></i>
                     نمایش
                     <strong id="visibleبازیکنCount">
-                        <?= number_format($visibleبازیکنCount) ?>
+                        <?= number_format($visiblePlayerCount) ?>
                     </strong>
                     بازیکن از
                     <strong>
-                        <?= number_format($totalبازیکنs) ?>
+                        <?= number_format($totalPlayers) ?>
                     </strong>
                 </span>
 
@@ -1233,11 +1233,11 @@ function leaderboardBuildUrl(array $params = []): string
                                     );
 
                                 $pointsPercent =
-                                    $topMaxامتیاز > 0
+                                    $topMaxPoints > 0
                                         ? round(
                                             (
                                                 $player['points'] /
-                                                $topMaxامتیاز
+                                                $topMaxPoints
                                             ) * 100
                                         )
                                         : 0;
@@ -1542,7 +1542,7 @@ function leaderboardBuildUrl(array $params = []): string
                                         <i class="fas fa-clock"></i>
 
                                         <?= leaderboardEscape(
-                                            leaderboardFormatزمان بازی(
+                                            leaderboardFormatPlaytime(
                                                 $player['playtime']
                                             )
                                         ) ?>
@@ -1563,11 +1563,11 @@ function leaderboardBuildUrl(array $params = []): string
                 <div class="leaderboard-footer-controls">
                     <div class="leaderboard-range">
                         نمایش
-                        <?= $totalبازیکنs > 0 ? $offset + 1 : 0 ?>
+                        <?= $totalPlayers > 0 ? $offset + 1 : 0 ?>
                         تا
-                        <?= min($offset + $perPage, $totalبازیکنs) ?>
+                        <?= min($offset + $perPage, $totalPlayers) ?>
                         از
-                        <?= number_format($totalبازیکنs) ?>
+                        <?= number_format($totalPlayers) ?>
                         بازیکن
                     </div>
 
