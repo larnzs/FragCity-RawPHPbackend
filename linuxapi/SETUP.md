@@ -6,6 +6,7 @@ This is the repeatable setup guide for the files in this directory. Follow it on
 
 - **WeaponPaints:** the Linux API connects to the Linux-local MariaDB database `GLOBAL_weaponpaints` through `127.0.0.1:3306`. Keep this DB and API path unchanged.
 - **Ranks:** the signed `/v1/ranks` route uses a separate read-only MariaDB account for `GLOBAL_ranks.lvl_base`; the website leaderboard and profile do not connect directly to this schema.
+- **VIPCore:** the signed `/v1/vipcore` route reads and grants only in the existing `GLOBAL_vip.vip_users` table through a dedicated account. The grant action is test-only, admin-only, and requires an explicit Linux SteamID64 allowlist; it does not implement payment.
 - **Website data:** the main website database `kyonxcbt_fragcity_services` stays on shared hosting; Laragon uses a local copy. The confirmed website schema consists of `donations`, `password_resets`, `tickets`, `ticket_replies`, `users`, `user_wallets`, `vip_codes`, `vip_usage`, `wallet_transactions`, and `withdraw_requests`.
 - The Linux API must never open a MySQL connection to `kyonxcbt_fragcity_services`, receive its credentials, or expose MariaDB port 3306.
 - **Windows Agent API:** retired. `/v1/agent/*` returns HTTP 410; `api/internal_agent_bridge.php` is a fail-closed retired endpoint. Do not configure `website_bridge`, set `integrations.linuxapi_site_bridge`, create bridge-specific tables, or execute the former `site-bridge-schema.sql`.
@@ -515,22 +516,22 @@ The same signed smoke-test script was run with a test SteamID as the second argu
 
 This verifies only the SELECT statements actually implemented in `get_selection`. The current endpoint does **not** query `wp_player_gloves`, so do not claim glove reads have been tested. The output included real player data; keep SteamIDs and selected-item details out of generic installation documentation and public logs.
 
-### Reusable API pattern for future plugin integrations
+### Reusable API pattern for current and future plugin integrations
 
-The successful WeaponPaints deployment is the reference pattern for future **Ranks, VIP, and SimpleAdmin** integrations. Those integrations are future work; this does not mean their endpoints have already been implemented or their schemas verified.
+WeaponPaints remains the reference transport implementation. Ranks and VIPCore are now implemented as domain-specific signed routes: `POST /v1/ranks` is read-only for `GLOBAL_ranks.lvl_base`; `POST /v1/vipcore` reads `GLOBAL_vip.vip_users` and exposes a temporary no-payment test grant. SimpleAdmin also has its own restricted read-only route. These are not generic SQL proxies.
 
 Reuse the security/transport pattern where appropriate:
 
 1. HTTPS only, with certificate validation on clients; keep MariaDB port 3306 private rather than exposing it to plugin nodes or the Internet.
 2. Signed requests using HMAC-SHA256 over a canonical representation of the timestamp, nonce, HTTP method, path, and SHA-256 hash of the exact request body. Validate timestamps within the allowed window, verify signatures with a constant-time comparison, and reject replayed nonces.
 3. Strict request validation, prepared SQL statements, explicit action/route allowlists, bounded payload sizes, and generic external errors with useful but secret-free server logs. Never accept a caller-provided table name, column name, or SQL fragment.
-4. Domain-specific routes and schemas, for example `/v1/ranks`, `/v1/vip`, and `/v1/simpleadmin`, or equivalent separately versioned endpoints. These are examples for future design, not live routes today. Share the authentication implementation where sensible, but do not turn `/v1/weaponpaints` into an unrestricted all-plugin SQL endpoint.
-5. Least-privilege database permissions. Keep `fragcity_weaponpaints_api` limited to its existing WeaponPaints/nonce grants; do not broaden it as a shortcut for future plugins. Before implementation, inspect the exact plugin version, schema, primary keys, and current read/write behavior, then create narrowly scoped credentials/grants for the required tables. In particular, inspect `GLOBAL_simpleadmin` independently before designing its API; it is not the WeaponPaints database target.
+4. Domain-specific routes are active: `/v1/ranks`, `/v1/vipcore`, and `/v1/simpleadmin`. Share the root HMAC transport where intended, but keep each route's action allowlist, validation, schema and database connection separate. Do not turn `/v1/weaponpaints` into an unrestricted all-plugin SQL endpoint.
+5. Least-privilege database permissions. Keep `fragcity_weaponpaints_api` limited to its existing WeaponPaints/nonce grants. Ranks uses `fragcity_ranks_api` with `SELECT` on `GLOBAL_ranks.lvl_base` only. VIPCore uses `fragcity_vip_api` with `SELECT`, `INSERT`, and `UPDATE` on `GLOBAL_vip.vip_users` only. Do not reuse game-plugin or WeaponPaints credentials.
 6. Test in stages: signed `ping_db`; read-only queries against known test data; controlled writes for a test player/account; then read-after-write comparison against the expected database rows. Record the request contract, expected database mutations, rollback/recovery approach, and test results before enabling the website integration.
 
-For future work, first document the actual Ranks/VIP/SimpleAdmin tables and ownership rules. Decide whether each plugin's data is global across CS2 nodes or node-local, which operations the website genuinely needs, and which service account should access each table. Do not assume their schema or add grants until this inspection is complete.
+Ranks and VIPCore schemas have been inspected for this integration. Do not alter either plugin-owned table. Confirm VIPCore's live `ServerId` before enabling the route. Leave `test_mode.enabled` false for initial connection checks; before a one-hour grant test, add only the trusted administrator's exact SteamID64 to `test_mode.allowed_steamids`, then temporarily enable test mode. The website endpoint also requires the authenticated site role `admin`. Keep the allowlist empty when no grant test is being performed.
 
-Write operations should only be tested with a test player/account and should be verified against GLOBAL_weaponpaints. The smoke-test script itself does not perform player-data writes.
+Ranks is read-only. VIPCore test grants must be checked against `GLOBAL_vip.vip_users` and only with a designated test Steam account; no wallet deduction or ZarinPal payment is performed. The signed smoke tests only ping/read data and do not grant VIP.
 
 ## 10. Switch the shared-host website only after verification
 
