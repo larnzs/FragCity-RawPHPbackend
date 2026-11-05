@@ -57,7 +57,7 @@ Each shared secret must be 64 lowercase hexadecimal characters or longer (up to 
 openssl rand -hex 32
 ```
 
-Do not paste secrets into chat, Git, issue trackers or browser JavaScript. The website stores only the matching HMAC secret for each integration. It must never store the Pterodactyl Application API token or a Wings token.
+Do not paste secrets into chat, Git, issue trackers or browser JavaScript. WeaponPaints, SimpleAdmin and VIPCore intentionally share the one root `shared_secret`; Standby and Monitoring each use their own key. The website must never store the Pterodactyl Application API token or a Wings token.
 
 ### WeaponPaints, SimpleAdmin and VIPCore
 
@@ -82,7 +82,7 @@ The matching Linux-side template is `linuxapi/config.example.php`. It documents:
 
 The example is copied to `/etc/fragcity-api/config.php` only for a fresh install. On an existing server, merge the required keys into the live config; never overwrite its real database password or current HMAC secrets. Keep the file outside the public document root, readable by PHP-FPM and not writable by the web process.
 
-The same Pterodactyl Application API token may be reused by Standby and Monitoring if its read-only scopes cover both features. Its value stays only on Linux. The HMAC secrets must still be unique per endpoint.
+The same Pterodactyl Application API token may be reused by Standby and Monitoring if its read-only scopes cover both features. Its value stays only on Linux. Standby and Monitoring HMAC keys remain independent from each other and from the shared WeaponPaints/SimpleAdmin/VIPCore key.
 
 ## Web-server protection
 
