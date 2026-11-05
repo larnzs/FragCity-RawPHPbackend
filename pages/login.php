@@ -25,7 +25,7 @@ unset($_SESSION['auth_error']);
         <?php endif; ?>
 
         <!-- Login Form -->
-        <form id="loginForm" method="post" action="?page=login&amp;auth_modal=1">
+        <form id="loginForm" method="post" action="/?page=login&amp;auth_modal=1">
             <input type="hidden" name="auth_action" value="login">
             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string) ($authCsrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>">
 
@@ -109,7 +109,7 @@ unset($_SESSION['auth_error']);
         </div>
 
         <!-- Steam Login (Fixed: Removed target="_blank" for proper OpenID redirect flow) -->
-        <a href="steam/steam_login.php" class="btn-steam-login">
+        <a href="/steam/steam_login.php" class="btn-steam-login">
             <i class="fab fa-steam"></i>
             ورود با Steam
         </a>
