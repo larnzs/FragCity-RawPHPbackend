@@ -59,36 +59,38 @@
         }
 
         function syncInvoiceFooterDock() {
-            if (!invoice || !invoice.isConnected) return;
+            // Resolve the current page's invoice every time; AJAX navigation replaces it.
+            const currentInvoice = document.querySelector('body > [data-vip-invoice]');
+            if (!currentInvoice || !currentInvoice.isConnected) return;
 
             const footer = document.getElementById('siteFooter');
             if (!footer) {
-                invoice.classList.remove('is-footer-docked');
-                invoice.style.removeProperty('--vip-invoice-footer-top');
+                currentInvoice.classList.remove('is-footer-docked');
+                currentInvoice.style.removeProperty('--vip-invoice-footer-top');
                 return;
             }
 
-            const invoiceRect = invoice.getBoundingClientRect();
+            const invoiceRect = currentInvoice.getBoundingClientRect();
             const footerRect = footer.getBoundingClientRect();
             const invoiceHeight = invoiceRect.height;
             if (!invoiceHeight) return;
 
-            let fixedBottom = Number(invoice.dataset.vipFixedBottomGap);
+            let fixedBottom = Number(currentInvoice.dataset.vipFixedBottomGap);
             if (!Number.isFinite(fixedBottom)) {
-                fixedBottom = Number.parseFloat(window.getComputedStyle(invoice).bottom);
+                fixedBottom = Number.parseFloat(window.getComputedStyle(currentInvoice).bottom);
                 if (!Number.isFinite(fixedBottom)) fixedBottom = 12;
-                invoice.dataset.vipFixedBottomGap = String(fixedBottom);
+                currentInvoice.dataset.vipFixedBottomGap = String(fixedBottom);
             }
 
             // Dock the fixed bar to the footer's top edge as soon as the two would overlap.
             const fixedTop = window.innerHeight - invoiceHeight - fixedBottom;
             if (footerRect.top <= fixedTop) {
                 const dockTop = footerRect.top - invoiceHeight - fixedBottom;
-                invoice.style.setProperty('--vip-invoice-footer-top', dockTop + 'px');
-                invoice.classList.add('is-footer-docked');
+                currentInvoice.style.setProperty('--vip-invoice-footer-top', dockTop + 'px');
+                currentInvoice.classList.add('is-footer-docked');
             } else {
-                invoice.classList.remove('is-footer-docked');
-                invoice.style.removeProperty('--vip-invoice-footer-top');
+                currentInvoice.classList.remove('is-footer-docked');
+                currentInvoice.style.removeProperty('--vip-invoice-footer-top');
             }
         }
 
