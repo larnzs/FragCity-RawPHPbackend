@@ -682,7 +682,9 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
 
 
 
-    <div class="vip-store-layout">\n        <div class="vip-store-main-column">\n    <div class="vip-catalog-heading">
+    <div class="vip-store-layout">
+        <div class="vip-store-main-column">
+            <div class="vip-catalog-heading">
         <div>
             <span class="vip-store-eyebrow">CHOOSE YOUR TIER</span>
             <h2>سطح‌های VIP</h2>
