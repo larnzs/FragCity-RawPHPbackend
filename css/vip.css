@@ -2655,3 +2655,236 @@ body.vip-comparison-open {
         animation: none !important;
     }
 }
+
+
+/* Fixed glass invoice bar: return the VIP catalog to its natural full-width layout. */
+#vipStorefront {
+    padding-bottom: max(190px, calc(env(safe-area-inset-bottom, 0px) + 170px)) !important;
+}
+.vip-invoice-panel.vip-checkout-bar {
+    position: fixed !important;
+    inset: auto auto calc(env(safe-area-inset-bottom, 0px) + 14px) 50% !important;
+    z-index: 10020 !important;
+    display: grid !important;
+    grid-template-columns: minmax(190px, .9fr) minmax(270px, 1.15fr) minmax(260px, auto);
+    align-items: center;
+    gap: 15px;
+    width: min(1280px, calc(100vw - 32px)) !important;
+    max-width: 1280px !important;
+    min-width: 0;
+    margin: 0 !important;
+    padding: 12px 16px;
+    border: 1px solid rgba(255, 179, 71, .23);
+    border-radius: 15px;
+    background:
+        radial-gradient(ellipse at 100% 0, rgba(249, 115, 22, .105), transparent 42%),
+        rgba(13, 13, 13, .76) !important;
+    box-shadow: 0 16px 42px rgba(0, 0, 0, .42), inset 0 1px rgba(255, 255, 255, .06);
+    -webkit-backdrop-filter: blur(22px) saturate(135%) !important;
+    backdrop-filter: blur(22px) saturate(135%) !important;
+    transform: translateX(-50%);
+}
+.vip-invoice-panel.vip-checkout-bar::before {
+    position: absolute;
+    inset: 0 22px auto;
+    height: 2px;
+    border-radius: 0 0 4px 4px;
+    background: linear-gradient(90deg, transparent, #f97316 28%, #ffb347 72%, transparent);
+    content: "";
+    pointer-events: none;
+}
+.vip-invoice-panel .vip-invoice-product {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 3px;
+    padding: 0 4px;
+    border: 0;
+    background: transparent;
+}
+.vip-invoice-panel .vip-invoice-product .vip-store-eyebrow {
+    margin: 0;
+    color: #e99a5e;
+    font-size: .55rem;
+}
+.vip-invoice-panel .vip-invoice-product > strong {
+    overflow: hidden;
+    color: #fff;
+    font-size: .9rem;
+    font-weight: 950;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.vip-invoice-panel .vip-invoice-product > small {
+    color: #858585;
+    font-size: .62rem;
+}
+.vip-invoice-panel .vip-invoice-lines {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+}
+.vip-invoice-panel .vip-invoice-line {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3px;
+    padding: 3px 10px;
+    border: 0;
+    border-right: 1px solid rgba(255, 255, 255, .08);
+}
+.vip-invoice-panel .vip-invoice-line > span,
+.vip-invoice-panel .vip-invoice-total > span {
+    color: #858585;
+    font-size: .59rem;
+}
+.vip-invoice-panel .vip-invoice-line > strong {
+    overflow: hidden;
+    max-width: 100%;
+    color: #e6e1da;
+    font-size: .72rem;
+    font-weight: 850;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.vip-invoice-panel .vip-invoice-total {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3px;
+    margin: 0;
+    padding: 3px 10px;
+    border: 0;
+    border-right: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 0;
+    background: transparent;
+}
+.vip-invoice-panel .vip-invoice-total > strong {
+    color: #ffd08f;
+    font-size: .88rem;
+    font-weight: 950;
+    white-space: nowrap;
+}
+.vip-invoice-panel .vip-invoice-status {
+    grid-column: 1 / -1;
+    min-height: 0;
+    margin: 0;
+    padding: 5px 4px 0;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, .06);
+    border-radius: 0;
+    background: transparent;
+    color: #929292;
+    font-size: .58rem;
+    line-height: 1.65;
+}
+.vip-invoice-actions {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+.vip-invoice-panel .vip-invoice-checkout,
+.vip-invoice-panel .vip-invoice-wallet {
+    width: auto;
+    min-width: 0;
+    min-height: 42px;
+    margin: 0;
+    padding: 9px 12px;
+    border-radius: 9px;
+    font-size: .66rem;
+    white-space: nowrap;
+}
+.vip-invoice-panel .vip-invoice-checkout {
+    flex: 1 1 auto;
+}
+.vip-invoice-panel .vip-invoice-wallet {
+    flex: 0 0 auto;
+}
+@media (max-width: 900px) {
+    .vip-invoice-panel.vip-checkout-bar {
+        grid-template-columns: minmax(125px, .8fr) minmax(230px, 1.15fr) minmax(220px, auto);
+        gap: 10px;
+        width: calc(100vw - 24px) !important;
+        padding: 10px 12px;
+    }
+    .vip-invoice-panel .vip-invoice-checkout,
+    .vip-invoice-panel .vip-invoice-wallet {
+        padding-inline: 9px;
+        font-size: .61rem;
+    }
+}
+@media (max-width: 700px) {
+    #vipStorefront {
+        padding-bottom: max(230px, calc(env(safe-area-inset-bottom, 0px) + 210px)) !important;
+    }
+    .vip-invoice-panel.vip-checkout-bar {
+        bottom: calc(env(safe-area-inset-bottom, 0px) + 7px) !important;
+        grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+        gap: 8px 10px;
+        width: calc(100vw - 14px) !important;
+        max-height: min(42dvh, 260px);
+        overflow-y: auto;
+        padding: 10px 11px;
+        border-radius: 13px;
+    }
+    .vip-invoice-panel .vip-invoice-product {
+        grid-column: 1;
+    }
+    .vip-invoice-panel .vip-invoice-product > strong {
+        font-size: .79rem;
+    }
+    .vip-invoice-panel .vip-invoice-lines {
+        grid-column: 2;
+        grid-template-columns: 1fr;
+        gap: 3px;
+    }
+    .vip-invoice-panel .vip-invoice-line,
+    .vip-invoice-panel .vip-invoice-total {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 2px 4px;
+        border: 0;
+    }
+    .vip-invoice-panel .vip-invoice-line > strong {
+        font-size: .65rem;
+    }
+    .vip-invoice-panel .vip-invoice-total > strong {
+        font-size: .78rem;
+    }
+    .vip-invoice-actions {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 7px;
+    }
+    .vip-invoice-panel .vip-invoice-checkout,
+    .vip-invoice-panel .vip-invoice-wallet {
+        width: 100%;
+        min-height: 39px;
+        padding: 8px 9px;
+        font-size: .62rem;
+    }
+    .vip-invoice-panel .vip-invoice-status {
+        grid-column: 1 / -1;
+        display: -webkit-box;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        font-size: .56rem;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .vip-invoice-panel.vip-checkout-bar {
+        transition: none !important;
+    }
+}
