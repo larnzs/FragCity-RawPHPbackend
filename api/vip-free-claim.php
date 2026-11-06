@@ -84,13 +84,13 @@ try {
             'group' => 'SILVER',
             'claimed_at' => $result['claimed_at'],
             'expires' => $result['expires'],
-            'duration_seconds' => 604800,
-            'message' => 'عضویت Silver به مدت ۷ روز برای حساب Steam شما فعال شد.',
+            'duration_seconds' => (int)$result['duration_seconds'],
+            'message' => 'عضویت Silver به مدت ۳ روز برای حساب Steam شما فعال شد.',
         ],
     ]);
 } catch (FragCityLinuxApiException $e) {
     $messages = [
-        'free_trial_already_claimed' => 'هدیه یک‌هفته‌ای Silver قبلاً برای این حساب Steam دریافت شده است.',
+        'free_trial_already_claimed' => 'هدیه سه‌روزه Silver قبلاً برای این حساب Steam دریافت شده است.',
         'membership_already_active' => 'این حساب در حال حاضر اشتراک VIP فعال دارد؛ ابتدا باید اشتراک فعلی پایان یابد.',
         'vipcore_disabled' => 'اتصال VIPCore روی سرور فعال نیست.',
         'vipcore_not_configured' => 'تنظیمات اتصال VIPCore کامل نیست.',
