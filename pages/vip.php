@@ -82,16 +82,16 @@ $vipLevels = [
         'fa_icon' => 'fas fa-medal',
         'color' => '#C0C0C0',
         'available' => true,
-        'summary' => 'One-time seven-day Silver welcome membership with 125 armor, a defuse kit, smoke effects and 3% vampirism.',
-        'summary_fa' => 'هدیه خوش‌آمدگویی یک‌هفته‌ای و یک‌بار برای هر حساب؛ همراه ۱۲۵ زره، کیت خنثی‌سازی، دود رنگی و ۳٪ Vampirism.',
+        'summary' => 'One-time 7-day Silver welcome membership.',
+        'summary_fa' => 'هدیه خوش‌آمدگویی رایگان برای ۷ روز؛ فقط یک‌بار برای هر حساب Steam.',
     ],
     3 => [
         'name' => 'Gold',
         'fa_icon' => 'fas fa-crown',
         'color' => '#F5B042',
         'available' => true,
-        'summary' => 'A stronger loadout with 100 HP, 150 armor, a healthshot and advanced combat perks.',
-        'summary_fa' => 'تجهیزات کامل‌تر با ۱۰۰ سلامتی، ۱۵۰ زره، یک Healthshot و قابلیت‌های پیشرفته.',
+        'summary' => 'Paid VIP membership with expanded in-game perks.',
+        'summary_fa' => 'پلن پولی با دسترسی به قابلیت‌های کامل‌تر VIP.',
     ],
     4 => [
         'name' => 'Platinum',
@@ -522,6 +522,22 @@ $vipLockedExpanded = $vipHasActiveMembership
         </div>
     </header>
 
+    <section class="vip-current-strip" id="vipMembershipStatusBar" aria-label="وضعیت اشتراک فعلی">
+        <div class="vip-current-icon" aria-hidden="true"><i class="fas fa-id-badge"></i></div>
+        <div class="vip-current-copy">
+            <span>وضعیت اشتراک شما</span>
+            <strong><?= htmlspecialchars($vipCurrentName, ENT_QUOTES, 'UTF-8') ?></strong>
+        </div>
+        <span class="vip-current-state <?= $vipHasActiveMembership ? 'is-active' : 'is-inactive' ?>">
+            <i class="fas <?= $vipHasActiveMembership ? 'fa-circle-check' : 'fa-circle-info' ?>" aria-hidden="true"></i>
+            <?= htmlspecialchars($vipCurrentStatus, ENT_QUOTES, 'UTF-8') ?>
+        </span>
+        <div class="vip-current-expiry">
+            <span>اعتبار تا</span>
+            <strong><?= htmlspecialchars($vipHasActiveMembership ? $vipExpiryLabel : '—', ENT_QUOTES, 'UTF-8') ?></strong>
+        </div>
+    </section>
+
     <section class="vip-notice-grid vip-free-trial-grid" aria-label="هدیه یک‌هفته‌ای VIP Silver">
         <aside class="vip-notice vip-notice-store vip-free-trial-card">
             <div class="vip-free-trial-copy">
@@ -666,7 +682,7 @@ $vipLockedExpanded = $vipHasActiveMembership
                 aria-label="<?= htmlspecialchars('Select ' . $tier['name'] . ' VIP to view its features', ENT_QUOTES, 'UTF-8') ?>"
                 data-price-label="<?= htmlspecialchars($tierPriceLabel, ENT_QUOTES, 'UTF-8') ?>"
                 data-duration-label="<?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?>"
-                style="--vip-tier-color: <?= htmlspecialchars($tier['color'], ENT_QUOTES, 'UTF-8') ?>;"
+                style="--vip-tier-color: <?= htmlspecialchars($tier['color'], ENT_QUOTES, 'UTF-8') ?>; --vip-tier-order: <?= (int)$lvl ?>;"
             >
                 <div class="vip-plan-topline">
                     <span class="vip-plan-index">FRAGCITY / VIP 0<?= (int) $lvl ?></span>
@@ -696,25 +712,11 @@ $vipLockedExpanded = $vipHasActiveMembership
                     <small lang="en" dir="ltr"><?= htmlspecialchars($tier['summary'], ENT_QUOTES, 'UTF-8') ?></small>
                 </p>
 
-                <?php $tierFeatures = $vipFeaturesData[$lvl] ?? []; ?>
-                <div class="vip-plan-preview-heading">
-                    <strong>ویژگی‌های شاخص <span>/ KEY PERKS</span></strong>
-                    <small><?= count($tierFeatures) ?> قابلیت / PERKS</small>
-                </div>
-                <ul class="vip-plan-preview">
-                    <?php foreach (array_slice($tierFeatures, 0, 3) as $previewFeature): ?>
-                        <li>
-                            <i class="<?= htmlspecialchars($previewFeature['icon'], ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
-                            <span>
-                                <strong lang="fa" dir="rtl"><?= htmlspecialchars($previewFeature['name_fa'], ENT_QUOTES, 'UTF-8') ?></strong>
-                                <small lang="en" dir="ltr"><?= htmlspecialchars($previewFeature['name_en'], ENT_QUOTES, 'UTF-8') ?></small>
-                            </span>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-
-                <div class="vip-plan-price">
-                    <span><?= $tier['available'] ? 'قیمت پلن' : 'وضعیت' ?></span>
+                <div class="vip-plan-price<?= (int)$lvl === 2 ? ' is-free-trial' : (!$tier['available'] ? ' is-locked' : ' is-paid') ?>">
+                    <span class="vip-plan-price-label">
+                        <i class="fas <?= (int)$lvl === 2 ? 'fa-gift' : (!$tier['available'] ? 'fa-lock' : 'fa-tag') ?>" aria-hidden="true"></i>
+                        <?= (int)$lvl === 2 ? 'شرایط دریافت هدیه' : (!$tier['available'] ? 'وضعیت پلن' : 'قیمت پلن') ?>
+                    </span>
                     <strong><?= htmlspecialchars($tierPriceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
                     <small><?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?></small>
                 </div>
@@ -813,21 +815,7 @@ $vipLockedExpanded = $vipHasActiveMembership
 
 </main>
 
-    <section class="vip-current-strip" id="vipMembershipStatusBar" aria-label="وضعیت اشتراک فعلی">
-        <div class="vip-current-icon" aria-hidden="true"><i class="fas fa-id-badge"></i></div>
-        <div class="vip-current-copy">
-            <span>وضعیت اشتراک شما</span>
-            <strong><?= htmlspecialchars($vipCurrentName, ENT_QUOTES, 'UTF-8') ?></strong>
-        </div>
-        <span class="vip-current-state <?= $vipHasActiveMembership ? 'is-active' : 'is-inactive' ?>">
-            <i class="fas <?= $vipHasActiveMembership ? 'fa-circle-check' : 'fa-circle-info' ?>" aria-hidden="true"></i>
-            <?= htmlspecialchars($vipCurrentStatus, ENT_QUOTES, 'UTF-8') ?>
-        </span>
-        <div class="vip-current-expiry">
-            <span>اعتبار تا</span>
-            <strong><?= htmlspecialchars($vipHasActiveMembership ? $vipExpiryLabel : '—', ENT_QUOTES, 'UTF-8') ?></strong>
-        </div>
-    </section>
+
 
 
 
