@@ -504,6 +504,92 @@ $vipCurrentStatus = !$isLoggedIn
         : ($vipHasActiveMembership ? 'اشتراک فعال' : 'بدون اشتراک فعال'));
 $vipLockedExpanded = $vipHasActiveMembership
     && in_array($vipCurrentLevel, [4, 5, 6], true);
+
+$vipComparisonGroups = [];
+$vipComparisonCategoryTitles = [
+    'economy' => 'اقتصاد و امکانات عمومی',
+    'combat' => 'نبرد و آسیب',
+    'survival' => 'بقا و بازیابی',
+    'equipment' => 'تجهیزات و سلاح',
+    'movement' => 'حرکت و جابه‌جایی',
+    'cosmetics' => 'ظاهر و شخصی‌سازی',
+    'community' => 'امکانات اجتماعی',
+];
+$vipComparisonCategory = static function (string $nameEn): string {
+    $name = strtolower($nameEn);
+    if (str_starts_with($name, 'vip star tag') || str_contains($name, 'kill screen')
+        || str_contains($name, 'smoke color') || str_contains($name, 'rainbow')) {
+        return 'cosmetics';
+    }
+    if (str_contains($name, 'vampirism') || str_contains($name, 'damage')
+        || str_contains($name, 'sniper') || str_contains($name, 'fast defuse')
+        || str_contains($name, 'fast plant')) {
+        return 'combat';
+    }
+    if (str_contains($name, 'spawn health') || str_contains($name, 'spawn armor')
+        || str_contains($name, 'regeneration') || str_contains($name, 'healthshot')
+        || str_contains($name, 'respawn') || str_contains($name, 'defuse kit')) {
+        return 'survival';
+    }
+    if (str_contains($name, 'bunnyhop') || str_contains($name, 'gravity')
+        || str_contains($name, 'decoy teleport') || str_contains($name, 'air jump')
+        || str_contains($name, 'fall damage')) {
+        return 'movement';
+    }
+    if (str_contains($name, 'weapon') || str_contains($name, 'zeus')
+        || str_contains($name, 'ammo')) {
+        return 'equipment';
+    }
+    if (str_contains($name, 'playervotes')) {
+        return 'community';
+    }
+    return 'economy';
+};
+
+foreach ($vipFeaturesData as $featureLevel => $features) {
+    foreach ($features as $feature) {
+        $nameEn = (string) ($feature['name_en'] ?? 'VIP Feature');
+        $featureKey = str_starts_with($nameEn, 'VIP Star Tag') ? 'vip_star_tag' : $nameEn;
+        $category = $vipComparisonCategory($nameEn);
+        if (!isset($vipComparisonGroups[$category])) {
+            $vipComparisonGroups[$category] = ['rows' => []];
+        }
+        if (!isset($vipComparisonGroups[$category]['rows'][$featureKey])) {
+            $vipComparisonGroups[$category]['rows'][$featureKey] = [
+                'icon' => (string) ($feature['icon'] ?? 'fas fa-check'),
+                'name_fa' => str_starts_with($nameEn, 'VIP Star Tag') ? 'تگ ستاره‌ای VIP' : (string) ($feature['name_fa'] ?? $nameEn),
+                'name_en' => str_starts_with($nameEn, 'VIP Star Tag') ? 'VIP Star Tag' : $nameEn,
+                'tiers' => [],
+            ];
+        }
+        $vipComparisonGroups[$category]['rows'][$featureKey]['tiers'][(int) $featureLevel] = [
+            'desc_fa' => (string) ($feature['desc_fa'] ?? ''),
+            'desc_en' => (string) ($feature['desc_en'] ?? ''),
+        ];
+    }
+}
+
+$vipAllowedPurchaseDurations = [7, 15, 30, 60, 90];
+$vipPurchasePriceMap = [];
+foreach ($vipLevels as $level => $tier) {
+    if (empty($tier['available']) || ($tier['purchase_mode'] ?? '') !== 'paid') {
+        continue;
+    }
+    $package = is_array($vipPurchasePackages[(string) $level] ?? null)
+        ? $vipPurchasePackages[(string) $level]
+        : [];
+    foreach ($vipAllowedPurchaseDurations as $days) {
+        $durationPackage = is_array($package['durations'][(string) $days] ?? null)
+            ? $package['durations'][(string) $days]
+            : [];
+        $rawPrice = $durationPackage['price_toman'] ?? null;
+        $price = is_numeric($rawPrice) && (float) $rawPrice > 0 && (float) $rawPrice <= 1000000000000
+            ? (int) $rawPrice
+            : null;
+        $vipPurchasePriceMap[(string) $level][(string) $days] = $price;
+    }
+}
+$vipCheckoutIntegrationReady = false; // Fail closed until order creation, ZarinPal verification and paid VIPCore provisioning are implemented.
 ?>
 <main
     class="vip-page"
@@ -511,6 +597,10 @@ $vipLockedExpanded = $vipHasActiveMembership
     data-vip-has-active="<?= $vipHasActiveMembership ? '1' : '0' ?>"
     data-vip-current-level="<?= $vipCurrentLevel ?>"
     data-vip-status-unavailable="<?= $vipStatusUnavailable ? '1' : '0' ?>"
+    data-vip-logged-in="<?= $isLoggedIn ? '1' : '0' ?>"
+    data-vip-test-admin="<?= $isVipTestAdmin ? '1' : '0' ?>"
+    data-vip-prices="<?= htmlspecialchars(json_encode($vipPurchasePriceMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+    data-vip-checkout-ready="<?= $vipCheckoutIntegrationReady ? '1' : '0' ?>"
 >
     <header class="vip-store-hero">
         <div class="vip-store-hero-icon" aria-hidden="true"><i class="fas fa-crown"></i></div>
@@ -592,50 +682,36 @@ $vipLockedExpanded = $vipHasActiveMembership
 
 
 
-    <div class="vip-catalog-heading">
+    <div class="vip-store-layout">\n        <div class="vip-store-main-column">\n    <div class="vip-catalog-heading">
         <div>
             <span class="vip-store-eyebrow">CHOOSE YOUR TIER</span>
             <h2>سطح‌های VIP</h2>
             <p>هر سطح یک کارت مستقل دارد؛ برای دیدن قابلیت‌ها، کارت موردنظر را انتخاب کن.</p>
         </div>
-        <?php if ($isLoggedIn): ?>
-            <button type="button" class="vip-wallet-shortcut" data-fc-wallet-charge-open>
-                <i class="fas fa-wallet" aria-hidden="true"></i>
-                شارژ کیف پول
-            </button>
-        <?php else: ?>
-            <a class="vip-wallet-shortcut" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
-                <i class="fas fa-wallet" aria-hidden="true"></i>
-                ورود برای شارژ کیف پول
-            </a>
-        <?php endif; ?>
+
     </div>
 
     <section class="vip-plans-grid vip-public-plans-grid" aria-label="سطح‌های فعال و عمومی VIP">
         <?php foreach ($vipLevels as $lvl => $tier): ?>
             <?php if ((int)$lvl === 1 && !$isVipTestAdmin) continue; ?>
             <?php
-                $package = is_array($vipPurchasePackages[(string) $lvl] ?? null)
-                    ? $vipPurchasePackages[(string) $lvl]
-                    : [];
-                $rawPrice = $package['price_toman'] ?? null;
-                $rawDuration = $package['duration_days'] ?? null;
-                $tierPrice = is_numeric($rawPrice) && (int) $rawPrice > 0
-                    ? (int) $rawPrice
-                    : null;
-                $tierDuration = is_numeric($rawDuration) && (int) $rawDuration > 0
-                    ? (int) $rawDuration
-                    : null;
+                $levelPrices = $vipPurchasePriceMap[(string) $lvl] ?? [];
+                $configuredPrices = array_values(array_filter(
+                    $levelPrices,
+                    static fn ($price): bool => is_int($price) && $price > 0
+                ));
                 $tierPriceLabel = (int)$lvl === 2
                     ? 'هدیه رایگان · ۳ روز'
                     : (!$tier['available']
                         ? 'غیرفعال'
-                        : ($tierPrice !== null ? number_format($tierPrice) . ' ' . $vipCurrency : 'قیمت تعیین نشده'));
+                        : (!empty($configuredPrices)
+                            ? 'از ' . number_format(min($configuredPrices)) . ' ' . $vipCurrency
+                            : 'قیمت‌گذاری تکمیل نشده'));
                 $tierDurationLabel = (int)$lvl === 2
                     ? 'فقط یک‌بار برای هر SteamID64'
                     : (!$tier['available']
                         ? 'Not available'
-                        : ($tierDuration !== null ? number_format($tierDuration) . ' روز' : 'مدت اشتراک مشخص نشده'));
+                        : '۷، ۱۵، ۳۰، ۶۰ یا ۹۰ روز');
                 $isCurrentTier = $vipHasActiveMembership && $vipCurrentLevel === (int) $lvl;
             ?>
             <?php if ((int) $lvl === 4): ?>
@@ -678,12 +754,8 @@ $vipLockedExpanded = $vipHasActiveMembership
                 data-vip-summary-fa="<?= htmlspecialchars($tier['summary_fa'], ENT_QUOTES, 'UTF-8') ?>"
                 data-vip-available="<?= $tier['available'] ? '1' : '0' ?>"
                 data-vip-purchase-mode="<?= htmlspecialchars((string)($tier['purchase_mode'] ?? 'none'), ENT_QUOTES, 'UTF-8') ?>"
-                role="button"
-                tabindex="0"
-                aria-pressed="false"
-                aria-expanded="false"
-                aria-controls="vipFeaturePanel"
-                aria-label="<?= htmlspecialchars('Select ' . $tier['name'] . ' VIP to view its features', ENT_QUOTES, 'UTF-8') ?>"
+                data-vip-current="<?= $isCurrentTier ? '1' : '0' ?>"
+                data-vip-color="<?= htmlspecialchars($tier['color'], ENT_QUOTES, 'UTF-8') ?>"
                 data-price-label="<?= htmlspecialchars($tierPriceLabel, ENT_QUOTES, 'UTF-8') ?>"
                 data-duration-label="<?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?>"
                 style="--vip-tier-color: <?= htmlspecialchars($tier['color'], ENT_QUOTES, 'UTF-8') ?>; --vip-tier-order: <?= (int)$lvl ?>;"
@@ -725,91 +797,123 @@ $vipLockedExpanded = $vipHasActiveMembership
                     <small><?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?></small>
                 </div>
 
-                <span class="vip-plan-select" data-vip-select aria-hidden="true">
-                    مشاهده قابلیت‌ها
-                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                </span>
+                <div class="vip-plan-actions">
+                    <button
+                        type="button"
+                        class="vip-plan-select"
+                        data-vip-select-plan
+                        aria-pressed="false"
+                        <?= (!$tier['available'] && !($isVipTestAdmin && in_array((int)$lvl, [1, 2, 3], true))) || $isCurrentTier ? 'disabled' : '' ?>
+                    >
+                        <?= $isCurrentTier ? 'اشتراک فعلی شما' : (!$tier['available'] && !($isVipTestAdmin && in_array((int)$lvl, [1, 2, 3], true)) ? 'فعلاً غیرفعال' : 'انتخاب این سطح') ?>
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                    </button>
+                    <button
+                        type="button"
+                        class="vip-plan-feature-button"
+                        data-vip-open-comparison
+                        aria-haspopup="dialog"
+                        aria-controls="vipComparisonModal"
+                    >
+                        <i class="fas fa-list-check" aria-hidden="true"></i>
+                        ویژگی‌های این سطح
+                    </button>
+                </div>
                 </article>
             </div>
         <?php endforeach; ?>
                 </div>
             </section>
 
-    <span id="vipDetailPanelHome" hidden aria-hidden="true"></span>
-    <section class="vip-feature-panel" id="vipFeaturePanel" aria-labelledby="vipDetailTierName" aria-live="polite" hidden>
-        <div class="vip-feature-panel-head">
-            <div class="vip-feature-panel-title">
-                <span class="vip-store-eyebrow">TIER DETAILS</span>
-                <h2 id="vipDetailTierName">Bronze</h2>
-                <p id="vipDetailTierSummaryFa" lang="fa" dir="rtl">شروع اقتصادی با قابلیت‌های پایه VIP.</p>
-                <small id="vipDetailTierSummaryEn" lang="en" dir="ltr">A practical entry tier with core VIP perks.</small>
-            </div>
-            <span class="vip-detail-state" id="vipDetailTierState">PUBLIC TIER</span>
+    <section
+        class="vip-duration-selector"
+        id="vipPurchaseDurationSelector"
+        data-vip-duration-selector
+        aria-labelledby="vipPurchaseDurationTitle"
+        aria-hidden="true"
+        hidden
+    >
+        <div class="vip-duration-selector-heading">
+            <span class="vip-store-eyebrow">CHOOSE SUBSCRIPTION DURATION</span>
+            <h3 id="vipPurchaseDurationTitle">مدت اشتراک را انتخاب کن</h3>
+            <p>مدت موردنظرت را برای پلن Gold انتخاب کن؛ فاکتور در ستون کناری به‌روزرسانی می‌شود.</p>
         </div>
-        <div class="vip-detail-feature-grid" id="vipDetailFeatures"></div>
-        <section
-            class="vip-duration-selector"
-            id="vipPurchaseDurationSelector"
-            data-vip-duration-selector
-            aria-labelledby="vipPurchaseDurationTitle"
-            aria-hidden="true"
-            hidden
-        >
-            <div class="vip-duration-selector-heading">
-                <span class="vip-store-eyebrow">CHOOSE SUBSCRIPTION DURATION</span>
-                <h3 id="vipPurchaseDurationTitle">مدت اشتراک را انتخاب کن</h3>
-                <p>مدت موردنظرت را برای پلن انتخاب‌شده مشخص کن.</p>
-            </div>
-
-            <div class="vip-duration-options" role="group" aria-label="مدت اشتراک">
-                <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="7" data-duration-label="۱ هفته" aria-pressed="false">
-                    <span class="vip-duration-code">07 DAYS</span>
-                    <strong>۱ هفته</strong>
-                    <small>۷ روز</small>
-                </button>
-                <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="15" data-duration-label="۱۵ روز" aria-pressed="false">
-                    <span class="vip-duration-code">15 DAYS</span>
-                    <strong>۱۵ روز</strong>
-                    <small>۱۵ روز</small>
-                </button>
-                <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="30" data-duration-label="۳۰ روز" aria-pressed="false">
-                    <span class="vip-duration-code">30 DAYS</span>
-                    <strong>۳۰ روز</strong>
-                    <small>۳۰ روز</small>
-                </button>
-                <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="60" data-duration-label="۶۰ روز" aria-pressed="false">
-                    <span class="vip-duration-code">60 DAYS</span>
-                    <strong>۶۰ روز</strong>
-                    <small>۶۰ روز</small>
-                </button>
-                <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="90" data-duration-label="۹۰ روز" aria-pressed="false">
-                    <span class="vip-duration-code">90 DAYS</span>
-                    <strong>۹۰ روز</strong>
-                    <small>۹۰ روز</small>
-                </button>
-            </div>
-
-            <p class="vip-duration-selection-status" data-vip-duration-selection-status role="status" aria-live="polite">
-                برای ادامه، یکی از مدت‌ها را انتخاب کن.
-            </p>
-        </section>
-        <?php if ($isVipTestAdmin): ?>
-        <div class="vip-test-purchase" data-vip-test-purchase-box>
-                <button
-                    type="button"
-                    class="vip-test-purchase-button"
-                    data-vip-test-purchase
-                    data-csrf-token="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
-                    data-level="1"
-                    disabled
-                >
-                    ثبت آزمایشی VIP بدون پرداخت
-                </button>
-            <small class="vip-test-purchase-note">حالت آزمایشی فقط برای حساب مدیر و SteamIDهای مجاز در Linux فعال است.</small>
-            <p class="vip-test-purchase-feedback" data-vip-test-feedback role="status" aria-live="polite" hidden></p>
+        <div class="vip-duration-options" role="group" aria-label="مدت اشتراک">
+            <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="7" data-duration-label="۱ هفته" aria-pressed="false">
+                <span class="vip-duration-code">07 DAYS</span><strong>۱ هفته</strong><small data-duration-price>قیمت تعیین نشده</small>
+            </button>
+            <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="15" data-duration-label="۱۵ روز" aria-pressed="false">
+                <span class="vip-duration-code">15 DAYS</span><strong>۱۵ روز</strong><small data-duration-price>قیمت تعیین نشده</small>
+            </button>
+            <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="30" data-duration-label="۳۰ روز" aria-pressed="false">
+                <span class="vip-duration-code">30 DAYS</span><strong>۳۰ روز</strong><small data-duration-price>قیمت تعیین نشده</small>
+            </button>
+            <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="60" data-duration-label="۶۰ روز" aria-pressed="false">
+                <span class="vip-duration-code">60 DAYS</span><strong>۶۰ روز</strong><small data-duration-price>قیمت تعیین نشده</small>
+            </button>
+            <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="90" data-duration-label="۹۰ روز" aria-pressed="false">
+                <span class="vip-duration-code">90 DAYS</span><strong>۹۰ روز</strong><small data-duration-price>قیمت تعیین نشده</small>
+            </button>
         </div>
-        <?php endif; ?>
+        <p class="vip-duration-selection-status" data-vip-duration-selection-status role="status" aria-live="polite">
+            ابتدا Gold را انتخاب کن و سپس مدت موردنظرت را مشخص کن.
+        </p>
     </section>
+        </div>
+
+        <aside class="vip-invoice-panel" id="vipOrderSummary" data-vip-invoice aria-labelledby="vipInvoiceTitle">
+            <div class="vip-invoice-topline">
+                <span class="vip-store-eyebrow">FRAGCITY · ORDER SUMMARY</span>
+                <span class="vip-invoice-icon" aria-hidden="true"><i class="fas fa-receipt"></i></span>
+            </div>
+            <h2 id="vipInvoiceTitle">فاکتور خرید</h2>
+            <p class="vip-invoice-subtitle">مشخصات سفارش انتخاب‌شده پیش از پرداخت</p>
+
+            <div class="vip-invoice-product">
+                <span>محصول</span>
+                <strong data-invoice-tier>هنوز پلنی انتخاب نشده</strong>
+            </div>
+            <div class="vip-invoice-lines">
+                <div class="vip-invoice-line"><span>سطح عضویت</span><strong data-invoice-level>—</strong></div>
+                <div class="vip-invoice-line"><span>مدت اشتراک</span><strong data-invoice-duration>—</strong></div>
+                <div class="vip-invoice-line"><span>تعداد</span><strong>۱</strong></div>
+            </div>
+            <div class="vip-invoice-total">
+                <span>مبلغ نهایی</span>
+                <strong data-invoice-total>— <small>تومان</small></strong>
+            </div>
+            <p class="vip-invoice-status" data-invoice-status role="status" aria-live="polite">
+                برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.
+            </p>
+            <button type="button" class="vip-invoice-checkout" data-vip-checkout disabled>
+                <i class="fas fa-lock" aria-hidden="true"></i>
+                پرداخت و فعال‌سازی
+            </button>
+            <small class="vip-invoice-checkout-note">Checkout مستقیم پس از تنظیم قیمت‌ها و تکمیل تأیید پرداخت و فعال‌سازی امن VIPCore در دسترس قرار می‌گیرد.</small>
+
+            <?php if ($isLoggedIn): ?>
+                <button type="button" class="vip-invoice-wallet" data-fc-wallet-charge-open>
+                    <i class="fas fa-wallet" aria-hidden="true"></i>
+                    شارژ کیف پول
+                </button>
+            <?php else: ?>
+                <a class="vip-invoice-wallet" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
+                    <i class="fab fa-steam" aria-hidden="true"></i>
+                    ورود با Steam
+                </a>
+            <?php endif; ?>
+
+            <?php if ($isVipTestAdmin): ?>
+                <div class="vip-test-purchase" data-vip-test-purchase-box>
+                    <button type="button" class="vip-test-purchase-button" data-vip-test-purchase data-csrf-token="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" data-level="1" disabled>
+                        ثبت آزمایشی VIP بدون پرداخت
+                    </button>
+                    <small class="vip-test-purchase-note">حالت آزمایشی فقط برای حساب مدیر و SteamIDهای مجاز در Linux فعال است.</small>
+                    <p class="vip-test-purchase-feedback" data-vip-test-feedback role="status" aria-live="polite" hidden></p>
+                </div>
+            <?php endif; ?>
+        </aside>
+    </div>
 
     <section class="vip-notice-grid vip-admin-guide-grid" aria-label="راهنمای مدیریت VIP">
         <aside class="vip-notice vip-notice-modes vip-admin-guide" role="note">
@@ -837,33 +941,83 @@ $vipLockedExpanded = $vipHasActiveMembership
                     <small>وضعیت فعلی کاتالوگ و پرداخت</small>
                 </span>
             </div>
-            <p>Bronze فقط یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. هر حساب Steam می‌تواند یک‌بار Silver را به مدت ۳ روز رایگان دریافت کند؛ Gold سطح پولی است. Platinum، Emerald و Diamond فعلاً برای خرید فعال نیستند.</p>
+            <p>Bronze فقط یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. هر حساب Steam می‌تواند یک‌بار Silver را به مدت ۳ روز رایگان دریافت کند. Gold تنها سطح پولی قابل انتخاب فعلی است؛ قیمت‌گذاری و Checkout مستقیم هنوز فعال نشده‌اند. Platinum، Emerald و Diamond برای خرید غیرفعال هستند.</p>
             <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> هدیه Silver فقط برای حساب بدون اشتراک فعال Silver یا بالاتر قابل دریافت است؛ Bronze آزمایشی مانع دریافت هدیه نیست. پس از استفاده، حتی بعد از پایان ۳ روز، هدیه دوباره قابل دریافت نخواهد بود.</p>
         </aside>
     </section>
 
-    <?php foreach ($vipFeaturesData as $featureLevel => $features): ?>
-        <template data-vip-feature-template data-level="<?= (int) $featureLevel ?>">
-            <ul class="vip-detail-features-list">
-                <?php foreach ($features as $feature): ?>
-                    <li>
-                        <span class="vip-feature-icon" aria-hidden="true">
-                            <i class="<?= htmlspecialchars($feature['icon'], ENT_QUOTES, 'UTF-8') ?>"></i>
-                        </span>
-                        <span class="vip-feature-copy">
-                            <strong lang="fa" dir="rtl"><?= htmlspecialchars($feature['name_fa'], ENT_QUOTES, 'UTF-8') ?></strong>
-                            <small class="vip-feature-name-en" lang="en" dir="ltr"><?= htmlspecialchars($feature['name_en'], ENT_QUOTES, 'UTF-8') ?></small>
-                            <span class="vip-feature-description-fa" lang="fa" dir="rtl"><?= htmlspecialchars($feature['desc_fa'], ENT_QUOTES, 'UTF-8') ?></span>
-                            <small class="vip-feature-description-en" lang="en" dir="ltr"><?= htmlspecialchars($feature['desc_en'], ENT_QUOTES, 'UTF-8') ?></small>
-                        </span>
-                    </li>
-                <?php endforeach; ?>
-            </ul>
-        </template>
-    <?php endforeach; ?>
-
-
 </main>
+
+<div class="vip-comparison-modal" id="vipComparisonModal" hidden aria-hidden="true">
+    <div class="vip-comparison-backdrop" data-vip-comparison-close></div>
+    <section class="vip-comparison-dialog" id="vipComparisonDialog" role="dialog" aria-modal="true" aria-labelledby="vipComparisonTitle" aria-describedby="vipComparisonDescription" tabindex="-1">
+        <header class="vip-comparison-header">
+            <div class="vip-comparison-heading">
+                <span class="vip-store-eyebrow">FRAGCITY · VIP TIER COMPARISON</span>
+                <h2 id="vipComparisonTitle">مقایسه کامل سطح‌های VIP</h2>
+                <p id="vipComparisonDescription">تمام قابلیت‌ها و مقادیر اختصاصی هر شش سطح را در یک جدول بررسی کن.</p>
+                <div class="vip-comparison-selected-tier" data-vip-comparison-selected>
+                    <span class="vip-comparison-selected-dot" aria-hidden="true"></span>
+                    <span data-vip-comparison-selected-name>مقایسه همه سطح‌ها</span>
+                </div>
+            </div>
+            <button type="button" class="vip-comparison-close" data-vip-comparison-close aria-label="بستن پنجره مقایسه">
+                <i class="fas fa-xmark" aria-hidden="true"></i>
+            </button>
+        </header>
+
+        <div class="vip-comparison-table-scroll" role="region" aria-label="جدول مقایسه شش سطح VIP" tabindex="0">
+            <table class="vip-comparison-table">
+                <thead>
+                    <tr>
+                        <th class="vip-comparison-feature-heading" scope="col">قابلیت و مشخصات</th>
+                        <?php foreach ($vipLevels as $level => $tier): ?>
+                            <th scope="col" data-comparison-tier="<?= (int)$level ?>" style="--vip-tier-color: <?= htmlspecialchars($tier['color'], ENT_QUOTES, 'UTF-8') ?>;">
+                                <span class="vip-comparison-tier-dot" aria-hidden="true"></span>
+                                <strong><?= htmlspecialchars($tier['name'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                <small>VIP 0<?= (int)$level ?></small>
+                            </th>
+                        <?php endforeach; ?>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($vipComparisonGroups as $category => $group): ?>
+                        <tr class="vip-comparison-category">
+                            <th colspan="7" scope="colgroup"><?= htmlspecialchars($vipComparisonCategoryTitles[$category] ?? $category, ENT_QUOTES, 'UTF-8') ?></th>
+                        </tr>
+                        <?php foreach ($group['rows'] as $row): ?>
+                            <tr>
+                                <th class="vip-comparison-feature" scope="row">
+                                    <span class="vip-comparison-feature-icon" aria-hidden="true"><i class="<?= htmlspecialchars($row['icon'], ENT_QUOTES, 'UTF-8') ?>"></i></span>
+                                    <span>
+                                        <strong><?= htmlspecialchars($row['name_fa'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                        <small lang="en" dir="ltr"><?= htmlspecialchars($row['name_en'], ENT_QUOTES, 'UTF-8') ?></small>
+                                    </span>
+                                </th>
+                                <?php foreach ($vipLevels as $level => $tier): ?>
+                                    <td class="<?= isset($row['tiers'][$level]) ? 'has-vip-feature' : 'no-vip-feature' ?>" style="--vip-tier-color: <?= htmlspecialchars($tier['color'], ENT_QUOTES, 'UTF-8') ?>;">
+                                        <?php if (isset($row['tiers'][$level])): ?>
+                                            <span class="vip-comparison-check" aria-label="فعال"><i class="fas fa-check" aria-hidden="true"></i></span>
+                                            <small lang="fa" dir="rtl"><?= htmlspecialchars($row['tiers'][$level]['desc_fa'], ENT_QUOTES, 'UTF-8') ?></small>
+                                            <span class="vip-comparison-description-en" lang="en" dir="ltr"><?= htmlspecialchars($row['tiers'][$level]['desc_en'], ENT_QUOTES, 'UTF-8') ?></span>
+                                        <?php else: ?>
+                                            <span class="vip-comparison-dash" aria-label="در این سطح وجود ندارد">—</span>
+                                        <?php endif; ?>
+                                    </td>
+                                <?php endforeach; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="vip-comparison-footer">
+            <span><i class="fas fa-circle-info" aria-hidden="true"></i> مقادیر جدول بر اساس مشخصات تعریف‌شده برای VIPCore نمایش داده می‌شوند.</span>
+            <button type="button" class="vip-comparison-done" data-vip-comparison-close>بستن مقایسه</button>
+        </footer>
+    </section>
+</div>
 
 <?php
 $fcSuccessModalConfig = [
