@@ -6,8 +6,15 @@ final class VipCoreMembershipConflict extends RuntimeException
 {
 }
 
+final class VipCoreFreeTrialAlreadyClaimed extends RuntimeException
+{
+}
+
 final class VipCoreService
 {
+    public const FREE_TRIAL_GROUP = 'SILVER';
+    public const FREE_TRIAL_DURATION_SECONDS = 604800;
+
     private const GROUPS = [
         'BRONZE' => 1,
         'SILVER' => 2,
@@ -132,6 +139,205 @@ final class VipCoreService
             'level' => $active ? $level : 0,
             'group' => $active ? $group : null,
             'expires' => $active ? $expires : null,
+            'server_id' => $this->serverId,
+        ];
+    }
+
+    /**
+     * Read the one-time Silver trial state. The claim ledger is deliberately
+     * separate from vip_users because VIPCore deletes expired membership rows.
+     */
+    public function getFreeTrialStatus(string $steamId64): array
+    {
+        $accountId = self::accountIdFromSteamId64($steamId64);
+
+        $claimStatement = $this->pdo->prepare(
+            'SELECT `vip_group`, `claimed_at`, `expires`
+             FROM `fragcity_vip_free_trial_claims`
+             WHERE `steamid64` = :steamid64
+             LIMIT 1'
+        );
+        $claimStatement->execute([':steamid64' => $steamId64]);
+        $claim = $claimStatement->fetch(PDO::FETCH_ASSOC);
+
+        $membershipStatement = $this->pdo->prepare(
+            'SELECT `group`, `expires`
+             FROM `vip_users`
+             WHERE `account_id` = :account_id AND `sid` = :server_id
+             LIMIT 1'
+        );
+        $membershipStatement->execute([
+            ':account_id' => $accountId,
+            ':server_id' => $this->serverId,
+        ]);
+        $membership = $membershipStatement->fetch(PDO::FETCH_ASSOC);
+
+        $now = time();
+        $membershipGroup = is_array($membership)
+            ? strtoupper(trim((string)($membership['group'] ?? '')))
+            : '';
+        $membershipExpires = is_array($membership) ? (int)($membership['expires'] ?? 0) : null;
+        $hasActiveMembership = self::levelForGroup($membershipGroup) > 0
+            && ($membershipExpires === 0 || ($membershipExpires !== null && $membershipExpires > $now));
+        $claimed = is_array($claim);
+
+        return [
+            'available' => !$claimed && !$hasActiveMembership,
+            'claimed' => $claimed,
+            'blocked_by_active_membership' => !$claimed && $hasActiveMembership,
+            'claimed_at' => $claimed ? (int)$claim['claimed_at'] : null,
+            'expires' => $claimed ? (int)$claim['expires'] : null,
+            'group' => $claimed
+                ? (string)$claim['vip_group']
+                : ($hasActiveMembership ? $membershipGroup : null),
+            'server_id' => $this->serverId,
+        ];
+    }
+
+    /**
+     * Grant exactly one seven-day Silver trial per SteamID64.
+     * The unique claim ledger and vip_users upsert are committed atomically.
+     */
+    public function grantFreeSilverTrial(string $steamId64, string $playerName): array
+    {
+        $accountId = self::accountIdFromSteamId64($steamId64);
+        $group = self::FREE_TRIAL_GROUP;
+        $playerName = trim($playerName);
+
+        if ($playerName === ''
+            || preg_match('//u', $playerName) !== 1
+            || preg_match('/[\\x00-\\x1F\\x7F]/', $playerName)) {
+            throw new InvalidArgumentException('Invalid player name.');
+        }
+
+        $nameLength = function_exists('mb_strlen')
+            ? mb_strlen($playerName, 'UTF-8')
+            : strlen($playerName);
+        if ($nameLength > 64) {
+            $playerName = function_exists('mb_substr')
+                ? mb_substr($playerName, 0, 64, 'UTF-8')
+                : substr($playerName, 0, 64);
+        }
+
+        $now = time();
+        $expires = $now + self::FREE_TRIAL_DURATION_SECONDS;
+
+        $this->pdo->beginTransaction();
+        try {
+            $existingClaim = $this->pdo->prepare(
+                'SELECT `steamid64`
+                 FROM `fragcity_vip_free_trial_claims`
+                 WHERE `steamid64` = :steamid64
+                 LIMIT 1 FOR UPDATE'
+            );
+            $existingClaim->execute([':steamid64' => $steamId64]);
+            if ($existingClaim->fetch(PDO::FETCH_ASSOC) !== false) {
+                throw new VipCoreFreeTrialAlreadyClaimed('free_trial_already_claimed');
+            }
+
+            $existingMembership = $this->pdo->prepare(
+                'SELECT `group`, `expires`
+                 FROM `vip_users`
+                 WHERE `account_id` = :account_id AND `sid` = :server_id
+                 LIMIT 1 FOR UPDATE'
+            );
+            $existingMembership->execute([
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+            ]);
+            $membership = $existingMembership->fetch(PDO::FETCH_ASSOC);
+
+            if (is_array($membership)) {
+                $currentGroup = strtoupper(trim((string)($membership['group'] ?? '')));
+                $currentExpires = (int)($membership['expires'] ?? 0);
+                if (self::levelForGroup($currentGroup) > 0
+                    && ($currentExpires === 0 || $currentExpires > $now)) {
+                    throw new VipCoreMembershipConflict('membership_already_active');
+                }
+            }
+
+            // The SteamID64 primary key makes the free trial globally one-time,
+            // even after VIPCore has purged the expired vip_users row.
+            $claimInsert = $this->pdo->prepare(
+                'INSERT INTO `fragcity_vip_free_trial_claims`
+                    (`steamid64`, `account_id`, `sid`, `vip_group`, `claimed_at`, `expires`)
+                 VALUES
+                    (:steamid64, :account_id, :server_id, :vip_group, :claimed_at, :expires)'
+            );
+            $claimInsert->execute([
+                ':steamid64' => $steamId64,
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+                ':vip_group' => $group,
+                ':claimed_at' => $now,
+                ':expires' => $expires,
+            ]);
+
+            // Keep the exact INSERT/ON DUPLICATE KEY semantics used by VIPCore.
+            $membershipInsert = $this->pdo->prepare(
+                'INSERT INTO `vip_users`
+                    (`account_id`, `name`, `lastvisit`, `sid`, `group`, `expires`)
+                 VALUES
+                    (:account_id, :name, :lastvisit, :server_id, :vip_group, :expires)
+                 ON DUPLICATE KEY UPDATE
+                    `name` = VALUES(`name`),
+                    `lastvisit` = VALUES(`lastvisit`),
+                    `group` = VALUES(`group`),
+                    `expires` = VALUES(`expires`)'
+            );
+            $membershipInsert->execute([
+                ':account_id' => $accountId,
+                ':name' => $playerName,
+                ':lastvisit' => $now,
+                ':server_id' => $this->serverId,
+                ':vip_group' => $group,
+                ':expires' => $expires,
+            ]);
+
+            $verify = $this->pdo->prepare(
+                'SELECT `group`, `expires`
+                 FROM `vip_users`
+                 WHERE `account_id` = :account_id AND `sid` = :server_id
+                 LIMIT 1'
+            );
+            $verify->execute([
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+            ]);
+            $saved = $verify->fetch(PDO::FETCH_ASSOC);
+
+            if (!is_array($saved)
+                || strtoupper(trim((string)($saved['group'] ?? ''))) !== $group
+                || (int)($saved['expires'] ?? 0) !== $expires) {
+                throw new RuntimeException('VIPCore read-after-write verification failed.');
+            }
+
+            $this->pdo->commit();
+        } catch (PDOException $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            $driverCode = (int)($e->errorInfo[1] ?? 0);
+            if ((string)$e->getCode() === '23000' && $driverCode === 1062) {
+                throw new VipCoreFreeTrialAlreadyClaimed('free_trial_already_claimed', 0, $e);
+            }
+            throw $e;
+        } catch (Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        return [
+            'granted' => true,
+            'account_id' => $accountId,
+            'level' => 2,
+            'group' => $group,
+            'claimed_at' => $now,
+            'expires' => $expires,
+            'duration_seconds' => self::FREE_TRIAL_DURATION_SECONDS,
             'server_id' => $this->serverId,
         ];
     }
