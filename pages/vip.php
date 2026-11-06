@@ -13,6 +13,15 @@ $userVip = [
     'vip_permanent' => false,
 ];
 $vipStatusUnavailable = false;
+$vipFreeTrialStatus = [
+    'available' => false,
+    'claimed' => false,
+    'blocked_by_active_membership' => false,
+    'claimed_at' => null,
+    'expires' => null,
+    'group' => null,
+];
+$vipFreeTrialStatusUnavailable = false;
 
 $vipSettings = fragcity_settings('files.pages.vip', []);
 $vipPurchaseCatalog = is_array($vipSettings['purchase_catalog'] ?? null)
@@ -44,6 +53,19 @@ if ($isLoggedIn && $steamid64 !== '') {
     }
 }
 
+if ($isLoggedIn && $steamid64 !== '') {
+    try {
+        $vipFreeTrialStatus = (new VipCoreRepository())->getFreeTrialStatus($steamid64);
+    } catch (Throwable $e) {
+        $vipFreeTrialStatusUnavailable = true;
+        error_log(
+            '[FragCity VIP storefront] Free Silver trial status lookup failed; steam_hash='
+            . substr(hash('sha256', $steamid64), 0, 16)
+            . '; type=' . get_class($e)
+        );
+    }
+}
+
 $vipNames = [0 => 'No VIP', 1 => 'Bronze', 2 => 'Silver', 3 => 'Gold', 4 => 'Platinum', 5 => 'Emerald', 6 => 'Diamond'];
 
 $vipLevels = [
@@ -51,17 +73,17 @@ $vipLevels = [
         'name' => 'Bronze',
         'fa_icon' => 'fas fa-medal',
         'color' => '#CD7F32',
-        'available' => true,
-        'summary' => 'An entry tier with bonus round cash, a dedicated VIP tag and team sniper-count intel.',
-        'summary_fa' => 'شروع اقتصادی با پول اضافه ابتدای راند، تگ اختصاصی و نمایش آمار اسنایپرهای دو تیم.',
+        'available' => false,
+        'summary' => 'Internal test-only dummy tier. Bronze is not offered as a customer membership.',
+        'summary_fa' => 'سطح آزمایشی داخلی VIPCore است و به‌عنوان اشتراک واقعی به کاربران عرضه نمی‌شود.',
     ],
     2 => [
         'name' => 'Silver',
         'fa_icon' => 'fas fa-medal',
         'color' => '#C0C0C0',
         'available' => true,
-        'summary' => 'More utility with infinite ammo, 125 armor, a defuse kit, smoke effects and 3% vampirism.',
-        'summary_fa' => 'امکانات بیشتر با مهمات بی‌نهایت، ۱۲۵ زره، کیت خنثی‌سازی، دود رنگی و ۳٪ Vampirism.',
+        'summary' => 'One-time seven-day Silver welcome membership with 125 armor, a defuse kit, smoke effects and 3% vampirism.',
+        'summary_fa' => 'هدیه خوش‌آمدگویی یک‌هفته‌ای و یک‌بار برای هر حساب؛ همراه ۱۲۵ زره، کیت خنثی‌سازی، دود رنگی و ۳٪ Vampirism.',
     ],
     3 => [
         'name' => 'Gold',
@@ -506,7 +528,7 @@ $vipLockedExpanded = $vipHasActiveMembership
         </div>
         <div class="vip-store-hero-aside">
             <i class="fas fa-layer-group" aria-hidden="true"></i>
-            <span>۶ سطح VIP · ۳ سطح عمومی</span>
+            <span>۶ سطح VIP · ۲ سطح فعال برای کاربران</span>
         </div>
     </header>
 
@@ -561,8 +583,53 @@ $vipLockedExpanded = $vipHasActiveMembership
                     <small>وضعیت فعلی کاتالوگ و پرداخت</small>
                 </span>
             </div>
-            <p>سطح‌های Bronze، Silver و Gold در کاتالوگ عمومی قرار دارند. سطح‌های Platinum، Emerald و Diamond فقط برای مشاهده جزئیات نمایش داده می‌شوند و فعلاً قابل خرید نیستند.</p>
-            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> در حالت آزمایشی، دکمهٔ ثبت VIP یک اعتبار موقت را مستقیماً در VIPCore ثبت می‌کند و هیچ پرداختی انجام نمی‌شود. فعال‌سازی فقط برای حساب بدون VIP فعال و سه سطح عمومی مجاز است.</p>
+            <p>Bronze فقط یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. هر حساب Steam می‌تواند یک‌بار Silver را به مدت ۷ روز رایگان دریافت کند؛ Gold سطح پولی است. Platinum، Emerald و Diamond فعلاً برای خرید فعال نیستند.</p>
+            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> هدیه Silver فقط برای حساب بدون VIP فعال قابل دریافت است و پس از استفاده، حتی بعد از پایان ۷ روز، دوباره قابل دریافت نخواهد بود.</p>
+        </aside>
+    </section>
+
+    <section class="vip-notice-grid vip-free-trial-grid" aria-label="هدیه یک‌هفته‌ای VIP Silver">
+        <aside class="vip-notice vip-notice-store vip-free-trial-card">
+            <div class="vip-free-trial-copy">
+                <div class="vip-notice-heading">
+                    <span class="vip-notice-icon" aria-hidden="true"><i class="fas fa-gift"></i></span>
+                    <span>
+                        <strong>هدیه خوش‌آمدگویی FragCity</strong>
+                        <small>ONE-TIME SILVER MEMBERSHIP · 7 DAYS</small>
+                    </span>
+                </div>
+                <p>با حساب Steam متصل به FragCity، یک‌بار عضویت Silver را برای ۷ روز فعال کن. سطح و مدت از سمت سرور تعیین می‌شوند و قابل تغییر از مرورگر نیستند.</p>
+            </div>
+            <div class="vip-free-trial-actions">
+                <?php if (!$isLoggedIn): ?>
+                    <a class="vip-wallet-shortcut" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
+                        <i class="fab fa-steam" aria-hidden="true"></i>
+                        ورود با Steam برای دریافت هدیه
+                    </a>
+                <?php elseif ($vipStatusUnavailable || $vipFreeTrialStatusUnavailable): ?>
+                    <button type="button" class="vip-test-purchase-button" disabled>بررسی وضعیت VIP فعلاً ممکن نیست</button>
+                    <small class="vip-test-purchase-note">سرویس VIPCore یا جدول ثبت هدیه در دسترس نیست.</small>
+                <?php elseif (!empty($vipFreeTrialStatus['claimed'])): ?>
+                    <span class="vip-free-trial-state is-claimed"><i class="fas fa-check-circle" aria-hidden="true"></i> هدیه Silver قبلاً دریافت شده است.</span>
+                    <small class="vip-test-purchase-note">هر SteamID64 فقط یک‌بار می‌تواند از این هدیه استفاده کند.</small>
+                <?php elseif ($vipHasActiveMembership || !empty($vipFreeTrialStatus['blocked_by_active_membership'])): ?>
+                    <span class="vip-free-trial-state is-blocked"><i class="fas fa-lock" aria-hidden="true"></i> این حساب VIP فعال دارد.</span>
+                    <small class="vip-test-purchase-note">برای دریافت هدیه، حساب نباید اشتراک VIP فعال داشته باشد.</small>
+                <?php elseif (!empty($vipFreeTrialStatus['available'])): ?>
+                    <button
+                        type="button"
+                        class="vip-test-purchase-button"
+                        data-vip-free-claim
+                        data-csrf-token="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                    >
+                        <i class="fas fa-gift" aria-hidden="true"></i>
+                        دریافت Silver رایگان · ۷ روز
+                    </button>
+                    <p class="vip-test-purchase-feedback" data-vip-free-feedback role="status" aria-live="polite" hidden></p>
+                <?php else: ?>
+                    <button type="button" class="vip-test-purchase-button" disabled>هدیه فعلاً قابل دریافت نیست</button>
+                <?php endif; ?>
+            </div>
         </aside>
     </section>
 
@@ -585,7 +652,7 @@ $vipLockedExpanded = $vipHasActiveMembership
         <?php endif; ?>
     </div>
 
-    <section class="vip-plans-grid" aria-label="سه سطح VIP عمومی">
+    <section class="vip-plans-grid" aria-label="سطح‌های فعال و عمومی VIP">
         <?php foreach ($vipLevels as $lvl => $tier): ?>
             <?php
                 $package = is_array($vipPurchasePackages[(string) $lvl] ?? null)
@@ -599,12 +666,16 @@ $vipLockedExpanded = $vipHasActiveMembership
                 $tierDuration = is_numeric($rawDuration) && (int) $rawDuration > 0
                     ? (int) $rawDuration
                     : null;
-                $tierPriceLabel = !$tier['available']
-                    ? 'غیرفعال'
-                    : ($tierPrice !== null ? number_format($tierPrice) . ' ' . $vipCurrency : 'قیمت تعیین نشده');
-                $tierDurationLabel = !$tier['available']
-                    ? 'Not available'
-                    : ($tierDuration !== null ? number_format($tierDuration) . ' روز' : 'مدت اشتراک مشخص نشده');
+                $tierPriceLabel = (int)$lvl === 2
+                    ? 'هدیه رایگان · ۷ روز'
+                    : (!$tier['available']
+                        ? 'غیرفعال'
+                        : ($tierPrice !== null ? number_format($tierPrice) . ' ' . $vipCurrency : 'قیمت تعیین نشده'));
+                $tierDurationLabel = (int)$lvl === 2
+                    ? 'فقط یک‌بار برای هر SteamID64'
+                    : (!$tier['available']
+                        ? 'Not available'
+                        : ($tierDuration !== null ? number_format($tierDuration) . ' روز' : 'مدت اشتراک مشخص نشده'));
                 $isCurrentTier = $vipHasActiveMembership && $vipCurrentLevel === (int) $lvl;
             ?>
             <?php if ((int) $lvl === 4): ?>
