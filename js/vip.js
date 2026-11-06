@@ -294,18 +294,29 @@
                         throw new Error(message);
                     }
 
-                    if (freeTrialFeedback) {
-                        freeTrialFeedback.hidden = false;
-                        freeTrialFeedback.classList.add('is-success');
-                        freeTrialFeedback.textContent = payload.data && payload.data.message
-                            ? payload.data.message + ' صفحه برای نمایش وضعیت جدید تازه‌سازی می‌شود.'
-                            : 'اشتراک Silver با موفقیت ثبت شد.';
-                    }
                     root.dataset.vipHasActive = '1';
                     freeTrialButton.textContent = 'هدیه Silver ثبت شد';
-                    window.setTimeout(function () {
+
+                    if (window.FragCitySuccessModal && typeof window.FragCitySuccessModal.open === 'function') {
+                        window.FragCitySuccessModal.open({
+                            kind: 'gift',
+                            title: 'هدیه ۷ روزه Silver را با موفقیت دریافت کردید!',
+                            message: 'عضویت Silver با موفقیت روی حساب Steam شما فعال شد. از قابلیت‌های VIP در سرورهای FragCity لذت ببرید.',
+                            tier: 'Silver',
+                            duration: '۷ روز',
+                            expires: payload.data && payload.data.expires ? payload.data.expires : '',
+                            actionLabel: 'مشاهده وضعیت اشتراک',
+                            reloadOnClose: true,
+                            dismissible: true
+                        });
+                    } else {
+                        if (freeTrialFeedback) {
+                            freeTrialFeedback.hidden = false;
+                            freeTrialFeedback.classList.add('is-success');
+                            freeTrialFeedback.textContent = 'هدیه Silver با موفقیت ثبت شد. صفحه برای نمایش وضعیت جدید تازه‌سازی می‌شود.';
+                        }
                         window.location.reload();
-                    }, 1400);
+                    }
                 } catch (error) {
                     if (freeTrialFeedback) {
                         freeTrialFeedback.hidden = false;
