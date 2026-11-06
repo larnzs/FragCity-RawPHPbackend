@@ -65,6 +65,13 @@
             });
         }
 
+        function replayDetailAnimation() {
+            if (!detailPanel) return;
+            detailPanel.classList.remove('is-refreshing');
+            void detailPanel.offsetWidth;
+            detailPanel.classList.add('is-refreshing');
+        }
+
         function selectPlan(plan, userInitiated) {
             if (!plan) return;
             const wasActivePlan = activePlan === plan;
@@ -134,6 +141,7 @@
             }
 
             syncDetailPanelPosition();
+            replayDetailAnimation();
 
         }
 
