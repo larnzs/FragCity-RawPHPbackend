@@ -92,6 +92,12 @@ final class VipCoreService
         return self::GROUPS[strtoupper(trim($group))] ?? 0;
     }
 
+    public static function isRealMembershipGroup(string $group): bool
+    {
+        // Bronze is a dummy/test tier; Silver and above are real memberships.
+        return self::levelForGroup($group) >= 2;
+    }
+
     public function ping(): array
     {
         $count = (int)$this->pdo->query('SELECT COUNT(*) FROM `vip_users`')->fetchColumn();
@@ -178,7 +184,7 @@ final class VipCoreService
             : '';
         $membershipExpires = is_array($membership) ? (int)($membership['expires'] ?? 0) : null;
         // Bronze is a test-only dummy tier and does not count as a real membership.
-        $hasActiveMembership = self::levelForGroup($membershipGroup) >= 2
+        $hasActiveMembership = self::isRealMembershipGroup($membershipGroup)
             && ($membershipExpires === 0 || ($membershipExpires !== null && $membershipExpires > $now));
         $claimed = is_array($claim);
 
@@ -252,7 +258,7 @@ final class VipCoreService
                 $currentGroup = strtoupper(trim((string)($membership['group'] ?? '')));
                 $currentExpires = (int)($membership['expires'] ?? 0);
                 // Ignore Bronze test records; Silver and above are real memberships.
-                if (self::levelForGroup($currentGroup) >= 2
+                if (self::isRealMembershipGroup($currentGroup)
                     && ($currentExpires === 0 || $currentExpires > $now)) {
                     throw new VipCoreMembershipConflict('membership_already_active');
                 }
