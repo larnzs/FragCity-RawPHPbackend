@@ -139,32 +139,34 @@
     "pages.vip": {
       "_comment": "VIP status and entitlements are read from VIPCore through the signed Linux API. This section contains storefront display metadata only.",
       "purchase_catalog": {
-        "_comment": "Display metadata only. The one-time three-day Silver welcome trial is managed by the signed VIPCore API. The admin-only temporary test button is separate; paid checkout is handled independently.",
+        "_comment": "Display price metadata only. Checkout remains disabled until secure order creation, ZarinPal verification and paid VIPCore provisioning are implemented. The one-time three-day Silver welcome trial is managed by the signed VIPCore API.",
+        "checkout_enabled": false,
         "currency": "تومان",
         "packages": {
           "1": {
-            "price_toman": null,
-            "duration_days": null
+            "durations": {}
           },
           "2": {
-            "price_toman": null,
-            "duration_days": null
+            "durations": {}
           },
           "3": {
-            "price_toman": null,
-            "duration_days": null
+            "_comment": "Gold is the only currently selectable paid tier. Enter a positive integer price_toman for each duration only after pricing is approved.",
+            "durations": {
+              "7": { "price_toman": null },
+              "15": { "price_toman": null },
+              "30": { "price_toman": null },
+              "60": { "price_toman": null },
+              "90": { "price_toman": null }
+            }
           },
           "4": {
-            "price_toman": null,
-            "duration_days": null
+            "durations": {}
           },
           "5": {
-            "price_toman": null,
-            "duration_days": null
+            "durations": {}
           },
           "6": {
-            "price_toman": null,
-            "duration_days": null
+            "durations": {}
           }
         }
       }
