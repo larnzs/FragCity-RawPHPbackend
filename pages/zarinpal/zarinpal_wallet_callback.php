@@ -260,7 +260,7 @@ if (
     <title><?= $is_success ? 'پرداخت موفق' : 'خطا در پرداخت' ?> | FragCity</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/fragcity-success-modal.css">
+    <link rel="stylesheet" href="/css/fragcity-success-modal.css?v=20261106-1">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0a; color: #e0e0e0; font-family: 'Vazirmatn', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; direction: rtl; overflow: hidden; }
@@ -312,6 +312,6 @@ if (
             </script>
         </div>
     <?php endif; ?>
-    <script src="/js/fragcity-success-modal.js" defer></script>
+    <script src="/js/fragcity-success-modal.js?v=20261106-1" defer></script>
 </body>
 </html>
