@@ -186,19 +186,22 @@ body.fc-page-transition-active .fc-page-transition__card {
 
 /* Persistent performance mode. Keep controls and content usable while removing
    animation, transitions, blur filters and expensive decorative shadows. */
+/* Keep the compact global mode from disabling the navigation itself.
+   The header is a persistent control surface: its dropdowns, button feedback,
+   sticky glass state and menu transitions remain responsive in both modes. */
 html.fc-no-animation,
-html.fc-no-animation * ,
-html.fc-no-animation *::before,
-html.fc-no-animation *::after {
+html.fc-no-animation *:not(.shock-header):not(.shock-header *),
+html.fc-no-animation *:not(.shock-header):not(.shock-header *)::before,
+html.fc-no-animation *:not(.shock-header):not(.shock-header *)::after {
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
     will-change: auto !important;
 }
 
-html.fc-no-animation *,
-html.fc-no-animation *::before,
-html.fc-no-animation *::after {
+html.fc-no-animation *:not(.shock-header):not(.shock-header *),
+html.fc-no-animation *:not(.shock-header):not(.shock-header *)::before,
+html.fc-no-animation *:not(.shock-header):not(.shock-header *)::after {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
     filter: none !important;
