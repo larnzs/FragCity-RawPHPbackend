@@ -20,6 +20,8 @@
         const testPurchaseButton = root.querySelector('[data-vip-test-purchase]');
         const testLoginLink = root.querySelector('[data-vip-test-login]');
         const testFeedback = root.querySelector('[data-vip-test-feedback]');
+        const freeTrialButton = root.querySelector('[data-vip-free-claim]');
+        const freeTrialFeedback = root.querySelector('[data-vip-free-feedback]');
         const mobileQuery = window.matchMedia('(max-width: 700px)');
         let activePlan = null;
         let mobileDetailsOpen = false;
@@ -114,7 +116,7 @@
             if (testPurchaseButton) {
                 const hasActiveMembership = root.dataset.vipHasActive === '1';
                 testPurchaseButton.dataset.level = level;
-                testPurchaseButton.hidden = !isAvailable;
+                testPurchaseButton.hidden = ![1, 2, 3].includes(Number(level));
                 testPurchaseButton.disabled = !isAvailable || hasActiveMembership;
                 testPurchaseButton.textContent = hasActiveMembership
                     ? 'برای این حساب VIP فعال ثبت شده است'
@@ -239,6 +241,71 @@
                     testPurchaseButton.textContent = root.dataset.vipHasActive === '1'
                         ? 'برای این حساب VIP فعال ثبت شده است'
                         : previousLabel;
+                }
+            });
+        }
+
+        if (freeTrialButton) {
+            freeTrialButton.addEventListener('click', async function () {
+                if (freeTrialButton.disabled) return;
+
+                freeTrialButton.disabled = true;
+                freeTrialButton.textContent = 'در حال ثبت هدیه Silver در VIPCore...';
+                if (freeTrialFeedback) {
+                    freeTrialFeedback.hidden = false;
+                    freeTrialFeedback.classList.remove('is-error', 'is-success');
+                    freeTrialFeedback.textContent = 'درخواست دریافت هدیه ارسال شد.';
+                }
+
+                try {
+                    const response = await fetch('/api/vip-free-claim.php', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        cache: 'no-store',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-FragCity-CSRF': freeTrialButton.dataset.csrfToken || ''
+                        },
+                        body: JSON.stringify({})
+                    });
+
+                    let payload = null;
+                    try {
+                        payload = await response.json();
+                    } catch (parseError) {
+                        throw new Error('پاسخ سرور قابل خواندن نیست.');
+                    }
+
+                    if (!response.ok || !payload || payload.success !== true) {
+                        const message = payload && typeof payload.message === 'string'
+                            ? payload.message
+                            : 'دریافت هدیه Silver ناموفق بود.';
+                        throw new Error(message);
+                    }
+
+                    if (freeTrialFeedback) {
+                        freeTrialFeedback.hidden = false;
+                        freeTrialFeedback.classList.add('is-success');
+                        freeTrialFeedback.textContent = payload.data && payload.data.message
+                            ? payload.data.message + ' صفحه برای نمایش وضعیت جدید تازه‌سازی می‌شود.'
+                            : 'اشتراک Silver با موفقیت ثبت شد.';
+                    }
+                    root.dataset.vipHasActive = '1';
+                    freeTrialButton.textContent = 'هدیه Silver ثبت شد';
+                    window.setTimeout(function () {
+                        window.location.reload();
+                    }, 1400);
+                } catch (error) {
+                    if (freeTrialFeedback) {
+                        freeTrialFeedback.hidden = false;
+                        freeTrialFeedback.classList.add('is-error');
+                        freeTrialFeedback.textContent = error instanceof Error
+                            ? error.message
+                            : 'ارتباط با سرویس VIPCore برقرار نشد.';
+                    }
+                    freeTrialButton.disabled = false;
+                    freeTrialButton.textContent = 'دریافت Silver رایگان · ۷ روز';
                 }
             });
         }
