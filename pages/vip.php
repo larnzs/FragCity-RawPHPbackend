@@ -134,6 +134,13 @@ $vipSniperCount = $vipFeature(
     'پس از پایان زمان خرید، تعداد AWP، SSG 08، SCAR-20 و G3SG1 هر تیم در چت برای بازیکنان VIP نمایش داده می‌شود.',
     'After freeze time, VIPs see each team’s AWP, SSG 08, SCAR-20 and G3SG1 counts in chat.'
 );
+$vipVote = $vipFeature(
+    'fas fa-check-to-slot',
+    'شروع رأی‌گیری بازیکنان',
+    'PlayerVotes Access',
+    'امکان شروع رأی‌گیری برای Kick، Ban، Mute، Gag و Silence با حداقل ۲ بازیکن فعال و حدنصاب ۸۰٪. بازیکنان دارای این قابلیت از هدف رأی‌گیری مصون هستند.',
+    'Start Kick, Ban, Mute, Gag and Silence votes with at least 2 active players and an 80% threshold. Players with this perk are protected from being vote targets.'
+);
 $vipDefuser = $vipFeature(
     'fas fa-bomb',
     'کیت خنثی‌سازی بمب',
@@ -328,6 +335,7 @@ $vipFeaturesData = [
     ],
     2 => [
         $vipCash(2000),
+        $vipVote,
         $vipDefuser,
         $vipArmor(125),
         $vipSmoke,
@@ -338,6 +346,7 @@ $vipFeaturesData = [
     ],
     3 => [
         $vipSpawnHealth(100),
+        $vipVote,
         $vipArmor(150),
         $vipCash(3000),
         $vipDefuser,
@@ -356,6 +365,7 @@ $vipFeaturesData = [
     ],
     4 => [
         $vipSpawnHealth(150),
+        $vipVote,
         $vipCash(3000),
         $vipDefuser,
         $vipBhop,
@@ -384,6 +394,7 @@ $vipFeaturesData = [
     ],
     5 => [
         $vipSpawnHealth(180),
+        $vipVote,
         $vipCash(5000),
         $vipDefuser,
         $vipBhop,
@@ -413,6 +424,7 @@ $vipFeaturesData = [
     ],
     6 => [
         $vipSpawnHealth(300),
+        $vipVote,
         $vipCash(20000),
         $vipDefuser,
         $vipBhop,
