@@ -600,6 +600,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
     data-vip-logged-in="<?= $isLoggedIn ? '1' : '0' ?>"
     data-vip-test-admin="<?= $isVipTestAdmin ? '1' : '0' ?>"
     data-vip-prices="<?= htmlspecialchars(json_encode($vipPurchasePriceMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+    data-vip-currency="<?= htmlspecialchars($vipCurrency, ENT_QUOTES, 'UTF-8') ?>"
     data-vip-checkout-ready="<?= $vipCheckoutIntegrationReady ? '1' : '0' ?>"
 >
     <header class="vip-store-hero">
