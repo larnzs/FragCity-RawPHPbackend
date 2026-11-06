@@ -177,7 +177,8 @@ final class VipCoreService
             ? strtoupper(trim((string)($membership['group'] ?? '')))
             : '';
         $membershipExpires = is_array($membership) ? (int)($membership['expires'] ?? 0) : null;
-        $hasActiveMembership = self::levelForGroup($membershipGroup) > 0
+        // Bronze is a test-only dummy tier and does not count as a real membership.
+        $hasActiveMembership = self::levelForGroup($membershipGroup) >= 2
             && ($membershipExpires === 0 || ($membershipExpires !== null && $membershipExpires > $now));
         $claimed = is_array($claim);
 
@@ -250,7 +251,8 @@ final class VipCoreService
             if (is_array($membership)) {
                 $currentGroup = strtoupper(trim((string)($membership['group'] ?? '')));
                 $currentExpires = (int)($membership['expires'] ?? 0);
-                if (self::levelForGroup($currentGroup) > 0
+                // Ignore Bronze test records; Silver and above are real memberships.
+                if (self::levelForGroup($currentGroup) >= 2
                     && ($currentExpires === 0 || $currentExpires > $now)) {
                     throw new VipCoreMembershipConflict('membership_already_active');
                 }
