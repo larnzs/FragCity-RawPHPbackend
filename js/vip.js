@@ -296,7 +296,7 @@
             const level = Number(plan.dataset.level || 0);
             const isAdminTestTier = root.dataset.vipTestAdmin === '1' && [1, 2, 3].includes(level);
             if (plan.dataset.vipAvailable !== '1' && !isAdminTestTier) return;
-            if (plan.dataset.vipCurrent === '1') return;
+            if (plan.dataset.vipCurrent === '1' && userInitiated) return;
 
             if (userInitiated) {
                 hasUserSelectedPlan = true;
