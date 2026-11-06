@@ -2490,26 +2490,27 @@ body.vip-comparison-open {
     text-align: right;
 }
 .vip-comparison-feature {
-    display: flex;
-    align-items: flex-start;
-    gap: 9px;
+    display: table-cell;
+    vertical-align: top;
 }
 .vip-comparison-feature-icon {
-    display: grid;
-    flex: 0 0 28px;
+    display: inline-grid;
     width: 28px;
     height: 28px;
+    margin-left: 8px;
     place-items: center;
+    vertical-align: top;
     border-radius: 8px;
     background: rgba(249, 115, 22, .09);
     color: #ffb16f;
     font-size: .7rem;
 }
 .vip-comparison-feature > span:last-child {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     min-width: 0;
     gap: 3px;
+    vertical-align: top;
 }
 .vip-comparison-feature strong {
     color: #eee;
