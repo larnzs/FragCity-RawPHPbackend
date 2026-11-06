@@ -6,6 +6,22 @@
         if (!root || root.dataset.vipStoreReady === '1') return;
         root.dataset.vipStoreReady = '1';
 
+        if (!window.fragCityVipMembershipGlassBound) {
+            window.fragCityVipMembershipGlassBound = true;
+            const syncMembershipGlass = function () {
+                const statusBar = document.getElementById('vipMembershipStatusBar');
+                if (!statusBar) return;
+                const scrollTop = Math.max(
+                    window.scrollY || 0,
+                    document.documentElement.scrollTop || 0
+                );
+                statusBar.classList.toggle('is-glass', scrollTop > 4);
+            };
+            window.addEventListener('scroll', syncMembershipGlass, { passive: true });
+            window.addEventListener('content-loaded', syncMembershipGlass);
+            syncMembershipGlass();
+        }
+
         const plans = Array.from(root.querySelectorAll('[data-vip-plan]'));
         const inactiveToggle = root.querySelector('#vipLockedToggle');
         const inactivePlans = root.querySelector('#vipInactivePlans');
