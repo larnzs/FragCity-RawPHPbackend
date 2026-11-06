@@ -583,8 +583,9 @@ foreach ($vipLevels as $level => $tier) {
             ? $package['durations'][(string) $days]
             : [];
         $rawPrice = $durationPackage['price_toman'] ?? null;
-        $price = is_numeric($rawPrice) && (float) $rawPrice > 0 && (float) $rawPrice <= 1000000000000
-            ? (int) $rawPrice
+        $validatedPrice = filter_var($rawPrice, FILTER_VALIDATE_INT);
+        $price = $validatedPrice !== false && $validatedPrice > 0 && $validatedPrice <= 1000000000000
+            ? $validatedPrice
             : null;
         $vipPurchasePriceMap[(string) $level][(string) $days] = $price;
     }
@@ -608,7 +609,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
         <div class="vip-store-hero-copy">
             <span class="vip-store-eyebrow">FRAGCITY MEMBERSHIP STORE</span>
             <h1>عضویت VIP فرگ‌سیتی</h1>
-            <p>سطح موردنظرت را انتخاب کن؛ جزئیات و قابلیت‌های همان سطح در ادامه نمایش داده می‌شود.</p>
+            <p>سطح موردنظرت را انتخاب کن و تفاوت قابلیت‌ها را در مودال مقایسه کامل بررسی کن.</p>
         </div>
         <div class="vip-store-hero-aside">
             <i class="fas fa-layer-group" aria-hidden="true"></i>
@@ -689,7 +690,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
         <div>
             <span class="vip-store-eyebrow">CHOOSE YOUR TIER</span>
             <h2>سطح‌های VIP</h2>
-            <p>هر سطح یک کارت مستقل دارد؛ برای دیدن قابلیت‌ها، کارت موردنظر را انتخاب کن.</p>
+            <p>برای خرید، سطح موردنظر را انتخاب کن؛ ویژگی‌ها را جداگانه در جدول مقایسه ببین.</p>
         </div>
 
     </div>
