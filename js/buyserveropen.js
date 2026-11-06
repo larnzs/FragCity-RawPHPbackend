@@ -6,6 +6,12 @@
         if (!root || root.dataset.serverStoreInitialized === '1') return;
         root.dataset.serverStoreInitialized = '1';
 
+        const memoryInput = root.querySelector('#serverStoreMemory');
+        const diskInput = root.querySelector('#serverStoreDisk');
+        const cpuInput = root.querySelector('#serverStoreCpu');
+        const memoryOutput = root.querySelector('#serverStoreMemoryValue');
+        const diskOutput = root.querySelector('#serverStoreDiskValue');
+        const cpuOutput = root.querySelector('#serverStoreCpuValue');
         const mapInput = root.querySelector('#serverStoreMap');
         const playersInput = root.querySelector('#serverStorePlayers');
         const tickrateSelect = root.querySelector('#serverStoreTickrate');
@@ -17,6 +23,8 @@
         const guardMinutesInput = root.querySelector('#serverStoreGuardMinutes');
 
         if (
+            !memoryInput || !diskInput || !cpuInput ||
+            !memoryOutput || !diskOutput || !cpuOutput ||
             !mapInput || !playersInput || !tickrateSelect || !execSelect ||
             !mapgroupSelect || !cooldownSelect || !guardSelect ||
             !guardMinutesField || !guardMinutesInput
@@ -98,8 +106,42 @@
             );
         }
 
+        function formatGigabytes(valueInMb) {
+            const gigabytes = valueInMb / 1024;
+            const formatted = Number.isInteger(gigabytes)
+                ? String(gigabytes)
+                : gigabytes.toFixed(2).replace(/0+$/, '').replace(/\\.$/, '');
+            return formatted + ' GB';
+        }
+
+        function syncRangeProgress(input) {
+            const min = Number(input.min);
+            const max = Number(input.max);
+            const value = Number(input.value);
+            const progress = max > min ? ((value - min) / (max - min)) * 100 : 0;
+            input.style.setProperty('--range-progress', progress + '%');
+        }
+
         function updateSummary() {
             validateLocalFields();
+
+            const memoryMb = Number(memoryInput.value);
+            const diskMb = Number(diskInput.value);
+            const cpuPercent = Number(cpuInput.value);
+            const cpuVcores = cpuPercent / 100;
+            const cpuUnit = cpuVcores === 1 ? 'vCore' : 'vCores';
+
+            memoryOutput.textContent = formatGigabytes(memoryMb);
+            diskOutput.textContent = formatGigabytes(diskMb);
+            cpuOutput.textContent = cpuPercent + '% · ' + cpuVcores + ' ' + cpuUnit;
+
+            syncRangeProgress(memoryInput);
+            syncRangeProgress(diskInput);
+            syncRangeProgress(cpuInput);
+
+            setSummary('memory', formatGigabytes(memoryMb) + ' · ' + memoryMb + ' MB');
+            setSummary('disk', formatGigabytes(diskMb) + ' · ' + diskMb + ' MB');
+            setSummary('cpu', cpuPercent + '% · ' + cpuVcores + ' ' + cpuUnit);
 
             const mapValue = mapInput.value.trim();
             const playersValue = playersInput.value.trim();
@@ -128,6 +170,9 @@
 
         root.addEventListener('input', function (event) {
             if (
+                event.target === memoryInput ||
+                event.target === diskInput ||
+                event.target === cpuInput ||
                 event.target === mapInput ||
                 event.target === playersInput ||
                 event.target === guardMinutesInput
