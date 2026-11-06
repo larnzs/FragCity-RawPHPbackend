@@ -109,6 +109,8 @@ return [
     |
     | Uses the existing plugins MariaDB account.
     | Required operations: SELECT, INSERT and UPDATE on vip_users.
+    | Also requires SELECT and INSERT on fragcity_vip_free_trial_claims
+    | after the one-time trial migration has been applied.
     |
     */
 
