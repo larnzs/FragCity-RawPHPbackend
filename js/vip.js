@@ -26,6 +26,7 @@
         const inactiveToggle = root.querySelector('#vipLockedToggle');
         const inactivePlans = root.querySelector('#vipInactivePlans');
         let inactiveExpanded = Boolean(inactiveToggle && inactiveToggle.getAttribute('aria-expanded') === 'true');
+        const testPurchaseBox = root.querySelector('[data-vip-test-purchase-box]');
         const testPurchaseButton = root.querySelector('[data-vip-test-purchase]');
         const testFeedback = root.querySelector('[data-vip-test-feedback]');
         const freeTrialButton = root.querySelector('[data-vip-free-claim]');
@@ -316,10 +317,13 @@
             const isCurrent = plan.dataset.vipCurrent === '1';
             syncDurationSelector(plan, isCurrent);
 
+            if (testPurchaseBox) {
+                testPurchaseBox.hidden = !isAdminTestTier;
+            }
             if (testPurchaseButton) {
                 const hasActiveMembership = root.dataset.vipHasActive === '1';
                 testPurchaseButton.dataset.level = String(level);
-                testPurchaseButton.hidden = !isAdminTestTier;
+                testPurchaseButton.hidden = false;
                 testPurchaseButton.disabled = hasActiveMembership;
                 testPurchaseButton.textContent = hasActiveMembership
                     ? 'برای این حساب VIP فعال ثبت شده است'
