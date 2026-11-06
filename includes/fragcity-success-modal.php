@@ -83,7 +83,7 @@ $fcSuccessModalAttr = static function (string $key, string $default = '') use ($
                 <span data-fc-success-action-label>مشاهده وضعیت اشتراک</span>
                 <i class="fas fa-arrow-left" aria-hidden="true"></i>
             </button>
-            <span class="fc-success-footnote"><i class="fas fa-shield-check" aria-hidden="true"></i> FragCity · تجربه‌ای امن و مطمئن</span>
+            <span class="fc-success-footnote"><i class="fas fa-shield-halved" aria-hidden="true"></i> FragCity · تجربه‌ای امن و مطمئن</span>
         </div>
     </section>
 </div>
