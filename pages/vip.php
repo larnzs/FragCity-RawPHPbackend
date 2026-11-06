@@ -652,8 +652,9 @@ $vipLockedExpanded = $vipHasActiveMembership
         <?php endif; ?>
     </div>
 
-    <section class="vip-plans-grid" aria-label="سطح‌های فعال و عمومی VIP">
+    <section class="vip-plans-grid vip-public-plans-grid" aria-label="سطح‌های فعال و عمومی VIP">
         <?php foreach ($vipLevels as $lvl => $tier): ?>
+            <?php if ((int)$lvl === 1 && !$isVipTestAdmin) continue; ?>
             <?php
                 $package = is_array($vipPurchasePackages[(string) $lvl] ?? null)
                     ? $vipPurchasePackages[(string) $lvl]
