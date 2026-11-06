@@ -7,22 +7,6 @@
         root.dataset.vipStoreReady = '1';
         window.fragCityVipActiveRoot = root;
 
-        if (!window.fragCityVipMembershipGlassBound) {
-            window.fragCityVipMembershipGlassBound = true;
-            const syncMembershipGlass = function () {
-                const statusBar = document.getElementById('vipMembershipStatusBar');
-                if (!statusBar) return;
-                const scrollTop = Math.max(
-                    window.scrollY || 0,
-                    document.documentElement.scrollTop || 0
-                );
-                statusBar.classList.toggle('is-glass', scrollTop > 4);
-            };
-            window.addEventListener('scroll', syncMembershipGlass, { passive: true });
-            window.addEventListener('content-loaded', syncMembershipGlass);
-            syncMembershipGlass();
-        }
-
         const plans = Array.from(root.querySelectorAll('[data-vip-plan]'));
         const inactiveToggle = root.querySelector('#vipLockedToggle');
         const inactivePlans = root.querySelector('#vipInactivePlans');
@@ -58,6 +42,8 @@
         let selectedDurationDays = '';
         let previousModalFocus = null;
         let previousBodyOverflow = '';
+        let comparisonCloseTimer = null;
+        let comparisonIsClosing = false;
         let priceMap = {};
         try {
             priceMap = JSON.parse(root.dataset.vipPrices || '{}');
@@ -118,8 +104,14 @@
             }
         }
 
-        function closeComparison() {
+        function finishComparisonClose() {
             if (!comparisonModal || comparisonModal.hidden) return;
+            if (comparisonCloseTimer !== null) {
+                window.clearTimeout(comparisonCloseTimer);
+                comparisonCloseTimer = null;
+            }
+            comparisonIsClosing = false;
+            comparisonModal.classList.remove('is-closing');
             comparisonModal.hidden = true;
             comparisonModal.setAttribute('aria-hidden', 'true');
             document.body.classList.remove('vip-comparison-open');
@@ -129,6 +121,25 @@
             if (focusTarget && focusTarget.isConnected && typeof focusTarget.focus === 'function') {
                 focusTarget.focus();
             }
+        }
+
+        function closeComparison() {
+            if (!comparisonModal || comparisonModal.hidden || comparisonIsClosing) return;
+
+            const reducedMotion = (
+                document.documentElement.classList.contains('fc-no-animation')
+                || (typeof window.matchMedia === 'function'
+                    && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+            );
+
+            if (reducedMotion) {
+                finishComparisonClose();
+                return;
+            }
+
+            comparisonIsClosing = true;
+            comparisonModal.classList.add('is-closing');
+            comparisonCloseTimer = window.setTimeout(finishComparisonClose, 220);
         }
 
         function openComparison(plan, trigger) {
@@ -159,6 +170,12 @@
                 heading.classList.toggle('is-active-tier', active);
             });
 
+            if (comparisonCloseTimer !== null) {
+                window.clearTimeout(comparisonCloseTimer);
+                comparisonCloseTimer = null;
+            }
+            comparisonIsClosing = false;
+            comparisonModal.classList.remove('is-closing');
             previousModalFocus = trigger || document.activeElement;
             previousBodyOverflow = document.body.style.overflow;
             comparisonModal.hidden = false;
