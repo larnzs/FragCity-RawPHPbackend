@@ -120,12 +120,12 @@ $vipCash = static fn (int $amount): array => $vipFeature(
     'در شروع راند، ' . number_format($amount) . ' دلار پول اضافه دریافت می‌کنی.',
     'Receive +$' . number_format($amount) . ' bonus money at round start.'
 );
-$vipTag = static fn (string $tier): array => $vipFeature(
-    'fas fa-tag',
-    'تگ اختصاصی ' . $tier,
-    $tier . ' VIP Tag',
-    'تگ VIP : ' . strtoupper($tier) . ' در چت و اسکوربورد نمایش داده می‌شود.',
-    'Displays VIP : ' . strtoupper($tier) . ' in chat and on the scoreboard.'
+$vipTag = static fn (string $tier, int $starCount): array => $vipFeature(
+    'fas fa-star',
+    'تگ ستاره‌ای ' . $tier,
+    'VIP Star Tag · ' . str_repeat('⭐', $starCount),
+    'پیشوند چت: [VIP : ' . str_repeat('⭐', $starCount) . ']؛ تگ اسکوربورد: VIP : ' . str_repeat('⭐', $starCount) . '. رنگ اختصاصی سطح ' . $tier . ' حفظ می‌شود. با دستور !tag یا از منوی !vip ← Tag می‌توانی تگ را انتخاب یا خاموش کنی؛ انتخابت ذخیره می‌شود.',
+    'Chat prefix: [VIP : ' . str_repeat('⭐', $starCount) . ']; scoreboard clan tag: VIP : ' . str_repeat('⭐', $starCount) . '. The ' . $tier . ' tier colour is retained. Use !tag or !vip → Tag to select or disable it; your choice is saved.'
 );
 $vipSniperCount = $vipFeature(
     'fas fa-crosshairs',
@@ -324,7 +324,7 @@ $vipFeaturesData = [
     1 => [
         $vipCash(1000),
         $vipSniperCount,
-        $vipTag('Bronze'),
+        $vipTag('Bronze', 1),
     ],
     2 => [
         $vipCash(2000),
@@ -334,7 +334,7 @@ $vipFeaturesData = [
         $vipKillscreen,
         $vipVampirism(3),
         $vipSniperCount,
-        $vipTag('Silver'),
+        $vipTag('Silver', 2),
     ],
     3 => [
         $vipSpawnHealth(100),
@@ -352,7 +352,7 @@ $vipFeaturesData = [
         $vipRainbow,
         $vipKillscreen,
         $vipSniperCount,
-        $vipTag('Gold'),
+        $vipTag('Gold', 3),
     ],
     4 => [
         $vipSpawnHealth(150),
@@ -380,7 +380,7 @@ $vipFeaturesData = [
         $vipRainbow,
         $vipKillscreen,
         $vipSniperCount,
-        $vipTag('Platinum'),
+        $vipTag('Platinum', 4),
     ],
     5 => [
         $vipSpawnHealth(180),
@@ -409,7 +409,7 @@ $vipFeaturesData = [
         $vipRainbow,
         $vipKillscreen,
         $vipSniperCount,
-        $vipTag('Emerald'),
+        $vipTag('Emerald', 5),
     ],
     6 => [
         $vipSpawnHealth(300),
@@ -439,7 +439,7 @@ $vipFeaturesData = [
         $vipRainbow,
         $vipKillscreen,
         $vipSniperCount,
-        $vipTag('Diamond'),
+        $vipTag('Diamond', 6),
     ],
 ];
 
