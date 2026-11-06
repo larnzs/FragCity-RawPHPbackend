@@ -2685,8 +2685,8 @@
         if (wearValue) {
             const wearNumber = Number(detail.weapon_wear ?? 0.001);
             wearValue.textContent = Number.isFinite(wearNumber)
-                ? wearNumber.toFixed(3)
-                : '0.001';
+                ? wearNumber.toFixed(6)
+                : '0.001000';
         }
 
         const stattrak = form.elements.namedItem('stattrak');
@@ -3979,7 +3979,7 @@
                         <input
                             type="number"
                             name="wear"
-                            step="0.001"
+                            step="0.000001"
                             min="0"
                             max="1"
                             value="${escapeHtml(
@@ -4009,6 +4009,8 @@
                             name="seed"
                             id="skinSeedInput"
                             min="0"
+                            max="1000000"
+                            step="1"
                             value="${escapeHtml(
                                 selectedSeed
                             )}"
@@ -4555,13 +4557,10 @@
                 'input',
                 () => {
 
-                    wearValue.textContent =
-                        Number(
-                            wearInput.value
-                        )
-                            .toFixed(
-                                3
-                            );
+                    const wearNumber = Number(wearInput.value);
+                    wearValue.textContent = Number.isFinite(wearNumber)
+                        ? wearNumber.toFixed(6)
+                        : '0.001000';
 
                 }
             );
