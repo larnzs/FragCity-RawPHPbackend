@@ -86,7 +86,7 @@ final class VipCoreRepository
         if (($data['granted'] ?? false) !== true
             || (int)($data['level'] ?? 0) !== 2
             || (string)($data['group'] ?? '') !== 'SILVER'
-            || (int)($data['duration_seconds'] ?? 0) !== 604800
+            || (int)($data['duration_seconds'] ?? 0) !== 259200
             || !is_numeric($data['expires'] ?? null)
             || !is_numeric($data['claimed_at'] ?? null)) {
             throw new RuntimeException('VIPCore API returned an invalid free Silver trial grant payload.');
@@ -98,7 +98,7 @@ final class VipCoreRepository
             'group' => 'SILVER',
             'claimed_at' => (int)$data['claimed_at'],
             'expires' => (int)$data['expires'],
-            'duration_seconds' => 604800,
+            'duration_seconds' => 259200,
         ];
     }
 
