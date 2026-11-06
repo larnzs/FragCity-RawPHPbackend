@@ -651,7 +651,7 @@ try {
         }
     }
     if ($isVipCoreRequest) {
-        if (!in_array($action, ['ping_db', 'get_status', 'grant_test_vip'], true)) {
+        if (!in_array($action, ['ping_db', 'get_status', 'get_free_trial_status', 'claim_free_silver_trial', 'grant_test_vip'], true)) {
             apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
         }
 
@@ -709,6 +709,30 @@ try {
                 ]);
             }
 
+            if ($action === 'get_free_trial_status') {
+                $steamId64 = $body['steamid64'] ?? null;
+                if (!is_string($steamId64)) {
+                    throw new InvalidArgumentException('Invalid SteamID64.');
+                }
+                apiRespond(200, [
+                    'success' => true,
+                    'data' => $vipService->getFreeTrialStatus($steamId64),
+                ]);
+            }
+
+            if ($action === 'claim_free_silver_trial') {
+                $steamId64 = $body['steamid64'] ?? null;
+                $playerName = $body['player_name'] ?? null;
+                if (!is_string($steamId64) || !is_string($playerName)) {
+                    throw new InvalidArgumentException('Invalid VIP free-trial identity.');
+                }
+                $grant = $vipService->grantFreeSilverTrial($steamId64, $playerName);
+                apiRespond(200, [
+                    'success' => true,
+                    'data' => $grant,
+                ]);
+            }
+
             if (empty($testConfig['enabled'])) {
                 apiRespond(503, ['success' => false, 'error' => 'test_mode_disabled']);
             }
@@ -728,6 +752,8 @@ try {
 
             $grant = $vipService->grantTestMembership($steamId64, $playerName, $level);
             apiRespond(200, ['success' => true, 'data' => $grant]);
+        } catch (VipCoreFreeTrialAlreadyClaimed $e) {
+            apiRespond(409, ['success' => false, 'error' => 'free_trial_already_claimed']);
         } catch (VipCoreMembershipConflict $e) {
             apiRespond(409, ['success' => false, 'error' => 'membership_already_active']);
         } catch (InvalidArgumentException $e) {
