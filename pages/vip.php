@@ -910,6 +910,9 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
         <span class="vip-store-eyebrow">FRAGCITY · ORDER SUMMARY</span>
         <strong data-invoice-tier>هنوز پلنی انتخاب نشده</strong>
         <small data-invoice-level>سطح عضویت: —</small>
+        <p class="vip-invoice-status" data-invoice-status role="status" aria-live="polite">
+            برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.
+        </p>
     </div>
 
     <div class="vip-invoice-lines">
@@ -941,9 +944,6 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
         <?php endif; ?>
     </div>
 
-    <p class="vip-invoice-status" data-invoice-status role="status" aria-live="polite">
-        برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.
-    </p>
 </aside>
 
 </main>
