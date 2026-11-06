@@ -139,6 +139,63 @@ $headerSteamProfileLink = $headerSteamProfileUrl !== ''
         ? 'https://steamcommunity.com/profiles/' . rawurlencode($headerSteamId64)
         : '');
 
+
+$headerVipStatusAvailable = false;
+$headerVipActive = false;
+$headerVipLevel = 0;
+$headerVipExpiryLabel = '—';
+$headerVipStatusLabel = 'وضعیت VIP در دسترس نیست';
+$headerVipTierNames = [
+    0 => 'بدون VIP',
+    1 => 'Bronze',
+    2 => 'Silver',
+    3 => 'Gold',
+    4 => 'Platinum',
+    5 => 'Emerald',
+    6 => 'Diamond',
+];
+$headerVipTierColors = [
+    1 => '#CD7F32',
+    2 => '#C0C0C0',
+    3 => '#F5B042',
+    4 => '#9CC9E8',
+    5 => '#34D399',
+    6 => '#93C5FD',
+];
+$headerVipTierColor = '#737373';
+
+// Resolve membership only for the Steam account authenticated in this session.
+if ($isLoggedIn && preg_match('/^7656119[0-9]{10}$/D', $headerSteamId64)) {
+    try {
+        require_once __DIR__ . '/../class/VipCoreRepository.php';
+        $headerVipStatus = (new VipCoreRepository())->getStatus($headerSteamId64);
+        $headerVipStatusAvailable = true;
+        $headerVipActive = $headerVipStatus['active'] === true;
+        $headerVipLevel = $headerVipActive ? max(0, min(6, (int)$headerVipStatus['level'])) : 0;
+        $headerVipStatusLabel = $headerVipActive ? 'اشتراک فعال' : 'بدون اشتراک فعال';
+        $headerVipTierColor = $headerVipTierColors[$headerVipLevel] ?? '#737373';
+
+        if ($headerVipActive && (int)($headerVipStatus['expires'] ?? -1) === 0) {
+            $headerVipExpiryLabel = 'دائمی';
+        } elseif ($headerVipActive && is_numeric($headerVipStatus['expires'] ?? null)
+            && (int)$headerVipStatus['expires'] > 0) {
+            $headerVipExpiryLabel = (new DateTimeImmutable('@' . (int)$headerVipStatus['expires']))
+                ->setTimezone(new DateTimeZone(date_default_timezone_get()))
+                ->format('Y/m/d H:i');
+        }
+    } catch (Throwable $vipError) {
+        error_log('[FragCity] Header VIP status unavailable; type=' . get_class($vipError));
+        $headerVipStatusLabel = 'اطلاعات VIP موقتاً در دسترس نیست';
+    }
+}
+
+$headerVipTierLabel = $headerVipStatusAvailable
+    ? ($headerVipTierNames[$headerVipLevel] ?? 'نامشخص')
+    : 'نامشخص';
+$headerVipState = !$headerVipStatusAvailable
+    ? 'unavailable'
+    : ($headerVipActive ? 'active' : 'inactive');
+
 // Resolve the authenticated player's CS2 FACEIT level through the shared,
 // server-side cache. The API key remains in PHP and is never sent to the client.
 $headerFaceitProfile = [];
@@ -399,6 +456,32 @@ $mobileMoreNavItems = [
                                     <span style="width: <?= htmlspecialchars((string)round($headerFaceitProgress, 2), ENT_QUOTES, 'UTF-8') ?>%;"></span>
                                 </div>
                             </div>
+
+
+                            <section
+                                class="frag-drop-vip"
+                                data-state="<?= htmlspecialchars($headerVipState, ENT_QUOTES, 'UTF-8') ?>"
+                                style="--vip-tier-color: <?= htmlspecialchars($headerVipTierColor, ENT_QUOTES, 'UTF-8') ?>;"
+                                aria-label="وضعیت اشتراک VIP حساب Steam فعلی"
+                            >
+                                <div class="frag-drop-vip__top">
+                                    <span class="frag-drop-vip__label">
+                                        <i class="fas fa-crown" aria-hidden="true"></i>
+                                        وضعیت اشتراک VIP
+                                    </span>
+                                    <strong class="frag-drop-vip__tier"><?= htmlspecialchars($headerVipTierLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                                </div>
+                                <div class="frag-drop-vip__bottom">
+                                    <span class="frag-drop-vip__state">
+                                        <i class="fas <?= $headerVipState === 'active' ? 'fa-circle-check' : ($headerVipState === 'inactive' ? 'fa-circle-minus' : 'fa-circle-info') ?>" aria-hidden="true"></i>
+                                        <?= htmlspecialchars($headerVipStatusLabel, ENT_QUOTES, 'UTF-8') ?>
+                                    </span>
+                                    <span class="frag-drop-vip__expiry">
+                                        <small>اعتبار تا</small>
+                                        <strong><?= htmlspecialchars($headerVipExpiryLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                                    </span>
+                                </div>
+                            </section>
 
                             <div class="frag-drop-wallet-card">
                                 <div class="frag-drop-wallet-card__balance">
