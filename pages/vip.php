@@ -815,6 +815,16 @@ $vipLockedExpanded = $vipHasActiveMembership
 
 </main>
 
+<?php
+$fcSuccessModalConfig = [
+    'kind' => 'gift',
+    'dismissible' => true,
+    'reload_on_close' => true,
+];
+require __DIR__ . '/../includes/fragcity-success-modal.php';
+?>
+
+
 
 
 
