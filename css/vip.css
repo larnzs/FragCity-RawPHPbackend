@@ -10,7 +10,7 @@
  background:radial-gradient(ellipse at 82% 0,rgba(249,115,22,.105),transparent 37%),radial-gradient(ellipse at 8% 52%,rgba(255,179,71,.05),transparent 31%),linear-gradient(180deg,#101010 0%,#0D0D0D 58%,#090909 100%);
 }
 .vip-store-hero,.vip-current-strip,.vip-catalog-heading,.vip-competitive-note,.vip-plans-grid,.vip-checkout-bar,.vip-checkout-note{
- width:min(100%,1280px);margin-left:auto;margin-right:auto;
+ width:min(100%,100%);margin-left:auto;margin-right:auto;
 }
 .vip-store-hero{display:flex;align-items:center;gap:17px;margin-bottom:22px;padding:22px 24px;border:1px solid rgba(249,115,22,.18);border-radius:18px;background:linear-gradient(115deg,rgba(249,115,22,.075),rgba(24,24,24,.96) 45%,rgba(15,15,15,.98));box-shadow:inset 0 1px rgba(255,255,255,.025)}
 .vip-store-hero-icon{display:grid;flex:0 0 54px;width:54px;height:54px;place-items:center;border:1px solid rgba(255,179,71,.28);border-radius:15px;background:rgba(249,115,22,.12);color:var(--vip-amber);font-size:1.3rem}
@@ -62,7 +62,7 @@
 .vip-feature-copy>small{color:#777;font-size:.56rem;line-height:1.55;overflow-wrap:anywhere}
 .vip-plan-select{display:inline-flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:37px;margin-top:auto;padding:7px 11px;border:1px solid rgba(249,115,22,.18);border-radius:8px;background:rgba(249,115,22,.065);color:#f5b17d;font-family:inherit;font-size:.68rem;font-weight:850;cursor:pointer;transition:border-color .18s ease,background .18s ease,color .18s ease}
 .vip-plan-select:hover,.vip-plan-card.is-selected .vip-plan-select{border-color:rgba(249,115,22,.5);background:linear-gradient(120deg,#F97316,#D95A0B);color:#fff}
-.vip-checkout-bar{position:sticky;bottom:12px;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:18px;width:min(100%,1280px);margin:20px auto 0;padding:13px 16px;border:1px solid rgba(249,115,22,.24);border-radius:13px;background:rgba(15,15,15,.94);box-shadow:0 14px 38px rgba(0,0,0,.4),inset 0 1px rgba(255,255,255,.04);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.vip-checkout-bar{position:sticky;bottom:12px;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:18px;width:min(100%,100%);margin:20px auto 0;padding:13px 16px;border:1px solid rgba(249,115,22,.24);border-radius:13px;background:rgba(15,15,15,.94);box-shadow:0 14px 38px rgba(0,0,0,.4),inset 0 1px rgba(255,255,255,.04);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
 .vip-checkout-selection{display:flex;flex-direction:column;min-width:0;gap:2px}
 .vip-checkout-label{display:inline-flex;align-items:center;gap:6px;color:#8a8a8a;font-size:.6rem;font-weight:750}
 .vip-checkout-label i{color:var(--vip-orange)}
@@ -128,7 +128,7 @@ button.vip-checkout-wallet {
 .vip-store-hero-aside{position:relative;z-index:1;padding:10px 13px;font-size:.7rem}
 .vip-current-strip{margin-bottom:26px;border-radius:14px;padding:14px 17px;background:linear-gradient(100deg,rgba(26,26,26,.96),rgba(17,17,17,.92));box-shadow:inset 0 1px rgba(255,255,255,.025)}
 .vip-notice-grid,.vip-catalog-heading,.vip-plans-grid,.vip-feature-panel,.vip-checkout-bar,.vip-checkout-note{
-    width:min(100%,1280px);margin-left:auto;margin-right:auto
+    width:min(100%,100%);margin-left:auto;margin-right:auto
 }
 .vip-notice-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(270px,.8fr);gap:13px;margin-bottom:28px}
 .vip-notice{position:relative;min-width:0;padding:17px 18px;border:1px solid rgba(255,255,255,.08);border-radius:15px;background:linear-gradient(145deg,rgba(25,25,25,.96),rgba(15,15,15,.96));box-shadow:0 12px 30px rgba(0,0,0,.16)}
@@ -1068,7 +1068,7 @@ button.vip-checkout-wallet {
 
 .vip-free-trial-grid {
     grid-template-columns: minmax(0, 1fr);
-    width: min(100%, 1280px);
+    width: min(100%, 100%);
     margin-inline: auto;
 }
 
@@ -1091,7 +1091,7 @@ button.vip-checkout-wallet {
 .vip-admin-guide-grid,
 .vip-store-notice-grid {
     grid-template-columns: minmax(0, 1fr);
-    width: min(100%, 1280px);
+    width: min(100%, 100%);
     margin-inline: auto;
 }
 
@@ -1303,7 +1303,7 @@ button.vip-checkout-wallet {
 .vip-page > .vip-feature-panel,
 .vip-page > .vip-admin-guide-grid,
 .vip-page > .vip-store-notice-grid {
-    width: min(100%, 1280px) !important;
+    width: min(100%, 100%) !important;
     margin-left: auto !important;
     margin-right: auto !important;
 }
@@ -1314,12 +1314,12 @@ button.vip-checkout-wallet {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     align-items: stretch;
     gap: 18px;
-    width: min(100%, 1280px) !important;
+    width: min(100%, 100%) !important;
     margin-inline: auto !important;
 }
 
 .vip-locked-section {
-    width: min(100%, 1280px) !important;
+    width: min(100%, 100%) !important;
 }
 
 .vip-inactive-grid {
@@ -1506,7 +1506,7 @@ button.vip-checkout-wallet {
 }
 
 .vip-feature-panel {
-    width: min(100%, 1280px) !important;
+    width: min(100%, 100%) !important;
     margin-top: 24px;
     padding: 27px;
     border-radius: 20px;
@@ -1548,7 +1548,7 @@ button.vip-checkout-wallet {
     grid-template-areas: "icon copy state expiry";
     align-items: center;
     gap: 15px;
-    width: min(100%, 1280px) !important;
+    width: min(100%, 100%) !important;
     margin: 0 auto 28px !important;
     padding: 13px 20px !important;
     border: 1px solid rgba(249,115,22,.3);
@@ -2039,7 +2039,7 @@ button.vip-checkout-wallet {
     grid-template-columns: minmax(0, 1fr) minmax(292px, 350px);
     align-items: start;
     gap: 22px;
-    width: min(100%, 1280px);
+    width: min(100%, 100%);
     margin: 0 auto;
     direction: rtl;
 }
@@ -2930,5 +2930,304 @@ body.vip-comparison-open {
     .vip-comparison-dialog,
     .vip-comparison-backdrop {
         animation: none !important;
+    }
+}
+
+
+/* Full-width VIP layout: align all sections to the duration selector's usable width. */
+.vip-page {
+    padding-right: clamp(14px, 2.2vw, 34px);
+    padding-left: clamp(14px, 2.2vw, 34px);
+}
+.vip-store-hero,
+.vip-current-strip,
+.vip-catalog-heading,
+.vip-competitive-note,
+.vip-notice-grid,
+.vip-plans-grid,
+.vip-locked-section,
+.vip-feature-panel,
+.vip-duration-selector,
+.vip-admin-guide-grid,
+.vip-store-notice-grid,
+.vip-checkout-note {
+    width: 100% !important;
+    max-width: none !important;
+    box-sizing: border-box;
+}
+.vip-store-hero {
+    gap: 14px;
+    margin-bottom: 17px;
+    padding: 17px 20px;
+    border-radius: 15px;
+}
+.vip-store-hero-icon {
+    flex-basis: 46px;
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+}
+.vip-store-hero h1 {
+    font-size: clamp(1.18rem, 2vw, 1.55rem);
+}
+.vip-store-hero p {
+    font-size: .72rem;
+}
+.vip-store-hero-aside {
+    padding: 7px 10px;
+    font-size: .62rem;
+}
+.vip-current-strip {
+    gap: 12px;
+    margin-bottom: 23px !important;
+    padding: 10px 15px !important;
+    border-radius: 12px;
+}
+.vip-current-icon {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+    font-size: .98rem;
+}
+.vip-current-copy > span,
+.vip-current-expiry > span {
+    font-size: .59rem;
+}
+.vip-current-copy > strong {
+    font-size: .92rem;
+}
+.vip-current-state {
+    gap: 5px;
+    padding: 6px 9px;
+    font-size: .61rem;
+}
+.vip-current-expiry {
+    min-width: 130px;
+}
+.vip-current-expiry > strong {
+    font-size: .62rem;
+}
+.vip-catalog-heading {
+    margin-bottom: 12px;
+}
+.vip-catalog-heading h2 {
+    font-size: 1.35rem;
+}
+.vip-catalog-heading p {
+    font-size: .68rem;
+}
+.vip-notice-grid {
+    gap: 13px;
+    margin-bottom: 23px;
+}
+.vip-notice {
+    padding: 17px 19px;
+    border-radius: 14px;
+}
+.vip-notice-heading {
+    gap: 11px;
+    margin-bottom: 12px;
+}
+.vip-notice-icon {
+    flex-basis: 42px;
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
+    font-size: 1rem;
+}
+.vip-notice-heading strong {
+    font-size: .86rem;
+}
+.vip-notice-heading small,
+.vip-notice-store > p,
+.vip-notice p {
+    font-size: .72rem;
+    line-height: 1.8;
+}
+.vip-plans-grid {
+    gap: 12px;
+}
+.vip-plan-item > .vip-plan-card {
+    min-height: 310px;
+    padding: 20px;
+    border-radius: 15px;
+}
+.vip-plan-topline {
+    margin-bottom: 16px;
+}
+.vip-plan-index,
+.vip-plan-public,
+.vip-plan-locked,
+.vip-plan-current {
+    font-size: .56rem;
+}
+.vip-plan-title-row {
+    gap: 12px;
+}
+.vip-tier-emblem {
+    flex-basis: 49px;
+    width: 49px;
+    height: 49px;
+    border-radius: 13px;
+    font-size: 1.18rem;
+}
+.vip-plan-title-row h3 {
+    font-size: 1.38rem;
+}
+.vip-plan-title-row > div > span {
+    margin-top: 3px;
+    font-size: .63rem;
+}
+.vip-plan-summary {
+    min-height: 65px;
+    gap: 4px;
+    margin: 13px 0 14px;
+    font-size: .82rem;
+    line-height: 1.75;
+}
+.vip-plan-summary > span {
+    font-size: .84rem;
+}
+.vip-plan-summary > small {
+    font-size: .66rem;
+}
+.vip-plan-price {
+    min-height: 92px;
+    gap: 6px;
+    margin-bottom: 13px;
+    padding: 13px 15px;
+    border-radius: 12px;
+}
+.vip-plan-price-label {
+    gap: 6px;
+    font-size: .68rem;
+}
+.vip-plan-price > strong {
+    font-size: clamp(1rem, 1.5vw, 1.28rem);
+}
+.vip-plan-price > small {
+    font-size: .68rem;
+}
+.vip-plan-actions .vip-plan-select,
+.vip-plan-feature-button {
+    min-height: 37px;
+    padding: 7px 9px;
+    font-size: .61rem;
+}
+.vip-plan-card[data-card-selectable="1"] {
+    cursor: pointer;
+}
+.vip-plan-card[data-card-selectable="1"]:focus-visible {
+    outline: 2px solid rgba(255, 179, 71, .8);
+    outline-offset: 3px;
+}
+.vip-duration-selector {
+    margin-top: 19px;
+    padding: 18px 20px;
+    border-radius: 15px;
+}
+.vip-duration-selector-heading {
+    margin-bottom: 12px;
+}
+.vip-duration-selector-heading h3 {
+    font-size: .98rem;
+}
+.vip-duration-selector-heading p {
+    font-size: .67rem;
+}
+.vip-duration-options {
+    gap: 9px;
+}
+.vip-duration-option {
+    min-height: 100px;
+    gap: 6px;
+    padding: 12px 14px;
+    border-radius: 10px;
+}
+.vip-duration-option strong {
+    font-size: .95rem;
+}
+.vip-duration-option small {
+    font-size: .62rem;
+}
+.vip-duration-selection-status {
+    min-height: 20px;
+    margin-top: 10px;
+    font-size: .65rem;
+}
+.vip-competitive-note {
+    margin-bottom: 17px;
+    padding: 10px 13px;
+}
+.vip-competitive-note strong {
+    font-size: .67rem;
+}
+.vip-competitive-note small {
+    font-size: .61rem;
+}
+.vip-feature-panel {
+    margin-top: 18px;
+    padding: 21px;
+    border-radius: 16px;
+}
+
+/* Slightly larger invoice for easier reading, without increasing its footprint excessively. */
+.vip-invoice-panel.vip-checkout-bar {
+    min-height: 78px;
+    gap: 20px;
+    padding: 10px 20px;
+    border-radius: 14px;
+}
+.vip-invoice-panel .vip-invoice-product .vip-store-eyebrow {
+    font-size: .53rem;
+}
+.vip-invoice-panel .vip-invoice-product > strong {
+    font-size: .9rem;
+}
+.vip-invoice-panel .vip-invoice-product > small {
+    font-size: .61rem;
+}
+.vip-invoice-panel .vip-invoice-product .vip-invoice-status {
+    font-size: .58rem;
+}
+.vip-invoice-panel .vip-invoice-line > span,
+.vip-invoice-panel .vip-invoice-total > span {
+    font-size: .61rem;
+}
+.vip-invoice-panel .vip-invoice-line > strong {
+    font-size: .75rem;
+}
+.vip-invoice-panel .vip-invoice-total > strong {
+    font-size: .94rem;
+}
+.vip-invoice-panel .vip-invoice-checkout,
+.vip-invoice-panel .vip-invoice-wallet {
+    min-height: 41px;
+    padding: 9px 13px;
+    font-size: .67rem;
+}
+@media (max-width: 700px) {
+    .vip-store-hero {
+        padding: 14px;
+    }
+    .vip-plan-item > .vip-plan-card {
+        min-height: 0;
+        padding: 17px;
+    }
+    .vip-duration-selector {
+        padding: 14px;
+    }
+    .vip-duration-option {
+        min-height: 88px;
+        padding: 10px;
+    }
+    .vip-invoice-panel.vip-checkout-bar {
+        min-height: 0;
+        gap: 7px 9px;
+        padding: 9px 10px;
+    }
+    .vip-invoice-panel .vip-invoice-total > strong {
+        font-size: .8rem;
     }
 }
