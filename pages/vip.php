@@ -47,12 +47,54 @@ if ($isLoggedIn && $steamid64 !== '') {
 $vipNames = [0 => 'No VIP', 1 => 'Bronze', 2 => 'Silver', 3 => 'Gold', 4 => 'Platinum', 5 => 'Emerald', 6 => 'Diamond'];
 
 $vipLevels = [
-    1 => ['name' => 'Bronze', 'fa_icon' => 'fas fa-medal', 'color' => '#CD7F32', 'available' => true, 'summary' => 'A practical entry tier with bonus cash, team healing and a Bronze tag.', 'summary_fa' => 'شروع اقتصادی با پول اضافه، HealShot تیمی و تگ اختصاصی Bronze.'],
-    2 => ['name' => 'Silver', 'fa_icon' => 'fas fa-medal', 'color' => '#C0C0C0', 'available' => true, 'summary' => 'More utility with a defuse kit, smoke effects, kill screen and vampirism.', 'summary_fa' => 'امکانات بیشتر با کیت خنثی‌سازی، دود رنگی، Kill Screen و Vampirism.'],
-    3 => ['name' => 'Gold', 'fa_icon' => 'fas fa-crown', 'color' => '#F5B042', 'available' => true, 'summary' => 'A stronger loadout with 100 HP, 120 armor and advanced combat perks.', 'summary_fa' => 'تجهیزات کامل‌تر با ۱۰۰ HP، زره ۱۲۰ و قابلیت‌های پیشرفته مبارزه.'],
-    4 => ['name' => 'Platinum', 'fa_icon' => 'fas fa-gem', 'color' => '#9CC9E8', 'available' => false, 'summary' => 'Advanced movement, anti-flash and health/armor regeneration.', 'summary_fa' => 'حرکت پیشرفته، Anti-Flash و بازیابی تدریجی سلامتی و زره.'],
-    5 => ['name' => 'Emerald', 'fa_icon' => 'fas fa-gem', 'color' => '#34D399', 'available' => false, 'summary' => 'A stronger regeneration setup, infinite ammo and a round-two loadout.', 'summary_fa' => 'بازیابی قوی‌تر، مهمات بی‌نهایت و تجهیزات ویژه از راند دوم.'],
-    6 => ['name' => 'Diamond', 'fa_icon' => 'fas fa-gem', 'color' => '#93C5FD', 'available' => false, 'summary' => 'The highest configured tier with powerful combat perks and an extra respawn.', 'summary_fa' => 'بالاترین سطح با قابلیت‌های قدرتمند مبارزه و یک Respawn اضافه.']
+    1 => [
+        'name' => 'Bronze',
+        'fa_icon' => 'fas fa-medal',
+        'color' => '#CD7F32',
+        'available' => true,
+        'summary' => 'An entry tier with bonus round cash, a dedicated VIP tag and team sniper-count intel.',
+        'summary_fa' => 'شروع اقتصادی با پول اضافه ابتدای راند، تگ اختصاصی و نمایش آمار اسنایپرهای دو تیم.',
+    ],
+    2 => [
+        'name' => 'Silver',
+        'fa_icon' => 'fas fa-medal',
+        'color' => '#C0C0C0',
+        'available' => true,
+        'summary' => 'More utility with infinite ammo, 125 armor, a defuse kit, smoke effects and 3% vampirism.',
+        'summary_fa' => 'امکانات بیشتر با مهمات بی‌نهایت، ۱۲۵ زره، کیت خنثی‌سازی، دود رنگی و ۳٪ Vampirism.',
+    ],
+    3 => [
+        'name' => 'Gold',
+        'fa_icon' => 'fas fa-crown',
+        'color' => '#F5B042',
+        'available' => true,
+        'summary' => 'A stronger loadout with 100 HP, 150 armor, a healthshot and advanced combat perks.',
+        'summary_fa' => 'تجهیزات کامل‌تر با ۱۰۰ سلامتی، ۱۵۰ زره، یک Healthshot و قابلیت‌های پیشرفته.',
+    ],
+    4 => [
+        'name' => 'Platinum',
+        'fa_icon' => 'fas fa-gem',
+        'color' => '#9CC9E8',
+        'available' => false,
+        'summary' => 'Advanced movement, increased gravity, anti-flash, decoy teleport and teammate healing.',
+        'summary_fa' => 'حرکت پیشرفته، گرانش افزایشی، Anti-Flash، تلپورت با Decoy و درمان هم‌تیمی.',
+    ],
+    5 => [
+        'name' => 'Emerald',
+        'fa_icon' => 'fas fa-gem',
+        'color' => '#34D399',
+        'available' => false,
+        'summary' => 'Stronger regeneration, infinite ammo, a round-two loadout and enhanced VIP utilities.',
+        'summary_fa' => 'بازیابی قوی‌تر، مهمات بی‌نهایت، منوی تجهیزات از راند دوم و قابلیت‌های ویژه‌تر.',
+    ],
+    6 => [
+        'name' => 'Diamond',
+        'fa_icon' => 'fas fa-gem',
+        'color' => '#93C5FD',
+        'available' => false,
+        'summary' => 'The top tier with 300 HP, maximum configured regeneration, extra respawn and premium utilities.',
+        'summary_fa' => 'بالاترین سطح با ۳۰۰ سلامتی، بیشترین بازیابی، Respawn اضافه و قابلیت‌های ویژه.',
+    ],
 ];
 
 $vipFeature = static function (
@@ -74,16 +116,9 @@ $vipFeature = static function (
 $vipCash = static fn (int $amount): array => $vipFeature(
     'fas fa-coins',
     'پول اضافه شروع راند',
-    'Bonus Spawn Money',
+    'Bonus Round Money',
     'در شروع راند، ' . number_format($amount) . ' دلار پول اضافه دریافت می‌کنی.',
     'Receive +$' . number_format($amount) . ' bonus money at round start.'
-);
-$vipHealShot = $vipFeature(
-    'fas fa-heart-pulse',
-    'HealShot تیمی',
-    'Team HealShot',
-    'با شلیک به هم‌تیمی، ۱۰ واحد سلامتی بازیابی می‌شود؛ سقف سلامتی درمان‌شده ۱۰۰ است.',
-    'Each qualifying shot restores 10 HP to a teammate, up to 100 HP. VIP-only.'
 );
 $vipTag = static fn (string $tier): array => $vipFeature(
     'fas fa-tag',
@@ -92,12 +127,33 @@ $vipTag = static fn (string $tier): array => $vipFeature(
     'تگ VIP : ' . strtoupper($tier) . ' در چت و اسکوربورد نمایش داده می‌شود.',
     'Displays VIP : ' . strtoupper($tier) . ' in chat and on the scoreboard.'
 );
+$vipSniperCount = $vipFeature(
+    'fas fa-crosshairs',
+    'نمایش آمار اسنایپرهای دو تیم',
+    'Team Sniper Count',
+    'پس از پایان زمان خرید، تعداد AWP، SSG 08، SCAR-20 و G3SG1 هر تیم در چت برای بازیکنان VIP نمایش داده می‌شود.',
+    'After freeze time, VIPs see each team’s AWP, SSG 08, SCAR-20 and G3SG1 counts in chat.'
+);
 $vipDefuser = $vipFeature(
     'fas fa-bomb',
     'کیت خنثی‌سازی بمب',
     'Defuse Kit',
     'با کیت خنثی‌سازی رایگان وارد راند می‌شوی.',
     'Spawn with a free defuse kit.'
+);
+$vipArmor = static fn (int $amount): array => $vipFeature(
+    'fas fa-shield-halved',
+    'زره شروع راند',
+    'Spawn Armor',
+    'با ' . number_format($amount) . ' واحد زره وارد راند می‌شوی.',
+    'Spawn with ' . number_format($amount) . ' armor.'
+);
+$vipSpawnHealth = static fn (int $amount): array => $vipFeature(
+    'fas fa-heart',
+    'سلامتی شروع راند',
+    'Spawn Health',
+    'با ' . number_format($amount) . ' واحد سلامتی وارد راند می‌شوی.',
+    'Spawn with ' . number_format($amount) . ' HP.'
 );
 $vipSmoke = $vipFeature(
     'fas fa-smog',
@@ -150,10 +206,10 @@ $vipBhop = $vipFeature(
 );
 $vipAntiFlash = $vipFeature(
     'fas fa-eye-slash',
-    'محافظت ضد فلش',
-    'Anti-Flash Protection',
-    'قابلیت محافظت در برابر افکت فلش فعال می‌شود.',
-    'Anti-flash protection is enabled.'
+    'محافظت ضد فلش تیمی',
+    'Team and Self Anti-Flash',
+    'فلش خودت و فلش بازیکنان تیم خودی روی تو بی‌اثر می‌شود؛ فلش دشمن همچنان اثر دارد.',
+    'Your own flashes and flashes from teammates do not blind you; enemy flashes still work.'
 );
 $vipFastPlant = $vipFeature(
     'fas fa-fire',
@@ -165,120 +221,226 @@ $vipFastPlant = $vipFeature(
 $vipInfiniteAmmo = $vipFeature(
     'fas fa-infinity',
     'مهمات بی‌نهایت',
-    'Infinite Ammo',
-    'قابلیت مهمات بی‌نهایت فعال می‌شود.',
-    'Infinite ammunition is enabled.'
+    'Infinite Ammo · Type 1',
+    'حالت Type 1 مهمات بی‌نهایت فعال است؛ خشاب اسلحه با شلیک و خشاب‌گذاری دوباره شارژ می‌شود.',
+    'Type 1 infinite ammo is enabled; the weapon clip is refilled on fire and reload.'
+);
+$vipHealthshot = static fn (int $count): array => $vipFeature(
+    'fas fa-syringe',
+    'سرنگ Healthshot',
+    'Healthshot',
+    'در هر بار Spawn، ' . number_format($count) . ' عدد Healthshot دریافت می‌کنی.',
+    'Receive ' . number_format($count) . ' healthshot(s) on spawn.'
+);
+$vipDecoyTp = static fn (int $count): array => $vipFeature(
+    'fas fa-location-crosshairs',
+    'تلپورت با نارنجک Decoy',
+    'Decoy Teleport',
+    'در هر راند ' . number_format($count) . ' بار می‌توانی با Decoy تلپورت کنی.',
+    'Teleport with a decoy up to ' . number_format($count) . ' time(s) per round.'
+);
+$vipBuyTeamWeapon = $vipFeature(
+    'fas fa-right-left',
+    'خرید اسلحه تیم مقابل',
+    'Buy Opposing-Team Weapons',
+    'در محدوده خرید می‌توانی اسلحه‌های منتخب تیم مقابل را با دستورهای اختصاصی خریداری کنی.',
+    'Buy selected weapons normally restricted to the opposing team while inside a buy zone.'
+);
+$vipGravity = static function (float $multiplier) use ($vipFeature): array {
+    $value = number_format($multiplier, 2, '.', '');
+    return $vipFeature(
+        'fas fa-arrow-up-wide-short',
+        'ضریب گرانش افزایشی',
+        'Increased Gravity',
+        'ضریب گرانش روی ' . $value . 'x تنظیم شده است؛ مقدار استاندارد 1.00x است.',
+        'Gravity is set to ' . $value . 'x; the standard multiplier is 1.00x.'
+    );
+};
+$vipJumps = $vipFeature(
+    'fas fa-angles-up',
+    'پرش اضافه در هوا',
+    'Additional Air Jump',
+    'یک پرش اضافه در هوا فعال است؛ حداکثر ۵ بار در هر راند.',
+    'One additional air jump is enabled, with a limit of 5 uses per round.'
+);
+$vipVampirism = static fn (int $percent): array => $vipFeature(
+    'fas fa-droplet',
+    'سرقت سلامتی',
+    'Vampirism',
+    $percent . '٪ از دمیجی که وارد می‌کنی به سلامتی تبدیل می‌شود.',
+    'Convert ' . $percent . '% of dealt damage into health.'
+);
+$vipDamageMultiplier = static fn (float $multiplier): array => $vipFeature(
+    'fas fa-burst',
+    'ضریب آسیب بیشتر',
+    'Damage Multiplier',
+    number_format(($multiplier - 1) * 100, 0) . '٪ آسیب بیشتر وارد می‌کنی (ضریب ' . number_format($multiplier, 2) . 'x).',
+    'Deal ' . number_format(($multiplier - 1) * 100, 0) . '% more damage (' . number_format($multiplier, 2) . 'x multiplier).'
+);
+$vipFastDefuse = static fn (int $percent): array => $vipFeature(
+    'fas fa-stopwatch',
+    'خنثی‌سازی سریع‌تر',
+    'Fast Defuse',
+    'بمب را ' . number_format($percent) . '٪ سریع‌تر خنثی می‌کنی.',
+    'Defuse the bomb ' . number_format($percent) . '% faster.'
+);
+$vipHealthRegen = static fn (int $amount): array => $vipFeature(
+    'fas fa-heart-pulse',
+    'بازیابی سلامتی',
+    'Health Regeneration',
+    'در هر نوبت بازیابی، ' . number_format($amount) . ' واحد سلامتی برمی‌گردد.',
+    'Restore ' . number_format($amount) . ' HP per regeneration tick.'
+);
+$vipArmorRegen = static fn (int $amount): array => $vipFeature(
+    'fas fa-shield-heart',
+    'بازیابی زره',
+    'Armor Regeneration',
+    'در هر نوبت بازیابی، ' . number_format($amount) . ' واحد زره برمی‌گردد.',
+    'Restore ' . number_format($amount) . ' armor per regeneration tick.'
+);
+$vipTeammatesHeal = $vipFeature(
+    'fas fa-hand-holding-medical',
+    'درمان هم‌تیمی با شلیک',
+    'Teammate Healing',
+    '۱۰۰٪ دمیج شلیک به هم‌تیمی به سلامتی تبدیل می‌شود؛ حداکثر ۱۰ HP در هر تیر و تا سقف ۱۰۰ HP برای بازیکن درمان‌شونده.',
+    '100% of shot damage heals a teammate, capped at 10 HP per shot and 100 HP target health.'
 );
 $vipWeaponMenu = $vipFeature(
     'fas fa-crosshairs',
-    'منوی تجهیزات راند دوم',
+    'منوی انتخاب تجهیزات از راند دوم',
     'Round 2 Weapon Loadout',
-    'از راند دوم: CT اسلحه M4A1 و Deagle و تیم T اسلحه AK-47 و Deagle دریافت می‌کند.',
-    'From round 2: CT receives M4A1 + Deagle; T receives AK-47 + Deagle.'
+    'از راند دوم، منوی انتخاب ترکیب‌های ازپیش‌تعریف‌شده اسلحه برای هر دو تیم CT و T فعال می‌شود.',
+    'From round 2, choose from preset weapon combinations for both CT and T.'
+);
+$vipExtraRespawn = $vipFeature(
+    'fas fa-rotate',
+    'یک Respawn اضافه',
+    'Extra Respawn',
+    'یک فرصت Respawn اضافه در تنظیمات این سطح در نظر گرفته شده است.',
+    'One additional respawn is configured for this tier.'
 );
 
 $vipFeaturesData = [
     1 => [
         $vipCash(1000),
-        $vipHealShot,
+        $vipSniperCount,
         $vipTag('Bronze'),
     ],
     2 => [
         $vipCash(2000),
         $vipDefuser,
+        $vipArmor(125),
+        $vipInfiniteAmmo,
         $vipSmoke,
         $vipKillscreen,
-        $vipFeature('fas fa-droplet', 'سرقت سلامتی', 'Vampirism', '۳٪ از دمیجی که وارد می‌کنی به سلامتی تبدیل می‌شود.', 'Convert 3% of dealt damage into health.'),
-        $vipHealShot,
+        $vipVampirism(3),
+        $vipSniperCount,
         $vipTag('Silver'),
     ],
     3 => [
-        $vipFeature('fas fa-heart', 'سلامتی شروع راند', 'Spawn Health', 'با ۱۰۰ واحد سلامتی وارد راند می‌شوی.', 'Spawn with 100 HP.'),
-        $vipFeature('fas fa-shield-halved', 'زره شروع راند', 'Spawn Armor', 'با ۱۲۰ واحد زره وارد راند می‌شوی.', 'Spawn with 120 armor.'),
+        $vipSpawnHealth(100),
+        $vipArmor(150),
         $vipCash(3000),
         $vipDefuser,
         $vipFastReload,
-        $vipFeature('fas fa-droplet', 'سرقت سلامتی', 'Vampirism', '۵٪ از دمیجی که وارد می‌کنی به سلامتی تبدیل می‌شود.', 'Convert 5% of dealt damage into health.'),
-        $vipFeature('fas fa-burst', 'ضریب آسیب بیشتر', 'Damage Multiplier', '۵٪ آسیب بیشتر وارد می‌کنی (ضریب 1.05x).', 'Deal 5% more damage (1.05x multiplier).'),
+        $vipVampirism(5),
+        $vipDamageMultiplier(1.05),
         $vipNoFall,
         $vipZeus,
-        $vipFeature('fas fa-stopwatch', 'خنثی‌سازی سریع‌تر', 'Fast Defuse', 'بمب را ۱۰٪ سریع‌تر خنثی می‌کنی.', 'Defuse the bomb 10% faster.'),
-        $vipFeature('fas fa-globe', 'گرانش کمتر', 'Reduced Gravity', 'گرانش روی 0.95 تنظیم می‌شود.', 'Gravity is set to 0.95.'),
+        $vipFastDefuse(10),
+        $vipHealthshot(1),
+        $vipInfiniteAmmo,
         $vipSmoke,
         $vipRainbow,
         $vipKillscreen,
-        $vipHealShot,
+        $vipSniperCount,
         $vipTag('Gold'),
     ],
     4 => [
-        $vipFeature('fas fa-heart', 'سلامتی شروع راند', 'Spawn Health', 'با ۱۵۰ واحد سلامتی وارد راند می‌شوی.', 'Spawn with 150 HP.'),
+        $vipSpawnHealth(150),
         $vipCash(3000),
         $vipDefuser,
         $vipBhop,
         $vipFastReload,
-        $vipFeature('fas fa-droplet', 'سرقت سلامتی', 'Vampirism', '۱۰٪ از دمیجی که وارد می‌کنی به سلامتی تبدیل می‌شود.', 'Convert 10% of dealt damage into health.'),
-        $vipFeature('fas fa-burst', 'ضریب آسیب بیشتر', 'Damage Multiplier', '۱۰٪ آسیب بیشتر وارد می‌کنی (ضریب 1.10x).', 'Deal 10% more damage (1.10x multiplier).'),
+        $vipVampirism(10),
+        $vipDamageMultiplier(1.10),
         $vipNoFall,
         $vipAntiFlash,
         $vipZeus,
-        $vipFeature('fas fa-stopwatch', 'خنثی‌سازی سریع‌تر', 'Fast Defuse', 'بمب را ۱۵٪ سریع‌تر خنثی می‌کنی.', 'Defuse the bomb 15% faster.'),
+        $vipFastDefuse(15),
         $vipFastPlant,
-        $vipFeature('fas fa-globe', 'گرانش کمتر', 'Reduced Gravity', 'گرانش روی 0.90 تنظیم می‌شود.', 'Gravity is set to 0.90.'),
-        $vipFeature('fas fa-heart-pulse', 'بازیابی سلامتی', 'Health Regeneration', 'در هر نوبت بازیابی، ۲ واحد سلامتی برمی‌گردد.', 'Restore 2 HP per regeneration tick.'),
-        $vipFeature('fas fa-shield-heart', 'بازیابی زره', 'Armor Regeneration', 'در هر نوبت بازیابی، ۲ واحد زره برمی‌گردد.', 'Restore 2 armor per regeneration tick.'),
+        $vipGravity(1.05),
+        $vipHealthshot(2),
+        $vipDecoyTp(1),
+        $vipBuyTeamWeapon,
+        $vipInfiniteAmmo,
+        $vipHealthRegen(2),
+        $vipArmorRegen(2),
+        $vipTeammatesHeal,
+        $vipJumps,
         $vipSmoke,
         $vipRainbow,
         $vipKillscreen,
-        $vipHealShot,
+        $vipSniperCount,
         $vipTag('Platinum'),
     ],
     5 => [
-        $vipFeature('fas fa-heart', 'سلامتی شروع راند', 'Spawn Health', 'با ۱۸۰ واحد سلامتی وارد راند می‌شوی.', 'Spawn with 180 HP.'),
+        $vipSpawnHealth(180),
         $vipCash(5000),
         $vipDefuser,
         $vipBhop,
         $vipFastReload,
-        $vipFeature('fas fa-droplet', 'سرقت سلامتی', 'Vampirism', '۱۵٪ از دمیجی که وارد می‌کنی به سلامتی تبدیل می‌شود.', 'Convert 15% of dealt damage into health.'),
-        $vipFeature('fas fa-burst', 'ضریب آسیب بیشتر', 'Damage Multiplier', '۲۰٪ آسیب بیشتر وارد می‌کنی (ضریب 1.20x).', 'Deal 20% more damage (1.20x multiplier).'),
+        $vipVampirism(15),
+        $vipDamageMultiplier(1.20),
         $vipNoFall,
         $vipAntiFlash,
         $vipZeus,
-        $vipFeature('fas fa-stopwatch', 'خنثی‌سازی سریع‌تر', 'Fast Defuse', 'بمب را ۲۰٪ سریع‌تر خنثی می‌کنی.', 'Defuse the bomb 20% faster.'),
+        $vipFastDefuse(20),
         $vipFastPlant,
-        $vipFeature('fas fa-globe', 'گرانش کمتر', 'Reduced Gravity', 'گرانش روی 0.85 تنظیم می‌شود.', 'Gravity is set to 0.85.'),
+        $vipGravity(1.10),
+        $vipHealthshot(2),
+        $vipDecoyTp(1),
+        $vipBuyTeamWeapon,
         $vipInfiniteAmmo,
-        $vipFeature('fas fa-heart-pulse', 'بازیابی سلامتی', 'Health Regeneration', 'در هر نوبت بازیابی، ۴ واحد سلامتی برمی‌گردد.', 'Restore 4 HP per regeneration tick.'),
-        $vipFeature('fas fa-shield-heart', 'بازیابی زره', 'Armor Regeneration', 'در هر نوبت بازیابی، ۴ واحد زره برمی‌گردد.', 'Restore 4 armor per regeneration tick.'),
+        $vipHealthRegen(4),
+        $vipArmorRegen(4),
         $vipWeaponMenu,
+        $vipTeammatesHeal,
+        $vipJumps,
         $vipSmoke,
         $vipRainbow,
         $vipKillscreen,
-        $vipHealShot,
+        $vipSniperCount,
         $vipTag('Emerald'),
     ],
     6 => [
-        $vipFeature('fas fa-heart', 'سلامتی شروع راند', 'Spawn Health', 'با ۳۰۰ واحد سلامتی وارد راند می‌شوی.', 'Spawn with 300 HP.'),
+        $vipSpawnHealth(300),
         $vipCash(20000),
         $vipDefuser,
         $vipBhop,
         $vipFastReload,
-        $vipFeature('fas fa-droplet', 'سرقت سلامتی', 'Vampirism', '۴۰٪ از دمیجی که وارد می‌کنی به سلامتی تبدیل می‌شود.', 'Convert 40% of dealt damage into health.'),
-        $vipFeature('fas fa-burst', 'ضریب آسیب بیشتر', 'Damage Multiplier', '۳۵٪ آسیب بیشتر وارد می‌کنی (ضریب 1.35x).', 'Deal 35% more damage (1.35x multiplier).'),
+        $vipVampirism(40),
+        $vipDamageMultiplier(1.35),
         $vipNoFall,
         $vipAntiFlash,
         $vipZeus,
-        $vipFeature('fas fa-stopwatch', 'خنثی‌سازی سریع‌تر', 'Fast Defuse', 'بمب را ۲۵٪ سریع‌تر خنثی می‌کنی.', 'Defuse the bomb 25% faster.'),
+        $vipFastDefuse(25),
         $vipFastPlant,
-        $vipFeature('fas fa-globe', 'گرانش کمتر', 'Reduced Gravity', 'گرانش روی 0.75 تنظیم می‌شود.', 'Gravity is set to 0.75.'),
+        $vipGravity(1.15),
+        $vipHealthshot(3),
+        $vipDecoyTp(2),
+        $vipBuyTeamWeapon,
         $vipInfiniteAmmo,
-        $vipFeature('fas fa-heart-pulse', 'بازیابی سلامتی', 'Health Regeneration', 'در هر نوبت بازیابی، ۱۵ واحد سلامتی برمی‌گردد.', 'Restore 15 HP per regeneration tick.'),
-        $vipFeature('fas fa-shield-heart', 'بازیابی زره', 'Armor Regeneration', 'در هر نوبت بازیابی، ۱۵ واحد زره برمی‌گردد.', 'Restore 15 armor per regeneration tick.'),
+        $vipHealthRegen(15),
+        $vipArmorRegen(15),
         $vipWeaponMenu,
-        $vipFeature('fas fa-rotate', 'یک Respawn اضافه', 'Extra Respawn', 'یک فرصت Respawn اضافه در تنظیمات این سطح در نظر گرفته شده است.', 'One additional respawn is configured for this tier.'),
+        $vipExtraRespawn,
+        $vipTeammatesHeal,
+        $vipJumps,
         $vipSmoke,
         $vipRainbow,
         $vipKillscreen,
-        $vipHealShot,
+        $vipSniperCount,
         $vipTag('Diamond'),
     ],
 ];
