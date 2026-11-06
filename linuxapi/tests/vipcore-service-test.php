@@ -34,6 +34,13 @@ $check(
     && VipCoreService::groupForLevel(3) === 'GOLD'
 );
 $check(
+    'Bronze is a dummy tier and Silver or higher is a real membership',
+    !VipCoreService::isRealMembershipGroup('BRONZE')
+    && VipCoreService::isRealMembershipGroup('SILVER')
+    && VipCoreService::isRealMembershipGroup('GOLD')
+);
+
+$check(
     'All six configured groups can be read from VIPCore',
     VipCoreService::levelForGroup('BRONZE') === 1
     && VipCoreService::levelForGroup('SILVER') === 2
