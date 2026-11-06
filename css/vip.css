@@ -878,12 +878,6 @@ button.vip-checkout-wallet {
     box-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 12px 28px rgba(0,0,0,.17);
 }
 
-/* Reduce the visual scale of the complete VIP page by approximately 10%. */
-.vip-page {
-    zoom: .9;
-    width: 111.111111%;
-    margin-inline: -5.555555%;
-}
 
 @media (max-width: 700px) {
     .vip-locked-section {
@@ -1183,29 +1177,6 @@ button.vip-checkout-wallet {
     text-align: right;
 }
 
-.vip-current-strip {
-    position: fixed !important;
-    z-index: 9999 !important;
-    left: 50% !important;
-    right: auto !important;
-    bottom: calc(14px + env(safe-area-inset-bottom)) !important;
-    transform: translateX(-50%) !important;
-    display: grid !important;
-    grid-template-columns: auto minmax(0, 1fr) auto auto;
-    grid-template-areas: "icon copy state expiry";
-    align-items: center;
-    gap: 14px;
-    width: min(94vw, 1120px) !important;
-    margin: 0 !important;
-    padding: 12px 18px !important;
-    border: 1px solid rgba(249, 115, 22, .28);
-    border-radius: 15px;
-    background: rgba(12, 12, 12, .96);
-    box-shadow: 0 16px 46px rgba(0, 0, 0, .52), inset 0 1px rgba(255,255,255,.055);
-    -webkit-backdrop-filter: blur(20px);
-    backdrop-filter: blur(20px);
-    direction: rtl;
-}
 
 .vip-current-icon {
     grid-area: icon;
@@ -1307,5 +1278,405 @@ button.vip-checkout-wallet {
 
     .vip-current-state {
         font-size: .64rem;
+    }
+}
+
+
+/* =========================================================
+   VIP storefront — unified cards, pricing focus and motion
+   Motion timing inspired by the FragCity Server Browser cards.
+========================================================= */
+
+.vip-page {
+    zoom: 1 !important;
+    width: 100% !important;
+    margin-inline: 0 !important;
+    padding-bottom: 48px !important;
+}
+
+.vip-page > .vip-store-hero,
+.vip-page > .vip-current-strip,
+.vip-page > .vip-free-trial-grid,
+.vip-page > .vip-catalog-heading,
+.vip-page > .vip-plans-grid,
+.vip-page > .vip-locked-section,
+.vip-page > .vip-feature-panel,
+.vip-page > .vip-admin-guide-grid,
+.vip-page > .vip-store-notice-grid {
+    width: min(100%, 1280px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.vip-public-plans-grid,
+.vip-inactive-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    align-items: stretch;
+    gap: 18px;
+    width: min(100%, 1280px) !important;
+    margin-inline: auto !important;
+}
+
+.vip-locked-section {
+    width: min(100%, 1280px) !important;
+}
+
+.vip-inactive-grid {
+    width: 100% !important;
+}
+
+.vip-plan-item {
+    display: flex;
+    min-width: 0;
+    height: 100%;
+    animation: vip-card-arrive .52s cubic-bezier(.2,.75,.25,1) both;
+    animation-delay: calc(var(--vip-tier-order, 1) * 55ms);
+}
+
+.vip-plan-item > .vip-plan-card {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    width: 100%;
+    min-height: 352px;
+    height: 100%;
+    padding: 24px;
+    border-radius: 18px;
+    transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease, background .22s ease, filter .22s ease;
+}
+
+.vip-plan-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--vip-tier-color), transparent 48%);
+    box-shadow: 0 17px 38px rgba(0,0,0,.30), 0 5px 25px rgba(249,115,22,.055);
+}
+
+.vip-plan-card.is-selected {
+    transform: translateY(-2px);
+    border-color: var(--vip-tier-color);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--vip-tier-color), transparent 68%), 0 17px 38px rgba(0,0,0,.28), 0 0 28px color-mix(in srgb, var(--vip-tier-color), transparent 88%);
+}
+
+.vip-plan-card.is-locked {
+    filter: grayscale(.78);
+    opacity: .76;
+}
+
+.vip-plan-card.is-locked:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,.22);
+    box-shadow: 0 14px 32px rgba(0,0,0,.24);
+}
+
+.vip-plan-topline {
+    margin-bottom: 22px;
+}
+
+.vip-plan-title-row {
+    gap: 16px;
+}
+
+.vip-tier-emblem {
+    width: 58px;
+    height: 58px;
+    flex-basis: 58px;
+    border-radius: 16px;
+    font-size: 1.45rem;
+}
+
+.vip-plan-title-row h3 {
+    font-size: 1.65rem;
+}
+
+.vip-plan-title-row > div > span {
+    margin-top: 5px;
+    font-size: .72rem;
+}
+
+.vip-plan-summary {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 76px;
+    gap: 5px;
+    margin: 17px 0 18px;
+    direction: rtl;
+    text-align: right;
+    font-size: .92rem;
+    line-height: 1.9;
+}
+
+.vip-plan-summary > span {
+    color: #ededed;
+    font-size: .96rem;
+    font-weight: 700;
+    text-align: right;
+}
+
+.vip-plan-summary > small {
+    color: #858585;
+    direction: ltr;
+    text-align: left;
+    font-size: .75rem;
+}
+
+.vip-plan-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 8px;
+    min-height: 116px;
+    margin: auto 0 16px;
+    padding: 18px 20px;
+    border: 1px solid rgba(255,255,255,.105);
+    border-radius: 14px;
+    background: radial-gradient(ellipse at 100% 0, rgba(255,179,71,.09), transparent 58%), linear-gradient(135deg, rgba(255,255,255,.045), rgba(0,0,0,.28));
+    direction: rtl;
+    text-align: right;
+    transition: border-color .22s ease, background .22s ease, box-shadow .22s ease;
+}
+
+.vip-plan-price.is-free-trial {
+    border-color: rgba(255,179,71,.38);
+    background: radial-gradient(ellipse at 100% 0, rgba(255,179,71,.2), transparent 60%), linear-gradient(130deg, rgba(249,115,22,.13), rgba(20,18,15,.92) 72%);
+    box-shadow: inset 0 1px rgba(255,255,255,.07), 0 8px 26px rgba(249,115,22,.08);
+}
+
+.vip-plan-price.is-paid {
+    border-color: color-mix(in srgb, var(--vip-tier-color), transparent 68%);
+    background: radial-gradient(ellipse at 100% 0, color-mix(in srgb, var(--vip-tier-color), transparent 86%), transparent 62%), linear-gradient(130deg, rgba(255,255,255,.045), rgba(0,0,0,.28));
+}
+
+.vip-plan-price.is-locked {
+    border-color: rgba(255,255,255,.08);
+    background: rgba(0,0,0,.24);
+}
+
+.vip-plan-price-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #aaa;
+    font-size: .78rem;
+    font-weight: 850;
+}
+
+.vip-plan-price-label i {
+    color: #ffb347;
+    font-size: .95rem;
+}
+
+.vip-plan-price > strong {
+    color: #ffe1b6;
+    font-size: clamp(1.18rem, 2vw, 1.55rem);
+    line-height: 1.45;
+    font-weight: 950;
+    text-align: right;
+    letter-spacing: -.02em;
+}
+
+.vip-plan-price.is-paid > strong {
+    color: var(--vip-tier-color);
+}
+
+.vip-plan-price > small {
+    color: #c5a987;
+    font-size: .8rem;
+    font-weight: 750;
+    line-height: 1.6;
+}
+
+.vip-plan-price.is-locked > small {
+    color: #858585;
+}
+
+.vip-plan-select {
+    min-height: 48px;
+    justify-content: center;
+    margin-top: 0;
+    border-radius: 11px;
+    font-size: .88rem;
+    transition: transform .2s ease, color .2s ease, background .2s ease, border-color .2s ease;
+}
+
+.vip-plan-card:hover .vip-plan-select {
+    transform: translateY(-1px);
+}
+
+.vip-feature-panel {
+    width: min(100%, 1280px) !important;
+    margin-top: 24px;
+    padding: 27px;
+    border-radius: 20px;
+}
+
+.vip-feature-panel.is-refreshing {
+    animation: vip-detail-arrive .38s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.vip-detail-features-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.vip-detail-features-list > li {
+    min-height: 116px;
+    padding: 15px;
+    border-radius: 13px;
+    transition: transform .2s ease, border-color .2s ease, background .2s ease;
+}
+
+.vip-detail-features-list > li:hover {
+    transform: translateY(-2px);
+    border-color: rgba(249,115,22,.2);
+    background: rgba(249,115,22,.035);
+}
+
+/* The sticky bar is inside main; it leaves the site footer unobstructed. */
+.vip-current-strip {
+    position: sticky !important;
+    top: calc(var(--fc-header-overlap-height, 0px) + 10px) !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    z-index: 80 !important;
+    display: grid !important;
+    grid-template-columns: 48px minmax(160px, 1fr) auto auto;
+    grid-template-areas: "icon copy state expiry";
+    align-items: center;
+    gap: 15px;
+    width: min(100%, 1280px) !important;
+    margin: 0 auto 28px !important;
+    padding: 13px 20px !important;
+    border: 1px solid rgba(249,115,22,.3);
+    border-radius: 16px;
+    background: rgba(13,13,13,.94);
+    box-shadow: 0 12px 32px rgba(0,0,0,.27), inset 0 1px rgba(255,255,255,.055);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    direction: rtl;
+    transition: border-color .22s ease, box-shadow .22s ease, background .22s ease;
+}
+
+.vip-current-strip:hover {
+    border-color: rgba(249,115,22,.42);
+    box-shadow: 0 16px 38px rgba(0,0,0,.32), 0 4px 22px rgba(249,115,22,.055);
+}
+
+.vip-current-icon { grid-area: icon; }
+.vip-current-copy { grid-area: copy; min-width: 0; }
+.vip-current-state { grid-area: state; justify-self: end; margin: 0 !important; white-space: nowrap; }
+.vip-current-expiry { grid-area: expiry; min-width: 150px; margin: 0; }
+
+@keyframes vip-card-arrive {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes vip-detail-arrive {
+    from { opacity: .2; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 1050px) {
+    .vip-detail-features-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .vip-public-plans-grid,
+    .vip-inactive-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 13px;
+    }
+
+    .vip-plan-item > .vip-plan-card {
+        min-height: 0;
+        padding: 19px;
+    }
+
+    .vip-plan-summary {
+        min-height: 0;
+        margin: 13px 0 16px;
+    }
+
+    .vip-plan-price {
+        min-height: 104px;
+        padding: 15px 16px;
+    }
+
+    .vip-current-strip {
+        top: calc(var(--fc-header-overlap-height, 56px) + 7px) !important;
+        grid-template-columns: 38px minmax(0, 1fr) auto;
+        grid-template-areas: "icon copy expiry" "state state state";
+        gap: 8px 10px;
+        padding: 10px 13px !important;
+        margin-bottom: 20px !important;
+        border-radius: 13px;
+    }
+
+    .vip-current-icon {
+        width: 38px;
+        height: 38px;
+        flex-basis: 38px;
+        border-radius: 10px;
+        font-size: .9rem;
+    }
+
+    .vip-current-copy > span,
+    .vip-current-expiry > span {
+        font-size: .68rem;
+    }
+
+    .vip-current-copy > strong { font-size: .88rem; }
+
+    .vip-current-state {
+        justify-self: stretch;
+        justify-content: center;
+        white-space: normal;
+        padding: 5px 9px;
+        font-size: .7rem;
+        text-align: center;
+    }
+
+    .vip-current-expiry {
+        min-width: 0;
+        text-align: left;
+    }
+
+    .vip-current-expiry > strong { font-size: .72rem; }
+
+    .vip-detail-features-list { grid-template-columns: 1fr; }
+    .vip-feature-panel { padding: 18px; }
+}
+
+@media (max-width: 380px) {
+    .vip-current-strip {
+        grid-template-columns: 32px minmax(0, 1fr) auto;
+        gap: 6px 8px;
+        padding: 9px 10px !important;
+    }
+
+    .vip-current-icon {
+        width: 32px;
+        height: 32px;
+        flex-basis: 32px;
+    }
+
+    .vip-current-copy > strong { font-size: .8rem; }
+    .vip-current-expiry > strong { font-size: .65rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vip-page *,
+    .vip-page *::before,
+    .vip-page *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
     }
 }
