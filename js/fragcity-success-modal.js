@@ -84,13 +84,13 @@
 
             if (titleNode) {
                 titleNode.textContent = String(activeConfig.title ||
-                    (isPayment ? 'پرداخت با موفقیت انجام شد' : 'هدیه ۷ روزه Silver را با موفقیت دریافت کردید!'));
+                    (isPayment ? 'پرداخت با موفقیت انجام شد' : 'هدیه ۳ روزه Silver را با موفقیت دریافت کردید!'));
             }
             if (messageNode) {
                 messageNode.textContent = String(activeConfig.message ||
                     (isPayment
                         ? 'پرداخت شما توسط درگاه تأیید و با موفقیت ثبت شد.'
-                        : 'عضویت Silver برای ۷ روز روی حساب Steam شما فعال شد. از بازی در سرورهای FragCity لذت ببرید.'));
+                        : 'عضویت Silver برای ۳ روز روی حساب Steam شما فعال شد. از بازی در سرورهای FragCity لذت ببرید.'));
             }
             if (eyebrowNode) {
                 eyebrowNode.textContent = String(activeConfig.eyebrow ||
