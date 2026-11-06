@@ -65,7 +65,7 @@ $isPageActive = static function (array $pages) use ($current_page): string {
     return in_array($current_page, $pages, true) ? 'active' : '';
 };
 
-$morePages = ['buyserveropen', 'buyserver', 'launcher', 'leaderboard', 'leaderboard_vps', 'banlist', 'status'];
+$morePages = ['serverguide', 'launcher', 'status'];
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
@@ -289,20 +289,20 @@ $headerFaceitEloLabel = $headerFaceitElo !== null
     ? number_format($headerFaceitElo) . ' ELO'
     : '— ELO';
 
-// Keep the core destinations visible at the top of the mobile drawer.
+// Keep the main destinations visible at the top of the mobile drawer.
 $mobileNavItems = [
     ['servers_vps', 'لیست سرورها', 'fa-server', ['servers_vps', 'servers']],
     ['skins', 'انتخاب اسکین', 'fa-palette', ['skins', 'skins_vps']],
-    ['serverguide', 'راهنمای سرور', 'fa-book-open', ['serverguide']],
+    ['buyserveropen', 'خرید سرور', 'fa-shopping-cart', ['buyserveropen', 'buyserver']],
+    ['leaderboard', 'لیدربورد', 'fa-trophy', ['leaderboard', 'leaderboard_vps']],
+    ['banlist', 'لیست محرومیت‌ها', 'fa-gavel', ['banlist']],
     ['vip', 'VIP', 'fa-crown', ['vip']],
 ];
 
-// The remaining destinations live under the same "More" grouping as desktop.
+// Secondary destinations stay grouped under "More" on desktop and mobile.
 $mobileMoreNavItems = [
-    ['buyserveropen', 'خرید سرور', 'fa-shopping-cart', ['buyserveropen', 'buyserver']],
+    ['serverguide', 'راهنمای سرور', 'fa-book-open', ['serverguide']],
     ['launcher', 'دانلود لانچر', 'fa-download', ['launcher']],
-    ['leaderboard', 'لیدربورد', 'fa-trophy', ['leaderboard', 'leaderboard_vps']],
-    ['banlist', 'لیست محرومیت‌ها', 'fa-gavel', ['banlist']],
     ['status', 'وضعیت سرویس‌ها', 'fa-heart-pulse', ['status']],
 ];
 ?>
@@ -330,11 +330,25 @@ $mobileMoreNavItems = [
                 <span>انتخاب اسکین</span>
             </a>
 
-            <a href="<?= htmlspecialchars(fragcity_page_url('serverguide'), ENT_QUOTES, 'UTF-8') ?>"
-               class="shock-nav-item shock-nav-item--guide <?= $isPageActive(['serverguide']) ?>"
-               data-ajax-nav data-slug="serverguide">
-                <i class="fa-solid fa-book-open" aria-hidden="true"></i>
-                <span>راهنمای سرور</span>
+            <a href="<?= htmlspecialchars(fragcity_page_url('buyserveropen'), ENT_QUOTES, 'UTF-8') ?>"
+               class="shock-nav-item <?= $isPageActive(['buyserveropen', 'buyserver']) ?>"
+               data-ajax-nav data-slug="buyserveropen">
+                <i class="fas fa-shopping-cart" aria-hidden="true"></i>
+                <span>خرید سرور</span>
+            </a>
+
+            <a href="<?= htmlspecialchars(fragcity_page_url('leaderboard'), ENT_QUOTES, 'UTF-8') ?>"
+               class="shock-nav-item <?= $isPageActive(['leaderboard', 'leaderboard_vps']) ?>"
+               data-ajax-nav data-slug="leaderboard">
+                <i class="fas fa-trophy" aria-hidden="true"></i>
+                <span>لیدربورد</span>
+            </a>
+
+            <a href="<?= htmlspecialchars(fragcity_page_url('banlist'), ENT_QUOTES, 'UTF-8') ?>"
+               class="shock-nav-item <?= $isPageActive(['banlist']) ?>"
+               data-ajax-nav data-slug="banlist">
+                <i class="fas fa-gavel" aria-hidden="true"></i>
+                <span>لیست محرومیت‌ها</span>
             </a>
 
             <a href="<?= htmlspecialchars(fragcity_page_url('vip'), ENT_QUOTES, 'UTF-8') ?>"
@@ -356,17 +370,11 @@ $mobileMoreNavItems = [
                 </button>
 
                 <div class="frag-dropdown-menu" id="shockMoreMenu">
-                    <a href="<?= htmlspecialchars(fragcity_page_url('buyserveropen'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['buyserveropen', 'buyserver']) ?>" data-ajax-nav data-slug="buyserveropen">
-                        <i class="fas fa-shopping-cart"></i><span>خرید سرور</span>
+                    <a href="<?= htmlspecialchars(fragcity_page_url('serverguide'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['serverguide']) ?>" data-ajax-nav data-slug="serverguide">
+                        <i class="fas fa-book-open"></i><span>راهنمای سرور</span>
                     </a>
                     <a href="<?= htmlspecialchars(fragcity_page_url('launcher'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['launcher']) ?>" data-ajax-nav data-slug="launcher">
                         <i class="fas fa-download"></i><span>دانلود لانچر</span>
-                    </a>
-                    <a href="<?= htmlspecialchars(fragcity_page_url('leaderboard'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['leaderboard', 'leaderboard_vps']) ?>" data-ajax-nav data-slug="leaderboard">
-                        <i class="fas fa-trophy"></i><span>لیدربورد</span>
-                    </a>
-                    <a href="<?= htmlspecialchars(fragcity_page_url('banlist'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['banlist']) ?>" data-ajax-nav data-slug="banlist">
-                        <i class="fas fa-gavel"></i><span>لیست محرومیت‌ها</span>
                     </a>
                     <a href="<?= htmlspecialchars(fragcity_page_url('status'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['status']) ?>" data-ajax-nav data-slug="status">
                         <i class="fas fa-heart-pulse"></i><span>وضعیت سرویس‌ها</span>
