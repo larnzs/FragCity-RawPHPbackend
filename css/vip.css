@@ -988,3 +988,66 @@ button.vip-checkout-wallet {
         width: 100%;
     }
 }
+
+
+/* Public one-time Silver welcome trial. */
+.vip-free-trial-grid {
+    grid-template-columns: minmax(0, 1fr);
+}
+.vip-free-trial-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+.vip-free-trial-copy {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.vip-free-trial-copy .vip-notice-heading {
+    margin-bottom: 9px;
+}
+.vip-free-trial-copy > p {
+    margin: 0;
+    color: #aaa;
+    font-size: .72rem;
+    line-height: 1.9;
+}
+.vip-free-trial-actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    min-width: 260px;
+}
+.vip-free-trial-state {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 42px;
+    color: #d5d5d5;
+    font-size: .78rem;
+    font-weight: 800;
+}
+.vip-free-trial-state.is-claimed {
+    color: #86efac;
+}
+.vip-free-trial-state.is-blocked {
+    color: #fbbf72;
+}
+@media (max-width: 700px) {
+    .vip-free-trial-card {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .vip-free-trial-actions {
+        width: 100%;
+        min-width: 0;
+    }
+    .vip-free-trial-actions .vip-test-purchase-button,
+    .vip-free-trial-actions .vip-wallet-shortcut {
+        width: 100%;
+    }
+}
