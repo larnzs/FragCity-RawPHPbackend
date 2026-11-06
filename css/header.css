@@ -652,7 +652,7 @@ body.mobile-menu-open {
    Responsive
 ========================================= */
 
-@media (max-width: 1100px) {
+@media (max-width: 1280px) {
     .shock-container {
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 16px;
