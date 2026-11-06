@@ -584,7 +584,7 @@ $vipLockedExpanded = $vipHasActiveMembership
                 </span>
             </div>
             <p>Bronze فقط یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. هر حساب Steam می‌تواند یک‌بار Silver را به مدت ۷ روز رایگان دریافت کند؛ Gold سطح پولی است. Platinum، Emerald و Diamond فعلاً برای خرید فعال نیستند.</p>
-            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> هدیه Silver فقط برای حساب بدون VIP فعال قابل دریافت است و پس از استفاده، حتی بعد از پایان ۷ روز، دوباره قابل دریافت نخواهد بود.</p>
+            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> هدیه Silver فقط برای حساب بدون اشتراک فعال Silver یا بالاتر قابل دریافت است؛ Bronze آزمایشی مانع دریافت هدیه نیست. پس از استفاده، حتی بعد از پایان ۷ روز، هدیه دوباره قابل دریافت نخواهد بود.</p>
         </aside>
     </section>
 
@@ -613,7 +613,7 @@ $vipLockedExpanded = $vipHasActiveMembership
                     <span class="vip-free-trial-state is-claimed"><i class="fas fa-check-circle" aria-hidden="true"></i> هدیه Silver قبلاً دریافت شده است.</span>
                     <small class="vip-test-purchase-note">هر SteamID64 فقط یک‌بار می‌تواند از این هدیه استفاده کند.</small>
                 <?php elseif (!empty($vipFreeTrialStatus['blocked_by_active_membership'])): ?>
-                    <span class="vip-free-trial-state is-blocked"><i class="fas fa-lock" aria-hidden="true"></i> این حساب VIP فعال دارد.</span>
+                    <span class="vip-free-trial-state is-blocked"><i class="fas fa-lock" aria-hidden="true"></i> این حساب اشتراک فعال Silver یا بالاتر دارد.</span>
                     <small class="vip-test-purchase-note">برای دریافت هدیه، حساب نباید اشتراک VIP فعال داشته باشد.</small>
                 <?php elseif (!empty($vipFreeTrialStatus['available'])): ?>
                     <button
