@@ -477,16 +477,6 @@ $vipFeaturesData = [
     ],
 ];
 
-$vipModeDisabled = [
-    'Competitive', 'Practice', 'Wingman', 'Deathmatch', 'Valve Competitive',
-    'Valve Wingman', 'Valve Deathmatch', 'Deathmatch FFA', 'Retakes',
-    'Valve Retakes', 'Executes', 'Prefire', '1v1 Arenas', 'Aim'
-];
-$vipModeEnabled = [
-    'AWP', 'AWP Aim', 'ScoutzKnivez', 'Gun Game', 'One in the Chamber',
-    'Battle Royale', 'Valve Arms Race', 'Competitive 45°'
-];
-
 $vipCurrentLevel = max(0, (int) ($userVip['vip_level'] ?? 0));
 $vipActive = !empty($userVip['vip_active']);
 $vipExpiryLabel = '—';
@@ -532,62 +522,6 @@ $vipLockedExpanded = $vipHasActiveMembership
         </div>
     </header>
 
-    <section class="vip-current-strip" aria-label="وضعیت اشتراک فعلی">
-        <div class="vip-current-icon" aria-hidden="true"><i class="fas fa-id-badge"></i></div>
-        <div class="vip-current-copy">
-            <span>وضعیت اشتراک شما</span>
-            <strong><?= htmlspecialchars($vipCurrentName, ENT_QUOTES, 'UTF-8') ?></strong>
-        </div>
-        <span class="vip-current-state <?= $vipHasActiveMembership ? 'is-active' : 'is-inactive' ?>">
-            <i class="fas <?= $vipHasActiveMembership ? 'fa-circle-check' : 'fa-circle-info' ?>" aria-hidden="true"></i>
-            <?= htmlspecialchars($vipCurrentStatus, ENT_QUOTES, 'UTF-8') ?>
-        </span>
-        <div class="vip-current-expiry">
-            <span>اعتبار تا</span>
-            <strong><?= htmlspecialchars($vipHasActiveMembership ? $vipExpiryLabel : '—', ENT_QUOTES, 'UTF-8') ?></strong>
-        </div>
-    </section>
-
-    <section class="vip-notice-grid" aria-label="اطلاعیه‌ها و قوانین VIP">
-        <aside class="vip-notice vip-notice-modes" role="note">
-            <div class="vip-notice-heading">
-                <span class="vip-notice-icon" aria-hidden="true"><i class="fas fa-scale-balanced"></i></span>
-                <span>
-                    <strong>قوانین فعال بودن VIP در مودهای بازی</strong>
-                    <small>برای حفظ تعادل رقابتی، VIPCore در مودهای زیر فعال یا غیرفعال می‌شود.</small>
-                </span>
-            </div>
-            <div class="vip-mode-group vip-mode-disabled">
-                <strong><i class="fas fa-ban" aria-hidden="true"></i> VIP غیرفعال</strong>
-                <div class="vip-mode-chips">
-                    <?php foreach ($vipModeDisabled as $mode): ?>
-                        <span><?= htmlspecialchars($mode, ENT_QUOTES, 'UTF-8') ?></span>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <div class="vip-mode-group vip-mode-enabled">
-                <strong><i class="fas fa-circle-check" aria-hidden="true"></i> VIP فعال</strong>
-                <div class="vip-mode-chips">
-                    <?php foreach ($vipModeEnabled as $mode): ?>
-                        <span><?= htmlspecialchars($mode, ENT_QUOTES, 'UTF-8') ?></span>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </aside>
-
-        <aside class="vip-notice vip-notice-store" role="status">
-            <div class="vip-notice-heading">
-                <span class="vip-notice-icon" aria-hidden="true"><i class="fas fa-bullhorn"></i></span>
-                <span>
-                    <strong>اطلاعیه فروش VIP</strong>
-                    <small>وضعیت فعلی کاتالوگ و پرداخت</small>
-                </span>
-            </div>
-            <p>Bronze فقط یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. هر حساب Steam می‌تواند یک‌بار Silver را به مدت ۷ روز رایگان دریافت کند؛ Gold سطح پولی است. Platinum، Emerald و Diamond فعلاً برای خرید فعال نیستند.</p>
-            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> هدیه Silver فقط برای حساب بدون اشتراک فعال Silver یا بالاتر قابل دریافت است؛ Bronze آزمایشی مانع دریافت هدیه نیست. پس از استفاده، حتی بعد از پایان ۷ روز، هدیه دوباره قابل دریافت نخواهد بود.</p>
-        </aside>
-    </section>
-
     <section class="vip-notice-grid vip-free-trial-grid" aria-label="هدیه یک‌هفته‌ای VIP Silver">
         <aside class="vip-notice vip-notice-store vip-free-trial-card">
             <div class="vip-free-trial-copy">
@@ -632,6 +566,12 @@ $vipLockedExpanded = $vipHasActiveMembership
             </div>
         </aside>
     </section>
+
+
+
+
+
+
 
     <div class="vip-catalog-heading">
         <div>
@@ -819,6 +759,37 @@ $vipLockedExpanded = $vipHasActiveMembership
         <?php endif; ?>
     </section>
 
+    <section class="vip-notice-grid vip-admin-guide-grid" aria-label="راهنمای مدیریت VIP">
+        <aside class="vip-notice vip-notice-modes vip-admin-guide" role="note">
+            <div class="vip-notice-heading">
+                <span class="vip-notice-icon" aria-hidden="true"><i class="fas fa-user-shield"></i></span>
+                <span>
+                    <strong>قوانین فعال بودن VIP در مودهای بازی</strong>
+                    <small>برای غیرفعال کردن VIP در سرور، فقط کافی است پلاگین VIPCore را از پنل ادمین خاموش کنید.</small>
+                </span>
+            </div>
+            <p class="vip-admin-guide-copy">
+                دستور <bdi dir="ltr">!admin</bdi> را اجرا کنید؛ سپس از مسیر
+                <bdi dir="ltr">Server Manage → Plugins → VIPCore</bdi>
+                پلاگین را خاموش کنید. همین کافی است.
+            </p>
+        </aside>
+    </section>
+
+    <section class="vip-notice-grid vip-store-notice-grid" aria-label="اطلاعیه فروش VIP">
+        <aside class="vip-notice vip-notice-store" role="status">
+            <div class="vip-notice-heading">
+                <span class="vip-notice-icon" aria-hidden="true"><i class="fas fa-bullhorn"></i></span>
+                <span>
+                    <strong>اطلاعیه فروش VIP</strong>
+                    <small>وضعیت فعلی کاتالوگ و پرداخت</small>
+                </span>
+            </div>
+            <p>Bronze فقط یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. هر حساب Steam می‌تواند یک‌بار Silver را به مدت ۷ روز رایگان دریافت کند؛ Gold سطح پولی است. Platinum، Emerald و Diamond فعلاً برای خرید فعال نیستند.</p>
+            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> هدیه Silver فقط برای حساب بدون اشتراک فعال Silver یا بالاتر قابل دریافت است؛ Bronze آزمایشی مانع دریافت هدیه نیست. پس از استفاده، حتی بعد از پایان ۷ روز، هدیه دوباره قابل دریافت نخواهد بود.</p>
+        </aside>
+    </section>
+
     <?php foreach ($vipFeaturesData as $featureLevel => $features): ?>
         <template data-vip-feature-template data-level="<?= (int) $featureLevel ?>">
             <ul class="vip-detail-features-list">
@@ -841,5 +812,22 @@ $vipLockedExpanded = $vipHasActiveMembership
 
 
 </main>
+
+    <section class="vip-current-strip" id="vipMembershipStatusBar" aria-label="وضعیت اشتراک فعلی">
+        <div class="vip-current-icon" aria-hidden="true"><i class="fas fa-id-badge"></i></div>
+        <div class="vip-current-copy">
+            <span>وضعیت اشتراک شما</span>
+            <strong><?= htmlspecialchars($vipCurrentName, ENT_QUOTES, 'UTF-8') ?></strong>
+        </div>
+        <span class="vip-current-state <?= $vipHasActiveMembership ? 'is-active' : 'is-inactive' ?>">
+            <i class="fas <?= $vipHasActiveMembership ? 'fa-circle-check' : 'fa-circle-info' ?>" aria-hidden="true"></i>
+            <?= htmlspecialchars($vipCurrentStatus, ENT_QUOTES, 'UTF-8') ?>
+        </span>
+        <div class="vip-current-expiry">
+            <span>اعتبار تا</span>
+            <strong><?= htmlspecialchars($vipHasActiveMembership ? $vipExpiryLabel : '—', ENT_QUOTES, 'UTF-8') ?></strong>
+        </div>
+    </section>
+
 
 
