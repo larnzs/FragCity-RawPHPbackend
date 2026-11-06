@@ -13,7 +13,7 @@ final class VipCoreFreeTrialAlreadyClaimed extends RuntimeException
 final class VipCoreService
 {
     public const FREE_TRIAL_GROUP = 'SILVER';
-    public const FREE_TRIAL_DURATION_SECONDS = 604800;
+    public const FREE_TRIAL_DURATION_SECONDS = 259200;
 
     private const GROUPS = [
         'BRONZE' => 1,
@@ -202,7 +202,7 @@ final class VipCoreService
     }
 
     /**
-     * Grant exactly one seven-day Silver trial per SteamID64.
+     * Grant exactly one three-day Silver trial per SteamID64.
      * The unique claim ledger and vip_users upsert are committed atomically.
      */
     public function grantFreeSilverTrial(string $steamId64, string $playerName): array
