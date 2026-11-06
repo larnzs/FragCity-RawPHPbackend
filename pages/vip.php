@@ -734,8 +734,10 @@ $vipLockedExpanded = $vipHasActiveMembership
                         <span class="vip-plan-current"><i class="fas fa-check" aria-hidden="true"></i> پلن فعلی</span>
                     <?php elseif (!$tier['available']): ?>
                         <span class="vip-plan-locked"><i class="fas fa-lock" aria-hidden="true"></i> قفل‌شده</span>
+                    <?php elseif ((int)$lvl === 2): ?>
+                        <span class="vip-plan-public">ONE-TIME FREE TRIAL</span>
                     <?php else: ?>
-                        <span class="vip-plan-public">PUBLIC TIER</span>
+                        <span class="vip-plan-public">PAID TIER</span>
                     <?php endif; ?>
                 </div>
 
