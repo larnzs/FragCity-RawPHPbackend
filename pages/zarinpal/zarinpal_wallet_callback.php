@@ -260,6 +260,7 @@ if (
     <title><?= $is_success ? 'پرداخت موفق' : 'خطا در پرداخت' ?> | FragCity</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/fragcity-success-modal.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: #0a0a0a; color: #e0e0e0; font-family: 'Vazirmatn', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; direction: rtl; overflow: hidden; }
@@ -281,39 +282,36 @@ if (
         .btn-return:hover { opacity: 0.9; transform: scale(0.98); }
     </style>
 </head>
-<body>
-    <div class="result-card <?= $is_success ? 'success' : 'error' ?>">
-        <?php if ($is_success): ?>
-            <div class="icon-circle"><i class="fas fa-check-circle"></i></div>
-            <h1>پرداخت موفق</h1>
-            <div class="details">
-                <div>مبلغ شارژ</div>
-                <div class="amount"><?= number_format($amount) ?> تومان</div>
-                <?php if ($ref_id): ?>
-                <div>شماره پیگیری</div>
-                <div class="ref-id"><?= htmlspecialchars($ref_id, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></div>
-                <?php endif; ?>
-            </div>
-            <div class="progress-container">
-                <div class="progress-bar"></div>
-            </div>
-            <p style="color:#aaa; font-size:0.9rem;">در حال بازگشت به FragCity...</p>
-            <script>
-                setTimeout(function(){
-                    window.location.href = 'https://fragcity.ir/';
-                }, 3000);
-            </script>
-        <?php else: ?>
+<body class="<?= $is_success ? 'fc-success-page-body' : '' ?>">
+    <?php if ($is_success): ?>
+        <?php
+        $fcSuccessModalConfig = [
+            'auto_open' => true,
+            'kind' => 'payment',
+            'title' => 'پرداخت با موفقیت انجام شد',
+            'message' => 'پرداخت شما تأیید شد و مبلغ شارژ با موفقیت به کیف پول FragCity اضافه شد.',
+            'amount' => number_format($amount) . ' تومان',
+            'amount_label' => 'مبلغ شارژ کیف پول',
+            'reference' => $ref_id,
+            'return_url' => 'https://fragcity.ir/',
+            'return_label' => 'بازگشت به FragCity',
+            'dismissible' => false,
+        ];
+        require __DIR__ . '/../../includes/fragcity-success-modal.php';
+        ?>
+    <?php else: ?>
+        <div class="result-card error">
             <div class="icon-circle"><i class="fas fa-exclamation-triangle"></i></div>
             <h1>خطا در پرداخت</h1>
-            <p style="color:#aaa; margin-bottom: 24px;"><?= htmlspecialchars($error_message) ?></p>
+            <p style="color:#aaa; margin-bottom: 24px;"><?= htmlspecialchars($error_message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></p>
             <a href="https://fragcity.ir/" class="btn-return">بازگشت به FragCity</a>
             <script>
-                setTimeout(function(){
+                setTimeout(function () {
                     window.location.href = 'https://fragcity.ir/';
                 }, 5000);
             </script>
-        <?php endif; ?>
-    </div>
+        </div>
+    <?php endif; ?>
+    <script src="/js/fragcity-success-modal.js" defer></script>
 </body>
 </html>
