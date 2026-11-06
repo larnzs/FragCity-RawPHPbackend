@@ -16,7 +16,15 @@
     }
 
     function initSuccessModal(root) {
-        if (!root || root.dataset.fcSuccessReady === '1') return;
+        if (!root) return;
+
+        // The page fader has a transform, which changes the containing block of
+        // position:fixed descendants. Mount the overlay directly under body.
+        if (root.parentElement !== document.body) {
+            document.body.appendChild(root);
+        }
+
+        if (root.dataset.fcSuccessReady === '1') return;
         root.dataset.fcSuccessReady = '1';
 
         const dialog = root.querySelector('.fc-success-dialog');
@@ -190,6 +198,27 @@
     function boot() {
         document.querySelectorAll('[data-fc-success-modal]').forEach(initSuccessModal);
     }
+
+    function handleContentLoaded(event) {
+        const page = event && event.detail ? String(event.detail.page || '') : '';
+
+        if (page !== 'vip') {
+            document.querySelectorAll('[data-fc-success-modal]').forEach(function (root) {
+                root.remove();
+            });
+            document.body.classList.remove('fc-success-modal-open');
+            return;
+        }
+
+        // A fresh VIP fragment may have been inserted while the previous modal
+        // was mounted under body. Remove that old instance, then mount the new one.
+        document.querySelectorAll('[data-fc-success-modal]').forEach(function (root) {
+            if (root.parentElement === document.body) root.remove();
+        });
+        boot();
+    }
+
+    window.addEventListener('content-loaded', handleContentLoaded);
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', boot, { once: true });
