@@ -98,7 +98,9 @@
             if (detailState) {
                 detailState.classList.toggle('is-locked', !isAvailable);
                 detailState.textContent = isAvailable
-                    ? (isCurrent ? 'CURRENT MEMBERSHIP · اشتراک فعلی' : 'PUBLIC TIER · پلن قابل خرید')
+                    ? (isCurrent
+                        ? 'CURRENT MEMBERSHIP · اشتراک فعلی'
+                        : (Number(level) === 2 ? 'ONE-TIME FREE TRIAL · هدیه رایگان ۷ روزه' : 'PUBLIC TIER · پلن پولی'))
                     : (isCurrent ? 'CURRENT MEMBER · LOCKED FOR NEW PURCHASES' : 'LOCKED · NOT AVAILABLE');
             }
 
