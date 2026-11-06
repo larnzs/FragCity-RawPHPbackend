@@ -3525,3 +3525,89 @@ body { max-width: 100%; overflow-x: clip; }
         transform: none !important;
     }
 }
+
+
+/* Current Steam account VIP membership summary in the profile dropdown. */
+#shockUserDropdown .frag-drop-vip {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 9px 0 10px;
+    padding: 10px 11px;
+    border: 1px solid color-mix(in srgb, var(--vip-tier-color, #737373) 30%, transparent);
+    border-radius: 12px;
+    background:
+        radial-gradient(ellipse at 100% 0, color-mix(in srgb, var(--vip-tier-color, #737373) 10%, transparent), transparent 66%),
+        linear-gradient(135deg, rgba(255, 255, 255, .035), rgba(255, 255, 255, .012));
+}
+#shockUserDropdown .frag-drop-vip__top,
+#shockUserDropdown .frag-drop-vip__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+}
+#shockUserDropdown .frag-drop-vip__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: #A3A3A3;
+    font-size: .68rem;
+    font-weight: 800;
+}
+#shockUserDropdown .frag-drop-vip__label > i {
+    color: var(--vip-tier-color, #FFB347);
+}
+#shockUserDropdown .frag-drop-vip__tier {
+    overflow: hidden;
+    color: var(--vip-tier-color, #D4D4D4);
+    font-size: .78rem;
+    font-weight: 950;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+#shockUserDropdown .frag-drop-vip__state {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    color: #A3A3A3;
+    font-size: .65rem;
+    font-weight: 750;
+}
+#shockUserDropdown .frag-drop-vip__state > i {
+    flex: 0 0 auto;
+    color: #737373;
+}
+#shockUserDropdown .frag-drop-vip[data-state="active"] .frag-drop-vip__state,
+#shockUserDropdown .frag-drop-vip[data-state="active"] .frag-drop-vip__state > i {
+    color: #86EFAC;
+}
+#shockUserDropdown .frag-drop-vip[data-state="inactive"] .frag-drop-vip__state {
+    color: #A3A3A3;
+}
+#shockUserDropdown .frag-drop-vip[data-state="unavailable"] .frag-drop-vip__state,
+#shockUserDropdown .frag-drop-vip[data-state="unavailable"] .frag-drop-vip__state > i {
+    color: #FCA5A5;
+}
+#shockUserDropdown .frag-drop-vip__expiry {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #777;
+    font-size: .59rem;
+    white-space: nowrap;
+}
+#shockUserDropdown .frag-drop-vip__expiry > strong {
+    color: #D4D4D4;
+    font-size: .61rem;
+    font-weight: 850;
+    font-variant-numeric: tabular-nums;
+}
+@media (max-width: 700px) {
+    #shockUserDropdown .frag-drop-vip {
+        margin: 7px 0 8px;
+        padding: 9px 10px;
+    }
+}
