@@ -360,12 +360,13 @@ $mobileMoreNavItems = [
 
             <div class="frag-dropdown" id="shockMoreDropdown">
                 <button type="button"
-                        class="shock-nav-item shock-nav-item--icon-only <?= $isPageActive($morePages) ?>"
+                        class="shock-nav-item <?= $isPageActive($morePages) ?>"
                         id="shockMoreButton"
                         aria-label="بیشتر"
                         title="بیشتر"
                         aria-expanded="false"
                         aria-controls="shockMoreMenu">
+                    <span>بیشتر</span>
                     <i class="fas fa-chevron-down frag-arrow" aria-hidden="true"></i>
                 </button>
 
