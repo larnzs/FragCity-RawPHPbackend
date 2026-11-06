@@ -65,7 +65,7 @@ $isPageActive = static function (array $pages) use ($current_page): string {
     return in_array($current_page, $pages, true) ? 'active' : '';
 };
 
-$morePages = ['buyserveropen', 'buyserver', 'launcher', 'leaderboard', 'leaderboard_vps', 'banlist', 'vip', 'status'];
+$morePages = ['buyserveropen', 'buyserver', 'launcher', 'leaderboard', 'leaderboard_vps', 'banlist', 'status'];
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
@@ -294,6 +294,7 @@ $mobileNavItems = [
     ['servers_vps', 'لیست سرورها', 'fa-server', ['servers_vps', 'servers']],
     ['skins', 'انتخاب اسکین', 'fa-palette', ['skins', 'skins_vps']],
     ['serverguide', 'راهنمای سرور', 'fa-book-open', ['serverguide']],
+    ['vip', 'VIP', 'fa-crown', ['vip']],
 ];
 
 // The remaining destinations live under the same "More" grouping as desktop.
@@ -302,7 +303,6 @@ $mobileMoreNavItems = [
     ['launcher', 'دانلود لانچر', 'fa-download', ['launcher']],
     ['leaderboard', 'لیدربورد', 'fa-trophy', ['leaderboard', 'leaderboard_vps']],
     ['banlist', 'لیست محرومیت‌ها', 'fa-gavel', ['banlist']],
-    ['vip', 'VIP', 'fa-crown', ['vip']],
     ['status', 'وضعیت سرویس‌ها', 'fa-heart-pulse', ['status']],
 ];
 ?>
@@ -337,6 +337,13 @@ $mobileMoreNavItems = [
                 <span>راهنمای سرور</span>
             </a>
 
+            <a href="<?= htmlspecialchars(fragcity_page_url('vip'), ENT_QUOTES, 'UTF-8') ?>"
+               class="shock-nav-item shock-nav-item--vip <?= $isPageActive(['vip']) ?>"
+               data-ajax-nav data-slug="vip">
+                <i class="fas fa-crown" aria-hidden="true"></i>
+                <span>VIP</span>
+            </a>
+
             <div class="frag-dropdown" id="shockMoreDropdown">
                 <button type="button"
                         class="shock-nav-item shock-nav-item--icon-only <?= $isPageActive($morePages) ?>"
@@ -360,9 +367,6 @@ $mobileMoreNavItems = [
                     </a>
                     <a href="<?= htmlspecialchars(fragcity_page_url('banlist'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['banlist']) ?>" data-ajax-nav data-slug="banlist">
                         <i class="fas fa-gavel"></i><span>لیست محرومیت‌ها</span>
-                    </a>
-                    <a href="<?= htmlspecialchars(fragcity_page_url('vip'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['vip']) ?>" data-ajax-nav data-slug="vip">
-                        <i class="fas fa-crown"></i><span>VIP</span>
                     </a>
                     <a href="<?= htmlspecialchars(fragcity_page_url('status'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['status']) ?>" data-ajax-nav data-slug="status">
                         <i class="fas fa-heart-pulse"></i><span>وضعیت سرویس‌ها</span>
@@ -573,7 +577,7 @@ $mobileMoreNavItems = [
         </button>
         <?php foreach ($mobileNavItems as [$slug, $label, $icon, $activePages]): ?>
             <a href="<?= htmlspecialchars(fragcity_page_url($slug), ENT_QUOTES, 'UTF-8') ?>"
-               class="mobile-nav-link <?= $isPageActive($activePages) ?>"
+               class="mobile-nav-link <?= $slug === 'vip' ? 'mobile-nav-link--vip ' : '' ?><?= $isPageActive($activePages) ?>"
                data-ajax-nav
                data-slug="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
                 <i class="fas <?= htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
