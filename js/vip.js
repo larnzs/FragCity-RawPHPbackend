@@ -5,6 +5,7 @@
         const root = document.getElementById('vipStorefront');
         if (!root || root.dataset.vipStoreReady === '1') return;
         root.dataset.vipStoreReady = '1';
+        window.fragCityVipActiveRoot = root;
 
         if (!window.fragCityVipMembershipGlassBound) {
             window.fragCityVipMembershipGlassBound = true;
@@ -66,6 +67,10 @@
         }
 
         if (!plans.length) return;
+
+        if (invoice && invoice.parentElement !== document.body) {
+            document.body.appendChild(invoice);
+        }
 
         if (comparisonModal && comparisonDialog) {
             if (comparisonModal.parentElement !== document.body) {
@@ -586,12 +591,19 @@
     }
 
     window.addEventListener('content-loaded', function () {
-        if (!document.getElementById('vipStorefront')) {
+        const nextRoot = document.getElementById('vipStorefront');
+        const previousRoot = window.fragCityVipActiveRoot || null;
+
+        if (previousRoot !== nextRoot) {
             const staleModal = document.body.querySelector('#vipComparisonModal');
+            const staleInvoice = document.body.querySelector('[data-vip-invoice]');
             if (staleModal) staleModal.remove();
+            if (staleInvoice) staleInvoice.remove();
             document.body.classList.remove('vip-comparison-open');
             document.body.style.overflow = '';
         }
+
+        window.fragCityVipActiveRoot = nextRoot;
         initVipStorefront();
     });
 })();
