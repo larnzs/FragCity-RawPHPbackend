@@ -84,6 +84,7 @@ $vipLevels = [
         'available' => true,
         'summary' => 'One-time 3-day Silver welcome membership.',
         'summary_fa' => 'هدیه خوش‌آمدگویی رایگان برای ۳ روز؛ فقط یک‌بار برای هر حساب Steam.',
+        'purchase_mode' => 'trial',
     ],
     3 => [
         'name' => 'Gold',
@@ -92,6 +93,7 @@ $vipLevels = [
         'available' => true,
         'summary' => 'Paid VIP membership with expanded in-game perks.',
         'summary_fa' => 'پلن پولی با دسترسی به قابلیت‌های کامل‌تر VIP.',
+        'purchase_mode' => 'paid',
     ],
     4 => [
         'name' => 'Platinum',
@@ -508,6 +510,7 @@ $vipLockedExpanded = $vipHasActiveMembership
     id="vipStorefront"
     data-vip-has-active="<?= $vipHasActiveMembership ? '1' : '0' ?>"
     data-vip-current-level="<?= $vipCurrentLevel ?>"
+    data-vip-status-unavailable="<?= $vipStatusUnavailable ? '1' : '0' ?>"
 >
     <header class="vip-store-hero">
         <div class="vip-store-hero-icon" aria-hidden="true"><i class="fas fa-crown"></i></div>
@@ -674,6 +677,7 @@ $vipLockedExpanded = $vipHasActiveMembership
                 data-vip-summary="<?= htmlspecialchars($tier['summary'], ENT_QUOTES, 'UTF-8') ?>"
                 data-vip-summary-fa="<?= htmlspecialchars($tier['summary_fa'], ENT_QUOTES, 'UTF-8') ?>"
                 data-vip-available="<?= $tier['available'] ? '1' : '0' ?>"
+                data-vip-purchase-mode="<?= htmlspecialchars((string)($tier['purchase_mode'] ?? 'none'), ENT_QUOTES, 'UTF-8') ?>"
                 role="button"
                 tabindex="0"
                 aria-pressed="false"
@@ -743,6 +747,52 @@ $vipLockedExpanded = $vipHasActiveMembership
             <span class="vip-detail-state" id="vipDetailTierState">PUBLIC TIER</span>
         </div>
         <div class="vip-detail-feature-grid" id="vipDetailFeatures"></div>
+        <section
+            class="vip-duration-selector"
+            id="vipPurchaseDurationSelector"
+            data-vip-duration-selector
+            aria-labelledby="vipPurchaseDurationTitle"
+            aria-hidden="true"
+            hidden
+        >
+            <div class="vip-duration-selector-heading">
+                <span class="vip-store-eyebrow">CHOOSE SUBSCRIPTION DURATION</span>
+                <h3 id="vipPurchaseDurationTitle">مدت اشتراک را انتخاب کن</h3>
+                <p>مدت موردنظرت را برای پلن انتخاب‌شده مشخص کن.</p>
+            </div>
+
+            <div class="vip-duration-options" role="group" aria-label="مدت اشتراک">
+                <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="7" data-duration-label="۱ هفته" aria-pressed="false">
+                    <span class="vip-duration-code">07 DAYS</span>
+                    <strong>۱ هفته</strong>
+                    <small>۷ روز</small>
+                </button>
+                <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="15" data-duration-label="۱۵ روز" aria-pressed="false">
+                    <span class="vip-duration-code">15 DAYS</span>
+                    <strong>۱۵ روز</strong>
+                    <small>۱۵ روز</small>
+                </button>
+                <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="30" data-duration-label="۳۰ روز" aria-pressed="false">
+                    <span class="vip-duration-code">30 DAYS</span>
+                    <strong>۳۰ روز</strong>
+                    <small>۳۰ روز</small>
+                </button>
+                <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="60" data-duration-label="۶۰ روز" aria-pressed="false">
+                    <span class="vip-duration-code">60 DAYS</span>
+                    <strong>۶۰ روز</strong>
+                    <small>۶۰ روز</small>
+                </button>
+                <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="90" data-duration-label="۹۰ روز" aria-pressed="false">
+                    <span class="vip-duration-code">90 DAYS</span>
+                    <strong>۹۰ روز</strong>
+                    <small>۹۰ روز</small>
+                </button>
+            </div>
+
+            <p class="vip-duration-selection-status" data-vip-duration-selection-status role="status" aria-live="polite">
+                برای ادامه، یکی از مدت‌ها را انتخاب کن.
+            </p>
+        </section>
         <?php if ($isVipTestAdmin): ?>
         <div class="vip-test-purchase" data-vip-test-purchase-box>
                 <button
