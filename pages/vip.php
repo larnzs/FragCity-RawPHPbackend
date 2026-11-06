@@ -82,8 +82,8 @@ $vipLevels = [
         'fa_icon' => 'fas fa-medal',
         'color' => '#C0C0C0',
         'available' => true,
-        'summary' => 'One-time 7-day Silver welcome membership.',
-        'summary_fa' => 'هدیه خوش‌آمدگویی رایگان برای ۷ روز؛ فقط یک‌بار برای هر حساب Steam.',
+        'summary' => 'One-time 3-day Silver welcome membership.',
+        'summary_fa' => 'هدیه خوش‌آمدگویی رایگان برای ۳ روز؛ فقط یک‌بار برای هر حساب Steam.',
     ],
     3 => [
         'name' => 'Gold',
@@ -538,17 +538,17 @@ $vipLockedExpanded = $vipHasActiveMembership
         </div>
     </section>
 
-    <section class="vip-notice-grid vip-free-trial-grid" aria-label="هدیه یک‌هفته‌ای VIP Silver">
+    <section class="vip-notice-grid vip-free-trial-grid" aria-label="هدیه سه‌روزه VIP Silver">
         <aside class="vip-notice vip-notice-store vip-free-trial-card">
             <div class="vip-free-trial-copy">
                 <div class="vip-notice-heading">
                     <span class="vip-notice-icon" aria-hidden="true"><i class="fas fa-gift"></i></span>
                     <span>
                         <strong>هدیه خوش‌آمدگویی FragCity</strong>
-                        <small>ONE-TIME SILVER MEMBERSHIP · 7 DAYS</small>
+                        <small>ONE-TIME SILVER MEMBERSHIP · 3 DAYS</small>
                     </span>
                 </div>
-                <p>با حساب Steam متصل به FragCity، یک‌بار عضویت Silver را برای ۷ روز فعال کن. سطح و مدت از سمت سرور تعیین می‌شوند و قابل تغییر از مرورگر نیستند.</p>
+                <p>با حساب Steam متصل به FragCity، یک‌بار عضویت Silver را برای ۳ روز فعال کن. سطح و مدت از سمت سرور تعیین می‌شوند و قابل تغییر از مرورگر نیستند.</p>
             </div>
             <div class="vip-free-trial-actions">
                 <?php if (!$isLoggedIn): ?>
@@ -573,7 +573,7 @@ $vipLockedExpanded = $vipHasActiveMembership
                         data-csrf-token="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
                     >
                         <i class="fas fa-gift" aria-hidden="true"></i>
-                        دریافت Silver رایگان · ۷ روز
+                        دریافت Silver رایگان · ۳ روز
                     </button>
                     <p class="vip-test-purchase-feedback" data-vip-free-feedback role="status" aria-live="polite" hidden></p>
                 <?php else: ?>
@@ -624,7 +624,7 @@ $vipLockedExpanded = $vipHasActiveMembership
                     ? (int) $rawDuration
                     : null;
                 $tierPriceLabel = (int)$lvl === 2
-                    ? 'هدیه رایگان · ۷ روز'
+                    ? 'هدیه رایگان · ۳ روز'
                     : (!$tier['available']
                         ? 'غیرفعال'
                         : ($tierPrice !== null ? number_format($tierPrice) . ' ' . $vipCurrency : 'قیمت تعیین نشده'));
@@ -787,8 +787,8 @@ $vipLockedExpanded = $vipHasActiveMembership
                     <small>وضعیت فعلی کاتالوگ و پرداخت</small>
                 </span>
             </div>
-            <p>Bronze فقط یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. هر حساب Steam می‌تواند یک‌بار Silver را به مدت ۷ روز رایگان دریافت کند؛ Gold سطح پولی است. Platinum، Emerald و Diamond فعلاً برای خرید فعال نیستند.</p>
-            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> هدیه Silver فقط برای حساب بدون اشتراک فعال Silver یا بالاتر قابل دریافت است؛ Bronze آزمایشی مانع دریافت هدیه نیست. پس از استفاده، حتی بعد از پایان ۷ روز، هدیه دوباره قابل دریافت نخواهد بود.</p>
+            <p>Bronze فقط یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. هر حساب Steam می‌تواند یک‌بار Silver را به مدت ۳ روز رایگان دریافت کند؛ Gold سطح پولی است. Platinum، Emerald و Diamond فعلاً برای خرید فعال نیستند.</p>
+            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> هدیه Silver فقط برای حساب بدون اشتراک فعال Silver یا بالاتر قابل دریافت است؛ Bronze آزمایشی مانع دریافت هدیه نیست. پس از استفاده، حتی بعد از پایان ۳ روز، هدیه دوباره قابل دریافت نخواهد بود.</p>
         </aside>
     </section>
 
