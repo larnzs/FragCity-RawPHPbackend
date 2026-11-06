@@ -612,7 +612,7 @@ $vipLockedExpanded = $vipHasActiveMembership
                 <?php elseif (!empty($vipFreeTrialStatus['claimed'])): ?>
                     <span class="vip-free-trial-state is-claimed"><i class="fas fa-check-circle" aria-hidden="true"></i> هدیه Silver قبلاً دریافت شده است.</span>
                     <small class="vip-test-purchase-note">هر SteamID64 فقط یک‌بار می‌تواند از این هدیه استفاده کند.</small>
-                <?php elseif ($vipHasActiveMembership || !empty($vipFreeTrialStatus['blocked_by_active_membership'])): ?>
+                <?php elseif (!empty($vipFreeTrialStatus['blocked_by_active_membership'])): ?>
                     <span class="vip-free-trial-state is-blocked"><i class="fas fa-lock" aria-hidden="true"></i> این حساب VIP فعال دارد.</span>
                     <small class="vip-test-purchase-note">برای دریافت هدیه، حساب نباید اشتراک VIP فعال داشته باشد.</small>
                 <?php elseif (!empty($vipFreeTrialStatus['available'])): ?>
