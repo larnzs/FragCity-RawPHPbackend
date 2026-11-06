@@ -16,6 +16,17 @@ $check(
     'Known SteamID64 converts to numeric account ID one',
     VipCoreService::accountIdFromSteamId64('76561197960265729') === 1
 );
+
+$check(
+    'Provided SteamID64 example maps to the provided account ID',
+    VipCoreService::accountIdFromSteamId64('76561198214760293') === 254494565
+);
+
+$check(
+    'Public free trial is fixed to Silver for exactly seven days',
+    VipCoreService::FREE_TRIAL_GROUP === 'SILVER'
+    && VipCoreService::FREE_TRIAL_DURATION_SECONDS === 604800
+);
 $check(
     'Only Bronze, Silver and Gold are grantable',
     VipCoreService::groupForLevel(1) === 'BRONZE'
