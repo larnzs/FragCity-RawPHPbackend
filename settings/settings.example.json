@@ -139,7 +139,7 @@
     "pages.vip": {
       "_comment": "VIP status and entitlements are read from VIPCore through the signed Linux API. This section contains storefront display metadata only.",
       "purchase_catalog": {
-        "_comment": "Display metadata only. The temporary test button grants one hour in VIPCore without payment; production checkout is a separate step.",
+        "_comment": "Display metadata only. The one-time seven-day Silver welcome trial is managed by the signed VIPCore API. The admin-only temporary test button is separate; paid checkout is handled independently.",
         "currency": "تومان",
         "packages": {
           "1": {
