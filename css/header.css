@@ -3995,3 +3995,69 @@ body { max-width: 100%; overflow-x: clip; }
         transition: none !important;
     }
 }
+
+
+/* Stable Performance Mode icon geometry in both gauge and bolt states. */
+.shock-header .shock-user-area-wrapper > button.fc-motion-toggle {
+    width: 46px;
+    min-width: 46px;
+    max-width: 46px;
+    height: 46px;
+    min-height: 46px;
+    flex: 0 0 46px;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+    line-height: 1;
+}
+
+.shock-header .shock-user-area-wrapper > button.fc-motion-toggle > i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 18px;
+    width: 18px;
+    min-width: 18px;
+    max-width: 18px;
+    height: 18px;
+    margin: 0;
+    font-size: .95rem;
+    line-height: 1;
+    text-align: center;
+}
+
+.shock-header .shock-user-area-wrapper > button.fc-motion-toggle > .fc-motion-toggle__label {
+    display: inline-block;
+    flex: 0 0 auto;
+    max-width: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    white-space: nowrap;
+    font-size: .67rem;
+    transition: max-width 190ms ease, opacity 130ms ease, visibility 130ms ease;
+}
+
+.shock-header .shock-user-area-wrapper > button.fc-motion-toggle:hover,
+.shock-header .shock-user-area-wrapper > button.fc-motion-toggle:focus-visible {
+    width: 158px;
+    min-width: 158px;
+    max-width: 158px;
+    flex-basis: 158px;
+    gap: 8px;
+    padding-inline: 11px;
+}
+
+.shock-header .shock-user-area-wrapper > button.fc-motion-toggle:hover > .fc-motion-toggle__label,
+.shock-header .shock-user-area-wrapper > button.fc-motion-toggle:focus-visible > .fc-motion-toggle__label {
+    max-width: 112px;
+    opacity: 1;
+    visibility: visible;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-header .shock-user-area-wrapper > button.fc-motion-toggle,
+    .shock-header .shock-user-area-wrapper > button.fc-motion-toggle > .fc-motion-toggle__label {
+        transition: none !important;
+    }
+}
