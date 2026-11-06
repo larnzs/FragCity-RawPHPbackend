@@ -2355,3 +2355,169 @@ body:has(.server-store-page) .content-fader {
         transition-duration: .01ms !important;
     }
 }
+
+
+/* =========================================================
+   Server Store width and vertical rhythm refinement
+   Make better use of desktop viewport without changing structure.
+========================================================= */
+.server-store-page {
+    padding-right: clamp(20px, 2.2vw, 42px);
+    padding-left: clamp(20px, 2.2vw, 42px);
+}
+
+.server-store-container {
+    width: 100%;
+    max-width: none;
+}
+
+.server-store-hero {
+    min-height: 132px;
+    padding: 25px 30px;
+}
+
+.server-store-progress {
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.server-store-progress li {
+    min-height: 66px;
+    padding: 12px 16px;
+}
+
+.server-store-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 390px);
+    gap: 20px;
+}
+
+.server-store-main {
+    gap: 18px;
+}
+
+.server-store-section {
+    padding: clamp(20px, 1.7vw, 28px);
+    border-radius: 17px;
+}
+
+.server-store-section-heading {
+    margin-bottom: 19px;
+}
+
+.server-store-duration-grid {
+    gap: 12px;
+}
+
+.server-store-duration-card {
+    min-height: 122px;
+    padding: 15px 14px;
+    border-radius: 12px;
+}
+
+.server-store-duration-code {
+    margin-bottom: 13px;
+}
+
+.server-store-setting-grid {
+    gap: 12px;
+}
+
+.server-store-setting-card {
+    min-height: 132px;
+    padding: 16px;
+    gap: 10px 12px;
+}
+
+.server-store-setting-icon {
+    width: 42px;
+    height: 42px;
+}
+
+.server-store-addon-card {
+    min-height: 94px;
+    padding: 17px;
+}
+
+.server-store-addon-icon {
+    flex-basis: 46px;
+    width: 46px;
+    height: 46px;
+}
+
+.server-store-summary {
+    padding: 22px;
+}
+
+.server-store-summary-product {
+    padding: 14px;
+}
+
+.server-store-summary-lines > div {
+    padding-top: 11px;
+    padding-bottom: 11px;
+}
+
+.server-store-summary-total {
+    padding: 16px;
+}
+
+@media (max-width: 1080px) {
+    .server-store-layout {
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 350px);
+        gap: 14px;
+    }
+}
+
+@media (max-width: 900px) {
+    .server-store-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 680px) {
+    .server-store-page {
+        padding-right: 13px;
+        padding-left: 13px;
+    }
+
+    .server-store-hero {
+        min-height: 0;
+        padding: 17px;
+    }
+
+    .server-store-progress li {
+        min-height: 0;
+        padding: 8px 7px;
+    }
+
+    .server-store-section {
+        padding: 14px;
+    }
+
+    .server-store-duration-card {
+        min-height: 92px;
+        padding: 12px 11px;
+    }
+
+    .server-store-setting-card {
+        min-height: 0;
+        padding: 13px;
+    }
+
+    .server-store-addon-card {
+        min-height: 0;
+        padding: 11px;
+    }
+
+    .server-store-summary {
+        padding: 15px;
+    }
+
+    .server-store-summary-product {
+        padding: 11px;
+    }
+
+    .server-store-summary-total {
+        padding: 13px;
+    }
+}
