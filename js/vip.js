@@ -38,9 +38,18 @@
         const testFeedback = root.querySelector('[data-vip-test-feedback]');
         const freeTrialButton = root.querySelector('[data-vip-free-claim]');
         const freeTrialFeedback = root.querySelector('[data-vip-free-feedback]');
+        const durationSelector = root.querySelector('[data-vip-duration-selector]');
+        const durationOptions = durationSelector
+            ? Array.from(durationSelector.querySelectorAll('[data-vip-duration-option]'))
+            : [];
+        const durationSelectionStatus = durationSelector
+            ? durationSelector.querySelector('[data-vip-duration-selection-status]')
+            : null;
         const mobileQuery = window.matchMedia('(max-width: 700px)');
         let activePlan = null;
         let mobileDetailsOpen = false;
+        let hasUserSelectedPlan = false;
+        let selectedDurationDays = '';
 
         if (!plans.length) return;
 
@@ -88,9 +97,54 @@
             detailPanel.classList.add('is-refreshing');
         }
 
+        function resetDurationSelection() {
+            selectedDurationDays = '';
+            delete root.dataset.vipSelectedDurationDays;
+            delete root.dataset.vipSelectedTierLevel;
+
+            durationOptions.forEach(function (button) {
+                button.classList.remove('is-selected');
+                button.setAttribute('aria-pressed', 'false');
+            });
+
+            if (durationSelector) {
+                durationSelector.classList.remove('has-selection');
+            }
+            if (durationSelectionStatus) {
+                durationSelectionStatus.textContent = 'برای ادامه، یکی از مدت‌ها را انتخاب کن.';
+            }
+        }
+
+        function syncDurationSelector(plan, isCurrent) {
+            if (!durationSelector) return;
+
+            const canChooseDuration = (
+                hasUserSelectedPlan
+                && plan.dataset.vipPurchaseMode === 'paid'
+                && !isCurrent
+                && root.dataset.vipStatusUnavailable !== '1'
+            );
+
+            durationSelector.hidden = !canChooseDuration;
+            durationSelector.setAttribute('aria-hidden', canChooseDuration ? 'false' : 'true');
+
+            if (!canChooseDuration) {
+                resetDurationSelection();
+            }
+        }
+
         function selectPlan(plan, userInitiated) {
             if (!plan) return;
+            const planChanged = activePlan !== plan;
             const wasActivePlan = activePlan === plan;
+
+            if (userInitiated) {
+                hasUserSelectedPlan = true;
+            }
+            if (planChanged) {
+                resetDurationSelection();
+            }
+
             activePlan = plan;
 
             if (mobileQuery.matches) {
@@ -112,6 +166,7 @@
             const isAvailable = plan.dataset.vipAvailable === '1';
             const isCurrent = plan.classList.contains('is-current');
             const summaryFa = plan.dataset.vipSummaryFa || '';
+            syncDurationSelector(plan, isCurrent);
             const summaryEn = plan.dataset.vipSummary || '';
 
             if (detailName) detailName.textContent = name;
@@ -346,6 +401,46 @@
                 }
             });
         }
+
+        durationOptions.forEach(function (button) {
+            button.addEventListener('click', function () {
+                if (
+                    !durationSelector
+                    || durationSelector.hidden
+                    || !activePlan
+                    || activePlan.dataset.vipPurchaseMode !== 'paid'
+                    || activePlan.classList.contains('is-current')
+                ) {
+                    return;
+                }
+
+                const days = Number(button.dataset.durationDays || 0);
+                if (![7, 15, 30, 60, 90].includes(days)) return;
+
+                selectedDurationDays = String(days);
+                root.dataset.vipSelectedDurationDays = selectedDurationDays;
+                root.dataset.vipSelectedTierLevel = String(activePlan.dataset.level || '');
+
+                durationOptions.forEach(function (option) {
+                    const selected = option === button;
+                    option.classList.toggle('is-selected', selected);
+                    option.setAttribute('aria-pressed', selected ? 'true' : 'false');
+                });
+
+                durationSelector.classList.add('has-selection');
+                if (durationSelectionStatus) {
+                    const label = button.dataset.durationLabel || (days + ' روز');
+                    durationSelectionStatus.textContent = 'مدت انتخاب‌شده: ' + label + ' (' + days + ' روز)';
+                }
+
+                window.dispatchEvent(new CustomEvent('fragcity:vip-duration-selected', {
+                    detail: {
+                        tierLevel: Number(activePlan.dataset.level || 0),
+                        durationDays: days
+                    }
+                }));
+            });
+        });
 
         plans.forEach(function (plan) {
             // The whole card is one accessible control (Enter / Space / pointer).
