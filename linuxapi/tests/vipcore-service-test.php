@@ -23,9 +23,9 @@ $check(
 );
 
 $check(
-    'Public free trial is fixed to Silver for exactly seven days',
+    'Public free trial is fixed to Silver for exactly three days',
     VipCoreService::FREE_TRIAL_GROUP === 'SILVER'
-    && VipCoreService::FREE_TRIAL_DURATION_SECONDS === 604800
+    && VipCoreService::FREE_TRIAL_DURATION_SECONDS === 259200
 );
 $check(
     'Only Bronze, Silver and Gold are grantable',
