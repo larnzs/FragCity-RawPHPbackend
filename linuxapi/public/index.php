@@ -676,7 +676,10 @@ try {
 
         $vipServerId = apiInt($vipConfig['server_id'] ?? 0, 'vipcore.server_id', 0, 2147483647);
         $testConfig = is_array($vipConfig['test_mode'] ?? null) ? $vipConfig['test_mode'] : [];
-        $testDuration = apiInt($testConfig['duration_seconds'] ?? 3600, 'vipcore.test_duration_seconds', 300, 86400);
+        // Keep the public fixed-duration Silver trial independent from admin test-mode settings.
+        $testDuration = $action === 'grant_test_vip'
+            ? apiInt($testConfig['duration_seconds'] ?? 3600, 'vipcore.test_duration_seconds', 300, 86400)
+            : 3600;
 
         require_once __DIR__ . '/../src/VIPCore/VipCoreService.php';
         try {
