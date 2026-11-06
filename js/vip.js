@@ -329,6 +329,8 @@
         const initialPlan = plans.find(function (plan) {
             return plan.classList.contains('is-current');
         }) || plans.find(function (plan) {
+            return plan.dataset.level === '3' && plan.dataset.vipAvailable === '1';
+        }) || plans.find(function (plan) {
             return plan.dataset.vipAvailable === '1';
         }) || plans[0];
 
