@@ -117,7 +117,7 @@
                 const hasActiveMembership = root.dataset.vipHasActive === '1';
                 testPurchaseButton.dataset.level = level;
                 testPurchaseButton.hidden = ![1, 2, 3].includes(Number(level));
-                testPurchaseButton.disabled = !isAvailable || hasActiveMembership;
+                testPurchaseButton.disabled = hasActiveMembership;
                 testPurchaseButton.textContent = hasActiveMembership
                     ? 'برای این حساب VIP فعال ثبت شده است'
                     : 'ثبت آزمایشی VIP بدون پرداخت';
