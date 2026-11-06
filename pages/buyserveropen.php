@@ -122,41 +122,67 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                     <div class="server-store-section-heading">
                         <span class="server-store-section-index">01</span>
                         <div>
-                            <h2 id="serverResourcesTitle">منابع اختصاصی پلن</h2>
-                            <p>منابع ثابت سرور شما؛ ظرفیت و تنظیمات بازی در مرحله بعد قابل انتخاب هستند.</p>
+                            <h2 id="serverResourcesTitle">منابع قابل تنظیم سرور</h2>
+                            <p>منابع سرور را متناسب با نیاز کامیونیتی خودت انتخاب کن؛ مقدار هر اسلایدر در لحظه به‌روزرسانی می‌شود.</p>
                         </div>
-                        <span class="server-store-section-state">پلن پایه</span>
+                        <span class="server-store-section-state">قابل تنظیم</span>
                     </div>
 
                     <div class="server-store-resource-grid">
                         <article class="server-store-resource-card">
-                            <span class="server-store-resource-icon"><i class="fa-solid fa-memory" aria-hidden="true"></i></span>
-                            <div class="server-store-resource-copy">
-                                <small>RAM</small>
-                                <strong>1024 MB</strong>
-                                <span>DDR5 · 6000 MHz · CL30</span>
+                            <div class="server-store-resource-head">
+                                <span class="server-store-resource-icon"><i class="fa-solid fa-memory" aria-hidden="true"></i></span>
+                                <div class="server-store-resource-copy">
+                                    <small>RAM</small>
+                                    <strong><output id="serverStoreMemoryValue" for="serverStoreMemory">1 GB</output></strong>
+                                    <span>DDR5 · 6000 MHz · CL30</span>
+                                </div>
+                            </div>
+                            <div class="server-store-range-wrap">
+                                <label class="server-store-resource-slider-label" for="serverStoreMemory">مقدار حافظه</label>
+                                <input class="server-store-range" id="serverStoreMemory" name="memory" type="range" min="1024" max="2048" step="256" value="1024" aria-describedby="serverStoreMemoryHelp">
+                                <div class="server-store-range-meta" aria-hidden="true"><span>1 GB</span><span>2 GB</span></div>
+                                <small class="server-store-range-help" id="serverStoreMemoryHelp">محدوده تخصیص حافظه: ۱۰۲۴ تا ۲۰۴۸ مگابایت.</small>
                             </div>
                         </article>
+
                         <article class="server-store-resource-card">
-                            <span class="server-store-resource-icon"><i class="fa-solid fa-hard-drive" aria-hidden="true"></i></span>
-                            <div class="server-store-resource-copy">
-                                <small>SSD STORAGE</small>
-                                <strong>10 GB</strong>
-                                <span>فضای ذخیره‌سازی پلن</span>
+                            <div class="server-store-resource-head">
+                                <span class="server-store-resource-icon"><i class="fa-solid fa-hard-drive" aria-hidden="true"></i></span>
+                                <div class="server-store-resource-copy">
+                                    <small>SSD STORAGE</small>
+                                    <strong><output id="serverStoreDiskValue" for="serverStoreDisk">10 GB</output></strong>
+                                    <span>فضای ذخیره‌سازی قابل تخصیص</span>
+                                </div>
+                            </div>
+                            <div class="server-store-range-wrap">
+                                <label class="server-store-resource-slider-label" for="serverStoreDisk">فضای دیسک</label>
+                                <input class="server-store-range" id="serverStoreDisk" name="disk" type="range" min="5120" max="10240" step="1024" value="10240" aria-describedby="serverStoreDiskHelp">
+                                <div class="server-store-range-meta" aria-hidden="true"><span>5 GB</span><span>10 GB</span></div>
+                                <small class="server-store-range-help" id="serverStoreDiskHelp">محدوده تخصیص دیسک: ۵ تا ۱۰ گیگابایت.</small>
                             </div>
                         </article>
+
                         <article class="server-store-resource-card">
-                            <span class="server-store-resource-icon"><i class="fa-solid fa-microchip" aria-hidden="true"></i></span>
-                            <div class="server-store-resource-copy">
-                                <small>CPU</small>
-                                <strong>1 Core</strong>
-                                <span>AMD Ryzen 9 7950X · 5.7 GHz</span>
+                            <div class="server-store-resource-head">
+                                <span class="server-store-resource-icon"><i class="fa-solid fa-microchip" aria-hidden="true"></i></span>
+                                <div class="server-store-resource-copy">
+                                    <small>CPU</small>
+                                    <strong><output id="serverStoreCpuValue" for="serverStoreCpu">100% · 1 vCore</output></strong>
+                                    <span>AMD Ryzen 9 7950X · 5.7 GHz</span>
+                                </div>
+                            </div>
+                            <div class="server-store-range-wrap">
+                                <label class="server-store-resource-slider-label" for="serverStoreCpu">قدرت پردازنده</label>
+                                <input class="server-store-range" id="serverStoreCpu" name="cpu" type="range" min="100" max="400" step="100" value="100" aria-describedby="serverStoreCpuHelp">
+                                <div class="server-store-range-meta" aria-hidden="true"><span>100%</span><span>400%</span></div>
+                                <small class="server-store-range-help" id="serverStoreCpuHelp">هر ۱۰۰٪ محدودیت CPU معادل یک vCore است.</small>
                             </div>
                         </article>
                     </div>
                     <div class="server-store-resource-footnote">
                         <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                        نود و پورت اتصال به‌صورت خودکار توسط سیستم تخصیص داده می‌شوند.
+                        مقدار RAM و Storage به مگابایت و مقدار CPU به درصد بیان می‌شود. نود و پورت اتصال به‌صورت خودکار تخصیص داده می‌شوند.
                     </div>
                 </section>
 
@@ -315,6 +341,9 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                 </div>
 
                 <div class="server-store-summary-lines">
+                    <div><span>RAM</span><strong data-server-summary="memory">1 GB · 1024 MB</strong></div>
+                    <div><span>CPU</span><strong data-server-summary="cpu">100% · 1 vCore</strong></div>
+                    <div><span>Storage</span><strong data-server-summary="disk">10 GB · 10240 MB</strong></div>
                     <div><span>نقشه پیش‌فرض</span><strong data-server-summary="map">de_dust2</strong></div>
                     <div><span>ظرفیت بازیکن</span><strong data-server-summary="players">32 نفر</strong></div>
                     <div><span>Tickrate</span><strong data-server-summary="tickrate">64 Tick</strong></div>
