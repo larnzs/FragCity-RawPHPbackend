@@ -123,7 +123,7 @@
                 detailState.textContent = isAvailable
                     ? (isCurrent
                         ? 'CURRENT MEMBERSHIP · اشتراک فعلی'
-                        : (Number(level) === 2 ? 'ONE-TIME FREE TRIAL · هدیه رایگان ۷ روزه' : 'PUBLIC TIER · پلن پولی'))
+                        : (Number(level) === 2 ? 'ONE-TIME FREE TRIAL · هدیه رایگان ۳ روزه' : 'PUBLIC TIER · پلن پولی'))
                     : (isCurrent ? 'CURRENT MEMBER · LOCKED FOR NEW PURCHASES' : 'LOCKED · NOT AVAILABLE');
             }
 
@@ -316,10 +316,10 @@
                     if (window.FragCitySuccessModal && typeof window.FragCitySuccessModal.open === 'function') {
                         window.FragCitySuccessModal.open({
                             kind: 'gift',
-                            title: 'هدیه ۷ روزه Silver را با موفقیت دریافت کردید!',
+                            title: 'هدیه ۳ روزه Silver را با موفقیت دریافت کردید!',
                             message: 'عضویت Silver با موفقیت روی حساب Steam شما فعال شد. از قابلیت‌های VIP در سرورهای FragCity لذت ببرید.',
                             tier: 'Silver',
-                            duration: '۷ روز',
+                            duration: '۳ روز',
                             expires: payload.data && payload.data.expires ? payload.data.expires : '',
                             actionLabel: 'مشاهده وضعیت اشتراک',
                             reloadOnClose: true,
@@ -342,7 +342,7 @@
                             : 'ارتباط با سرویس VIPCore برقرار نشد.';
                     }
                     freeTrialButton.disabled = false;
-                    freeTrialButton.textContent = 'دریافت Silver رایگان · ۷ روز';
+                    freeTrialButton.textContent = 'دریافت Silver رایگان · ۳ روز';
                 }
             });
         }
