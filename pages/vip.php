@@ -908,7 +908,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
             <?php endif; ?>
 
             <?php if ($isVipTestAdmin): ?>
-                <div class="vip-test-purchase" data-vip-test-purchase-box>
+                <div class="vip-test-purchase" data-vip-test-purchase-box hidden>
                     <button type="button" class="vip-test-purchase-button" data-vip-test-purchase data-csrf-token="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" data-level="1" disabled>
                         ثبت آزمایشی VIP بدون پرداخت
                     </button>
