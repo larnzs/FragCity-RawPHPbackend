@@ -3846,3 +3846,152 @@ body { max-width: 100%; overflow-x: clip; }
         transition: none !important;
     }
 }
+
+
+/* Secondary header controls use the same 46px neutral / gold-active system. */
+.shock-header .shock-user-area-wrapper > .frag-login-btn,
+.shock-header .shock-user-area-wrapper > .fc-motion-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 46px;
+    min-height: 46px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    gap: 8px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: #A3A3A3;
+    box-shadow: none;
+    font-family: inherit;
+    font-size: .86rem;
+    font-weight: 750;
+    line-height: 1.1;
+    text-decoration: none;
+    text-shadow: none;
+    white-space: nowrap;
+    transform: none;
+    filter: none;
+    transition:
+        color 150ms ease,
+        background-color 150ms ease,
+        border-color 150ms ease,
+        box-shadow 150ms ease;
+}
+
+.shock-header .shock-user-area-wrapper > .frag-login-btn > i,
+.shock-header .shock-user-area-wrapper > .fc-motion-toggle > i {
+    color: #8B8B8B;
+    font-size: .95rem;
+    transition: color 150ms ease;
+}
+
+/* Resting controls stay neutral; hover is deliberately subtler than selected. */
+.shock-header .shock-user-area-wrapper > .frag-login-btn:not(.active):not([aria-expanded="true"]):hover,
+.shock-header .shock-user-area-wrapper > .fc-motion-toggle:not(.is-active):not([aria-pressed="true"]):hover {
+    border-color: rgba(255, 255, 255, .085);
+    background: rgba(255, 255, 255, .035);
+    color: #E5E5E5;
+    box-shadow: none;
+    transform: none;
+    filter: none;
+}
+
+.shock-header .shock-user-area-wrapper > .frag-login-btn:not(.active):not([aria-expanded="true"]):hover > i,
+.shock-header .shock-user-area-wrapper > .fc-motion-toggle:not(.is-active):not([aria-pressed="true"]):hover > i {
+    color: #D4D4D4;
+}
+
+/* Login is selected on the auth route or while its modal is expanded. */
+.shock-header .shock-user-area-wrapper > .frag-login-btn.active,
+.shock-header .shock-user-area-wrapper > .frag-login-btn[aria-expanded="true"],
+.shock-header .shock-user-area-wrapper > .fc-motion-toggle.is-active,
+.shock-header .shock-user-area-wrapper > .fc-motion-toggle[aria-pressed="true"] {
+    border-color: rgba(255, 179, 71, .48);
+    background: linear-gradient(135deg, rgba(255, 179, 71, .20), rgba(249, 115, 22, .115));
+    color: #FFE2B5;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045);
+    text-shadow: 0 0 18px rgba(255, 179, 71, .10);
+}
+
+.shock-header .shock-user-area-wrapper > .frag-login-btn.active > i,
+.shock-header .shock-user-area-wrapper > .frag-login-btn[aria-expanded="true"] > i,
+.shock-header .shock-user-area-wrapper > .fc-motion-toggle.is-active > i,
+.shock-header .shock-user-area-wrapper > .fc-motion-toggle[aria-pressed="true"] > i {
+    color: #FFB347;
+}
+
+.shock-header .shock-user-area-wrapper > .frag-login-btn:focus-visible,
+.shock-header .shock-user-area-wrapper > .fc-motion-toggle:focus-visible {
+    outline: 2px solid rgba(255, 179, 71, .55);
+    outline-offset: 3px;
+}
+
+/* The desktop More trigger is a regular labeled navigation button now. */
+.shock-header #shockMoreButton {
+    gap: 8px;
+}
+
+.shock-header #shockMoreButton .frag-arrow {
+    color: #8B8B8B;
+    font-size: .72rem;
+    transition: color 150ms ease, transform 180ms ease;
+}
+
+.shock-header #shockMoreButton.active .frag-arrow {
+    color: #FFB347;
+}
+
+.shock-header #shockMoreButton:not(.active):hover .frag-arrow {
+    color: #D4D4D4;
+}
+
+/* The mobile Performance Mode control follows the same active palette. */
+.mobile-nav-links > .fc-motion-toggle-mobile {
+    min-height: 46px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: #A3A3A3;
+    font-size: .88rem;
+    font-weight: 750;
+    box-shadow: none;
+}
+
+.mobile-nav-links > .fc-motion-toggle-mobile > i {
+    color: #8B8B8B;
+}
+
+.mobile-nav-links > .fc-motion-toggle-mobile:not(.is-active):hover,
+.mobile-nav-links > .fc-motion-toggle-mobile:not(.is-active):focus-visible {
+    border-color: rgba(255, 255, 255, .085);
+    background: rgba(255, 255, 255, .035);
+    color: #E5E5E5;
+}
+
+.mobile-nav-links > .fc-motion-toggle-mobile:not(.is-active):hover > i {
+    color: #D4D4D4;
+}
+
+.mobile-nav-links > .fc-motion-toggle-mobile.is-active,
+.mobile-nav-links > .fc-motion-toggle-mobile[aria-pressed="true"] {
+    border-color: rgba(255, 179, 71, .43);
+    background: linear-gradient(135deg, rgba(255, 179, 71, .17), rgba(249, 115, 22, .10));
+    color: #FFE2B5;
+    box-shadow: inset -3px 0 0 #FFB347;
+}
+
+.mobile-nav-links > .fc-motion-toggle-mobile.is-active > i,
+.mobile-nav-links > .fc-motion-toggle-mobile[aria-pressed="true"] > i {
+    color: #FFB347;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-header .shock-user-area-wrapper > .frag-login-btn,
+    .shock-header .shock-user-area-wrapper > .fc-motion-toggle,
+    .shock-header #shockMoreButton .frag-arrow,
+    .mobile-nav-links > .fc-motion-toggle-mobile {
+        transition: none !important;
+    }
+}
