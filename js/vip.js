@@ -577,6 +577,29 @@
         plans.forEach(function (plan) {
             const selectButton = plan.querySelector('[data-vip-select-plan]');
             const featureButton = plan.querySelector('[data-vip-open-comparison]');
+            const level = Number(plan.dataset.level || 0);
+            const isAdminTestTier = root.dataset.vipTestAdmin === '1' && [1, 2, 3].includes(level);
+            const canSelectCard = (
+                (plan.dataset.vipAvailable === '1' || isAdminTestTier)
+                && plan.dataset.vipCurrent !== '1'
+            );
+
+            // The card body is a selection target; nested action buttons keep their own behavior.
+            plan.dataset.cardSelectable = canSelectCard ? '1' : '0';
+            plan.tabIndex = canSelectCard ? 0 : -1;
+            if (canSelectCard) {
+                plan.addEventListener('click', function (event) {
+                    if (event.defaultPrevented) return;
+                    if (event.target.closest('button, a, input, select, textarea, [data-vip-open-comparison]')) return;
+                    selectPlan(plan, true);
+                });
+
+                plan.addEventListener('keydown', function (event) {
+                    if (event.target !== plan || (event.key !== 'Enter' && event.key !== ' ')) return;
+                    event.preventDefault();
+                    selectPlan(plan, true);
+                });
+            }
 
             if (selectButton) {
                 selectButton.addEventListener('click', function () {
