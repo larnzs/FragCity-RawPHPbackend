@@ -90,88 +90,40 @@ $serverStoreDefaultMapGroup = 'mg_comp';
 <main class="server-store-page" dir="rtl">
     <div class="server-store-container">
         <header class="server-store-hero" data-fc-reveal="up">
-            <div class="server-store-hero-icon" aria-hidden="true">
-                <i class="fa-solid fa-server"></i>
+            <div class="server-store-hero-main">
+                <div class="server-store-hero-icon" aria-hidden="true">
+                    <i class="fa-solid fa-server"></i>
+                </div>
+                <div class="server-store-hero-copy">
+                    <span class="server-store-eyebrow" dir="ltr">FRAGCITY / GAME HOSTING</span>
+                    <h1>سرور CS2 خودت رو بساز</h1>
+                    <p>یک سرور چندحالته با منابع اختصاصی انتخاب کن و تنظیمات بازی را دقیقاً مطابق سبک کامیونیتی خودت بچین.</p>
+                    <div class="server-store-hero-tags">
+                        <span><i class="fa-solid fa-check" aria-hidden="true"></i> منابع مشخص</span>
+                        <span><i class="fa-solid fa-sliders" aria-hidden="true"></i> تنظیمات قابل انتخاب</span>
+                        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> محافظت اختیاری</span>
+                    </div>
+                </div>
             </div>
 
-            <div class="server-store-hero-copy">
-                <span class="server-store-eyebrow" dir="ltr">FRAGCITY · SERVER STORE</span>
-                <h1>سرور اختصاصی CS2 خودت رو بساز</h1>
-                <p>ظرفیت، تنظیمات گیم‌مود و قابلیت‌های موردنیازت رو در یک مسیر یکپارچه انتخاب کن.</p>
-            </div>
-
-            <div class="server-store-hero-aside">
-                <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-                <span>پیکربندی اختصاصی</span>
+            <div class="server-store-hero-product">
+                <span class="server-store-product-kicker">YOUR GAME SERVER</span>
+                <strong>CS2 Multimode</strong>
+                <span class="server-store-product-status"><i class="fa-solid fa-circle" aria-hidden="true"></i> پلن پیکربندی‌شده</span>
+                <div class="server-store-product-mark" aria-hidden="true">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </div>
             </div>
         </header>
 
-        <ol class="server-store-progress" aria-label="مراحل خرید سرور" data-fc-reveal="up" data-fc-reveal-delay="60">
-            <li class="is-current">
-                <span class="server-store-progress-index">01</span>
-                <span><strong>پیکربندی سرور</strong><small>انتخاب مشخصات و امکانات</small></span>
-            </li>
-            <li>
-                <span class="server-store-progress-index">02</span>
-                <span><strong>بررسی سفارش</strong><small>مشاهده جزئیات و مبلغ</small></span>
-            </li>
-            <li>
-                <span class="server-store-progress-index">03</span>
-                <span><strong>راه‌اندازی سرویس</strong><small>ساخت و تحویل سرور</small></span>
-            </li>
-        </ol>
-
         <div class="server-store-layout">
             <div class="server-store-main">
-                <section class="server-store-section" aria-labelledby="serverDurationTitle" data-fc-reveal="up">
+                <section class="server-store-section server-store-resources-section" aria-labelledby="serverResourcesTitle" data-fc-reveal="up" data-fc-reveal-delay="40">
                     <div class="server-store-section-heading">
                         <span class="server-store-section-index">01</span>
                         <div>
-                            <h2 id="serverDurationTitle">مدت اشتراک سرور</h2>
-                            <p>مدت موردنظرت رو انتخاب کن؛ جزئیات قیمت پس از اتصال کاتالوگ فروش نمایش داده می‌شه.</p>
-                        </div>
-                        <span class="server-store-section-state">انتخاب پلن</span>
-                    </div>
-
-                    <div class="server-store-duration-grid" aria-label="گزینه‌های مدت اشتراک">
-                        <article class="server-store-duration-card">
-                            <span class="server-store-duration-code">01 DAY</span>
-                            <strong>۱ روز</strong>
-                            <small>اشتراک کوتاه‌مدت</small>
-                        </article>
-                        <article class="server-store-duration-card">
-                            <span class="server-store-duration-code">03 DAYS</span>
-                            <strong>۳ روز</strong>
-                            <small>اشتراک آزمایشی</small>
-                        </article>
-                        <article class="server-store-duration-card">
-                            <span class="server-store-duration-code">07 DAYS</span>
-                            <strong>۷ روز</strong>
-                            <small>یک هفته</small>
-                        </article>
-                        <article class="server-store-duration-card">
-                            <span class="server-store-duration-code">15 DAYS</span>
-                            <strong>۱۵ روز</strong>
-                            <small>نیم‌ماه</small>
-                        </article>
-                        <article class="server-store-duration-card">
-                            <span class="server-store-duration-code">30 DAYS</span>
-                            <strong>۳۰ روز</strong>
-                            <small>یک ماه</small>
-                        </article>
-                    </div>
-                    <p class="server-store-inline-note">
-                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                        کارت‌ها در این مرحله نمایشی هستند و هنوز به قیمت‌گذاری یا ثبت سفارش متصل نشده‌اند.
-                    </p>
-                </section>
-
-                <section class="server-store-section" aria-labelledby="serverResourcesTitle" data-fc-reveal="up" data-fc-reveal-delay="50">
-                    <div class="server-store-section-heading">
-                        <span class="server-store-section-index">02</span>
-                        <div>
-                            <h2 id="serverResourcesTitle">مشخصات پلن · CS2 Multimode Server</h2>
-                            <p>منابع ثابت این پلن؛ ظرفیت و تنظیمات گیم‌سرور در بخش پیکربندی انتخاب می‌شوند.</p>
+                            <h2 id="serverResourcesTitle">منابع اختصاصی پلن</h2>
+                            <p>منابع ثابت سرور شما؛ ظرفیت و تنظیمات بازی در مرحله بعد قابل انتخاب هستند.</p>
                         </div>
                         <span class="server-store-section-state">پلن پایه</span>
                     </div>
@@ -209,12 +161,12 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                 </section>
 
                 <form id="serverStoreConfigForm" class="server-store-config-form" autocomplete="off">
-                    <section class="server-store-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="90">
+                    <section class="server-store-section server-store-config-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">03</span>
+                            <span class="server-store-section-index">02</span>
                             <div>
-                                <h2 id="serverGameModeTitle">پیکربندی سرور CS2</h2>
-                                <p>فیلدها و مقادیر این بخش با Checkout افزونه FragCity CS2 در Billing هماهنگ شده‌اند.</p>
+                                <h2 id="serverGameModeTitle">تنظیمات گیم‌سرور</h2>
+                                <p>مود بازی، نقشه شروع و ظرفیت بازیکنان را مشخص کن.</p>
                             </div>
                             <span class="server-store-section-state">تنظیمات الزامی</span>
                         </div>
@@ -294,12 +246,12 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                         </div>
                     </section>
 
-                    <section class="server-store-section" aria-labelledby="serverAddonTitle" data-fc-reveal="up" data-fc-reveal-delay="130">
+                    <section class="server-store-section server-store-security-section" aria-labelledby="serverAddonTitle" data-fc-reveal="up" data-fc-reveal-delay="120">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">04</span>
+                            <span class="server-store-section-index">03</span>
                             <div>
-                                <h2 id="serverAddonTitle">قوانین اتصال و افزونه‌های تکمیلی</h2>
-                                <p>سیاست ورود بازیکنان و قابلیت محافظت اضافه را تنظیم کن.</p>
+                                <h2 id="serverAddonTitle">محافظت و قوانین اتصال</h2>
+                                <p>قوانین ورود بازیکنان و افزونه محافظت در برابر بات‌ها را تنظیم کن.</p>
                             </div>
                         </div>
 
@@ -355,7 +307,7 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                 </div>
 
                 <h2 id="serverSummaryTitle">خلاصه سفارش</h2>
-                <p class="server-store-summary-description">پیکربندی انتخاب‌شده و مشخصات سرویس را پیش از فعال‌شدن Checkout مرور کن.</p>
+                <p class="server-store-summary-description">خلاصه انتخاب‌هایت اینجا به‌روزرسانی می‌شود. پیش از فعال‌شدن خرید، همه موارد را بررسی کن.</p>
 
                 <div class="server-store-summary-product">
                     <span class="server-store-summary-product-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
@@ -387,7 +339,7 @@ $serverStoreDefaultMapGroup = 'mg_comp';
 
                 <div class="server-store-summary-footnote">
                     <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                    این صفحه در مرحله طراحی رابط کاربری است؛ سفارش و Provisioning تا آماده‌شدن Backend فعال نمی‌شوند.
+                    پیکربندی فعلاً در حالت پیش‌نمایش است؛ ثبت سفارش پس از اتصال Backend فعال خواهد شد.
                 </div>
             </aside>
         </div>
