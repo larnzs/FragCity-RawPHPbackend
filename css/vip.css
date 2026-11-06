@@ -3238,3 +3238,177 @@ body.vip-comparison-open {
     top: var(--vip-invoice-footer-top, auto) !important;
     bottom: auto !important;
 }
+
+
+/* Clear separation and readable hierarchy for inactive tiers and VIP rules. */
+.vip-page > .vip-locked-section {
+    margin-bottom: 30px !important;
+}
+
+.vip-page > .vip-admin-guide-grid {
+    margin-top: 30px !important;
+}
+
+.vip-page .vip-locked-toggle {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    min-height: 82px;
+    padding: 16px 20px;
+}
+
+.vip-page .vip-locked-toggle-copy {
+    display: flex !important;
+    flex: 1 1 auto !important;
+    flex-direction: column !important;
+    align-items: flex-start;
+    justify-content: center;
+    min-width: 0;
+    gap: 7px !important;
+    line-height: 1.5;
+}
+
+.vip-page .vip-locked-toggle-copy > strong {
+    display: block;
+    line-height: 1.5;
+}
+
+.vip-page .vip-locked-toggle-copy > small {
+    display: block;
+    line-height: 1.6;
+}
+
+.vip-page .vip-locked-toggle-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    margin-inline-start: 4px;
+    line-height: 1.5;
+}
+
+.vip-page .vip-locked-toggle-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    margin-inline-start: 2px;
+    line-height: 1.5;
+}
+
+.vip-page .vip-admin-guide {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 22px 24px;
+}
+
+.vip-page .vip-admin-guide .vip-notice-heading {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    margin: 0 0 17px;
+    padding: 0 0 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, .075);
+}
+
+.vip-page .vip-admin-guide .vip-notice-heading > span:last-child {
+    display: flex !important;
+    flex: 1 1 auto;
+    flex-direction: column !important;
+    align-items: flex-start;
+    justify-content: center;
+    min-width: 0;
+    gap: 7px !important;
+}
+
+.vip-page .vip-admin-guide .vip-notice-heading strong {
+    display: block;
+    color: #F5F5F5;
+    font-size: .98rem;
+    font-weight: 900;
+    line-height: 1.65;
+}
+
+.vip-page .vip-admin-guide .vip-notice-heading small {
+    display: block;
+    max-width: 100%;
+    color: #A3A3A3;
+    font-size: .82rem;
+    line-height: 1.95;
+}
+
+.vip-page .vip-admin-guide .vip-admin-guide-copy {
+    display: block;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0;
+    color: #D4D4D4;
+    font-size: .88rem;
+    line-height: 2.1;
+    text-align: right;
+    direction: rtl;
+}
+
+.vip-page .vip-admin-guide .vip-admin-guide-copy bdi {
+    display: inline-block;
+    margin-inline: 2px;
+    color: #FFBD86;
+    font-weight: 850;
+    line-height: 1.8;
+}
+
+@media (max-width: 700px) {
+    .vip-page > .vip-locked-section {
+        margin-bottom: 22px !important;
+    }
+
+    .vip-page > .vip-admin-guide-grid {
+        margin-top: 22px !important;
+    }
+
+    .vip-page .vip-locked-toggle {
+        min-height: 72px;
+        gap: 11px !important;
+        padding: 12px 13px;
+    }
+
+    .vip-page .vip-locked-toggle-copy {
+        gap: 5px !important;
+    }
+
+    .vip-page .vip-locked-toggle-status {
+        display: none;
+    }
+
+    .vip-page .vip-admin-guide {
+        gap: 0;
+        padding: 17px 16px;
+    }
+
+    .vip-page .vip-admin-guide .vip-notice-heading {
+        align-items: flex-start;
+        gap: 11px;
+        margin-bottom: 14px;
+        padding-bottom: 13px;
+    }
+
+    .vip-page .vip-admin-guide .vip-notice-heading > span:last-child {
+        gap: 5px !important;
+    }
+
+    .vip-page .vip-admin-guide .vip-notice-heading strong {
+        font-size: .88rem;
+    }
+
+    .vip-page .vip-admin-guide .vip-notice-heading small {
+        font-size: .76rem;
+        line-height: 1.9;
+    }
+
+    .vip-page .vip-admin-guide .vip-admin-guide-copy {
+        font-size: .8rem;
+        line-height: 2;
+    }
+}
