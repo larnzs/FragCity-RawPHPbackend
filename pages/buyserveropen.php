@@ -2,9 +2,90 @@
 /**
  * FragCity CS2 server storefront.
  *
- * This is the presentation layer only. Order creation, pricing and provisioning
- * remain disabled until the server-order backend contract is implemented.
+ * Checkout values mirror the FragCityCS2 Paymenter manifest. This page collects
+ * a local configuration preview only; order creation and provisioning remain
+ * disabled until the signed server-order backend is implemented.
  */
+$serverStoreGameModes = [
+    ['label' => 'Casual — casual.cfg', 'config' => 'casual.cfg', 'map_groups' => ['mg_active', 'mg_comp']],
+    ['label' => 'Gun Game — gg.cfg', 'config' => 'gg.cfg', 'map_groups' => ['mg_gg']],
+    ['label' => 'Deathmatch — deathmatch.cfg', 'config' => 'deathmatch.cfg', 'map_groups' => ['mg_dm']],
+    ['label' => 'Competitive — comp.cfg', 'config' => 'comp.cfg', 'map_groups' => ['mg_comp']],
+    ['label' => 'Wingman — wingman.cfg', 'config' => 'wingman.cfg', 'map_groups' => ['mg_wingman']],
+    ['label' => 'Practice Mode — prac.cfg', 'config' => 'prac.cfg', 'map_groups' => ['mg_comp']],
+    ['label' => 'Prefire — prefire.cfg', 'config' => 'prefire.cfg', 'map_groups' => ['mg_prefire']],
+    ['label' => 'Retakes — retake.cfg', 'config' => 'retake.cfg', 'map_groups' => ['mg_retake']],
+    ['label' => 'Executes — executes.cfg', 'config' => 'executes.cfg', 'map_groups' => ['mg_executes']],
+    ['label' => 'Awp Only — awp.cfg', 'config' => 'awp.cfg', 'map_groups' => ['mg_awp']],
+    ['label' => '1v1 Arenas — 1v1.cfg', 'config' => '1v1.cfg', 'map_groups' => ['mg_1v1']],
+    ['label' => 'Aim — aim.cfg', 'config' => 'aim.cfg', 'map_groups' => ['mg_aim']],
+    ['label' => 'Bhop — bhop.cfg', 'config' => 'bhop.cfg', 'map_groups' => ['mg_bhop']],
+    ['label' => 'Surf — surf.cfg', 'config' => 'surf.cfg', 'map_groups' => ['mg_surf']],
+    ['label' => 'Kreedz Climbing — kz.cfg', 'config' => 'kz.cfg', 'map_groups' => ['mg_kz']],
+    ['label' => 'Capture The Flag — ctf.cfg', 'config' => 'ctf.cfg', 'map_groups' => ['mg_ctf']],
+    ['label' => 'Hide N Seek — hns.cfg', 'config' => 'hns.cfg', 'map_groups' => ['mg_hns']],
+    ['label' => 'Soccer — soccer.cfg', 'config' => 'soccer.cfg', 'map_groups' => ['mg_soccer']],
+    ['label' => 'Course — course.cfg', 'config' => 'course.cfg', 'map_groups' => ['mg_course']],
+    ['label' => 'Deathrun — deathrun.cfg', 'config' => 'deathrun.cfg', 'map_groups' => ['mg_deathrun']],
+    ['label' => 'Minigames — minigames.cfg', 'config' => 'minigames.cfg', 'map_groups' => ['mg_minigames']],
+    ['label' => 'ScoutzKnivez — scoutzknivez.cfg', 'config' => 'scoutzknivez.cfg', 'map_groups' => ['mg_scoutzknivez']],
+    ['label' => 'One In The Chamber — oitc.cfg', 'config' => 'oitc.cfg', 'map_groups' => ['mg_gg']],
+    ['label' => 'Battle Ball — battle.cfg', 'config' => 'battle.cfg', 'map_groups' => ['mg_battle']],
+    ['label' => 'Battle Royale — br.cfg', 'config' => 'br.cfg', 'map_groups' => ['mg_battleroyale']],
+    ['label' => 'Casual (1.6) — Casual-1.6.cfg', 'config' => 'Casual-1.6.cfg', 'map_groups' => ['mg_casual-1.6']],
+    ['label' => 'Competitive (Valve) — valve-competitive.cfg', 'config' => 'valve-competitive.cfg', 'map_groups' => ['mg_valve_competitive']],
+    ['label' => 'Deathmatch FFA (Valve) — valve-deathmatch-freeforall.cfg', 'config' => 'valve-deathmatch-freeforall.cfg', 'map_groups' => ['mg_valve_deathmatch']],
+    ['label' => 'Arms Race (Valve) — valve-armsrace.cfg', 'config' => 'valve-armsrace.cfg', 'map_groups' => ['mg_valve_arms_race']],
+    ['label' => 'Wingman (Valve) — valve-wingman.cfg', 'config' => 'valve-wingman.cfg', 'map_groups' => ['mg_valve_wingman']],
+    ['label' => 'Casual Workshop — casualw.cfg', 'config' => 'casualw.cfg', 'map_groups' => ['mg_casualw']],
+    ['label' => 'Casual Active — casual-active.cfg', 'config' => 'casual-active.cfg', 'map_groups' => ['mg_casuala']],
+    ['label' => 'Retakes (Valve) — valve-retake.cfg', 'config' => 'valve-retake.cfg', 'map_groups' => ['mg_valve_retakes']],
+    ['label' => 'Competitive 45° — 45.cfg', 'config' => '45.cfg', 'map_groups' => ['mg_45']],
+];
+
+$serverStoreMapGroupLabels = [
+    'mg_active' => 'Casual — mg_active',
+    'mg_comp' => 'Casual / Competitive / Practice Mode — mg_comp',
+    'mg_gg' => 'Gun Game / One In The Chamber — mg_gg',
+    'mg_dm' => 'Deathmatch — mg_dm',
+    'mg_wingman' => 'Wingman — mg_wingman',
+    'mg_prefire' => 'Prefire — mg_prefire',
+    'mg_retake' => 'Retakes — mg_retake',
+    'mg_executes' => 'Executes — mg_executes',
+    'mg_awp' => 'Awp Only — mg_awp',
+    'mg_1v1' => '1v1 Arenas — mg_1v1',
+    'mg_aim' => 'Aim — mg_aim',
+    'mg_bhop' => 'Bhop — mg_bhop',
+    'mg_surf' => 'Surf — mg_surf',
+    'mg_kz' => 'Kreedz Climbing — mg_kz',
+    'mg_ctf' => 'Capture The Flag — mg_ctf',
+    'mg_hns' => 'Hide N Seek — mg_hns',
+    'mg_soccer' => 'Soccer — mg_soccer',
+    'mg_course' => 'Course — mg_course',
+    'mg_deathrun' => 'Deathrun — mg_deathrun',
+    'mg_minigames' => 'Minigames — mg_minigames',
+    'mg_scoutzknivez' => 'ScoutzKnivez — mg_scoutzknivez',
+    'mg_battle' => 'Battle Ball — mg_battle',
+    'mg_battleroyale' => 'Battle Royale — mg_battleroyale',
+    'mg_casual-1.6' => 'Casual (1.6) — mg_casual-1.6',
+    'mg_valve_competitive' => 'Competitive (Valve) — mg_valve_competitive',
+    'mg_valve_deathmatch' => 'Deathmatch FFA (Valve) — mg_valve_deathmatch',
+    'mg_valve_arms_race' => 'Arms Race (Valve) — mg_valve_arms_race',
+    'mg_valve_wingman' => 'Wingman (Valve) — mg_valve_wingman',
+    'mg_casualw' => 'Casual Workshop — mg_casualw',
+    'mg_casuala' => 'Casual Active — mg_casuala',
+    'mg_valve_retakes' => 'Retakes (Valve) — mg_valve_retakes',
+    'mg_45' => 'Competitive 45° — mg_45',
+];
+
+$serverStoreMapGroupModes = [];
+foreach ($serverStoreGameModes as $serverStoreMode) {
+    foreach ($serverStoreMode['map_groups'] as $serverStoreMapGroup) {
+        $serverStoreMapGroupModes[$serverStoreMapGroup][] = $serverStoreMode['config'];
+    }
+}
+$serverStoreDefaultConfig = 'comp.cfg';
+$serverStoreDefaultMapGroup = 'mg_comp';
 ?>
 <main class="server-store-page" dir="rtl">
     <div class="server-store-container">
@@ -85,98 +166,186 @@
                     </p>
                 </section>
 
-                <section class="server-store-section" aria-labelledby="serverCapacityTitle" data-fc-reveal="up" data-fc-reveal-delay="50">
+                <section class="server-store-section" aria-labelledby="serverResourcesTitle" data-fc-reveal="up" data-fc-reveal-delay="50">
                     <div class="server-store-section-heading">
                         <span class="server-store-section-index">02</span>
                         <div>
-                            <h2 id="serverCapacityTitle">ظرفیت و مشخصات سرور</h2>
-                            <p>منابع اصلی سرور را متناسب با تعداد بازیکنان و نوع استفاده تنظیم کن.</p>
+                            <h2 id="serverResourcesTitle">مشخصات پلن · CS2 Multimode Server</h2>
+                            <p>منابع ثابت این پلن؛ ظرفیت و تنظیمات گیم‌سرور در بخش پیکربندی انتخاب می‌شوند.</p>
                         </div>
+                        <span class="server-store-section-state">پلن پایه</span>
                     </div>
 
-                    <div class="server-store-setting-grid">
-                        <article class="server-store-setting-card">
-                            <div class="server-store-setting-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></div>
-                            <div class="server-store-setting-copy">
-                                <strong>حداکثر بازیکنان</strong>
-                                <span>CS2 Maximum Players</span>
+                    <div class="server-store-resource-grid">
+                        <article class="server-store-resource-card">
+                            <span class="server-store-resource-icon"><i class="fa-solid fa-memory" aria-hidden="true"></i></span>
+                            <div class="server-store-resource-copy">
+                                <small>RAM</small>
+                                <strong>1024 MB</strong>
+                                <span>DDR5 · 6000 MHz · CL30</span>
                             </div>
-                            <div class="server-store-setting-value">در انتظار انتخاب</div>
-                            <small>ظرفیت پایه و اسلات‌های اضافه در محاسبه نهایی لحاظ می‌شوند.</small>
                         </article>
-
-                        <article class="server-store-setting-card">
-                            <div class="server-store-setting-icon"><i class="fa-solid fa-network-wired" aria-hidden="true"></i></div>
-                            <div class="server-store-setting-copy">
-                                <strong>نود و پورت اتصال</strong>
-                                <span>Node &amp; Allocation</span>
+                        <article class="server-store-resource-card">
+                            <span class="server-store-resource-icon"><i class="fa-solid fa-hard-drive" aria-hidden="true"></i></span>
+                            <div class="server-store-resource-copy">
+                                <small>SSD STORAGE</small>
+                                <strong>10 GB</strong>
+                                <span>فضای ذخیره‌سازی پلن</span>
                             </div>
-                            <div class="server-store-setting-value is-auto">
-                                <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-                                تخصیص خودکار
-                            </div>
-                            <small>نود و پورت مناسب توسط سیستم انتخاب می‌شود؛ نیازی به انتخاب دستی نیست.</small>
                         </article>
+                        <article class="server-store-resource-card">
+                            <span class="server-store-resource-icon"><i class="fa-solid fa-microchip" aria-hidden="true"></i></span>
+                            <div class="server-store-resource-copy">
+                                <small>CPU</small>
+                                <strong>1 Core</strong>
+                                <span>AMD Ryzen 9 7950X · 5.7 GHz</span>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="server-store-resource-footnote">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                        نود و پورت اتصال به‌صورت خودکار توسط سیستم تخصیص داده می‌شوند.
                     </div>
                 </section>
 
-                <section class="server-store-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="90">
-                    <div class="server-store-section-heading">
-                        <span class="server-store-section-index">03</span>
-                        <div>
-                            <h2 id="serverGameModeTitle">تنظیمات GameModeManager</h2>
-                            <p>گروه نقشه و CFG گیم‌مود را از گزینه‌های مجاز سرور انتخاب خواهی کرد.</p>
-                        </div>
-                    </div>
-
-                    <div class="server-store-setting-grid">
-                        <article class="server-store-setting-card server-store-setting-card--wide">
-                            <div class="server-store-setting-icon"><i class="fa-solid fa-map" aria-hidden="true"></i></div>
-                            <div class="server-store-setting-copy">
-                                <strong>گروه نقشه</strong>
-                                <span>mg_mapgroup</span>
+                <form id="serverStoreConfigForm" class="server-store-config-form" autocomplete="off">
+                    <section class="server-store-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="90">
+                        <div class="server-store-section-heading">
+                            <span class="server-store-section-index">03</span>
+                            <div>
+                                <h2 id="serverGameModeTitle">پیکربندی سرور CS2</h2>
+                                <p>فیلدها و مقادیر این بخش با Checkout افزونه FragCity CS2 در Billing هماهنگ شده‌اند.</p>
                             </div>
-                            <div class="server-store-setting-value">فهرست گزینه‌ها متصل می‌شود</div>
-                            <small>فقط Map Groupهای تعریف‌شده و مجاز GameModeManager نمایش داده می‌شوند.</small>
-                        </article>
+                            <span class="server-store-section-state">تنظیمات الزامی</span>
+                        </div>
 
-                        <article class="server-store-setting-card server-store-setting-card--wide">
-                            <div class="server-store-setting-icon"><i class="fa-solid fa-file-code" aria-hidden="true"></i></div>
-                            <div class="server-store-setting-copy">
-                                <strong>پیکربندی گیم‌مود</strong>
-                                <span>GameMode CFG</span>
+                        <div class="server-store-field-grid">
+                            <div class="server-store-field">
+                                <label for="serverStoreMap">نقشه پیش‌فرض <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <input
+                                    class="server-store-input"
+                                    id="serverStoreMap"
+                                    name="SRCDS_MAP"
+                                    type="text"
+                                    value="de_dust2"
+                                    placeholder="de_dust2"
+                                    pattern="[A-Za-z0-9_-]+"
+                                    maxlength="64"
+                                    required
+                                    aria-describedby="serverStoreMapHelp"
+                                >
+                                <small id="serverStoreMapHelp">نام نقشه‌ای که سرور پس از راه‌اندازی با آن بالا می‌آید؛ مانند de_dust2 یا de_mirage.</small>
                             </div>
-                            <div class="server-store-setting-value">فهرست گزینه‌ها متصل می‌شود</div>
-                            <small>فقط CFGهای گیم‌مود قابل انتخاب هستند؛ فایل‌های تنظیمات عمومی در این فهرست قرار نمی‌گیرند.</small>
-                        </article>
-                    </div>
-                </section>
 
-                <section class="server-store-section" aria-labelledby="serverAddonTitle" data-fc-reveal="up" data-fc-reveal-delay="130">
-                    <div class="server-store-section-heading">
-                        <span class="server-store-section-index">04</span>
-                        <div>
-                            <h2 id="serverAddonTitle">افزونه‌های تکمیلی</h2>
-                            <p>قابلیت‌های اضافه را در کنار سرویس اصلی فعال کن.</p>
-                        </div>
-                    </div>
-
-                    <article class="server-store-addon-card">
-                        <div class="server-store-addon-icon"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i></div>
-                        <div class="server-store-addon-copy">
-                            <div class="server-store-addon-title">
-                                <strong>Bot Guard</strong>
-                                <span class="server-store-addon-badge">افزونه اختیاری</span>
+                            <div class="server-store-field">
+                                <label for="serverStorePlayers">ظرفیت بازیکن هم‌زمان <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <input
+                                    class="server-store-input"
+                                    id="serverStorePlayers"
+                                    name="SRCDS_MAXPLAYERS"
+                                    type="number"
+                                    min="5"
+                                    max="64"
+                                    step="1"
+                                    value="32"
+                                    required
+                                    inputmode="numeric"
+                                    aria-describedby="serverStorePlayersHelp"
+                                >
+                                <small id="serverStorePlayersHelp">حداکثر تعداد بازیکنانی که می‌توانند هم‌زمان وارد سرور شوند؛ مقدار مجاز بین 5 و 64 است.</small>
                             </div>
-                            <p>محافظت تکمیلی در برابر ورود و رفتار ربات‌های مزاحم در سرور.</p>
-                            <small>مدت Ban و سایر گزینه‌های مجاز پس از تکمیل اتصال تنظیمات نمایش داده می‌شوند.</small>
+
+                            <div class="server-store-field">
+                                <label for="serverStoreTickrate">Tickrate سرور <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <select class="server-store-select" id="serverStoreTickrate" name="TICKRATE" required aria-describedby="serverStoreTickrateHelp">
+                                    <option value="64" selected>64 Tick · نرخ پایه</option>
+                                    <option value="128">128 Tick · ارتقای پولی</option>
+                                </select>
+                                <small id="serverStoreTickrateHelp">Tickrate قابل انتخاب برای سرور. گزینه 128 به‌عنوان ارتقای پولی در سبد خرید FragCity محاسبه می‌شود.</small>
+                            </div>
+
+                            <div class="server-store-field">
+                                <label for="serverStoreExec">حالت بازی (Game Mode CFG) <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <select class="server-store-select" id="serverStoreExec" name="EXEC" required aria-describedby="serverStoreExecHelp">
+                                    <?php foreach ($serverStoreGameModes as $serverStoreMode): ?>
+                                        <option
+                                            value="<?= htmlspecialchars($serverStoreMode['config'], ENT_QUOTES, 'UTF-8') ?>"
+                                            data-map-groups="<?= htmlspecialchars(implode('|', $serverStoreMode['map_groups']), ENT_QUOTES, 'UTF-8') ?>"
+                                            <?= $serverStoreMode['config'] === $serverStoreDefaultConfig ? 'selected' : '' ?>
+                                        ><?= htmlspecialchars($serverStoreMode['label'], ENT_QUOTES, 'UTF-8') ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <small id="serverStoreExecHelp">فایل CFG مربوط به GameModeManager. فقط مودهای تعریف‌شده در GameModes فهرست می‌شوند؛ فایل‌های Settings، Warmup و custom در دسترس Checkout نیستند.</small>
+                            </div>
+
+                            <div class="server-store-field server-store-field--wide">
+                                <label for="serverStoreMapgroup">گروه نقشه (MAPGROUP) <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <select class="server-store-select" id="serverStoreMapgroup" name="MAPGROUP" required aria-describedby="serverStoreMapgroupHelp">
+                                    <?php foreach ($serverStoreMapGroupLabels as $serverStoreMapGroupValue => $serverStoreMapGroupLabel): ?>
+                                        <option
+                                            value="<?= htmlspecialchars($serverStoreMapGroupValue, ENT_QUOTES, 'UTF-8') ?>"
+                                            data-game-modes="<?= htmlspecialchars(implode('|', $serverStoreMapGroupModes[$serverStoreMapGroupValue] ?? []), ENT_QUOTES, 'UTF-8') ?>"
+                                            <?= $serverStoreMapGroupValue === $serverStoreDefaultMapGroup ? 'selected' : '' ?>
+                                        ><?= htmlspecialchars($serverStoreMapGroupLabel, ENT_QUOTES, 'UTF-8') ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                                <small id="serverStoreMapgroupHelp">شناسه Map Group مرتبط با مود بازی. گزینه‌ها بر اساس CFG انتخاب‌شده و مقادیر MapGroups در GameModeManager فیلتر می‌شوند.</small>
+                            </div>
                         </div>
-                        <div class="server-store-addon-state">
-                            <span class="server-store-addon-switch" aria-hidden="true"><span></span></span>
-                            <small>در انتظار اتصال</small>
+                    </section>
+
+                    <section class="server-store-section" aria-labelledby="serverAddonTitle" data-fc-reveal="up" data-fc-reveal-delay="130">
+                        <div class="server-store-section-heading">
+                            <span class="server-store-section-index">04</span>
+                            <div>
+                                <h2 id="serverAddonTitle">قوانین اتصال و افزونه‌های تکمیلی</h2>
+                                <p>سیاست ورود بازیکنان و قابلیت محافظت اضافه را تنظیم کن.</p>
+                            </div>
                         </div>
-                    </article>
-                </section>
+
+                        <div class="server-store-field-grid">
+                            <div class="server-store-field">
+                                <label for="serverStoreCooldown">اخراج بازیکنان دارای Cooldown <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <select class="server-store-select" id="serverStoreCooldown" name="COOLDOWN" required aria-describedby="serverStoreCooldownHelp">
+                                    <option value="0" selected>غیرفعال</option>
+                                    <option value="1">فعال</option>
+                                </select>
+                                <small id="serverStoreCooldownHelp">معادل sv_kick_players_with_cooldown.</small>
+                            </div>
+
+                            <div class="server-store-field">
+                                <label for="serverStoreGuard">فعال‌سازی محافظ Bot Guard <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <select class="server-store-select" id="serverStoreGuard" name="ENABLE_GUARD" required aria-describedby="serverStoreGuardHelp">
+                                    <option value="0" selected>غیرفعال</option>
+                                    <option value="1">فعال — افزونه پولی</option>
+                                </select>
+                                <small id="serverStoreGuardHelp">محافظت در برابر بات‌ها و اتصال‌های مخرب. فعال‌سازی Bot Guard به‌عنوان افزونه پولی در سبد خرید FragCity محاسبه می‌شود.</small>
+                            </div>
+
+                            <div class="server-store-field server-store-field--wide" id="serverStoreGuardMinutesField" hidden>
+                                <label for="serverStoreGuardMinutes">مدت مسدودسازی Bot Guard (دقیقه)</label>
+                                <input
+                                    class="server-store-input"
+                                    id="serverStoreGuardMinutes"
+                                    name="GUARD_BAN_MINUTES"
+                                    type="number"
+                                    min="1"
+                                    step="1"
+                                    value="60"
+                                    inputmode="numeric"
+                                    disabled
+                                    aria-describedby="serverStoreGuardMinutesHelp"
+                                >
+                                <small id="serverStoreGuardMinutesHelp">مدت مسدودسازی در صورت انتخاب رفتار Kick یا Block توسط مدیر محصول. فقط در صورت فعال بودن Bot Guard کاربرد دارد.</small>
+                            </div>
+                        </div>
+
+                        <div class="server-store-config-note" role="note">
+                            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                            انتخاب‌ها در این صفحه برای پیش‌نمایش سفارش هستند؛ ثبت سفارش و Provisioning هنوز به Backend متصل نشده‌اند.
+                        </div>
+                    </section>
+                </form>
             </div>
 
             <aside class="server-store-summary" aria-labelledby="serverSummaryTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
@@ -186,18 +355,22 @@
                 </div>
 
                 <h2 id="serverSummaryTitle">خلاصه سفارش</h2>
-                <p class="server-store-summary-description">با تکمیل پیکربندی، جزئیات سرویس و مبلغ نهایی در این بخش نمایش داده می‌شود.</p>
+                <p class="server-store-summary-description">پیکربندی انتخاب‌شده و مشخصات سرویس را پیش از فعال‌شدن Checkout مرور کن.</p>
 
                 <div class="server-store-summary-product">
                     <span class="server-store-summary-product-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
-                    <span><strong>سرور اختصاصی CS2</strong><small>FragCity Game Hosting</small></span>
+                    <span><strong>CS2 Multimode Server</strong><small>FragCity Game Hosting</small></span>
                 </div>
 
                 <div class="server-store-summary-lines">
-                    <div><span>مدت اشتراک</span><strong>انتخاب نشده</strong></div>
-                    <div><span>ظرفیت بازیکن</span><strong>انتخاب نشده</strong></div>
-                    <div><span>GameMode CFG</span><strong>انتخاب نشده</strong></div>
-                    <div><span>Bot Guard</span><strong>مشخص نشده</strong></div>
+                    <div><span>نقشه پیش‌فرض</span><strong data-server-summary="map">de_dust2</strong></div>
+                    <div><span>ظرفیت بازیکن</span><strong data-server-summary="players">32 نفر</strong></div>
+                    <div><span>Tickrate</span><strong data-server-summary="tickrate">64 Tick</strong></div>
+                    <div><span>Game Mode CFG</span><strong data-server-summary="exec">Competitive — comp.cfg</strong></div>
+                    <div><span>MAPGROUP</span><strong data-server-summary="mapgroup">Casual / Competitive / Practice Mode — mg_comp</strong></div>
+                    <div><span>Cooldown</span><strong data-server-summary="cooldown">غیرفعال</strong></div>
+                    <div><span>Bot Guard</span><strong data-server-summary="guard">غیرفعال</strong></div>
+                    <div><span>مدت مسدودسازی</span><strong data-server-summary="guard-minutes">فقط هنگام فعال بودن</strong></div>
                     <div><span>نود و پورت</span><strong>تخصیص خودکار</strong></div>
                 </div>
 
