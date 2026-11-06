@@ -3231,3 +3231,10 @@ body.vip-comparison-open {
         font-size: .8rem;
     }
 }
+
+
+/* Keep the fixed invoice docked above the shared site footer. */
+.vip-invoice-panel.vip-checkout-bar.is-footer-docked {
+    top: var(--vip-invoice-footer-top, auto) !important;
+    bottom: auto !important;
+}
