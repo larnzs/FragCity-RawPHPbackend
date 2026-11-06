@@ -921,9 +921,11 @@ $pageAssets = [
     'vip' => [
         'css' => [
             '/css/pages-base.css?v=' . asset_version(__DIR__ . '/css/pages-base.css'),
+            '/css/fragcity-success-modal.css?v=' . asset_version(__DIR__ . '/css/fragcity-success-modal.css'),
             '/css/vip.css?v=' . asset_version(__DIR__ . '/css/vip.css'),
         ],
         'js' => [
+            '/js/fragcity-success-modal.js?v=' . asset_version(__DIR__ . '/js/fragcity-success-modal.js'),
             '/js/vip.js?v=' . asset_version(__DIR__ . '/js/vip.js'),
         ],
     ],
