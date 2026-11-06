@@ -3612,64 +3612,131 @@ body { max-width: 100%; overflow-x: clip; }
     }
 }
 
-/* Primary VIP destination: visible beside the main navigation links. */
-.shock-header .shock-nav-item--vip {
+/* Unified navigation styling: only the current destination receives the gold treatment. */
+.shock-header .shock-nav .shock-nav-item {
     min-height: 38px;
-    padding-inline: 15px;
+    padding: 8px 14px;
     gap: 8px;
-    border-color: rgba(255, 179, 71, .25);
-    background: linear-gradient(135deg, rgba(255, 179, 71, .13), rgba(249, 115, 22, .075));
-    color: #FFD28A;
-    font-weight: 850;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .035);
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: #A3A3A3;
+    box-shadow: none;
+    text-shadow: none;
+    font-weight: 750;
+    transition:
+        color 150ms ease,
+        background-color 150ms ease,
+        border-color 150ms ease,
+        box-shadow 150ms ease;
 }
 
-.shock-header .shock-nav-item--vip > i {
+.shock-header .shock-nav .shock-nav-item > i {
+    color: #8B8B8B;
+    transition: color 150ms ease;
+}
+
+/* Hover and keyboard focus stay quiet; they do not imitate the selected state. */
+.shock-header .shock-nav .shock-nav-item:not(.active):hover,
+.shock-header .shock-nav .shock-nav-item:not(.active):focus-visible,
+.shock-header .shock-nav .frag-dropdown.open > .shock-nav-item:not(.active) {
+    border-color: rgba(255, 255, 255, .085);
+    background: rgba(255, 255, 255, .035);
+    color: #E5E5E5;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+.shock-header .shock-nav .shock-nav-item:not(.active):hover > i,
+.shock-header .shock-nav .shock-nav-item:not(.active):focus-visible > i {
+    color: #D4D4D4;
+}
+
+.shock-header .shock-nav .shock-nav-item:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, .38);
+    outline-offset: 2px;
+}
+
+/* The same champagne / gold finish is reserved for the active page. */
+.shock-header .shock-nav .shock-nav-item.active {
+    border-color: rgba(255, 179, 71, .48);
+    background: linear-gradient(135deg, rgba(255, 179, 71, .20), rgba(249, 115, 22, .115));
+    color: #FFE2B5;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045);
+    text-shadow: 0 0 18px rgba(255, 179, 71, .10);
+}
+
+.shock-header .shock-nav .shock-nav-item.active > i {
     color: #FFB347;
 }
 
-.shock-header .shock-nav-item--vip:hover,
-.shock-header .shock-nav-item--vip:focus-visible,
-.shock-header .shock-nav-item--vip.active {
-    border-color: rgba(255, 179, 71, .52);
-    background: linear-gradient(135deg, rgba(255, 179, 71, .22), rgba(249, 115, 22, .13));
+/* Mobile drawer uses the same rule: neutral at rest, gold only for the active page. */
+.mobile-nav-links > .mobile-nav-link,
+.mobile-nav-more > .mobile-nav-more-toggle,
+.mobile-nav-more-menu .mobile-nav-link {
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: #A3A3A3;
+    box-shadow: none;
+    transition:
+        color 150ms ease,
+        background-color 150ms ease,
+        border-color 150ms ease,
+        box-shadow 150ms ease;
+}
+
+.mobile-nav-links > .mobile-nav-link > i,
+.mobile-nav-more > .mobile-nav-more-toggle > i,
+.mobile-nav-more-menu .mobile-nav-link > i {
+    color: #8B8B8B;
+}
+
+.mobile-nav-links > .mobile-nav-link:not(.active):hover,
+.mobile-nav-links > .mobile-nav-link:not(.active):focus-visible,
+.mobile-nav-more > .mobile-nav-more-toggle:not(.active):hover,
+.mobile-nav-more > .mobile-nav-more-toggle:not(.active):focus-visible,
+.mobile-nav-more-menu .mobile-nav-link:not(.active):hover,
+.mobile-nav-more-menu .mobile-nav-link:not(.active):focus-visible {
+    border-color: rgba(255, 255, 255, .085);
+    background: rgba(255, 255, 255, .035);
+    color: #E5E5E5;
+    box-shadow: none;
+}
+
+.mobile-nav-links > .mobile-nav-link:not(.active):hover > i,
+.mobile-nav-more > .mobile-nav-more-toggle:not(.active):hover > i,
+.mobile-nav-more-menu .mobile-nav-link:not(.active):hover > i {
+    color: #D4D4D4;
+}
+
+.mobile-nav-links > .mobile-nav-link:focus-visible,
+.mobile-nav-more > .mobile-nav-more-toggle:focus-visible,
+.mobile-nav-more-menu .mobile-nav-link:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, .38);
+    outline-offset: 2px;
+}
+
+.mobile-nav-links > .mobile-nav-link.active,
+.mobile-nav-more > .mobile-nav-more-toggle.active,
+.mobile-nav-more-menu .mobile-nav-link.active {
+    border-color: rgba(255, 179, 71, .43);
+    background: linear-gradient(135deg, rgba(255, 179, 71, .17), rgba(249, 115, 22, .10));
     color: #FFE2B5;
-    outline: none;
-}
-
-.shock-header .shock-nav-item--vip:hover > i,
-.shock-header .shock-nav-item--vip:focus-visible > i,
-.shock-header .shock-nav-item--vip.active > i {
-    color: #FFD28A;
-}
-
-.mobile-nav-link--vip {
-    border-color: rgba(255, 179, 71, .24);
-    background: linear-gradient(135deg, rgba(255, 179, 71, .12), rgba(249, 115, 22, .065));
-    color: #FFD28A;
-    font-weight: 800;
-}
-
-.mobile-nav-link--vip > i {
-    color: #FFB347;
-}
-
-.mobile-nav-link--vip:hover,
-.mobile-nav-link--vip:focus-visible,
-.mobile-nav-link--vip.active {
-    border-color: rgba(255, 179, 71, .45);
-    background: linear-gradient(135deg, rgba(255, 179, 71, .19), rgba(249, 115, 22, .11));
-    color: #FFE2B5;
-    outline: none;
-}
-
-.mobile-nav-link--vip.active {
     box-shadow: inset -3px 0 0 #FFB347;
 }
 
+.mobile-nav-links > .mobile-nav-link.active > i,
+.mobile-nav-more > .mobile-nav-more-toggle.active > i,
+.mobile-nav-more-menu .mobile-nav-link.active > i {
+    color: #FFB347;
+}
+
 @media (prefers-reduced-motion: reduce) {
-    .shock-header .shock-nav-item--vip,
-    .mobile-nav-link--vip {
+    .shock-header .shock-nav .shock-nav-item,
+    .mobile-nav-links > .mobile-nav-link,
+    .mobile-nav-more > .mobile-nav-more-toggle,
+    .mobile-nav-more-menu .mobile-nav-link {
         transition: none !important;
     }
 }
