@@ -47,7 +47,7 @@ body:has(.server-store-page) .content-fader {
     margin: 0;
     padding:
         calc(var(--fc-header-overlap-height, 72px) + var(--fc-page-safe-gap, 28px))
-        clamp(16px, 2.7vw, 42px)
+        clamp(14px, 2.2vw, 34px)
         64px;
     color: var(--store-text);
     direction: rtl;
@@ -67,8 +67,9 @@ body:has(.server-store-page) .content-fader {
 }
 
 .server-store-container {
-    width: min(100%, 1640px);
-    margin-inline: auto;
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
 }
 
 /* Hero */
@@ -959,7 +960,7 @@ body:has(.server-store-page) .content-fader {
     .server-store-page {
         padding:
             calc(var(--fc-header-overlap-height, 66px) + var(--fc-page-safe-gap, 20px))
-            13px
+            clamp(14px, 2.2vw, 34px)
             44px;
     }
 
