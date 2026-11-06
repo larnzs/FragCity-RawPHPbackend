@@ -108,9 +108,7 @@
 
         function formatGigabytes(valueInMb) {
             const gigabytes = valueInMb / 1024;
-            const formatted = Number.isInteger(gigabytes)
-                ? String(gigabytes)
-                : gigabytes.toFixed(2).replace(/0+$/, '').replace(/\\.$/, '');
+            const formatted = Number(gigabytes.toFixed(2)).toString();
             return formatted + ' GB';
         }
 
