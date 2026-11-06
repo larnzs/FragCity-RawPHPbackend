@@ -684,9 +684,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
 
 
 
-    <div class="vip-store-layout">
-        <div class="vip-store-main-column">
-            <div class="vip-catalog-heading">
+    <div class="vip-catalog-heading">
         <div>
             <span class="vip-store-eyebrow">CHOOSE YOUR TIER</span>
             <h2>سطح‌های VIP</h2>
@@ -863,61 +861,18 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
             ابتدا Gold را انتخاب کن و سپس مدت موردنظرت را مشخص کن.
         </p>
     </section>
-        </div>
 
-        <aside class="vip-invoice-panel" id="vipOrderSummary" data-vip-invoice aria-labelledby="vipInvoiceTitle">
-            <div class="vip-invoice-topline">
-                <span class="vip-store-eyebrow">FRAGCITY · ORDER SUMMARY</span>
-                <span class="vip-invoice-icon" aria-hidden="true"><i class="fas fa-receipt"></i></span>
-            </div>
-            <h2 id="vipInvoiceTitle">فاکتور خرید</h2>
-            <p class="vip-invoice-subtitle">مشخصات سفارش انتخاب‌شده پیش از پرداخت</p>
-
-            <div class="vip-invoice-product">
-                <span>محصول</span>
-                <strong data-invoice-tier>هنوز پلنی انتخاب نشده</strong>
-            </div>
-            <div class="vip-invoice-lines">
-                <div class="vip-invoice-line"><span>سطح عضویت</span><strong data-invoice-level>—</strong></div>
-                <div class="vip-invoice-line"><span>مدت اشتراک</span><strong data-invoice-duration>—</strong></div>
-                <div class="vip-invoice-line"><span>تعداد</span><strong>۱</strong></div>
-            </div>
-            <div class="vip-invoice-total">
-                <span>مبلغ نهایی</span>
-                <strong data-invoice-total>— <small>تومان</small></strong>
-            </div>
-            <p class="vip-invoice-status" data-invoice-status role="status" aria-live="polite">
-                برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.
-            </p>
-            <button type="button" class="vip-invoice-checkout" data-vip-checkout disabled>
-                <i class="fas fa-lock" aria-hidden="true"></i>
-                پرداخت و فعال‌سازی
+    <?php if ($isVipTestAdmin): ?>
+        <div class="vip-test-purchase" data-vip-test-purchase-box hidden>
+            <button type="button" class="vip-test-purchase-button" data-vip-test-purchase data-csrf-token="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" data-level="1" disabled>
+                ثبت آزمایشی VIP بدون پرداخت
             </button>
-            <small class="vip-invoice-checkout-note">Checkout مستقیم پس از تنظیم قیمت‌ها و تکمیل تأیید پرداخت و فعال‌سازی امن VIPCore در دسترس قرار می‌گیرد.</small>
+            <small class="vip-test-purchase-note">حالت آزمایشی فقط برای حساب مدیر و SteamIDهای مجاز در Linux فعال است.</small>
+            <p class="vip-test-purchase-feedback" data-vip-test-feedback role="status" aria-live="polite" hidden></p>
+        </div>
+    <?php endif; ?>
 
-            <?php if ($isLoggedIn): ?>
-                <button type="button" class="vip-invoice-wallet" data-fc-wallet-charge-open>
-                    <i class="fas fa-wallet" aria-hidden="true"></i>
-                    شارژ کیف پول
-                </button>
-            <?php else: ?>
-                <a class="vip-invoice-wallet" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
-                    <i class="fab fa-steam" aria-hidden="true"></i>
-                    ورود با Steam
-                </a>
-            <?php endif; ?>
 
-            <?php if ($isVipTestAdmin): ?>
-                <div class="vip-test-purchase" data-vip-test-purchase-box hidden>
-                    <button type="button" class="vip-test-purchase-button" data-vip-test-purchase data-csrf-token="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>" data-level="1" disabled>
-                        ثبت آزمایشی VIP بدون پرداخت
-                    </button>
-                    <small class="vip-test-purchase-note">حالت آزمایشی فقط برای حساب مدیر و SteamIDهای مجاز در Linux فعال است.</small>
-                    <p class="vip-test-purchase-feedback" data-vip-test-feedback role="status" aria-live="polite" hidden></p>
-                </div>
-            <?php endif; ?>
-        </aside>
-    </div>
 
     <section class="vip-notice-grid vip-admin-guide-grid" aria-label="راهنمای مدیریت VIP">
         <aside class="vip-notice vip-notice-modes vip-admin-guide" role="note">
@@ -949,6 +904,47 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
             <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> هدیه Silver فقط برای حساب بدون اشتراک فعال Silver یا بالاتر قابل دریافت است؛ Bronze آزمایشی مانع دریافت هدیه نیست. پس از استفاده، حتی بعد از پایان ۳ روز، هدیه دوباره قابل دریافت نخواهد بود.</p>
         </aside>
     </section>
+
+<aside class="vip-invoice-panel vip-checkout-bar" id="vipOrderSummary" data-vip-invoice aria-label="فاکتور و خلاصه سفارش">
+    <div class="vip-invoice-product">
+        <span class="vip-store-eyebrow">FRAGCITY · ORDER SUMMARY</span>
+        <strong data-invoice-tier>هنوز پلنی انتخاب نشده</strong>
+        <small data-invoice-level>سطح عضویت: —</small>
+    </div>
+
+    <div class="vip-invoice-lines">
+        <div class="vip-invoice-line">
+            <span>مدت اشتراک</span>
+            <strong data-invoice-duration>—</strong>
+        </div>
+        <div class="vip-invoice-total">
+            <span>مبلغ نهایی</span>
+            <strong data-invoice-total>— تومان</strong>
+        </div>
+    </div>
+
+    <div class="vip-invoice-actions">
+        <button type="button" class="vip-invoice-checkout" data-vip-checkout disabled>
+            <i class="fas fa-lock" aria-hidden="true"></i>
+            پرداخت و فعال‌سازی
+        </button>
+        <?php if ($isLoggedIn): ?>
+            <button type="button" class="vip-invoice-wallet" data-fc-wallet-charge-open>
+                <i class="fas fa-wallet" aria-hidden="true"></i>
+                کیف پول
+            </button>
+        <?php else: ?>
+            <a class="vip-invoice-wallet" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
+                <i class="fab fa-steam" aria-hidden="true"></i>
+                ورود با Steam
+            </a>
+        <?php endif; ?>
+    </div>
+
+    <p class="vip-invoice-status" data-invoice-status role="status" aria-live="polite">
+        برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.
+    </p>
+</aside>
 
 </main>
 
