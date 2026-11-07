@@ -402,6 +402,17 @@ $mobileMoreNavItems = [
                 <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
                 <span class="fc-motion-toggle__label">Performance Mode</span>
             </button>
+            <a
+                href="<?= htmlspecialchars(fragcity_page_url('support'), ENT_QUOTES, 'UTF-8') ?>"
+                class="fc-support-toggle <?= $isPageActive(['support']) ?>"
+                data-ajax-nav
+                data-slug="support"
+                aria-label="پشتیبانی"
+                title="پشتیبانی"
+            >
+                <i class="fa-solid fa-headset" aria-hidden="true"></i>
+                <span class="fc-support-toggle__label">پشتیبانی</span>
+            </a>
             <?php if ($isLoggedIn): ?>
                 <div class="frag-user-area">
                     <div class="frag-dropdown" id="shockUserDropdown">
