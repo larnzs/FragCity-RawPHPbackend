@@ -55,6 +55,7 @@ try {
         'paymenter_support_invalid_identity_response',
         'fragcity_account_not_linked',
         'linked_paymenter_user_missing',
+        'identity_lookup_failed',
         'paymenter_api_permission_denied',
         'paymenter_support_validation_failed',
         'paymenter_support_rate_limited',
