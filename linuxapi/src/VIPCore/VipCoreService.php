@@ -116,18 +116,38 @@ final class VipCoreService
         $accountId = self::accountIdFromSteamId64($steamId64);
 
         // vip_users is the source of truth for membership visibility. The paid
-        // ledger is an auxiliary checkout capability; a missing table or
-        // incomplete migration must not hide a user's existing VIP status.
+        // ledger and its write permissions are checkout capabilities; a missing
+        // table, incomplete migration or insufficient grant must not hide a
+        // user's existing VIP status or allow a payment that cannot be applied.
         $paidLedgerAvailable = false;
         try {
-            $ledgerProbe = $this->pdo->query(
-                'SELECT order_ref, vip_level, duration_seconds, granted_at, expires, tier_price_rial
+            // These zero-row INSERT...SELECT / UPDATE probes validate the exact
+            // columns and required SELECT/INSERT/UPDATE grants without changing
+            // any stored row or firing row-level triggers.
+            $this->pdo->exec(
+                'INSERT INTO fragcity_vip_paid_orders
+                    (order_ref, steamid64, account_id, sid, vip_level, vip_group,
+                     duration_seconds, tier_price_rial, granted_at, expires)
+                 SELECT order_ref, steamid64, account_id, sid, vip_level, vip_group,
+                        duration_seconds, tier_price_rial, granted_at, expires
                  FROM fragcity_vip_paid_orders
-                 LIMIT 0'
+                 WHERE 1 = 0'
             );
-            $paidLedgerAvailable = $ledgerProbe !== false;
+            $this->pdo->exec(
+                'INSERT INTO `vip_users`
+                    (`account_id`, `name`, `lastvisit`, `sid`, `group`, `expires`)
+                 SELECT `account_id`, `name`, `lastvisit`, `sid`, `group`, `expires`
+                 FROM `vip_users`
+                 WHERE 1 = 0'
+            );
+            $this->pdo->exec(
+                'UPDATE `vip_users`
+                 SET `lastvisit` = `lastvisit`
+                 WHERE 1 = 0'
+            );
+            $paidLedgerAvailable = true;
         } catch (PDOException $e) {
-            error_log('[FragCity VIPCore] Paid-order ledger unavailable; SQLSTATE ' . $e->getCode());
+            error_log('[FragCity VIPCore] Paid checkout storage unavailable; SQLSTATE ' . $e->getCode());
         }
 
         $statement = $this->pdo->prepare(
