@@ -126,4 +126,42 @@ final class VipCoreRepository
             'duration_seconds' => (int)($data['duration_seconds'] ?? 0),
         ];
     }
+
+    public function grantPaidMembership(
+        string $orderRef,
+        string $steamId64,
+        string $playerName,
+        int $level,
+        int $durationSeconds
+    ): array {
+        $data = $this->api->request([
+            'action' => 'grant_paid_membership',
+            'order_ref' => $orderRef,
+            'steamid64' => $steamId64,
+            'player_name' => $playerName,
+            'level' => $level,
+            'duration_seconds' => $durationSeconds,
+        ], '/v1/vipcore');
+
+        if (($data['granted'] ?? false) !== true
+            || (string)($data['order_ref'] ?? '') !== $orderRef
+            || (int)($data['level'] ?? 0) !== $level
+            || !is_numeric($data['expires'] ?? null)
+            || !is_numeric($data['duration_seconds'] ?? null)
+            || (int)$data['duration_seconds'] !== $durationSeconds
+            || !in_array((string)($data['group'] ?? ''), ['BRONZE', 'SILVER', 'GOLD'], true)) {
+            throw new RuntimeException('VIPCore API returned an invalid paid grant payload.');
+        }
+
+        return [
+            'granted' => true,
+            'order_ref' => $orderRef,
+            'level' => $level,
+            'group' => (string)$data['group'],
+            'granted_at' => (int)($data['granted_at'] ?? 0),
+            'expires' => (int)$data['expires'],
+            'duration_seconds' => $durationSeconds,
+        ];
+    }
+
 }
