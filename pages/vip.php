@@ -26,6 +26,7 @@ $vipFreeTrialStatus = [
 $vipFreeTrialStatusUnavailable = false;
 $vipWalletBalanceAvailable = false;
 $vipWalletBalanceToman = 0;
+$vipWalletPendingOrder = null;
 
 if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64)) {
     try {
@@ -47,6 +48,49 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64)) {
             ? max(0, (int)($walletBalanceRow['balance'] ?? 0))
             : 0;
         $vipWalletBalanceAvailable = true;
+
+        // A wallet debit may be committed while VIPCore is temporarily
+        // unavailable. Surface the existing paid order so the customer can
+        // retry provisioning without submitting another debit.
+        try {
+            $pendingWalletQuery = $walletPdo->prepare(
+                "SELECT order_ref, authority, vip_level, duration_days, amount_rial
+                 FROM vip_orders
+                 WHERE steamid64 = ?
+                   AND status = 'paid'
+                   AND LEFT(authority, 7) = 'WALLET_'
+                 ORDER BY id DESC
+                 LIMIT 1"
+            );
+            $pendingWalletQuery->execute([$steamid64]);
+            $pendingWalletRow = $pendingWalletQuery->fetch(PDO::FETCH_ASSOC);
+
+            if (is_array($pendingWalletRow)) {
+                $pendingAuthority = (string)($pendingWalletRow['authority'] ?? '');
+                $pendingOrderRef = (string)($pendingWalletRow['order_ref'] ?? '');
+                $pendingLevel = (int)($pendingWalletRow['vip_level'] ?? 0);
+                $pendingDays = (int)($pendingWalletRow['duration_days'] ?? 0);
+                $pendingAmountRial = (int)($pendingWalletRow['amount_rial'] ?? 0);
+
+                if (preg_match('/^WALLET_[a-f0-9]{32}$/D', $pendingAuthority)
+                    && preg_match('/^[a-f0-9]{32}$/D', $pendingOrderRef)
+                    && in_array($pendingLevel, [1, 2, 3], true)
+                    && in_array($pendingDays, [7, 15, 30, 60, 90], true)
+                    && $pendingAmountRial >= 10
+                    && $pendingAmountRial % 10 === 0) {
+                    $vipWalletPendingOrder = [
+                        'callback_url' => '/pages/zarinpal/zarinpal_vip_callback.php?Authority='
+                            . rawurlencode($pendingAuthority) . '&Status=OK',
+                        'level' => $pendingLevel,
+                        'duration_days' => $pendingDays,
+                        'amount_toman' => intdiv($pendingAmountRial, 10),
+                        'order_ref' => $pendingOrderRef,
+                    ];
+                }
+            }
+        } catch (Throwable $pendingWalletError) {
+            error_log('[FragCity VIP storefront] Pending wallet order lookup failed; type=' . get_class($pendingWalletError));
+        }
     } catch (Throwable $walletError) {
         error_log('[FragCity VIP storefront] Wallet balance lookup failed; type=' . get_class($walletError));
     }
@@ -787,6 +831,11 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
     data-vip-upgrade-prices-rial="<?= htmlspecialchars(json_encode($vipUpgradePriceRialMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-wallet-balance="<?= $vipWalletBalanceToman ?>"
     data-vip-wallet-balance-available="<?= $vipWalletBalanceAvailable ? '1' : '0' ?>"
+    data-vip-wallet-pending-callback="<?= htmlspecialchars((string)($vipWalletPendingOrder['callback_url'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+    data-vip-wallet-pending-level="<?= (int)($vipWalletPendingOrder['level'] ?? 0) ?>"
+    data-vip-wallet-pending-duration-days="<?= (int)($vipWalletPendingOrder['duration_days'] ?? 0) ?>"
+    data-vip-wallet-pending-amount-toman="<?= (int)($vipWalletPendingOrder['amount_toman'] ?? 0) ?>"
+    data-vip-wallet-pending-order-ref="<?= htmlspecialchars((string)($vipWalletPendingOrder['order_ref'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-free-trial-claimed="<?= !empty($vipFreeTrialStatus['claimed']) ? '1' : '0' ?>"
     data-vip-logged-in="<?= $isLoggedIn ? '1' : '0' ?>"
     data-vip-test-admin="<?= $isVipTestAdmin ? '1' : '0' ?>"
