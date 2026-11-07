@@ -142,6 +142,42 @@ final class VipCoreRepository
         ];
     }
 
+    public function revokeMembership(string $steamId64): array
+    {
+        $data = $this->api->request([
+            'action' => 'revoke_membership',
+            'steamid64' => $steamId64,
+        ], '/v1/vipcore');
+
+        if (!is_bool($data['revoked'] ?? null)
+            || $data['revoked'] !== true
+            || !is_bool($data['already_revoked'] ?? null)
+            || !is_numeric($data['level'] ?? null)
+            || !is_string($data['group'] ?? null)
+            || !is_numeric($data['expires'] ?? null)
+            || !is_numeric($data['revoked_at'] ?? null)
+            || !is_numeric($data['server_id'] ?? null)) {
+            throw new RuntimeException('VIPCore API returned an invalid membership revocation payload.');
+        }
+
+        $orderRef = $data['order_ref'] ?? null;
+        if ($orderRef !== null
+            && (!is_string($orderRef) || !preg_match('/^[a-f0-9]{32}$/D', $orderRef))) {
+            throw new RuntimeException('VIPCore API returned an invalid revoked order reference.');
+        }
+
+        return [
+            'revoked' => true,
+            'already_revoked' => $data['already_revoked'],
+            'level' => max(0, min(6, (int)$data['level'])),
+            'group' => $data['group'],
+            'expires' => max(0, (int)$data['expires']),
+            'revoked_at' => max(0, (int)$data['revoked_at']),
+            'order_ref' => $orderRef,
+            'server_id' => (int)$data['server_id'],
+        ];
+    }
+
     public function grantTestMembership(string $steamId64, string $playerName, int $level): array
     {
         $data = $this->api->request([
