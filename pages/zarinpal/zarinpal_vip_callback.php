@@ -127,24 +127,24 @@ try {
         );
     }
 
-    if (in_array($orderStatus, ['failed', 'expired', 'cancelled'], true)) {
+    if (in_array($orderStatus, ['failed', 'cancelled'], true)) {
         $renderResult(false, 'این سفارش دیگر در وضعیت قابل پردازش نیست. برای بررسی وضعیت پرداخت با پشتیبانی تماس بگیرید.');
     }
 
-    if (!in_array($orderStatus, ['pending', 'paid'], true)) {
+    if (!in_array($orderStatus, ['pending', 'expired', 'paid'], true)) {
         $renderResult(false, 'وضعیت سفارش قابل شناسایی نیست.');
     }
 
     $refId = trim((string)($order['ref_id'] ?? ''));
 
-    if ($orderStatus === 'pending') {
+    if (in_array($orderStatus, ['pending', 'expired'], true)) {
         // The query-string Status is not proof of payment. It may only mark
         // a pending order as cancelled; activation requires a successful verify.
         if ($gatewayStatus !== 'OK') {
             $cancel = $pdo->prepare(
                 "UPDATE vip_orders
                  SET status = 'cancelled', last_error = 'gateway_cancelled'
-                 WHERE id = ? AND status = 'pending'"
+                 WHERE id = ? AND status IN ('pending', 'expired')"
             );
             $cancel->execute([(int)$order['id']]);
             $renderResult(false, 'پرداخت توسط شما لغو شد یا از درگاه تأیید نشد.');
@@ -245,11 +245,11 @@ try {
         }
 
         $lockedStatus = (string)($locked['status'] ?? '');
-        if ($lockedStatus === 'pending') {
+        if (in_array($lockedStatus, ['pending', 'expired'], true)) {
             $paid = $pdo->prepare(
                 "UPDATE vip_orders
                  SET status = 'paid', ref_id = ?, paid_at = UTC_TIMESTAMP(), last_error = NULL
-                 WHERE id = ? AND status = 'pending'"
+                 WHERE id = ? AND status IN ('pending', 'expired')"
             );
             $paid->execute([$refId, (int)$order['id']]);
             if ($paid->rowCount() !== 1) {
