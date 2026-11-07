@@ -67,25 +67,26 @@ if ($isLoggedIn && $steamid64 !== '') {
 }
 
 $vipNames = [0 => 'No VIP', 1 => 'Bronze', 2 => 'Silver', 3 => 'Gold', 4 => 'Platinum', 5 => 'Emerald', 6 => 'Diamond'];
-$vipSelectableLevels = [1, 2, 3, 5]; // Display/selection is separate from purchase eligibility.
+$vipSelectableLevels = [1, 2, 3, 4, 5, 6]; // All VIPCore tiers are inspectable; purchase eligibility remains separate.
 
 $vipLevels = [
     1 => [
         'name' => 'Bronze',
         'fa_icon' => 'fas fa-medal',
         'color' => '#CD7F32',
-        'available' => false,
-        'summary' => 'Internal test-only dummy tier. Bronze is not offered as a customer membership.',
-        'summary_fa' => 'سطح آزمایشی داخلی VIPCore است و به‌عنوان اشتراک واقعی به کاربران عرضه نمی‌شود.',
+        'available' => true,
+        'summary' => 'The base FragCity VIP membership for official servers.',
+        'summary_fa' => 'پلن پایه VIP فرگ‌سیتی برای استفاده در تمام سرورهای رسمی.',
+        'purchase_mode' => 'paid',
     ],
     2 => [
         'name' => 'Silver',
         'fa_icon' => 'fas fa-medal',
         'color' => '#C0C0C0',
         'available' => true,
-        'summary' => 'One-time 3-day Silver welcome membership.',
-        'summary_fa' => 'هدیه خوش‌آمدگویی رایگان برای ۳ روز؛ فقط یک‌بار برای هر حساب Steam.',
-        'purchase_mode' => 'trial',
+        'summary' => 'Paid Silver membership with a separate one-time three-day welcome trial.',
+        'summary_fa' => 'عضویت پولی Silver همراه با هدیه خوش‌آمدگویی رایگان سه‌روزه که فقط یک‌بار قابل دریافت است.',
+        'purchase_mode' => 'paid',
     ],
     3 => [
         'name' => 'Gold',
@@ -710,22 +711,18 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                     $levelPrices,
                     static fn ($price): bool => is_int($price) && $price > 0
                 ));
-                $tierPriceLabel = (int)$lvl === 1
-                    ? 'Dummy داخلی · غیرقابل خرید'
+                $tierPriceLabel = !$tier['available']
+                    ? 'فعلاً قابل خرید نیست'
+                    : (!empty($configuredPrices)
+                        ? 'از ' . number_format(min($configuredPrices)) . ' ' . $vipCurrency
+                        : ((int)$lvl === 2
+                            ? 'هدیه ۳ روزه · قیمت اشتراک تعیین نشده'
+                            : 'قیمت‌گذاری تکمیل نشده'));
+                $tierDurationLabel = !$tier['available']
+                    ? 'فعلاً برای خرید فعال نیست'
                     : ((int)$lvl === 2
-                        ? 'هدیه رایگان · ۳ روز'
-                        : (!$tier['available']
-                            ? 'غیرفعال'
-                            : (!empty($configuredPrices)
-                                ? 'از ' . number_format(min($configuredPrices)) . ' ' . $vipCurrency
-                                : 'قیمت‌گذاری تکمیل نشده')));
-                $tierDurationLabel = (int)$lvl === 1
-                    ? 'فقط تست داخلی'
-                    : ((int)$lvl === 2
-                        ? 'فقط یک‌بار برای هر SteamID64'
-                        : (!$tier['available']
-                            ? 'Not available'
-                            : '۷، ۱۵، ۳۰، ۶۰ یا ۹۰ روز'));
+                        ? '۷، ۱۵، ۳۰، ۶۰ یا ۹۰ روز · هدیه ۳ روزه یک‌باره'
+                        : '۷، ۱۵، ۳۰، ۶۰ یا ۹۰ روز');
                 $isCurrentTier = $vipHasActiveMembership && $vipCurrentLevel === (int) $lvl;
                 $isSelectableTier = in_array((int) $lvl, $vipSelectableLevels, true);
             ?>
@@ -744,10 +741,10 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                         <i class="fas fa-lock"></i>
                     </span>
                     <span class="vip-locked-toggle-copy">
-                        <strong>پلن‌های غیرفعال</strong>
+                        <strong>پلن‌های دیگر</strong>
                         <small>Platinum · Emerald · Diamond</small>
                     </span>
-                    <span class="vip-locked-toggle-status">غیرفعال برای خرید</span>
+                    <span class="vip-locked-toggle-status">قابل انتخاب · خرید فعلاً غیرفعال</span>
                     <span class="vip-locked-toggle-count">۳ سطح</span>
                     <i class="fas fa-chevron-down vip-locked-chevron" aria-hidden="true"></i>
                 </button>
@@ -780,12 +777,10 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                     <span class="vip-plan-index">FRAGCITY / VIP 0<?= (int) $lvl ?></span>
                     <?php if ($isCurrentTier): ?>
                         <span class="vip-plan-current"><i class="fas fa-check" aria-hidden="true"></i> پلن فعلی</span>
-                    <?php elseif ((int)$lvl === 1): ?>
-                        <span class="vip-plan-locked vip-plan-dummy"><i class="fas fa-flask" aria-hidden="true"></i> DUMMY · تست داخلی</span>
                     <?php elseif (!$tier['available']): ?>
                         <span class="vip-plan-locked"><i class="fas fa-lock" aria-hidden="true"></i> قفل‌شده</span>
                     <?php elseif ((int)$lvl === 2): ?>
-                        <span class="vip-plan-public">ONE-TIME FREE TRIAL</span>
+                        <span class="vip-plan-public">PAID TIER · FREE TRIAL GIFT</span>
                     <?php else: ?>
                         <span class="vip-plan-public">PAID TIER</span>
                     <?php endif; ?>
@@ -806,10 +801,10 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                     <small lang="en" dir="ltr"><?= htmlspecialchars($tier['summary'], ENT_QUOTES, 'UTF-8') ?></small>
                 </p>
 
-                <div class="vip-plan-price<?= (int)$lvl === 2 ? ' is-free-trial' : (!$tier['available'] ? ' is-locked' : ' is-paid') ?>">
+                <div class="vip-plan-price<?= !$tier['available'] ? ' is-locked' : ' is-paid' ?>">
                     <span class="vip-plan-price-label">
-                        <i class="fas <?= (int)$lvl === 1 ? 'fa-flask' : ((int)$lvl === 2 ? 'fa-gift' : (!$tier['available'] ? 'fa-lock' : 'fa-tag')) ?>" aria-hidden="true"></i>
-                        <?= (int)$lvl === 1 ? 'کاربرد داخلی' : ((int)$lvl === 2 ? 'شرایط دریافت هدیه' : (!$tier['available'] ? 'وضعیت پلن' : 'قیمت پلن')) ?>
+                        <i class="fas <?= !$tier['available'] ? 'fa-lock' : ((int)$lvl === 2 ? 'fa-gift' : 'fa-tag') ?>" aria-hidden="true"></i>
+                        <?= !$tier['available'] ? 'وضعیت پلن' : ((int)$lvl === 2 ? 'قیمت اشتراک و هدیه' : 'قیمت پلن') ?>
                     </span>
                     <strong><?= htmlspecialchars($tierPriceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
                     <small><?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?></small>
@@ -858,7 +853,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
         <div class="vip-duration-selector-heading">
             <span class="vip-store-eyebrow">CHOOSE SUBSCRIPTION DURATION</span>
             <h3 id="vipPurchaseDurationTitle">مدت اشتراک را انتخاب کن</h3>
-            <p>مدت موردنظرت را برای پلن Gold انتخاب کن؛ فاکتور سمت چپ صفحه به‌روزرسانی می‌شود.</p>
+            <p>مدت اشتراک Bronze، Silver یا Gold را انتخاب کن؛ فاکتور سمت چپ با قیمت رسمی FragCity به‌روزرسانی می‌شود.</p>
         </div>
         <div class="vip-duration-options" role="group" aria-label="مدت اشتراک">
             <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="7" data-duration-label="۱ هفته" aria-pressed="false">
@@ -878,7 +873,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
             </button>
         </div>
         <p class="vip-duration-selection-status" data-vip-duration-selection-status role="status" aria-live="polite">
-            ابتدا Gold را انتخاب کن و سپس مدت موردنظرت را مشخص کن.
+            ابتدا Bronze، Silver یا Gold را انتخاب کن و سپس مدت موردنظرت را مشخص کن.
         </p>
     </section>
 
@@ -967,7 +962,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
             <details class="vip-faq-item">
                 <summary>اگر سرور اجاره‌ای داشته باشم، می‌توانم VIP مخصوص خودم را بفروشم؟</summary>
                 <div class="vip-faq-answer">
-                    <p>بله؛ این مسیر باید مستقل از فروشگاه مرکزی FragCity باشد. در معماری در نظرگرفته‌شده، VIPCore سرور اجاره‌ای به دیتابیس جداگانه همان مالک متصل می‌شود؛ مالک می‌تواند برای بازیکنان خودش VIP رایگان یا پولی با قیمت‌گذاری مستقل تعریف کند. اطلاعات این VIP نباید از دیتابیس مرکزی FragCity خوانده شود و فقط روی همان سرورهای متعلق به آن مالک اعتبار داشته باشد. این بخش، مسیر توسعه و پیکربندی جداگانه صاحبان سرور است و تا زمان ارائه تنظیماتش در پنل، نباید آن را قابلیت فعال‌شده فرض کرد.</p>
+                    <p>بله؛ این مسیر مستقل از فروشگاه مرکزی FragCity است. VIPCore سرور اجاره‌ای به دیتابیس جداگانه همان مالک متصل می‌شود؛ بنابراین مالک قیمت VIP خودش را مستقل تعیین می‌کند و حتی می‌تواند آن را رایگان عرضه کند. کف قیمت Bronze، Silver و Gold فقط برای فروشگاه و سرورهای رسمی FragCity است و به سرورهای مشتریان تحمیل نمی‌شود. اطلاعات VIP خصوصی هم نباید از دیتابیس مرکزی FragCity خوانده شود. این بخش مسیر توسعه و پیکربندی جداگانه صاحبان سرور است و تا زمان ارائه تنظیماتش در پنل، قابلیت فعال‌شده محسوب نمی‌شود.</p>
                 </div>
             </details>
 
@@ -981,7 +976,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
             <details class="vip-faq-item">
                 <summary>وضعیت سطح‌های Bronze، Silver و Gold و خرید VIP چیست؟</summary>
                 <div class="vip-faq-answer">
-                    <p>Bronze یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. Silver هدیه رایگان سه‌روزه و یک‌باره است. Gold تنها سطح پولی قابل انتخاب فعلی است؛ بااین‌حال قیمت‌گذاری و Checkout مستقیم هنوز فعال نشده‌اند. سطح‌های Platinum، Emerald و Diamond نیز فعلاً برای خرید غیرفعال هستند.</p>
+                    <p>Bronze، Silver و Gold سه سطح قابل‌فروش در فروشگاه رسمی FragCity هستند و قیمت هرکدام بر اساس مدت اشتراک از تنظیمات قیمت‌گذاری خوانده می‌شود. Silver علاوه بر اشتراک پولی، یک هدیه رایگان سه‌روزه و یک‌باره دارد. قیمت‌های این سه سطح، کف قیمت رسمی FragCity هستند. Platinum، Emerald و Diamond نیز برای مشاهده و مقایسه قابل انتخاب‌اند، اما فعلاً برای خرید فعال نیستند. Checkout مستقیم همچنان تا تکمیل اتصال سفارش، پرداخت و فعال‌سازی VIPCore غیرفعال است.</p>
                 </div>
             </details>
 
