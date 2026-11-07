@@ -70,7 +70,7 @@ $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
 // Read the same wallet balance source used by the former wallet page.
-$headerWalletBalance = 0;
+$headerWalletBalance = 0.0;
 if ($isLoggedIn && trim((string)$displaySteamID) !== '') {
     try {
         require_once dirname(__DIR__) . '/class/customer_db.php';
@@ -79,12 +79,19 @@ if ($isLoggedIn && trim((string)$displaySteamID) !== '') {
             'SELECT balance FROM user_wallets WHERE steamid = ? LIMIT 1',
             [(string)$displaySteamID]
         );
-        $headerWalletBalance = max(0, (int)($headerWalletRows[0]['balance'] ?? 0));
+        $headerWalletBalance = max(0.0, (float)($headerWalletRows[0]['balance'] ?? 0));
     } catch (Throwable $walletError) {
         error_log('[FragCity] Header wallet balance unavailable.');
     }
 }
-$headerWalletBalanceLabel = number_format($headerWalletBalance) . ' تومان';
+$headerWalletBalanceLabel = rtrim(
+    rtrim(number_format($headerWalletBalance, 8, '.', ','), '0'),
+    '.'
+);
+if ($headerWalletBalanceLabel === '') {
+    $headerWalletBalanceLabel = '0';
+}
+$headerWalletBalanceLabel .= ' تومان';
 
 $headerSteamId64 = preg_match('/^[0-9]{17}$/D', (string)$displaySteamID)
     ? (string)$displaySteamID : '';
