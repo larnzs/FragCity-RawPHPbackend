@@ -423,6 +423,7 @@ final class PaymenterSupportApiClient
             : [];
         $ticketId = (int) ($resource['id'] ?? $attributes['id'] ?? 0);
         $includedMap = $this->includedMap($included);
+        $ticketOwnerId = (int) ($attributes['user_id'] ?? 0);
         $messageRefs = $resource['relationships']['messages']['data'] ?? [];
         $messages = [];
 
@@ -446,6 +447,9 @@ final class PaymenterSupportApiClient
                     'created_at' => (string) ($messageAttributes['created_at'] ?? ''),
                     'user_id' => is_array($authorRef) && isset($authorRef['id'])
                         ? (int) $authorRef['id']
+                        : null,
+                    'is_customer' => is_array($authorRef) && isset($authorRef['id']) && $ticketOwnerId > 0
+                        ? (int) $authorRef['id'] === $ticketOwnerId
                         : null,
                 ];
             }
