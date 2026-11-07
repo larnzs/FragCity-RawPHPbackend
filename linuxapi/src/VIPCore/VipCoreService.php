@@ -132,6 +132,7 @@ final class VipCoreService
                 'level' => 0,
                 'group' => null,
                 'expires' => null,
+                'paid_purchase' => null,
                 'server_id' => $this->serverId,
             ];
         }
@@ -140,12 +141,50 @@ final class VipCoreService
         $expires = (int)($row['expires'] ?? 0);
         $level = self::levelForGroup($group);
         $active = $level > 0 && ($expires === 0 || $expires > time());
+        $paidPurchase = null;
+
+        // A current membership is eligible for upgrade credit only when its
+        // exact active VIPCore row is backed by a paid-order ledger entry.
+        // Free Silver claims never create this paid ledger record.
+        if ($active && $expires > 0) {
+            $paidStatement = $this->pdo->prepare(
+                'SELECT order_ref, vip_level, duration_seconds, granted_at, expires
+                 FROM fragcity_vip_paid_orders
+                 WHERE account_id = :account_id
+                   AND sid = :server_id
+                   AND vip_level = :vip_level
+                   AND expires = :expires
+                 ORDER BY granted_at DESC
+                 LIMIT 1'
+            );
+            $paidStatement->execute([
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+                ':vip_level' => $level,
+                ':expires' => $expires,
+            ]);
+            $paidRow = $paidStatement->fetch(PDO::FETCH_ASSOC);
+
+            if (is_array($paidRow)
+                && preg_match('/^[a-f0-9]{32}$/D', (string)($paidRow['order_ref'] ?? ''))
+                && (int)($paidRow['duration_seconds'] ?? 0) > 0
+                && (int)($paidRow['expires'] ?? 0) === $expires) {
+                $paidPurchase = [
+                    'order_ref' => (string)$paidRow['order_ref'],
+                    'level' => (int)$paidRow['vip_level'],
+                    'duration_seconds' => (int)$paidRow['duration_seconds'],
+                    'granted_at' => (int)$paidRow['granted_at'],
+                    'expires' => (int)$paidRow['expires'],
+                ];
+            }
+        }
 
         return [
             'active' => $active,
             'level' => $active ? $level : 0,
             'group' => $active ? $group : null,
             'expires' => $active ? $expires : null,
+            'paid_purchase' => $active ? $paidPurchase : null,
             'server_id' => $this->serverId,
         ];
     }
@@ -456,15 +495,16 @@ final class VipCoreService
 
     /**
      * Grant a paid public-store membership exactly once per verified website order.
-     * The signed website API is the only caller; the order ledger and vip_users
-     * upsert share one transaction so duplicate callbacks cannot extend expiry.
+     * A paid upgrade preserves the existing expiry; a free-trial/legacy membership
+     * can only be replaced by a full-price higher tier.
      */
     public function grantPaidMembership(
         string $orderRef,
         string $steamId64,
         string $playerName,
         int $level,
-        int $durationSeconds
+        int $durationSeconds,
+        ?array $upgrade = null
     ): array {
         if (!preg_match('/^[a-f0-9]{32}$/D', $orderRef)) {
             throw new InvalidArgumentException('Invalid VIP payment order reference.');
@@ -474,13 +514,39 @@ final class VipCoreService
             throw new InvalidArgumentException('Invalid paid VIP duration.');
         }
 
+        if ($upgrade !== null) {
+            $fromOrderRef = $upgrade['from_order_ref'] ?? null;
+            $fromLevel = filter_var($upgrade['from_level'] ?? null, FILTER_VALIDATE_INT);
+            $fromExpires = filter_var($upgrade['from_expires'] ?? null, FILTER_VALIDATE_INT);
+            $upgradeDuration = filter_var($upgrade['duration_seconds'] ?? null, FILTER_VALIDATE_INT);
+
+            if (!is_string($fromOrderRef)
+                || !preg_match('/^[a-f0-9]{32}$/D', $fromOrderRef)
+                || $fromLevel === false
+                || !in_array((int)$fromLevel, [1, 2], true)
+                || (int)$level <= (int)$fromLevel
+                || $fromExpires === false
+                || (int)$fromExpires < 1
+                || $upgradeDuration === false
+                || (int)$upgradeDuration !== $durationSeconds) {
+                throw new InvalidArgumentException('Invalid paid VIP upgrade context.');
+            }
+
+            $upgrade = [
+                'from_order_ref' => $fromOrderRef,
+                'from_level' => (int)$fromLevel,
+                'from_expires' => (int)$fromExpires,
+                'duration_seconds' => (int)$upgradeDuration,
+            ];
+        }
+
         $accountId = self::accountIdFromSteamId64($steamId64);
         $group = self::groupForLevel($level);
         $playerName = trim($playerName);
 
         if ($playerName === ''
             || preg_match('//u', $playerName) !== 1
-            || preg_match('/[\x00-\x1F\x7F]/', $playerName)) {
+            || preg_match('/[\\x00-\\x1F\\x7F]/', $playerName)) {
             throw new InvalidArgumentException('Invalid player name.');
         }
 
@@ -532,6 +598,7 @@ final class VipCoreService
                 'granted_at' => (int)$row['granted_at'],
                 'expires' => (int)$row['expires'],
                 'duration_seconds' => $durationSeconds,
+                'upgraded' => $upgrade !== null,
                 'server_id' => $this->serverId,
             ];
         };
@@ -544,11 +611,100 @@ final class VipCoreService
 
         $now = time();
         $expires = $now + $durationSeconds;
+        $wasUpgrade = $upgrade !== null;
         $this->pdo->beginTransaction();
 
         try {
-            // Insert the unique order reference first. A simultaneous callback
-            // for this same order blocks here and later reads the original grant.
+            // Lock the live VIP row so two separate paid orders cannot race.
+            $existingMembership = $this->pdo->prepare(
+                'SELECT `group`, `expires`
+                 FROM `vip_users`
+                 WHERE `account_id` = :account_id
+                   AND `sid` = :server_id
+                 LIMIT 1 FOR UPDATE'
+            );
+            $existingMembership->execute([
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+            ]);
+            $membership = $existingMembership->fetch(PDO::FETCH_ASSOC);
+
+            $currentLevel = 0;
+            $currentExpires = 0;
+            $currentActive = false;
+            if (is_array($membership)) {
+                $currentGroup = strtoupper(trim((string)($membership['group'] ?? '')));
+                $currentLevel = self::levelForGroup($currentGroup);
+                $currentExpires = (int)($membership['expires'] ?? 0);
+                $currentActive = $currentLevel > 0
+                    && ($currentExpires === 0 || $currentExpires > $now);
+            }
+
+            if ($upgrade !== null) {
+                if (!$currentActive
+                    || $currentLevel !== $upgrade['from_level']
+                    || $currentExpires !== $upgrade['from_expires']
+                    || $level <= $currentLevel) {
+                    throw new VipCoreMembershipConflict('membership_upgrade_source_changed');
+                }
+
+                $sourceOrder = $this->pdo->prepare(
+                    'SELECT order_ref, duration_seconds
+                     FROM fragcity_vip_paid_orders
+                     WHERE order_ref = :order_ref
+                       AND account_id = :account_id
+                       AND sid = :server_id
+                       AND vip_level = :vip_level
+                       AND expires = :expires
+                     LIMIT 1 FOR UPDATE'
+                );
+                $sourceOrder->execute([
+                    ':order_ref' => $upgrade['from_order_ref'],
+                    ':account_id' => $accountId,
+                    ':server_id' => $this->serverId,
+                    ':vip_level' => $currentLevel,
+                    ':expires' => $currentExpires,
+                ]);
+                $source = $sourceOrder->fetch(PDO::FETCH_ASSOC);
+
+                if (!is_array($source)
+                    || (int)($source['duration_seconds'] ?? 0) !== $upgrade['duration_seconds']
+                    || $upgrade['duration_seconds'] !== $durationSeconds) {
+                    throw new VipCoreMembershipConflict('membership_upgrade_source_changed');
+                }
+
+                // Upgrade applies immediately but never discards unused paid time.
+                $expires = $currentExpires;
+            } elseif ($currentActive) {
+                if ($level <= $currentLevel) {
+                    throw new VipCoreMembershipConflict('membership_already_active');
+                }
+
+                // An active paid membership must use the discounted upgrade path.
+                // Only a non-paid active membership (for example, the free Silver
+                // trial) may be replaced after charging the target tier in full.
+                $paidCurrent = $this->pdo->prepare(
+                    'SELECT order_ref
+                     FROM fragcity_vip_paid_orders
+                     WHERE account_id = :account_id
+                       AND sid = :server_id
+                       AND vip_level = :vip_level
+                       AND expires = :expires
+                     ORDER BY granted_at DESC
+                     LIMIT 1 FOR UPDATE'
+                );
+                $paidCurrent->execute([
+                    ':account_id' => $accountId,
+                    ':server_id' => $this->serverId,
+                    ':vip_level' => $currentLevel,
+                    ':expires' => $currentExpires,
+                ]);
+                if ($paidCurrent->fetch(PDO::FETCH_ASSOC) !== false) {
+                    throw new VipCoreMembershipConflict('paid_membership_upgrade_required');
+                }
+            }
+
+            // The order ledger and VIPCore upsert share one transaction.
             $ledgerInsert = $this->pdo->prepare(
                 'INSERT INTO fragcity_vip_paid_orders
                     (order_ref, steamid64, account_id, sid, vip_level,
@@ -569,29 +725,7 @@ final class VipCoreService
                 ':expires' => $expires,
             ]);
 
-            $existingMembership = $this->pdo->prepare(
-                'SELECT `group`, `expires`
-                 FROM `vip_users`
-                 WHERE `account_id` = :account_id
-                   AND `sid` = :server_id
-                 LIMIT 1 FOR UPDATE'
-            );
-            $existingMembership->execute([
-                ':account_id' => $accountId,
-                ':server_id' => $this->serverId,
-            ]);
-            $membership = $existingMembership->fetch(PDO::FETCH_ASSOC);
-
-            if (is_array($membership)) {
-                $currentGroup = strtoupper(trim((string)($membership['group'] ?? '')));
-                $currentExpires = (int)($membership['expires'] ?? 0);
-                if (self::levelForGroup($currentGroup) > 0
-                    && ($currentExpires === 0 || $currentExpires > $now)) {
-                    throw new VipCoreMembershipConflict('membership_already_active');
-                }
-            }
-
-            // Match VIPCore's own INSERT / ON DUPLICATE KEY semantics.
+            // Match VIPCore's INSERT / ON DUPLICATE KEY semantics.
             $membershipInsert = $this->pdo->prepare(
                 'INSERT INTO `vip_users`
                     (`account_id`, `name`, `lastvisit`,
@@ -638,7 +772,7 @@ final class VipCoreService
                 $this->pdo->rollBack();
             }
 
-            // A retry of the same verified order returns the original expiry.
+            // A retry of the same verified order returns the original grant.
             if ($e instanceof PDOException) {
                 $driverCode = (int)($e->errorInfo[1] ?? 0);
                 if ((string)$e->getCode() === '23000' && $driverCode === 1062) {
@@ -661,6 +795,7 @@ final class VipCoreService
             'granted_at' => $now,
             'expires' => $expires,
             'duration_seconds' => $durationSeconds,
+            'upgraded' => $wasUpgrade,
             'server_id' => $this->serverId,
         ];
     }
