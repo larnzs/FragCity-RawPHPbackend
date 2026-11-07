@@ -822,7 +822,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                             ? 'مشاهده پلن فعال'
                             : ($isSelectableTier
                                 ? 'انتخاب این سطح'
-                                : ((int)$lvl === 1 ? 'فقط تست داخلی' : 'فعلاً غیرفعال')) ?>
+                                : 'فعلاً برای خرید فعال نیست') ?>
                         <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     </button>
                     <button
@@ -983,7 +983,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
             <details class="vip-faq-item">
                 <summary>شرایط دریافت هدیه رایگان Silver چیست؟</summary>
                 <div class="vip-faq-answer">
-                    <p>هر حساب Steam فقط یک‌بار می‌تواند هدیه Silver را برای ۳ روز دریافت کند. این هدیه فقط برای حسابی قابل دریافت است که اشتراک فعال Silver یا سطح بالاتر نداشته باشد. Bronze آزمایشی مانع دریافت هدیه نیست؛ اما پس از یک‌بار دریافت، حتی بعد از پایان سه روز هم امکان دریافت مجدد وجود ندارد.</p>
+                    <p>هر حساب Steam فقط یک‌بار می‌تواند هدیه Silver را برای ۳ روز دریافت کند. این هدیه فقط برای حسابی قابل دریافت است که اشتراک فعال Silver یا سطح بالاتر نداشته باشد. داشتن Bronze فعال مانع دریافت هدیه Silver نیست؛ اما پس از یک‌بار دریافت، حتی بعد از پایان سه روز هم امکان دریافت مجدد وجود ندارد.</p>
                 </div>
             </details>
 
