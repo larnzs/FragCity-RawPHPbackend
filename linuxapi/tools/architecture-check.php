@@ -64,6 +64,12 @@ try {
     $profileIntegrationsSmokeTest = $read('tools/profile-integrations-smoke-test.php');
     $vipCoreSiteRepository = $read('class/VipCoreRepository.php');
     $vipCoreSiteEndpoint = $read('api/vip-test-purchase.php');
+    $vipRevokeEndpoint = $read('api/vip-revoke.php');
+    $ordersPage = $read('pages/orders.php');
+    $ordersJavascript = $read('js/orders.js');
+    $vipRevocationMigration = $read('linuxapi/migrations/20261107_vip_membership_revocations.sql');
+    $vipRevocationPermissionsMigration = $read('linuxapi/migrations/20261107_vip_membership_revocation_permissions.sql');
+    $vipRevocationPreflight = $read('linuxapi/tools/vipcore-paid-ledger-preflight.php');
     $vipCorePage = $read('pages/vip.php');
     $vipCoreJavascript = $read('js/vip.js');
     $vipCoreService = $read('linuxapi/src/VIPCore/VipCoreService.php');
@@ -264,6 +270,32 @@ $check(
         && str_contains($websiteSettingsRaw, 'VIP status and entitlements are read from VIPCore')
         && !isset($websiteSettings['files']['pages.vip']['database_profile'])
 );
+
+$check(
+    'Customer VIP revocation uses authenticated CSRF, signed VIPCore deletion and an immutable audit ledger',
+    str_contains($vipRevokeEndpoint, "($_SESSION['steamid']")
+        && str_contains($vipRevokeEndpoint, 'X_FRAGCITY_CSRF')
+        && str_contains($vipRevokeEndpoint, "session_write_close()")
+        && str_contains($vipRevokeEndpoint, "status = 'revoked'")
+        && str_contains($vipCoreSiteRepository, "'action' => 'revoke_membership'")
+        && str_contains($vipCoreService, 'public function revokeMembership')
+        && str_contains($vipCoreService, "DELETE FROM `vip_users`")
+        && str_contains($vipCoreService, 'fragcity_vip_membership_revocations')
+        && str_contains($vipCoreService, 'VIPCore membership revocation read-after-write verification failed')
+        && str_contains($index, "'revoke_membership'")
+        && str_contains($index, 'VipCoreMembershipNotActive')
+        && str_contains($vipRevocationMigration, 'CREATE TABLE IF NOT EXISTS fragcity_vip_membership_revocations')
+        && str_contains($vipRevocationPermissionsMigration, 'GRANT DELETE ON GLOBAL_vip.vip_users')
+        && str_contains($vipRevocationPreflight, "'vip_users DELETE privilege'")
+        && str_contains($vipRevocationPreflight, "'revocation audit INSERT privilege'")
+        && str_contains($ordersPage, 'data-vip-revoke-open')
+        && str_contains($ordersPage, 'new VipCoreRepository())->getStatus')
+        && str_contains($ordersPage, "'revoked' =>")
+        && str_contains($ordersJavascript, '/api/vip-revoke.php')
+        && str_contains($ordersJavascript, 'fcVipRevokeDialog')
+);
+
+
 
 $check(
     'Free VIP test grants are restricted to admin sessions and explicit Linux SteamID allowlist',
