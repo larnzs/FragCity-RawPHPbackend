@@ -832,6 +832,7 @@ $pageAssets = [
 
     'orders' => [
         'css' => [
+            '/css/pages-base.css?v=' . asset_version(__DIR__ . '/css/pages-base.css'),
             '/css/orders.css?v=' . asset_version(__DIR__ . '/css/orders.css'),
         ],
         'js' => [],
