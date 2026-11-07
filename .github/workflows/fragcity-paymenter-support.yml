@@ -87,5 +87,14 @@ jobs:
           grep -q 'fc-support-toggle:hover' css/header.css
           grep -q 'fc-support-toggle__label' css/header.css
 
+      - name: Verify fail-closed ticket ownership
+        shell: bash
+        run: |
+          set -euo pipefail
+          client="class/PaymenterSupportApiClient.php"
+          grep -Fq "'include' => 'user'" "$client"
+          grep -Fq 'resourceOwnerUserId($resource) !== $userId' "$client"
+          grep -Fq '? $matchedUserId !== $userId' "$client"
+          grep -Fq 'private function resourceOwnerUserId' "$client"
       - name: Check support JavaScript
         run: node --check js/support.js
