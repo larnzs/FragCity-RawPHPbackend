@@ -1,14 +1,10 @@
 <?php
-// pages/support.php
-// Public page – contact tab always visible; tickets require login to view/submit
+// Existing FragCity customer support page.
+// Customer ticket data is always loaded from Paymenter through /api/support.php.
 
 require_once __DIR__ . '/../settings/loader.php';
 
 $isLoggedIn = (($_SESSION['user_logged_in'] ?? false) === true);
-$steamid    = is_string($_SESSION['steamid'] ?? null) ? $_SESSION['steamid'] : '';
-$isAdmin    = ($_SESSION['role'] ?? '') === 'admin';
-$message    = '';
-$error      = '';
 
 $supportCsrfToken = $_SESSION['auth_csrf_token'] ?? '';
 if (
@@ -19,100 +15,18 @@ if (
     $_SESSION['auth_csrf_token'] = $supportCsrfToken;
 }
 
-$supportSettings = fragcity_settings('files.pages.support', []);
-$supportProfile = isset($supportSettings['database_profile'])
-    ? (string) $supportSettings['database_profile']
-    : 'main';
-$pdo = fragcity_create_pdo($supportProfile);
-
-// Handle new ticket submission (only if logged in and CSRF-verified).
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_ticket'])) {
-    $submittedCsrfToken = $_POST['csrf_token'] ?? '';
-
-    if (!$isLoggedIn) {
-        $error = 'برای ارسال تیکت باید وارد شوید.';
-    } elseif (
-        !is_string($submittedCsrfToken)
-        || !hash_equals($supportCsrfToken, $submittedCsrfToken)
-    ) {
-        $error = 'درخواست معتبر نیست؛ صفحه را تازه‌سازی کنید و دوباره تلاش کنید.';
-    } elseif (!preg_match('/^[0-9]{17}$/D', $steamid)) {
-        $error = 'شناسه حساب معتبر نیست؛ دوباره وارد شوید.';
-    } elseif (!$pdo instanceof PDO) {
-        $error = 'خطا در اتصال به دیتابیس.';
-    } else {
-        $subjectInput = $_POST['subject'] ?? null;
-        $bodyInput = $_POST['ticket_body'] ?? null;
-
-        if (!is_string($subjectInput) || !is_string($bodyInput)) {
-            $error = 'اطلاعات تیکت معتبر نیست.';
-        } else {
-            $subject = trim($subjectInput);
-            $body = trim($bodyInput);
-            $subjectLength = function_exists('mb_strlen')
-                ? mb_strlen($subject, 'UTF-8')
-                : strlen($subject);
-
-            if ($subject === '' || $body === '') {
-                $error = 'موضوع و متن تیکت نمی‌تواند خالی باشد.';
-            } elseif ($subjectLength > 191 || strlen($body) > 20000) {
-                $error = 'موضوع حداکثر ۱۹۱ کاراکتر و متن تیکت حداکثر ۲۰ هزار بایت باشد.';
-            } else {
-                try {
-                    $pdo->beginTransaction();
-
-                    $stmt = $pdo->prepare(
-                        'INSERT INTO tickets (steamid, subject) VALUES (?, ?)'
-                    );
-                    $stmt->execute([$steamid, $subject]);
-                    $ticketId = (int) $pdo->lastInsertId();
-
-                    if ($ticketId < 1) {
-                        throw new RuntimeException('support_ticket_id_missing');
-                    }
-
-                    $reply = $pdo->prepare(
-                        'INSERT INTO ticket_replies (ticket_id, steamid, message) VALUES (?, ?, ?)'
-                    );
-                    $reply->execute([$ticketId, $steamid, $body]);
-
-                    $pdo->commit();
-                    $message = '✅ تیکت شما با موفقیت ثبت شد.';
-                } catch (Throwable $e) {
-                    if ($pdo->inTransaction()) {
-                        $pdo->rollBack();
-                    }
-                    error_log(
-                        '[FragCity] Support ticket creation failed ('
-                        . get_class($e) . ', code ' . (string) $e->getCode() . ').'
-                    );
-                    $error = 'در حال حاضر امکان ثبت تیکت وجود ندارد.';
-                }
-            }
-        }
-    }
+$activeTab = is_string($_GET['tab'] ?? null) ? $_GET['tab'] : 'contact';
+if (!in_array($activeTab, ['contact', 'tickets'], true)) {
+    $activeTab = 'contact';
 }
 
-// Fetch tickets (only if logged in)
-$tickets = [];
-if ($isLoggedIn && $pdo) {
-    try {
-        if ($isAdmin) {
-            $tickets = $pdo->query("SELECT * FROM tickets ORDER BY updated_at DESC")->fetchAll(PDO::FETCH_ASSOC);
-        } else {
-            $stmt = $pdo->prepare("SELECT * FROM tickets WHERE steamid = ? ORDER BY updated_at DESC");
-            $stmt->execute([$steamid]);
-            $tickets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-    } catch (PDOException $e) {
-        error_log('[FragCity] Support ticket list failed (SQLSTATE ' . $e->getCode() . ').');
-        $error = 'در حال حاضر امکان دریافت فهرست تیکت‌ها وجود ندارد.';
-    }
-}
-
-$activeTab = $_GET['tab'] ?? 'contact';
+$requestedTicketId = filter_var(
+    $_GET['ticket_id'] ?? null,
+    FILTER_VALIDATE_INT,
+    ['options' => ['min_range' => 1]]
+);
+$requestedTicketId = $requestedTicketId === false ? 0 : (int) $requestedTicketId;
 ?>
-
 
 <div class="support-page">
     <div class="support-header">
@@ -132,10 +46,9 @@ $activeTab = $_GET['tab'] ?? 'contact';
         </a>
     </div>
 
-    <!-- ======================== تب تماس با ما (همیشه در دسترس) ======================== -->
     <?php if ($activeTab === 'contact'): ?>
         <p class="support-intro">
-            اگر سوالی داری، به مشکل برخوردی یا نیاز به راهنمایی برای سرورهای <strong>Counter-Strike 2</strong> داری، تیم <strong>Frag City</strong> 
+            اگر سوالی داری، به مشکل برخوردی یا نیاز به راهنمایی برای سرورهای <strong>Counter-Strike 2</strong> داری، تیم <strong>Frag City</strong>
             همیشه کنارته. از طریق شبکه‌های اجتماعی رسمی با ما در ارتباط باش.
         </p>
 
@@ -146,7 +59,7 @@ $activeTab = $_GET['tab'] ?? 'contact';
             </div>
             <div class="social-grid">
                 <a href="https://rubika.ir/fragcity_cs2" target="_blank" rel="noopener noreferrer" class="social-item">
-                    <img src="./assets/images/logo/rubika.png" alt="روبیکا" class="social-icon" 
+                    <img src="./assets/images/logo/rubika.png" alt="روبیکا" class="social-icon"
                          onerror="this.src='https://placehold.co/64x64?text=Rubika'">
                     <div class="social-info">
                         <h3>روبیکا</h3>
@@ -155,7 +68,7 @@ $activeTab = $_GET['tab'] ?? 'contact';
                     <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
                 </a>
                 <a href="https://t.me/fragcity_support" target="_blank" rel="noopener noreferrer" class="social-item">
-                    <img src="./assets/images/logo/telegram.png" alt="تلگرام" class="social-icon" 
+                    <img src="./assets/images/logo/telegram.png" alt="تلگرام" class="social-icon"
                          onerror="this.src='https://placehold.co/64x64?text=Telegram'">
                     <div class="social-info">
                         <h3>تلگرام</h3>
@@ -179,7 +92,7 @@ $activeTab = $_GET['tab'] ?? 'contact';
             </div>
             <div class="teamspeak-container">
                 <div class="ts-logo-area">
-                    <img src="./assets/images/logo/teamspeak.png" alt="TeamSpeak Logo" class="ts-logo" 
+                    <img src="./assets/images/logo/teamspeak.png" alt="TeamSpeak Logo" class="ts-logo"
                          onerror="this.src='https://placehold.co/110x110?text=TS3'">
                 </div>
                 <div class="ts-details">
@@ -209,59 +122,95 @@ $activeTab = $_GET['tab'] ?? 'contact';
             </div>
         </div>
 
-    <!-- ======================== تب تیکت‌ها ======================== -->
     <?php elseif ($activeTab === 'tickets'): ?>
-        <div class="ticket-section">
-            <?php if ($message): ?>
-                <div class="toast-message success" id="toast"><?= $message ?></div>
-            <?php elseif ($error): ?>
-                <div class="toast-message error" id="toast"><?= $error ?></div>
-            <?php endif; ?>
-
+        <div
+            class="ticket-section"
+            id="fragcitySupportApp"
+            data-endpoint="/api/support.php"
+            data-csrf="<?= htmlspecialchars($supportCsrfToken, ENT_QUOTES, 'UTF-8') ?>"
+            data-initial-ticket-id="<?= $requestedTicketId ?>"
+        >
             <?php if (!$isLoggedIn): ?>
                 <div class="auth-message error support-login-message">
                     <i class="fas fa-lock"></i> برای مشاهده و ارسال تیکت باید <a href="/login/" class="support-login-link">وارد شوید</a>.
                 </div>
             <?php else: ?>
-                <!-- فرم ارسال تیکت -->
-                <div class="ticket-create-card">
-                    <h3><i class="fas fa-plus-circle"></i> ارسال تیکت جدید</h3>
-                    <form method="post" class="ticket-form">
-                        <input type="hidden" name="new_ticket" value="1">
-                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($supportCsrfToken, ENT_QUOTES, 'UTF-8') ?>">
-                        <div class="form-group">
-                            <label>موضوع تیکت</label>
-                            <input type="text" name="subject" placeholder="موضوع را خلاصه بنویسید" required>
-                        </div>
-                        <div class="form-group">
-                            <label>متن تیکت</label>
-                            <textarea name="ticket_body" rows="5" placeholder="توضیح کامل مشکل یا سوال خود را بنویسید..." required></textarea>
-                        </div>
-                        <button type="submit" class="gold-btn">ارسال تیکت</button>
-                    </form>
-                </div>
+                <div class="toast-message" id="supportToast" role="status" aria-live="polite" hidden></div>
 
-                <!-- لیست تیکت‌ها -->
-                <div class="ticket-list-card">
-                    <h3><i class="fas fa-list-ul"></i> <?= $isAdmin ? 'همه تیکت‌ها' : 'تیکت‌های شما' ?></h3>
-                    <?php if (empty($tickets)): ?>
-                        <p class="text-muted">هیچ تیکتی یافت نشد.</p>
-                    <?php else: ?>
-                        <div class="ticket-list">
-                            <?php foreach ($tickets as $t): ?>
-                                <a href="/support/?tab=tickets&ticket_id=<?= (int) ($t['id'] ?? 0) ?>" class="ticket-row">
-                                    <div class="ticket-info">
-                                        <strong>#<?= $t['id'] ?> – <?= htmlspecialchars((string) ($t['subject'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></strong>
-                                        <span class="ticket-date"><?= htmlspecialchars((string) ($t['created_at'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
-                                    </div>
-                                    <span class="ticket-status <?= htmlspecialchars((string) ($t['status'] ?? 'unknown'), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>"><?= $t['status'] ?></span>
-                                </a>
-                            <?php endforeach; ?>
+                <section class="ticket-create-card" id="supportCreateCard">
+                    <h3><i class="fas fa-plus-circle"></i> ارسال تیکت جدید</h3>
+                    <form id="supportCreateForm" class="ticket-form">
+                        <div class="form-group">
+                            <label for="supportSubject">موضوع تیکت</label>
+                            <input
+                                id="supportSubject"
+                                name="subject"
+                                type="text"
+                                maxlength="255"
+                                placeholder="موضوع را خلاصه بنویسید"
+                                required
+                            >
                         </div>
-                    <?php endif; ?>
-                </div>
+                        <div class="form-group">
+                            <label for="supportMessage">متن تیکت</label>
+                            <textarea
+                                id="supportMessage"
+                                name="message"
+                                rows="5"
+                                maxlength="5000"
+                                placeholder="توضیح کامل مشکل یا سوال خود را بنویسید..."
+                                required
+                            ></textarea>
+                        </div>
+                        <button type="submit" class="gold-btn" id="supportCreateButton">
+                            <i class="fas fa-paper-plane"></i> ارسال تیکت
+                        </button>
+                    </form>
+                </section>
+
+                <section class="ticket-list-card" id="supportListCard">
+                    <div class="support-card-heading">
+                        <h3><i class="fas fa-list-ul"></i> تیکت‌های شما</h3>
+                        <button type="button" class="support-refresh-btn" id="supportRefreshButton" aria-label="به‌روزرسانی فهرست">
+                            <i class="fas fa-rotate"></i>
+                        </button>
+                    </div>
+                    <div class="ticket-list" id="supportTicketList" aria-live="polite">
+                        <p class="text-muted">در حال دریافت تیکت‌ها...</p>
+                    </div>
+                </section>
+
+                <section class="ticket-list-card support-ticket-detail" id="supportTicketDetail" hidden>
+                    <div class="support-detail-heading">
+                        <button type="button" class="support-back-btn" id="supportBackButton">
+                            <i class="fas fa-arrow-right"></i> بازگشت به فهرست
+                        </button>
+                        <span class="ticket-status" id="supportDetailStatus"></span>
+                    </div>
+                    <h3 id="supportDetailSubject">جزئیات تیکت</h3>
+                    <p class="ticket-date" id="supportDetailMeta"></p>
+                    <div class="support-conversation" id="supportConversation" aria-live="polite">
+                        <p class="text-muted">در حال دریافت مکالمه...</p>
+                    </div>
+                    <div class="support-detail-actions" id="supportDetailActions"></div>
+                    <form class="support-reply-form" id="supportReplyForm">
+                        <div class="form-group">
+                            <label for="supportReplyMessage">پاسخ شما</label>
+                            <textarea
+                                id="supportReplyMessage"
+                                name="message"
+                                rows="4"
+                                maxlength="5000"
+                                placeholder="پیام خود را بنویسید..."
+                                required
+                            ></textarea>
+                        </div>
+                        <button type="submit" class="gold-btn" id="supportReplyButton">
+                            <i class="fas fa-reply"></i> ارسال پاسخ
+                        </button>
+                    </form>
+                </section>
             <?php endif; ?>
         </div>
     <?php endif; ?>
 </div>
-
