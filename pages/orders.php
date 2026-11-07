@@ -250,7 +250,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
             <span class="fc-orders__section-kicker">VIP MEMBERSHIP CONTROL</span>
             <h2 id="fcVipRevokeTitle">ابطال وضعیت VIP</h2>
             <p id="fcVipRevokeDescription">آیا مطمئنی می‌خوای سطح فعلی VIP رو باطل کنی؟</p>
-            <p class="fc-orders__revoke-warning">با تأیید، دسترسی VIP فعلی از VIPCore حذف می‌شود. مبلغ پرداخت‌شده به‌صورت خودکار بازگشت داده نمی‌شود.</p>
+            <p class="fc-orders__revoke-warning">با تأیید، VIP فعلی و هر سفارش VIP پرداخت‌شده‌ای که هنوز فعال نشده از صف فعال‌سازی خارج می‌شود. مبلغ پرداخت‌شده به‌صورت خودکار بازگشت داده نمی‌شود.</p>
             <div class="fc-orders__revoke-actions">
                 <button type="button" class="fc-orders__revoke-cancel" data-vip-revoke-cancel>انصراف</button>
                 <button type="button" class="fc-orders__revoke-confirm" data-vip-revoke-confirm>
@@ -366,7 +366,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
                         ? '/pages/zarinpal/zarinpal_vip_callback.php?Authority=' . rawurlencode($orderAuthority) . '&Status=OK'
                         : '';
                     ?>
-                    <article class="fc-orders__order-card" data-order-ref="<?= $ordersPageEscape($orderRef) ?>">
+                    <article class="fc-orders__order-card" data-order-ref="<?= $ordersPageEscape($orderRef) ?>" data-order-status="<?= $ordersPageEscape($orderStatus) ?>">
                         <div class="fc-orders__order-main">
                             <span class="fc-orders__order-icon"><i class="fa-solid fa-crown" aria-hidden="true"></i></span>
                             <div class="fc-orders__order-identity">
