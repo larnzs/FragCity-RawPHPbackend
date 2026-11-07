@@ -37,6 +37,9 @@ jobs:
       - name: Validate profile JavaScript syntax
         run: node --check js/profile.js
 
+      - name: Test legacy dotted and nested settings lookups
+        run: php tools/settings-loader-test.php
+
       - name: Validate FACEIT source SVGs and public icon path
         run: |
           python3 - <<'PY'
