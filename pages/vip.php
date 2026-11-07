@@ -711,6 +711,13 @@ $vipUpgradePriceMap = [];
 foreach ($vipUpgradePriceRialMap as $upgradeLevel => $upgradePriceRial) {
     $vipUpgradePriceMap[(string)$upgradeLevel] = intdiv($upgradePriceRial, 10);
 }
+
+// A current level without a matching paid-order grant is a trial, test grant
+// or legacy/manual membership. It can be converted into a paid subscription
+// at the same level, or replaced with a higher paid tier at full price.
+$vipCurrentMembershipReplaceable = $vipHasActiveMembership
+    && $vipPaidLedgerAvailable
+    && !$vipPaidUpgradeEligible;
 $vipGatewaySettings = fragcity_settings('integrations.zarinpal', []);
 $vipGatewayUrlIsSecure = static function ($value): bool {
     if (!is_string($value) || trim($value) === '') {
@@ -970,7 +977,9 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
                         <?= !$isSelectableTier ? 'disabled' : '' ?>
                     >
                         <?= $isCurrentTier
-                            ? 'مشاهده پلن فعال'
+                            ? ($vipCurrentMembershipReplaceable
+                                ? 'خرید اشتراک پولی این سطح'
+                                : 'مشاهده پلن فعال')
                             : ($isSelectableTier
                                 ? 'انتخاب این سطح'
                                 : 'فعلاً برای خرید فعال نیست') ?>
