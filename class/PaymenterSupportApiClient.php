@@ -660,6 +660,29 @@ final class PaymenterSupportApiClient
         }
 
         if ($status < 200 || $status >= 300) {
+            $bridgeError = is_string($decoded['error'] ?? null)
+                ? $decoded['error']
+                : '';
+            $knownBridgeErrors = [
+                'fragcity_account_not_linked',
+                'linked_paymenter_user_missing',
+                'validation_failed',
+                'identity_lookup_failed',
+                'support_api_not_configured',
+                'source_ip_not_allowed',
+                'invalid_ip_allowlist_configuration',
+                'invalid_signature_headers',
+                'invalid_signature',
+                'request_replayed',
+                'invalid_json_body',
+                'request_too_large',
+            ];
+
+            if (in_array($bridgeError, $knownBridgeErrors, true)) {
+                error_log('[FragCity] Support identity bridge rejected a request; HTTP ' . $status . ', error=' . $bridgeError . '.');
+                throw new RuntimeException($bridgeError);
+            }
+
             $safeError = match ($status) {
                 401, 403 => 'paymenter_api_permission_denied',
                 404 => 'paymenter_support_resource_not_found',
