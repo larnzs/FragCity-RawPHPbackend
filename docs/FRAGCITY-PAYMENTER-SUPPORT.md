@@ -41,12 +41,13 @@ Create a separate Admin API Key, for example **FragCity Support Website**, with 
 | Update Tickets | Yes |
 | View Ticket Messages | Yes |
 | Create Ticket Messages | Yes |
+| View Users | **No** — ticket ownership is verified from `user_id`; this relationship is not requested. |
 | View Invoices | Yes |
 | View Invoice Items | Yes |
 
 Do not enable Delete, Impersonate, Create/Update Users, Invoice Create/Update, Invoice Item Create/Update, Orders, Services, Coupons or Credits. View Users is not required for the SteamID64 mapping.
 
-The API key is administrative, not customer-scoped. Never expose it to the browser. The server-side adapter always resolves the Paymenter ID from the session's SteamID64. Before any ticket or invoice action, the backend verifies that the signed Paymenter identity has the same user ID, email and phone as the authenticated FragCity database row. Paymenter filters are only query optimizations, never an authorization boundary: every ticket returned by the list is independently checked against its `user_id` (or JSON:API `user` relationship), and a missing owner ID is rejected. Ticket detail reads, replies, closes and reopens also require an exact owner match before the operation proceeds.
+The API key is administrative, not customer-scoped. Never expose it to the browser. The server-side adapter always resolves the Paymenter ID from the session's SteamID64. Before any ticket or invoice action, the backend verifies that the signed Paymenter identity has the same user ID, email and phone as the authenticated FragCity database row. Paymenter filters are only query optimizations, never an authorization boundary: every ticket returned by the list is independently checked against its `user_id` attribute, and a missing owner ID is rejected. Ticket detail reads, replies, closes and reopens also require an exact owner match before the operation proceeds. The adapter deliberately does not request `include=user`: Paymenter only permits that relationship when the API key also has a separate View Users permission, which is unrelated to ticket ownership because `TicketResource` already exposes `user_id`. Ticket conversations use only `include=messages` and require View Ticket Messages.
 
 ## Private settings
 
@@ -106,8 +107,9 @@ https://billing.fragcity.ir/api/v1/admin
 
 The PHP adapter uses:
 
-- GET /tickets?filter[user_id]=...&sort=-updated_at&per_page=20
-- GET /tickets?filter[id]=...&filter[user_id]=...&include=messages&per_page=1
+- GET /tickets?filter[user_id]=...&sort=-updated_at&per_page=20 (each `attributes.user_id` is checked server-side)
+- GET /tickets?filter[id]=...&filter[user_id]=...&per_page=1 (server-side ownership check)
+- GET /tickets/{id}?include=messages (conversation; no `user` relationship include)
 - POST /tickets
 - POST /ticket-messages
 - PATCH /tickets/{id} with status=open|closed
@@ -157,7 +159,7 @@ The preflight verifies:
 
 - Signed HMAC ping and Support API version.
 - Paymenter Admin API read access for tickets.
-- Paymenter Admin API read access for ticket messages.
+- Paymenter Admin API read access for ticket messages, including the `messages` relationship on ticket details.
 - Paymenter Admin API read access for invoices and invoice items.
 - Optional SteamID64-to-Paymenter-user mapping.
 - Customer identity verification against local FragCity email, phone and `paymenter_user_id` when a SteamID64 is supplied.
