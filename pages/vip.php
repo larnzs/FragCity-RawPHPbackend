@@ -1192,7 +1192,7 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
                         <input type="hidden" name="payment_method" value="wallet">
                         <button type="submit" class="vip-invoice-wallet" data-vip-wallet-checkout disabled>
                             <i class="fas fa-wallet" aria-hidden="true"></i>
-                            پرداخت از کیف پول
+                            پرداخت از طریق کیف پول
                         </button>
                     </form>
                     <div class="vip-invoice-wallet-meta">
