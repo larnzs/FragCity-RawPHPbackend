@@ -9,7 +9,7 @@
 | GET | `/health` | Public service health only | None |
 | POST | `/v1/weaponpaints` | WeaponPaints read/write operations | Root `shared_secret` |
 | POST | `/v1/simpleadmin` | Read-only SimpleAdmin lookups and Ban List data | Root `shared_secret` |
-| POST | `/v1/vipcore` | VIPCore status and temporary no-payment test grants | Same root `shared_secret` |
+| POST | `/v1/vipcore` | VIPCore status, paid grants and authenticated site workflows including membership revocation | Same root `shared_secret` |
 | POST | `/v1/ranks` | Read-only Ranks leaderboard and player statistics | Same root `shared_secret` |
 | POST | `/v1/pterodactyl-standby` | Public CS2 Server Browser snapshot | `pterodactyl_standby.shared_secret` |
 | POST | `/v1/pterodactyl-monitoring` | Node and CS2-container resource snapshot | `pterodactyl_monitoring.shared_secret` |
@@ -51,7 +51,7 @@ The Linux API reads and writes the existing VIPCore-owned table `GLOBAL_vip.vip_
 
 The current FragCity deployment reuses the existing MariaDB account `plugins`@ `%` for WeaponPaints, SimpleAdmin, VIPCore and Ranks. Do not create `fragcity_vip_api`, generate another database password, or change the existing account as part of this integration. The private Linux config uses the same `$pluginsDbPassword` variable for the WeaponPaints, VIPCore and Ranks connections.
 
-The VIPCore service itself only executes `SELECT`, `INSERT` and `UPDATE` against `GLOBAL_vip.vip_users`; it does not need DDL, DELETE or arbitrary SQL. However, the current shared `plugins` account has broader schema-level permissions (including `WITH GRANT OPTION`) than this endpoint requires. This is an explicit compatibility choice for the existing installation, not a least-privilege design. Keep the account private to the host and do not expose its password. A future move to separate restricted service accounts should be handled as a coordinated credential migration, not by changing grants during this deployment.
+The VIPCore service reads and writes `GLOBAL_vip.vip_users`; customer revocation additionally executes a scoped `DELETE` for the authenticated Steam account and inserts an append-only row in `fragcity_vip_membership_revocations`. It does not need DDL or arbitrary SQL at runtime. However, the current shared `plugins` account has broader schema-level permissions (including `WITH GRANT OPTION`) than this endpoint requires. This is an explicit compatibility choice for the existing installation, not a least-privilege design. Keep the account private to the host and do not expose its password. A future move to separate restricted service accounts should be handled as a coordinated credential migration, not by changing grants during this deployment.
 
 Inspect the existing account without changing it:
 
@@ -62,7 +62,7 @@ SHOW CREATE TABLE GLOBAL_vip.vip_users;
 
 Merge the `vipcore` block from `linuxapi/config.example.php` into the existing `/etc/fragcity-api/config.php`; do not replace that live file or its existing secrets. Set `enabled => true`, reuse the existing `plugins` credentials, and keep `server_id => 0` only while it matches the running VIPCore configuration. Leave `test_mode.enabled => false` for connection checks. If a designated test grant is later approved, temporarily enable test mode and allowlist only that exact test SteamID64. The endpoint rejects tiers 4-6 and refuses to overwrite an active or permanent membership. Test grants do not read prices, debit the wallet, or call ZarinPal.
 
-The fixed API actions are `ping_db`, `get_status` and `grant_test_vip`. The website's VIP page now reads its membership status from VIPCore rather than the legacy `users.vip_level/vip_expire` fields.
+The fixed API actions include `ping_db`, `get_status`, `get_free_trial_status`, `claim_free_silver_trial`, `grant_paid_membership`, `revoke_membership` and the restricted `grant_test_vip`. Customer revocation is requested only from an authenticated FragCity session, through the website's signed server-to-server client; the browser never supplies a SteamID64 or database key. The API deletes only the current `(account_id, sid)` membership row, verifies the deletion, records the former tier/expiry/order reference in `fragcity_vip_membership_revocations`, and leaves payment ledgers intact. The website marks the matching order as `revoked` so it is no longer offered as a pending activation retry. The website's VIP page reads membership status from VIPCore rather than legacy `users.vip_level/vip_expire` fields.
 
 ### Paid VIP checkout database prerequisites
 
@@ -74,7 +74,7 @@ Apply these migrations in order on the existing `GLOBAL_vip` database:
 2. `linuxapi/migrations/20261107_vip_paid_order_tier_prices.sql`
 3. `linuxapi/migrations/20261107_vip_paid_order_permissions.sql`
 
-The third migration grants only `SELECT` and `INSERT` on the paid-order ledger to the already-existing `plugins`@`%` account used by this deployment. Do not create another MariaDB user. If the actual MariaDB account host has changed from the documented `%`, stop and adjust the grant to the exact existing account shown by `SELECT User, Host FROM mysql.user WHERE User = 'plugins';`.
+The third migration grants only `SELECT` and `INSERT` on the paid-order ledger to the already-existing `plugins`@`%` account used by this deployment.\n\nFor customer-initiated membership revocation, also apply these two additional migrations on `GLOBAL_vip` after the paid-order migrations:\n\n4. `linuxapi/migrations/20261107_vip_membership_revocations.sql`\n5. `linuxapi/migrations/20261107_vip_membership_revocation_permissions.sql`\n\nThe revocation permissions migration grants `DELETE` only on `vip_users` and `SELECT, INSERT` on the separate revocation audit table. The API verifies that exactly one current membership row was removed before it reports success. Never delete rows from `fragcity_vip_paid_orders` or the one-time free-trial claim ledger. Do not create another MariaDB user. If the actual MariaDB account host has changed from the documented `%`, stop and adjust the grant to the exact existing account shown by `SELECT User, Host FROM mysql.user WHERE User = 'plugins';`.
 
 After deploying the latest `linuxapi/src/VIPCore/VipCoreService.php` to the live API source (normally `/var/www/fragcity-api/src/VIPCore/VipCoreService.php`), run the CLI preflight:
 
