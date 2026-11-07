@@ -801,9 +801,12 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
                         <i class="fab fa-steam" aria-hidden="true"></i>
                         ورود با Steam برای دریافت هدیه
                     </a>
-                <?php elseif ($vipStatusUnavailable || $vipFreeTrialStatusUnavailable): ?>
+                <?php elseif ($vipStatusUnavailable): ?>
                     <button type="button" class="vip-test-purchase-button" disabled>بررسی وضعیت VIP فعلاً ممکن نیست</button>
-                    <small class="vip-test-purchase-note">سرویس VIPCore یا جدول ثبت هدیه در دسترس نیست.</small>
+                    <small class="vip-test-purchase-note">سرویس اصلی VIPCore در دسترس نیست؛ وضعیت عضویت قابل دریافت نیست.</small>
+                <?php elseif ($vipFreeTrialStatusUnavailable): ?>
+                    <button type="button" class="vip-test-purchase-button" disabled>دریافت هدیه موقتاً غیرفعال است</button>
+                    <small class="vip-test-purchase-note">فقط جدول سوابق هدیه در دسترس نیست؛ وضعیت VIP و خرید اشتراک پولی مستقل از این بخش هستند.</small>
                 <?php elseif (!empty($vipFreeTrialStatus['claimed'])): ?>
                     <span class="vip-free-trial-state is-claimed"><i class="fas fa-check-circle" aria-hidden="true"></i> هدیه Silver قبلاً دریافت شده است.</span>
                     <small class="vip-test-purchase-note">هر SteamID64 فقط یک‌بار می‌تواند از این هدیه استفاده کند.</small>
