@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS vip_orders (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    order_ref CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    steamid64 CHAR(17) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+    player_name VARCHAR(64) NOT NULL,
+    vip_level TINYINT UNSIGNED NOT NULL,
+    duration_days SMALLINT UNSIGNED NOT NULL,
+    duration_seconds INT UNSIGNED NOT NULL,
+    amount_rial BIGINT UNSIGNED NOT NULL,
+    authority VARCHAR(128) CHARACTER SET ascii COLLATE ascii_bin NULL,
+    ref_id VARCHAR(64) NULL,
+    status VARCHAR(24) NOT NULL DEFAULT 'pending',
+    last_error VARCHAR(80) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    paid_at DATETIME NULL,
+    provisioned_at DATETIME NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_vip_orders_order_ref (order_ref),
+    UNIQUE KEY uq_vip_orders_authority (authority),
+    KEY idx_vip_orders_steam_status (steamid64, status, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
