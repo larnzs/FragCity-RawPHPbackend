@@ -1127,7 +1127,7 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
                     </button>
                 </form>
                 <?php if ($isLoggedIn): ?>
-                    <form method="post" action="/pages/vip/wallet_checkout.php" data-vip-wallet-form>
+                    <form method="post" action="/pages/zarinpal/zarinpal_vip_request.php" data-vip-wallet-form>
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
                         <input type="hidden" name="level" value="" data-vip-wallet-level>
                         <input type="hidden" name="duration_days" value="" data-vip-wallet-duration>
