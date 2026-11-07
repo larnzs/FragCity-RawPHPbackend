@@ -124,9 +124,16 @@ if (!empty($vipStatus['active'])) {
         $terminate('فقط امکان ارتقا به سطح بالاتر وجود دارد؛ خرید مجدد یا تنزل سطح مجاز نیست.', 409);
     }
 
-    $paidPurchase = is_array($vipStatus['paid_purchase'] ?? null)
-        ? $vipStatus['paid_purchase']
-        : null;
+    $currentMembershipIsFreeTrial = $currentLevel === 2
+        && !empty($freeTrialStatus['claimed'])
+        && strtoupper((string)($freeTrialStatus['group'] ?? '')) === 'SILVER'
+        && (int)($freeTrialStatus['expires'] ?? 0) === $currentExpires;
+    $paidPurchase = $currentMembershipIsFreeTrial
+        ? null
+        : (is_array($vipStatus['paid_purchase'] ?? null)
+            ? $vipStatus['paid_purchase']
+            : null);
+
     if ($paidPurchase !== null
         && (int)($paidPurchase['level'] ?? 0) === $currentLevel
         && (int)($paidPurchase['expires'] ?? 0) === $currentExpires) {
