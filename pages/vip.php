@@ -608,7 +608,27 @@ foreach ($vipLevels as $level => $tier) {
             : intdiv($priceRial, 10);
     }
 }
-$vipCheckoutIntegrationReady = false; // Fail closed until order creation, ZarinPal verification and paid VIPCore provisioning are implemented.
+$vipGatewaySettings = fragcity_settings('integrations.zarinpal', []);
+$vipGatewayUrlIsSecure = static function ($value): bool {
+    if (!is_string($value) || trim($value) === '') {
+        return false;
+    }
+    $parts = parse_url(trim($value));
+    return is_array($parts)
+        && strtolower((string)($parts['scheme'] ?? '')) === 'https'
+        && !empty($parts['host'])
+        && !isset($parts['user'])
+        && !isset($parts['pass'])
+        && !isset($parts['query'])
+        && !isset($parts['fragment']);
+};
+$vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false) === true
+    && is_array($vipGatewaySettings)
+    && trim((string)($vipGatewaySettings['merchant_id'] ?? '')) !== ''
+    && $vipGatewayUrlIsSecure($vipGatewaySettings['request_url'] ?? null)
+    && $vipGatewayUrlIsSecure($vipGatewaySettings['verify_url'] ?? null)
+    && $vipGatewayUrlIsSecure($vipGatewaySettings['startpay_base_url'] ?? null)
+    && $vipGatewayUrlIsSecure(fragcity_settings('app.site_base_url', ''));
 ?>
 <main
     class="vip-page"
@@ -940,10 +960,15 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
             </div>
 
             <div class="vip-invoice-actions">
-                <button type="button" class="vip-invoice-checkout" data-vip-checkout disabled>
-                    <i class="fas fa-lock" aria-hidden="true"></i>
-                    پرداخت و فعال‌سازی
-                </button>
+                <form method="post" action="/pages/zarinpal/zarinpal_vip_request.php" data-vip-checkout-form>
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                    <input type="hidden" name="level" value="" data-vip-checkout-level>
+                    <input type="hidden" name="duration_days" value="" data-vip-checkout-duration>
+                    <button type="submit" class="vip-invoice-checkout" data-vip-checkout disabled>
+                        <i class="fas fa-lock" aria-hidden="true"></i>
+                        پرداخت و فعال‌سازی
+                    </button>
+                </form>
                 <?php if ($isLoggedIn): ?>
                     <button type="button" class="vip-invoice-wallet" data-fc-wallet-charge-open>
                         <i class="fas fa-wallet" aria-hidden="true"></i>
@@ -957,7 +982,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                 <?php endif; ?>
             </div>
 
-            <small class="vip-invoice-checkout-note">مبلغ‌ها در صفحه به تومان نمایش داده می‌شوند؛ مبلغ مرجع درگاه در سمت سرور به ریال نگهداری می‌شود. پرداخت مستقیم تا تکمیل اتصال سفارش و تأیید نهایی VIPCore غیرفعال است.</small>
+            <small class="vip-invoice-checkout-note">مبلغ در صفحه به تومان نمایش داده می‌شود و سفارش با مبلغ مرجع ریالی از سمت سرور ساخته می‌شود. VIP فقط پس از تأیید زرین‌پال و ثبت موفق در VIPCore فعال خواهد شد.</small>
         </aside>
     </div>
 
