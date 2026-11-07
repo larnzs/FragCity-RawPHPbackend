@@ -336,6 +336,9 @@
                 && Number.isSafeInteger(payableToman)
                 && payableToman > 0
                 && walletBalanceToman >= payableToman;
+            const walletSelectionValid = canCreatePaidOrder
+                && Number.isSafeInteger(payableToman)
+                && payableToman > 0;
 
             const replacementNotice = 'عضویت فعلی شما هدیه، آزمایشی یا بدون سابقه خرید پولی است؛ برای تبدیل آن به اشتراک پولی، قیمت کامل سطح و مدت انتخاب‌شده پرداخت می‌شود. هدیه Silver اعتبار ارتقا ندارد.';
             let message = 'برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.';
@@ -395,9 +398,6 @@
                     : message;
             }
 
-            const walletSelectionValid = canCreatePaidOrder
-                && Number.isSafeInteger(payableToman)
-                && payableToman > 0;
             if (walletLevelInput) walletLevelInput.value = walletSelectionValid ? String(level) : '';
             if (walletDurationInput) {
                 walletDurationInput.value = walletSelectionValid
