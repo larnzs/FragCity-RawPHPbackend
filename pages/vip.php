@@ -25,8 +25,13 @@ $vipFreeTrialStatus = [
 ];
 $vipFreeTrialStatusUnavailable = false;
 $vipWalletBalanceAvailable = false;
-$vipWalletBalanceToman = 0;
+$vipWalletBalanceToman = 0.0;
 $vipWalletPendingOrder = null;
+$vipFormatWalletToman = static function ($value, bool $grouped = true): string {
+    $formatted = number_format(max(0.0, (float)$value), 8, '.', $grouped ? ',' : '');
+    $formatted = rtrim(rtrim($formatted, '0'), '.');
+    return $formatted === '' ? '0' : $formatted;
+};
 
 if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64)) {
     try {
@@ -45,8 +50,8 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64)) {
         $walletBalanceQuery->execute([$steamid64]);
         $walletBalanceRow = $walletBalanceQuery->fetch(PDO::FETCH_ASSOC);
         $vipWalletBalanceToman = is_array($walletBalanceRow)
-            ? max(0, (int)($walletBalanceRow['balance'] ?? 0))
-            : 0;
+            ? max(0.0, (float)($walletBalanceRow['balance'] ?? 0))
+            : 0.0;
         $vipWalletBalanceAvailable = true;
 
         // A wallet debit may be committed while VIPCore is temporarily
@@ -838,7 +843,7 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
     data-vip-upgrade-duration-days="<?= $vipUpgradeDurationDays ?>"
     data-vip-upgrade-prices="<?= htmlspecialchars(json_encode($vipUpgradePriceMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-upgrade-prices-rial="<?= htmlspecialchars(json_encode($vipUpgradePriceRialMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
-    data-vip-wallet-balance="<?= $vipWalletBalanceToman ?>"
+    data-vip-wallet-balance="<?= htmlspecialchars($vipFormatWalletToman($vipWalletBalanceToman, false), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-wallet-balance-available="<?= $vipWalletBalanceAvailable ? '1' : '0' ?>"
     data-vip-wallet-pending-callback="<?= htmlspecialchars((string)($vipWalletPendingOrder['callback_url'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-wallet-pending-level="<?= (int)($vipWalletPendingOrder['level'] ?? 0) ?>"
@@ -1196,7 +1201,7 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
                         </button>
                     </form>
                     <div class="vip-invoice-wallet-meta">
-                        <small data-vip-wallet-status role="status" aria-live="polite">موجودی کیف پول: <?= number_format($vipWalletBalanceToman) ?> تومان</small>
+                        <small data-vip-wallet-status role="status" aria-live="polite">موجودی کیف پول: <?= htmlspecialchars($vipFormatWalletToman($vipWalletBalanceToman), ENT_QUOTES, 'UTF-8') ?> تومان</small>
                         <button type="button" class="vip-wallet-recharge" data-vip-wallet-recharge data-fc-wallet-charge-open hidden>
                             <i class="fas fa-plus" aria-hidden="true"></i>
                             افزایش موجودی
