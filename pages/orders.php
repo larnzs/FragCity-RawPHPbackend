@@ -181,13 +181,13 @@ $ordersPageRevokeCooldownUnavailable = false;
 $ordersPageRevokeCooldownRequired = false;
 
 if ($ordersPageCurrentVipActive
+    && ($ordersPageVipStatus['paid_ledger_available'] ?? false) !== true) {
+    $ordersPageRevokeCooldownRequired = true;
+    $ordersPageRevokeCooldownUnavailable = true;
+} elseif ($ordersPageCurrentVipActive
     && is_array($ordersPageVipStatus['paid_purchase'] ?? null)) {
     $ordersPageRevokeCooldownRequired = true;
     try {
-        if (($ordersPageVipStatus['paid_ledger_available'] ?? false) !== true) {
-            throw new RuntimeException('vip_paid_ledger_unavailable_for_revocation_cooldown');
-        }
-
         $revokeOrderRef = (string)($ordersPageVipStatus['paid_purchase']['order_ref'] ?? '');
         if (!preg_match('/^[a-f0-9]{32}$/D', $revokeOrderRef)) {
             throw new RuntimeException('vip_paid_order_reference_invalid_for_revocation_cooldown');
