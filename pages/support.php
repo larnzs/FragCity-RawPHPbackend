@@ -184,7 +184,7 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
                     </div>
                     <form id="supportCreateForm" class="ticket-form support-ticket-form" novalidate>
                         <div class="support-form-grid">
-                            <div class="form-group"><label for="supportCustomerName">نام</label><input id="supportCustomerName" type="text" value="<?= htmlspecialchars($supportCustomerName, ENT_QUOTES, 'UTF-8') ?>" readonly aria-readonly="true" autocomplete="name"><small class="support-field-hint">از پروفایل FragCity دریافت شده است.</small></div>
+                            <div class="form-group"><label for="supportCustomerName">نام</label><input id="supportCustomerName" name="customer_name" type="text" value="<?= htmlspecialchars($supportCustomerName, ENT_QUOTES, 'UTF-8') ?>" maxlength="100" autocomplete="name" required><small class="support-field-hint">نامی که تیم پشتیبانی برای خطاب‌کردن شما استفاده می‌کند.</small></div>
                             <div class="form-group"><label for="supportCustomerEmail">آدرس ایمیل</label><input id="supportCustomerEmail" type="email" value="<?= htmlspecialchars($supportCustomerEmail, ENT_QUOTES, 'UTF-8') ?>" readonly aria-readonly="true" autocomplete="email"><small class="support-field-hint">برای تغییر ایمیل، از تنظیمات حساب استفاده کن.</small></div>
                             <div class="form-group support-form-full">
                                 <label for="supportDepartment">بخش</label>
