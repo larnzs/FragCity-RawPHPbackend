@@ -399,7 +399,7 @@ try {
                 if ($walletExists) {
                     $walletCredit = $ordersPdo->prepare(
                         'UPDATE user_wallets
-                         SET balance = balance + CAST(? AS DECIMAL(20,8))
+                         SET balance = balance + CAST(? AS DECIMAL(30,8))
                          WHERE steamid = ?'
                     );
                     $walletCredit->execute([$refundAmountToman, $steamId64]);
@@ -409,7 +409,7 @@ try {
                 } else {
                     $createWallet = $ordersPdo->prepare(
                         'INSERT INTO user_wallets (steamid, balance)
-                         VALUES (?, CAST(? AS DECIMAL(20,8)))'
+                         VALUES (?, CAST(? AS DECIMAL(30,8)))'
                     );
                     $createWallet->execute([$steamId64, $refundAmountToman]);
                 }
@@ -420,7 +420,7 @@ try {
                 $walletTransaction = $ordersPdo->prepare(
                     "INSERT INTO wallet_transactions
                         (steamid, amount, type, description, authority, status)
-                     VALUES (?, CAST(? AS DECIMAL(20,8)), 'deposit', ?, ?, 'success')"
+                     VALUES (?, CAST(? AS DECIMAL(30,8)), 'deposit', ?, ?, 'success')"
                 );
                 $walletTransaction->execute([
                     $steamId64,
