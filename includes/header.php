@@ -517,6 +517,9 @@ $mobileMoreNavItems = [
 
                             <div class="frag-drop-divider"></div>
                             <div class="frag-drop-actions">
+                                <a href="<?= htmlspecialchars(fragcity_page_url('orders'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link frag-drop-link--orders <?= $isPageActive(['orders']) ?>" data-ajax-nav data-slug="orders">
+                                    <i class="fa-solid fa-receipt" aria-hidden="true"></i><span>سفارش‌های شما</span>
+                                </a>
                                 <a href="<?= htmlspecialchars(fragcity_page_url('myservers'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['myservers']) ?>" data-ajax-nav data-slug="myservers">
                                     <i class="fa-solid fa-server" aria-hidden="true"></i><span>سرورهای من</span>
                                 </a>
