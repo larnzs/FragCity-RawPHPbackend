@@ -85,7 +85,7 @@ if (!$pdo instanceof PDO) {
 try {
     $lookup = $pdo->prepare(
         'SELECT id, order_ref, steamid64, player_name, vip_level,
-                duration_days, duration_seconds, amount_rial,
+                duration_days, duration_seconds, amount_rial, tier_price_rial,
                 authority, ref_id, status, purchase_type,
                 upgrade_from_order_ref, upgrade_from_level, upgrade_from_expires
          FROM vip_orders
@@ -101,6 +101,12 @@ try {
 
     $orderStatus = (string)($order['status'] ?? '');
     $amountRial = (int)($order['amount_rial'] ?? 0);
+    $tierPriceRial = (int)($order['tier_price_rial'] ?? 0);
+    // Legacy orders created before the price-snapshot migration were full-price
+    // purchases; for those records their paid amount is also the tier base price.
+    if ($tierPriceRial < 1) {
+        $tierPriceRial = $amountRial;
+    }
     $orderRef = (string)($order['order_ref'] ?? '');
     $steamId64 = (string)($order['steamid64'] ?? '');
     $level = (int)($order['vip_level'] ?? 0);
@@ -138,6 +144,9 @@ try {
         || $durationSeconds !== $days * 86400
         || $amountRial < 1
         || $amountRial % 10 !== 0
+        || $tierPriceRial < 1
+        || $tierPriceRial > 10000000000000
+        || $tierPriceRial % 10 !== 0
         || (string)($order['authority'] ?? '') !== $authority) {
         $renderResult(false, 'اطلاعات داخلی سفارش با قالب مورد انتظار مطابقت ندارد. برای بررسی با پشتیبانی تماس بگیرید.');
     }
@@ -299,6 +308,7 @@ try {
             $playerName,
             $level,
             $durationSeconds,
+            $tierPriceRial,
             $upgradeContext
         );
 
