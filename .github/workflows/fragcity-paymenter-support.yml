@@ -65,7 +65,7 @@ jobs:
           done
 
       - name: Validate settings example JSON
-        run: php -r '$v=json_decode(file_get_contents("settings/settings.example.json"), true, 512, JSON_THROW_ON_ERROR); if (!isset($v["integrations"]["paymenter_support"]["base_url"], $v["integrations"]["paymenter_support"]["admin_api_key"], $v["integrations"]["paymenter_support"]["shared_secret"])) { exit(1); }'
+        run: php -r '$v=json_decode(file_get_contents("settings/settings.example.json"), true, 512, JSON_THROW_ON_ERROR); $s=$v["integrations"]["paymenter_support"]??[]; if (!isset($s["base_url"], $s["admin_api_key"], $s["shared_secret"]) || !is_array($s["departments"]??null)) { exit(1); }'
 
       - name: Ensure the support page does not write local ticket records
         shell: bash
@@ -125,5 +125,22 @@ jobs:
           grep -Fq 'SELECT email, phone, paymenter_user_id' "$endpoint"
           grep -Fq '$client->verifyCustomerIdentity(' "$endpoint"
           grep -Fq 'paymenter_support_identity_mismatch' "$endpoint"
+      - name: Verify ticket form contract and CAPTCHA protections
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'support-ticket-form' pages/support.php
+          grep -Fq 'name="department"' pages/support.php
+          grep -Fq 'name="priority"' pages/support.php
+          grep -Fq 'name="service"' pages/support.php
+          grep -Fq 'name="domain"' pages/support.php
+          grep -Fq 'supportCaptchaQuestion' pages/support.php
+          grep -Fq "if (\$action === 'captcha_challenge')" api/support.php
+          grep -Fq "if (\$action === 'create_ticket')" api/support.php
+          grep -Fq "'answer_hash' => hash('sha256'" api/support.php
+          grep -Fq 'captcha_invalid' api/support.php
+          grep -Fq 'setPanelVisibility' js/support.js
+          grep -Fq 'is-closing' js/support.js
+          grep -Fq '.is-exiting' css/support.css
       - name: Check support JavaScript
         run: node --check js/support.js
