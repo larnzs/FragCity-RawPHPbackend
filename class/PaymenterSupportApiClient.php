@@ -250,10 +250,48 @@ final class PaymenterSupportApiClient
 
         return [
             'ticket_id' => $ticketId,
+            // Internal server-side handoff only. This field is never returned
+            // by api/support.php to the browser.
+            'owner_user_id' => $userId,
             'subject' => $subject,
             'status' => (string) ($resource['attributes']['status'] ?? 'open'),
             'priority' => (string) ($resource['attributes']['priority'] ?? $priority),
         ];
+    }
+
+    /**
+     * Add the first message to a ticket created moments earlier in the same
+     * server-side request. The owner ID is supplied only from createTicket(),
+     * never from the browser, and is rebound to the current Steam session.
+     *
+     * @return array{message_id:int}
+     */
+    public function replyToNewTicket(
+        string $steamId64,
+        int $ticketId,
+        int $createdForUserId,
+        string $message
+    ): array {
+        $this->assertSteamId($steamId64);
+        $message = trim($message);
+
+        if (
+            $ticketId < 1
+            || $createdForUserId < 1
+            || $message === ''
+            || mb_strlen($message, 'UTF-8') > 5000
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        $userId = $this->resolvePaymenterUserId($steamId64);
+        if ($createdForUserId !== $userId) {
+            throw new RuntimeException('paymenter_support_ticket_not_found');
+        }
+
+        // The ticket ID came directly from the successful createTicket()
+        // response in this same request. No second Admin API read is needed.
+        return $this->postTicketMessage($userId, $ticketId, $message);
     }
 
     /**
@@ -273,6 +311,14 @@ final class PaymenterSupportApiClient
             throw new RuntimeException('paymenter_support_ticket_closed');
         }
 
+        return $this->postTicketMessage($userId, $ticketId, $message);
+    }
+
+    /**
+     * @return array{message_id:int}
+     */
+    private function postTicketMessage(int $userId, int $ticketId, string $message): array
+    {
         $response = $this->nativeRequest('POST', '/ticket-messages', [], [
             'message' => $message,
             'user_id' => $userId,
