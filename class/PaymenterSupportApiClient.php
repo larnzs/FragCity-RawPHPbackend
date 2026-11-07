@@ -86,16 +86,28 @@ final class PaymenterSupportApiClient
         $tickets = $this->nativeRequest('GET', '/tickets', [
             'per_page' => 1,
         ]);
+        $messages = $this->nativeRequest('GET', '/ticket-messages', [
+            'per_page' => 1,
+        ]);
         $invoices = $this->nativeRequest('GET', '/invoices', [
             'per_page' => 1,
             'include' => 'items',
         ]);
 
-        if (!array_key_exists('data', $tickets) || !array_key_exists('data', $invoices)) {
+        if (
+            !array_key_exists('data', $tickets)
+            || !array_key_exists('data', $messages)
+            || !array_key_exists('data', $invoices)
+        ) {
             throw new RuntimeException('paymenter_support_invalid_api_response');
         }
 
-        return ['tickets' => true, 'invoices' => true];
+        return [
+            'tickets' => true,
+            'ticket_messages' => true,
+            'invoices' => true,
+            'invoice_items' => true,
+        ];
     }
 
     public function resolvePaymenterUserId(string $steamId64): int
