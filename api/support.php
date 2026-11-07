@@ -105,6 +105,12 @@ if ($action === 'create_ticket') {
     unset($_SESSION['support_ticket_captcha']);
     $submittedToken = is_string($payload['captcha_token'] ?? null) ? $payload['captcha_token'] : '';
     $submittedAnswer = is_string($payload['captcha_answer'] ?? null) ? trim($payload['captcha_answer']) : '';
+    $submittedAnswer = strtr($submittedAnswer, [
+        '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4',
+        '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9',
+        '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4',
+        '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
+    ]);
     $expectedToken = is_array($challenge) ? (string) ($challenge['token'] ?? '') : '';
     $expectedHash = is_array($challenge) ? (string) ($challenge['answer_hash'] ?? '') : '';
     $expiresAt = is_array($challenge) ? (int) ($challenge['expires_at'] ?? 0) : 0;
@@ -205,6 +211,14 @@ try {
             if (!is_array($configuredDepartments)) {
                 $configuredDepartments = [];
             }
+            $configuredDepartments = array_values(array_unique(array_filter(
+                array_map(static function ($value): string {
+                    if (!is_string($value)) return '';
+                    $value = trim(preg_replace('/[\\r\\n\\x00-\\x1F\\x7F]+/u', ' ', $value) ?? '');
+                    return mb_strlen($value, 'UTF-8') <= 100 ? $value : '';
+                }, $configuredDepartments),
+                static fn (string $value): bool => $value !== ''
+            )));
             if ($department !== '' && !in_array($department, $configuredDepartments, true)) {
                 $respond(['success' => false, 'error' => 'validation_failed'], 422);
             }
