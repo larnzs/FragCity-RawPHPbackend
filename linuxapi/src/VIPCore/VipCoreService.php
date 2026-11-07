@@ -577,7 +577,8 @@ final class VipCoreService
             $accountId,
             $level,
             $group,
-            $durationSeconds
+            $durationSeconds,
+            $upgrade
         ): array {
             if ((string)($row['steamid64'] ?? '') !== $steamId64
                 || (int)($row['account_id'] ?? -1) !== $accountId
