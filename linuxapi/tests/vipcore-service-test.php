@@ -27,6 +27,11 @@ $check(
     VipCoreService::FREE_TRIAL_GROUP === 'SILVER'
     && VipCoreService::FREE_TRIAL_DURATION_SECONDS === 259200
 );
+
+$check(
+    'Paid VIP subscriptions accept only the five storefront durations',
+    VipCoreService::PAID_DURATION_SECONDS === [604800, 1296000, 2592000, 5184000, 7776000]
+);
 $check(
     'Only Bronze, Silver and Gold are grantable',
     VipCoreService::groupForLevel(1) === 'BRONZE'
