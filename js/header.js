@@ -252,6 +252,7 @@
                 'register': 'register',
                 'profile': 'profile',
                 'my-servers': 'myservers',
+                'orders': 'orders',
                 'vip': 'vip',
                 'leaderboard': 'leaderboard',
                 'forgot-password': 'forgot_password',
