@@ -64,6 +64,26 @@ Merge the `vipcore` block from `linuxapi/config.example.php` into the existing `
 
 The fixed API actions are `ping_db`, `get_status` and `grant_test_vip`. The website's VIP page now reads its membership status from VIPCore rather than the legacy `users.vip_level/vip_expire` fields.
 
+### Paid VIP checkout database prerequisites
+
+The paid VIP storefront remains fail-closed until the Linux API confirms that the paid-order ledger and the existing VIPCore membership table are readable and writable by the configured `vipcore.database` account.
+
+Apply these migrations in order on the existing `GLOBAL_vip` database:
+
+1. `linuxapi/migrations/20261107_vip_paid_orders.sql`
+2. `linuxapi/migrations/20261107_vip_paid_order_tier_prices.sql`
+3. `linuxapi/migrations/20261107_vip_paid_order_permissions.sql`
+
+The third migration grants only `SELECT` and `INSERT` on the paid-order ledger to the already-existing `plugins`@`%` account used by this deployment. Do not create another MariaDB user. If the actual MariaDB account host has changed from the documented `%`, stop and adjust the grant to the exact existing account shown by `SELECT User, Host FROM mysql.user WHERE User = 'plugins';`.
+
+After deploying the latest `linuxapi/src/VIPCore/VipCoreService.php` to the live API source (normally `/var/www/fragcity-api/src/VIPCore/VipCoreService.php`), run the CLI preflight:
+
+```bash
+sudo php /var/www/fragcity-api/tools/vipcore-paid-ledger-preflight.php
+```
+
+The preflight uses the same private `vipcore` connection as the API and checks the exact schema and SELECT/INSERT/UPDATE capabilities required by checkout. Its INSERT/UPDATE probes use `WHERE 1 = 0` and do not modify rows. Continue only when every check reports `PASS` and the final result says the database prerequisites are ready. If any check fails, its SQLSTATE and MariaDB driver code identify whether a migration/column or privilege is missing. Do not bypass the website's readiness check.
+
 ### Ranks leaderboard
 
 The website reads the existing `GLOBAL_ranks.lvl_base` table only through the signed `POST /v1/ranks` route. The table schema is owned by the game plugin: do not create, alter, truncate or seed it as part of this integration. The API exposes three fixed actions: `ping_db`, `get_leaderboard` and `get_player`. The leaderboard action performs allowlisted sorting, literal search, filtered aggregates, Top 3 and bounded pagination on Linux; it does not accept SQL fragments or arbitrary column names. The player action accepts SteamID64 and converts it to the Steam2 value stored in `lvl_base.steam`.
