@@ -81,7 +81,7 @@ final class PaymenterSupportApiClient
     /**
      * Verify read permissions without changing Paymenter records.
      *
-     * @return array{tickets:bool,invoices:bool}
+     * @return array{tickets:bool,ticket_messages:bool,ticket_message_includes:bool,invoices:bool,invoice_items:bool}
      */
     public function testNativeApiAccess(): array
     {
@@ -505,7 +505,7 @@ final class PaymenterSupportApiClient
         $this->assertOwnedResource('/tickets', $ticketId, $userId);
 
         $response = $this->nativeRequest('GET', '/tickets/' . $ticketId, [
-            'include' => 'messages,user',
+            'include' => 'messages',
         ]);
         $resource = $response['data'] ?? null;
 
