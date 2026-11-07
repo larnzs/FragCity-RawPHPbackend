@@ -12,3 +12,12 @@ CREATE TABLE IF NOT EXISTS fragcity_vip_paid_orders (
     KEY idx_vip_paid_orders_account_sid (account_id, sid),
     KEY idx_vip_paid_orders_steamid (steamid64)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- The Linux API connects as the existing "plugins" MariaDB account.
+-- Discover its exact host first; do not guess the host component:
+-- SELECT User, Host FROM mysql.user WHERE User = 'plugins';
+--
+-- The service inserts paid grants and reads the active paid grant for upgrades.
+-- Replace localhost with the exact Host returned above:
+-- GRANT SELECT, INSERT ON GLOBAL_vip.fragcity_vip_paid_orders
+--     TO 'plugins'@'localhost';
