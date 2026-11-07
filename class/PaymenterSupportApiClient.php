@@ -88,6 +88,12 @@ final class PaymenterSupportApiClient
         $tickets = $this->nativeRequest('GET', '/tickets', [
             'per_page' => 1,
         ]);
+        // Relationship includes have their own permissions in Paymenter.
+        // Verify that messages can be included without needing View Users.
+        $ticketMessageIncludes = $this->nativeRequest('GET', '/tickets', [
+            'include' => 'messages',
+            'per_page' => 1,
+        ]);
         $messages = $this->nativeRequest('GET', '/ticket-messages', [
             'per_page' => 1,
         ]);
@@ -98,6 +104,7 @@ final class PaymenterSupportApiClient
 
         if (
             !array_key_exists('data', $tickets)
+            || !array_key_exists('data', $ticketMessageIncludes)
             || !array_key_exists('data', $messages)
             || !array_key_exists('data', $invoices)
         ) {
@@ -107,6 +114,7 @@ final class PaymenterSupportApiClient
         return [
             'tickets' => true,
             'ticket_messages' => true,
+            'ticket_message_includes' => true,
             'invoices' => true,
             'invoice_items' => true,
         ];
@@ -219,7 +227,6 @@ final class PaymenterSupportApiClient
 
         $query = [
             'filter' => ['user_id' => $userId],
-            'include' => 'user',
             'sort' => '-updated_at',
             'page' => $page,
             'per_page' => $perPage,
@@ -263,7 +270,7 @@ final class PaymenterSupportApiClient
         $this->assertOwnedResource('/tickets', $ticketId, $userId);
 
         $response = $this->nativeRequest('GET', '/tickets/' . $ticketId, [
-            'include' => 'messages,user',
+            'include' => 'messages',
         ]);
         $resource = $response['data'] ?? null;
 
@@ -523,9 +530,6 @@ final class PaymenterSupportApiClient
             'per_page' => 1,
         ];
 
-        if ($collectionPath === '/tickets') {
-            $query['include'] = 'user';
-        }
 
         $response = $this->nativeRequest('GET', $collectionPath, $query);
 
@@ -561,9 +565,9 @@ final class PaymenterSupportApiClient
     /**
      * Read the authoritative Paymenter owner ID from a ticket resource.
      *
-     * Paymenter may expose user_id as an attribute or as a JSON:API user
-     * relationship. No owner value means "not verifiably owned" and callers
-     * must reject the resource.
+     * Paymenter v1.5.9 exposes user_id directly in TicketResource attributes.
+     * Relationship fallback supports compatible JSON:API resource shapes.
+     * No owner value means "not verifiably owned" and callers must reject it.
      */
     private function resourceOwnerUserId(array $resource): int
     {
@@ -862,6 +866,7 @@ final class PaymenterSupportApiClient
             }
 
             $safeError = match ($status) {
+                400 => 'paymenter_support_invalid_api_query',
                 401, 403 => 'paymenter_api_permission_denied',
                 404 => 'paymenter_support_resource_not_found',
                 422 => 'paymenter_support_validation_failed',
