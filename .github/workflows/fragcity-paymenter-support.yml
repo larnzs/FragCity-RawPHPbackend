@@ -154,5 +154,15 @@ jobs:
           grep -Fq '.support-dashboard-layout > .support-faq' css/support.css
           grep -Fq 'display: contents' css/support.css
           grep -Fq 'setPanelVisibility(listCard, true)' js/support.js
+      - name: Verify full-width support page layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq '.support-page {' css/support.css
+          grep -Fq 'padding-inline: 0;' css/support.css
+          grep -Fq '.support-page > .support-header,' css/support.css
+          grep -Fq '.support-page > .support-dashboard-layout' css/support.css
+          grep -Fq 'max-width: none;' css/support.css
+          grep -Fq 'width: 100%;' css/support.css
       - name: Check support JavaScript
         run: node --check js/support.js
