@@ -108,10 +108,6 @@ try {
             $message = is_string($payload['message'] ?? null)
                 ? trim($payload['message'])
                 : '';
-            $department = is_string($payload['department'] ?? null)
-                ? trim($payload['department'])
-                : null;
-
             if (
                 $subject === ''
                 || mb_strlen($subject, 'UTF-8') > 255
@@ -121,7 +117,7 @@ try {
                 $respond(['success' => false, 'error' => 'validation_failed'], 422);
             }
 
-            $created = $client->createTicket($steamId64, $subject, $department, 'medium');
+            $created = $client->createTicket($steamId64, $subject, null, 'medium');
             $ticketId = (int) $created['ticket_id'];
 
             try {
