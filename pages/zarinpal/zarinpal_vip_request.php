@@ -101,15 +101,20 @@ $resolvePriceRial = static function (int $targetLevel, int $durationDays) use ($
         : null;
 };
 
-// Re-check the live entitlement and the immutable free-trial claim ledger on
-// the server. Only an active paid order can generate upgrade credit.
+// Re-check the live entitlement and the paid-order ledger on the server.
+// The paid ledger is required to provision any verified purchase safely.
+// The separate free-trial ledger is not required for paid checkout: a current
+// membership without a matching paid-order record receives no upgrade credit.
 try {
     $vipRepository = new VipCoreRepository();
     $vipStatus = $vipRepository->getStatus($steamId64);
-    $freeTrialStatus = $vipRepository->getFreeTrialStatus($steamId64);
 } catch (Throwable $e) {
     error_log('[FragCity VIP checkout] VIPCore entitlement lookup failed; type=' . get_class($e));
-    $terminate('وضعیت VIP یا سوابق هدیه در دسترس نیست؛ برای جلوگیری از محاسبه اشتباه، سفارش ساخته نشد.', 503);
+    $terminate('وضعیت VIPCore در دسترس نیست؛ سفارش ساخته نشد.', 503);
+}
+
+if (($vipStatus['paid_ledger_available'] ?? false) !== true) {
+    $terminate('زیرساخت ثبت سفارش‌های پولی VIP آماده نیست؛ پس از تکمیل Migration و مجوزهای دیتابیس دوباره تلاش کنید.', 503);
 }
 
 $purchaseType = 'new';
@@ -124,15 +129,12 @@ if (!empty($vipStatus['active'])) {
         $terminate('فقط امکان ارتقا به سطح بالاتر وجود دارد؛ خرید مجدد یا تنزل سطح مجاز نیست.', 409);
     }
 
-    $currentMembershipIsFreeTrial = $currentLevel === 2
-        && !empty($freeTrialStatus['claimed'])
-        && strtoupper((string)($freeTrialStatus['group'] ?? '')) === 'SILVER'
-        && (int)($freeTrialStatus['expires'] ?? 0) === $currentExpires;
-    $paidPurchase = $currentMembershipIsFreeTrial
-        ? null
-        : (is_array($vipStatus['paid_purchase'] ?? null)
-            ? $vipStatus['paid_purchase']
-            : null);
+    // Upgrade credit is granted only by a matching immutable paid-order row.
+    // Free Silver trials and legacy/manual memberships have no such row and
+    // therefore follow the full-price replacement path.
+    $paidPurchase = is_array($vipStatus['paid_purchase'] ?? null)
+        ? $vipStatus['paid_purchase']
+        : null;
 
     if ($paidPurchase !== null
         && (int)($paidPurchase['level'] ?? 0) === $currentLevel
@@ -177,20 +179,15 @@ if (!empty($vipStatus['active'])) {
             'duration_seconds' => $paidDurationSeconds,
         ];
     } else {
-        // A free Silver trial or a legacy/manual membership has no paid-order
-        // ledger. It may be replaced only by a higher tier at its full price.
-        // Reading freeTrialStatus here intentionally confirms this account's
-        // one-time claim state; a trial itself never contributes upgrade credit.
-        $trialWasClaimed = !empty($freeTrialStatus['claimed']);
+        // A free Silver trial or a legacy/manual membership has no matching
+        // paid-order ledger row. It may only be replaced by a higher tier at
+        // its full catalogue price; the gift-claim table is not consulted here.
         $purchaseType = 'replacement';
         $durationSeconds = $days * 86400;
         $amountRial = $resolvePriceRial($level, $days);
         $tierPriceRial = $amountRial;
         if ($amountRial === null || $amountRial < 1) {
             $terminate('قیمت این اشتراک در تنظیمات معتبر نیست؛ هیچ مبلغی از شما دریافت نشده است.', 503);
-        }
-        if ($trialWasClaimed) {
-            error_log('[FragCity VIP checkout] Full-price upgrade from an account with a recorded Silver trial claim.');
         }
     }
 } else {
