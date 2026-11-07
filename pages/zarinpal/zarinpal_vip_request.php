@@ -51,6 +51,12 @@ if (!is_string($sessionCsrf)
     $terminate('درخواست معتبر نیست؛ صفحه را تازه‌سازی کنید و دوباره تلاش کنید.', 419);
 }
 
+$paymentMethodInput = $_POST['payment_method'] ?? 'online';
+$paymentMethod = is_string($paymentMethodInput) ? trim($paymentMethodInput) : '';
+if (!in_array($paymentMethod, ['online', 'wallet'], true)) {
+    $terminate('روش پرداخت انتخاب‌شده معتبر نیست.', 422);
+}
+
 $levelInput = $_POST['level'] ?? null;
 $daysInput = $_POST['duration_days'] ?? null;
 $level = is_string($levelInput) ? filter_var($levelInput, FILTER_VALIDATE_INT) : false;
@@ -200,33 +206,40 @@ if (!empty($vipStatus['active'])) {
     }
 }
 
-$zarinpalSettings = fragcity_settings('integrations.zarinpal', []);
-$merchantId = is_array($zarinpalSettings) ? trim((string)($zarinpalSettings['merchant_id'] ?? '')) : '';
-$requestUrl = is_array($zarinpalSettings) ? trim((string)($zarinpalSettings['request_url'] ?? '')) : '';
-$verifyUrl = is_array($zarinpalSettings) ? trim((string)($zarinpalSettings['verify_url'] ?? '')) : '';
-$startPayBase = is_array($zarinpalSettings)
-    ? rtrim(trim((string)($zarinpalSettings['startpay_base_url'] ?? '')), '/') . '/'
-    : '';
 $siteBaseUrl = rtrim(trim((string)fragcity_settings('app.site_base_url', '')), '/');
+$merchantId = '';
+$requestUrl = '';
+$verifyUrl = '';
+$startPayBase = '';
 
-$validHttpsUrl = static function (string $url): bool {
-    $parts = parse_url($url);
-    return is_array($parts)
-        && strtolower((string)($parts['scheme'] ?? '')) === 'https'
-        && !empty($parts['host'])
-        && !isset($parts['user'])
-        && !isset($parts['pass'])
-        && !isset($parts['query'])
-        && !isset($parts['fragment']);
-};
+if ($paymentMethod === 'online') {
+    $zarinpalSettings = fragcity_settings('integrations.zarinpal', []);
+    $merchantId = is_array($zarinpalSettings) ? trim((string)($zarinpalSettings['merchant_id'] ?? '')) : '';
+    $requestUrl = is_array($zarinpalSettings) ? trim((string)($zarinpalSettings['request_url'] ?? '')) : '';
+    $verifyUrl = is_array($zarinpalSettings) ? trim((string)($zarinpalSettings['verify_url'] ?? '')) : '';
+    $startPayBase = is_array($zarinpalSettings)
+        ? rtrim(trim((string)($zarinpalSettings['startpay_base_url'] ?? '')), '/') . '/'
+        : '';
 
-if ($merchantId === ''
-    || !$validHttpsUrl($requestUrl)
-    || !$validHttpsUrl($verifyUrl)
-    || !$validHttpsUrl($startPayBase)
-    || !$validHttpsUrl($siteBaseUrl)
-    || !function_exists('curl_init')) {
-    $terminate('تنظیمات امن زرین‌پال یا آدرس HTTPS سایت کامل نیست.', 503);
+    $validHttpsUrl = static function (string $url): bool {
+        $parts = parse_url($url);
+        return is_array($parts)
+            && strtolower((string)($parts['scheme'] ?? '')) === 'https'
+            && !empty($parts['host'])
+            && !isset($parts['user'])
+            && !isset($parts['pass'])
+            && !isset($parts['query'])
+            && !isset($parts['fragment']);
+    };
+
+    if ($merchantId === ''
+        || !$validHttpsUrl($requestUrl)
+        || !$validHttpsUrl($verifyUrl)
+        || !$validHttpsUrl($startPayBase)
+        || !$validHttpsUrl($siteBaseUrl)
+        || !function_exists('curl_init')) {
+        $terminate('تنظیمات امن زرین‌پال یا آدرس HTTPS سایت کامل نیست.', 503);
+    }
 }
 
 $databaseProfile = fragcity_settings('files.pages.zarinpal.vip_request.database_profile', 'main');
@@ -237,6 +250,9 @@ if (!$pdo instanceof PDO) {
 }
 
 $orderRef = bin2hex(random_bytes(16));
+$walletAuthority = $paymentMethod === 'wallet' ? 'WALLET_' . $orderRef : null;
+$walletBalanceBefore = 0;
+$walletAmountToman = null;
 $playerName = trim((string)($_SESSION['username'] ?? 'FragCity Player'));
 if ($playerName === '') {
     $playerName = 'FragCity Player';
@@ -290,12 +306,75 @@ try {
         throw new DomainException('vip_checkout_order_already_open');
     }
 
+    $orderStatus = 'pending';
+    $orderAuthority = null;
+    $orderReference = null;
+    $paidAtSql = '';
+
+    if ($paymentMethod === 'wallet') {
+        if ($amountRial < 1 || $amountRial % 10 !== 0) {
+            throw new RuntimeException('vip_wallet_amount_invalid');
+        }
+        $walletAmountToman = intdiv($amountRial, 10);
+
+        $walletLock = $pdo->prepare(
+            'SELECT balance
+             FROM user_wallets
+             WHERE steamid = ?
+             LIMIT 1 FOR UPDATE'
+        );
+        $walletLock->execute([$steamId64]);
+        $walletRow = $walletLock->fetch(PDO::FETCH_ASSOC);
+        $walletBalanceBefore = is_array($walletRow)
+            ? max(0, (int)($walletRow['balance'] ?? 0))
+            : 0;
+
+        if (!is_array($walletRow) || $walletBalanceBefore < $walletAmountToman) {
+            throw new DomainException('vip_wallet_insufficient');
+        }
+
+        $walletDebit = $pdo->prepare(
+            'UPDATE user_wallets
+             SET balance = balance - ?
+             WHERE steamid = ? AND balance >= ?'
+        );
+        $walletDebit->execute([$walletAmountToman, $steamId64, $walletAmountToman]);
+        if ($walletDebit->rowCount() !== 1) {
+            throw new DomainException('vip_wallet_insufficient');
+        }
+
+        $walletTransactionRef = 'VIP-' . $orderRef;
+        $walletTransaction = $pdo->prepare(
+            "INSERT INTO wallet_transactions
+                (steamid, amount, type, description, authority, ref_id, status)
+             VALUES (?, ?, 'vip_purchase', ?, ?, ?, 'success')"
+        );
+        $walletTransaction->execute([
+            $steamId64,
+            $walletAmountToman,
+            'خرید اشتراک VIP ' . $level . ' · ' . $days . ' روز',
+            $walletAuthority,
+            $walletTransactionRef,
+        ]);
+        $walletTransactionId = (int)$pdo->lastInsertId();
+        if ($walletTransactionId < 1) {
+            throw new RuntimeException('vip_wallet_transaction_insert_failed');
+        }
+
+        $orderStatus = 'paid';
+        $orderAuthority = $walletAuthority;
+        $orderReference = 'WALLET-TX-' . $walletTransactionId;
+        $paidAtSql = ', paid_at = CURRENT_TIMESTAMP';
+    }
+
     $insert = $pdo->prepare(
-        "INSERT INTO vip_orders
+        'INSERT INTO vip_orders
             (order_ref, steamid64, player_name, vip_level, duration_days,
              duration_seconds, amount_rial, tier_price_rial, status, purchase_type,
-             upgrade_from_order_ref, upgrade_from_level, upgrade_from_expires)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)"
+             upgrade_from_order_ref, upgrade_from_level, upgrade_from_expires,
+             authority, ref_id, paid_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
+            . ($paymentMethod === 'wallet' ? 'CURRENT_TIMESTAMP' : 'NULL') . ')'
     );
     $insert->execute([
         $orderRef,
@@ -306,10 +385,13 @@ try {
         $durationSeconds,
         $amountRial,
         $tierPriceRial,
+        $orderStatus,
         $purchaseType,
         $upgradeContext['from_order_ref'] ?? null,
         $upgradeContext['from_level'] ?? null,
         $upgradeContext['from_expires'] ?? null,
+        $orderAuthority,
+        $orderReference,
     ]);
     if ($insert->rowCount() !== 1) {
         throw new RuntimeException('vip_checkout_order_insert_failed');
@@ -320,6 +402,11 @@ try {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
     }
+    if ($e->getMessage() === 'vip_wallet_insufficient') {
+        $availableLabel = number_format(max(0, (int)$walletBalanceBefore));
+        $requiredLabel = number_format(max(0, (int)$walletAmountToman));
+        $terminate('موجودی کیف پول ناکافی است. موجودی فعلی: ' . $availableLabel . ' تومان؛ مبلغ موردنیاز: ' . $requiredLabel . ' تومان.', 409);
+    }
     $terminate('یک سفارش VIP قبلی هنوز در حال پرداخت یا فعال‌سازی است. از پرداخت دوباره خودداری کنید و ابتدا وضعیت سفارش قبلی را بررسی کنید.', 409);
 } catch (Throwable $e) {
     if ($pdo->inTransaction()) {
@@ -327,6 +414,14 @@ try {
     }
     error_log('[FragCity VIP checkout] Order creation failed; type=' . get_class($e));
     $terminate('ثبت سفارش VIP انجام نشد؛ هیچ پرداختی به درگاه ارسال نشده است.', 503);
+}
+
+if ($paymentMethod === 'wallet') {
+    $walletCallbackUrl = '/pages/zarinpal/zarinpal_vip_callback.php?Authority='
+        . rawurlencode((string)$walletAuthority)
+        . '&Status=OK';
+    header('Location: ' . $walletCallbackUrl, true, 303);
+    exit;
 }
 
 $callbackUrl = $siteBaseUrl . '/pages/zarinpal/zarinpal_vip_callback.php';
