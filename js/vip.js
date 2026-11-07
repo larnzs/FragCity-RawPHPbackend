@@ -273,6 +273,7 @@
             const blockedByLevel = hasAnyActiveMembership && !higherThanCurrent;
             const checkoutReady = root.dataset.vipCheckoutReady === '1';
             const statusAvailable = root.dataset.vipStatusUnavailable !== '1';
+            const paidLedgerReady = root.dataset.vipPaidLedgerAvailable === '1';
             const upgradeDurationDays = Number(root.dataset.vipUpgradeDurationDays || 0);
 
             if (invoiceTier) invoiceTier.textContent = name;
@@ -303,6 +304,7 @@
             const canCheckout = loggedIn
                 && checkoutReady
                 && statusAvailable
+                && paidLedgerReady
                 && !current
                 && available
                 && mode === 'paid'
@@ -317,16 +319,18 @@
                 message = 'Silver هدیه سه‌روزه است؛ آن را از کارت هدیه خوش‌آمدگویی دریافت کن. این سفارش وارد Checkout نمی‌شود.';
             } else if (blockedByLevel) {
                 message = 'فقط می‌توانی به سطح بالاتر ارتقا بدهی؛ خرید مجدد یا تنزل سطح امکان‌پذیر نیست.';
+            } else if (root.dataset.vipStatusUnavailable === '1') {
+                message = 'وضعیت VIPCore قابل بررسی نیست؛ پرداخت تا بازیابی سرویس متوقف می‌ماند.';
+            } else if (!loggedIn) {
+                message = 'برای خرید VIP ابتدا با حساب Steam وارد شوید.';
+            } else if (!paidLedgerReady) {
+                message = 'جدول ثبت سفارش‌های پولی VIP آماده نیست؛ تا تکمیل Migration و مجوزهای دیتابیس، پرداخت فعال نمی‌شود.';
             } else if (paidUpgradeCandidate && upgradePrice === null) {
                 message = 'قیمت ارتقا یا اعتبار باقی‌مانده قابل محاسبه نیست؛ لطفاً پس از پایان اشتراک، پلن جدید را با قیمت کامل بخر.';
             } else if (isPaidUpgrade) {
                 message = 'اعتبار باقی‌مانده از اشتراک پولی کسر می‌شود و سطح جدید تا همان تاریخ انقضای فعلی فعال خواهد بود.';
             } else if (isFullPriceReplacement) {
                 message = 'اشتراک فعلی شما اعتبار پولی قابل انتقال ندارد؛ برای پلن بالاتر باید مبلغ کامل را پرداخت کنی. هدیه رایگان Silver شامل تخفیف ارتقا نیست.';
-            } else if (root.dataset.vipStatusUnavailable === '1') {
-                message = 'قیمت و مدت پلن قابل مشاهده است، اما تا زمان در دسترس‌شدن VIPCore امکان پرداخت وجود ندارد.';
-            } else if (!loggedIn) {
-                message = 'برای خرید VIP ابتدا با حساب Steam وارد شوید.';
             } else if (mode === 'paid' && !days) {
                 message = 'یکی از مدت‌های اشتراک را انتخاب کن تا فاکتور و مبلغ نهایی تکمیل شود.';
             } else if (mode === 'paid' && price === null) {
