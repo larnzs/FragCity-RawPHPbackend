@@ -752,6 +752,15 @@ try {
                     604800,
                     7776000
                 );
+                $tierPriceRial = apiInt(
+                    $body['tier_price_rial'] ?? null,
+                    'tier_price_rial',
+                    1,
+                    10000000000000
+                );
+                if ($tierPriceRial % 10 !== 0) {
+                    throw new InvalidArgumentException('Invalid VIP tier price snapshot.');
+                }
 
                 $upgradeContext = null;
                 if (array_key_exists('upgrade', $body) && $body['upgrade'] !== null) {
@@ -784,6 +793,7 @@ try {
                     $playerName,
                     $level,
                     $durationSeconds,
+                    $tierPriceRial,
                     $upgradeContext
                 );
                 apiRespond(200, ['success' => true, 'data' => $grant]);
