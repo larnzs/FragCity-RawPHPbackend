@@ -163,6 +163,7 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
             </div>
             <span class="support-workspace-badge"><i class="fas fa-shield-halved" aria-hidden="true"></i> پشتیبانی FragCity</span>
         </div>
+        <div class="support-dashboard-layout<?= $isLoggedIn ? '' : ' is-guest' ?>">
         <div
             class="ticket-section"
             id="fragcitySupportApp"
@@ -320,5 +321,6 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
                 </details>
             </div>
         </section>
+        </div>
     <?php endif; ?>
 </div>
