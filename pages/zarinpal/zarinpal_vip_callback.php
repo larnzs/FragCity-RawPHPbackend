@@ -34,8 +34,17 @@ $renderResult = static function (
             'return_label' => 'مشاهده وضعیت VIP',
             'dismissible' => false,
         ];
+
+        echo '<!doctype html><html lang="fa" dir="rtl"><head>'
+            . '<meta charset="utf-8">'
+            . '<meta name="viewport" content="width=device-width,initial-scale=1">'
+            . '<title>پرداخت موفق | FragCity</title>'
+            . '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">'
+            . '<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;800&display=swap" rel="stylesheet">'
+            . '<link rel="stylesheet" href="/css/fragcity-success-modal.css?v=20261107-1">'
+            . '</head><body class="fc-success-page-body">';
         require __DIR__ . '/../../includes/fragcity-success-modal.php';
-        echo '<script src="/js/fragcity-success-modal.js" defer></script>';
+        echo '<script src="/js/fragcity-success-modal.js?v=20261107-1" defer></script></body></html>';
         exit;
     }
 
