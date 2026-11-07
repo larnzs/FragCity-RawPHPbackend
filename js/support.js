@@ -466,6 +466,7 @@
                 return field ? String(field.value || '').trim() : '';
             };
             const subject = valueOf('subject');
+            const customerName = valueOf('customer_name');
             const message = valueOf('message');
             const captcha = valueOf('captcha_answer');
             const token = valueOf('captcha_token');
@@ -478,8 +479,8 @@
                 })
                 : [];
 
-            if (!subject || !message || !captcha || !token) {
-                showToast('موضوع، توضیحات و کد امنیتی را کامل کن.', 'error');
+            if (!subject || !customerName || !message || !captcha || !token) {
+                showToast('نام، موضوع، توضیحات و کد امنیتی را کامل کن.', 'error');
                 return;
             }
             if (extraFields.some(function (item) { return !item.label || !item.value; })) {
@@ -491,6 +492,7 @@
             try {
                 const data = await callApi('create_ticket', {
                     subject: subject,
+                    customer_name: customerName,
                     message: message,
                     department: valueOf('department'),
                     priority: priorityField ? priorityField.value : 'medium',
