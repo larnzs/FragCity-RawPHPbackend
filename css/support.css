@@ -2096,3 +2096,33 @@ button.ticket-row {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+
+/* =========================================================
+   Support dashboard: full-bleed horizontal layout
+========================================================= */
+.support-page {
+    padding-inline: 0;
+}
+
+.support-page > .support-header,
+.support-page > .support-tabs,
+.support-page > .support-intro,
+.support-page > .card.support-card,
+.support-page > .support-footer,
+.support-page > .support-workspace-heading,
+.support-page > .support-dashboard-layout {
+    width: 100%;
+    max-width: none;
+    margin-inline: 0;
+}
+
+.support-page > .support-dashboard-layout {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+}
+
+@media (max-width: 980px) {
+    .support-page > .support-dashboard-layout {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
