@@ -2,13 +2,13 @@
 declare(strict_types=1);
 
 /**
- * CLI-only, read/write-permission preflight for paid VIP checkout.
+ * CLI-only, read/write-permission preflight for paid VIP checkout and customer revocation.
  *
  * Usage:
  *   php linuxapi/tools/vipcore-paid-ledger-preflight.php
  *
  * Uses the same private vipcore database settings as /v1/vipcore.
- * INSERT and UPDATE probes use WHERE 1=0, so they affect zero rows.
+ * INSERT, UPDATE and DELETE probes use zero-row conditions, so they affect zero rows.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -132,6 +132,35 @@ $checks = [
                  ' . $groupColumn . ' = ' . $groupColumn . ', expires = expires
              WHERE 1 = 0'
         );
+    'vip_users DELETE privilege' => static function (PDO $pdo): void {
+        $pdo->exec('DELETE FROM vip_users WHERE 1 = 0');
+    },
+    'revocation audit SELECT and required columns' => static function (PDO $pdo): void {
+        $pdo->query(
+            'SELECT id, steamid64, account_id, sid, vip_group, vip_level,
+                    expires, paid_order_ref, revoked_at, revoked_by
+             FROM fragcity_vip_membership_revocations
+             LIMIT 0'
+        );
+    },
+    'revocation audit INSERT privilege' => static function (PDO $pdo): void {
+        $pdo->exec(
+            'INSERT INTO fragcity_vip_membership_revocations
+                (steamid64, account_id, sid, vip_group, vip_level,
+                 expires, paid_order_ref, revoked_at, revoked_by)
+             SELECT
+                CAST(REPEAT(\'0\', 17) AS CHAR(17)),
+                CAST(0 AS UNSIGNED),
+                CAST(0 AS UNSIGNED),
+                CAST(\'BRONZE\' AS CHAR(64)),
+                CAST(1 AS UNSIGNED),
+                CAST(0 AS UNSIGNED),
+                NULL,
+                CAST(1 AS UNSIGNED),
+                CAST(\'customer\' AS CHAR(32))
+             WHERE 1 = 0'
+        );
+    },
     },
 ];
 
