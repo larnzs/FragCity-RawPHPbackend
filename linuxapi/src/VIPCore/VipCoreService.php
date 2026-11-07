@@ -114,6 +114,22 @@ final class VipCoreService
     public function getStatus(string $steamId64): array
     {
         $accountId = self::accountIdFromSteamId64($steamId64);
+
+        // vip_users is the source of truth for membership visibility. The paid
+        // ledger is an auxiliary checkout capability; a missing table or
+        // incomplete migration must not hide a user's existing VIP status.
+        $paidLedgerAvailable = false;
+        try {
+            $ledgerProbe = $this->pdo->query(
+                'SELECT order_ref, vip_level, duration_seconds, granted_at, expires, tier_price_rial
+                 FROM fragcity_vip_paid_orders
+                 LIMIT 0'
+            );
+            $paidLedgerAvailable = $ledgerProbe !== false;
+        } catch (PDOException $e) {
+            error_log('[FragCity VIPCore] Paid-order ledger unavailable; SQLSTATE ' . $e->getCode());
+        }
+
         $statement = $this->pdo->prepare(
             'SELECT `group`, `expires`
              FROM `vip_users`
@@ -133,6 +149,7 @@ final class VipCoreService
                 'group' => null,
                 'expires' => null,
                 'paid_purchase' => null,
+                'paid_ledger_available' => $paidLedgerAvailable,
                 'server_id' => $this->serverId,
             ];
         }
@@ -146,39 +163,45 @@ final class VipCoreService
         // A current membership is eligible for upgrade credit only when its
         // exact active VIPCore row is backed by a paid-order ledger entry.
         // Free Silver claims never create this paid ledger record.
-        if ($active && $expires > 0) {
-            $paidStatement = $this->pdo->prepare(
-                'SELECT order_ref, vip_level, duration_seconds, granted_at, expires, tier_price_rial
-                 FROM fragcity_vip_paid_orders
-                 WHERE account_id = :account_id
-                   AND sid = :server_id
-                   AND vip_level = :vip_level
-                   AND expires = :expires
-                 ORDER BY granted_at DESC
-                 LIMIT 1'
-            );
-            $paidStatement->execute([
-                ':account_id' => $accountId,
-                ':server_id' => $this->serverId,
-                ':vip_level' => $level,
-                ':expires' => $expires,
-            ]);
-            $paidRow = $paidStatement->fetch(PDO::FETCH_ASSOC);
+        if ($active && $expires > 0 && $paidLedgerAvailable) {
+            try {
+                $paidStatement = $this->pdo->prepare(
+                    'SELECT order_ref, vip_level, duration_seconds, granted_at, expires, tier_price_rial
+                     FROM fragcity_vip_paid_orders
+                     WHERE account_id = :account_id
+                       AND sid = :server_id
+                       AND vip_level = :vip_level
+                       AND expires = :expires
+                     ORDER BY granted_at DESC
+                     LIMIT 1'
+                );
+                $paidStatement->execute([
+                    ':account_id' => $accountId,
+                    ':server_id' => $this->serverId,
+                    ':vip_level' => $level,
+                    ':expires' => $expires,
+                ]);
+                $paidRow = $paidStatement->fetch(PDO::FETCH_ASSOC);
 
-            if (is_array($paidRow)
-                && preg_match('/^[a-f0-9]{32}$/D', (string)($paidRow['order_ref'] ?? ''))
-                && (int)($paidRow['duration_seconds'] ?? 0) > 0
-                && (int)($paidRow['expires'] ?? 0) === $expires) {
-                $paidPurchase = [
-                    'order_ref' => (string)$paidRow['order_ref'],
-                    'level' => (int)$paidRow['vip_level'],
-                    'duration_seconds' => (int)$paidRow['duration_seconds'],
-                    'tier_price_rial' => (int)($paidRow['tier_price_rial'] ?? 0) > 0
-                        ? (int)$paidRow['tier_price_rial']
-                        : null,
-                    'granted_at' => (int)$paidRow['granted_at'],
-                    'expires' => (int)$paidRow['expires'],
-                ];
+                if (is_array($paidRow)
+                    && preg_match('/^[a-f0-9]{32}$/D', (string)($paidRow['order_ref'] ?? ''))
+                    && (int)($paidRow['duration_seconds'] ?? 0) > 0
+                    && (int)($paidRow['expires'] ?? 0) === $expires) {
+                    $paidPurchase = [
+                        'order_ref' => (string)$paidRow['order_ref'],
+                        'level' => (int)$paidRow['vip_level'],
+                        'duration_seconds' => (int)$paidRow['duration_seconds'],
+                        'tier_price_rial' => (int)($paidRow['tier_price_rial'] ?? 0) > 0
+                            ? (int)$paidRow['tier_price_rial']
+                            : null,
+                        'granted_at' => (int)$paidRow['granted_at'],
+                        'expires' => (int)$paidRow['expires'],
+                    ];
+                }
+            } catch (PDOException $e) {
+                $paidLedgerAvailable = false;
+                $paidPurchase = null;
+                error_log('[FragCity VIPCore] Paid-order ledger lookup failed; SQLSTATE ' . $e->getCode());
             }
         }
 
@@ -188,6 +211,7 @@ final class VipCoreService
             'group' => $active ? $group : null,
             'expires' => $active ? $expires : null,
             'paid_purchase' => $active ? $paidPurchase : null,
+            'paid_ledger_available' => $paidLedgerAvailable,
             'server_id' => $this->serverId,
         ];
     }
