@@ -2,8 +2,9 @@
 declare(strict_types=1);
 
 /**
- * Verifies ZarinPal and provisions the exact VIP membership attached to the
- * stored order. The callback never trusts browser-supplied amount or tier.
+ * Verifies online ZarinPal payments or validates the stored wallet debit, then
+ * provisions the exact VIP membership attached to the order.
+ * The callback never trusts browser-supplied amount or tier.
  */
 require_once __DIR__ . '/../../settings/loader.php';
 require_once __DIR__ . '/../../class/VipCoreRepository.php';
