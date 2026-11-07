@@ -613,7 +613,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
         </div>
         <div class="vip-store-hero-aside">
             <i class="fas fa-layer-group" aria-hidden="true"></i>
-            <span>۶ سطح VIP · ۲ سطح فعال برای کاربران</span>
+            <span>۶ سطح VIP · ۲ سطح قابل عرضه به کاربران</span>
         </div>
     </header>
 
@@ -684,36 +684,33 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
 
 
 
-    <div class="vip-catalog-heading">
-        <div>
-            <span class="vip-store-eyebrow">CHOOSE YOUR TIER</span>
-            <h2>سطح‌های VIP</h2>
-            <p>برای خرید، سطح موردنظر را انتخاب کن؛ ویژگی‌ها را جداگانه در جدول مقایسه ببین.</p>
-        </div>
-
-    </div>
+    <div class="vip-store-layout">
+        <div class="vip-store-main-column">
 
     <section class="vip-plans-grid vip-public-plans-grid" aria-label="سطح‌های فعال و عمومی VIP">
         <?php foreach ($vipLevels as $lvl => $tier): ?>
-            <?php if ((int)$lvl === 1 && !$isVipTestAdmin) continue; ?>
             <?php
                 $levelPrices = $vipPurchasePriceMap[(string) $lvl] ?? [];
                 $configuredPrices = array_values(array_filter(
                     $levelPrices,
                     static fn ($price): bool => is_int($price) && $price > 0
                 ));
-                $tierPriceLabel = (int)$lvl === 2
-                    ? 'هدیه رایگان · ۳ روز'
-                    : (!$tier['available']
-                        ? 'غیرفعال'
-                        : (!empty($configuredPrices)
-                            ? 'از ' . number_format(min($configuredPrices)) . ' ' . $vipCurrency
-                            : 'قیمت‌گذاری تکمیل نشده'));
-                $tierDurationLabel = (int)$lvl === 2
-                    ? 'فقط یک‌بار برای هر SteamID64'
-                    : (!$tier['available']
-                        ? 'Not available'
-                        : '۷، ۱۵، ۳۰، ۶۰ یا ۹۰ روز');
+                $tierPriceLabel = (int)$lvl === 1
+                    ? 'Dummy داخلی · غیرقابل خرید'
+                    : ((int)$lvl === 2
+                        ? 'هدیه رایگان · ۳ روز'
+                        : (!$tier['available']
+                            ? 'غیرفعال'
+                            : (!empty($configuredPrices)
+                                ? 'از ' . number_format(min($configuredPrices)) . ' ' . $vipCurrency
+                                : 'قیمت‌گذاری تکمیل نشده')));
+                $tierDurationLabel = (int)$lvl === 1
+                    ? 'فقط تست داخلی'
+                    : ((int)$lvl === 2
+                        ? 'فقط یک‌بار برای هر SteamID64'
+                        : (!$tier['available']
+                            ? 'Not available'
+                            : '۷، ۱۵، ۳۰، ۶۰ یا ۹۰ روز'));
                 $isCurrentTier = $vipHasActiveMembership && $vipCurrentLevel === (int) $lvl;
             ?>
             <?php if ((int) $lvl === 4): ?>
@@ -766,6 +763,8 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                     <span class="vip-plan-index">FRAGCITY / VIP 0<?= (int) $lvl ?></span>
                     <?php if ($isCurrentTier): ?>
                         <span class="vip-plan-current"><i class="fas fa-check" aria-hidden="true"></i> پلن فعلی</span>
+                    <?php elseif ((int)$lvl === 1): ?>
+                        <span class="vip-plan-locked vip-plan-dummy"><i class="fas fa-flask" aria-hidden="true"></i> DUMMY · تست داخلی</span>
                     <?php elseif (!$tier['available']): ?>
                         <span class="vip-plan-locked"><i class="fas fa-lock" aria-hidden="true"></i> قفل‌شده</span>
                     <?php elseif ((int)$lvl === 2): ?>
@@ -792,8 +791,8 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
 
                 <div class="vip-plan-price<?= (int)$lvl === 2 ? ' is-free-trial' : (!$tier['available'] ? ' is-locked' : ' is-paid') ?>">
                     <span class="vip-plan-price-label">
-                        <i class="fas <?= (int)$lvl === 2 ? 'fa-gift' : (!$tier['available'] ? 'fa-lock' : 'fa-tag') ?>" aria-hidden="true"></i>
-                        <?= (int)$lvl === 2 ? 'شرایط دریافت هدیه' : (!$tier['available'] ? 'وضعیت پلن' : 'قیمت پلن') ?>
+                        <i class="fas <?= (int)$lvl === 1 ? 'fa-flask' : ((int)$lvl === 2 ? 'fa-gift' : (!$tier['available'] ? 'fa-lock' : 'fa-tag')) ?>" aria-hidden="true"></i>
+                        <?= (int)$lvl === 1 ? 'کاربرد داخلی' : ((int)$lvl === 2 ? 'شرایط دریافت هدیه' : (!$tier['available'] ? 'وضعیت پلن' : 'قیمت پلن')) ?>
                     </span>
                     <strong><?= htmlspecialchars($tierPriceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
                     <small><?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?></small>
@@ -807,7 +806,11 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                         aria-pressed="false"
                         <?= (!$tier['available'] && !($isVipTestAdmin && in_array((int)$lvl, [1, 2, 3], true))) || $isCurrentTier ? 'disabled' : '' ?>
                     >
-                        <?= $isCurrentTier ? 'اشتراک فعلی شما' : (!$tier['available'] && !($isVipTestAdmin && in_array((int)$lvl, [1, 2, 3], true)) ? 'فعلاً غیرفعال' : 'انتخاب این سطح') ?>
+                        <?= $isCurrentTier
+                            ? 'اشتراک فعلی شما'
+                            : (!$tier['available'] && !($isVipTestAdmin && in_array((int)$lvl, [1, 2, 3], true))
+                                ? ((int)$lvl === 1 ? 'فقط تست داخلی' : 'فعلاً غیرفعال')
+                                : 'انتخاب این سطح') ?>
                         <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     </button>
                     <button
@@ -874,77 +877,98 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
 
 
 
-    <section class="vip-notice-grid vip-admin-guide-grid" aria-label="راهنمای مدیریت VIP">
-        <aside class="vip-notice vip-notice-modes vip-admin-guide" role="note">
-            <div class="vip-notice-heading">
-                <span class="vip-notice-icon" aria-hidden="true"><i class="fas fa-user-shield"></i></span>
-                <span>
-                    <strong>قوانین فعال بودن VIP در مودهای بازی</strong>
-                    <small>برای غیرفعال کردن VIP در سرور، فقط کافی است پلاگین VIPCore را از پنل ادمین خاموش کنید.</small>
-                </span>
+        </div>
+
+        <aside class="vip-invoice-panel vip-checkout-bar" id="vipOrderSummary" data-vip-invoice aria-label="فاکتور و خلاصه سفارش">
+            <div class="vip-invoice-topline">
+                <span class="vip-store-eyebrow">FRAGCITY · ORDER SUMMARY</span>
+                <span class="vip-invoice-icon" aria-hidden="true"><i class="fas fa-receipt"></i></span>
             </div>
-            <p class="vip-admin-guide-copy">
-                دستور <bdi dir="ltr">!admin</bdi> را اجرا کنید؛ سپس از مسیر
-                <bdi dir="ltr">Server Manage → Plugins → VIPCore</bdi>
-                پلاگین را خاموش کنید. همین کافی است.
+
+            <h2>خلاصه سفارش</h2>
+            <p class="vip-invoice-subtitle">پلن و مدت انتخابی را اینجا بررسی کن؛ فاکتور با انتخاب‌های تو به‌روزرسانی می‌شود.</p>
+
+            <div class="vip-invoice-product">
+                <span>پلن انتخاب‌شده</span>
+                <strong data-invoice-tier>هنوز پلنی انتخاب نشده</strong>
+                <small data-invoice-level>سطح عضویت: —</small>
+            </div>
+
+            <p class="vip-invoice-status" data-invoice-status role="status" aria-live="polite">
+                برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.
             </p>
-        </aside>
-    </section>
 
-    <section class="vip-notice-grid vip-store-notice-grid" aria-label="اطلاعیه فروش VIP">
-        <aside class="vip-notice vip-notice-store" role="status">
-            <div class="vip-notice-heading">
-                <span class="vip-notice-icon" aria-hidden="true"><i class="fas fa-bullhorn"></i></span>
-                <span>
-                    <strong>اطلاعیه فروش VIP</strong>
-                    <small>وضعیت فعلی کاتالوگ و پرداخت</small>
-                </span>
+            <div class="vip-invoice-lines">
+                <div class="vip-invoice-line">
+                    <span>مدت اشتراک</span>
+                    <strong data-invoice-duration>—</strong>
+                </div>
             </div>
-            <p>Bronze فقط یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. هر حساب Steam می‌تواند یک‌بار Silver را به مدت ۳ روز رایگان دریافت کند. Gold تنها سطح پولی قابل انتخاب فعلی است؛ قیمت‌گذاری و Checkout مستقیم هنوز فعال نشده‌اند. Platinum، Emerald و Diamond برای خرید غیرفعال هستند.</p>
-            <p class="vip-notice-store-warning"><i class="fas fa-circle-exclamation" aria-hidden="true"></i> هدیه Silver فقط برای حساب بدون اشتراک فعال Silver یا بالاتر قابل دریافت است؛ Bronze آزمایشی مانع دریافت هدیه نیست. پس از استفاده، حتی بعد از پایان ۳ روز، هدیه دوباره قابل دریافت نخواهد بود.</p>
+
+            <div class="vip-invoice-total">
+                <span>مبلغ نهایی</span>
+                <strong data-invoice-total>— تومان</strong>
+            </div>
+
+            <div class="vip-invoice-actions">
+                <button type="button" class="vip-invoice-checkout" data-vip-checkout disabled>
+                    <i class="fas fa-lock" aria-hidden="true"></i>
+                    پرداخت و فعال‌سازی
+                </button>
+                <?php if ($isLoggedIn): ?>
+                    <button type="button" class="vip-invoice-wallet" data-fc-wallet-charge-open>
+                        <i class="fas fa-wallet" aria-hidden="true"></i>
+                        کیف پول
+                    </button>
+                <?php else: ?>
+                    <a class="vip-invoice-wallet" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
+                        <i class="fab fa-steam" aria-hidden="true"></i>
+                        ورود با Steam
+                    </a>
+                <?php endif; ?>
+            </div>
+
+            <small class="vip-invoice-checkout-note">پرداخت مستقیم تا تکمیل اتصال سرویس سفارش و تأیید نهایی VIPCore غیرفعال است.</small>
         </aside>
+    </div>
+
+    <section class="vip-faq-section" aria-labelledby="vipFaqTitle">
+        <header class="vip-faq-heading">
+            <span class="vip-store-eyebrow">FRAGCITY · HELP CENTER</span>
+            <h2 id="vipFaqTitle">سؤالات متداول VIP</h2>
+            <p>پاسخ پرسش‌های رایج درباره پلن‌ها، هدیه Silver و دسترسی داخل سرور.</p>
+        </header>
+
+        <div class="vip-faq-list">
+            <details class="vip-faq-item">
+                <summary>چطور VIP را از طریق پنل سرور مدیریت یا غیرفعال کنم؟</summary>
+                <div class="vip-faq-answer">
+                    <p>دستور <bdi dir="ltr">!admin</bdi> را اجرا کنید؛ سپس از مسیر <bdi dir="ltr">Server Manage → Plugins → VIPCore</bdi> پلاگین VIPCore را خاموش کنید. برای غیرفعال‌کردن VIP در سرور، همین کار کافی است.</p>
+                </div>
+            </details>
+
+            <details class="vip-faq-item">
+                <summary>وضعیت سطح‌های Bronze، Silver و Gold و خرید VIP چیست؟</summary>
+                <div class="vip-faq-answer">
+                    <p>Bronze یک سطح Dummy برای تست داخلی است و به کاربران عرضه نمی‌شود. Silver هدیه رایگان سه‌روزه و یک‌باره است. Gold تنها سطح پولی قابل انتخاب فعلی است؛ بااین‌حال قیمت‌گذاری و Checkout مستقیم هنوز فعال نشده‌اند. سطح‌های Platinum، Emerald و Diamond نیز فعلاً برای خرید غیرفعال هستند.</p>
+                </div>
+            </details>
+
+            <details class="vip-faq-item">
+                <summary>شرایط دریافت هدیه رایگان Silver چیست؟</summary>
+                <div class="vip-faq-answer">
+                    <p>هر حساب Steam فقط یک‌بار می‌تواند هدیه Silver را برای ۳ روز دریافت کند. این هدیه فقط برای حسابی قابل دریافت است که اشتراک فعال Silver یا سطح بالاتر نداشته باشد. Bronze آزمایشی مانع دریافت هدیه نیست؛ اما پس از یک‌بار دریافت، حتی بعد از پایان سه روز هم امکان دریافت مجدد وجود ندارد.</p>
+                </div>
+            </details>
+
+            <details class="vip-faq-item">
+                <summary>VIP فعال شده اما من هنوز در سرور دسترسی ندارم؛ چه کار کنم؟</summary>
+                <div class="vip-faq-answer">
+                    <p>به یکی از ادمین‌های سرور اطلاع بده و درخواست کن فهرست VIPها را به‌روزرسانی کند. ادمین باید دستور <code dir="ltr">Player reload</code> را اجرا کند تا فهرست بازخوانی شود.</p>
+                </div>
+            </details>
+        </div>
     </section>
-
-<aside class="vip-invoice-panel vip-checkout-bar" id="vipOrderSummary" data-vip-invoice aria-label="فاکتور و خلاصه سفارش">
-    <div class="vip-invoice-product">
-        <span class="vip-store-eyebrow">FRAGCITY · ORDER SUMMARY</span>
-        <strong data-invoice-tier>هنوز پلنی انتخاب نشده</strong>
-        <small data-invoice-level>سطح عضویت: —</small>
-        <p class="vip-invoice-status" data-invoice-status role="status" aria-live="polite">
-            برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.
-        </p>
-    </div>
-
-    <div class="vip-invoice-lines">
-        <div class="vip-invoice-line">
-            <span>مدت اشتراک</span>
-            <strong data-invoice-duration>—</strong>
-        </div>
-        <div class="vip-invoice-total">
-            <span>مبلغ نهایی</span>
-            <strong data-invoice-total>— تومان</strong>
-        </div>
-    </div>
-
-    <div class="vip-invoice-actions">
-        <button type="button" class="vip-invoice-checkout" data-vip-checkout disabled>
-            <i class="fas fa-lock" aria-hidden="true"></i>
-            پرداخت و فعال‌سازی
-        </button>
-        <?php if ($isLoggedIn): ?>
-            <button type="button" class="vip-invoice-wallet" data-fc-wallet-charge-open>
-                <i class="fas fa-wallet" aria-hidden="true"></i>
-                کیف پول
-            </button>
-        <?php else: ?>
-            <a class="vip-invoice-wallet" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
-                <i class="fab fa-steam" aria-hidden="true"></i>
-                ورود با Steam
-            </a>
-        <?php endif; ?>
-    </div>
-
-</aside>
 
 </main>
 
