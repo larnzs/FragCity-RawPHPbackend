@@ -1944,3 +1944,155 @@ button.ticket-row {
         transform: none !important;
     }
 }
+
+
+/* =========================================================
+   Support dashboard: 70% request workspace / 30% ticket rail
+   In RTL, the first grid track is the right-hand column.
+========================================================= */
+.support-dashboard-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 3fr);
+    align-items: start;
+    column-gap: 16px;
+    row-gap: 16px;
+    width: min(100%, 1160px);
+    margin: 0 auto;
+    direction: rtl;
+}
+
+.support-dashboard-layout > #fragcitySupportApp.ticket-section {
+    display: contents;
+    width: auto;
+    max-width: none;
+    margin: 0;
+}
+
+.support-dashboard-layout .support-create-card,
+.support-dashboard-layout .support-ticket-detail {
+    grid-column: 1;
+    width: 100%;
+    min-width: 0;
+}
+
+.support-dashboard-layout #supportListCard,
+.support-dashboard-layout > .support-faq {
+    grid-column: 2;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+.support-dashboard-layout #supportListCard {
+    display: flex;
+    flex-direction: column;
+    max-height: min(62vh, 560px);
+    overflow: hidden;
+}
+
+.support-dashboard-layout #supportListCard .support-card-heading {
+    flex: 0 0 auto;
+}
+
+.support-dashboard-layout #supportTicketList {
+    min-height: 86px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(249, 115, 22, .35) rgba(255,255,255,.035);
+    padding-inline-end: 2px;
+}
+
+.support-dashboard-layout #supportTicketList::-webkit-scrollbar {
+    width: 5px;
+}
+
+.support-dashboard-layout #supportTicketList::-webkit-scrollbar-thumb {
+    border-radius: 8px;
+    background: rgba(249, 115, 22, .35);
+}
+
+.support-dashboard-layout > .support-faq {
+    margin-top: 0;
+    padding: 16px;
+}
+
+.support-dashboard-layout > .support-faq .support-faq-heading {
+    align-items: flex-start;
+    gap: 9px;
+    margin-bottom: 12px;
+}
+
+.support-dashboard-layout > .support-faq .support-faq-icon {
+    flex-basis: 34px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    font-size: .85rem;
+}
+
+.support-dashboard-layout > .support-faq .support-faq-heading h2 {
+    font-size: .84rem;
+}
+
+.support-dashboard-layout > .support-faq .support-faq-heading p {
+    font-size: .61rem;
+    line-height: 1.7;
+}
+
+.support-dashboard-layout > .support-faq .support-faq-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 7px;
+}
+
+.support-dashboard-layout > .support-faq .support-faq-item summary {
+    min-height: 42px;
+    padding: 9px 10px;
+    font-size: .65rem;
+}
+
+.support-dashboard-layout > .support-faq .support-faq-item > p {
+    padding-inline: 10px;
+    font-size: .62rem;
+}
+
+.support-dashboard-layout.is-guest {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.support-dashboard-layout.is-guest .support-login-message,
+.support-dashboard-layout.is-guest > .support-faq {
+    grid-column: 1;
+}
+
+@media (max-width: 980px) {
+    .support-dashboard-layout {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 13px;
+    }
+
+    .support-dashboard-layout .support-create-card,
+    .support-dashboard-layout .support-ticket-detail,
+    .support-dashboard-layout #supportListCard,
+    .support-dashboard-layout > .support-faq {
+        grid-column: 1;
+    }
+
+    .support-dashboard-layout #supportListCard {
+        max-height: 420px;
+    }
+
+    .support-dashboard-layout > .support-faq .support-faq-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 600px) {
+    .support-dashboard-layout {
+        row-gap: 11px;
+    }
+
+    .support-dashboard-layout > .support-faq .support-faq-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
