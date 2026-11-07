@@ -12,6 +12,12 @@ header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('X-Content-Type-Options: nosniff');
 
+$requestedAuthority = $_GET['Authority'] ?? '';
+$acceptHeader = strtolower((string)($_SERVER['HTTP_ACCEPT'] ?? ''));
+$wantsJsonResponse = is_string($requestedAuthority)
+    && str_starts_with(trim($requestedAuthority), 'WALLET_')
+    && str_contains($acceptHeader, 'application/json');
+
 $renderResult = static function (
     bool $success,
     string $message,
@@ -19,7 +25,24 @@ $renderResult = static function (
     string $reference = '',
     bool $provisionPending = false,
     ?string $retryUrl = null
-): never {
+) use ($wantsJsonResponse): never {
+    if ($wantsJsonResponse) {
+        http_response_code($success ? 200 : ($provisionPending ? 202 : 422));
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode(
+            [
+                'success' => $success,
+                'message' => $message,
+                'amount_toman' => intdiv(max(0, $amountRial), 10),
+                'reference' => $reference,
+                'provision_pending' => $provisionPending,
+                'retry_url' => $retryUrl,
+            ],
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+        );
+        exit;
+    }
+
     header('Content-Type: text/html; charset=UTF-8');
 
     if ($success) {
