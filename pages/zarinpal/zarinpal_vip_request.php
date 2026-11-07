@@ -198,6 +198,8 @@ if (!empty($vipStatus['active'])) {
             'from_level' => $currentLevel,
             'from_expires' => $currentExpires,
             'duration_seconds' => $paidDurationSeconds,
+            // Immutable pricing window used later if the customer revokes VIP.
+            'remaining_seconds' => $remainingSeconds,
         ];
     } else {
         // A free Silver trial, admin test grant or legacy/manual membership
@@ -434,8 +436,8 @@ try {
             (order_ref, steamid64, player_name, vip_level, duration_days,
              duration_seconds, amount_rial, tier_price_rial, status, purchase_type,
              upgrade_from_order_ref, upgrade_from_level, upgrade_from_expires,
-             authority, ref_id, paid_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
+             upgrade_remaining_seconds, authority, ref_id, paid_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, '
             . ($paymentMethod === 'wallet' ? 'CURRENT_TIMESTAMP' : 'NULL') . ')'
     );
     $insert->execute([
@@ -452,6 +454,7 @@ try {
         $upgradeContext['from_order_ref'] ?? null,
         $upgradeContext['from_level'] ?? null,
         $upgradeContext['from_expires'] ?? null,
+        $upgradeContext['remaining_seconds'] ?? null,
         $orderAuthority,
         $orderReference,
     ]);
