@@ -106,7 +106,7 @@ $checks = [
     },
     'vip_users SELECT and required columns' => static function (PDO $pdo) use ($groupColumn): void {
         $pdo->query(
-            'SELECT account_id, name, lastvisit, ' . $groupColumn . ', expires
+            'SELECT account_id, name, lastvisit, sid, ' . $groupColumn . ', expires
              FROM vip_users
              LIMIT 0'
         );
@@ -114,7 +114,7 @@ $checks = [
     'vip_users INSERT privilege' => static function (PDO $pdo) use ($groupColumn): void {
         $pdo->exec(
             'INSERT INTO vip_users
-                (account_id, name, lastvisit, ' . $groupColumn . ', expires)
+                (account_id, name, lastvisit, sid, ' . $groupColumn . ', expires)
              SELECT
                 CAST(0 AS UNSIGNED),
                 CAST(\'FragCity\' AS CHAR(64)),
