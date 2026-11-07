@@ -37,6 +37,20 @@
         const checkoutForm = invoice ? invoice.querySelector('[data-vip-checkout-form]') : null;
         const checkoutLevelInput = checkoutForm ? checkoutForm.querySelector('[data-vip-checkout-level]') : null;
         const checkoutDurationInput = checkoutForm ? checkoutForm.querySelector('[data-vip-checkout-duration]') : null;
+        const walletCheckoutForm = invoice ? invoice.querySelector('[data-vip-wallet-form]') : null;
+        const walletCheckoutButton = walletCheckoutForm
+            ? walletCheckoutForm.querySelector('[data-vip-wallet-checkout]')
+            : null;
+        const walletLevelInput = walletCheckoutForm
+            ? walletCheckoutForm.querySelector('[data-vip-wallet-level]')
+            : null;
+        const walletDurationInput = walletCheckoutForm
+            ? walletCheckoutForm.querySelector('[data-vip-wallet-duration]')
+            : null;
+        const walletStatus = invoice ? invoice.querySelector('[data-vip-wallet-status]') : null;
+        const walletRechargeButton = invoice ? invoice.querySelector('[data-vip-wallet-recharge]') : null;
+        const walletBalanceToman = Math.max(0, Number(root.dataset.vipWalletBalance || 0));
+        const walletBalanceAvailable = root.dataset.vipWalletBalanceAvailable === '1';
         const comparisonModal = document.getElementById('vipComparisonModal');
         const comparisonDialog = comparisonModal
             ? comparisonModal.querySelector('#vipComparisonDialog')
@@ -308,14 +322,20 @@
             const canBuyFullTerm = !hasAnyActiveMembership
                 ? days > 0 && price !== null
                 : (isFullPriceReplacement && days > 0 && price !== null);
-            const canCheckout = loggedIn
-                && checkoutReady
+            const canCreatePaidOrder = loggedIn
                 && statusAvailable
                 && paidLedgerReady
                 && (!current || isFullPriceReplacement)
                 && available
                 && mode === 'paid'
                 && (isPaidUpgrade || canBuyFullTerm);
+            const payableToman = isPaidUpgrade ? upgradePrice : (canBuyFullTerm ? price : null);
+            const canCheckout = canCreatePaidOrder && checkoutReady;
+            const canWalletCheckout = canCreatePaidOrder
+                && walletBalanceAvailable
+                && Number.isSafeInteger(payableToman)
+                && payableToman > 0
+                && walletBalanceToman >= payableToman;
 
             let message = 'برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.';
             if (current && !isFullPriceReplacement) {
@@ -343,7 +363,9 @@
             } else if (mode === 'paid' && price === null) {
                 message = 'قیمت این مدت در تنظیمات سرور معتبر نیست؛ مبلغی از مرورگر دریافت نمی‌شود.';
             } else if (!checkoutReady) {
-                message = 'درگاه یا تنظیمات Checkout هنوز در سرور فعال نیست؛ پرداخت تا آماده‌سازی امن غیرفعال می‌ماند.';
+                message = canWalletCheckout
+                    ? 'درگاه آنلاین موقتاً آماده نیست، اما می‌توانی با موجودی کیف پول خرید را کامل کنی.'
+                    : 'درگاه آنلاین یا تنظیمات Checkout آماده نیست؛ وضعیت کیف پول را هم در دکمهٔ پرداخت از کیف پول بررسی کن.';
             } else if (canCheckout) {
                 message = 'مبلغ نهایی از تنظیمات سرور محاسبه شده است. پس از تأیید زرین‌پال، VIPCore فعال می‌شود.';
             }
@@ -360,6 +382,47 @@
                 checkoutButton.title = canCheckout
                     ? (isPaidUpgrade ? 'پرداخت مابه‌التفاوت و ارتقای VIP' : 'ساخت سفارش امن و انتقال به درگاه زرین‌پال')
                     : message;
+            }
+
+            const walletSelectionValid = canCreatePaidOrder
+                && Number.isSafeInteger(payableToman)
+                && payableToman > 0;
+            if (walletLevelInput) walletLevelInput.value = walletSelectionValid ? String(level) : '';
+            if (walletDurationInput) {
+                walletDurationInput.value = walletSelectionValid
+                    ? String(isPaidUpgrade ? upgradeDurationDays : days)
+                    : '';
+            }
+            if (walletCheckoutButton) {
+                walletCheckoutButton.disabled = !canWalletCheckout;
+                if (!walletSelectionValid) {
+                    walletCheckoutButton.textContent = 'انتخاب پلن و مدت اشتراک';
+                } else if (!walletBalanceAvailable) {
+                    walletCheckoutButton.textContent = 'موجودی کیف پول در دسترس نیست';
+                } else if (!canWalletCheckout) {
+                    walletCheckoutButton.textContent = 'موجودی کیف پول ناکافی';
+                } else {
+                    walletCheckoutButton.textContent = 'پرداخت از کیف پول';
+                }
+                walletCheckoutButton.title = canWalletCheckout
+                    ? 'کسر مبلغ از کیف پول و فعال‌سازی VIP'
+                    : (walletBalanceAvailable && walletSelectionValid
+                        ? 'موجودی کیف پول برای این سفارش کافی نیست.'
+                        : 'ابتدا پلن و مدت اشتراک را انتخاب کنید.');
+            }
+            if (walletStatus) {
+                walletStatus.textContent = walletBalanceAvailable
+                    ? 'موجودی کیف پول: ' + formatPrice(walletBalanceToman)
+                    : 'موجودی کیف پول فعلاً قابل بررسی نیست.';
+                if (walletSelectionValid && walletBalanceAvailable && !canWalletCheckout) {
+                    walletStatus.textContent += ' · مبلغ سفارش: ' + formatPrice(payableToman) + ' · موجودی ناکافی';
+                } else if (walletSelectionValid && canWalletCheckout) {
+                    walletStatus.textContent += ' · موجودی برای خرید کافی است.';
+                }
+            }
+            if (walletRechargeButton) {
+                walletRechargeButton.hidden = !loggedIn
+                    || (walletSelectionValid && canWalletCheckout);
             }
         }
 
@@ -735,6 +798,24 @@
                 checkoutButton.disabled = true;
                 checkoutButton.classList.add('is-submitting');
                 checkoutButton.textContent = 'در حال انتقال به زرین‌پال...';
+            });
+        }
+
+        if (walletCheckoutForm && walletCheckoutButton) {
+            walletCheckoutForm.addEventListener('submit', function (event) {
+                if (walletCheckoutButton.disabled
+                    || !walletLevelInput
+                    || !walletDurationInput
+                    || !walletLevelInput.value
+                    || !walletDurationInput.value) {
+                    event.preventDefault();
+                    renderInvoice();
+                    return;
+                }
+
+                walletCheckoutButton.disabled = true;
+                walletCheckoutButton.classList.add('is-submitting');
+                walletCheckoutButton.textContent = 'در حال بررسی موجودی و فعال‌سازی...';
             });
         }
 
