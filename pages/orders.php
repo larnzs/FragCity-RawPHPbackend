@@ -172,6 +172,67 @@ if ($ordersPageCurrentVipActive) {
     }
 }
 
+// Paid VIP cancellation becomes available one hour after the actual payment.
+// Keep this server-rendered countdown informational only; the API repeats the
+// check against the same paid_at timestamp before deleting vip_users.
+$ordersPageRevokeAvailableAt = 0;
+$ordersPageRevokeRemainingSeconds = 0;
+$ordersPageRevokeCooldownUnavailable = false;
+$ordersPageRevokeCooldownRequired = false;
+
+if ($ordersPageCurrentVipActive
+    && is_array($ordersPageVipStatus['paid_purchase'] ?? null)) {
+    $ordersPageRevokeCooldownRequired = true;
+    try {
+        if (($ordersPageVipStatus['paid_ledger_available'] ?? false) !== true) {
+            throw new RuntimeException('vip_paid_ledger_unavailable_for_revocation_cooldown');
+        }
+
+        $revokeOrderRef = (string)($ordersPageVipStatus['paid_purchase']['order_ref'] ?? '');
+        if (!preg_match('/^[a-f0-9]{32}$/D', $revokeOrderRef)) {
+            throw new RuntimeException('vip_paid_order_reference_invalid_for_revocation_cooldown');
+        }
+
+        $revokeTimeProfile = fragcity_settings(
+            'files.pages.zarinpal.vip_request.database_profile',
+            'main'
+        );
+        $revokeTimeProfile = is_string($revokeTimeProfile) && trim($revokeTimeProfile) !== ''
+            ? trim($revokeTimeProfile)
+            : 'main';
+        $revokeTimePdo = fragcity_create_pdo($revokeTimeProfile);
+        if (!$revokeTimePdo instanceof PDO) {
+            throw new RuntimeException('vip_paid_order_database_unavailable_for_revocation_cooldown');
+        }
+
+        $revokeTimeQuery = $revokeTimePdo->prepare(
+            'SELECT UNIX_TIMESTAMP(COALESCE(paid_at, provisioned_at, created_at))
+             FROM vip_orders
+             WHERE order_ref = ? AND steamid64 = ?
+             LIMIT 1'
+        );
+        $revokeTimeQuery->execute([
+            $revokeOrderRef,
+            $ordersPageSteamId,
+        ]);
+        $revokePurchaseTimestamp = (int)$revokeTimeQuery->fetchColumn();
+
+        if ($revokePurchaseTimestamp < 1) {
+            throw new RuntimeException('vip_paid_order_timestamp_missing_for_revocation_cooldown');
+        }
+
+        $ordersPageRevokeAvailableAt = $revokePurchaseTimestamp + 3600;
+        $ordersPageRevokeRemainingSeconds = max(0, $ordersPageRevokeAvailableAt - time());
+    } catch (Throwable $e) {
+        $ordersPageRevokeCooldownUnavailable = true;
+        error_log(
+            '[FragCity Orders] VIP revocation cooldown lookup failed; steam_hash='
+            . substr(hash('sha256', $ordersPageSteamId), 0, 16)
+            . '; type=' . get_class($e)
+        );
+    }
+}
+
 $ordersPageTotal = count($ordersPageRows);
 $ordersPageCompleted = 0;
 $ordersPageAttention = 0;
@@ -229,10 +290,24 @@ foreach ($ordersPageRows as $ordersPageRow) {
         </div>
         <div class="fc-orders__vip-status-actions">
             <?php if ($ordersPageCurrentVipActive): ?>
-                <button class="fc-orders__revoke-trigger" type="button" data-vip-revoke-open>
+                <button
+                    class="fc-orders__revoke-trigger"
+                    type="button"
+                    data-vip-revoke-open
+                    data-vip-revoke-available-at="<?= $ordersPageRevokeAvailableAt ?>"
+                    data-vip-revoke-server-now="<?= time() ?>"
+                    <?= ($ordersPageRevokeRemainingSeconds > 0 || $ordersPageRevokeCooldownUnavailable) ? 'disabled' : '' ?>
+                >
                     <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
                     ابطال وضعیت VIP
                 </button>
+                <?php if ($ordersPageRevokeCooldownUnavailable): ?>
+                    <span class="fc-orders__revoke-cooldown is-unavailable">زمان پرداخت سفارش برای بررسی محدودیت ابطال در دسترس نیست؛ فعلاً امکان ابطال وجود ندارد.</span>
+                <?php elseif ($ordersPageRevokeCooldownRequired && $ordersPageRevokeRemainingSeconds > 0): ?>
+                    <span class="fc-orders__revoke-cooldown" data-vip-revoke-countdown>امکان ابطال یک ساعت پس از پرداخت فعال می‌شود.</span>
+                <?php elseif ($ordersPageRevokeCooldownRequired): ?>
+                    <span class="fc-orders__revoke-cooldown" data-vip-revoke-countdown>محدودیت یک‌ساعته به پایان رسیده است؛ امکان ابطال فعال است.</span>
+                <?php endif; ?>
             <?php elseif (!$ordersPageVipStatusUnavailable): ?>
                 <a class="fc-orders__buy-link" href="/vip/" data-ajax-nav data-slug="vip">
                     <i class="fa-solid fa-crown" aria-hidden="true"></i>
