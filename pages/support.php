@@ -26,6 +26,37 @@ $requestedTicketId = filter_var(
     ['options' => ['min_range' => 1]]
 );
 $requestedTicketId = $requestedTicketId === false ? 0 : (int) $requestedTicketId;
+
+$supportCustomerName = trim((string) ($_SESSION['username'] ?? ''));
+$supportCustomerEmail = '';
+$supportDepartments = fragcity_settings('integrations.paymenter_support.departments', []);
+if (!is_array($supportDepartments)) $supportDepartments = [];
+$supportDepartments = array_values(array_unique(array_filter(
+    array_map(static function ($department): string {
+        if (!is_string($department)) return '';
+        $department = trim(preg_replace('/[\\r\\n\\x00-\\x1F\\x7F]+/u', ' ', $department) ?? '');
+        return mb_strlen($department, 'UTF-8') <= 100 ? $department : '';
+    }, $supportDepartments),
+    static fn (string $department): bool => $department !== ''
+)));
+if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?? ''))) {
+    try {
+        $supportIndexSettings = fragcity_settings('files.index', []);
+        $supportDatabaseProfile = is_array($supportIndexSettings) ? (string) ($supportIndexSettings['database_profile'] ?? 'main') : 'main';
+        $supportPdo = fragcity_create_pdo($supportDatabaseProfile);
+        if ($supportPdo instanceof PDO) {
+            $supportAccountStatement = $supportPdo->prepare('SELECT username, email FROM users WHERE steamid64 = ? LIMIT 1');
+            $supportAccountStatement->execute([(string) $_SESSION['steamid']]);
+            $supportAccount = $supportAccountStatement->fetch(PDO::FETCH_ASSOC);
+            if (is_array($supportAccount)) {
+                $supportCustomerName = trim((string) ($supportAccount['username'] ?? $supportCustomerName));
+                $supportCustomerEmail = trim((string) ($supportAccount['email'] ?? ''));
+            }
+        }
+    } catch (Throwable $supportAccountError) {
+        error_log('[FragCity] Support form contact details could not be loaded.');
+    }
+}
 ?>
 
 <div class="support-page">
@@ -146,34 +177,41 @@ $requestedTicketId = $requestedTicketId === false ? 0 : (int) $requestedTicketId
             <?php else: ?>
                 <div class="toast-message" id="supportToast" role="status" aria-live="polite" hidden></div>
 
-                <section class="ticket-create-card" id="supportCreateCard">
-                    <h3><i class="fas fa-plus-circle"></i> ارسال تیکت جدید</h3>
-                    <form id="supportCreateForm" class="ticket-form">
-                        <div class="form-group">
-                            <label for="supportSubject">موضوع تیکت</label>
-                            <input
-                                id="supportSubject"
-                                name="subject"
-                                type="text"
-                                maxlength="255"
-                                placeholder="موضوع را خلاصه بنویسید"
-                                required
-                            >
+                <section class="ticket-create-card support-create-card" id="supportCreateCard">
+                    <div class="support-form-heading">
+                        <div><span class="support-form-eyebrow">NEW SUPPORT REQUEST</span><h3><i class="fas fa-plus-circle"></i> ثبت درخواست پشتیبانی</h3><p>اطلاعات درخواست را کامل کن تا تیم FragCity سریع‌تر پیگیری کند.</p></div>
+                        <span class="support-form-required-note"><i class="fas fa-asterisk"></i> فیلدهای ستاره‌دار الزامی‌اند</span>
+                    </div>
+                    <form id="supportCreateForm" class="ticket-form support-ticket-form" novalidate>
+                        <div class="support-form-grid">
+                            <div class="form-group"><label for="supportCustomerName">نام</label><input id="supportCustomerName" type="text" value="<?= htmlspecialchars($supportCustomerName, ENT_QUOTES, 'UTF-8') ?>" readonly aria-readonly="true" autocomplete="name"><small class="support-field-hint">از پروفایل FragCity دریافت شده است.</small></div>
+                            <div class="form-group"><label for="supportCustomerEmail">آدرس ایمیل</label><input id="supportCustomerEmail" type="email" value="<?= htmlspecialchars($supportCustomerEmail, ENT_QUOTES, 'UTF-8') ?>" readonly aria-readonly="true" autocomplete="email"><small class="support-field-hint">برای تغییر ایمیل، از تنظیمات حساب استفاده کن.</small></div>
+                            <div class="form-group support-form-full">
+                                <label for="supportDepartment">بخش</label>
+                                <select id="supportDepartment" name="department"><option value="">پشتیبانی عمومی</option><?php foreach ($supportDepartments as $department): ?><option value="<?= htmlspecialchars($department, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($department, ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select>
+                                <?php if ($supportDepartments === []): ?><small class="support-field-hint">درخواست به بخش عمومی ارسال می‌شود؛ بخش‌های اختصاصی پس از تنظیم در Paymenter نمایش داده خواهند شد.</small><?php endif; ?>
+                            </div>
+                            <div class="form-group support-form-full"><label for="supportSubject">موضوع <span class="support-required">*</span></label><input id="supportSubject" name="subject" type="text" maxlength="255" placeholder="موضوع درخواست را کوتاه و دقیق بنویس" required></div>
+                            <fieldset class="form-group support-priority-group support-form-full"><legend>اولویت</legend><div class="support-priority-options">
+                                <label class="support-priority-option"><input type="radio" name="priority" value="high"><span><i class="fas fa-angle-double-up" aria-hidden="true"></i> زیاد</span></label>
+                                <label class="support-priority-option"><input type="radio" name="priority" value="medium" checked><span><i class="fas fa-equals" aria-hidden="true"></i> متوسط</span></label>
+                                <label class="support-priority-option"><input type="radio" name="priority" value="low"><span><i class="fas fa-angle-down" aria-hidden="true"></i> کم</span></label>
+                            </div></fieldset>
+                            <div class="form-group"><label for="supportService">سرویس مربوطه</label><input id="supportService" name="service" type="text" maxlength="160" placeholder="نام سرویس، شناسه یا IP سرور"></div>
+                            <div class="form-group"><label for="supportDomain">آدرس دامنه</label><input id="supportDomain" name="domain" type="text" maxlength="255" placeholder="مثلاً server.fragcity.ir" dir="ltr"></div>
+                            <div class="form-group support-form-full"><label for="supportMessage">توضیحات تکمیلی <span class="support-required">*</span></label><textarea id="supportMessage" name="message" rows="6" maxlength="4200" placeholder="مشکل یا درخواستت را با جزئیات بنویس؛ مراحل تکرار، متن خطا و زمان رخداد را هم ذکر کن." required></textarea><small class="support-field-hint">حداکثر ۴۲۰۰ نویسه. اطلاعات این بخش به‌همراه مشخصات درخواست در Paymenter ذخیره می‌شود.</small></div>
+                            <div class="form-group support-extra-fields-group support-form-full"><div class="support-extra-fields-heading"><label>موارد تکمیلی</label><button type="button" class="support-add-extra-btn" id="supportAddExtraButton"><i class="fas fa-plus" aria-hidden="true"></i> افزودن موارد دیگر</button></div><div id="supportExtraFields" class="support-extra-fields"></div></div>
+                            <div class="support-attachments support-form-full" aria-label="ضمیمه‌ها">
+                                <div class="support-attachments-heading"><span><i class="fas fa-paperclip" aria-hidden="true"></i> ضمیمه‌ها</span><span class="support-coming-soon">به‌زودی</span></div>
+                                <div class="support-attachments-disabled"><i class="fas fa-cloud-arrow-up" aria-hidden="true"></i><div><strong>بارگذاری فایل فعلاً فعال نیست</strong><p>برای جلوگیری از انتخاب فایلی که در Paymenter ذخیره نمی‌شود، امکان پیوست تا زمان راه‌اندازی مسیر امن آپلود غیرفعال است.</p></div></div>
+                                <div class="support-notice"><strong><i class="fas fa-circle-info" aria-hidden="true"></i> توجه</strong><p>از ارسال مدارک هویتی، اطلاعات حساس یا اسناد مالکیت در تیکت خودداری کن. برای پیگیری، فقط اطلاعات فنی موردنیاز را بنویس.</p></div>
+                            </div>
+                            <div class="support-captcha-wrap support-form-full">
+                                <div class="support-captcha-copy"><label for="supportCaptchaAnswer">کد امنیتی <span class="support-required">*</span></label><span id="supportCaptchaQuestion" class="support-captcha-question" aria-live="polite">در حال دریافت کد امنیتی...</span></div>
+                                <div class="support-captcha-controls"><input id="supportCaptchaAnswer" name="captcha_answer" type="text" inputmode="numeric" pattern="[0-9]{1,2}" maxlength="2" autocomplete="off" placeholder="پاسخ" required><input id="supportCaptchaToken" type="hidden" name="captcha_token" value=""><button type="button" class="support-captcha-refresh" id="supportCaptchaRefreshButton" aria-label="تولید کد امنیتی جدید"><i class="fas fa-rotate" aria-hidden="true"></i></button></div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="supportMessage">متن تیکت</label>
-                            <textarea
-                                id="supportMessage"
-                                name="message"
-                                rows="5"
-                                maxlength="5000"
-                                placeholder="توضیح کامل مشکل یا سوال خود را بنویسید..."
-                                required
-                            ></textarea>
-                        </div>
-                        <button type="submit" class="gold-btn" id="supportCreateButton">
-                            <i class="fas fa-paper-plane"></i> ارسال تیکت
-                        </button>
+                        <div class="support-form-actions"><p><i class="fas fa-shield-halved" aria-hidden="true"></i> اطلاعات حساب از پروفایل تأییدشده دریافت می‌شود.</p><button type="submit" class="gold-btn" id="supportCreateButton"><i class="fas fa-paper-plane" aria-hidden="true"></i> ثبت درخواست</button></div>
                     </form>
                 </section>
 
@@ -270,7 +308,7 @@ $requestedTicketId = $requestedTicketId === false ? 0 : (int) $requestedTicketId
                         <span>امکان ارسال تصویر یا فایل پیوست وجود دارد؟</span>
                         <i class="fas fa-plus" aria-hidden="true"></i>
                     </summary>
-                    <p>در حال حاضر ارسال فایل پیوست از داخل تیکت فعال نیست. برای بررسی سریع‌تر، جزئیات مشکل، متن خطا، نام سرور و زمان رخداد را داخل پیام بنویس.</p>
+                    <p>بارگذاری ضمیمه هنوز فعال نشده است؛ فعلاً متن خطا، شناسه سرور و جزئیات لازم را داخل توضیحات درخواست بنویس.</p>
                 </details>
 
                 <details class="support-faq-item">
