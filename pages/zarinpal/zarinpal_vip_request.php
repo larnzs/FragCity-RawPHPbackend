@@ -2,7 +2,9 @@
 declare(strict_types=1);
 
 /**
- * Creates an independent paid VIP order and redirects to ZarinPal.
+ * Creates an independent paid VIP order for online or wallet checkout.
+ * Online purchases redirect to ZarinPal; wallet purchases can return JSON
+ * for the VIP storefront modal and never call the gateway.
  * Amount, Steam identity, VIP tier and duration are validated server-side.
  */
 require_once __DIR__ . '/../../settings/session.php';
