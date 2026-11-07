@@ -59,7 +59,8 @@ Copy the example settings structure into the private runtime file settings/setti
     "paymenter_support": {
       "base_url": "https://billing.fragcity.ir",
       "admin_api_key": "PASTE_PAYMENTER_ADMIN_API_KEY_HERE",
-      "shared_secret": "PASTE_SUPPORT_EXTENSION_HMAC_SECRET_HERE"
+      "shared_secret": "PASTE_SUPPORT_EXTENSION_HMAC_SECRET_HERE",
+      "departments": ["Exact department name from Paymenter ticket_departments"]
     }
   }
 }
@@ -74,6 +75,16 @@ openssl rand -hex 32
 Configure the same secret in Paymenter Admin → Extensions → Others → FragCity Support API. This secret must be different from integrations.paymenter_backend.shared_secret, which belongs to the existing server bridge.
 
 base_url must be the HTTPS origin only. Do not append /api/v1/admin or any other path.
+
+The optional `departments` array controls the **بخش** dropdown in the FragCity support form. Every value must exactly match one of the values configured in Paymenter `settings.ticket_departments`; do not add labels that Paymenter does not accept. If the array is empty, tickets are created in the general queue with no department value.
+
+## Customer ticket form
+
+- Name and email are shown read-only from the authenticated FragCity account. The backend re-reads the account row; browser values are never trusted.
+- Priority is sent to Paymenter as `low`, `medium` or `high`.
+- The service reference and domain, as well as up to three additional label/value pairs, are saved in the first Paymenter message together with the customer's description. They are descriptive metadata; the current v1.5.9 Admin `CreateTicketRequest` does not accept `service_id` for a relational service link.
+- The arithmetic CAPTCHA is generated and verified server-side, is bound to the PHP session and expires after five minutes. A challenge can be used only once.
+- File attachments are intentionally disabled in the website form. Paymenter v1.5.9 stores ticket attachments through its authenticated client upload flow and exposes no native Admin API upload route. Do not present a file picker as active until a dedicated, authenticated upload bridge stores the files as Paymenter ticket-message attachments.
 
 ## Endpoints used by the website
 
@@ -122,7 +133,7 @@ Ticket creation and first-message creation are two Paymenter API calls. If the t
 
 Paymenter v1.5.9 Admin API does not provide an invoice transaction resource, an explicit remaining balance, or computed invoice total in the Invoice API resource. The current support integration therefore displays invoice status/due date/items only; it does not invent a payable balance or use Paymenter Credits.
 
-Paymenter Admin API does not expose a Ticket Message upload endpoint. The current customer support interface is text-only. No custom attachment route is added.
+Paymenter Admin API does not expose a Ticket Message upload endpoint. The FragCity support form therefore disables attachments and explains the limitation rather than accepting files it cannot persist. No custom attachment route is added.
 
 ## Customer website API
 
