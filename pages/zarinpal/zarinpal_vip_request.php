@@ -177,7 +177,7 @@ try {
         "UPDATE vip_orders
          SET status = 'expired', last_error = 'payment_window_expired'
          WHERE steamid64 = ? AND status = 'pending'
-           AND created_at < (UTC_TIMESTAMP() - INTERVAL 30 MINUTE)"
+           AND created_at < (CURRENT_TIMESTAMP - INTERVAL 30 MINUTE)"
     );
     $expireOld->execute([$steamId64]);
 
