@@ -841,7 +841,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
         <div class="vip-duration-selector-heading">
             <span class="vip-store-eyebrow">CHOOSE SUBSCRIPTION DURATION</span>
             <h3 id="vipPurchaseDurationTitle">مدت اشتراک را انتخاب کن</h3>
-            <p>مدت موردنظرت را برای پلن Gold انتخاب کن؛ فاکتور پایین صفحه به‌روزرسانی می‌شود.</p>
+            <p>مدت موردنظرت را برای پلن Gold انتخاب کن؛ فاکتور سمت چپ صفحه به‌روزرسانی می‌شود.</p>
         </div>
         <div class="vip-duration-options" role="group" aria-label="مدت اشتراک">
             <button type="button" class="vip-duration-option" data-vip-duration-option data-duration-days="7" data-duration-label="۱ هفته" aria-pressed="false">
