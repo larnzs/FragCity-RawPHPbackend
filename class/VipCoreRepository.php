@@ -43,6 +43,11 @@ final class VipCoreRepository
                 || (int)$paidPurchase['level'] !== $level
                 || !is_numeric($paidPurchase['duration_seconds'] ?? null)
                 || !in_array((int)$paidPurchase['duration_seconds'], [604800, 1296000, 2592000, 5184000, 7776000], true)
+                || (($paidPurchase['tier_price_rial'] ?? null) !== null
+                    && (!is_numeric($paidPurchase['tier_price_rial'])
+                        || (int)$paidPurchase['tier_price_rial'] < 1
+                        || (int)$paidPurchase['tier_price_rial'] > 10000000000000
+                        || (int)$paidPurchase['tier_price_rial'] % 10 !== 0))
                 || !is_numeric($paidPurchase['granted_at'] ?? null)
                 || !is_numeric($paidPurchase['expires'] ?? null)
                 || $expires === null
@@ -54,6 +59,9 @@ final class VipCoreRepository
                 'order_ref' => $paidPurchase['order_ref'],
                 'level' => (int)$paidPurchase['level'],
                 'duration_seconds' => (int)$paidPurchase['duration_seconds'],
+                'tier_price_rial' => ($paidPurchase['tier_price_rial'] ?? null) === null
+                    ? null
+                    : (int)$paidPurchase['tier_price_rial'],
                 'granted_at' => (int)$paidPurchase['granted_at'],
                 'expires' => (int)$paidPurchase['expires'],
             ];
@@ -160,6 +168,7 @@ final class VipCoreRepository
         string $playerName,
         int $level,
         int $durationSeconds,
+        int $tierPriceRial,
         ?array $upgrade = null
     ): array {
         $payload = [
@@ -169,6 +178,7 @@ final class VipCoreRepository
             'player_name' => $playerName,
             'level' => $level,
             'duration_seconds' => $durationSeconds,
+            'tier_price_rial' => $tierPriceRial,
         ];
         if ($upgrade !== null) {
             $payload['upgrade'] = $upgrade;
