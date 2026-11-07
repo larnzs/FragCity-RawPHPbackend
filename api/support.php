@@ -193,6 +193,7 @@ try {
 
         case 'create_ticket':
             $subject = is_string($payload['subject'] ?? null) ? trim($payload['subject']) : '';
+            $customerName = is_string($payload['customer_name'] ?? null) ? trim($payload['customer_name']) : '';
             $description = is_string($payload['message'] ?? null) ? trim($payload['message']) : '';
             $priority = is_string($payload['priority'] ?? null) ? trim($payload['priority']) : 'medium';
             $department = is_string($payload['department'] ?? null) ? trim($payload['department']) : '';
@@ -200,6 +201,8 @@ try {
             if (
                 $subject === ''
                 || mb_strlen($subject, 'UTF-8') > 255
+                || $customerName === ''
+                || mb_strlen($customerName, 'UTF-8') > 100
                 || $description === ''
                 || mb_strlen($description, 'UTF-8') > 4200
                 || !in_array($priority, ['low', 'medium', 'high'], true)
@@ -247,7 +250,7 @@ try {
             }
 
             $messageParts = [
-                'نام: ' . (trim((string) ($customerAccount['username'] ?? '')) ?: 'ثبت نشده'),
+                'نام: ' . $cleanOptionalField($customerName, 100),
                 'آدرس ایمیل: ' . trim((string) ($customerAccount['email'] ?? '')),
             ];
             if ($department !== null) {
