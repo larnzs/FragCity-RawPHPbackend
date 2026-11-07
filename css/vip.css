@@ -3743,3 +3743,169 @@ body.vip-comparison-open {
         grid-template-columns: 1fr !important;
     }
 }
+
+
+/* Owner-only tiers use the same compact three-card row as Bronze/Silver/Gold. */
+@container vip-store-main (min-width: 760px) {
+    .vip-inactive-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 12px;
+    }
+
+    .vip-inactive-grid > .vip-plan-item > .vip-plan-card {
+        min-height: 0;
+        padding: 16px 14px 14px;
+        border-radius: 15px;
+    }
+
+    .vip-inactive-grid .vip-plan-topline {
+        min-height: 20px;
+        margin-bottom: 13px;
+    }
+
+    .vip-inactive-grid .vip-plan-index {
+        font-size: .52rem;
+    }
+
+    .vip-inactive-grid .vip-plan-current,
+    .vip-inactive-grid .vip-plan-public,
+    .vip-inactive-grid .vip-plan-locked {
+        padding: 3px 5px;
+        font-size: .48rem;
+    }
+
+    .vip-inactive-grid .vip-plan-title-row {
+        gap: 9px;
+    }
+
+    .vip-inactive-grid .vip-tier-emblem {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        font-size: 1rem;
+    }
+
+    .vip-inactive-grid .vip-plan-title-row h3 {
+        font-size: 1.12rem;
+    }
+
+    .vip-inactive-grid .vip-plan-title-row > div > span {
+        font-size: .58rem;
+    }
+
+    .vip-inactive-grid .vip-plan-summary {
+        min-height: 65px;
+        margin: 10px 0 11px;
+        font-size: .73rem;
+        line-height: 1.65;
+    }
+
+    .vip-inactive-grid .vip-plan-summary > span {
+        font-size: .76rem;
+    }
+
+    .vip-inactive-grid .vip-plan-summary > small {
+        font-size: .6rem;
+    }
+
+    .vip-inactive-grid .vip-plan-price {
+        min-height: 78px;
+        margin-bottom: 11px;
+        padding: 10px 11px;
+    }
+
+    .vip-inactive-grid .vip-plan-price > strong {
+        font-size: clamp(.88rem, 1.15cqi, 1.05rem);
+    }
+
+    .vip-inactive-grid .vip-plan-select,
+    .vip-inactive-grid .vip-plan-feature-button {
+        min-height: 36px;
+        padding: 7px 8px;
+        font-size: .57rem;
+    }
+}
+
+@container vip-store-main (max-width: 759px) {
+    .vip-inactive-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 700px) {
+    .vip-inactive-grid {
+        grid-template-columns: 1fr !important;
+        gap: 13px;
+    }
+}
+
+/* Make the whole checkout form obey the invoice column sizing. */
+.vip-invoice-actions > form {
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+}
+
+/* Tactile interaction for plan, duration and payment controls. */
+.vip-plan-card,
+.vip-plan-select,
+.vip-plan-feature-button,
+.vip-duration-option,
+.vip-invoice-checkout,
+.vip-invoice-wallet,
+.vip-locked-toggle {
+    transition:
+        transform .22s cubic-bezier(.2, .75, .25, 1),
+        border-color .22s ease,
+        background-color .22s ease,
+        box-shadow .22s ease,
+        color .18s ease,
+        filter .22s ease;
+}
+
+.vip-plan-card[data-card-selectable="1"]:active,
+.vip-plan-select:active:not(:disabled),
+.vip-plan-feature-button:active,
+.vip-duration-option:active:not(:disabled),
+.vip-invoice-checkout:active:not(:disabled),
+.vip-invoice-wallet:active,
+.vip-locked-toggle:active {
+    transform: scale(.985);
+}
+
+.vip-plan-card.is-selected {
+    animation: vip-plan-selected-pulse .3s cubic-bezier(.2, .75, .25, 1);
+}
+
+@keyframes vip-plan-selected-pulse {
+    0% { filter: brightness(1); }
+    45% { filter: brightness(1.16); }
+    100% { filter: brightness(1); }
+}
+
+.vip-invoice-checkout:not(:disabled):hover,
+.vip-invoice-wallet:hover,
+.vip-plan-select:hover:not(:disabled),
+.vip-plan-feature-button:hover {
+    transform: translateY(-2px);
+}
+
+.vip-invoice-checkout.is-submitting {
+    cursor: progress;
+    opacity: .82;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .vip-plan-card,
+    .vip-plan-select,
+    .vip-plan-feature-button,
+    .vip-duration-option,
+    .vip-invoice-checkout,
+    .vip-invoice-wallet,
+    .vip-locked-toggle {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+    }
+}
