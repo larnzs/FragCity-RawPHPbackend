@@ -232,13 +232,23 @@ if ($paymentMethod === 'online') {
             && !isset($parts['fragment']);
     };
 
-    if ($merchantId === ''
-        || !$validHttpsUrl($requestUrl)
-        || !$validHttpsUrl($verifyUrl)
-        || !$validHttpsUrl($startPayBase)
-        || !$validHttpsUrl($siteBaseUrl)
-        || !function_exists('curl_init')) {
-        $terminate('تنظیمات امن زرین‌پال یا آدرس HTTPS سایت کامل نیست.', 503);
+    if ($merchantId === '') {
+        $terminate('شناسه پذیرنده زرین‌پال (merchant_id) در تنظیمات خصوصی سایت وارد نشده است.', 503);
+    }
+    if (!$validHttpsUrl($requestUrl)) {
+        $terminate('آدرس درخواست زرین‌پال (request_url) خالی یا نامعتبر است؛ یک URL معتبر HTTPS تنظیم کنید.', 503);
+    }
+    if (!$validHttpsUrl($verifyUrl)) {
+        $terminate('آدرس تأیید پرداخت زرین‌پال (verify_url) خالی یا نامعتبر است؛ یک URL معتبر HTTPS تنظیم کنید.', 503);
+    }
+    if (!$validHttpsUrl($startPayBase)) {
+        $terminate('آدرس شروع پرداخت زرین‌پال (startpay_base_url) خالی یا نامعتبر است؛ یک URL معتبر HTTPS تنظیم کنید.', 503);
+    }
+    if (!$validHttpsUrl($siteBaseUrl)) {
+        $terminate('آدرس اصلی سایت (app.site_base_url) باید با HTTPS معتبر تنظیم شده باشد.', 503);
+    }
+    if (!function_exists('curl_init')) {
+        $terminate('افزونه PHP cURL روی هاست سایت فعال نیست؛ ارتباط امن با زرین‌پال برقرار نمی‌شود.', 503);
     }
 }
 
