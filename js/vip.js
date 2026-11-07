@@ -91,7 +91,7 @@
         let walletPendingCallbackUrl = '';
         let walletPendingCheckout = null;
         let walletDebitCommitted = false;
-        let walletRequestStarted = false;
+        let walletCheckoutResponseReceived = false;
         let walletPaymentPreviousFocus = null;
         const comparisonModal = document.getElementById('vipComparisonModal');
         const comparisonDialog = comparisonModal
@@ -946,6 +946,7 @@
                 : (walletPendingCheckout && Number.isSafeInteger(Number(walletPendingCheckout.amount_toman))
                     ? formatPrice(Number(walletPendingCheckout.amount_toman))
                     : '');
+            if (walletPaymentModal) walletPaymentModal.classList.remove('is-processing');
             hideWalletPaymentModal();
             if (walletCheckoutButton) {
                 walletCheckoutButton.disabled = true;
@@ -1033,7 +1034,7 @@
             walletCheckoutButton.textContent = 'در حال پرداخت از کیف پول...';
 
             walletDebitCommitted = false;
-            walletRequestStarted = true;
+            walletCheckoutResponseReceived = false;
             walletPendingCheckout = null;
             walletPendingCallbackUrl = '';
 
@@ -1049,6 +1050,7 @@
                     },
                     body: new FormData(walletCheckoutForm)
                 });
+                walletCheckoutResponseReceived = true;
                 const checkoutResult = await parseWalletJson(response);
                 if (!response.ok || !checkoutResult || checkoutResult.success !== true) {
                     throw new Error(checkoutResult && typeof checkoutResult.message === 'string'
@@ -1087,12 +1089,28 @@
                     return;
                 }
 
+                if (!walletCheckoutResponseReceived) {
+                    setWalletPaymentState('pending', 'پاسخ سرور دریافت نشد و وضعیت برداشت نامشخص است.');
+                    if (walletPaymentMessage) {
+                        walletPaymentMessage.textContent = 'برای جلوگیری از کسر دوباره، خرید را مجدداً ارسال نکن. صفحه را تازه‌سازی و موجودی کیف پول و وضعیت سفارش را بررسی کن؛ اگر مبلغ کم شده ولی VIP فعال نیست، از گزینه پشتیبانی پیگیری کن.';
+                    }
+                    if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
+                    if (walletPaymentCancel) {
+                        walletPaymentCancel.hidden = false;
+                        walletPaymentCancel.textContent = 'بستن';
+                    }
+                    if (walletPaymentClose) walletPaymentClose.hidden = false;
+                    if (walletCheckoutButton) {
+                        walletCheckoutButton.disabled = true;
+                        walletCheckoutButton.classList.remove('is-submitting');
+                        walletCheckoutButton.textContent = 'وضعیت برداشت نامشخص';
+                    }
+                    return;
+                }
+
                 setWalletPaymentState('error', error instanceof Error
                     ? error.message
                     : 'پرداخت از کیف پول انجام نشد.');
-                if (walletRequestStarted && !(error instanceof Error && error.message)) {
-                    if (walletPaymentMessage) walletPaymentMessage.textContent = 'در صورت نامشخص‌بودن نتیجه، صفحه را تازه‌سازی و موجودی کیف پول را بررسی کن؛ درخواست خرید را پشت‌سرهم ارسال نکن.';
-                }
                 if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
                 if (walletPaymentCancel) {
                     walletPaymentCancel.hidden = false;
@@ -1105,7 +1123,6 @@
                     renderInvoice();
                 }
             } finally {
-                walletRequestStarted = false;
                 if (walletPaymentConfirm && !walletDebitCommitted && !walletPaymentModal.classList.contains('is-processing')) {
                     walletPaymentConfirm.disabled = false;
                     walletPaymentConfirm.innerHTML = '<i class="fas fa-wallet" aria-hidden="true"></i> تأیید و پرداخت';
