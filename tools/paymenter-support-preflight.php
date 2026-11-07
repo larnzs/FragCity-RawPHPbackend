@@ -40,8 +40,40 @@ try {
 
     $steamId64 = isset($argv[1]) && is_string($argv[1]) ? trim($argv[1]) : '';
     if ($steamId64 !== '') {
-        $paymenterUserId = $client->resolvePaymenterUserId($steamId64);
+        $indexSettings = fragcity_settings('files.index', []);
+        $databaseProfile = is_array($indexSettings)
+            ? (string) ($indexSettings['database_profile'] ?? 'main')
+            : 'main';
+        $pdo = fragcity_create_pdo($databaseProfile);
+        if (!$pdo instanceof PDO) {
+            throw new RuntimeException('fragcity_account_unavailable');
+        }
+
+        $statement = $pdo->prepare(
+            'SELECT email, phone, paymenter_user_id
+             FROM users
+             WHERE steamid64 = ?
+             LIMIT 1'
+        );
+        $statement->execute([$steamId64]);
+        $account = $statement->fetch(PDO::FETCH_ASSOC);
+        $localPaymenterUserId = filter_var(
+            is_array($account) ? ($account['paymenter_user_id'] ?? null) : null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+        if (!is_array($account) || $localPaymenterUserId === false) {
+            throw new RuntimeException('paymenter_support_identity_not_synced');
+        }
+
+        $paymenterUserId = $client->verifyCustomerIdentity(
+            $steamId64,
+            (string) ($account['email'] ?? ''),
+            (string) ($account['phone'] ?? ''),
+            (int) $localPaymenterUserId
+        );
         echo "STEAM IDENTITY LOOKUP: PASS\n";
+        echo "FRAGCITY / PAYMENTER EMAIL + PHONE MATCH: PASS\n";
         echo 'Paymenter user ID: ' . $paymenterUserId . "\n";
     }
 
@@ -55,6 +87,9 @@ try {
         'paymenter_support_invalid_identity_response',
         'fragcity_account_not_linked',
         'linked_paymenter_user_missing',
+        'paymenter_support_identity_not_synced',
+        'paymenter_support_identity_mismatch',
+        'fragcity_account_unavailable',
         'identity_lookup_failed',
         'paymenter_api_permission_denied',
         'paymenter_support_validation_failed',
