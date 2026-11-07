@@ -572,7 +572,8 @@ foreach ($vipFeaturesData as $featureLevel => $features) {
 }
 
 $vipAllowedPurchaseDurations = [7, 15, 30, 60, 90];
-$vipPurchasePriceMap = [];
+$vipPurchasePriceMap = []; // Toman values for storefront display only.
+$vipPurchasePriceRialMap = []; // Rial values are the canonical amounts for the payment provider.
 foreach ($vipLevels as $level => $tier) {
     if (empty($tier['available']) || ($tier['purchase_mode'] ?? '') !== 'paid') {
         continue;
@@ -584,12 +585,19 @@ foreach ($vipLevels as $level => $tier) {
         $durationPackage = is_array($package['durations'][(string) $days] ?? null)
             ? $package['durations'][(string) $days]
             : [];
-        $rawPrice = $durationPackage['price_toman'] ?? null;
+        $rawPrice = $durationPackage['price_rial'] ?? null;
         $validatedPrice = filter_var($rawPrice, FILTER_VALIDATE_INT);
-        $price = $validatedPrice !== false && $validatedPrice > 0 && $validatedPrice <= 1000000000000
+        $priceRial = $validatedPrice !== false
+            && $validatedPrice > 0
+            && $validatedPrice <= 10000000000000
+            && $validatedPrice % 10 === 0
             ? $validatedPrice
             : null;
-        $vipPurchasePriceMap[(string) $level][(string) $days] = $price;
+
+        $vipPurchasePriceRialMap[(string) $level][(string) $days] = $priceRial;
+        $vipPurchasePriceMap[(string) $level][(string) $days] = $priceRial === null
+            ? null
+            : intdiv($priceRial, 10);
     }
 }
 $vipCheckoutIntegrationReady = false; // Fail closed until order creation, ZarinPal verification and paid VIPCore provisioning are implemented.
@@ -603,6 +611,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
     data-vip-logged-in="<?= $isLoggedIn ? '1' : '0' ?>"
     data-vip-test-admin="<?= $isVipTestAdmin ? '1' : '0' ?>"
     data-vip-prices="<?= htmlspecialchars(json_encode($vipPurchasePriceMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+    data-vip-prices-rial="<?= htmlspecialchars(json_encode($vipPurchasePriceRialMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-currency="<?= htmlspecialchars($vipCurrency, ENT_QUOTES, 'UTF-8') ?>"
     data-vip-checkout-ready="<?= $vipCheckoutIntegrationReady ? '1' : '0' ?>"
 >
@@ -712,14 +721,14 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                     static fn ($price): bool => is_int($price) && $price > 0
                 ));
                 $tierPriceLabel = !$tier['available']
-                    ? 'فعلاً قابل خرید نیست'
+                    ? 'نیازمند حق دیتابیس VIP اختصاصی'
                     : (!empty($configuredPrices)
                         ? 'از ' . number_format(min($configuredPrices)) . ' ' . $vipCurrency
                         : ((int)$lvl === 2
                             ? 'هدیه ۳ روزه · قیمت اشتراک تعیین نشده'
                             : 'قیمت‌گذاری تکمیل نشده'));
                 $tierDurationLabel = !$tier['available']
-                    ? 'فعلاً برای خرید فعال نیست'
+                    ? 'پس از فعال‌سازی حق دیتابیس اختصاصی'
                     : ((int)$lvl === 2
                         ? '۷، ۱۵، ۳۰، ۶۰ یا ۹۰ روز · هدیه ۳ روزه یک‌باره'
                         : '۷، ۱۵، ۳۰، ۶۰ یا ۹۰ روز');
@@ -729,7 +738,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
             <?php if ((int) $lvl === 4): ?>
             </section>
 
-            <section class="vip-locked-section" aria-label="سطح‌های VIP غیرفعال">
+            <section class="vip-locked-section" aria-label="VIP اختصاصی صاحبان سرور">
                 <button
                     type="button"
                     class="vip-locked-toggle"
@@ -741,10 +750,10 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                         <i class="fas fa-lock"></i>
                     </span>
                     <span class="vip-locked-toggle-copy">
-                        <strong>پلن‌های دیگر</strong>
+                        <strong>VIP اختصاصی صاحبان سرور</strong>
                         <small>Platinum · Emerald · Diamond</small>
                     </span>
-                    <span class="vip-locked-toggle-status">قابل انتخاب · خرید فعلاً غیرفعال</span>
+                    <span class="vip-locked-toggle-status">نیازمند حق دیتابیس VIP اختصاصی</span>
                     <span class="vip-locked-toggle-count">۳ سطح</span>
                     <i class="fas fa-chevron-down vip-locked-chevron" aria-hidden="true"></i>
                 </button>
@@ -778,7 +787,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                     <?php if ($isCurrentTier): ?>
                         <span class="vip-plan-current"><i class="fas fa-check" aria-hidden="true"></i> پلن فعلی</span>
                     <?php elseif (!$tier['available']): ?>
-                        <span class="vip-plan-locked"><i class="fas fa-lock" aria-hidden="true"></i> قفل‌شده</span>
+                        <span class="vip-plan-locked"><i class="fas fa-database" aria-hidden="true"></i> دیتابیس اختصاصی لازم است</span>
                     <?php elseif ((int)$lvl === 2): ?>
                         <span class="vip-plan-public">PAID TIER · FREE TRIAL GIFT</span>
                     <?php else: ?>
@@ -804,7 +813,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                 <div class="vip-plan-price<?= !$tier['available'] ? ' is-locked' : ' is-paid' ?>">
                     <span class="vip-plan-price-label">
                         <i class="fas <?= !$tier['available'] ? 'fa-lock' : ((int)$lvl === 2 ? 'fa-gift' : 'fa-tag') ?>" aria-hidden="true"></i>
-                        <?= !$tier['available'] ? 'وضعیت پلن' : ((int)$lvl === 2 ? 'قیمت اشتراک و هدیه' : 'قیمت پلن') ?>
+                        <?= !$tier['available'] ? 'شرط فعال‌سازی' : ((int)$lvl === 2 ? 'قیمت اشتراک و هدیه' : 'قیمت پلن') ?>
                     </span>
                     <strong><?= htmlspecialchars($tierPriceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
                     <small><?= htmlspecialchars($tierDurationLabel, ENT_QUOTES, 'UTF-8') ?></small>
@@ -962,7 +971,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
             <details class="vip-faq-item">
                 <summary>اگر سرور اجاره‌ای داشته باشم، می‌توانم VIP مخصوص خودم را بفروشم؟</summary>
                 <div class="vip-faq-answer">
-                    <p>بله؛ این مسیر مستقل از فروشگاه مرکزی FragCity است. VIPCore سرور اجاره‌ای به دیتابیس جداگانه همان مالک متصل می‌شود؛ بنابراین مالک قیمت VIP خودش را مستقل تعیین می‌کند و حتی می‌تواند آن را رایگان عرضه کند. کف قیمت Bronze، Silver و Gold فقط برای فروشگاه و سرورهای رسمی FragCity است و به سرورهای مشتریان تحمیل نمی‌شود. اطلاعات VIP خصوصی هم نباید از دیتابیس مرکزی FragCity خوانده شود. این بخش مسیر توسعه و پیکربندی جداگانه صاحبان سرور است و تا زمان ارائه تنظیماتش در پنل، قابلیت فعال‌شده محسوب نمی‌شود.</p>
+                    <p>برای فروش VIP روی سرور اجاره‌ای باید حق استفاده از دیتابیس VIP اختصاصی را جداگانه از FragCity تهیه کنی. پس از فعال‌سازی این حق، VIPCore سرور به دیتابیس مستقل همان مالک متصل می‌شود و او می‌تواند گروه‌ها، مزایا و قیمت VIP خودش را تعریف کند؛ حتی رایگان. این سیستم کاملاً از VIP مرکزی FragCity جداست. قیمت‌های Bronze، Silver و Gold فروشگاه رسمی به سرورهای مشتریان تحمیل نمی‌شود و اطلاعات VIP خصوصی هم نباید از دیتابیس مرکزی خوانده شود. مبلغ و دورهٔ حق دیتابیس اختصاصی هنوز تعیین نشده و تا فعال‌سازی رسمی، امکان خرید آن را فرض نکن.</p>
                 </div>
             </details>
 
