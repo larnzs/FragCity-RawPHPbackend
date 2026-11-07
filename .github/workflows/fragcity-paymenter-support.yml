@@ -106,5 +106,18 @@ jobs:
             echo "Internal Paymenter owner ID must never be returned by the website API"
             exit 1
           fi
+      - name: Verify support identity matches local email, phone and Paymenter ID
+        shell: bash
+        run: |
+          set -euo pipefail
+          client="class/PaymenterSupportApiClient.php"
+          endpoint="api/support.php"
+          grep -Fq 'public function verifyCustomerIdentity' "$client"
+          grep -Fq 'hash_equals($websiteEmail, $paymenterEmail)' "$client"
+          grep -Fq 'hash_equals($websitePhone, $paymenterPhone)' "$client"
+          grep -Fq '(int) $paymenterUserId !== $websitePaymenterUserId' "$client"
+          grep -Fq 'SELECT email, phone, paymenter_user_id' "$endpoint"
+          grep -Fq '$client->verifyCustomerIdentity(' "$endpoint"
+          grep -Fq 'paymenter_support_identity_mismatch' "$endpoint"
       - name: Check support JavaScript
         run: node --check js/support.js
