@@ -59,6 +59,16 @@
             priceMap = {};
         }
 
+        let upgradePriceMap = {};
+        try {
+            upgradePriceMap = JSON.parse(root.dataset.vipUpgradePrices || '{}');
+            if (!upgradePriceMap || typeof upgradePriceMap !== 'object' || Array.isArray(upgradePriceMap)) {
+                upgradePriceMap = {};
+            }
+        } catch (error) {
+            upgradePriceMap = {};
+        }
+
         if (!plans.length) return;
 
         if (comparisonModal && comparisonDialog) {
@@ -201,6 +211,11 @@
             return Number.isSafeInteger(price) && price > 0 ? price : null;
         }
 
+        function getUpgradePrice(level) {
+            const price = Number(upgradePriceMap[String(level)]);
+            return Number.isSafeInteger(price) && price >= 100 ? price : null;
+        }
+
         function formatPrice(price) {
             return new Intl.NumberFormat('fa-IR').format(price) + ' ' + (root.dataset.vipCurrency || 'تومان');
         }
@@ -246,46 +261,68 @@
             const durationLabel = durationButton ? (durationButton.dataset.durationLabel || (days + ' روز')) : '';
             const price = days > 0 ? getConfiguredPrice(level, days) : null;
             const basePrice = getConfiguredPrice(level, 30);
+            const loggedIn = root.dataset.vipLoggedIn === '1';
+            const hasAnyActiveMembership = root.dataset.vipHasActive === '1';
+            const currentLevel = Number(root.dataset.vipCurrentLevel || 0);
+            const paidUpgradeEligible = root.dataset.vipPaidUpgradeEligible === '1';
+            const higherThanCurrent = level > currentLevel;
+            const paidUpgradeCandidate = hasAnyActiveMembership && paidUpgradeEligible && higherThanCurrent;
+            const upgradePrice = paidUpgradeCandidate ? getUpgradePrice(level) : null;
+            const isPaidUpgrade = paidUpgradeCandidate && upgradePrice !== null;
+            const isFullPriceReplacement = hasAnyActiveMembership && !paidUpgradeEligible && higherThanCurrent;
+            const blockedByLevel = hasAnyActiveMembership && !higherThanCurrent;
+            const checkoutReady = root.dataset.vipCheckoutReady === '1';
+            const statusAvailable = root.dataset.vipStatusUnavailable !== '1';
+            const upgradeDurationDays = Number(root.dataset.vipUpgradeDurationDays || 0);
 
             if (invoiceTier) invoiceTier.textContent = name;
             if (invoiceLevel) invoiceLevel.textContent = name + ' · VIP ' + String(level).padStart(2, '0');
-            if (invoiceDuration) invoiceDuration.textContent = mode === 'trial'
-                ? '۳ روز · هدیه خوش‌آمدگویی'
-                : (durationLabel || 'انتخاب نشده');
+            if (invoiceDuration) {
+                invoiceDuration.textContent = mode === 'trial'
+                    ? '۳ روز · هدیه خوش‌آمدگویی'
+                    : (paidUpgradeCandidate
+                        ? 'تا پایان اعتبار اشتراک فعلی'
+                        : (durationLabel || 'انتخاب نشده'));
+            }
             if (invoiceTotal) {
                 invoiceTotal.textContent = mode === 'trial'
                     ? 'رایگان'
-                    : (price !== null
-                        ? formatPrice(price)
-                        : (!days && basePrice !== null
-                            ? 'قیمت پایهٔ ۳۰ روزه: ' + formatPrice(basePrice)
-                            : '— تومان'));
+                    : (paidUpgradeCandidate
+                        ? (upgradePrice !== null ? formatPrice(upgradePrice) : 'قیمت ارتقا در دسترس نیست')
+                        : (price !== null
+                            ? formatPrice(price)
+                            : (!days && basePrice !== null
+                                ? 'قیمت پایهٔ ۳۰ روزه: ' + formatPrice(basePrice)
+                                : '— تومان')));
             }
             invoice.style.setProperty('--vip-invoice-accent', activePlan.dataset.vipColor || '#F97316');
 
-            const loggedIn = root.dataset.vipLoggedIn === '1';
-            const hasAnyActiveMembership = root.dataset.vipHasActive === '1';
-            const checkoutReady = root.dataset.vipCheckoutReady === '1';
-            const statusAvailable = root.dataset.vipStatusUnavailable !== '1';
+            const canBuyFullTerm = !hasAnyActiveMembership
+                ? days > 0 && price !== null
+                : (isFullPriceReplacement && days > 0 && price !== null);
             const canCheckout = loggedIn
                 && checkoutReady
                 && statusAvailable
-                && !hasAnyActiveMembership
                 && !current
                 && available
                 && mode === 'paid'
-                && days > 0
-                && price !== null;
+                && (isPaidUpgrade || canBuyFullTerm);
 
             let message = 'برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.';
             if (current) {
-                message = 'این سطح هم‌اکنون روی حساب شما فعال است؛ امکان خرید مجدد یا ارتقا تا پایان اشتراک وجود ندارد.';
+                message = 'این سطح هم‌اکنون روی حساب شما فعال است؛ خرید مجدد همان سطح مجاز نیست.';
             } else if (!available) {
                 message = 'این سطح در حال حاضر برای خرید فعال نیست.';
             } else if (mode === 'trial') {
                 message = 'Silver هدیه سه‌روزه است؛ آن را از کارت هدیه خوش‌آمدگویی دریافت کن. این سفارش وارد Checkout نمی‌شود.';
-            } else if (hasAnyActiveMembership) {
-                message = 'حساب شما از قبل VIP فعال دارد؛ قیمت و مدت پلن‌ها قابل بررسی است، اما خرید یا ارتقا تا پایان اشتراک فعلی انجام نمی‌شود.';
+            } else if (blockedByLevel) {
+                message = 'فقط می‌توانی به سطح بالاتر ارتقا بدهی؛ خرید مجدد یا تنزل سطح امکان‌پذیر نیست.';
+            } else if (paidUpgradeCandidate && upgradePrice === null) {
+                message = 'قیمت ارتقا یا اعتبار باقی‌مانده قابل محاسبه نیست؛ لطفاً پس از پایان اشتراک، پلن جدید را با قیمت کامل بخر.';
+            } else if (isPaidUpgrade) {
+                message = 'اعتبار باقی‌مانده از اشتراک پولی کسر می‌شود و سطح جدید تا همان تاریخ انقضای فعلی فعال خواهد بود.';
+            } else if (isFullPriceReplacement) {
+                message = 'اشتراک فعلی شما اعتبار پولی قابل انتقال ندارد؛ برای پلن بالاتر باید مبلغ کامل را پرداخت کنی. هدیه رایگان Silver شامل تخفیف ارتقا نیست.';
             } else if (root.dataset.vipStatusUnavailable === '1') {
                 message = 'قیمت و مدت پلن قابل مشاهده است، اما تا زمان در دسترس‌شدن VIPCore امکان پرداخت وجود ندارد.';
             } else if (!loggedIn) {
@@ -302,11 +339,15 @@
 
             if (invoiceStatus) invoiceStatus.textContent = message;
             if (checkoutLevelInput) checkoutLevelInput.value = canCheckout ? String(level) : '';
-            if (checkoutDurationInput) checkoutDurationInput.value = canCheckout ? String(days) : '';
+            if (checkoutDurationInput) {
+                checkoutDurationInput.value = canCheckout
+                    ? String(isPaidUpgrade ? upgradeDurationDays : days)
+                    : '';
+            }
             if (checkoutButton) {
                 checkoutButton.disabled = !canCheckout;
                 checkoutButton.title = canCheckout
-                    ? 'ساخت سفارش امن و انتقال به درگاه زرین‌پال'
+                    ? (isPaidUpgrade ? 'پرداخت مابه‌التفاوت و ارتقای VIP' : 'ساخت سفارش امن و انتقال به درگاه زرین‌پال')
                     : message;
             }
         }
@@ -333,20 +374,35 @@
         function syncDurationSelector(plan, isCurrent) {
             if (!durationSelector) return;
 
-            // Pricing remains inspectable even when an existing VIP or a
-            // temporary VIPCore outage prevents checkout. Only the current
-            // active tier hides purchase durations to avoid repurchase.
+            const planLevel = Number(plan.dataset.level || 0);
+            const hasActiveMembership = root.dataset.vipHasActive === '1';
+            const currentLevel = Number(root.dataset.vipCurrentLevel || 0);
+            const higherThanCurrent = planLevel > currentLevel;
+            const paidUpgradeEligible = root.dataset.vipPaidUpgradeEligible === '1';
+            const isPaidUpgrade = hasActiveMembership && paidUpgradeEligible && higherThanCurrent;
             const canChooseDuration = (
                 hasUserSelectedPlan
                 && plan.dataset.vipAvailable === '1'
                 && plan.dataset.vipPurchaseMode === 'paid'
                 && !isCurrent
+                && (!hasActiveMembership || (!paidUpgradeEligible && higherThanCurrent))
             );
 
             durationSelector.hidden = !canChooseDuration;
             durationSelector.setAttribute('aria-hidden', canChooseDuration ? 'false' : 'true');
 
-            renderDurationPrices(Number(plan.dataset.level || 0));
+            renderDurationPrices(planLevel);
+            if (durationSelectionStatus) {
+                if (isPaidUpgrade) {
+                    durationSelectionStatus.textContent = 'با ارتقای پلن پولی، تاریخ انقضای فعلی حفظ می‌شود و فقط مابه‌التفاوت زمان باقی‌مانده پرداخت خواهد شد.';
+                } else if (hasActiveMembership && !higherThanCurrent) {
+                    durationSelectionStatus.textContent = 'برای این حساب فقط ارتقا به سطح بالاتر مجاز است.';
+                } else if (!canChooseDuration) {
+                    durationSelectionStatus.textContent = 'برای ادامه، یک سطح قابل خرید را انتخاب کن.';
+                } else {
+                    durationSelectionStatus.textContent = 'مدت اشتراک موردنظرت را انتخاب کن.';
+                }
+            }
             if (!canChooseDuration) {
                 resetDurationSelection();
             }
