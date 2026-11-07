@@ -191,10 +191,65 @@ try {
         ], 503);
     }
 
+    // Enforce the one-hour cancellation waiting period on the server.
+    // The browser countdown is only a usability hint; this check is authoritative.
+    $vipRepository = new VipCoreRepository();
+    $currentVip = $vipRepository->getStatus($steamId64);
+
+    if (($currentVip['active'] ?? false) === true) {
+        if (($currentVip['paid_ledger_available'] ?? false) !== true) {
+            $respond([
+                'success' => false,
+                'error' => 'vip_revoke_cooldown_status_unavailable',
+                'message' => 'زمان پرداخت اشتراک برای بررسی محدودیت ابطال در دسترس نیست. لطفاً بعداً دوباره تلاش کنید.',
+            ], 503);
+        }
+
+        $currentPaidPurchase = $currentVip['paid_purchase'] ?? null;
+        if (is_array($currentPaidPurchase)) {
+            $currentPaidOrderRef = (string)($currentPaidPurchase['order_ref'] ?? '');
+            if (!preg_match('/^[a-f0-9]{32}$/D', $currentPaidOrderRef)) {
+                throw new RuntimeException('vip_revoke_paid_order_reference_invalid');
+            }
+
+            $purchaseTimeQuery = $ordersPdo->prepare(
+                'SELECT UNIX_TIMESTAMP(COALESCE(paid_at, provisioned_at, created_at))
+                 FROM vip_orders
+                 WHERE order_ref = ? AND steamid64 = ?
+                 LIMIT 1'
+            );
+            $purchaseTimeQuery->execute([$currentPaidOrderRef, $steamId64]);
+            $purchaseTimestamp = (int)$purchaseTimeQuery->fetchColumn();
+
+            if ($purchaseTimestamp < 1) {
+                $respond([
+                    'success' => false,
+                    'error' => 'vip_revoke_cooldown_status_unavailable',
+                    'message' => 'زمان پرداخت سفارش قابل تأیید نیست؛ برای جلوگیری از ابطال زودهنگام، عملیات انجام نشد.',
+                ], 503);
+            }
+
+            $revokeAvailableAt = $purchaseTimestamp + 3600;
+            $retryAfterSeconds = max(0, $revokeAvailableAt - time());
+            if ($retryAfterSeconds > 0) {
+                $minutes = intdiv($retryAfterSeconds, 60);
+                $seconds = $retryAfterSeconds % 60;
+                $respond([
+                    'success' => false,
+                    'error' => 'vip_revoke_cooldown',
+                    'retry_after_seconds' => $retryAfterSeconds,
+                    'available_at' => $revokeAvailableAt,
+                    'message' => 'ابطال VIP یک ساعت پس از پرداخت سفارش فعال می‌شود. زمان باقی‌مانده: '
+                        . $minutes . ' دقیقه و ' . $seconds . ' ثانیه.',
+                ], 409);
+            }
+        }
+    }
+
     // VIPCore serializes revocation and records an audit row before deleting
     // vip_users. If the website transaction later fails, the same API request
     // can be retried and the same order reference will be returned.
-    $revocation = (new VipCoreRepository())->revokeMembership($steamId64);
+    $revocation = $vipRepository->revokeMembership($steamId64);
 
     if (($revocation['revoked'] ?? false) !== true) {
         $respond([
