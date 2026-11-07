@@ -634,7 +634,11 @@ if ($isLoggedIn
     && $vipHasActiveMembership
     && is_array($vipPaidPurchase)
     && (int)($vipPaidPurchase['level'] ?? 0) === $vipCurrentLevel
+    && (int)($vipPaidPurchase['expires'] ?? 0) === (int)($userVip['vip_expire'] ?? 0)
     && in_array($vipCurrentLevel, [1, 2], true)) {
+    // Keep this true even when the remaining-value quote is unavailable;
+    // otherwise the UI could incorrectly fall back to a full-term replacement.
+    $vipPaidUpgradeEligible = true;
     $paidDurationSeconds = (int)($vipPaidPurchase['duration_seconds'] ?? 0);
     $paidExpires = (int)($vipPaidPurchase['expires'] ?? 0);
     $candidateDays = intdiv(max(0, $paidDurationSeconds), 86400);
@@ -669,7 +673,6 @@ if ($isLoggedIn
 
             $vipUpgradeDurationDays = $candidateDays;
             $vipUpgradeRemainingSeconds = $remainingSeconds;
-            $vipPaidUpgradeEligible = $vipUpgradePriceRialMap !== [];
         }
     }
 }
