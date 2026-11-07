@@ -15,6 +15,8 @@ final class PaymenterSupportApiClient
     private string $baseUrl;
     private string $adminApiKey;
     private string $sharedSecret;
+    private ?string $verifiedSteamId64 = null;
+    private ?int $verifiedPaymenterUserId = null;
 
     public function __construct(
         ?string $baseUrl = null,
@@ -110,10 +112,84 @@ final class PaymenterSupportApiClient
         ];
     }
 
+    /**
+     * Verify the Paymenter identity against the authenticated FragCity user.
+     * Email and phone are supplied only from the local users table, never
+     * from browser input. Paymenter returns its own email and fragcity_phone
+     * property through the signed server-to-server identity bridge.
+     */
+    public function verifyCustomerIdentity(
+        string $steamId64,
+        string $websiteEmail,
+        string $websitePhone,
+        int $websitePaymenterUserId
+    ): int {
+        $this->assertSteamId($steamId64);
+
+        $websiteEmail = mb_strtolower(trim($websiteEmail));
+        $websitePhone = trim($websitePhone);
+
+        if (
+            !filter_var($websiteEmail, FILTER_VALIDATE_EMAIL)
+            || !preg_match('/^09[0-9]{9}$/D', $websitePhone)
+            || $websitePaymenterUserId < 1
+        ) {
+            throw new RuntimeException('paymenter_support_identity_not_synced');
+        }
+
+        $response = $this->hmacPost(
+            '/api/v1/fragcity/support/identity/resolve',
+            ['steamid64' => $steamId64]
+        );
+        $data = is_array($response['data'] ?? null) ? $response['data'] : [];
+
+        $paymenterUserId = filter_var(
+            $data['paymenter_user_id'] ?? null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+        $paymenterEmail = mb_strtolower(trim((string) ($data['email'] ?? '')));
+        $paymenterPhone = trim((string) ($data['phone'] ?? ''));
+
+        if (
+            $paymenterUserId === false
+            || !filter_var($paymenterEmail, FILTER_VALIDATE_EMAIL)
+            || !preg_match('/^09[0-9]{9}$/D', $paymenterPhone)
+        ) {
+            throw new RuntimeException('paymenter_support_invalid_identity_response');
+        }
+
+        if (
+            (int) $paymenterUserId !== $websitePaymenterUserId
+            || !hash_equals($websiteEmail, $paymenterEmail)
+            || !hash_equals($websitePhone, $paymenterPhone)
+        ) {
+            throw new RuntimeException('paymenter_support_identity_mismatch');
+        }
+
+        // Cache this verified mapping for the lifetime of this PHP request.
+        // Subsequent ticket methods reuse the same identity, avoiding a
+        // second bridge lookup and preventing mismatched IDs within one call.
+        $this->verifiedSteamId64 = $steamId64;
+        $this->verifiedPaymenterUserId = (int) $paymenterUserId;
+
+        return (int) $paymenterUserId;
+    }
+
     public function resolvePaymenterUserId(string $steamId64): int
     {
         $this->assertSteamId($steamId64);
 
+        if (
+            $this->verifiedSteamId64 !== null
+            && hash_equals($this->verifiedSteamId64, $steamId64)
+            && $this->verifiedPaymenterUserId !== null
+        ) {
+            return $this->verifiedPaymenterUserId;
+        }
+
+        // Kept for the read-only CLI preflight. Customer-facing support
+        // requests call verifyCustomerIdentity() before using any API action.
         $response = $this->hmacPost(
             '/api/v1/fragcity/support/identity/resolve',
             ['steamid64' => $steamId64]
