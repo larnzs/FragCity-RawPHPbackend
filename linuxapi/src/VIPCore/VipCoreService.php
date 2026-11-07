@@ -121,28 +121,53 @@ final class VipCoreService
         // user's existing VIP status or allow a payment that cannot be applied.
         $paidLedgerAvailable = false;
         try {
-            // These zero-row INSERT...SELECT / UPDATE probes validate the exact
-            // columns and required SELECT/INSERT/UPDATE grants without changing
-            // any stored row or firing row-level triggers.
+            // Probe schema and write grants using zero-row statements. The
+            // SELECTs validate every column; INSERT...SELECT has no source table
+            // and WHERE 1=0 guarantees that no row is inserted or trigger fired.
+            $this->pdo->query(
+                'SELECT order_ref, steamid64, account_id, sid, vip_level, vip_group,
+                        duration_seconds, tier_price_rial, granted_at, expires
+                 FROM fragcity_vip_paid_orders
+                 LIMIT 0'
+            );
             $this->pdo->exec(
                 'INSERT INTO fragcity_vip_paid_orders
                     (order_ref, steamid64, account_id, sid, vip_level, vip_group,
                      duration_seconds, tier_price_rial, granted_at, expires)
-                 SELECT order_ref, steamid64, account_id, sid, vip_level, vip_group,
-                        duration_seconds, tier_price_rial, granted_at, expires
-                 FROM fragcity_vip_paid_orders
+                 SELECT
+                    CAST(REPEAT(\'a\', 32) AS CHAR(32)),
+                    CAST(REPEAT(\'0\', 17) AS CHAR(17)),
+                    CAST(0 AS UNSIGNED),
+                    CAST(0 AS UNSIGNED),
+                    CAST(1 AS UNSIGNED),
+                    CAST(\'BRONZE\' AS CHAR(16)),
+                    CAST(604800 AS UNSIGNED),
+                    CAST(0 AS UNSIGNED),
+                    CAST(1 AS UNSIGNED),
+                    CAST(604801 AS UNSIGNED)
                  WHERE 1 = 0'
+            );
+            $this->pdo->query(
+                'SELECT `account_id`, `name`, `lastvisit`, `sid`, `group`, `expires`
+                 FROM `vip_users`
+                 LIMIT 0'
             );
             $this->pdo->exec(
                 'INSERT INTO `vip_users`
                     (`account_id`, `name`, `lastvisit`, `sid`, `group`, `expires`)
-                 SELECT `account_id`, `name`, `lastvisit`, `sid`, `group`, `expires`
-                 FROM `vip_users`
+                 SELECT
+                    CAST(0 AS UNSIGNED),
+                    CAST(\'FragCity\' AS CHAR(64)),
+                    CAST(0 AS UNSIGNED),
+                    CAST(0 AS UNSIGNED),
+                    CAST(\'BRONZE\' AS CHAR(64)),
+                    CAST(0 AS UNSIGNED)
                  WHERE 1 = 0'
             );
             $this->pdo->exec(
                 'UPDATE `vip_users`
-                 SET `lastvisit` = `lastvisit`
+                 SET `name` = `name`, `lastvisit` = `lastvisit`,
+                     `group` = `group`, `expires` = `expires`
                  WHERE 1 = 0'
             );
             $paidLedgerAvailable = true;
