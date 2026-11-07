@@ -5,6 +5,27 @@
         const page = document.querySelector('.support-page');
         if (!page) return;
 
+        page.querySelectorAll('.support-faq-item').forEach(function (item) {
+            const summary = item.querySelector('summary');
+            if (!summary || summary.dataset.transitionBound === '1') return;
+            summary.dataset.transitionBound = '1';
+            summary.addEventListener('click', function (event) {
+                event.preventDefault();
+                if (item.open) {
+                    item.classList.add('is-closing');
+                    window.setTimeout(function () {
+                        if (item.classList.contains('is-closing')) {
+                            item.open = false;
+                            item.classList.remove('is-closing');
+                        }
+                    }, 280);
+                } else {
+                    item.classList.remove('is-closing');
+                    item.open = true;
+                }
+            });
+        });
+
         const copyBtn = page.querySelector('#copyTsAddress');
         if (copyBtn && !copyBtn.dataset.bound) {
             copyBtn.dataset.bound = '1';
@@ -155,8 +176,12 @@
             toast.className = 'toast-message ' + (kind === 'error' ? 'error' : 'success');
             toast.hidden = false;
             window.clearTimeout(showToast.timer);
+            window.clearTimeout(showToast.hideTimer);
             showToast.timer = window.setTimeout(function () {
                 toast.classList.add('is-hidden');
+                showToast.hideTimer = window.setTimeout(function () {
+                    toast.hidden = true;
+                }, 240);
             }, 4200);
         }
 
