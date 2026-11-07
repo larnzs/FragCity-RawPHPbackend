@@ -78,6 +78,12 @@
       "_comment": "Private HMAC connection to the FragCityAPI add-on in Paymenter. Generate a random secret with openssl rand -hex 32 and configure the same value in Paymenter Admin -> Extensions -> Others -> FragCity API. Backend-only; never expose it to browser JavaScript or commit a real value.",
       "base_url": "",
       "shared_secret": ""
+    },
+    "paymenter_support": {
+      "_comment": "Private support integration. base_url is the HTTPS Paymenter origin. admin_api_key is a Paymenter Admin API Key stored only in private settings.json. shared_secret is a separate HMAC secret configured in FragCity Support API; never reuse paymenter_backend.shared_secret and never expose either secret to the browser.",
+      "base_url": "",
+      "admin_api_key": "",
+      "shared_secret": ""
     }
   },
   "files": {
