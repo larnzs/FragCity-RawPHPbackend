@@ -125,8 +125,8 @@ $tierPriceRial = null;
 if (!empty($vipStatus['active'])) {
     $currentLevel = (int)($vipStatus['level'] ?? 0);
     $currentExpires = (int)($vipStatus['expires'] ?? 0);
-    if ($currentLevel < 1 || $currentExpires < 1 || $level <= $currentLevel) {
-        $terminate('فقط امکان ارتقا به سطح بالاتر وجود دارد؛ خرید مجدد یا تنزل سطح مجاز نیست.', 409);
+    if ($currentLevel < 1 || $level < $currentLevel) {
+        $terminate('خرید سطح پایین‌تر از عضویت فعال مجاز نیست.', 409);
     }
 
     // Upgrade credit is granted only by a matching immutable paid-order row.
@@ -179,9 +179,10 @@ if (!empty($vipStatus['active'])) {
             'duration_seconds' => $paidDurationSeconds,
         ];
     } else {
-        // A free Silver trial or a legacy/manual membership has no matching
-        // paid-order ledger row. It may only be replaced by a higher tier at
-        // its full catalogue price; the gift-claim table is not consulted here.
+        // A free Silver trial, admin test grant or legacy/manual membership
+        // has no matching paid-order ledger row. It can be converted into a
+        // paid subscription at the same level or replaced by a higher tier,
+        // always at full catalogue price; trial history gives no price credit.
         $purchaseType = 'replacement';
         $durationSeconds = $days * 86400;
         $amountRial = $resolvePriceRial($level, $days);
