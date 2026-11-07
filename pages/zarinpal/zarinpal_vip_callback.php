@@ -202,8 +202,11 @@ try {
         }
 
         $walletTransactionId = (int)$walletReferenceMatch[1];
+        // vip_orders.ref_id stores WALLET-TX-{id}; the synthetic authority is
+        // also checked. wallet_transactions.ref_id is a legacy field and must
+        // not be compared with a textual VIP order reference.
         $walletTransactionQuery = $pdo->prepare(
-            'SELECT id, steamid, amount, type, authority, ref_id, status
+            'SELECT id, steamid, amount, type, authority, status
              FROM wallet_transactions
              WHERE id = ? AND authority = ?
              LIMIT 1'
@@ -215,8 +218,7 @@ try {
             || (string)($walletTransaction['steamid'] ?? '') !== $steamId64
             || (string)($walletTransaction['type'] ?? '') !== 'withdraw'
             || (string)($walletTransaction['status'] ?? '') !== 'success'
-            || (int)($walletTransaction['amount'] ?? 0) !== intdiv($amountRial, 10)
-            || (string)($walletTransaction['ref_id'] ?? '') !== 'VIP-' . $orderRef) {
+            || (int)($walletTransaction['amount'] ?? 0) !== intdiv($amountRial, 10)) {
             $renderResult(false, 'تراکنش کیف پول با سفارش VIP تطبیق ندارد؛ سفارش برای بررسی حفظ شده است.');
         }
     }
