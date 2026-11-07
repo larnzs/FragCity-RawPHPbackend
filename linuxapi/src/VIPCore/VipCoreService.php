@@ -735,13 +735,14 @@ final class VipCoreService
                 // Upgrade applies immediately but never discards unused paid time.
                 $expires = $currentExpires;
             } elseif ($currentActive) {
-                if ($level <= $currentLevel) {
+                if ($level < $currentLevel) {
                     throw new VipCoreMembershipConflict('membership_already_active');
                 }
 
                 // An active paid membership must use the discounted upgrade path.
-                // Only a non-paid active membership (for example, the free Silver
-                // trial) may be replaced after charging the target tier in full.
+                // A non-paid active membership (trial, test grant or legacy/manual
+                // grant) may be converted at the same tier or replaced by a higher
+                // tier after charging the selected catalogue price in full.
                 $paidCurrent = $this->pdo->prepare(
                     'SELECT order_ref
                      FROM fragcity_vip_paid_orders
