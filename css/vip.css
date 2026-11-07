@@ -3630,3 +3630,16 @@ body.vip-comparison-open {
         animation-duration: .01ms !important;
     }
 }
+
+
+/* Keep the invoice in normal flow on tablet/mobile; desktop uses the sticky left rail. */
+@media (max-width: 960px) {
+    .vip-invoice-panel.vip-checkout-bar {
+        position: relative !important;
+        top: auto !important;
+        bottom: auto !important;
+        align-self: stretch;
+        max-height: none;
+        overflow: visible;
+    }
+}
