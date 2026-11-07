@@ -6,8 +6,8 @@ declare(strict_types=1);
  *
  * The SteamID64 is taken only from the authenticated session. The signed
  * Linux API records the revocation and removes the live VIPCore row; the
- * website then marks the matching paid order as revoked without deleting
- * its payment history.
+ * website marks stale paid VIP orders and the matching current membership order as
+ * revoked without deleting payment history. Unpaid gateway-pending orders remain intact.
  */
 require_once dirname(__DIR__) . '/settings/session.php';
 require_once dirname(__DIR__) . '/class/VipCoreRepository.php';
