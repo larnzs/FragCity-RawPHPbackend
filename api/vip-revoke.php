@@ -254,6 +254,7 @@ try {
         $refundUnits = 0;
         $remainingSeconds = $expires > 0 ? max(0, $expires - $revokedAt) : 0;
         $subscriptionDurationSeconds = 0;
+        $walletBalanceAfter = '0';
 
         if (is_array($existingRefund)) {
             if ((string)($existingRefund['type'] ?? '') !== 'deposit'
@@ -325,13 +326,14 @@ try {
                     $previousOrderRef = $paidOrder['upgrade_from_order_ref'] ?? null;
                     if (!is_string($previousOrderRef)
                         || !preg_match('/^[a-f0-9]{32}$/D', $previousOrderRef)
-                        || $windowSeconds < 1) {
+                        || $windowSeconds < 1
+                        || $windowSeconds > 7776000) {
                         throw new RuntimeException('vip_refund_upgrade_window_invalid');
                     }
                 } else {
                     $windowSeconds = $durationSeconds;
                     $previousOrderRef = null;
-                    if ($windowSeconds < 1) {
+                    if (!in_array($windowSeconds, [604800, 1296000, 2592000, 5184000, 7776000], true)) {
                         throw new RuntimeException('vip_refund_paid_duration_invalid');
                     }
                     $subscriptionDurationSeconds = $windowSeconds;
@@ -453,6 +455,12 @@ try {
             $markRevoked->execute([$steamId64]);
         }
 
+        $walletBalanceQuery = $ordersPdo->prepare(
+            'SELECT balance FROM user_wallets WHERE steamid = ? LIMIT 1'
+        );
+        $walletBalanceQuery->execute([$steamId64]);
+        $walletBalanceAfter = $normaliseToman($walletBalanceQuery->fetchColumn() ?: 0);
+
         $ordersPdo->commit();
     } catch (Throwable $e) {
         if ($ordersPdo->inTransaction()) {
@@ -477,6 +485,7 @@ try {
             'revoked_at' => $revokedAt,
             'order_ref' => $orderRef,
             'refund_amount_toman' => $refundAmountToman,
+            'wallet_balance_toman' => $walletBalanceAfter,
             'refund_remaining_seconds' => $remainingSeconds,
             'refund_used_seconds' => $subscriptionDurationSeconds > 0
                 ? max(0, $subscriptionDurationSeconds - $remainingSeconds)
