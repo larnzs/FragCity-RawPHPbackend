@@ -175,8 +175,9 @@ final class PaymenterSupportApiClient
     }
 
     /**
-     * Ownership is verified through Paymenter's filtered collection before
-     * the direct show request. Paymenter API keys are administrative keys.
+     * Paymenter API keys are administrative. The collection filter is only a
+     * lookup optimization; exact ticket ownership is checked against the
+     * resource owner before and after the direct show request.
      *
      * @return array<string,mixed>
      */
@@ -490,7 +491,7 @@ final class PaymenterSupportApiClient
             : [];
         $ticketId = (int) ($resource['id'] ?? $attributes['id'] ?? 0);
         $includedMap = $this->includedMap($included);
-        $ticketOwnerId = (int) ($attributes['user_id'] ?? 0);
+        $ticketOwnerId = $this->resourceOwnerUserId($resource);
         $messageRefs = $resource['relationships']['messages']['data'] ?? [];
         $messages = [];
 
