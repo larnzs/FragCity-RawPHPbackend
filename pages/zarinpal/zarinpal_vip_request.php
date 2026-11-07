@@ -78,10 +78,16 @@ $packages = is_array($catalog['packages'] ?? null) ? $catalog['packages'] : [];
 $package = is_array($packages[(string)$level] ?? null) ? $packages[(string)$level] : [];
 $durations = is_array($package['durations'] ?? null) ? $package['durations'] : [];
 $durationPackage = is_array($durations[(string)$days] ?? null) ? $durations[(string)$days] : [];
-$rawPrice = array_key_exists('price_rial', $durationPackage)
-    ? $durationPackage['price_rial']
-    : ($defaultPriceRial[$level][$days] ?? null);
+$rawPrice = $durationPackage['price_rial'] ?? null;
 $validatedPrice = filter_var($rawPrice, FILTER_VALIDATE_INT);
+if ($validatedPrice === false
+    || $validatedPrice < 1
+    || $validatedPrice > 10000000000000
+    || $validatedPrice % 10 !== 0) {
+    // Keep the same official defaults used by the storefront if the
+    // private runtime settings still have the old price format.
+    $validatedPrice = filter_var($defaultPriceRial[$level][$days] ?? null, FILTER_VALIDATE_INT);
+}
 
 if ($validatedPrice === false
     || $validatedPrice < 1
