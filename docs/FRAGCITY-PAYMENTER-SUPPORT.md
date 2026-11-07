@@ -45,7 +45,7 @@ Create a separate Admin API Key, for example **FragCity Support Website**, with 
 
 Do not enable Delete, Impersonate, Create/Update Users, Invoice Create/Update, Invoice Item Create/Update, Orders, Services, Coupons or Credits. View Users is not required for the SteamID64 mapping.
 
-The API key is administrative, not customer-scoped. Never expose it to the browser. The server-side adapter always resolves the Paymenter ID from the session's SteamID64 and verifies ownership using Paymenter's filter[id] and filter[user_id] before reading or mutating a specific ticket/invoice.
+The API key is administrative, not customer-scoped. Never expose it to the browser. The server-side adapter always resolves the Paymenter ID from the session's SteamID64. Paymenter filters are only query optimizations, never an authorization boundary: every ticket returned by the list is independently checked against its `user_id` (or JSON:API `user` relationship), and a missing owner ID is rejected. Ticket detail reads, replies, closes and reopens also require an exact owner match before the operation proceeds.
 
 ## Private settings
 
