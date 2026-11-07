@@ -34,6 +34,9 @@
         const invoiceTotal = invoice ? invoice.querySelector('[data-invoice-total]') : null;
         const invoiceStatus = invoice ? invoice.querySelector('[data-invoice-status]') : null;
         const checkoutButton = invoice ? invoice.querySelector('[data-vip-checkout]') : null;
+        const checkoutForm = invoice ? invoice.querySelector('[data-vip-checkout-form]') : null;
+        const checkoutLevelInput = checkoutForm ? checkoutForm.querySelector('[data-vip-checkout-level]') : null;
+        const checkoutDurationInput = checkoutForm ? checkoutForm.querySelector('[data-vip-checkout-duration]') : null;
         const comparisonModal = document.getElementById('vipComparisonModal');
         const comparisonDialog = comparisonModal
             ? comparisonModal.querySelector('#vipComparisonDialog')
@@ -221,7 +224,12 @@
                 if (invoiceDuration) invoiceDuration.textContent = '—';
                 if (invoiceTotal) invoiceTotal.textContent = '— تومان';
                 if (invoiceStatus) invoiceStatus.textContent = 'برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.';
-                if (checkoutButton) checkoutButton.disabled = true;
+                if (checkoutButton) {
+                    checkoutButton.disabled = true;
+                    checkoutButton.title = 'ابتدا یک سطح و مدت اشتراک را انتخاب کنید.';
+                }
+                if (checkoutLevelInput) checkoutLevelInput.value = '';
+                if (checkoutDurationInput) checkoutDurationInput.value = '';
                 invoice.style.removeProperty('--vip-invoice-accent');
                 return;
             }
@@ -250,27 +258,49 @@
             }
             invoice.style.setProperty('--vip-invoice-accent', activePlan.dataset.vipColor || '#F97316');
 
+            const loggedIn = root.dataset.vipLoggedIn === '1';
+            const hasAnyActiveMembership = root.dataset.vipHasActive === '1';
+            const checkoutReady = root.dataset.vipCheckoutReady === '1';
+            const canCheckout = loggedIn
+                && checkoutReady
+                && !hasAnyActiveMembership
+                && !current
+                && available
+                && mode === 'paid'
+                && days > 0
+                && price !== null;
+
             let message = 'برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.';
             if (current) {
-                message = 'این سطح هم‌اکنون روی حساب شما فعال است؛ انتخاب مدت خرید برای آن نمایش داده نمی‌شود.';
+                message = 'این سطح هم‌اکنون روی حساب شما فعال است؛ امکان خرید مجدد یا ارتقا تا پایان اشتراک وجود ندارد.';
             } else if (!available) {
                 message = 'این سطح در حال حاضر برای خرید فعال نیست.';
             } else if (mode === 'trial') {
                 message = 'Silver هدیه سه‌روزه است؛ آن را از کارت هدیه خوش‌آمدگویی دریافت کن. این سفارش وارد Checkout نمی‌شود.';
-            } else if (mode === 'paid' && root.dataset.vipStatusUnavailable === '1') {
-                message = 'وضعیت VIPCore در دسترس نیست؛ برای جلوگیری از سفارش تکراری، انتخاب مدت موقتاً غیرفعال است.';
+            } else if (hasAnyActiveMembership) {
+                message = 'حساب شما از قبل VIP فعال دارد؛ خرید یا ارتقای سطح تا پایان اشتراک فعلی امکان‌پذیر نیست.';
+            } else if (root.dataset.vipStatusUnavailable === '1') {
+                message = 'وضعیت VIPCore در دسترس نیست؛ برای جلوگیری از پرداخت تکراری، خرید موقتاً غیرفعال است.';
+            } else if (!loggedIn) {
+                message = 'برای خرید VIP ابتدا با حساب Steam وارد شوید.';
             } else if (mode === 'paid' && !days) {
-                message = 'یکی از مدت‌های اشتراک را انتخاب کن تا جزئیات فاکتور تکمیل شود.';
+                message = 'یکی از مدت‌های اشتراک را انتخاب کن تا فاکتور و مبلغ نهایی تکمیل شود.';
             } else if (mode === 'paid' && price === null) {
-                message = 'قیمت این مدت هنوز در تنظیمات فروش تعریف نشده است؛ مبلغی از مرورگر یا حدس محاسبه نمی‌شود.';
-            } else if (mode === 'paid') {
-                message = 'مبلغ از تنظیمات قیمت‌گذاری خوانده شد؛ پرداخت واقعی تا تکمیل سرویس سفارش و تأیید VIPCore غیرفعال است.';
+                message = 'قیمت این مدت در تنظیمات سرور معتبر نیست؛ مبلغی از مرورگر دریافت نمی‌شود.';
+            } else if (!checkoutReady) {
+                message = 'درگاه یا تنظیمات Checkout هنوز در سرور فعال نیست؛ پرداخت تا آماده‌سازی امن غیرفعال می‌ماند.';
+            } else if (canCheckout) {
+                message = 'مبلغ نهایی از تنظیمات سرور محاسبه شده است. پس از تأیید زرین‌پال، VIPCore فعال می‌شود.';
             }
 
             if (invoiceStatus) invoiceStatus.textContent = message;
+            if (checkoutLevelInput) checkoutLevelInput.value = canCheckout ? String(level) : '';
+            if (checkoutDurationInput) checkoutDurationInput.value = canCheckout ? String(days) : '';
             if (checkoutButton) {
-                checkoutButton.disabled = true;
-                checkoutButton.title = 'Checkout مستقیم هنوز در سمت سرور پیاده‌سازی نشده است.';
+                checkoutButton.disabled = !canCheckout;
+                checkoutButton.title = canCheckout
+                    ? 'ساخت سفارش امن و انتقال به درگاه زرین‌پال'
+                    : message;
             }
         }
 
@@ -301,6 +331,7 @@
                 && plan.dataset.vipAvailable === '1'
                 && plan.dataset.vipPurchaseMode === 'paid'
                 && !isCurrent
+                && root.dataset.vipHasActive !== '1'
                 && root.dataset.vipStatusUnavailable !== '1'
             );
 
@@ -327,6 +358,7 @@
                 resetDurationSelection();
             }
             activePlan = plan;
+            if (userInitiated) playSelectionFeedback(plan);
 
             plans.forEach(function (item) {
                 const selected = item === plan;
@@ -357,6 +389,21 @@
             }
 
             renderInvoice();
+        }
+
+        function playSelectionFeedback(element) {
+            if (!element || prefersReducedMotion() || typeof element.animate !== 'function') return;
+            element.animate(
+                [
+                    { transform: 'scale(1)', filter: 'brightness(1)' },
+                    { transform: 'scale(.985)', filter: 'brightness(1.12)' },
+                    { transform: 'scale(1)', filter: 'brightness(1)' }
+                ],
+                {
+                    duration: 230,
+                    easing: 'cubic-bezier(.2, .75, .25, 1)'
+                }
+            );
         }
 
         function prefersReducedMotion() {
@@ -592,6 +639,24 @@
             });
         }
 
+        if (checkoutForm && checkoutButton) {
+            checkoutForm.addEventListener('submit', function (event) {
+                if (checkoutButton.disabled
+                    || !checkoutLevelInput
+                    || !checkoutDurationInput
+                    || !checkoutLevelInput.value
+                    || !checkoutDurationInput.value) {
+                    event.preventDefault();
+                    renderInvoice();
+                    return;
+                }
+
+                checkoutButton.disabled = true;
+                checkoutButton.classList.add('is-submitting');
+                checkoutButton.textContent = 'در حال انتقال به زرین‌پال...';
+            });
+        }
+
         if (freeTrialButton) {
             freeTrialButton.addEventListener('click', async function () {
                 if (freeTrialButton.disabled) return;
@@ -684,6 +749,7 @@
                 if (![7, 15, 30, 60, 90].includes(days)) return;
 
                 selectedDurationDays = String(days);
+                playSelectionFeedback(button);
                 root.dataset.vipSelectedDurationDays = selectedDurationDays;
                 root.dataset.vipSelectedTierLevel = String(activePlan.dataset.level || '');
 
