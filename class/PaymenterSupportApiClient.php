@@ -143,6 +143,7 @@ final class PaymenterSupportApiClient
 
         $query = [
             'filter' => ['user_id' => $userId],
+            'include' => 'user',
             'sort' => '-updated_at',
             'page' => $page,
             'per_page' => $perPage,
@@ -156,7 +157,14 @@ final class PaymenterSupportApiClient
         $tickets = [];
 
         foreach ($this->resourceList($response) as $resource) {
-            $tickets[] = $this->normaliseTicket($resource, []);
+            // The Admin API key can see every customer's tickets. Never trust
+            // collection filters alone: verify each returned owner server-side.
+            // Missing owner identity is rejected, not treated as a match.
+            if ($this->resourceOwnerUserId($resource) !== $userId) {
+                continue;
+            }
+
+            $tickets[] = $this->normaliseTicket($resource, $response['included'] ?? []);
         }
 
         return [
@@ -178,11 +186,15 @@ final class PaymenterSupportApiClient
         $this->assertOwnedResource('/tickets', $ticketId, $userId);
 
         $response = $this->nativeRequest('GET', '/tickets/' . $ticketId, [
-            'include' => 'messages',
+            'include' => 'messages,user',
         ]);
         $resource = $response['data'] ?? null;
 
-        if (!is_array($resource) || !isset($resource['id'])) {
+        if (
+            !is_array($resource)
+            || !isset($resource['id'])
+            || $this->resourceOwnerUserId($resource) !== $userId
+        ) {
             throw new RuntimeException('paymenter_support_ticket_not_found');
         }
 
@@ -363,11 +375,15 @@ final class PaymenterSupportApiClient
         $this->assertOwnedResource('/tickets', $ticketId, $userId);
 
         $response = $this->nativeRequest('GET', '/tickets/' . $ticketId, [
-            'include' => 'messages',
+            'include' => 'messages,user',
         ]);
         $resource = $response['data'] ?? null;
 
-        if (!is_array($resource) || !isset($resource['id'])) {
+        if (
+            !is_array($resource)
+            || !isset($resource['id'])
+            || $this->resourceOwnerUserId($resource) !== $userId
+        ) {
             throw new RuntimeException('paymenter_support_ticket_not_found');
         }
 
@@ -376,13 +392,19 @@ final class PaymenterSupportApiClient
 
     private function assertOwnedResource(string $collectionPath, int $resourceId, int $userId): void
     {
-        $response = $this->nativeRequest('GET', $collectionPath, [
+        $query = [
             'filter' => [
                 'id' => $resourceId,
                 'user_id' => $userId,
             ],
             'per_page' => 1,
-        ]);
+        ];
+
+        if ($collectionPath === '/tickets') {
+            $query['include'] = 'user';
+        }
+
+        $response = $this->nativeRequest('GET', $collectionPath, $query);
 
         $resources = $this->resourceList($response);
         if ($resources === []) {
@@ -394,18 +416,51 @@ final class PaymenterSupportApiClient
         }
 
         $matchedId = (int) ($resources[0]['id'] ?? 0);
-        $matchedUserId = (int) ($resources[0]['attributes']['user_id'] ?? 0);
+        $matchedUserId = $collectionPath === '/tickets'
+            ? $this->resourceOwnerUserId($resources[0])
+            : (int) ($resources[0]['attributes']['user_id'] ?? 0);
 
-        // Some JSON:API resource responses may omit user_id from attributes.
-        // In that case the filtered server-side query itself is the ownership
-        // check, and the ID must still match the requested object.
-        if ($matchedId !== $resourceId || ($matchedUserId > 0 && $matchedUserId !== $userId)) {
+        // Ticket ownership must be explicit. Admin API collection filters are
+        // not an authorization boundary and a missing owner ID fails closed.
+        $ownerMismatch = $collectionPath === '/tickets'
+            ? $matchedUserId !== $userId
+            : ($matchedUserId > 0 && $matchedUserId !== $userId);
+
+        if ($matchedId !== $resourceId || $ownerMismatch) {
             throw new RuntimeException(
                 $collectionPath === '/tickets'
                     ? 'paymenter_support_ticket_not_found'
                     : 'paymenter_support_invoice_not_found'
             );
         }
+    }
+
+    /**
+     * Read the authoritative Paymenter owner ID from a ticket resource.
+     *
+     * Paymenter may expose user_id as an attribute or as a JSON:API user
+     * relationship. No owner value means "not verifiably owned" and callers
+     * must reject the resource.
+     */
+    private function resourceOwnerUserId(array $resource): int
+    {
+        $attributes = is_array($resource['attributes'] ?? null)
+            ? $resource['attributes']
+            : [];
+
+        $candidate = $attributes['user_id'] ?? $resource['user_id'] ?? null;
+
+        if ($candidate === null) {
+            $candidate = $resource['relationships']['user']['data']['id'] ?? null;
+        }
+
+        $userId = filter_var(
+            $candidate,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+
+        return $userId === false ? 0 : (int) $userId;
     }
 
     /**
