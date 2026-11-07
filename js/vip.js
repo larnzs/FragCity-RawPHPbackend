@@ -265,6 +265,7 @@
             const hasAnyActiveMembership = root.dataset.vipHasActive === '1';
             const currentLevel = Number(root.dataset.vipCurrentLevel || 0);
             const paidUpgradeEligible = root.dataset.vipPaidUpgradeEligible === '1';
+            const currentMembershipPaid = root.dataset.vipCurrentPaid === '1';
             const higherThanCurrent = level > currentLevel;
             const atOrAboveCurrent = level >= currentLevel;
             const paidUpgradeCandidate = hasAnyActiveMembership && paidUpgradeEligible && higherThanCurrent;
@@ -274,7 +275,7 @@
             // grant) can be converted into a paid membership at the same tier
             // or replaced by a higher tier, always at the full catalogue price.
             const isFullPriceReplacement = hasAnyActiveMembership
-                && !paidUpgradeEligible
+                && !currentMembershipPaid
                 && atOrAboveCurrent;
             const blockedByLevel = hasAnyActiveMembership && level < currentLevel;
             const checkoutReady = root.dataset.vipCheckoutReady === '1';
@@ -390,9 +391,10 @@
             const higherThanCurrent = planLevel > currentLevel;
             const atOrAboveCurrent = planLevel >= currentLevel;
             const paidUpgradeEligible = root.dataset.vipPaidUpgradeEligible === '1';
+            const currentMembershipPaid = root.dataset.vipCurrentPaid === '1';
             const isPaidUpgrade = hasActiveMembership && paidUpgradeEligible && higherThanCurrent;
             const canReplaceNonPaidMembership = hasActiveMembership
-                && !paidUpgradeEligible
+                && !currentMembershipPaid
                 && atOrAboveCurrent;
             const canChooseDuration = (
                 hasUserSelectedPlan
