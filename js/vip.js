@@ -11,6 +11,10 @@
         const inactiveToggle = root.querySelector('#vipLockedToggle');
         const inactivePlans = root.querySelector('#vipInactivePlans');
         let inactiveExpanded = Boolean(inactiveToggle && inactiveToggle.getAttribute('aria-expanded') === 'true');
+        const inactiveSection = inactiveToggle ? inactiveToggle.closest('.vip-locked-section') : null;
+        let inactiveAnimation = null;
+        const faqAnimations = new WeakMap();
+        if (inactiveExpanded && inactiveSection) inactiveSection.classList.add('is-expanded');
         const testPurchaseBox = root.querySelector('[data-vip-test-purchase-box]');
         const testPurchaseButton = root.querySelector('[data-vip-test-purchase]');
         const testFeedback = root.querySelector('[data-vip-test-feedback]');
@@ -355,13 +359,147 @@
             renderInvoice();
         }
 
+        function prefersReducedMotion() {
+            return (
+                document.documentElement.classList.contains('fc-no-animation')
+                || (typeof window.matchMedia === 'function'
+                    && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+            );
+        }
+
         function setInactiveExpanded(expanded) {
             if (!inactiveToggle || !inactivePlans) return;
-            inactiveExpanded = Boolean(expanded);
-            inactiveToggle.setAttribute('aria-expanded', inactiveExpanded ? 'true' : 'false');
-            inactivePlans.setAttribute('aria-hidden', inactiveExpanded ? 'false' : 'true');
-            inactivePlans.hidden = !inactiveExpanded;
+
+            const shouldExpand = Boolean(expanded);
+            const currentHeight = inactivePlans.hidden
+                ? 0
+                : inactivePlans.getBoundingClientRect().height;
+
+            if (inactiveAnimation) {
+                inactiveAnimation.cancel();
+                inactiveAnimation = null;
+            }
+
+            inactiveExpanded = shouldExpand;
+            inactiveToggle.setAttribute('aria-expanded', shouldExpand ? 'true' : 'false');
+            inactivePlans.setAttribute('aria-hidden', shouldExpand ? 'false' : 'true');
+            if (inactiveSection) inactiveSection.classList.toggle('is-expanded', shouldExpand);
+
+            if (prefersReducedMotion() || typeof inactivePlans.animate !== 'function') {
+                inactivePlans.hidden = !shouldExpand;
+                inactivePlans.style.removeProperty('height');
+                inactivePlans.style.removeProperty('overflow');
+                return;
+            }
+
+            if (shouldExpand) inactivePlans.hidden = false;
+
+            const targetHeight = shouldExpand ? inactivePlans.scrollHeight : 0;
+            inactivePlans.style.height = currentHeight + 'px';
+            inactivePlans.style.overflow = 'hidden';
+
+            const animation = inactivePlans.animate(
+                [
+                    { height: currentHeight + 'px', opacity: shouldExpand ? 0 : 1 },
+                    { height: targetHeight + 'px', opacity: shouldExpand ? 1 : 0 }
+                ],
+                {
+                    duration: 260,
+                    easing: 'cubic-bezier(.22, .61, .36, 1)',
+                    fill: 'forwards'
+                }
+            );
+            inactiveAnimation = animation;
+
+            animation.onfinish = function () {
+                if (inactiveAnimation !== animation) return;
+                inactivePlans.hidden = !shouldExpand;
+                inactivePlans.style.removeProperty('height');
+                inactivePlans.style.removeProperty('overflow');
+                inactiveAnimation = null;
+            };
+            animation.oncancel = function () {
+                if (inactiveAnimation === animation) inactiveAnimation = null;
+            };
         }
+
+        function toggleFaqItem(details) {
+            if (!details || !details.classList.contains('vip-faq-item')) return;
+
+            const answer = details.querySelector('.vip-faq-answer');
+            if (!answer) {
+                details.open = !details.open;
+                return;
+            }
+
+            const shouldOpen = !details.open;
+            const previousAnimation = faqAnimations.get(details);
+            const currentHeight = previousAnimation
+                ? answer.getBoundingClientRect().height
+                : (details.open ? answer.getBoundingClientRect().height : 0);
+
+            if (previousAnimation) {
+                previousAnimation.cancel();
+                faqAnimations.delete(details);
+            }
+
+            if (shouldOpen) details.open = true;
+
+            if (prefersReducedMotion() || typeof answer.animate !== 'function') {
+                details.open = shouldOpen;
+                answer.style.removeProperty('height');
+                answer.style.removeProperty('overflow');
+                return;
+            }
+
+            const targetHeight = shouldOpen ? answer.scrollHeight : 0;
+            answer.style.height = currentHeight + 'px';
+            answer.style.overflow = 'hidden';
+
+            const animation = answer.animate(
+                [
+                    {
+                        height: currentHeight + 'px',
+                        opacity: shouldOpen ? 0 : 1,
+                        transform: shouldOpen ? 'translateY(-5px)' : 'translateY(0)'
+                    },
+                    {
+                        height: targetHeight + 'px',
+                        opacity: shouldOpen ? 1 : 0,
+                        transform: shouldOpen ? 'translateY(0)' : 'translateY(-5px)'
+                    }
+                ],
+                {
+                    duration: 230,
+                    easing: 'cubic-bezier(.22, .61, .36, 1)',
+                    fill: 'forwards'
+                }
+            );
+            faqAnimations.set(details, animation);
+            details.dataset.animating = '1';
+
+            animation.onfinish = function () {
+                if (faqAnimations.get(details) !== animation) return;
+                details.open = shouldOpen;
+                answer.style.removeProperty('height');
+                answer.style.removeProperty('overflow');
+                delete details.dataset.animating;
+                faqAnimations.delete(details);
+            };
+            animation.oncancel = function () {
+                if (faqAnimations.get(details) === animation) {
+                    delete details.dataset.animating;
+                    faqAnimations.delete(details);
+                }
+            };
+        }
+
+        root.querySelectorAll('.vip-faq-item > summary').forEach(function (summary) {
+            summary.addEventListener('click', function (event) {
+                event.preventDefault();
+                toggleFaqItem(summary.parentElement);
+            });
+        });
 
         if (inactiveToggle && inactivePlans) {
             inactiveToggle.addEventListener('click', function () {
