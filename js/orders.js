@@ -169,11 +169,14 @@
 
                 updateMembershipCard(result.data);
                 updateOrderCards(typeof result.data.order_ref === 'string' ? result.data.order_ref : '');
-                showFeedback(
-                    pageFeedback,
-                    'وضعیت VIP با موفقیت باطل شد. اکنون می‌توانید اشتراک جدیدی تهیه کنید.',
-                    false
-                );
+                const refundedToman = Math.max(0, Number(result.data.refund_amount_toman || 0));
+                const refundedLabel = new Intl.NumberFormat('fa-IR', {
+                    maximumFractionDigits: 8
+                }).format(refundedToman);
+                const successMessage = refundedToman > 0
+                    ? 'وضعیت VIP باطل شد و ' + refundedLabel + ' تومان به کیف پول شما بازگشت داده شد. اکنون می‌توانید اشتراک جدیدی تهیه کنید.'
+                    : 'وضعیت VIP با موفقیت باطل شد؛ اعتبار قابل‌بازگشتی باقی نمانده بود. اکنون می‌توانید اشتراک جدیدی تهیه کنید.';
+                showFeedback(pageFeedback, successMessage, false);
                 closeDialog();
             } catch (error) {
                 const code = error && typeof error.message === 'string' ? error.message : 'vip_revoke_unavailable';
