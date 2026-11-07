@@ -291,6 +291,12 @@
             return new Intl.NumberFormat('fa-IR').format(price) + ' ' + (root.dataset.vipCurrency || 'تومان');
         }
 
+        function formatWalletBalance(amount) {
+            return new Intl.NumberFormat('fa-IR', {
+                maximumFractionDigits: 8
+            }).format(amount) + ' ' + (root.dataset.vipCurrency || 'تومان');
+        }
+
         function renderDurationPrices(level) {
             durationOptions.forEach(function (button) {
                 const days = Number(button.dataset.durationDays || 0);
@@ -493,7 +499,7 @@
             }
             if (walletStatus) {
                 walletStatus.textContent = walletBalanceAvailable
-                    ? 'موجودی کیف پول: ' + formatPrice(walletBalanceToman)
+                    ? 'موجودی کیف پول: ' + formatWalletBalance(walletBalanceToman)
                     : 'موجودی کیف پول فعلاً قابل بررسی نیست.';
                 if (walletSelectionValid && walletBalanceAvailable && !canWalletCheckout) {
                     walletStatus.textContent += ' · مبلغ سفارش: ' + formatPrice(payableToman) + ' · موجودی ناکافی';
@@ -895,7 +901,7 @@
             if (walletPaymentAmount) walletPaymentAmount.textContent = invoiceTotal ? invoiceTotal.textContent : '—';
             if (walletPaymentBalance) {
                 walletPaymentBalance.textContent = walletBalanceAvailable
-                    ? formatPrice(walletBalanceToman)
+                    ? formatWalletBalance(walletBalanceToman)
                     : 'قابل بررسی نیست';
             }
             if (walletPaymentStatus) {
