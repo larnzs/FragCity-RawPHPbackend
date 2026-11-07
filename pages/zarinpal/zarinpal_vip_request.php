@@ -347,7 +347,7 @@ try {
         $walletTransaction = $pdo->prepare(
             "INSERT INTO wallet_transactions
                 (steamid, amount, type, description, authority, ref_id, status)
-             VALUES (?, ?, 'vip_purchase', ?, ?, ?, 'success')"
+             VALUES (?, ?, 'withdraw', ?, ?, ?, 'success')"
         );
         $walletTransaction->execute([
             $steamId64,
