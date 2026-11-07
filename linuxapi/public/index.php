@@ -753,12 +753,38 @@ try {
                     7776000
                 );
 
+                $upgradeContext = null;
+                if (array_key_exists('upgrade', $body) && $body['upgrade'] !== null) {
+                    if (!is_array($body['upgrade'])) {
+                        throw new InvalidArgumentException('Invalid VIP upgrade context.');
+                    }
+
+                    $upgradeOrderRef = $body['upgrade']['from_order_ref'] ?? null;
+                    if (!is_string($upgradeOrderRef)
+                        || !preg_match('/^[a-f0-9]{32}$/D', $upgradeOrderRef)) {
+                        throw new InvalidArgumentException('Invalid VIP upgrade source order.');
+                    }
+
+                    $upgradeContext = [
+                        'from_order_ref' => $upgradeOrderRef,
+                        'from_level' => apiInt($body['upgrade']['from_level'] ?? null, 'upgrade.from_level', 1, 2),
+                        'from_expires' => apiInt($body['upgrade']['from_expires'] ?? null, 'upgrade.from_expires', 1, 2147483647),
+                        'duration_seconds' => apiInt(
+                            $body['upgrade']['duration_seconds'] ?? null,
+                            'upgrade.duration_seconds',
+                            604800,
+                            7776000
+                        ),
+                    ];
+                }
+
                 $grant = $vipService->grantPaidMembership(
                     $orderRef,
                     $steamId64,
                     $playerName,
                     $level,
-                    $durationSeconds
+                    $durationSeconds,
+                    $upgradeContext
                 );
                 apiRespond(200, ['success' => true, 'data' => $grant]);
             }
