@@ -309,7 +309,6 @@ try {
     $orderStatus = 'pending';
     $orderAuthority = null;
     $orderReference = null;
-    $paidAtSql = '';
 
     if ($paymentMethod === 'wallet') {
         if ($amountRial < 1 || $amountRial % 10 !== 0) {
@@ -364,7 +363,6 @@ try {
         $orderStatus = 'paid';
         $orderAuthority = $walletAuthority;
         $orderReference = 'WALLET-TX-' . $walletTransactionId;
-        $paidAtSql = ', paid_at = CURRENT_TIMESTAMP';
     }
 
     $insert = $pdo->prepare(
