@@ -319,16 +319,54 @@ try {
     );
     $expireOld->execute([$steamId64]);
 
-    $openOrder = $pdo->prepare(
-        "SELECT order_ref, status
+    // A verified/debited order is a shared lock across payment methods:
+    // never start another checkout while money is already captured but VIPCore
+    // provisioning is still pending.
+    $paidOrder = $pdo->prepare(
+        "SELECT order_ref
          FROM vip_orders
-         WHERE steamid64 = ? AND status IN ('pending', 'paid')
+         WHERE steamid64 = ? AND status = 'paid'
          ORDER BY id DESC
          LIMIT 1"
     );
+    $paidOrder->execute([$steamId64]);
+    if ($paidOrder->fetch(PDO::FETCH_ASSOC)) {
+        throw new DomainException('vip_checkout_paid_order_already_open');
+    }
+
+    // Unpaid checkout intents are isolated by payment channel. Online/ZarinPal
+    // pending orders must not block a wallet checkout, and wallet pending
+    // intents must not block an online checkout. Wallet checkouts are normally
+    // stored as paid atomically with the debit, but the channel predicate also
+    // supports any legacy wallet-pending record.
+    if ($paymentMethod === 'wallet') {
+        $openOrder = $pdo->prepare(
+            "SELECT order_ref
+             FROM vip_orders
+             WHERE steamid64 = ?
+               AND status = 'pending'
+               AND LEFT(COALESCE(authority, ''), 7) = 'WALLET_'
+             ORDER BY id DESC
+             LIMIT 1"
+        );
+    } else {
+        $openOrder = $pdo->prepare(
+            "SELECT order_ref
+             FROM vip_orders
+             WHERE steamid64 = ?
+               AND status = 'pending'
+               AND (authority IS NULL OR LEFT(authority, 7) <> 'WALLET_')
+             ORDER BY id DESC
+             LIMIT 1"
+        );
+    }
     $openOrder->execute([$steamId64]);
     if ($openOrder->fetch(PDO::FETCH_ASSOC)) {
-        throw new DomainException('vip_checkout_order_already_open');
+        throw new DomainException(
+            $paymentMethod === 'wallet'
+                ? 'vip_checkout_wallet_order_already_open'
+                : 'vip_checkout_online_order_already_open'
+        );
     }
 
     $orderStatus = 'pending';
@@ -431,7 +469,17 @@ try {
         $requiredLabel = number_format(max(0, (int)$walletAmountToman));
         $terminate('موجودی کیف پول ناکافی است. موجودی فعلی: ' . $availableLabel . ' تومان؛ مبلغ موردنیاز: ' . $requiredLabel . ' تومان.', 409);
     }
-    $terminate('یک سفارش VIP قبلی هنوز در حال پرداخت یا فعال‌سازی است. از پرداخت دوباره خودداری کنید و ابتدا وضعیت سفارش قبلی را بررسی کنید.', 409);
+    $error = $e->getMessage();
+    if ($error === 'vip_checkout_paid_order_already_open') {
+        $terminate('یک سفارش VIP پرداخت‌شده هنوز در انتظار فعال‌سازی است. مبلغ دوباره پرداخت نمی‌شود؛ ابتدا وضعیت همان سفارش را بررسی کنید.', 409);
+    }
+    if ($error === 'vip_checkout_wallet_order_already_open') {
+        $terminate('یک تلاش پرداخت با کیف پول هنوز در حال بررسی است؛ از برداشت دوباره خودداری کنید و وضعیت سفارش قبلی را بررسی کنید.', 409);
+    }
+    if ($error === 'vip_checkout_online_order_already_open') {
+        $terminate('یک پرداخت آنلاین زرین‌پال هنوز باز است. ابتدا همان پرداخت را تکمیل یا لغو کنید؛ پرداخت کیف پول مستقل است.', 409);
+    }
+    $terminate('یک سفارش VIP قبلی هنوز در حال پرداخت یا فعال‌سازی است. ابتدا وضعیت سفارش قبلی را بررسی کنید.', 409);
 } catch (Throwable $e) {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();
