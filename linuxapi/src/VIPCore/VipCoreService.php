@@ -10,6 +10,10 @@ final class VipCoreFreeTrialAlreadyClaimed extends RuntimeException
 {
 }
 
+final class VipCoreMembershipNotActive extends RuntimeException
+{
+}
+
 final class VipCoreService
 {
     public const FREE_TRIAL_GROUP = 'SILVER';
@@ -561,6 +565,173 @@ final class VipCoreService
             'group' => $group,
             'expires' => $expires,
             'duration_seconds' => $this->testDurationSeconds,
+            'server_id' => $this->serverId,
+        ];
+    }
+
+    /**
+     * Revoke the currently active membership for one authenticated Steam account.
+     * The VIPCore entitlement is deleted, while a separate immutable audit row is
+     * retained. The paid-order ledger is deliberately never deleted.
+     */
+    public function revokeMembership(string $steamId64): array
+    {
+        $accountId = self::accountIdFromSteamId64($steamId64);
+        $now = time();
+
+        $this->pdo->beginTransaction();
+        try {
+            $membershipStatement = $this->pdo->prepare(
+                'SELECT \`group\`, \`expires\`
+                 FROM \`vip_users\`
+                 WHERE \`account_id\` = :account_id AND \`sid\` = :server_id
+                 LIMIT 1 FOR UPDATE'
+            );
+            $membershipStatement->execute([
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+            ]);
+            $membership = $membershipStatement->fetch(PDO::FETCH_ASSOC);
+
+            if (!is_array($membership)) {
+                $previousStatement = $this->pdo->prepare(
+                    'SELECT vip_group, vip_level, expires, paid_order_ref, revoked_at
+                     FROM fragcity_vip_membership_revocations
+                     WHERE steamid64 = :steamid64 AND sid = :server_id
+                     ORDER BY id DESC
+                     LIMIT 1'
+                );
+                $previousStatement->execute([
+                    ':steamid64' => $steamId64,
+                    ':server_id' => $this->serverId,
+                ]);
+                $previous = $previousStatement->fetch(PDO::FETCH_ASSOC);
+
+                $this->pdo->commit();
+
+                if (is_array($previous)) {
+                    return [
+                        'revoked' => true,
+                        'already_revoked' => true,
+                        'level' => (int)($previous['vip_level'] ?? 0),
+                        'group' => (string)($previous['vip_group'] ?? ''),
+                        'expires' => (int)($previous['expires'] ?? 0),
+                        'revoked_at' => (int)($previous['revoked_at'] ?? 0),
+                        'order_ref' => is_string($previous['paid_order_ref'] ?? null)
+                            && preg_match('/^[a-f0-9]{32}$/D', $previous['paid_order_ref'])
+                            ? $previous['paid_order_ref']
+                            : null,
+                        'server_id' => $this->serverId,
+                    ];
+                }
+
+                throw new VipCoreMembershipNotActive('membership_not_active');
+            }
+
+            $group = strtoupper(trim((string)($membership['group'] ?? '')));
+            $level = self::levelForGroup($group);
+            $expires = (int)($membership['expires'] ?? 0);
+            $active = $level > 0 && ($expires === 0 || $expires > $now);
+
+            if (!$active) {
+                $this->pdo->commit();
+                throw new VipCoreMembershipNotActive('membership_not_active');
+            }
+
+            $paidOrderRef = null;
+            if ($expires > 0) {
+                $paidStatement = $this->pdo->prepare(
+                    'SELECT order_ref
+                     FROM fragcity_vip_paid_orders
+                     WHERE account_id = :account_id
+                       AND sid = :server_id
+                       AND vip_level = :vip_level
+                       AND expires = :expires
+                     ORDER BY granted_at DESC
+                     LIMIT 1 FOR UPDATE'
+                );
+                $paidStatement->execute([
+                    ':account_id' => $accountId,
+                    ':server_id' => $this->serverId,
+                    ':vip_level' => $level,
+                    ':expires' => $expires,
+                ]);
+                $paidRow = $paidStatement->fetch(PDO::FETCH_ASSOC);
+                if (is_array($paidRow)
+                    && is_string($paidRow['order_ref'] ?? null)
+                    && preg_match('/^[a-f0-9]{32}$/D', $paidRow['order_ref'])) {
+                    $paidOrderRef = $paidRow['order_ref'];
+                }
+            }
+
+            $auditInsert = $this->pdo->prepare(
+                'INSERT INTO fragcity_vip_membership_revocations
+                    (steamid64, account_id, sid, vip_group, vip_level,
+                     expires, paid_order_ref, revoked_at, revoked_by)
+                 VALUES
+                    (:steamid64, :account_id, :server_id, :vip_group, :vip_level,
+                     :expires, :paid_order_ref, :revoked_at, :revoked_by)'
+            );
+            $auditInsert->execute([
+                ':steamid64' => $steamId64,
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+                ':vip_group' => $group,
+                ':vip_level' => $level,
+                ':expires' => $expires,
+                ':paid_order_ref' => $paidOrderRef,
+                ':revoked_at' => $now,
+                ':revoked_by' => 'customer',
+            ]);
+
+            $deleteMembership = $this->pdo->prepare(
+                'DELETE FROM \`vip_users\`
+                 WHERE \`account_id\` = :account_id
+                   AND \`sid\` = :server_id
+                   AND \`group\` = :vip_group
+                   AND \`expires\` = :expires'
+            );
+            $deleteMembership->execute([
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+                ':vip_group' => $group,
+                ':expires' => $expires,
+            ]);
+
+            if ($deleteMembership->rowCount() !== 1) {
+                throw new RuntimeException('VIPCore membership delete did not affect exactly one row.');
+            }
+
+            $verify = $this->pdo->prepare(
+                'SELECT 1
+                 FROM \`vip_users\`
+                 WHERE \`account_id\` = :account_id AND \`sid\` = :server_id
+                 LIMIT 1'
+            );
+            $verify->execute([
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+            ]);
+            if ($verify->fetchColumn() !== false) {
+                throw new RuntimeException('VIPCore membership revocation read-after-write verification failed.');
+            }
+
+            $this->pdo->commit();
+        } catch (Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        return [
+            'revoked' => true,
+            'already_revoked' => false,
+            'level' => $level,
+            'group' => $group,
+            'expires' => $expires,
+            'revoked_at' => $now,
+            'order_ref' => $paidOrderRef,
             'server_id' => $this->serverId,
         ];
     }
