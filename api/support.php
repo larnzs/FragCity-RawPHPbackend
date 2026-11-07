@@ -9,6 +9,7 @@ declare(strict_types=1);
  */
 
 require_once dirname(__DIR__) . '/settings/session.php';
+require_once dirname(__DIR__) . '/settings/loader.php';
 require_once dirname(__DIR__) . '/class/PaymenterSupportApiClient.php';
 
 fragcity_start_session();
@@ -80,7 +81,49 @@ $action = is_string($payload['action'] ?? null)
     : '';
 
 try {
+    // Resolve the customer's contact details from FragCity's own database.
+    // Neither email, phone nor Paymenter user ID is accepted from the browser.
+    $indexSettings = fragcity_settings('files.index', []);
+    $databaseProfile = is_array($indexSettings)
+        ? (string) ($indexSettings['database_profile'] ?? 'main')
+        : 'main';
+    $pdo = fragcity_create_pdo($databaseProfile);
+
+    if (!$pdo instanceof PDO) {
+        throw new RuntimeException('fragcity_account_unavailable');
+    }
+
+    try {
+        $accountStatement = $pdo->prepare(
+            'SELECT email, phone, paymenter_user_id
+             FROM users
+             WHERE steamid64 = ?
+             LIMIT 1'
+        );
+        $accountStatement->execute([$steamId64]);
+        $customerAccount = $accountStatement->fetch(PDO::FETCH_ASSOC);
+    } catch (Throwable $databaseError) {
+        error_log('[FragCity] Support identity lookup failed; SQLSTATE=' . (string) $databaseError->getCode() . '.');
+        throw new RuntimeException('fragcity_account_unavailable');
+    }
+
+    $localPaymenterUserId = filter_var(
+        is_array($customerAccount) ? ($customerAccount['paymenter_user_id'] ?? null) : null,
+        FILTER_VALIDATE_INT,
+        ['options' => ['min_range' => 1]]
+    );
+
+    if (!is_array($customerAccount) || $localPaymenterUserId === false) {
+        throw new RuntimeException('paymenter_support_identity_not_synced');
+    }
+
     $client = new PaymenterSupportApiClient();
+    $client->verifyCustomerIdentity(
+        $steamId64,
+        (string) ($customerAccount['email'] ?? ''),
+        (string) ($customerAccount['phone'] ?? ''),
+        (int) $localPaymenterUserId
+    );
 
     switch ($action) {
         case 'list_tickets':
@@ -206,7 +249,10 @@ try {
         'paymenter_support_ticket_not_found',
         'paymenter_support_invoice_not_found',
         'paymenter_support_resource_not_found' => 404,
+        'paymenter_support_identity_not_synced',
+        'paymenter_support_identity_mismatch',
         'paymenter_support_ticket_closed' => 409,
+        'fragcity_account_unavailable' => 503,
         'paymenter_api_permission_denied' => 502,
         'paymenter_support_validation_failed' => 422,
         'paymenter_support_rate_limited' => 429,
@@ -220,6 +266,9 @@ try {
         'paymenter_support_ticket_not_found',
         'paymenter_support_invoice_not_found',
         'paymenter_support_resource_not_found',
+        'paymenter_support_identity_not_synced',
+        'paymenter_support_identity_mismatch',
+        'fragcity_account_unavailable',
         'paymenter_support_ticket_closed',
         'paymenter_api_permission_denied',
         'paymenter_support_validation_failed',
