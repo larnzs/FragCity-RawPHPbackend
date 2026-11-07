@@ -148,7 +148,7 @@ final class VipCoreService
         // Free Silver claims never create this paid ledger record.
         if ($active && $expires > 0) {
             $paidStatement = $this->pdo->prepare(
-                'SELECT order_ref, vip_level, duration_seconds, granted_at, expires
+                'SELECT order_ref, vip_level, duration_seconds, granted_at, expires, tier_price_rial
                  FROM fragcity_vip_paid_orders
                  WHERE account_id = :account_id
                    AND sid = :server_id
@@ -173,6 +173,9 @@ final class VipCoreService
                     'order_ref' => (string)$paidRow['order_ref'],
                     'level' => (int)$paidRow['vip_level'],
                     'duration_seconds' => (int)$paidRow['duration_seconds'],
+                    'tier_price_rial' => (int)($paidRow['tier_price_rial'] ?? 0) > 0
+                        ? (int)$paidRow['tier_price_rial']
+                        : null,
                     'granted_at' => (int)$paidRow['granted_at'],
                     'expires' => (int)$paidRow['expires'],
                 ];
@@ -504,6 +507,7 @@ final class VipCoreService
         string $playerName,
         int $level,
         int $durationSeconds,
+        int $tierPriceRial,
         ?array $upgrade = null
     ): array {
         if (!preg_match('/^[a-f0-9]{32}$/D', $orderRef)) {
@@ -512,6 +516,10 @@ final class VipCoreService
 
         if (!in_array($durationSeconds, self::PAID_DURATION_SECONDS, true)) {
             throw new InvalidArgumentException('Invalid paid VIP duration.');
+        }
+
+        if ($tierPriceRial < 1 || $tierPriceRial > 10000000000000 || $tierPriceRial % 10 !== 0) {
+            throw new InvalidArgumentException('Invalid paid VIP tier price snapshot.');
         }
 
         if ($upgrade !== null) {
@@ -562,7 +570,7 @@ final class VipCoreService
         $findOrder = function () use ($orderRef): array|false {
             $statement = $this->pdo->prepare(
                 'SELECT order_ref, steamid64, account_id, sid, vip_level,
-                        vip_group, duration_seconds, granted_at, expires
+                        vip_group, duration_seconds, tier_price_rial, granted_at, expires
                  FROM fragcity_vip_paid_orders
                  WHERE order_ref = :order_ref
                  LIMIT 1'
@@ -578,6 +586,7 @@ final class VipCoreService
             $level,
             $group,
             $durationSeconds,
+            $tierPriceRial,
             $upgrade
         ): array {
             if ((string)($row['steamid64'] ?? '') !== $steamId64
@@ -585,7 +594,9 @@ final class VipCoreService
                 || (int)($row['sid'] ?? -1) !== $this->serverId
                 || (int)($row['vip_level'] ?? 0) !== $level
                 || strtoupper(trim((string)($row['vip_group'] ?? ''))) !== $group
-                || (int)($row['duration_seconds'] ?? 0) !== $durationSeconds) {
+                || (int)($row['duration_seconds'] ?? 0) !== $durationSeconds
+                || ((int)($row['tier_price_rial'] ?? 0) > 0
+                    && (int)$row['tier_price_rial'] !== $tierPriceRial)) {
                 throw new RuntimeException('VIP paid-order reference does not match its original grant.');
             }
 
@@ -599,6 +610,9 @@ final class VipCoreService
                 'granted_at' => (int)$row['granted_at'],
                 'expires' => (int)$row['expires'],
                 'duration_seconds' => $durationSeconds,
+                'tier_price_rial' => (int)($row['tier_price_rial'] ?? 0) > 0
+                    ? (int)$row['tier_price_rial']
+                    : $tierPriceRial,
                 'upgraded' => $upgrade !== null,
                 'server_id' => $this->serverId,
             ];
@@ -709,10 +723,10 @@ final class VipCoreService
             $ledgerInsert = $this->pdo->prepare(
                 'INSERT INTO fragcity_vip_paid_orders
                     (order_ref, steamid64, account_id, sid, vip_level,
-                     vip_group, duration_seconds, granted_at, expires)
+                     vip_group, duration_seconds, tier_price_rial, granted_at, expires)
                  VALUES
                     (:order_ref, :steamid64, :account_id, :server_id, :vip_level,
-                     :vip_group, :duration_seconds, :granted_at, :expires)'
+                     :vip_group, :duration_seconds, :tier_price_rial, :granted_at, :expires)'
             );
             $ledgerInsert->execute([
                 ':order_ref' => $orderRef,
@@ -722,6 +736,7 @@ final class VipCoreService
                 ':vip_level' => $level,
                 ':vip_group' => $group,
                 ':duration_seconds' => $durationSeconds,
+                ':tier_price_rial' => $tierPriceRial,
                 ':granted_at' => $now,
                 ':expires' => $expires,
             ]);
