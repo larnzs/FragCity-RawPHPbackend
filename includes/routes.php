@@ -24,6 +24,7 @@ if (!function_exists('fragcity_route_slugs')) {
             'register' => 'register',
             'profile' => 'profile',
             'myservers' => 'my-servers',
+            'orders' => 'orders',
             'vip' => 'vip',
             'leaderboard' => 'leaderboard',
             'leaderboard_vps' => 'leaderboard',
