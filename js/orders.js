@@ -30,6 +30,7 @@
             vipcore_disabled: 'اتصال VIPCore روی سرور فعال نیست.',
             vipcore_not_configured: 'تنظیمات اتصال VIPCore کامل نیست.',
             vipcore_unavailable: 'دیتابیس VIPCore یا جدول تاریخچه ابطال در دسترس نیست.',
+            vip_refund_migration_required: 'پیش از ابطال، Migration بازپرداخت کیف پول را روی دیتابیس اصلی سایت اجرا کنید.',
             vip_revoke_unavailable: 'ابطال وضعیت VIP انجام نشد. ارتباط سرویس را بررسی کنید و دوباره تلاش کنید.'
         };
 
@@ -177,6 +178,16 @@
                     ? 'وضعیت VIP باطل شد و ' + refundedLabel + ' تومان به کیف پول شما بازگشت داده شد. اکنون می‌توانید اشتراک جدیدی تهیه کنید.'
                     : 'وضعیت VIP با موفقیت باطل شد؛ اعتبار قابل‌بازگشتی باقی نمانده بود. اکنون می‌توانید اشتراک جدیدی تهیه کنید.';
                 showFeedback(pageFeedback, successMessage, false);
+
+                const walletBalanceAfter = Number(result.data.wallet_balance_toman);
+                if (Number.isFinite(walletBalanceAfter) && walletBalanceAfter >= 0) {
+                    const walletBalanceLabel = new Intl.NumberFormat('fa-IR', {
+                        maximumFractionDigits: 8
+                    }).format(walletBalanceAfter) + ' تومان';
+                    document.querySelectorAll('[data-fc-wallet-balance]').forEach((balanceNode) => {
+                        balanceNode.textContent = walletBalanceLabel;
+                    });
+                }
                 closeDialog();
             } catch (error) {
                 const code = error && typeof error.message === 'string' ? error.message : 'vip_revoke_unavailable';
