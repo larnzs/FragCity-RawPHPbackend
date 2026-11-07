@@ -1224,6 +1224,40 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
 
 </main>
 
+<div class="vip-wallet-modal" id="vipWalletPaymentModal" hidden aria-hidden="true">
+    <div class="vip-wallet-modal-backdrop" data-wallet-modal-dismiss></div>
+    <section class="vip-wallet-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="vipWalletModalTitle" aria-describedby="vipWalletModalMessage" tabindex="-1">
+        <button type="button" class="vip-wallet-modal-close" data-wallet-modal-close aria-label="بستن پنجره">
+            <i class="fas fa-xmark" aria-hidden="true"></i>
+        </button>
+
+        <span class="vip-wallet-modal-eyebrow">FRAGCITY · WALLET CHECKOUT</span>
+        <div class="vip-wallet-modal-icon" aria-hidden="true"><i class="fas fa-wallet"></i></div>
+        <h2 id="vipWalletModalTitle" data-wallet-modal-title>تأیید پرداخت از کیف پول</h2>
+        <p id="vipWalletModalMessage" data-wallet-modal-message>با تأیید شما، مبلغ فاکتور از موجودی کیف پول کسر و عضویت VIP فعال می‌شود.</p>
+
+        <div class="vip-wallet-modal-summary">
+            <div><span>پلن انتخاب‌شده</span><strong data-wallet-modal-tier>—</strong></div>
+            <div><span>مدت اشتراک</span><strong data-wallet-modal-duration>—</strong></div>
+            <div class="is-total"><span>مبلغ قابل کسر</span><strong data-wallet-modal-amount>—</strong></div>
+            <div><span>موجودی فعلی کیف پول</span><strong data-wallet-modal-balance>—</strong></div>
+        </div>
+
+        <p class="vip-wallet-modal-status" data-wallet-modal-status role="status" aria-live="polite">
+            پس از تأیید، موجودی واقعی در دیتابیس بررسی می‌شود.
+        </p>
+
+        <div class="vip-wallet-modal-actions">
+            <button type="button" class="vip-wallet-modal-secondary" data-wallet-modal-cancel>انصراف</button>
+            <button type="button" class="vip-wallet-modal-retry" data-wallet-modal-retry hidden>تلاش مجدد برای فعال‌سازی</button>
+            <button type="button" class="vip-wallet-modal-primary" data-wallet-modal-confirm>
+                <i class="fas fa-wallet" aria-hidden="true"></i> تأیید و پرداخت
+            </button>
+        </div>
+        <small class="vip-wallet-modal-footnote"><i class="fas fa-shield-halved" aria-hidden="true"></i> مبلغ فقط یک‌بار از کیف پول کسر می‌شود.</small>
+    </section>
+</div>
+
 <div class="vip-comparison-modal" id="vipComparisonModal" hidden aria-hidden="true">
     <div class="vip-comparison-backdrop" data-vip-comparison-close></div>
     <section class="vip-comparison-dialog" id="vipComparisonDialog" role="dialog" aria-modal="true" aria-labelledby="vipComparisonTitle" aria-describedby="vipComparisonDescription" tabindex="-1">
