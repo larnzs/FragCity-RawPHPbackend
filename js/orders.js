@@ -31,6 +31,8 @@
             vipcore_not_configured: 'تنظیمات اتصال VIPCore کامل نیست.',
             vipcore_unavailable: 'دیتابیس VIPCore یا جدول تاریخچه ابطال در دسترس نیست.',
             vip_refund_migration_required: 'پیش از ابطال، Migration بازپرداخت کیف پول را روی دیتابیس اصلی سایت اجرا کنید.',
+            vip_revoke_cooldown: 'ابطال VIP فقط یک ساعت پس از پرداخت سفارش فعال می‌شود.',
+            vip_revoke_cooldown_status_unavailable: 'زمان پرداخت سفارش برای بررسی محدودیت ابطال در دسترس نیست؛ فعلاً امکان ابطال وجود ندارد.',
             vip_revoke_unavailable: 'ابطال وضعیت VIP انجام نشد. ارتباط سرویس را بررسی کنید و دوباره تلاش کنید.'
         };
 
@@ -111,7 +113,65 @@
             }
         }
 
+        const cooldownLabel = statusCard.querySelector('[data-vip-revoke-countdown]');
+        let cooldownTimer = null;
+        const renderedServerTime = Number(openButton.dataset.vipRevokeServerNow || 0);
+        const renderedClientTime = Date.now();
+
+        function formatCooldown(seconds) {
+            const safeSeconds = Math.max(0, Math.floor(seconds));
+            const hours = Math.floor(safeSeconds / 3600);
+            const minutes = Math.floor((safeSeconds % 3600) / 60);
+            const remaining = safeSeconds % 60;
+            const number = (value) => new Intl.NumberFormat('fa-IR', {
+                minimumIntegerDigits: 2,
+                maximumFractionDigits: 0
+            }).format(value);
+
+            return hours > 0
+                ? number(hours) + ':' + number(minutes) + ':' + number(remaining)
+                : number(minutes) + ':' + number(remaining);
+        }
+
+        function updateRevokeCooldown() {
+            const availableAt = Number(openButton.dataset.vipRevokeAvailableAt || 0);
+            if (!cooldownLabel || availableAt < 1) return;
+
+            // Advance the server-rendered timestamp using elapsed browser time;
+            // this avoids depending on the visitor's local wall-clock setting.
+            const estimatedServerNow = renderedServerTime > 0
+                ? renderedServerTime + Math.floor((Date.now() - renderedClientTime) / 1000)
+                : Math.floor(Date.now() / 1000);
+            const remaining = Math.max(0, availableAt - estimatedServerNow);
+
+            if (remaining > 0) {
+                openButton.disabled = true;
+                cooldownLabel.textContent = 'امکان ابطال یک ساعت پس از پرداخت فعال می‌شود · زمان باقی‌مانده: ' + formatCooldown(remaining);
+                return;
+            }
+
+            openButton.disabled = false;
+            cooldownLabel.textContent = 'محدودیت یک‌ساعته به پایان رسیده است؛ امکان ابطال فعال است.';
+            if (cooldownTimer !== null) {
+                window.clearInterval(cooldownTimer);
+                cooldownTimer = null;
+            }
+        }
+
+        if (cooldownLabel && Number(openButton.dataset.vipRevokeAvailableAt || 0) > 0) {
+            updateRevokeCooldown();
+            cooldownTimer = window.setInterval(function () {
+                if (!document.contains(statusCard)) {
+                    window.clearInterval(cooldownTimer);
+                    cooldownTimer = null;
+                    return;
+                }
+                updateRevokeCooldown();
+            }, 1000);
+        }
+
         function openDialog() {
+            if (openButton.disabled) return;
             showFeedback(modalFeedback, '', false);
             setBusy(false);
             if (typeof dialog.showModal === 'function') {
@@ -165,7 +225,10 @@
 
                 if (!response.ok || result.success !== true || result.data?.revoked !== true) {
                     const code = typeof result.error === 'string' ? result.error : 'vip_revoke_unavailable';
-                    throw new Error(code);
+                    const requestError = new Error(code);
+                    requestError.retryAfterSeconds = Number(result.retry_after_seconds || 0);
+                    requestError.availableAt = Number(result.available_at || 0);
+                    throw requestError;
                 }
 
                 updateMembershipCard(result.data);
@@ -191,9 +254,33 @@
                 closeDialog();
             } catch (error) {
                 const code = error && typeof error.message === 'string' ? error.message : 'vip_revoke_unavailable';
-                const message = code === 'invalid_response'
+                let message = code === 'invalid_response'
                     ? 'پاسخ سرور معتبر نیست؛ وضعیت VIP را دوباره بررسی کنید.'
                     : (messages[code] || messages.vip_revoke_unavailable);
+
+                if (code === 'vip_revoke_cooldown' && Number(error.retryAfterSeconds) > 0) {
+                    const retryAfter = Math.floor(Number(error.retryAfterSeconds));
+                    message += ' زمان باقی‌مانده: ' + formatCooldown(retryAfter) + '.';
+                    if (Number(error.availableAt) > 0) {
+                        openButton.dataset.vipRevokeAvailableAt = String(Math.floor(Number(error.availableAt)));
+                        if (cooldownLabel) {
+                            if (cooldownTimer === null) {
+                                cooldownTimer = window.setInterval(function () {
+                                    if (!document.contains(statusCard)) {
+                                        window.clearInterval(cooldownTimer);
+                                        cooldownTimer = null;
+                                        return;
+                                    }
+                                    updateRevokeCooldown();
+                                }, 1000);
+                            }
+                            updateRevokeCooldown();
+                        } else {
+                            openButton.disabled = true;
+                        }
+                    }
+                }
+
                 showFeedback(modalFeedback, message, true);
                 setBusy(false);
             }
