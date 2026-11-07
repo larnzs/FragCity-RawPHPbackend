@@ -122,7 +122,7 @@ jobs:
           grep -Fq 'hash_equals($websiteEmail, $paymenterEmail)' "$client"
           grep -Fq 'hash_equals($websitePhone, $paymenterPhone)' "$client"
           grep -Fq '(int) $paymenterUserId !== $websitePaymenterUserId' "$client"
-          grep -Fq 'SELECT email, phone, paymenter_user_id' "$endpoint"
+          grep -Fq 'SELECT username, email, phone, paymenter_user_id' "$endpoint"
           grep -Fq '$client->verifyCustomerIdentity(' "$endpoint"
           grep -Fq 'paymenter_support_identity_mismatch' "$endpoint"
       - name: Verify ticket form contract and CAPTCHA protections
