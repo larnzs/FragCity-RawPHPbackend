@@ -143,5 +143,16 @@ jobs:
           grep -Fq 'setPanelVisibility' js/support.js
           grep -Fq 'is-closing' js/support.js
           grep -Fq '.is-exiting' css/support.css
+      - name: Verify two-column support dashboard layout
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'support-dashboard-layout' pages/support.php
+          grep -Fq 'grid-template-columns: minmax(0, 7fr) minmax(0, 3fr)' css/support.css
+          grep -Fq '.support-dashboard-layout .support-create-card' css/support.css
+          grep -Fq '.support-dashboard-layout #supportListCard' css/support.css
+          grep -Fq '.support-dashboard-layout > .support-faq' css/support.css
+          grep -Fq 'display: contents' css/support.css
+          grep -Fq 'setPanelVisibility(listCard, true)' js/support.js
       - name: Check support JavaScript
         run: node --check js/support.js
