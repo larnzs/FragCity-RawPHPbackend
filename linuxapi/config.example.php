@@ -108,8 +108,9 @@ return [
     | Table: vip_users
     |
     | Uses the existing plugins MariaDB account.
-    | Required operations: SELECT, INSERT and UPDATE on vip_users.
-    | Requires SELECT and INSERT on fragcity_vip_free_trial_claims.
+    | Required operations: SELECT, INSERT, UPDATE and DELETE on vip_users.
+    | Requires SELECT and INSERT on fragcity_vip_membership_revocations and
+    | fragcity_vip_free_trial_claims.
     | Requires SELECT and INSERT on fragcity_vip_paid_orders for paid grants
     | and to verify the current paid membership before upgrade pricing.
     |
