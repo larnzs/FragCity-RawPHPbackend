@@ -92,7 +92,13 @@ jobs:
         run: |
           set -euo pipefail
           client="class/PaymenterSupportApiClient.php"
-          grep -Fq "'include' => 'user'" "$client"
+          if grep -Fq "'include' => 'user'" "$client" || grep -Fq "'include' => 'messages,user'" "$client"; then
+            echo "Ticket reads must not require the unrelated View Users permission"
+            exit 1
+          fi
+          grep -Fq "'include' => 'messages'" "$client"
+          grep -Fq "\$attributes['user_id']" "$client"
+          grep -Fq "'ticket_message_includes' => true" "$client"
           test "$(grep -Fc 'resourceOwnerUserId($resource) !== $userId' "$client")" -ge 3
           grep -Fq '? $matchedUserId !== $userId' "$client"
           grep -Fq 'private function resourceOwnerUserId' "$client"
