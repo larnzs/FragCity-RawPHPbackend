@@ -249,7 +249,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
             <span class="fc-orders__section-kicker">VIP MEMBERSHIP CONTROL</span>
             <h2 id="fcVipRevokeTitle">ابطال وضعیت VIP</h2>
             <p id="fcVipRevokeDescription">آیا مطمئنی می‌خوای سطح فعلی VIP رو باطل کنی؟</p>
-            <p class="fc-orders__revoke-warning">با تأیید، VIP فعلی و هر سفارش VIP پرداخت‌شده‌ای که هنوز فعال نشده از صف فعال‌سازی خارج می‌شود. مبلغ پرداخت‌شده به‌صورت خودکار بازگشت داده نمی‌شود.</p>
+            <p class="fc-orders__revoke-warning">با تأیید، VIP فعلی باطل می‌شود. مبلغ مربوط به ثانیه‌های استفاده‌نشده، با محاسبه دقیق زمان و با احتساب پرداخت‌های ارتقا، به کیف پول FragCity شما برمی‌گردد؛ سفارش‌های پرداخت‌شده‌ای که هنوز فعال نشده‌اند نیز به‌طور کامل اعتبار می‌گیرند.</p>
             <div class="fc-orders__revoke-actions">
                 <button type="button" class="fc-orders__revoke-cancel" data-vip-revoke-cancel>انصراف</button>
                 <button type="button" class="fc-orders__revoke-confirm" data-vip-revoke-confirm>
