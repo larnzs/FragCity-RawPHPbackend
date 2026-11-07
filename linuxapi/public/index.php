@@ -651,7 +651,7 @@ try {
         }
     }
     if ($isVipCoreRequest) {
-        if (!in_array($action, ['ping_db', 'get_status', 'get_free_trial_status', 'claim_free_silver_trial', 'grant_test_vip'], true)) {
+        if (!in_array($action, ['ping_db', 'get_status', 'get_free_trial_status', 'claim_free_silver_trial', 'grant_paid_membership', 'grant_test_vip'], true)) {
             apiRespond(400, ['success' => false, 'error' => 'invalid_action']);
         }
 
@@ -734,6 +734,33 @@ try {
                     'success' => true,
                     'data' => $grant,
                 ]);
+            }
+
+            if ($action === 'grant_paid_membership') {
+                $steamId64 = $body['steamid64'] ?? null;
+                $playerName = $body['player_name'] ?? null;
+                $orderRef = $body['order_ref'] ?? null;
+                if (!is_string($steamId64) || !is_string($playerName)
+                    || !is_string($orderRef)) {
+                    throw new InvalidArgumentException('Invalid paid VIP grant identity.');
+                }
+
+                $level = apiInt($body['level'] ?? null, 'level', 1, 3);
+                $durationSeconds = apiInt(
+                    $body['duration_seconds'] ?? null,
+                    'duration_seconds',
+                    604800,
+                    7776000
+                );
+
+                $grant = $vipService->grantPaidMembership(
+                    $orderRef,
+                    $steamId64,
+                    $playerName,
+                    $level,
+                    $durationSeconds
+                );
+                apiRespond(200, ['success' => true, 'data' => $grant]);
             }
 
             if (empty($testConfig['enabled'])) {
