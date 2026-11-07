@@ -582,9 +582,9 @@ final class VipCoreService
         $this->pdo->beginTransaction();
         try {
             $membershipStatement = $this->pdo->prepare(
-                'SELECT \`group\`, \`expires\`
-                 FROM \`vip_users\`
-                 WHERE \`account_id\` = :account_id AND \`sid\` = :server_id
+                'SELECT `group`, `expires`
+                 FROM `vip_users`
+                 WHERE `account_id` = :account_id AND `sid` = :server_id
                  LIMIT 1 FOR UPDATE'
             );
             $membershipStatement->execute([
@@ -685,11 +685,11 @@ final class VipCoreService
             ]);
 
             $deleteMembership = $this->pdo->prepare(
-                'DELETE FROM \`vip_users\`
-                 WHERE \`account_id\` = :account_id
-                   AND \`sid\` = :server_id
-                   AND \`group\` = :vip_group
-                   AND \`expires\` = :expires'
+                'DELETE FROM `vip_users`
+                 WHERE `account_id` = :account_id
+                   AND `sid` = :server_id
+                   AND `group` = :vip_group
+                   AND `expires` = :expires'
             );
             $deleteMembership->execute([
                 ':account_id' => $accountId,
@@ -704,8 +704,8 @@ final class VipCoreService
 
             $verify = $this->pdo->prepare(
                 'SELECT 1
-                 FROM \`vip_users\`
-                 WHERE \`account_id\` = :account_id AND \`sid\` = :server_id
+                 FROM `vip_users`
+                 WHERE `account_id` = :account_id AND `sid` = :server_id
                  LIMIT 1'
             );
             $verify->execute([
