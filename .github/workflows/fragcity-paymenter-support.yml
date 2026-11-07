@@ -154,14 +154,20 @@ jobs:
           grep -Fq '.support-dashboard-layout > .support-faq' css/support.css
           grep -Fq 'display: contents' css/support.css
           grep -Fq 'setPanelVisibility(listCard, true)' js/support.js
-      - name: Verify support page content frame matches VIP and server store
+      - name: Verify support page frame matches VIP page
         shell: bash
         run: |
           set -euo pipefail
-          grep -Fq 'padding-inline: clamp(14px, 2.2vw, 34px);' css/support.css
-          grep -Fq 'width: min(100%, 1440px);' css/support.css
-          grep -Fq 'max-width: 1440px;' css/support.css
+          grep -Fq 'padding-left: clamp(18px, 4vw, 64px);' css/support.css
+          grep -Fq 'padding-right: clamp(18px, 4vw, 64px);' css/support.css
+          grep -Fq '.support-page > .support-dashboard-layout' css/support.css
+          grep -Fq 'width: 100%;' css/support.css
+          grep -Fq 'max-width: none;' css/support.css
           grep -Fq 'grid-template-columns: minmax(0, 7fr) minmax(0, 3fr)' css/support.css
           grep -Fq 'grid-template-columns: minmax(0, 1fr);' css/support.css
+          if sed -n '/Support dashboard: match VIP page frame exactly/,$p' css/support.css | grep -Fq 'max-width: 1440px;'; then
+            echo "Support page must not impose a narrower 1440px cap than VIP."
+            exit 1
+          fi
       - name: Check support JavaScript
         run: node --check js/support.js
