@@ -248,7 +248,7 @@ try {
         if (in_array($lockedStatus, ['pending', 'expired'], true)) {
             $paid = $pdo->prepare(
                 "UPDATE vip_orders
-                 SET status = 'paid', ref_id = ?, paid_at = UTC_TIMESTAMP(), last_error = NULL
+                 SET status = 'paid', ref_id = ?, paid_at = CURRENT_TIMESTAMP, last_error = NULL
                  WHERE id = ? AND status IN ('pending', 'expired')"
             );
             $paid->execute([$refId, (int)$order['id']]);
@@ -280,7 +280,7 @@ try {
         $markProvisioned = $pdo->prepare(
             "UPDATE vip_orders
              SET status = 'provisioned',
-                 provisioned_at = UTC_TIMESTAMP(),
+                 provisioned_at = CURRENT_TIMESTAMP,
                  last_error = NULL
              WHERE order_ref = ? AND status = 'paid'"
         );
