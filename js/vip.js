@@ -54,87 +54,6 @@
 
         if (!plans.length) return;
 
-        if (invoice && invoice.parentElement !== document.body) {
-            document.body.appendChild(invoice);
-        }
-
-        function syncInvoiceFooterDock() {
-            // Resolve the current page's invoice every time; AJAX navigation replaces it.
-            const currentInvoice = document.querySelector('body > [data-vip-invoice]');
-            if (!currentInvoice || !currentInvoice.isConnected) return;
-
-            const footer = document.getElementById('siteFooter');
-            if (!footer) {
-                currentInvoice.classList.remove('is-footer-docked');
-                currentInvoice.style.removeProperty('--vip-invoice-footer-top');
-                return;
-            }
-
-            const invoiceRect = currentInvoice.getBoundingClientRect();
-            const footerRect = footer.getBoundingClientRect();
-            const invoiceHeight = invoiceRect.height;
-            if (!invoiceHeight) return;
-
-            let fixedBottom = Number(currentInvoice.dataset.vipFixedBottomGap);
-            if (!Number.isFinite(fixedBottom)) {
-                fixedBottom = Number.parseFloat(window.getComputedStyle(currentInvoice).bottom);
-                if (!Number.isFinite(fixedBottom)) fixedBottom = 12;
-                currentInvoice.dataset.vipFixedBottomGap = String(fixedBottom);
-            }
-
-            // Dock the fixed bar to the footer's top edge as soon as the two would overlap.
-            const fixedTop = window.innerHeight - invoiceHeight - fixedBottom;
-            if (footerRect.top <= fixedTop) {
-                const dockTop = footerRect.top - invoiceHeight - fixedBottom;
-                currentInvoice.style.setProperty('--vip-invoice-footer-top', dockTop + 'px');
-                currentInvoice.classList.add('is-footer-docked');
-            } else {
-                currentInvoice.classList.remove('is-footer-docked');
-                currentInvoice.style.removeProperty('--vip-invoice-footer-top');
-            }
-        }
-
-        function bindInvoiceFooterDocking() {
-            if (window.fragCityVipInvoiceFooterDockBound) {
-                if (typeof window.fragCitySyncVipInvoiceFooterDock === 'function') {
-                    window.fragCitySyncVipInvoiceFooterDock();
-                }
-                return;
-            }
-
-            window.fragCityVipInvoiceFooterDockBound = true;
-            let framePending = false;
-            const scheduleSync = function () {
-                if (framePending) return;
-                framePending = true;
-                window.requestAnimationFrame(function () {
-                    framePending = false;
-                    const currentInvoice = document.querySelector('body > [data-vip-invoice]');
-                    if (!currentInvoice || !currentInvoice.isConnected) return;
-                    syncInvoiceFooterDock();
-                });
-            };
-
-            window.fragCitySyncVipInvoiceFooterDock = scheduleSync;
-            window.addEventListener('scroll', scheduleSync, { passive: true });
-            window.addEventListener('resize', scheduleSync, { passive: true });
-            window.addEventListener('load', scheduleSync);
-            window.addEventListener('content-loaded', scheduleSync);
-
-            if (typeof ResizeObserver === 'function') {
-                const pageContent = document.getElementById('mainContent');
-                if (pageContent) {
-                    const pageResizeObserver = new ResizeObserver(scheduleSync);
-                    pageResizeObserver.observe(pageContent);
-                    window.fragCityVipInvoiceResizeObserver = pageResizeObserver;
-                }
-            }
-
-            scheduleSync();
-        }
-
-        bindInvoiceFooterDocking();
-
         if (comparisonModal && comparisonDialog) {
             if (comparisonModal.parentElement !== document.body) {
                 document.body.appendChild(comparisonModal);
@@ -692,7 +611,8 @@
         });
 
         const initialCurrentPlan = plans.find(function (plan) {
-            return plan.dataset.vipCurrent === '1';
+            return plan.dataset.vipCurrent === '1'
+                && (plan.dataset.vipAvailable === '1' || root.dataset.vipTestAdmin === '1');
         });
         if (initialCurrentPlan) {
             selectPlan(initialCurrentPlan, false);
@@ -713,9 +633,7 @@
 
         if (previousRoot !== nextRoot) {
             const staleModal = document.body.querySelector('#vipComparisonModal');
-            const staleInvoice = document.body.querySelector('[data-vip-invoice]');
             if (staleModal) staleModal.remove();
-            if (staleInvoice) staleInvoice.remove();
             document.body.classList.remove('vip-comparison-open');
             document.body.style.overflow = '';
         }
