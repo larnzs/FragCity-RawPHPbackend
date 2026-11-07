@@ -167,6 +167,7 @@ button.vip-checkout-wallet {
 .vip-plan-current,.vip-plan-popular,.vip-plan-locked,.vip-plan-public{display:inline-flex;align-items:center;gap:5px;padding:4px 7px;border:1px solid rgba(255,255,255,.08);border-radius:6px;background:rgba(255,255,255,.035);font:800 .54rem/1.2 var(--fc-font-sans,sans-serif);letter-spacing:.04em}
 .vip-plan-current{border-color:rgba(74,222,128,.2);background:rgba(34,197,94,.08);color:#9ae6b4}
 .vip-plan-locked{border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:#9a9a9a}
+.vip-plan-dummy{border-color:rgba(205,127,50,.28);background:rgba(205,127,50,.09);color:#DDA16B}
 .vip-plan-public{border-color:rgba(249,115,22,.2);background:rgba(249,115,22,.07);color:#ffb16f}
 .vip-plan-title-row{gap:12px}
 .vip-tier-emblem{width:48px;height:48px;flex-basis:48px;border-radius:14px;font-size:1.2rem}
@@ -1047,12 +1048,11 @@ button.vip-checkout-wallet {
 }
 
 
-/* Customer catalog contains Silver and Gold; Bronze remains visible only to test admins. */
+/* The public catalogue also displays Bronze as an internal-only dummy tier. */
 .vip-public-plans-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    width: min(100%, 980px);
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
+    margin: 0;
 }
 @media (max-width: 700px) {
     .vip-public-plans-grid {
@@ -2033,18 +2033,24 @@ button.vip-checkout-wallet {
 }
 
 
-/* VIP storefront checkout layout: catalog on the right, invoice on the left (RTL). */
+/* VIP storefront layout: invoice on the left, catalogue on the right. */
 .vip-store-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(292px, 350px);
+    grid-template-columns: minmax(315px, 370px) minmax(0, 1fr);
     align-items: start;
-    gap: 22px;
-    width: min(100%, 100%);
-    margin: 0 auto;
-    direction: rtl;
+    gap: 20px;
+    width: 100%;
+    margin: 0;
+    direction: ltr;
 }
 .vip-store-main-column {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
     min-width: 0;
+    gap: 18px;
+    direction: rtl;
 }
 .vip-store-main-column .vip-catalog-heading,
 .vip-store-main-column .vip-plans-grid,
@@ -2060,8 +2066,11 @@ button.vip-checkout-wallet {
 }
 .vip-invoice-panel {
     --vip-invoice-accent: #F97316;
+    grid-column: 1;
+    grid-row: 1;
+    direction: rtl;
     position: sticky;
-    top: calc(var(--fc-header-overlap-height, 72px) + 22px);
+    top: calc(var(--fc-header-overlap-height, 72px) + 18px);
     min-width: 0;
     padding: 21px;
     border: 1px solid color-mix(in srgb, var(--vip-invoice-accent), transparent 68%);
@@ -2657,250 +2666,328 @@ body.vip-comparison-open {
 }
 
 
-/* Slim, wide fixed invoice bar with its live status kept on the product line. */
-#vipStorefront {
-    padding-bottom: max(132px, calc(env(safe-area-inset-bottom, 0px) + 112px)) !important;
-}
+/* Sidebar invoice aligned with the server configurator. */
 .vip-invoice-panel.vip-checkout-bar {
-    position: fixed !important;
-    inset: auto auto calc(env(safe-area-inset-bottom, 0px) + 12px) 50% !important;
-    z-index: 10020 !important;
-    display: grid !important;
-    grid-template-columns: minmax(210px, 1.05fr) minmax(300px, 1.2fr) minmax(270px, auto);
-    align-items: center;
-    gap: 18px;
-    width: min(1540px, calc(100vw - 36px)) !important;
-    max-width: 1540px !important;
+    position: sticky !important;
+    top: calc(var(--fc-header-overlap-height, 72px) + 18px) !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    inset: auto !important;
+    z-index: 20;
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    width: 100% !important;
+    max-width: none !important;
     min-width: 0;
-    min-height: 68px;
+    min-height: 0;
     margin: 0 !important;
-    padding: 7px 17px;
-    border: 1px solid rgba(255, 179, 71, .23);
-    border-radius: 13px;
+    padding: 22px;
+    border: 1px solid rgba(255, 179, 71, .2);
+    border-radius: 18px;
     background:
-        radial-gradient(ellipse at 100% 0, rgba(249, 115, 22, .105), transparent 42%),
-        rgba(13, 13, 13, .76) !important;
-    box-shadow: 0 13px 34px rgba(0, 0, 0, .4), inset 0 1px rgba(255, 255, 255, .06);
-    -webkit-backdrop-filter: blur(22px) saturate(135%) !important;
-    backdrop-filter: blur(22px) saturate(135%) !important;
-    transform: translateX(-50%);
+        radial-gradient(ellipse at 100% 0, rgba(255, 179, 71, .095), transparent 45%),
+        linear-gradient(155deg, #1C1A18 0%, #141313 48%, #101012 100%) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .34), inset 0 1px rgba(255, 255, 255, .045);
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    transform: none !important;
 }
 .vip-invoice-panel.vip-checkout-bar::before {
-    position: absolute;
-    inset: 0 22px auto;
-    height: 2px;
-    border-radius: 0 0 4px 4px;
-    background: linear-gradient(90deg, transparent, #f97316 28%, #ffb347 72%, transparent);
-    content: "";
-    pointer-events: none;
+    inset: 0 20px auto;
+    background: linear-gradient(90deg, transparent, #F97316 28%, #FFB347 72%, transparent);
+}
+.vip-invoice-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+.vip-invoice-topline .vip-store-eyebrow {
+    margin: 0;
+    color: #EBA363;
+    font-size: .56rem;
+}
+.vip-invoice-icon {
+    display: grid;
+    flex: 0 0 38px;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    border: 1px solid rgba(255, 179, 71, .2);
+    border-radius: 11px;
+    background: rgba(249, 115, 22, .09);
+    color: #FFB347;
+}
+.vip-invoice-panel h2 {
+    margin: 0;
+    color: #F8F8F8;
+    font-size: 1.18rem;
+    font-weight: 950;
+    line-height: 1.55;
+}
+.vip-invoice-subtitle {
+    margin: 5px 0 17px;
+    color: #929298;
+    font-size: .66rem;
+    line-height: 1.9;
 }
 .vip-invoice-panel .vip-invoice-product {
     display: flex;
     min-width: 0;
     flex-direction: column;
-    gap: 1px;
-    padding: 0 4px;
-    border: 0;
-    background: transparent;
+    gap: 5px;
+    padding: 14px;
+    border: 1px solid rgba(255, 179, 71, .16);
+    border-radius: 12px;
+    background:
+        radial-gradient(ellipse at 100% 0, rgba(255, 179, 71, .075), transparent 62%),
+        rgba(0, 0, 0, .16);
 }
-.vip-invoice-panel .vip-invoice-product .vip-store-eyebrow {
-    margin: 0;
-    color: #e99a5e;
-    font-size: .49rem;
-    line-height: 1.35;
+.vip-invoice-panel .vip-invoice-product > span {
+    color: #9B9389;
+    font-size: .6rem;
 }
 .vip-invoice-panel .vip-invoice-product > strong {
-    overflow: hidden;
-    color: #fff;
-    font-size: .82rem;
+    color: #FFF0D8;
+    font-size: .88rem;
     font-weight: 950;
-    line-height: 1.45;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
 }
 .vip-invoice-panel .vip-invoice-product > small {
-    overflow: hidden;
-    color: #858585;
-    font-size: .55rem;
-    line-height: 1.35;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    color: #96918A;
+    font-size: .62rem;
 }
-.vip-invoice-panel .vip-invoice-product .vip-invoice-status {
-    display: block;
-    overflow: hidden;
-    max-width: 100%;
+.vip-invoice-panel .vip-invoice-status {
     min-height: 0;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: #898989;
-    font-size: .52rem;
-    line-height: 1.35;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    margin: 13px 0 2px;
+    padding: 11px 12px;
+    border: 1px solid rgba(255, 255, 255, .055);
+    border-radius: 10px;
+    background: rgba(0, 0, 0, .17);
+    color: #A5A5AA;
+    font-size: .64rem;
+    line-height: 1.9;
 }
 .vip-invoice-panel .vip-invoice-lines {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    align-items: center;
-    gap: 10px;
-    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 12px 0 0;
 }
 .vip-invoice-panel .vip-invoice-line {
     display: flex;
-    min-width: 0;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 2px;
-    padding: 2px 10px;
-    border: 0;
-    border-right: 1px solid rgba(255, 255, 255, .08);
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 11px 2px;
+    border-bottom: 1px solid rgba(255, 255, 255, .055);
 }
-.vip-invoice-panel .vip-invoice-line > span,
-.vip-invoice-panel .vip-invoice-total > span {
-    color: #858585;
-    font-size: .55rem;
-    line-height: 1.35;
+.vip-invoice-panel .vip-invoice-line > span {
+    color: #929298;
+    font-size: .66rem;
 }
 .vip-invoice-panel .vip-invoice-line > strong {
-    overflow: hidden;
-    max-width: 100%;
-    color: #e6e1da;
-    font-size: .68rem;
+    max-width: 65%;
+    color: #E6E1DA;
+    font-size: .67rem;
     font-weight: 850;
-    line-height: 1.45;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    text-align: left;
+    overflow-wrap: anywhere;
 }
 .vip-invoice-panel .vip-invoice-total {
     display: flex;
-    min-width: 0;
     flex-direction: column;
     align-items: flex-start;
-    justify-content: center;
-    gap: 2px;
-    margin: 0;
-    padding: 2px 10px;
-    border: 0;
-    border-right: 1px solid rgba(255, 255, 255, .08);
-    border-radius: 0;
-    background: transparent;
+    gap: 5px;
+    margin: 14px 0 0;
+    padding: 14px 15px;
+    border: 1px solid rgba(255, 179, 71, .19);
+    border-radius: 12px;
+    background:
+        radial-gradient(ellipse at 100% 0, rgba(249, 115, 22, .09), transparent 60%),
+        rgba(255, 179, 71, .035);
+}
+.vip-invoice-panel .vip-invoice-total > span {
+    color: #A9A29A;
+    font-size: .66rem;
 }
 .vip-invoice-panel .vip-invoice-total > strong {
-    color: #ffd08f;
-    font-size: .82rem;
+    color: #FFD08D;
+    font-size: 1.16rem;
     font-weight: 950;
-    line-height: 1.4;
-    white-space: nowrap;
+    line-height: 1.5;
+    text-align: right;
 }
 .vip-invoice-actions {
     display: flex;
-    min-width: 0;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
+    flex-direction: column;
+    gap: 9px;
+    margin-top: 15px;
 }
 .vip-invoice-panel .vip-invoice-checkout,
 .vip-invoice-panel .vip-invoice-wallet {
-    width: auto;
-    min-width: 0;
-    min-height: 36px;
+    width: 100%;
+    min-height: 44px;
     margin: 0;
-    padding: 7px 11px;
-    border-radius: 8px;
-    font-size: .62rem;
-    white-space: nowrap;
+    padding: 10px 12px;
+    border-radius: 9px;
+    font-size: .68rem;
 }
 .vip-invoice-panel .vip-invoice-checkout {
-    flex: 1 1 auto;
+    justify-content: center;
 }
-.vip-invoice-panel .vip-invoice-wallet {
-    flex: 0 0 auto;
+.vip-invoice-checkout-note {
+    display: block;
+    margin: 11px 2px 0;
+    color: #77777E;
+    font-size: .59rem;
+    line-height: 1.85;
 }
-@media (max-width: 1050px) {
-    .vip-invoice-panel.vip-checkout-bar {
-        grid-template-columns: minmax(170px, .9fr) minmax(250px, 1.1fr) minmax(240px, auto);
-        gap: 10px;
-        width: calc(100vw - 24px) !important;
-        padding-inline: 12px;
+
+/* FAQ accordion */
+.vip-faq-section {
+    width: 100%;
+    margin-top: 28px;
+}
+.vip-faq-heading {
+    margin-bottom: 16px;
+}
+.vip-faq-heading .vip-store-eyebrow {
+    margin-bottom: 5px;
+}
+.vip-faq-heading h2 {
+    margin: 0;
+    color: #F5F5F5;
+    font-size: 1.35rem;
+    font-weight: 950;
+}
+.vip-faq-heading p {
+    margin: 5px 0 0;
+    color: #929298;
+    font-size: .7rem;
+    line-height: 1.8;
+}
+.vip-faq-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 12px;
+}
+.vip-faq-item {
+    min-width: 0;
+    border: 1px solid rgba(255, 255, 255, .075);
+    border-radius: 13px;
+    background: linear-gradient(145deg, rgba(25, 25, 27, .98), rgba(17, 17, 19, .985) 72%);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .16);
+    transition: border-color .18s ease, background-color .18s ease;
+}
+.vip-faq-item[open] {
+    border-color: rgba(255, 179, 71, .24);
+    background: radial-gradient(ellipse at 100% 0, rgba(255, 179, 71, .045), transparent 44%), #171719;
+}
+.vip-faq-item > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    min-height: 62px;
+    padding: 14px 16px;
+    color: #EDEDEF;
+    font-size: .74rem;
+    font-weight: 900;
+    line-height: 1.8;
+    cursor: pointer;
+    list-style: none;
+}
+.vip-faq-item > summary::-webkit-details-marker {
+    display: none;
+}
+.vip-faq-item > summary::after {
+    display: grid;
+    flex: 0 0 27px;
+    width: 27px;
+    height: 27px;
+    place-items: center;
+    border: 1px solid rgba(255, 179, 71, .18);
+    border-radius: 8px;
+    background: rgba(255, 179, 71, .06);
+    color: #FFB347;
+    content: "+";
+    font-size: 1rem;
+    line-height: 1;
+    transition: transform .18s ease, background .18s ease;
+}
+.vip-faq-item[open] > summary::after {
+    background: rgba(255, 179, 71, .12);
+    content: "−";
+    transform: rotate(180deg);
+}
+.vip-faq-answer {
+    padding: 0 16px 16px;
+    color: #A5A5AA;
+    font-size: .68rem;
+    line-height: 2;
+}
+.vip-faq-answer p {
+    margin: 0;
+}
+.vip-faq-answer code {
+    display: inline-block;
+    padding: 2px 7px;
+    border: 1px solid rgba(255, 179, 71, .17);
+    border-radius: 6px;
+    background: rgba(255, 179, 71, .07);
+    color: #FFD08D;
+    font: 750 .68rem var(--fc-font-mono, monospace);
+    direction: ltr;
+}
+.vip-faq-item:focus-within {
+    border-color: rgba(255, 179, 71, .42);
+}
+@media (max-width: 960px) {
+    .vip-store-layout {
+        grid-template-columns: minmax(0, 1fr);
+        direction: rtl;
     }
-    .vip-invoice-panel .vip-invoice-checkout,
-    .vip-invoice-panel .vip-invoice-wallet {
-        padding-inline: 8px;
-        font-size: .59rem;
+    .vip-store-main-column {
+        grid-column: 1;
+        grid-row: 1;
+    }
+    .vip-invoice-panel {
+        grid-column: 1;
+        grid-row: 2;
+        position: relative !important;
+        top: auto !important;
+        order: 2;
     }
 }
 @media (max-width: 700px) {
-    #vipStorefront {
-        padding-bottom: max(190px, calc(env(safe-area-inset-bottom, 0px) + 170px)) !important;
-    }
     .vip-invoice-panel.vip-checkout-bar {
-        bottom: calc(env(safe-area-inset-bottom, 0px) + 7px) !important;
-        grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
-        gap: 7px 9px;
-        width: calc(100vw - 14px) !important;
-        max-height: min(36dvh, 220px);
-        overflow-y: auto;
-        padding: 8px 10px;
-        border-radius: 12px;
+        padding: 17px;
+        border-radius: 15px;
     }
-    .vip-invoice-panel .vip-invoice-product {
-        grid-column: 1;
+    .vip-faq-section {
+        margin-top: 22px;
     }
-    .vip-invoice-panel .vip-invoice-product > strong {
-        font-size: .76rem;
+    .vip-faq-list {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 9px;
     }
-    .vip-invoice-panel .vip-invoice-product .vip-invoice-status {
-        display: -webkit-box;
-        overflow: hidden;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2;
-        white-space: normal;
-        line-height: 1.5;
+    .vip-faq-item > summary {
+        min-height: 56px;
+        padding: 12px 13px;
+        font-size: .69rem;
     }
-    .vip-invoice-panel .vip-invoice-lines {
-        grid-column: 2;
-        grid-template-columns: 1fr;
-        gap: 2px;
-    }
-    .vip-invoice-panel .vip-invoice-line,
-    .vip-invoice-panel .vip-invoice-total {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        gap: 7px;
-        padding: 1px 3px;
-        border: 0;
-    }
-    .vip-invoice-panel .vip-invoice-line > strong {
-        font-size: .62rem;
-    }
-    .vip-invoice-panel .vip-invoice-total > strong {
-        font-size: .74rem;
-    }
-    .vip-invoice-actions {
-        grid-column: 1 / -1;
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        gap: 7px;
-    }
-    .vip-invoice-panel .vip-invoice-checkout,
-    .vip-invoice-panel .vip-invoice-wallet {
-        width: 100%;
-        min-height: 36px;
-        padding: 7px 8px;
-        font-size: .59rem;
+    .vip-faq-answer {
+        padding: 0 13px 13px;
+        font-size: .65rem;
     }
 }
-@media (prefers-reduced-motion: reduce) {
-    .vip-invoice-panel.vip-checkout-bar {
-        transition: none !important;
-    }
-}
-
 /* Explicit exit motion for the six-tier comparison dialog. */
 .vip-comparison-backdrop {
     animation: vip-comparison-backdrop-enter .22s ease both;
@@ -3230,13 +3317,6 @@ body.vip-comparison-open {
     .vip-invoice-panel .vip-invoice-total > strong {
         font-size: .8rem;
     }
-}
-
-
-/* Keep the fixed invoice docked above the shared site footer. */
-.vip-invoice-panel.vip-checkout-bar.is-footer-docked {
-    top: var(--vip-invoice-footer-top, auto) !important;
-    bottom: auto !important;
 }
 
 
