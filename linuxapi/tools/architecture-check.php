@@ -273,7 +273,7 @@ $check(
 
 $check(
     'Customer VIP revocation uses authenticated CSRF, signed VIPCore deletion and an immutable audit ledger',
-    str_contains($vipRevokeEndpoint, "($_SESSION['steamid']")
+    str_contains($vipRevokeEndpoint, '$_SESSION[\\'steamid\\']')
         && str_contains($vipRevokeEndpoint, 'X_FRAGCITY_CSRF')
         && str_contains($vipRevokeEndpoint, "session_write_close()")
         && str_contains($vipRevokeEndpoint, "status = 'revoked'")
