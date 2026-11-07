@@ -367,18 +367,19 @@ try {
             throw new DomainException('vip_wallet_insufficient');
         }
 
-        $walletTransactionRef = 'VIP-' . $orderRef;
+        // wallet_transactions.ref_id is a legacy numeric/gateway reference.
+        // The VIP order stores its own wallet link as WALLET-TX-{transaction id}
+        // in vip_orders.ref_id after this insert; do not put text in the legacy column.
         $walletTransaction = $pdo->prepare(
             "INSERT INTO wallet_transactions
-                (steamid, amount, type, description, authority, ref_id, status)
-             VALUES (?, ?, 'withdraw', ?, ?, ?, 'success')"
+                (steamid, amount, type, description, authority, status)
+             VALUES (?, ?, 'withdraw', ?, ?, 'success')"
         );
         $walletTransaction->execute([
             $steamId64,
             $walletAmountToman,
             'خرید اشتراک VIP ' . $level . ' · ' . $days . ' روز',
             $walletAuthority,
-            $walletTransactionRef,
         ]);
         $walletTransactionId = (int)$pdo->lastInsertId();
         if ($walletTransactionId < 1) {
