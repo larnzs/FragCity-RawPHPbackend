@@ -314,8 +314,7 @@
 
             const level = Number(plan.dataset.level || 0);
             const isAdminTestTier = root.dataset.vipTestAdmin === '1' && [1, 2, 3].includes(level);
-            if (plan.dataset.vipAvailable !== '1' && !isAdminTestTier) return;
-            if (plan.dataset.vipCurrent === '1' && userInitiated) return;
+            if (plan.dataset.vipSelectable !== '1' && !isAdminTestTier) return;
 
             if (userInitiated) {
                 hasUserSelectedPlan = true;
@@ -576,8 +575,8 @@
             const level = Number(plan.dataset.level || 0);
             const isAdminTestTier = root.dataset.vipTestAdmin === '1' && [1, 2, 3].includes(level);
             const canSelectCard = (
-                (plan.dataset.vipAvailable === '1' || isAdminTestTier)
-                && plan.dataset.vipCurrent !== '1'
+                plan.dataset.vipSelectable === '1'
+                || isAdminTestTier
             );
 
             // The card body is a selection target; nested action buttons keep their own behavior.
@@ -612,7 +611,7 @@
 
         const initialCurrentPlan = plans.find(function (plan) {
             return plan.dataset.vipCurrent === '1'
-                && (plan.dataset.vipAvailable === '1' || root.dataset.vipTestAdmin === '1');
+                && (plan.dataset.vipSelectable === '1' || root.dataset.vipTestAdmin === '1');
         });
         if (initialCurrentPlan) {
             selectPlan(initialCurrentPlan, false);
