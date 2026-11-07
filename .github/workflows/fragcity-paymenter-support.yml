@@ -130,6 +130,7 @@ jobs:
         run: |
           set -euo pipefail
           grep -Fq 'support-ticket-form' pages/support.php
+          grep -Fq 'name="customer_name"' pages/support.php
           grep -Fq 'name="department"' pages/support.php
           grep -Fq 'name="priority"' pages/support.php
           grep -Fq 'name="service"' pages/support.php
