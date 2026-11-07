@@ -131,6 +131,13 @@ try {
     }
 
     $orderStatus = (string)($order['status'] ?? '');
+
+    if ($orderStatus === 'revoked') {
+        $renderResult(
+            false,
+            'این سفارش پس از ابطال عضویت VIP دیگر قابل فعال‌سازی نیست. برای تهیه اشتراک جدید، از فروشگاه VIP اقدام کنید.'
+        );
+    }
     $amountRial = (int)($order['amount_rial'] ?? 0);
     $tierPriceRial = (int)($order['tier_price_rial'] ?? 0);
     // Legacy orders created before the price-snapshot migration were full-price
