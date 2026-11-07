@@ -14,6 +14,7 @@ $userVip = [
 ];
 $vipStatusUnavailable = false;
 $vipPaidPurchase = null;
+$vipPaidLedgerAvailable = false;
 $vipFreeTrialStatus = [
     'available' => false,
     'claimed' => false,
@@ -39,6 +40,7 @@ if ($isLoggedIn && $steamid64 !== '') {
         $vipPaidPurchase = is_array($vipStatus['paid_purchase'] ?? null)
             ? $vipStatus['paid_purchase']
             : null;
+        $vipPaidLedgerAvailable = ($vipStatus['paid_ledger_available'] ?? false) === true;
         $vipExpires = $vipStatus['expires'];
 
         $userVip = [
@@ -736,7 +738,9 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
     id="vipStorefront"
     data-vip-has-active="<?= $vipHasActiveMembership ? '1' : '0' ?>"
     data-vip-current-level="<?= $vipCurrentLevel ?>"
-    data-vip-status-unavailable="<?= ($vipStatusUnavailable || $vipFreeTrialStatusUnavailable) ? '1' : '0' ?>"
+    data-vip-status-unavailable="<?= $vipStatusUnavailable ? '1' : '0' ?>"
+    data-vip-paid-ledger-available="<?= $vipPaidLedgerAvailable ? '1' : '0' ?>"
+    data-vip-free-trial-status-unavailable="<?= $vipFreeTrialStatusUnavailable ? '1' : '0' ?>"
     data-vip-paid-upgrade-eligible="<?= $vipPaidUpgradeEligible ? '1' : '0' ?>"
     data-vip-current-is-free-trial="<?= $vipCurrentMembershipIsFreeTrial ? '1' : '0' ?>"
     data-vip-upgrade-duration-days="<?= $vipUpgradeDurationDays ?>"
