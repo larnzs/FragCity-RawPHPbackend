@@ -51,6 +51,48 @@
         const walletRechargeButton = invoice ? invoice.querySelector('[data-vip-wallet-recharge]') : null;
         const walletBalanceToman = Math.max(0, Number(root.dataset.vipWalletBalance || 0));
         const walletBalanceAvailable = root.dataset.vipWalletBalanceAvailable === '1';
+        const walletPaymentModal = document.getElementById('vipWalletPaymentModal');
+        const walletPaymentDialog = walletPaymentModal
+            ? walletPaymentModal.querySelector('.vip-wallet-modal-dialog')
+            : null;
+        const walletPaymentTitle = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-title]')
+            : null;
+        const walletPaymentMessage = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-message]')
+            : null;
+        const walletPaymentTier = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-tier]')
+            : null;
+        const walletPaymentDuration = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-duration]')
+            : null;
+        const walletPaymentAmount = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-amount]')
+            : null;
+        const walletPaymentBalance = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-balance]')
+            : null;
+        const walletPaymentStatus = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-status]')
+            : null;
+        const walletPaymentConfirm = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-confirm]')
+            : null;
+        const walletPaymentCancel = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-cancel]')
+            : null;
+        const walletPaymentClose = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-close]')
+            : null;
+        const walletPaymentRetry = walletPaymentModal
+            ? walletPaymentModal.querySelector('[data-wallet-modal-retry]')
+            : null;
+        let walletPendingCallbackUrl = '';
+        let walletPendingCheckout = null;
+        let walletDebitCommitted = false;
+        let walletRequestStarted = false;
+        let walletPaymentPreviousFocus = null;
         const comparisonModal = document.getElementById('vipComparisonModal');
         const comparisonDialog = comparisonModal
             ? comparisonModal.querySelector('#vipComparisonDialog')
@@ -819,21 +861,294 @@
             });
         }
 
+        function showWalletPaymentModal() {
+            if (!walletPaymentModal) return false;
+
+            walletPaymentPreviousFocus = document.activeElement;
+            if (walletPaymentTitle) walletPaymentTitle.textContent = 'تأیید پرداخت از کیف پول';
+            if (walletPaymentMessage) {
+                walletPaymentMessage.textContent = 'با تأیید شما، مبلغ فاکتور به‌صورت مستقیم از موجودی کیف پول کسر و عضویت VIP فعال می‌شود.';
+            }
+            if (walletPaymentTier) walletPaymentTier.textContent = invoiceTier ? invoiceTier.textContent : '—';
+            if (walletPaymentDuration) walletPaymentDuration.textContent = invoiceDuration ? invoiceDuration.textContent : '—';
+            if (walletPaymentAmount) walletPaymentAmount.textContent = invoiceTotal ? invoiceTotal.textContent : '—';
+            if (walletPaymentBalance) {
+                walletPaymentBalance.textContent = walletBalanceAvailable
+                    ? formatPrice(walletBalanceToman)
+                    : 'قابل بررسی نیست';
+            }
+            if (walletPaymentStatus) {
+                walletPaymentStatus.textContent = 'پس از تأیید، موجودی از دیتابیس بررسی و برداشت به‌صورت اتمیک ثبت می‌شود.';
+            }
+            walletPaymentModal.classList.remove('is-processing', 'is-error', 'is-pending');
+            if (walletPaymentConfirm) {
+                walletPaymentConfirm.hidden = false;
+                walletPaymentConfirm.disabled = false;
+                walletPaymentConfirm.innerHTML = '<i class="fas fa-wallet" aria-hidden="true"></i> تأیید و پرداخت';
+            }
+            if (walletPaymentCancel) {
+                walletPaymentCancel.hidden = false;
+                walletPaymentCancel.textContent = 'انصراف';
+            }
+            if (walletPaymentClose) walletPaymentClose.hidden = false;
+            if (walletPaymentRetry) walletPaymentRetry.hidden = true;
+
+            walletPaymentModal.hidden = false;
+            walletPaymentModal.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('vip-wallet-modal-open');
+            requestAnimationFrame(function () {
+                walletPaymentModal.classList.add('is-visible');
+                if (walletPaymentConfirm) walletPaymentConfirm.focus();
+                else if (walletPaymentDialog) walletPaymentDialog.focus();
+            });
+            return true;
+        }
+
+        function hideWalletPaymentModal() {
+            if (!walletPaymentModal || walletPaymentModal.classList.contains('is-processing')) return;
+            walletPaymentModal.classList.remove('is-visible');
+            walletPaymentModal.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('vip-wallet-modal-open');
+            window.setTimeout(function () {
+                walletPaymentModal.hidden = true;
+            }, 240);
+            if (walletPaymentPreviousFocus && typeof walletPaymentPreviousFocus.focus === 'function') {
+                walletPaymentPreviousFocus.focus();
+            }
+        }
+
+        function setWalletPaymentState(state, message) {
+            if (!walletPaymentModal) return;
+            walletPaymentModal.classList.remove('is-processing', 'is-error', 'is-pending');
+            if (state) walletPaymentModal.classList.add('is-' + state);
+            if (walletPaymentStatus) walletPaymentStatus.textContent = message;
+        }
+
+        function parseWalletJson(response) {
+            return response.json().catch(function () {
+                throw new Error('پاسخ سرور قابل خواندن نیست؛ برای جلوگیری از برداشت تکراری، وضعیت کیف پول را بررسی کن.');
+            });
+        }
+
+        function getSameOriginPath(value) {
+            try {
+                const url = new URL(String(value || ''), window.location.href);
+                return url.origin === window.location.origin ? url.pathname + url.search : '';
+            } catch (error) {
+                return '';
+            }
+        }
+
+        function showWalletSuccess(result) {
+            const tierNames = { 1: 'Bronze', 2: 'Silver', 3: 'Gold' };
+            const amountText = Number.isSafeInteger(Number(result.amount_toman))
+                ? formatPrice(Number(result.amount_toman))
+                : (walletPendingCheckout && Number.isSafeInteger(Number(walletPendingCheckout.amount_toman))
+                    ? formatPrice(Number(walletPendingCheckout.amount_toman))
+                    : '');
+            hideWalletPaymentModal();
+            if (walletCheckoutButton) {
+                walletCheckoutButton.disabled = true;
+                walletCheckoutButton.classList.remove('is-submitting');
+                walletCheckoutButton.textContent = 'VIP با موفقیت فعال شد';
+            }
+            if (window.FragCitySuccessModal && typeof window.FragCitySuccessModal.open === 'function') {
+                window.FragCitySuccessModal.open({
+                    kind: 'payment',
+                    title: 'خرید VIP با موفقیت فعال شد',
+                    message: 'مبلغ با موفقیت از کیف پول کسر شد و عضویت VIP روی حساب Steam شما فعال شد.',
+                    tier: tierNames[Number(walletPendingCheckout && walletPendingCheckout.level)] || '',
+                    duration: Number(walletPendingCheckout && walletPendingCheckout.duration_days) > 0
+                        ? Number(walletPendingCheckout.duration_days) + ' روز'
+                        : '',
+                    amount: amountText,
+                    amountLabel: 'مبلغ کسرشده از کیف پول',
+                    reference: result.reference || (walletPendingCheckout && walletPendingCheckout.order_ref) || '',
+                    returnUrl: '/index.php?page=vip',
+                    actionLabel: 'مشاهده وضعیت VIP',
+                    dismissible: true
+                });
+            } else {
+                window.location.reload();
+            }
+        }
+
+        async function retryWalletActivation() {
+            if (!walletDebitCommitted || !walletPendingCallbackUrl) return;
+            if (walletPaymentRetry) {
+                walletPaymentRetry.disabled = true;
+                walletPaymentRetry.textContent = 'در حال تلاش مجدد...';
+            }
+            setWalletPaymentState('processing', 'مبلغ قبلاً از کیف پول کسر شده است؛ فقط فعال‌سازی VIP دوباره بررسی می‌شود و برداشت تکرار نخواهد شد.');
+
+            try {
+                const response = await fetch(walletPendingCallbackUrl, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    redirect: 'error',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const result = await parseWalletJson(response);
+                if (result && result.success === true) {
+                    showWalletSuccess(result);
+                    return;
+                }
+                throw new Error(result && typeof result.message === 'string'
+                    ? result.message
+                    : 'فعال‌سازی VIP هنوز کامل نشده است.');
+            } catch (error) {
+                setWalletPaymentState('pending', error instanceof Error
+                    ? error.message + ' مبلغ کسر شده است؛ از ثبت خرید جدید خودداری کن.'
+                    : 'فعال‌سازی VIP هنوز کامل نشده است. مبلغ کسر شده است؛ از ثبت خرید جدید خودداری کن.');
+                if (walletPaymentMessage) {
+                    walletPaymentMessage.textContent = 'سفارش پرداخت‌شده حفظ شده است. می‌توانی فقط فعال‌سازی را دوباره امتحان کنی؛ مبلغ دوباره کسر نمی‌شود.';
+                }
+                if (walletPaymentRetry) {
+                    walletPaymentRetry.hidden = false;
+                    walletPaymentRetry.disabled = false;
+                    walletPaymentRetry.textContent = 'تلاش مجدد برای فعال‌سازی';
+                }
+                if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
+                if (walletPaymentCancel) {
+                    walletPaymentCancel.hidden = false;
+                    walletPaymentCancel.textContent = 'بستن';
+                }
+                if (walletPaymentClose) walletPaymentClose.hidden = false;
+            }
+        }
+
+        async function processWalletCheckout() {
+            if (!walletCheckoutForm || !walletCheckoutButton || !walletPaymentModal || !walletPaymentConfirm) return;
+            if (walletPaymentConfirm.disabled || !walletLevelInput || !walletDurationInput
+                || !walletLevelInput.value || !walletDurationInput.value) return;
+
+            walletPaymentConfirm.disabled = true;
+            walletPaymentConfirm.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> در حال پرداخت...';
+            if (walletPaymentCancel) walletPaymentCancel.hidden = true;
+            if (walletPaymentClose) walletPaymentClose.hidden = true;
+            setWalletPaymentState('processing', 'در حال بررسی موجودی واقعی و ثبت برداشت امن در دیتابیس...');
+            walletCheckoutButton.disabled = true;
+            walletCheckoutButton.classList.add('is-submitting');
+            walletCheckoutButton.textContent = 'در حال پرداخت از کیف پول...';
+
+            walletDebitCommitted = false;
+            walletRequestStarted = true;
+            walletPendingCheckout = null;
+            walletPendingCallbackUrl = '';
+
+            try {
+                const response = await fetch(walletCheckoutForm.action, {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    redirect: 'error',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new FormData(walletCheckoutForm)
+                });
+                const checkoutResult = await parseWalletJson(response);
+                if (!response.ok || !checkoutResult || checkoutResult.success !== true) {
+                    throw new Error(checkoutResult && typeof checkoutResult.message === 'string'
+                        ? checkoutResult.message
+                        : 'پرداخت از کیف پول انجام نشد.');
+                }
+
+                walletDebitCommitted = true;
+                walletPendingCheckout = checkoutResult;
+                walletPendingCallbackUrl = getSameOriginPath(checkoutResult.callback_url);
+                if (!walletPendingCallbackUrl) {
+                    throw new Error('برداشت کیف پول ثبت شد، اما آدرس امن فعال‌سازی دریافت نشد.');
+                }
+
+                setWalletPaymentState('processing', 'برداشت کیف پول ثبت شد. در حال ارتباط با VIPCore برای فعال‌سازی اشتراک...');
+                await retryWalletActivation();
+            } catch (error) {
+                if (walletDebitCommitted) {
+                    setWalletPaymentState('pending', error instanceof Error
+                        ? error.message + ' برداشت انجام شده است؛ پرداخت را دوباره تکرار نکن.'
+                        : 'برداشت انجام شده است؛ پرداخت را دوباره تکرار نکن.');
+                    if (walletPaymentMessage) {
+                        walletPaymentMessage.textContent = 'سفارش در دیتابیس ثبت شده است. فقط فعال‌سازی را دوباره امتحان کن؛ مبلغ دوباره کسر نمی‌شود.';
+                    }
+                    if (walletPaymentRetry) {
+                        walletPaymentRetry.hidden = false;
+                        walletPaymentRetry.disabled = false;
+                        walletPaymentRetry.textContent = 'تلاش مجدد برای فعال‌سازی';
+                    }
+                    if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
+                    if (walletPaymentCancel) {
+                        walletPaymentCancel.hidden = false;
+                        walletPaymentCancel.textContent = 'بستن';
+                    }
+                    if (walletPaymentClose) walletPaymentClose.hidden = false;
+                    return;
+                }
+
+                setWalletPaymentState('error', error instanceof Error
+                    ? error.message
+                    : 'پرداخت از کیف پول انجام نشد.');
+                if (walletRequestStarted && !(error instanceof Error && error.message)) {
+                    if (walletPaymentMessage) walletPaymentMessage.textContent = 'در صورت نامشخص‌بودن نتیجه، صفحه را تازه‌سازی و موجودی کیف پول را بررسی کن؛ درخواست خرید را پشت‌سرهم ارسال نکن.';
+                }
+                if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
+                if (walletPaymentCancel) {
+                    walletPaymentCancel.hidden = false;
+                    walletPaymentCancel.textContent = 'بستن';
+                }
+                if (walletPaymentClose) walletPaymentClose.hidden = false;
+                if (walletCheckoutButton) {
+                    walletCheckoutButton.disabled = false;
+                    walletCheckoutButton.classList.remove('is-submitting');
+                    renderInvoice();
+                }
+            } finally {
+                walletRequestStarted = false;
+                if (walletPaymentConfirm && !walletDebitCommitted && !walletPaymentModal.classList.contains('is-processing')) {
+                    walletPaymentConfirm.disabled = false;
+                    walletPaymentConfirm.innerHTML = '<i class="fas fa-wallet" aria-hidden="true"></i> تأیید و پرداخت';
+                }
+            }
+        }
+
         if (walletCheckoutForm && walletCheckoutButton) {
             walletCheckoutForm.addEventListener('submit', function (event) {
+                event.preventDefault();
                 if (walletCheckoutButton.disabled
                     || !walletLevelInput
                     || !walletDurationInput
                     || !walletLevelInput.value
                     || !walletDurationInput.value) {
-                    event.preventDefault();
                     renderInvoice();
                     return;
                 }
+                showWalletPaymentModal();
+            });
+        }
 
-                walletCheckoutButton.disabled = true;
-                walletCheckoutButton.classList.add('is-submitting');
-                walletCheckoutButton.textContent = 'در حال بررسی موجودی و فعال‌سازی...';
+        if (walletPaymentConfirm) {
+            walletPaymentConfirm.addEventListener('click', processWalletCheckout);
+        }
+        if (walletPaymentRetry) {
+            walletPaymentRetry.addEventListener('click', retryWalletActivation);
+        }
+        if (walletPaymentCancel) {
+            walletPaymentCancel.addEventListener('click', hideWalletPaymentModal);
+        }
+        if (walletPaymentClose) {
+            walletPaymentClose.addEventListener('click', hideWalletPaymentModal);
+        }
+        if (walletPaymentModal) {
+            walletPaymentModal.querySelectorAll('[data-wallet-modal-dismiss]').forEach(function (node) {
+                node.addEventListener('click', hideWalletPaymentModal);
+            });
+            walletPaymentModal.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && !walletPaymentModal.classList.contains('is-processing')) {
+                    event.preventDefault();
+                    hideWalletPaymentModal();
+                }
             });
         }
 
