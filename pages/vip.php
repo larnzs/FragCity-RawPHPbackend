@@ -591,10 +591,20 @@ foreach ($vipLevels as $level => $tier) {
         $durationPackage = is_array($package['durations'][(string) $days] ?? null)
             ? $package['durations'][(string) $days]
             : [];
-        $rawPrice = array_key_exists('price_rial', $durationPackage)
-            ? $durationPackage['price_rial']
-            : ($vipDefaultPriceRialMap[(string) $level][(string) $days] ?? null);
+        $rawPrice = $durationPackage['price_rial'] ?? null;
         $validatedPrice = filter_var($rawPrice, FILTER_VALIDATE_INT);
+        if ($validatedPrice === false
+            || $validatedPrice < 1
+            || $validatedPrice > 10000000000000
+            || $validatedPrice % 10 !== 0) {
+            // Older private runtime settings may not yet contain price_rial.
+            // Keep the published official catalogue prices visible until an
+            // explicit valid Rial override is configured.
+            $validatedPrice = filter_var(
+                $vipDefaultPriceRialMap[(string) $level][(string) $days] ?? null,
+                FILTER_VALIDATE_INT
+            );
+        }
         $priceRial = $validatedPrice !== false
             && $validatedPrice > 0
             && $validatedPrice <= 10000000000000
