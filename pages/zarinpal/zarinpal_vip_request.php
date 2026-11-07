@@ -278,7 +278,7 @@ if (!$pdo instanceof PDO) {
 
 $orderRef = bin2hex(random_bytes(16));
 $walletAuthority = $paymentMethod === 'wallet' ? 'WALLET_' . $orderRef : null;
-$walletBalanceBefore = 0;
+$walletBalanceBefore = 0.0;
 $walletAmountToman = null;
 $playerName = trim((string)($_SESSION['username'] ?? 'FragCity Player'));
 if ($playerName === '') {
@@ -390,8 +390,8 @@ try {
         $walletLock->execute([$steamId64]);
         $walletRow = $walletLock->fetch(PDO::FETCH_ASSOC);
         $walletBalanceBefore = is_array($walletRow)
-            ? max(0, (int)($walletRow['balance'] ?? 0))
-            : 0;
+            ? max(0.0, (float)($walletRow['balance'] ?? 0))
+            : 0.0;
 
         if (!is_array($walletRow) || $walletBalanceBefore < $walletAmountToman) {
             throw new DomainException('vip_wallet_insufficient');
@@ -468,7 +468,7 @@ try {
         $pdo->rollBack();
     }
     if ($e->getMessage() === 'vip_wallet_insufficient') {
-        $availableLabel = number_format(max(0, (int)$walletBalanceBefore));
+        $availableLabel = rtrim(rtrim(number_format(max(0.0, $walletBalanceBefore), 8, '.', ','), '0'), '.');
         $requiredLabel = number_format(max(0, (int)$walletAmountToman));
         $terminate('موجودی کیف پول ناکافی است. موجودی فعلی: ' . $availableLabel . ' تومان؛ مبلغ موردنیاز: ' . $requiredLabel . ' تومان.', 409);
     }
