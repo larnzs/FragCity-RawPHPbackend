@@ -33,11 +33,38 @@ final class VipCoreRepository
             throw new RuntimeException('VIPCore API returned an invalid expiry value.');
         }
 
+        $level = max(0, min(6, (int)$data['level']));
+        $paidPurchase = $data['paid_purchase'] ?? null;
+        if ($paidPurchase !== null) {
+            if (!is_array($paidPurchase)
+                || !is_string($paidPurchase['order_ref'] ?? null)
+                || !preg_match('/^[a-f0-9]{32}$/D', $paidPurchase['order_ref'])
+                || !is_numeric($paidPurchase['level'] ?? null)
+                || (int)$paidPurchase['level'] !== $level
+                || !is_numeric($paidPurchase['duration_seconds'] ?? null)
+                || !in_array((int)$paidPurchase['duration_seconds'], [604800, 1296000, 2592000, 5184000, 7776000], true)
+                || !is_numeric($paidPurchase['granted_at'] ?? null)
+                || !is_numeric($paidPurchase['expires'] ?? null)
+                || $expires === null
+                || (int)$paidPurchase['expires'] !== (int)$expires) {
+                throw new RuntimeException('VIPCore API returned an invalid paid-membership status payload.');
+            }
+
+            $paidPurchase = [
+                'order_ref' => $paidPurchase['order_ref'],
+                'level' => (int)$paidPurchase['level'],
+                'duration_seconds' => (int)$paidPurchase['duration_seconds'],
+                'granted_at' => (int)$paidPurchase['granted_at'],
+                'expires' => (int)$paidPurchase['expires'],
+            ];
+        }
+
         return [
             'active' => $data['active'],
-            'level' => max(0, min(6, (int)$data['level'])),
+            'level' => $level,
             'group' => is_string($data['group'] ?? null) ? $data['group'] : null,
             'expires' => $expires === null ? null : max(0, (int)$expires),
+            'paid_purchase' => $paidPurchase,
             'server_id' => (int)$data['server_id'],
         ];
     }
@@ -132,16 +159,22 @@ final class VipCoreRepository
         string $steamId64,
         string $playerName,
         int $level,
-        int $durationSeconds
+        int $durationSeconds,
+        ?array $upgrade = null
     ): array {
-        $data = $this->api->request([
+        $payload = [
             'action' => 'grant_paid_membership',
             'order_ref' => $orderRef,
             'steamid64' => $steamId64,
             'player_name' => $playerName,
             'level' => $level,
             'duration_seconds' => $durationSeconds,
-        ], '/v1/vipcore');
+        ];
+        if ($upgrade !== null) {
+            $payload['upgrade'] = $upgrade;
+        }
+
+        $data = $this->api->request($payload, '/v1/vipcore');
 
         if (($data['granted'] ?? false) !== true
             || (string)($data['order_ref'] ?? '') !== $orderRef
