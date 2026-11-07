@@ -96,5 +96,15 @@ jobs:
           test "$(grep -Fc 'resourceOwnerUserId($resource) !== $userId' "$client")" -ge 3
           grep -Fq '? $matchedUserId !== $userId' "$client"
           grep -Fq 'private function resourceOwnerUserId' "$client"
+      - name: Verify initial ticket creation does not depend on a second detail read
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'public function replyToNewTicket' class/PaymenterSupportApiClient.php
+          grep -Fq '$client->replyToNewTicket(' api/support.php
+          if grep -Fq "'owner_user_id' =>" api/support.php; then
+            echo "Internal Paymenter owner ID must never be returned by the website API"
+            exit 1
+          fi
       - name: Check support JavaScript
         run: node --check js/support.js
