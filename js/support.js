@@ -47,11 +47,107 @@
         const replyForm = app.querySelector('#supportReplyForm');
         const replyButton = app.querySelector('#supportReplyButton');
         const toast = app.querySelector('#supportToast');
+        const captchaQuestion = app.querySelector('#supportCaptchaQuestion');
+        const captchaAnswer = app.querySelector('#supportCaptchaAnswer');
+        const captchaToken = app.querySelector('#supportCaptchaToken');
+        const captchaRefreshButton = app.querySelector('#supportCaptchaRefreshButton');
+        const extraFieldsContainer = app.querySelector('#supportExtraFields');
+        const addExtraButton = app.querySelector('#supportAddExtraButton');
 
         if (!listElement || !createForm || !detailCard) return;
 
         let activeTicketId = 0;
         let requestSequence = 0;
+
+        function setPanelVisibility(panel, visible) {
+            if (!panel) return;
+            const transitionId = (Number(panel.dataset.transitionId) || 0) + 1;
+            panel.dataset.transitionId = String(transitionId);
+
+            if (visible) {
+                if (!panel.hidden && !panel.classList.contains('is-exiting')) return;
+                panel.hidden = false;
+                panel.classList.remove('is-exiting', 'is-shown');
+                panel.classList.add('is-entering');
+                panel.getBoundingClientRect();
+                window.requestAnimationFrame(function () {
+                    if (panel.dataset.transitionId !== String(transitionId)) return;
+                    panel.classList.remove('is-entering');
+                    panel.classList.add('is-shown');
+                    window.setTimeout(function () {
+                        if (panel.dataset.transitionId === String(transitionId)) panel.classList.remove('is-shown');
+                    }, 360);
+                });
+                return;
+            }
+
+            if (panel.hidden || panel.classList.contains('is-exiting')) return;
+            panel.classList.remove('is-entering', 'is-shown');
+            panel.classList.add('is-exiting');
+            window.setTimeout(function () {
+                if (panel.dataset.transitionId !== String(transitionId)) return;
+                panel.hidden = true;
+                panel.classList.remove('is-exiting');
+            }, 260);
+        }
+
+        async function loadCaptcha() {
+            if (!captchaQuestion || !captchaToken) return;
+            captchaQuestion.textContent = 'در حال دریافت کد امنیتی...';
+            captchaToken.value = '';
+            if (captchaAnswer) captchaAnswer.value = '';
+            try {
+                const data = await callApi('captcha_challenge');
+                captchaQuestion.textContent = data.question || 'کد امنیتی دریافت نشد';
+                captchaToken.value = data.token || '';
+            } catch (error) {
+                captchaQuestion.textContent = 'دریافت کد امنیتی ناموفق بود؛ دوباره تلاش کن.';
+                showToast(errorMessage(error), 'error');
+            }
+        }
+
+        function addExtraField() {
+            if (!extraFieldsContainer || extraFieldsContainer.children.length >= 3) {
+                showToast('حداکثر سه مورد تکمیلی می‌توانی اضافه کنی.', 'error');
+                return;
+            }
+            const row = document.createElement('div');
+            row.className = 'support-extra-field-row';
+
+            const labelWrap = document.createElement('label');
+            labelWrap.className = 'support-extra-field-input';
+            labelWrap.textContent = 'عنوان';
+            const labelInput = document.createElement('input');
+            labelInput.type = 'text';
+            labelInput.maxLength = 50;
+            labelInput.placeholder = 'مثلاً شماره سفارش';
+            labelInput.className = 'support-extra-label';
+            labelWrap.appendChild(labelInput);
+
+            const valueWrap = document.createElement('label');
+            valueWrap.className = 'support-extra-field-input';
+            valueWrap.textContent = 'مقدار';
+            const valueInput = document.createElement('input');
+            valueInput.type = 'text';
+            valueInput.maxLength = 200;
+            valueInput.placeholder = 'مقدار موردنظر';
+            valueInput.className = 'support-extra-value';
+            valueWrap.appendChild(valueInput);
+
+            const removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'support-extra-remove';
+            removeButton.setAttribute('aria-label', 'حذف مورد تکمیلی');
+            removeButton.innerHTML = '<i class="fas fa-trash" aria-hidden="true"></i>';
+            removeButton.addEventListener('click', function () {
+                row.classList.add('is-removing');
+                window.setTimeout(function () { row.remove(); }, 180);
+            });
+
+            row.append(labelWrap, valueWrap, removeButton);
+            extraFieldsContainer.appendChild(row);
+            labelInput.focus();
+        }
 
         function showToast(message, kind) {
             if (!toast) return;
@@ -196,6 +292,7 @@
             const errors = {
                 authentication_required: 'برای مشاهده تیکت‌ها دوباره وارد حساب خود شوید.',
                 csrf_failed: 'نشست شما منقضی شده است. صفحه را تازه‌سازی کنید.',
+                captcha_invalid: 'کد امنیتی اشتباه یا منقضی شده است؛ کد تازه‌ای دریافت کن و دوباره تلاش کن.',
                 fragcity_account_not_linked: 'حساب شما هنوز به Paymenter متصل نشده است.',
                 linked_paymenter_user_missing: 'حساب پشتیبانی شما در دسترس نیست.',
                 paymenter_support_identity_not_synced: 'اطلاعات حساب شما هنوز با Paymenter همگام نشده است. لطفاً دوباره وارد حساب FragCity شوید یا با پشتیبانی تماس بگیرید.',
@@ -259,14 +356,14 @@
                 button.addEventListener('click', function () {
                     changeTicketStatus('reopen_ticket', ticket.ticket_id);
                 });
-                if (replyForm) replyForm.hidden = true;
+                if (replyForm) setPanelVisibility(replyForm, false);
             } else {
                 button.classList.add('support-close-btn');
                 button.innerHTML = '<i class="fas fa-lock"></i> بستن تیکت';
                 button.addEventListener('click', function () {
                     changeTicketStatus('close_ticket', ticket.ticket_id);
                 });
-                if (replyForm) replyForm.hidden = false;
+                if (replyForm) setPanelVisibility(replyForm, true);
             }
 
             detailActions.appendChild(button);
@@ -277,9 +374,9 @@
 
             const seq = ++requestSequence;
             activeTicketId = ticketId;
-            if (listCard) listCard.hidden = true;
-            if (createCard) createCard.hidden = true;
-            detailCard.hidden = false;
+            setPanelVisibility(listCard, false);
+            setPanelVisibility(createCard, false);
+            setPanelVisibility(detailCard, true);
             conversation.replaceChildren(makeEmpty('در حال دریافت مکالمه...'));
             detailSubject.textContent = 'تیکت #' + ticketId;
             detailStatus.textContent = '...';
@@ -325,9 +422,9 @@
         function showTicketList(updateHistory) {
             activeTicketId = 0;
             requestSequence++;
-            detailCard.hidden = true;
-            if (listCard) listCard.hidden = false;
-            if (createCard) createCard.hidden = false;
+            setPanelVisibility(detailCard, false);
+            setPanelVisibility(listCard, true);
+            setPanelVisibility(createCard, true);
 
             if (updateHistory) {
                 const url = new URL(window.location.href);
@@ -339,13 +436,29 @@
 
         createForm.addEventListener('submit', async function (event) {
             event.preventDefault();
-            const subjectInput = createForm.querySelector('[name="subject"]');
-            const messageInput = createForm.querySelector('[name="message"]');
-            const subject = subjectInput ? subjectInput.value.trim() : '';
-            const message = messageInput ? messageInput.value.trim() : '';
+            const valueOf = function (name) {
+                const field = createForm.querySelector('[name="' + name + '"]');
+                return field ? String(field.value || '').trim() : '';
+            };
+            const subject = valueOf('subject');
+            const message = valueOf('message');
+            const captcha = valueOf('captcha_answer');
+            const token = valueOf('captcha_token');
+            const priorityField = createForm.querySelector('[name="priority"]:checked');
+            const extraFields = extraFieldsContainer
+                ? Array.from(extraFieldsContainer.querySelectorAll('.support-extra-field-row')).map(function (row) {
+                    const label = row.querySelector('.support-extra-label');
+                    const value = row.querySelector('.support-extra-value');
+                    return { label: label ? label.value.trim() : '', value: value ? value.value.trim() : '' };
+                })
+                : [];
 
-            if (!subject || !message) {
-                showToast('موضوع و متن تیکت را وارد کنید.', 'error');
+            if (!subject || !message || !captcha || !token) {
+                showToast('موضوع، توضیحات و کد امنیتی را کامل کن.', 'error');
+                return;
+            }
+            if (extraFields.some(function (item) { return !item.label || !item.value; })) {
+                showToast('عنوان و مقدار تمام موارد تکمیلی را وارد کن.', 'error');
                 return;
             }
 
@@ -353,10 +466,19 @@
             try {
                 const data = await callApi('create_ticket', {
                     subject: subject,
-                    message: message
+                    message: message,
+                    department: valueOf('department'),
+                    priority: priorityField ? priorityField.value : 'medium',
+                    service: valueOf('service'),
+                    domain: valueOf('domain'),
+                    extra_fields: extraFields,
+                    captcha_answer: captcha,
+                    captcha_token: token
                 });
                 createForm.reset();
-                showToast('تیکت شما با موفقیت ثبت شد.', 'success');
+                if (extraFieldsContainer) extraFieldsContainer.replaceChildren();
+                await loadCaptcha();
+                showToast('درخواست شما با موفقیت ثبت شد.', 'success');
                 await loadTickets();
                 await openTicket(Number(data.ticket_id), true);
             } catch (error) {
@@ -367,6 +489,7 @@
                     await openTicket(ticketId, true);
                 } else {
                     showToast(errorMessage(error), 'error');
+                    if (error.message === 'captcha_invalid') await loadCaptcha();
                 }
             } finally {
                 setBusy(createButton, false);
@@ -401,9 +524,9 @@
             });
         }
 
-        if (refreshButton) {
-            refreshButton.addEventListener('click', loadTickets);
-        }
+        if (refreshButton) refreshButton.addEventListener('click', loadTickets);
+        if (addExtraButton) addExtraButton.addEventListener('click', addExtraField);
+        if (captchaRefreshButton) captchaRefreshButton.addEventListener('click', loadCaptcha);
         if (backButton) {
             backButton.addEventListener('click', function () {
                 showTicketList(true);
@@ -421,6 +544,7 @@
         });
 
         loadTickets();
+        loadCaptcha();
         const initialTicketId = Number(app.dataset.initialTicketId || 0);
         if (initialTicketId > 0) {
             openTicket(initialTicketId, false);
