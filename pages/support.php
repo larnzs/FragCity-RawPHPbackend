@@ -123,6 +123,15 @@ $requestedTicketId = $requestedTicketId === false ? 0 : (int) $requestedTicketId
         </div>
 
     <?php elseif ($activeTab === 'tickets'): ?>
+        <div class="support-workspace-heading">
+            <span class="support-workspace-icon" aria-hidden="true"><i class="fas fa-ticket-alt"></i></span>
+            <div class="support-workspace-copy">
+                <span class="support-workspace-eyebrow">TICKET MANAGEMENT</span>
+                <h2>مرکز ثبت و پیگیری تیکت</h2>
+                <p>درخواستت را ثبت کن و تمام پیام‌های تیم پشتیبانی را از همین بخش دنبال کن.</p>
+            </div>
+            <span class="support-workspace-badge"><i class="fas fa-shield-halved" aria-hidden="true"></i> پشتیبانی FragCity</span>
+        </div>
         <div
             class="ticket-section"
             id="fragcitySupportApp"
@@ -212,5 +221,66 @@ $requestedTicketId = $requestedTicketId === false ? 0 : (int) $requestedTicketId
                 </section>
             <?php endif; ?>
         </div>
+
+        <section class="support-faq" aria-labelledby="supportFaqTitle">
+            <div class="support-faq-heading">
+                <span class="support-faq-icon" aria-hidden="true"><i class="fas fa-circle-question"></i></span>
+                <div>
+                    <span class="support-faq-eyebrow">HELP CENTER</span>
+                    <h2 id="supportFaqTitle">سؤالات متداول</h2>
+                    <p>پاسخ پرسش‌های رایج درباره ثبت و پیگیری درخواست‌های پشتیبانی</p>
+                </div>
+            </div>
+
+            <div class="support-faq-grid">
+                <details class="support-faq-item">
+                    <summary>
+                        <span>چطور تیکت جدید ثبت کنم؟</span>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                    </summary>
+                    <p>در فرم «ارسال تیکت جدید»، موضوع و توضیح کامل درخواستت را بنویس و دکمه ارسال را بزن. بعد از ثبت، تیکت در فهرست «تیکت‌های شما» نمایش داده می‌شود.</p>
+                </details>
+
+                <details class="support-faq-item">
+                    <summary>
+                        <span>پاسخ تیم پشتیبانی را از کجا ببینم؟</span>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                    </summary>
+                    <p>از فهرست تیکت‌ها، درخواست موردنظرت را باز کن. پیام‌های تو و تیم پشتیبانی در همان صفحه و به ترتیب نمایش داده می‌شوند. برای دریافت آخرین وضعیت فهرست نیز از دکمه به‌روزرسانی استفاده کن.</p>
+                </details>
+
+                <details class="support-faq-item">
+                    <summary>
+                        <span>چطور به تیکت پاسخ بدهم؟</span>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                    </summary>
+                    <p>تیکت را باز کن و متن پاسخ را در بخش «پاسخ شما» بنویس. تا زمانی که تیکت باز باشد، می‌توانی پیام‌های تکمیلی را در همان گفتگو ارسال کنی.</p>
+                </details>
+
+                <details class="support-faq-item">
+                    <summary>
+                        <span>اگر تیکت را بسته باشم، می‌توانم دوباره ادامه بدهم؟</span>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                    </summary>
+                    <p>بله. تیکت بسته‌شده را باز کن و گزینه «بازکردن مجدد تیکت» را بزن. پس از باز شدن، امکان ارسال پاسخ دوباره فعال می‌شود.</p>
+                </details>
+
+                <details class="support-faq-item">
+                    <summary>
+                        <span>امکان ارسال تصویر یا فایل پیوست وجود دارد؟</span>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                    </summary>
+                    <p>در حال حاضر ارسال فایل پیوست از داخل تیکت فعال نیست. برای بررسی سریع‌تر، جزئیات مشکل، متن خطا، نام سرور و زمان رخداد را داخل پیام بنویس.</p>
+                </details>
+
+                <details class="support-faq-item">
+                    <summary>
+                        <span>چرا تیکت‌هایم را نمی‌بینم؟</span>
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                    </summary>
+                    <p>با همان حساب FragCity که هنگام ثبت تیکت وارد آن شده بودی وارد شو. اگر پیام مربوط به متصل نبودن حساب پشتیبانی را دیدی، از بخش تماس با ما با تیم FragCity ارتباط بگیر.</p>
+                </details>
+            </div>
+        </section>
     <?php endif; ?>
 </div>
