@@ -182,7 +182,7 @@ try {
 
         if (!is_array($walletTransaction)
             || (string)($walletTransaction['steamid'] ?? '') !== $steamId64
-            || (string)($walletTransaction['type'] ?? '') !== 'vip_purchase'
+            || (string)($walletTransaction['type'] ?? '') !== 'withdraw'
             || (string)($walletTransaction['status'] ?? '') !== 'success'
             || (int)($walletTransaction['amount'] ?? 0) !== intdiv($amountRial, 10)
             || (string)($walletTransaction['ref_id'] ?? '') !== 'VIP-' . $orderRef) {
