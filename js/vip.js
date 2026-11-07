@@ -454,21 +454,27 @@
                     : '';
             }
             if (walletCheckoutButton) {
-                walletCheckoutButton.disabled = !canWalletCheckout;
-                if (!walletSelectionValid) {
-                    walletCheckoutButton.textContent = 'انتخاب پلن و مدت اشتراک';
-                } else if (!walletBalanceAvailable) {
-                    walletCheckoutButton.textContent = 'موجودی کیف پول در دسترس نیست';
-                } else if (!canWalletCheckout) {
-                    walletCheckoutButton.textContent = 'موجودی کیف پول ناکافی';
+                if (walletDebitCommitted && walletPendingCallbackUrl) {
+                    walletCheckoutButton.disabled = false;
+                    walletCheckoutButton.textContent = 'پیگیری فعال‌سازی VIP';
+                    walletCheckoutButton.title = 'برداشت قبلاً انجام شده؛ فقط فعال‌سازی سفارش قبلی را پیگیری کن.';
                 } else {
-                    walletCheckoutButton.textContent = 'پرداخت از کیف پول';
+                    walletCheckoutButton.disabled = !canWalletCheckout;
+                    if (!walletSelectionValid) {
+                        walletCheckoutButton.textContent = 'انتخاب پلن و مدت اشتراک';
+                    } else if (!walletBalanceAvailable) {
+                        walletCheckoutButton.textContent = 'موجودی کیف پول در دسترس نیست';
+                    } else if (!canWalletCheckout) {
+                        walletCheckoutButton.textContent = 'موجودی کیف پول ناکافی';
+                    } else {
+                        walletCheckoutButton.textContent = 'پرداخت از کیف پول';
+                    }
+                    walletCheckoutButton.title = canWalletCheckout
+                        ? 'کسر مبلغ از کیف پول و فعال‌سازی VIP'
+                        : (walletBalanceAvailable && walletSelectionValid
+                            ? 'موجودی کیف پول برای این سفارش کافی نیست.'
+                            : 'ابتدا پلن و مدت اشتراک را انتخاب کنید.');
                 }
-                walletCheckoutButton.title = canWalletCheckout
-                    ? 'کسر مبلغ از کیف پول و فعال‌سازی VIP'
-                    : (walletBalanceAvailable && walletSelectionValid
-                        ? 'موجودی کیف پول برای این سفارش کافی نیست.'
-                        : 'ابتدا پلن و مدت اشتراک را انتخاب کنید.');
             }
             if (walletStatus) {
                 walletStatus.textContent = walletBalanceAvailable
@@ -881,6 +887,18 @@
                 walletPaymentStatus.textContent = 'پس از تأیید، موجودی از دیتابیس بررسی و برداشت به‌صورت اتمیک ثبت می‌شود.';
             }
             const activationPending = walletDebitCommitted && walletPendingCallbackUrl !== '';
+            if (activationPending && walletPendingCheckout) {
+                const savedTierNames = { 1: 'Bronze', 2: 'Silver', 3: 'Gold' };
+                if (walletPaymentTier) {
+                    walletPaymentTier.textContent = savedTierNames[Number(walletPendingCheckout.level)] || 'VIP';
+                }
+                if (walletPaymentDuration && Number(walletPendingCheckout.duration_days) > 0) {
+                    walletPaymentDuration.textContent = Number(walletPendingCheckout.duration_days) + ' روز';
+                }
+                if (walletPaymentAmount && Number.isSafeInteger(Number(walletPendingCheckout.amount_toman))) {
+                    walletPaymentAmount.textContent = formatPrice(Number(walletPendingCheckout.amount_toman));
+                }
+            }
             walletPaymentModal.classList.remove('is-processing', 'is-error', 'is-pending');
             if (activationPending) {
                 walletPaymentModal.classList.add('is-pending');
