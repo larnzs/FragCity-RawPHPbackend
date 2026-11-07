@@ -253,7 +253,7 @@ try {
         $refundAmountToman = '0';
         $refundUnits = 0;
         $remainingSeconds = $expires > 0 ? max(0, $expires - $revokedAt) : 0;
-        $usedSeconds = 0;
+        $subscriptionDurationSeconds = 0;
 
         if (is_array($existingRefund)) {
             if ((string)($existingRefund['type'] ?? '') !== 'deposit'
@@ -334,6 +334,7 @@ try {
                     if ($windowSeconds < 1) {
                         throw new RuntimeException('vip_refund_paid_duration_invalid');
                     }
+                    $subscriptionDurationSeconds = $windowSeconds;
                 }
 
                 $refundUnitsForOrder = $refundUnitsForWindow(
@@ -477,7 +478,9 @@ try {
             'order_ref' => $orderRef,
             'refund_amount_toman' => $refundAmountToman,
             'refund_remaining_seconds' => $remainingSeconds,
-            'refund_used_seconds' => max(0, ($expires > 0 ? $expires : $revokedAt) - $remainingSeconds),
+            'refund_used_seconds' => $subscriptionDurationSeconds > 0
+                ? max(0, $subscriptionDurationSeconds - $remainingSeconds)
+                : 0,
             'message' => $successMessage,
         ],
     ]);
