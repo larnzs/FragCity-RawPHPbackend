@@ -88,9 +88,16 @@
         const walletPaymentRetry = walletPaymentModal
             ? walletPaymentModal.querySelector('[data-wallet-modal-retry]')
             : null;
-        let walletPendingCallbackUrl = '';
-        let walletPendingCheckout = null;
-        let walletDebitCommitted = false;
+        const initialWalletPendingCallback = String(root.dataset.vipWalletPendingCallback || '');
+        const initialWalletPendingValid = /^\/pages\/zarinpal\/zarinpal_vip_callback\.php\?Authority=WALLET_[a-f0-9]{32}&Status=OK$/.test(initialWalletPendingCallback);
+        let walletPendingCallbackUrl = initialWalletPendingValid ? initialWalletPendingCallback : '';
+        let walletPendingCheckout = initialWalletPendingValid ? {
+            level: Number(root.dataset.vipWalletPendingLevel || 0),
+            duration_days: Number(root.dataset.vipWalletPendingDurationDays || 0),
+            amount_toman: Number(root.dataset.vipWalletPendingAmountToman || 0),
+            order_ref: String(root.dataset.vipWalletPendingOrderRef || '')
+        } : null;
+        let walletDebitCommitted = initialWalletPendingValid;
         let walletCheckoutResponseReceived = false;
         let walletPaymentPreviousFocus = null;
         const comparisonModal = document.getElementById('vipComparisonModal');
@@ -898,6 +905,7 @@
                 if (walletPaymentAmount && Number.isSafeInteger(Number(walletPendingCheckout.amount_toman))) {
                     walletPaymentAmount.textContent = formatPrice(Number(walletPendingCheckout.amount_toman));
                 }
+                if (walletPaymentBalance) walletPaymentBalance.textContent = 'برداشت این سفارش قبلاً ثبت شده است';
             }
             walletPaymentModal.classList.remove('is-processing', 'is-error', 'is-pending');
             if (activationPending) {
@@ -1179,6 +1187,10 @@
         if (walletCheckoutForm && walletCheckoutButton) {
             walletCheckoutForm.addEventListener('submit', function (event) {
                 event.preventDefault();
+                if (walletDebitCommitted && walletPendingCallbackUrl) {
+                    showWalletPaymentModal();
+                    return;
+                }
                 if (walletCheckoutButton.disabled
                     || !walletLevelInput
                     || !walletDurationInput
