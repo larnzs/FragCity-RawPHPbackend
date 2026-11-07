@@ -5,10 +5,10 @@ USE kyonxcbt_fragcity_services;
 -- DECIMAL keeps the historical whole-Toman values unchanged while allowing
 -- prorated refunds to retain up to eight fractional digits.
 ALTER TABLE user_wallets
-    MODIFY COLUMN balance DECIMAL(20,8) NOT NULL DEFAULT 0.00000000;
+    MODIFY COLUMN balance DECIMAL(30,8) NOT NULL DEFAULT 0.00000000;
 
 ALTER TABLE wallet_transactions
-    MODIFY COLUMN amount DECIMAL(20,8) NOT NULL;
+    MODIFY COLUMN amount DECIMAL(30,8) NOT NULL;
 
 -- Snapshot the exact remaining seconds used to price each VIP upgrade.
 -- This makes later cancellation refunds reproducible to the second.
