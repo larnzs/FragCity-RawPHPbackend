@@ -67,6 +67,7 @@ if ($isLoggedIn && $steamid64 !== '') {
 }
 
 $vipNames = [0 => 'No VIP', 1 => 'Bronze', 2 => 'Silver', 3 => 'Gold', 4 => 'Platinum', 5 => 'Emerald', 6 => 'Diamond'];
+$vipSelectableLevels = [1, 2, 3, 5]; // Display/selection is separate from purchase eligibility.
 
 $vipLevels = [
     1 => [
@@ -726,6 +727,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                             ? 'Not available'
                             : '۷، ۱۵، ۳۰، ۶۰ یا ۹۰ روز'));
                 $isCurrentTier = $vipHasActiveMembership && $vipCurrentLevel === (int) $lvl;
+                $isSelectableTier = in_array((int) $lvl, $vipSelectableLevels, true);
             ?>
             <?php if ((int) $lvl === 4): ?>
             </section>
@@ -766,6 +768,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                 data-vip-summary="<?= htmlspecialchars($tier['summary'], ENT_QUOTES, 'UTF-8') ?>"
                 data-vip-summary-fa="<?= htmlspecialchars($tier['summary_fa'], ENT_QUOTES, 'UTF-8') ?>"
                 data-vip-available="<?= $tier['available'] ? '1' : '0' ?>"
+                data-vip-selectable="<?= $isSelectableTier ? '1' : '0' ?>"
                 data-vip-purchase-mode="<?= htmlspecialchars((string)($tier['purchase_mode'] ?? 'none'), ENT_QUOTES, 'UTF-8') ?>"
                 data-vip-current="<?= $isCurrentTier ? '1' : '0' ?>"
                 data-vip-color="<?= htmlspecialchars($tier['color'], ENT_QUOTES, 'UTF-8') ?>"
@@ -818,13 +821,13 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                         class="vip-plan-select"
                         data-vip-select-plan
                         aria-pressed="false"
-                        <?= (!$tier['available'] && !($isVipTestAdmin && in_array((int)$lvl, [1, 2, 3], true))) || $isCurrentTier ? 'disabled' : '' ?>
+                        <?= !$isSelectableTier ? 'disabled' : '' ?>
                     >
                         <?= $isCurrentTier
-                            ? 'اشتراک فعلی شما'
-                            : (!$tier['available'] && !($isVipTestAdmin && in_array((int)$lvl, [1, 2, 3], true))
-                                ? ((int)$lvl === 1 ? 'فقط تست داخلی' : 'فعلاً غیرفعال')
-                                : 'انتخاب این سطح') ?>
+                            ? 'مشاهده پلن فعال'
+                            : ($isSelectableTier
+                                ? 'انتخاب این سطح'
+                                : ((int)$lvl === 1 ? 'فقط تست داخلی' : 'فعلاً غیرفعال')) ?>
                         <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     </button>
                     <button
