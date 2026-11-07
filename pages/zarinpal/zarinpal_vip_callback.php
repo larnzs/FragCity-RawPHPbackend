@@ -86,7 +86,8 @@ try {
     $lookup = $pdo->prepare(
         'SELECT id, order_ref, steamid64, player_name, vip_level,
                 duration_days, duration_seconds, amount_rial,
-                authority, ref_id, status
+                authority, ref_id, status, purchase_type,
+                upgrade_from_order_ref, upgrade_from_level, upgrade_from_expires
          FROM vip_orders
          WHERE authority = ?
          LIMIT 1'
@@ -106,6 +107,29 @@ try {
     $days = (int)($order['duration_days'] ?? 0);
     $durationSeconds = (int)($order['duration_seconds'] ?? 0);
     $playerName = (string)($order['player_name'] ?? '');
+    $purchaseType = (string)($order['purchase_type'] ?? 'new');
+    $upgradeContext = null;
+
+    if ($purchaseType === 'upgrade') {
+        $upgradeFromOrderRef = (string)($order['upgrade_from_order_ref'] ?? '');
+        $upgradeFromLevel = (int)($order['upgrade_from_level'] ?? 0);
+        $upgradeFromExpires = (int)($order['upgrade_from_expires'] ?? 0);
+        if (!preg_match('/^[a-f0-9]{32}$/D', $upgradeFromOrderRef)
+            || !in_array($upgradeFromLevel, [1, 2], true)
+            || $level <= $upgradeFromLevel
+            || $upgradeFromExpires < 1) {
+            $renderResult(false, 'اطلاعات مبدأ ارتقای VIP معتبر نیست؛ سفارش برای بررسی حفظ شده است.', $amountRial);
+        }
+
+        $upgradeContext = [
+            'from_order_ref' => $upgradeFromOrderRef,
+            'from_level' => $upgradeFromLevel,
+            'from_expires' => $upgradeFromExpires,
+            'duration_seconds' => $durationSeconds,
+        ];
+    } elseif (!in_array($purchaseType, ['new', 'replacement'], true)) {
+        $renderResult(false, 'نوع سفارش VIP قابل شناسایی نیست؛ سفارش برای بررسی حفظ شده است.', $amountRial);
+    }
 
     if (!preg_match('/^[a-f0-9]{32}$/D', $orderRef)
         || !preg_match('/^[0-9]{17}$/D', $steamId64)
@@ -274,7 +298,8 @@ try {
             $steamId64,
             $playerName,
             $level,
-            $durationSeconds
+            $durationSeconds,
+            $upgradeContext
         );
 
         $markProvisioned = $pdo->prepare(
