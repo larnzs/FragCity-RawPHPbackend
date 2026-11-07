@@ -86,37 +86,47 @@ try {
     }
 
     $orderRef = $revocation['order_ref'] ?? null;
-    if (is_string($orderRef) && preg_match('/^[a-f0-9]{32}$/D', $orderRef)) {
-        $databaseProfile = fragcity_settings(
-            'files.pages.zarinpal.vip_request.database_profile',
-            'main'
+    if ($orderRef !== null
+        && (!is_string($orderRef) || !preg_match('/^[a-f0-9]{32}$/D', $orderRef))) {
+        throw new RuntimeException('vip_revocation_order_reference_invalid');
+    }
+
+    $databaseProfile = fragcity_settings(
+        'files.pages.zarinpal.vip_request.database_profile',
+        'main'
+    );
+    $databaseProfile = is_string($databaseProfile) && trim($databaseProfile) !== ''
+        ? trim($databaseProfile)
+        : 'main';
+
+    $ordersPdo = fragcity_create_pdo($databaseProfile);
+    if (!$ordersPdo instanceof PDO) {
+        throw new RuntimeException('vip_orders_database_unavailable');
+    }
+
+    // Remove any stale paid-but-not-provisioned VIP order from the checkout
+    // blocker, and mark the exact order that created the current membership
+    // as revoked. The records remain in history; only their activation state
+    // changes. Pending ZarinPal orders are deliberately left untouched because
+    // a gateway payment may still complete and must not be silently discarded.
+    $ordersPdo->beginTransaction();
+    try {
+        $markRevoked = $ordersPdo->prepare(
+            "UPDATE vip_orders
+             SET status = 'revoked', last_error = 'customer_revoked_membership'
+             WHERE steamid64 = ?
+               AND (
+                    status = 'paid'
+                    OR (? IS NOT NULL AND order_ref = ? AND status = 'provisioned')
+               )"
         );
-        $databaseProfile = is_string($databaseProfile) && trim($databaseProfile) !== ''
-            ? trim($databaseProfile)
-            : 'main';
-
-        $ordersPdo = fragcity_create_pdo($databaseProfile);
-        if (!$ordersPdo instanceof PDO) {
-            throw new RuntimeException('vip_orders_database_unavailable');
+        $markRevoked->execute([$steamId64, $orderRef, $orderRef]);
+        $ordersPdo->commit();
+    } catch (Throwable $e) {
+        if ($ordersPdo->inTransaction()) {
+            $ordersPdo->rollBack();
         }
-
-        $ordersPdo->beginTransaction();
-        try {
-            $markRevoked = $ordersPdo->prepare(
-                "UPDATE vip_orders
-                 SET status = 'revoked', last_error = 'customer_revoked_membership'
-                 WHERE steamid64 = ?
-                   AND order_ref = ?
-                   AND status IN ('paid', 'provisioned')"
-            );
-            $markRevoked->execute([$steamId64, $orderRef]);
-            $ordersPdo->commit();
-        } catch (Throwable $e) {
-            if ($ordersPdo->inTransaction()) {
-                $ordersPdo->rollBack();
-            }
-            throw $e;
-        }
+        throw $e;
     }
 
     $respond([
