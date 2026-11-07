@@ -504,6 +504,10 @@ if ($vipActive && !empty($userVip['vip_permanent'])) {
 }
 
 $vipHasActiveMembership = $vipActive && $vipCurrentLevel > 0;
+$vipHasPaidCurrentMembership = $vipHasActiveMembership
+    && is_array($vipPaidPurchase)
+    && (int)($vipPaidPurchase['level'] ?? 0) === $vipCurrentLevel
+    && (int)($vipPaidPurchase['expires'] ?? 0) === (int)($userVip['vip_expire'] ?? 0);
 $vipCurrentName = $vipNames[$vipCurrentLevel] ?? 'نامشخص';
 $vipCurrentStatus = !$isLoggedIn
     ? 'برای مشاهده وضعیت وارد شوید'
@@ -717,7 +721,7 @@ foreach ($vipUpgradePriceRialMap as $upgradeLevel => $upgradePriceRial) {
 // at the same level, or replaced with a higher paid tier at full price.
 $vipCurrentMembershipReplaceable = $vipHasActiveMembership
     && $vipPaidLedgerAvailable
-    && !$vipPaidUpgradeEligible;
+    && !$vipHasPaidCurrentMembership;
 $vipGatewaySettings = fragcity_settings('integrations.zarinpal', []);
 $vipGatewayUrlIsSecure = static function ($value): bool {
     if (!is_string($value) || trim($value) === '') {
@@ -745,6 +749,7 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
     id="vipStorefront"
     data-vip-has-active="<?= $vipHasActiveMembership ? '1' : '0' ?>"
     data-vip-current-level="<?= $vipCurrentLevel ?>"
+    data-vip-current-paid="<?= $vipHasPaidCurrentMembership ? '1' : '0' ?>"
     data-vip-status-unavailable="<?= $vipStatusUnavailable ? '1' : '0' ?>"
     data-vip-paid-ledger-available="<?= $vipPaidLedgerAvailable ? '1' : '0' ?>"
     data-vip-free-trial-status-unavailable="<?= $vipFreeTrialStatusUnavailable ? '1' : '0' ?>"
