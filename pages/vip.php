@@ -658,7 +658,17 @@ if ($isLoggedIn
     ), true);
 
     if ($validPaidDuration && $paidExpires > $now && $remainingSeconds > 0) {
-        $currentTierPrice = $vipPurchasePriceRialMap[(string)$vipCurrentLevel][(string)$candidateDays] ?? null;
+        $currentTierPrice = filter_var(
+            $vipPaidPurchase['tier_price_rial'] ?? null,
+            FILTER_VALIDATE_INT
+        );
+        if ($currentTierPrice === false
+            || $currentTierPrice < 1
+            || $currentTierPrice > 10000000000000
+            || $currentTierPrice % 10 !== 0) {
+            // Legacy paid-order rows do not have a catalogue price snapshot.
+            $currentTierPrice = $vipPurchasePriceRialMap[(string)$vipCurrentLevel][(string)$candidateDays] ?? null;
+        }
         if (is_int($currentTierPrice) && $currentTierPrice > 0) {
             foreach ([1, 2, 3] as $targetLevel) {
                 if ($targetLevel <= $vipCurrentLevel) {
