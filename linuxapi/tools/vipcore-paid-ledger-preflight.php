@@ -132,6 +132,7 @@ $checks = [
                  ' . $groupColumn . ' = ' . $groupColumn . ', expires = expires
              WHERE 1 = 0'
         );
+    },
     'vip_users DELETE privilege' => static function (PDO $pdo): void {
         $pdo->exec('DELETE FROM vip_users WHERE 1 = 0');
     },
@@ -160,7 +161,6 @@ $checks = [
                 CAST(\'customer\' AS CHAR(32))
              WHERE 1 = 0'
         );
-    },
     },
 ];
 
