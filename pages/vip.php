@@ -609,11 +609,11 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
         <div class="vip-store-hero-copy">
             <span class="vip-store-eyebrow">FRAGCITY MEMBERSHIP STORE</span>
             <h1>عضویت VIP فرگ‌سیتی</h1>
-            <p>سطح موردنظرت را انتخاب کن و تفاوت قابلیت‌ها را در مودال مقایسه کامل بررسی کن.</p>
+            <p>عضویت مرکزی FragCity را برای تمام سرورهای رسمی در نظر گرفته‌ایم؛ وضعیت و اعتبار VIP را همین‌جا مدیریت کن.</p>
         </div>
         <div class="vip-store-hero-aside">
             <i class="fas fa-layer-group" aria-hidden="true"></i>
-            <span>۶ سطح VIP · ۲ سطح قابل عرضه به کاربران</span>
+            <span>یک عضویت مرکزی · تمام سرورهای رسمی</span>
         </div>
     </header>
 
@@ -686,6 +686,20 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
 
     <div class="vip-store-layout">
         <div class="vip-store-main-column">
+
+            <section class="vip-network-banner" aria-label="محدوده عضویت مرکزی FragCity">
+                <span class="vip-network-banner-icon" aria-hidden="true"><i class="fas fa-globe"></i></span>
+                <div class="vip-network-banner-copy">
+                    <span class="vip-store-eyebrow">ONE ACCOUNT · ALL OFFICIAL SERVERS</span>
+                    <h2>یک عضویت برای تمام سرورهای رسمی FragCity</h2>
+                    <p>هدف سیستم مرکزی این است که VIP به حساب Steam شما متصل باشد؛ نه اینکه برای هر سرور رسمی اشتراک جداگانه بخرید.</p>
+                </div>
+                <div class="vip-network-banner-points" aria-label="ویژگی‌های عضویت مرکزی">
+                    <span><i class="fas fa-steam" aria-hidden="true"></i> یک حساب Steam</span>
+                    <span><i class="fas fa-layer-group" aria-hidden="true"></i> یک عضویت مرکزی</span>
+                    <span><i class="fas fa-server" aria-hidden="true"></i> تمام سرورهای رسمی</span>
+                </div>
+            </section>
 
     <section class="vip-plans-grid vip-public-plans-grid" aria-label="سطح‌های فعال و عمومی VIP">
         <?php foreach ($vipLevels as $lvl => $tier): ?>
@@ -936,10 +950,24 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
         <header class="vip-faq-heading">
             <span class="vip-store-eyebrow">FRAGCITY · HELP CENTER</span>
             <h2 id="vipFaqTitle">سؤالات متداول VIP</h2>
-            <p>پاسخ پرسش‌های رایج درباره پلن‌ها، هدیه Silver و دسترسی داخل سرور.</p>
+            <p>عضویت مرکزی FragCity، هدیه Silver و تفاوت آن با VIP مستقل سرورهای اجاره‌ای.</p>
         </header>
 
         <div class="vip-faq-list">
+            <details class="vip-faq-item">
+                <summary>آیا برای هر سرور رسمی باید VIP جداگانه بخرم؟</summary>
+                <div class="vip-faq-answer">
+                    <p>خیر؛ مدل هدف FragCity یک عضویت مرکزی متصل به حساب Steam است که روی تمام سرورهای رسمی FragCity اعتبار داشته باشد. قرار نیست برای جابه‌جایی بین سرورهای رسمی، چند اشتراک جدا تهیه کنی.</p>
+                </div>
+            </details>
+
+            <details class="vip-faq-item">
+                <summary>اگر سرور اجاره‌ای داشته باشم، می‌توانم VIP مخصوص خودم را بفروشم؟</summary>
+                <div class="vip-faq-answer">
+                    <p>بله؛ این مسیر باید مستقل از فروشگاه مرکزی FragCity باشد. در معماری در نظرگرفته‌شده، VIPCore سرور اجاره‌ای به دیتابیس جداگانه همان مالک متصل می‌شود؛ مالک می‌تواند برای بازیکنان خودش VIP رایگان یا پولی با قیمت‌گذاری مستقل تعریف کند. اطلاعات این VIP نباید از دیتابیس مرکزی FragCity خوانده شود و فقط روی همان سرورهای متعلق به آن مالک اعتبار داشته باشد. این بخش، مسیر توسعه و پیکربندی جداگانه صاحبان سرور است و تا زمان ارائه تنظیماتش در پنل، نباید آن را قابلیت فعال‌شده فرض کرد.</p>
+                </div>
+            </details>
+
             <details class="vip-faq-item">
                 <summary>چطور VIP را از طریق پنل سرور مدیریت یا غیرفعال کنم؟</summary>
                 <div class="vip-faq-answer">
@@ -978,8 +1006,8 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
         <header class="vip-comparison-header">
             <div class="vip-comparison-heading">
                 <span class="vip-store-eyebrow">FRAGCITY · VIP TIER COMPARISON</span>
-                <h2 id="vipComparisonTitle">مقایسه کامل سطح‌های VIP</h2>
-                <p id="vipComparisonDescription">تمام قابلیت‌ها و مقادیر اختصاصی هر شش سطح را در یک جدول بررسی کن.</p>
+                <h2 id="vipComparisonTitle">مقایسه قابلیت‌های VIPCore</h2>
+                <p id="vipComparisonDescription">این جدول برای شفافیت قابلیت‌های تعریف‌شده است؛ خرید Level جداگانه در فروشگاه FragCity وجود ندارد.</p>
                 <div class="vip-comparison-selected-tier" data-vip-comparison-selected>
                     <span class="vip-comparison-selected-dot" aria-hidden="true"></span>
                     <span data-vip-comparison-selected-name>مقایسه همه سطح‌ها</span>
