@@ -880,18 +880,41 @@
             if (walletPaymentStatus) {
                 walletPaymentStatus.textContent = 'پس از تأیید، موجودی از دیتابیس بررسی و برداشت به‌صورت اتمیک ثبت می‌شود.';
             }
+            const activationPending = walletDebitCommitted && walletPendingCallbackUrl !== '';
             walletPaymentModal.classList.remove('is-processing', 'is-error', 'is-pending');
-            if (walletPaymentConfirm) {
-                walletPaymentConfirm.hidden = false;
-                walletPaymentConfirm.disabled = false;
-                walletPaymentConfirm.innerHTML = '<i class="fas fa-wallet" aria-hidden="true"></i> تأیید و پرداخت';
+            if (activationPending) {
+                walletPaymentModal.classList.add('is-pending');
+                if (walletPaymentTitle) walletPaymentTitle.textContent = 'فعال‌سازی VIP در انتظار تکمیل';
+                if (walletPaymentMessage) {
+                    walletPaymentMessage.textContent = 'برداشت قبلاً ثبت شده است. فقط وضعیت فعال‌سازی سفارش قبلی بررسی می‌شود و مبلغ دوباره کسر نخواهد شد.';
+                }
+                if (walletPaymentStatus) {
+                    walletPaymentStatus.textContent = 'برای تکمیل فعال‌سازی، درخواست قبلی را دوباره بررسی کن.';
+                }
+                if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
+                if (walletPaymentRetry) {
+                    walletPaymentRetry.hidden = false;
+                    walletPaymentRetry.disabled = false;
+                    walletPaymentRetry.textContent = 'تلاش مجدد برای فعال‌سازی';
+                }
+                if (walletPaymentCancel) {
+                    walletPaymentCancel.hidden = false;
+                    walletPaymentCancel.textContent = 'بستن';
+                }
+                if (walletPaymentClose) walletPaymentClose.hidden = false;
+            } else {
+                if (walletPaymentConfirm) {
+                    walletPaymentConfirm.hidden = false;
+                    walletPaymentConfirm.disabled = false;
+                    walletPaymentConfirm.innerHTML = '<i class="fas fa-wallet" aria-hidden="true"></i> تأیید و پرداخت';
+                }
+                if (walletPaymentCancel) {
+                    walletPaymentCancel.hidden = false;
+                    walletPaymentCancel.textContent = 'انصراف';
+                }
+                if (walletPaymentClose) walletPaymentClose.hidden = false;
+                if (walletPaymentRetry) walletPaymentRetry.hidden = true;
             }
-            if (walletPaymentCancel) {
-                walletPaymentCancel.hidden = false;
-                walletPaymentCancel.textContent = 'انصراف';
-            }
-            if (walletPaymentClose) walletPaymentClose.hidden = false;
-            if (walletPaymentRetry) walletPaymentRetry.hidden = true;
 
             walletPaymentModal.hidden = false;
             walletPaymentModal.setAttribute('aria-hidden', 'false');
@@ -1009,6 +1032,11 @@
                     walletPaymentRetry.hidden = false;
                     walletPaymentRetry.disabled = false;
                     walletPaymentRetry.textContent = 'تلاش مجدد برای فعال‌سازی';
+                }
+                if (walletCheckoutButton) {
+                    walletCheckoutButton.disabled = false;
+                    walletCheckoutButton.classList.remove('is-submitting');
+                    walletCheckoutButton.textContent = 'پیگیری فعال‌سازی VIP';
                 }
                 if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
                 if (walletPaymentCancel) {
