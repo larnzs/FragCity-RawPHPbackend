@@ -1,3 +1,9 @@
+-- Create the immutable ledger for verified paid VIP grants.
+-- Run once on GLOBAL_vip. Apply 20261107_vip_paid_order_tier_prices.sql afterwards
+-- to add the full tier-price snapshot used by future upgrades.
+
+USE GLOBAL_vip;
+
 CREATE TABLE IF NOT EXISTS fragcity_vip_paid_orders (
     order_ref CHAR(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
     steamid64 CHAR(17) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
