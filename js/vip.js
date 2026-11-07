@@ -417,6 +417,7 @@
                 inactivePlans.style.removeProperty('height');
                 inactivePlans.style.removeProperty('overflow');
                 inactiveAnimation = null;
+                animation.cancel();
             };
             animation.oncancel = function () {
                 if (inactiveAnimation === animation) inactiveAnimation = null;
@@ -485,6 +486,7 @@
                 answer.style.removeProperty('overflow');
                 delete details.dataset.animating;
                 faqAnimations.delete(details);
+                animation.cancel();
             };
             animation.oncancel = function () {
                 if (faqAnimations.get(details) === animation) {
