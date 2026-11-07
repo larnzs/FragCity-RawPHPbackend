@@ -80,7 +80,7 @@ The optional `departments` array controls the **بخش** dropdown in the FragCit
 
 ## Customer ticket form
 
-- Name and email are shown read-only from the authenticated FragCity account. The backend re-reads the account row; browser values are never trusted.
+- The name field is prefilled from the FragCity profile and may be edited as a display name for the support team. It is stored only as message metadata and never used for authentication or ownership. Email is shown read-only from the authenticated FragCity account; the backend re-reads and verifies it independently.
 - Priority is sent to Paymenter as `low`, `medium` or `high`.
 - The service reference and domain, as well as up to three additional label/value pairs, are saved in the first Paymenter message together with the customer's description. They are descriptive metadata; the current v1.5.9 Admin `CreateTicketRequest` does not accept `service_id` for a relational service link.
 - The arithmetic CAPTCHA is generated and verified server-side, is bound to the PHP session and expires after five minutes. A challenge can be used only once.
