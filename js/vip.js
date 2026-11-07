@@ -1416,6 +1416,13 @@
         if (previousRoot !== nextRoot) {
             const staleModal = document.body.querySelector('#vipComparisonModal');
             if (staleModal) staleModal.remove();
+
+            // The wallet modal is mounted on body so it stays viewport-fixed.
+            // Remove that detached instance when the AJAX page changes; the
+            // next VIP fragment contains a fresh modal with the same ID.
+            const staleWalletModal = document.body.querySelector('#vipWalletPaymentModal');
+            if (staleWalletModal) staleWalletModal.remove();
+            document.body.classList.remove('vip-wallet-modal-open');
             document.body.classList.remove('vip-comparison-open');
             document.body.style.overflow = '';
         }
