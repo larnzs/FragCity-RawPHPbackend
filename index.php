@@ -560,6 +560,7 @@ $allowedPages = [
     'register',
     'profile',
     'myservers',
+    'orders',
     'vip',
     'leaderboard',
     'forgot_password',
@@ -597,6 +598,7 @@ $cleanRoutePages = [
     'register' => 'register',
     'profile' => 'profile',
     'my-servers' => 'myservers',
+    'orders' => 'orders',
     'vip' => 'vip',
     'leaderboard' => 'leaderboard',
     'forgot-password' => 'forgot_password',
@@ -681,6 +683,7 @@ $protectedPages = [
     'skins_vps',
     'profile',
     'myservers',
+    'orders',
 ];
 
 if (
@@ -825,6 +828,13 @@ $pageAssets = [
                 __DIR__ . '/js/myservers.js'
             ),
         ],
+    ],
+
+    'orders' => [
+        'css' => [
+            '/css/orders.css?v=' . asset_version(__DIR__ . '/css/orders.css'),
+        ],
+        'js' => [],
     ],
 
     'login' => [
@@ -1068,6 +1078,10 @@ $fcSeoPages = [
     'support' => [
         'title' => 'پشتیبانی و تماس با FragCity',
         'description' => 'برای دریافت راهنمایی درباره حساب کاربری، سرورهای بازی و خدمات کامیونیتی با پشتیبانی فرگ‌سیتی تماس بگیر.',
+    ],
+    'orders' => [
+        'title' => 'سفارش‌های شما | FragCity',
+        'description' => 'وضعیت پرداخت و فعال‌سازی سفارش‌های VIP فرگ‌سیتی را در یک صفحه پیگیری کنید.',
     ],
     'vip' => [
         'title' => 'سطح‌های VIP فرگ‌سیتی',
