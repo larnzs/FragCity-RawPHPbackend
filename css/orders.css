@@ -63,9 +63,9 @@
 .fc-orders__content {
     position: relative;
     width: 100%;
-    max-width: 1600px;
-    margin-right: auto;
-    margin-left: auto;
+    max-width: none;
+    margin-right: 0;
+    margin-left: 0;
 }
 
 .fc-orders__header {
@@ -1069,12 +1069,7 @@
     color: #86EFAC;
 }
 .fc-orders__vip-status-copy { display: grid; min-width: 0; gap: 4px; }
-.fc-orders__vip-status-kicker {
-    color: #F9A35E;
-    font: 850 .58rem/1.4 var(--fc-font-sans, sans-serif);
-    letter-spacing: .14em;
-    direction: ltr;
-}
+
 .fc-orders__vip-status-copy h2 { margin: 0; color: #F7F7F7; font-size: .96rem; font-weight: 900; }
 .fc-orders__vip-status-description {
     display: flex;
