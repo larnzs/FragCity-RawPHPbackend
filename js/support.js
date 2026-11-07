@@ -399,7 +399,7 @@
 
             const seq = ++requestSequence;
             activeTicketId = ticketId;
-            setPanelVisibility(listCard, false);
+            setPanelVisibility(listCard, true);
             setPanelVisibility(createCard, false);
             setPanelVisibility(detailCard, true);
             conversation.replaceChildren(makeEmpty('در حال دریافت مکالمه...'));
