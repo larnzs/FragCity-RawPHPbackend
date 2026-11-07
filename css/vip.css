@@ -2609,11 +2609,18 @@ body.vip-comparison-open {
     border-color: rgba(249, 115, 22, .5);
     background: rgba(249, 115, 22, .15);
 }
-@media (max-width: 1120px) {
+@media (max-width: 960px) {
     .vip-store-layout {
         grid-template-columns: minmax(0, 1fr);
+        direction: rtl;
+    }
+    .vip-store-main-column {
+        grid-column: 1;
+        grid-row: 1;
     }
     .vip-invoice-panel {
+        grid-column: 1;
+        grid-row: 2;
         position: relative;
         top: auto;
         order: 2;
@@ -3259,12 +3266,12 @@ body.vip-comparison-open {
     border-radius: 16px;
 }
 
-/* Slightly larger invoice for easier reading, without increasing its footprint excessively. */
+/* Keep the invoice sized as a full sidebar card, not as the former fixed dock. */
 .vip-invoice-panel.vip-checkout-bar {
-    min-height: 78px;
-    gap: 20px;
-    padding: 10px 20px;
-    border-radius: 14px;
+    min-height: 0;
+    gap: 0;
+    padding: 22px;
+    border-radius: 18px;
 }
 .vip-invoice-panel .vip-invoice-product .vip-store-eyebrow {
     font-size: .53rem;
@@ -3311,8 +3318,9 @@ body.vip-comparison-open {
     }
     .vip-invoice-panel.vip-checkout-bar {
         min-height: 0;
-        gap: 7px 9px;
-        padding: 9px 10px;
+        gap: 0;
+        padding: 17px;
+        border-radius: 15px;
     }
     .vip-invoice-panel .vip-invoice-total > strong {
         font-size: .8rem;
