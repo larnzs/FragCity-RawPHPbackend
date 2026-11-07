@@ -34,6 +34,10 @@ final class VipCoreRepository
         }
 
         $level = max(0, min(6, (int)$data['level']));
+        // Older API deployments may not return this capability flag yet.
+        // Treat an unknown paid ledger as unavailable: status remains readable,
+        // but the storefront must not accept a payment it cannot provision.
+        $paidLedgerAvailable = ($data['paid_ledger_available'] ?? false) === true;
         $paidPurchase = $data['paid_purchase'] ?? null;
         if ($paidPurchase !== null) {
             if (!is_array($paidPurchase)
@@ -73,6 +77,7 @@ final class VipCoreRepository
             'group' => is_string($data['group'] ?? null) ? $data['group'] : null,
             'expires' => $expires === null ? null : max(0, (int)$expires),
             'paid_purchase' => $paidPurchase,
+            'paid_ledger_available' => $paidLedgerAvailable,
             'server_id' => (int)$data['server_id'],
         ];
     }
