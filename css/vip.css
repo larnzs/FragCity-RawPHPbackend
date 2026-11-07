@@ -2039,8 +2039,10 @@ button.vip-checkout-wallet {
     grid-template-columns: minmax(315px, 370px) minmax(0, 1fr);
     align-items: start;
     gap: 20px;
+    position: relative;
     width: 100%;
     margin: 0;
+    overflow: visible;
     direction: ltr;
 }
 .vip-store-main-column {
@@ -2680,7 +2682,14 @@ body.vip-comparison-open {
     right: auto !important;
     bottom: auto !important;
     left: auto !important;
-    inset: auto !important;
+    /* Do not use inset:auto here: it resets the sticky top offset above. */
+    align-self: start;
+    max-height: calc(100vh - var(--fc-header-overlap-height, 72px) - 36px);
+    max-height: calc(100svh - var(--fc-header-overlap-height, 72px) - 36px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(249, 115, 22, .38) rgba(255, 255, 255, .035);
     z-index: 20;
     display: flex !important;
     flex-direction: column;
