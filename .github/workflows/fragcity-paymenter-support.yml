@@ -7,6 +7,8 @@ on:
       - "api/support.php"
       - "class/PaymenterSupportApiClient.php"
       - "pages/support.php"
+      - "includes/header.php"
+      - "css/header.css"
       - "js/support.js"
       - "css/support.css"
       - "settings/settings.example.json"
@@ -19,6 +21,8 @@ on:
       - "api/support.php"
       - "class/PaymenterSupportApiClient.php"
       - "pages/support.php"
+      - "includes/header.php"
+      - "css/header.css"
       - "js/support.js"
       - "css/support.css"
       - "settings/settings.example.json"
@@ -52,6 +56,7 @@ jobs:
             "api/support.php"
             "class/PaymenterSupportApiClient.php"
             "pages/support.php"
+            "includes/header.php"
             "tools/paymenter-support-preflight.php"
           )
           for file in "${files[@]}"; do
@@ -70,6 +75,17 @@ jobs:
             echo "Legacy local ticket writes detected in pages/support.php"
             exit 1
           fi
+
+      - name: Verify headset support shortcut in the header
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q 'class="fc-support-toggle' includes/header.php
+          grep -q 'fa-solid fa-headset' includes/header.php
+          grep -q 'data-ajax-nav' includes/header.php
+          grep -q 'data-slug="support"' includes/header.php
+          grep -q 'fc-support-toggle:hover' css/header.css
+          grep -q 'fc-support-toggle__label' css/header.css
 
       - name: Check support JavaScript
         run: node --check js/support.js
