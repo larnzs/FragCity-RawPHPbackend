@@ -572,6 +572,12 @@ foreach ($vipFeaturesData as $featureLevel => $features) {
 }
 
 $vipAllowedPurchaseDurations = [7, 15, 30, 60, 90];
+// Default official FragCity floor prices (Rial). Runtime settings may override these per duration.
+$vipDefaultPriceRialMap = [
+    '1' => ['7' => 44000, '15' => 95000, '30' => 190000, '60' => 380000, '90' => 570000],
+    '2' => ['7' => 114000, '15' => 245000, '30' => 490000, '60' => 980000, '90' => 1470000],
+    '3' => ['7' => 208000, '15' => 445000, '30' => 890000, '60' => 1780000, '90' => 2670000],
+];
 $vipPurchasePriceMap = []; // Toman values for storefront display only.
 $vipPurchasePriceRialMap = []; // Rial values are the canonical amounts for the payment provider.
 foreach ($vipLevels as $level => $tier) {
@@ -585,7 +591,9 @@ foreach ($vipLevels as $level => $tier) {
         $durationPackage = is_array($package['durations'][(string) $days] ?? null)
             ? $package['durations'][(string) $days]
             : [];
-        $rawPrice = $durationPackage['price_rial'] ?? null;
+        $rawPrice = array_key_exists('price_rial', $durationPackage)
+            ? $durationPackage['price_rial']
+            : ($vipDefaultPriceRialMap[(string) $level][(string) $days] ?? null);
         $validatedPrice = filter_var($rawPrice, FILTER_VALIDATE_INT);
         $priceRial = $validatedPrice !== false
             && $validatedPrice > 0
