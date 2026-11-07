@@ -8,7 +8,8 @@ This integration uses the existing FragCity /support page as the customer UI and
 
 - Authenticates the customer through the existing FragCity session.
 - Reads SteamID64 from the authenticated server-side session.
-- Resolves the linked Paymenter user ID through the dedicated HMAC identity endpoint.
+- Reads email, phone and the linked Paymenter user ID from the authenticated FragCity database row.
+- Resolves the Paymenter identity through the signed HMAC endpoint and requires an exact match of Paymenter ID, email and the `fragcity_phone` User property before every support action.
 - Calls Paymenter's native Admin API from PHP.
 - Shows the customer's own tickets, messages and read-only invoice information.
 - Sends customer messages and permits the customer to close/reopen their own ticket.
@@ -45,7 +46,7 @@ Create a separate Admin API Key, for example **FragCity Support Website**, with 
 
 Do not enable Delete, Impersonate, Create/Update Users, Invoice Create/Update, Invoice Item Create/Update, Orders, Services, Coupons or Credits. View Users is not required for the SteamID64 mapping.
 
-The API key is administrative, not customer-scoped. Never expose it to the browser. The server-side adapter always resolves the Paymenter ID from the session's SteamID64. Paymenter filters are only query optimizations, never an authorization boundary: every ticket returned by the list is independently checked against its `user_id` (or JSON:API `user` relationship), and a missing owner ID is rejected. Ticket detail reads, replies, closes and reopens also require an exact owner match before the operation proceeds.
+The API key is administrative, not customer-scoped. Never expose it to the browser. The server-side adapter always resolves the Paymenter ID from the session's SteamID64. Before any ticket or invoice action, the backend verifies that the signed Paymenter identity has the same user ID, email and phone as the authenticated FragCity database row. Paymenter filters are only query optimizations, never an authorization boundary: every ticket returned by the list is independently checked against its `user_id` (or JSON:API `user` relationship), and a missing owner ID is rejected. Ticket detail reads, replies, closes and reopens also require an exact owner match before the operation proceeds.
 
 ## Private settings
 
@@ -93,7 +94,7 @@ X-FragCity-Signature: ...
 }
 ~~~
 
-The SteamID64 comes from the existing authenticated FragCity PHP session. Browser-supplied steamid64 or paymenter_user_id is not trusted.
+The SteamID64 comes from the existing authenticated FragCity PHP session. Browser-supplied steamid64, email, phone or paymenter_user_id is not trusted. The bridge resolves the Paymenter user ID, email and `fragcity_phone` property; the website compares all three with the local FragCity account before any ticket operation.
 
 ### Native Paymenter Admin API
 
@@ -159,6 +160,7 @@ The preflight verifies:
 - Paymenter Admin API read access for ticket messages.
 - Paymenter Admin API read access for invoices and invoice items.
 - Optional SteamID64-to-Paymenter-user mapping.
+- Customer identity verification against local FragCity email, phone and `paymenter_user_id` when a SteamID64 is supplied.
 
 This preflight is read-only. It does not create tickets/messages or modify accounting. Create and update permissions are exercised when a real test ticket is created/replied to/closed/reopened.
 
