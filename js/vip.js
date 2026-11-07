@@ -245,6 +245,7 @@
             });
             const durationLabel = durationButton ? (durationButton.dataset.durationLabel || (days + ' روز')) : '';
             const price = days > 0 ? getConfiguredPrice(level, days) : null;
+            const basePrice = getConfiguredPrice(level, 30);
 
             if (invoiceTier) invoiceTier.textContent = name;
             if (invoiceLevel) invoiceLevel.textContent = name + ' · VIP ' + String(level).padStart(2, '0');
@@ -254,15 +255,21 @@
             if (invoiceTotal) {
                 invoiceTotal.textContent = mode === 'trial'
                     ? 'رایگان'
-                    : (price !== null ? formatPrice(price) : '— تومان');
+                    : (price !== null
+                        ? formatPrice(price)
+                        : (!days && basePrice !== null
+                            ? 'شروع از ' + formatPrice(basePrice) + ' · ۳۰ روز'
+                            : '— تومان'));
             }
             invoice.style.setProperty('--vip-invoice-accent', activePlan.dataset.vipColor || '#F97316');
 
             const loggedIn = root.dataset.vipLoggedIn === '1';
             const hasAnyActiveMembership = root.dataset.vipHasActive === '1';
             const checkoutReady = root.dataset.vipCheckoutReady === '1';
+            const statusAvailable = root.dataset.vipStatusUnavailable !== '1';
             const canCheckout = loggedIn
                 && checkoutReady
+                && statusAvailable
                 && !hasAnyActiveMembership
                 && !current
                 && available
@@ -278,9 +285,9 @@
             } else if (mode === 'trial') {
                 message = 'Silver هدیه سه‌روزه است؛ آن را از کارت هدیه خوش‌آمدگویی دریافت کن. این سفارش وارد Checkout نمی‌شود.';
             } else if (hasAnyActiveMembership) {
-                message = 'حساب شما از قبل VIP فعال دارد؛ خرید یا ارتقای سطح تا پایان اشتراک فعلی امکان‌پذیر نیست.';
+                message = 'حساب شما از قبل VIP فعال دارد؛ قیمت و مدت پلن‌ها قابل بررسی است، اما خرید یا ارتقا تا پایان اشتراک فعلی انجام نمی‌شود.';
             } else if (root.dataset.vipStatusUnavailable === '1') {
-                message = 'وضعیت VIPCore در دسترس نیست؛ برای جلوگیری از پرداخت تکراری، خرید موقتاً غیرفعال است.';
+                message = 'قیمت و مدت پلن قابل مشاهده است، اما تا زمان در دسترس‌شدن VIPCore امکان پرداخت وجود ندارد.';
             } else if (!loggedIn) {
                 message = 'برای خرید VIP ابتدا با حساب Steam وارد شوید.';
             } else if (mode === 'paid' && !days) {
@@ -326,13 +333,14 @@
         function syncDurationSelector(plan, isCurrent) {
             if (!durationSelector) return;
 
+            // Pricing remains inspectable even when an existing VIP or a
+            // temporary VIPCore outage prevents checkout. Only the current
+            // active tier hides purchase durations to avoid repurchase.
             const canChooseDuration = (
                 hasUserSelectedPlan
                 && plan.dataset.vipAvailable === '1'
                 && plan.dataset.vipPurchaseMode === 'paid'
                 && !isCurrent
-                && root.dataset.vipHasActive !== '1'
-                && root.dataset.vipStatusUnavailable !== '1'
             );
 
             durationSelector.hidden = !canChooseDuration;
