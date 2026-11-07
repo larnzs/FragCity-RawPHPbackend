@@ -15,8 +15,21 @@ header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 header('X-Content-Type-Options: nosniff');
 
-$terminate = static function (string $message, int $status = 400): never {
+$acceptHeader = strtolower((string)($_SERVER['HTTP_ACCEPT'] ?? ''));
+$wantsJsonResponse = (string)($_POST['payment_method'] ?? '') === 'wallet'
+    && str_contains($acceptHeader, 'application/json');
+
+$terminate = static function (string $message, int $status = 400) use ($wantsJsonResponse): never {
     http_response_code($status);
+    if ($wantsJsonResponse) {
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode(
+            ['success' => false, 'message' => $message],
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+        );
+        exit;
+    }
+
     header('Content-Type: text/html; charset=UTF-8');
     $safeMessage = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
     echo '<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">'
@@ -428,6 +441,25 @@ if ($paymentMethod === 'wallet') {
     $walletCallbackUrl = '/pages/zarinpal/zarinpal_vip_callback.php?Authority='
         . rawurlencode((string)$walletAuthority)
         . '&Status=OK';
+
+    if ($wantsJsonResponse) {
+        header('Content-Type: application/json; charset=UTF-8');
+        echo json_encode(
+            [
+                'success' => true,
+                'message' => 'مبلغ با موفقیت از کیف پول کسر شد؛ در حال فعال‌سازی VIP هستیم.',
+                'callback_url' => $walletCallbackUrl,
+                'amount_toman' => (int)$walletAmountToman,
+                'level' => $level,
+                'duration_days' => $days,
+                'order_ref' => $orderRef,
+            ],
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+        );
+        exit;
+    }
+
+    // Non-AJAX wallet form submissions retain the safe callback flow.
     header('Location: ' . $walletCallbackUrl, true, 303);
     exit;
 }
