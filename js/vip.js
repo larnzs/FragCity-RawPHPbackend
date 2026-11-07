@@ -88,6 +88,14 @@
         const walletPaymentRetry = walletPaymentModal
             ? walletPaymentModal.querySelector('[data-wallet-modal-retry]')
             : null;
+
+        // The AJAX page transition applies transforms to the page container.
+        // A fixed-position modal inside that transformed subtree becomes fixed
+        // to the subtree instead of the viewport, so mount it directly on body.
+        if (walletPaymentModal && walletPaymentModal.parentElement !== document.body) {
+            document.body.appendChild(walletPaymentModal);
+        }
+
         const initialWalletPendingCallback = String(root.dataset.vipWalletPendingCallback || '');
         const initialWalletPendingValid = /^\/pages\/zarinpal\/zarinpal_vip_callback\.php\?Authority=WALLET_[a-f0-9]{32}&Status=OK$/.test(initialWalletPendingCallback);
         let walletPendingCallbackUrl = initialWalletPendingValid ? initialWalletPendingCallback : '';
@@ -474,7 +482,7 @@
                     } else if (!canWalletCheckout) {
                         walletCheckoutButton.textContent = 'موجودی کیف پول ناکافی';
                     } else {
-                        walletCheckoutButton.textContent = 'پرداخت از کیف پول';
+                        walletCheckoutButton.textContent = 'پرداخت از طریق کیف پول';
                     }
                     walletCheckoutButton.title = canWalletCheckout
                         ? 'کسر مبلغ از کیف پول و فعال‌سازی VIP'
