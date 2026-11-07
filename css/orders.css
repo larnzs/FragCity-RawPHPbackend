@@ -1099,7 +1099,17 @@
 .fc-orders__vip-status-meta span { display: inline-flex; align-items: center; gap: 6px; }
 .fc-orders__vip-status-meta i { color: #F9A35E; }
 .fc-orders__vip-status-meta strong { color: #DADADA; font-weight: 800; }
-.fc-orders__vip-status-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.fc-orders__vip-status-actions { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 7px; }
+.fc-orders__revoke-cooldown {
+    display: block;
+    max-width: 340px;
+    color: #FDBA74;
+    font-size: .61rem;
+    font-weight: 700;
+    line-height: 1.8;
+    text-align: right;
+}
+.fc-orders__revoke-cooldown.is-unavailable { color: #FCA5A5; }
 .fc-orders__revoke-trigger {
     display: inline-flex;
     align-items: center;
@@ -1123,7 +1133,7 @@
     background: rgba(127, 29, 29, .28);
     box-shadow: 0 9px 24px rgba(127, 29, 29, .13);
 }
-.fc-orders__revoke-trigger:disabled { cursor: wait; opacity: .65; }
+.fc-orders__revoke-trigger:disabled { cursor: not-allowed; opacity: .52; filter: saturate(.65); }
 .fc-orders__vip-status-feedback { grid-column: 2 / -1; min-height: 0; color: #86EFAC; font-size: .66rem; line-height: 1.8; }
 .fc-orders__vip-status-feedback.is-error { color: #FCA5A5; }
 .fc-orders__vip-status-feedback:empty { display: none; }
@@ -1243,8 +1253,9 @@
     .fc-orders__vip-status-copy h2 { font-size: .88rem; }
     .fc-orders__vip-status-description { font-size: .64rem; }
     .fc-orders__vip-status-meta { gap: 5px 10px; font-size: .59rem; }
-    .fc-orders__vip-status-actions { grid-column: 1 / -1; justify-content: stretch; }
+    .fc-orders__vip-status-actions { grid-column: 1 / -1; align-items: stretch; justify-content: stretch; }
     .fc-orders__vip-status-actions > * { width: 100%; }
+    .fc-orders__revoke-cooldown { max-width: none; text-align: center; font-size: .59rem; }
     .fc-orders__revoke-trigger { min-height: 39px; font-size: .67rem; }
     .fc-orders__vip-status-feedback { grid-column: 1 / -1; font-size: .62rem; }
     .fc-orders__revoke-panel { gap: 9px; padding: 22px 17px 18px; border-radius: 16px; }
