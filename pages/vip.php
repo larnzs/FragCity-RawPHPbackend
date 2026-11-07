@@ -630,6 +630,15 @@ $vipBaseUpgradeDifference30Toman = is_int($vipSilver30PriceToman)
         ? $vipGold30PriceToman - $vipSilver30PriceToman
         : null;
 
+// Match the live Silver row against the immutable free-trial claim ledger.
+// A claim whose expiry is the current VIP expiry is the active free trial,
+// never a paid membership eligible for upgrade credit.
+$vipCurrentMembershipIsFreeTrial = $vipHasActiveMembership
+    && $vipCurrentLevel === 2
+    && !empty($vipFreeTrialStatus['claimed'])
+    && strtoupper((string)($vipFreeTrialStatus['group'] ?? '')) === 'SILVER'
+    && (int)($vipFreeTrialStatus['expires'] ?? 0) === (int)($userVip['vip_expire'] ?? 0);
+
 // A paid active membership can be upgraded by paying only the prorated
 // difference for its unused time. A free Silver trial has no paid-order ledger
 // entry, so it never produces an upgrade credit.
@@ -640,6 +649,7 @@ $vipUpgradeRemainingSeconds = 0;
 if ($isLoggedIn
     && !$vipStatusUnavailable
     && $vipHasActiveMembership
+    && !$vipCurrentMembershipIsFreeTrial
     && is_array($vipPaidPurchase)
     && (int)($vipPaidPurchase['level'] ?? 0) === $vipCurrentLevel
     && (int)($vipPaidPurchase['expires'] ?? 0) === (int)($userVip['vip_expire'] ?? 0)
@@ -728,6 +738,7 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
     data-vip-current-level="<?= $vipCurrentLevel ?>"
     data-vip-status-unavailable="<?= ($vipStatusUnavailable || $vipFreeTrialStatusUnavailable) ? '1' : '0' ?>"
     data-vip-paid-upgrade-eligible="<?= $vipPaidUpgradeEligible ? '1' : '0' ?>"
+    data-vip-current-is-free-trial="<?= $vipCurrentMembershipIsFreeTrial ? '1' : '0' ?>"
     data-vip-upgrade-duration-days="<?= $vipUpgradeDurationDays ?>"
     data-vip-upgrade-prices="<?= htmlspecialchars(json_encode($vipUpgradePriceMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-upgrade-prices-rial="<?= htmlspecialchars(json_encode($vipUpgradePriceRialMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
