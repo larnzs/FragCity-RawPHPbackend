@@ -17,11 +17,15 @@ if (($_SESSION['user_logged_in'] ?? false) !== true) {
 }
 
 require_once dirname(__DIR__) . '/settings/loader.php';
+require_once dirname(__DIR__) . '/class/VipCoreRepository.php';
 
 $ordersPageSteamId = (string)($_SESSION['steamid'] ?? '');
 $ordersPageRows = [];
 $ordersPageError = false;
 $ordersPageErrorMessage = '';
+$ordersPageVipStatus = null;
+$ordersPageVipStatusUnavailable = false;
+$ordersPageCsrf = (string)($_SESSION['auth_csrf_token'] ?? '');
 
 $ordersPageEscape = static function ($value): string {
     return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -44,6 +48,9 @@ $ordersPageLevels = [
     1 => 'Bronze',
     2 => 'Silver',
     3 => 'Gold',
+    4 => 'Platinum',
+    5 => 'Emerald',
+    6 => 'Diamond',
 ];
 
 $ordersPageStatuses = [
@@ -82,6 +89,12 @@ $ordersPageStatuses = [
         'class' => 'muted',
         'icon' => 'fa-ban',
         'description' => 'این سفارش لغو شده است.',
+    ],
+    'revoked' => [
+        'label' => 'باطل‌شده توسط کاربر',
+        'class' => 'muted',
+        'icon' => 'fa-shield-halved',
+        'description' => 'دسترسی VIP این سفارش به درخواست شما از VIPCore حذف شده است؛ سابقه پرداخت برای پیگیری نگهداری می‌شود.',
     ],
 ];
 
@@ -125,6 +138,40 @@ if (!preg_match('/^[0-9]{17}$/D', $ordersPageSteamId)) {
     }
 }
 
+
+if (preg_match('/^[0-9]{17}$/D', $ordersPageSteamId)) {
+    try {
+        $ordersPageVipStatus = (new VipCoreRepository())->getStatus($ordersPageSteamId);
+    } catch (Throwable $e) {
+        $ordersPageVipStatusUnavailable = true;
+        error_log(
+            '[FragCity Orders] VIPCore status lookup failed; steam_hash='
+            . substr(hash('sha256', $ordersPageSteamId), 0, 16)
+            . '; type=' . get_class($e)
+        );
+    }
+}
+
+$ordersPageCurrentVipActive = is_array($ordersPageVipStatus)
+    && ($ordersPageVipStatus['active'] ?? false) === true;
+$ordersPageCurrentVipLevel = $ordersPageCurrentVipActive
+    ? (int)($ordersPageVipStatus['level'] ?? 0)
+    : 0;
+$ordersPageCurrentVipName = $ordersPageLevels[$ordersPageCurrentVipLevel] ?? 'VIP';
+$ordersPageCurrentVipExpires = $ordersPageCurrentVipActive
+    ? (int)($ordersPageVipStatus['expires'] ?? 0)
+    : null;
+$ordersPageCurrentVipExpiryLabel = '—';
+if ($ordersPageCurrentVipActive) {
+    if ($ordersPageCurrentVipExpires === 0) {
+        $ordersPageCurrentVipExpiryLabel = 'دائمی';
+    } elseif ($ordersPageCurrentVipExpires !== null && $ordersPageCurrentVipExpires > 0) {
+        $ordersPageCurrentVipExpiryLabel = (new DateTimeImmutable('@' . $ordersPageCurrentVipExpires))
+            ->setTimezone(new DateTimeZone(date_default_timezone_get()))
+            ->format('Y/m/d · H:i');
+    }
+}
+
 $ordersPageTotal = count($ordersPageRows);
 $ordersPageCompleted = 0;
 $ordersPageAttention = 0;
@@ -144,7 +191,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
 }
 ?>
 
-<section class="fc-orders" id="fcOrders">
+<section class="fc-orders" id="fcOrders" data-vip-revoke-csrf="<?= $ordersPageEscape($ordersPageCsrf) ?>">
     <div class="fc-orders__ambient fc-orders__ambient--one" aria-hidden="true"></div>
     <div class="fc-orders__ambient fc-orders__ambient--two" aria-hidden="true"></div>
 
@@ -159,6 +206,61 @@ foreach ($ordersPageRows as $ordersPageRow) {
             تازه‌سازی
         </a>
     </header>
+
+    <section class="fc-orders__vip-status<?= $ordersPageCurrentVipActive ? ' is-active' : '' ?>" id="fcOrdersVipStatus" aria-labelledby="fcOrdersVipStatusTitle">
+        <span class="fc-orders__vip-status-icon" aria-hidden="true">
+            <i class="fa-solid <?= $ordersPageCurrentVipActive ? 'fa-crown' : ($ordersPageVipStatusUnavailable ? 'fa-triangle-exclamation' : 'fa-shield-halved') ?>"></i>
+        </span>
+        <div class="fc-orders__vip-status-copy">
+            <span class="fc-orders__vip-status-kicker">CURRENT MEMBERSHIP</span>
+            <h2 id="fcOrdersVipStatusTitle">وضعیت فعلی VIP</h2>
+            <?php if ($ordersPageVipStatusUnavailable): ?>
+                <p class="fc-orders__vip-status-description is-unavailable">دریافت وضعیت از VIPCore ممکن نیست؛ برای جلوگیری از نمایش اطلاعات اشتباه، عملیات ابطال در دسترس نیست.</p>
+            <?php elseif ($ordersPageCurrentVipActive): ?>
+                <p class="fc-orders__vip-status-description">
+                    اشتراک <strong data-vip-current-level><?= $ordersPageEscape($ordersPageCurrentVipName) ?></strong>
+                    <span class="fc-orders__vip-active-pill"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> فعال</span>
+                </p>
+                <div class="fc-orders__vip-status-meta">
+                    <span><i class="fa-regular fa-calendar" aria-hidden="true"></i> اعتبار تا: <strong data-vip-current-expiry><?= $ordersPageEscape($ordersPageCurrentVipExpiryLabel) ?></strong></span>
+                </div>
+            <?php else: ?>
+                <p class="fc-orders__vip-status-description" data-vip-current-empty>در حال حاضر هیچ سطح VIP فعالی روی حساب شما ثبت نشده است.</p>
+            <?php endif; ?>
+        </div>
+        <div class="fc-orders__vip-status-actions">
+            <?php if ($ordersPageCurrentVipActive): ?>
+                <button class="fc-orders__revoke-trigger" type="button" data-vip-revoke-open>
+                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                    ابطال وضعیت VIP
+                </button>
+            <?php elseif (!$ordersPageVipStatusUnavailable): ?>
+                <a class="fc-orders__buy-link" href="/vip/" data-ajax-nav data-slug="vip">
+                    <i class="fa-solid fa-crown" aria-hidden="true"></i>
+                    خرید VIP
+                </a>
+            <?php endif; ?>
+        </div>
+        <span class="fc-orders__vip-status-feedback" data-vip-revoke-feedback role="status" aria-live="polite"></span>
+    </section>
+
+    <dialog class="fc-orders__revoke-dialog" id="fcVipRevokeDialog" aria-labelledby="fcVipRevokeTitle" aria-describedby="fcVipRevokeDescription">
+        <div class="fc-orders__revoke-panel">
+            <span class="fc-orders__revoke-icon" aria-hidden="true"><i class="fa-solid fa-triangle-exclamation"></i></span>
+            <span class="fc-orders__section-kicker">VIP MEMBERSHIP CONTROL</span>
+            <h2 id="fcVipRevokeTitle">ابطال وضعیت VIP</h2>
+            <p id="fcVipRevokeDescription">آیا مطمئنی می‌خوای سطح فعلی VIP رو باطل کنی؟</p>
+            <p class="fc-orders__revoke-warning">با تأیید، دسترسی VIP فعلی از VIPCore حذف می‌شود. مبلغ پرداخت‌شده به‌صورت خودکار بازگشت داده نمی‌شود.</p>
+            <div class="fc-orders__revoke-actions">
+                <button type="button" class="fc-orders__revoke-cancel" data-vip-revoke-cancel>انصراف</button>
+                <button type="button" class="fc-orders__revoke-confirm" data-vip-revoke-confirm>
+                    <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+                    بله، باطل کن
+                </button>
+            </div>
+            <p class="fc-orders__revoke-feedback" data-vip-revoke-modal-feedback role="status" aria-live="polite"></p>
+        </div>
+    </dialog>
 
     <section class="fc-orders__summary" aria-label="خلاصه سفارش‌ها">
         <article class="fc-orders__metric">
@@ -264,7 +366,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
                         ? '/pages/zarinpal/zarinpal_vip_callback.php?Authority=' . rawurlencode($orderAuthority) . '&Status=OK'
                         : '';
                     ?>
-                    <article class="fc-orders__order-card">
+                    <article class="fc-orders__order-card" data-order-ref="<?= $ordersPageEscape($orderRef) ?>">
                         <div class="fc-orders__order-main">
                             <span class="fc-orders__order-icon"><i class="fa-solid fa-crown" aria-hidden="true"></i></span>
                             <div class="fc-orders__order-identity">
