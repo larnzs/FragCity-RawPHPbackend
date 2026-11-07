@@ -33,7 +33,7 @@ try {
     $permissions = $client->testNativeApiAccess();
     echo "PAYMENTER ADMIN API: PASS\n";
     echo "View Tickets: PASS\n";
-    echo "View Ticket Messages: PASS\n";
+    echo "View Ticket Messages + ticket conversation include: PASS\n";
     echo "View Invoices: PASS\n";
     echo "View Invoice Items: PASS\n";
     echo "Write permissions are configured in Paymenter but are not tested by this read-only preflight.\n";
