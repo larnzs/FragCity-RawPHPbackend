@@ -49,25 +49,31 @@
             dialog.setAttribute('aria-busy', busy ? 'true' : 'false');
         }
 
-        function updateOrderCard(orderRef) {
-            if (!orderRef) return;
-            const orderCard = Array.from(root.querySelectorAll('[data-order-ref]'))
-                .find((card) => card.dataset.orderRef === orderRef);
-            if (!orderCard) return;
+        function updateOrderCards(orderRef) {
+            const cards = Array.from(root.querySelectorAll('[data-order-ref]'));
+            cards.forEach((orderCard) => {
+                const currentStatus = String(orderCard.dataset.orderStatus || '').toLowerCase();
+                const isCurrentMembershipOrder = Boolean(orderRef)
+                    && orderCard.dataset.orderRef === orderRef;
+                const isStalePaidOrder = currentStatus === 'paid';
 
-            const status = orderCard.querySelector('.fc-orders__status');
-            if (status) {
-                status.className = 'fc-orders__status fc-orders__status--muted';
-                status.innerHTML = '<i class="fa-solid fa-shield-halved" aria-hidden="true"></i> باطل‌شده توسط کاربر';
-            }
+                if (!isCurrentMembershipOrder && !isStalePaidOrder) return;
 
-            const description = orderCard.querySelector('.fc-orders__order-description');
-            if (description) {
-                description.textContent = 'دسترسی این اشتراک به درخواست شما از VIPCore حذف شده است. سابقه پرداخت برای پیگیری نگهداری می‌شود.';
-            }
+                const status = orderCard.querySelector('.fc-orders__status');
+                if (status) {
+                    status.className = 'fc-orders__status fc-orders__status--muted';
+                    status.innerHTML = '<i class="fa-solid fa-shield-halved" aria-hidden="true"></i> باطل‌شده توسط کاربر';
+                }
 
-            orderCard.querySelector('.fc-orders__retry')?.remove();
-            orderCard.querySelector('.fc-orders__verified')?.remove();
+                const description = orderCard.querySelector('.fc-orders__order-description');
+                if (description) {
+                    description.textContent = 'این سفارش به درخواست شما از صف فعال‌سازی خارج شده است. سابقه پرداخت برای پیگیری نگهداری می‌شود.';
+                }
+
+                orderCard.querySelector('.fc-orders__retry')?.remove();
+                orderCard.querySelector('.fc-orders__verified')?.remove();
+                orderCard.dataset.orderStatus = 'revoked';
+            });
         }
 
         function updateMembershipCard(data) {
@@ -162,7 +168,7 @@
                 }
 
                 updateMembershipCard(result.data);
-                updateOrderCard(typeof result.data.order_ref === 'string' ? result.data.order_ref : '');
+                updateOrderCards(typeof result.data.order_ref === 'string' ? result.data.order_ref : '');
                 showFeedback(
                     pageFeedback,
                     'وضعیت VIP با موفقیت باطل شد. اکنون می‌توانید اشتراک جدیدی تهیه کنید.',
