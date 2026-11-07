@@ -957,7 +957,7 @@ $vipCheckoutIntegrationReady = false; // Fail closed until order creation, Zarin
                 <?php endif; ?>
             </div>
 
-            <small class="vip-invoice-checkout-note">پرداخت مستقیم تا تکمیل اتصال سرویس سفارش و تأیید نهایی VIPCore غیرفعال است.</small>
+            <small class="vip-invoice-checkout-note">مبلغ‌ها در صفحه به تومان نمایش داده می‌شوند؛ مبلغ مرجع درگاه در سمت سرور به ریال نگهداری می‌شود. پرداخت مستقیم تا تکمیل اتصال سفارش و تأیید نهایی VIPCore غیرفعال است.</small>
         </aside>
     </div>
 
