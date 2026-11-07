@@ -17,7 +17,8 @@ $renderResult = static function (
     string $message,
     int $amountRial = 0,
     string $reference = '',
-    bool $provisionPending = false
+    bool $provisionPending = false,
+    ?string $retryUrl = null
 ): never {
     header('Content-Type: text/html; charset=UTF-8');
 
@@ -59,7 +60,13 @@ $renderResult = static function (
         . '</head><body><main class="card"><h1>' . $heading . '</h1><p>' . $safeMessage . '</p>';
 
     if ($provisionPending) {
-        echo '<div class="note">مبلغ را دوباره پرداخت نکنید. سفارش با وضعیت پرداخت‌شده ذخیره شده و تلاش مجدد برای ثبت VIP با همان شناسه سفارش انجام می‌شود. در صورت باقی‌ماندن مشکل، با پشتیبانی FragCity تماس بگیرید.</div>';
+        echo '<div class="note">مبلغ دوباره کسر نمی‌شود. سفارش ثبت شده و فعال‌سازی VIP قابل تلاش مجدد است.</div>';
+        if (is_string($retryUrl) && $retryUrl !== '') {
+            $safeRetryUrl = htmlspecialchars($retryUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            echo '<a class="btn" href="' . $safeRetryUrl . '">تلاش مجدد برای فعال‌سازی VIP</a>';
+        } else {
+            echo '<div class="note">در صورت باقی‌ماندن مشکل، با پشتیبانی FragCity تماس بگیرید.</div>';
+        }
     }
 
     echo '<a class="btn" href="/index.php?page=vip">بازگشت به فروشگاه VIP</a></main></body></html>';
@@ -149,6 +156,38 @@ try {
         || $tierPriceRial % 10 !== 0
         || (string)($order['authority'] ?? '') !== $authority) {
         $renderResult(false, 'اطلاعات داخلی سفارش با قالب مورد انتظار مطابقت ندارد. برای بررسی با پشتیبانی تماس بگیرید.');
+    }
+
+    $isWalletPayment = str_starts_with($authority, 'WALLET_');
+    $retryUrl = $isWalletPayment
+        ? '/pages/zarinpal/zarinpal_vip_callback.php?Authority=' . rawurlencode($authority) . '&Status=OK'
+        : null;
+    if ($isWalletPayment) {
+        $walletReference = (string)($order['ref_id'] ?? '');
+        if (!in_array($orderStatus, ['paid', 'provisioned'], true)
+            || $amountRial % 10 !== 0
+            || !preg_match('/^WALLET-TX-([1-9][0-9]{0,19})$/D', $walletReference, $walletReferenceMatch)) {
+            $renderResult(false, 'تراکنش کیف پول برای این سفارش معتبر نیست؛ از پرداخت مجدد خودداری کنید.');
+        }
+
+        $walletTransactionId = (int)$walletReferenceMatch[1];
+        $walletTransactionQuery = $pdo->prepare(
+            'SELECT id, steamid, amount, type, authority, ref_id, status
+             FROM wallet_transactions
+             WHERE id = ? AND authority = ?
+             LIMIT 1'
+        );
+        $walletTransactionQuery->execute([$walletTransactionId, $authority]);
+        $walletTransaction = $walletTransactionQuery->fetch(PDO::FETCH_ASSOC);
+
+        if (!is_array($walletTransaction)
+            || (string)($walletTransaction['steamid'] ?? '') !== $steamId64
+            || (string)($walletTransaction['type'] ?? '') !== 'vip_purchase'
+            || (string)($walletTransaction['status'] ?? '') !== 'success'
+            || (int)($walletTransaction['amount'] ?? 0) !== intdiv($amountRial, 10)
+            || (string)($walletTransaction['ref_id'] ?? '') !== 'VIP-' . $orderRef) {
+            $renderResult(false, 'تراکنش کیف پول با سفارش VIP تطبیق ندارد؛ سفارش برای بررسی حفظ شده است.');
+        }
     }
 
     if ($orderStatus === 'provisioned') {
@@ -351,10 +390,13 @@ try {
         error_log('[FragCity VIP checkout] Verified order could not be provisioned; type=' . get_class($e));
         $renderResult(
             false,
-            'پرداخت شما تأیید شده، اما ارتباط با VIPCore برای ثبت اشتراک کامل نشد.',
+            $isWalletPayment
+                ? 'مبلغ از کیف پول کسر و سفارش ثبت شده است، اما فعال‌سازی VIP هنوز کامل نشده است.'
+                : 'پرداخت شما تأیید شده، اما ارتباط با VIPCore برای ثبت اشتراک کامل نشد.',
             $amountRial,
             $refId,
-            true
+            true,
+            $retryUrl
         );
     }
 } catch (Throwable $e) {
