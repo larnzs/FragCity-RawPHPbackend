@@ -13,6 +13,7 @@ $userVip = [
     'vip_permanent' => false,
 ];
 $vipStatusUnavailable = false;
+$vipPaidPurchase = null;
 $vipFreeTrialStatus = [
     'available' => false,
     'claimed' => false,
@@ -35,6 +36,9 @@ $vipCurrency = (string) ($vipPurchaseCatalog['currency'] ?? 'تومان');
 if ($isLoggedIn && $steamid64 !== '') {
     try {
         $vipStatus = (new VipCoreRepository())->getStatus($steamid64);
+        $vipPaidPurchase = is_array($vipStatus['paid_purchase'] ?? null)
+            ? $vipStatus['paid_purchase']
+            : null;
         $vipExpires = $vipStatus['expires'];
 
         $userVip = [
@@ -618,6 +622,62 @@ foreach ($vipLevels as $level => $tier) {
             : intdiv($priceRial, 10);
     }
 }
+// A paid active membership can be upgraded by paying only the prorated
+// difference for its unused time. A free Silver trial has no paid-order ledger
+// entry, so it never produces an upgrade credit.
+$vipPaidUpgradeEligible = false;
+$vipUpgradeDurationDays = 0;
+$vipUpgradePriceRialMap = [];
+$vipUpgradeRemainingSeconds = 0;
+if ($isLoggedIn
+    && !$vipStatusUnavailable
+    && $vipHasActiveMembership
+    && is_array($vipPaidPurchase)
+    && (int)($vipPaidPurchase['level'] ?? 0) === $vipCurrentLevel
+    && in_array($vipCurrentLevel, [1, 2], true)) {
+    $paidDurationSeconds = (int)($vipPaidPurchase['duration_seconds'] ?? 0);
+    $paidExpires = (int)($vipPaidPurchase['expires'] ?? 0);
+    $candidateDays = intdiv(max(0, $paidDurationSeconds), 86400);
+    $now = time();
+    $remainingSeconds = max(0, $paidExpires - $now);
+    $validPaidDuration = in_array($paidDurationSeconds, array_map(
+        static fn (int $days): int => $days * 86400,
+        $vipAllowedPurchaseDurations
+    ), true);
+
+    if ($validPaidDuration && $paidExpires > $now && $remainingSeconds > 0) {
+        $currentTierPrice = $vipPurchasePriceRialMap[(string)$vipCurrentLevel][(string)$candidateDays] ?? null;
+        if (is_int($currentTierPrice) && $currentTierPrice > 0) {
+            foreach ([1, 2, 3] as $targetLevel) {
+                if ($targetLevel <= $vipCurrentLevel) {
+                    continue;
+                }
+                $targetTierPrice = $vipPurchasePriceRialMap[(string)$targetLevel][(string)$candidateDays] ?? null;
+                if (!is_int($targetTierPrice) || $targetTierPrice <= $currentTierPrice) {
+                    continue;
+                }
+
+                $rawDifference = ($targetTierPrice - $currentTierPrice)
+                    * ($remainingSeconds / $paidDurationSeconds);
+                // Rial quotes are rounded to 1,000 Rial (100 Toman), matching
+                // the catalogue's smallest published price increment.
+                $upgradePriceRial = (int)(round($rawDifference / 1000) * 1000);
+                if ($upgradePriceRial >= 1000) {
+                    $vipUpgradePriceRialMap[(string)$targetLevel] = $upgradePriceRial;
+                }
+            }
+
+            $vipUpgradeDurationDays = $candidateDays;
+            $vipUpgradeRemainingSeconds = $remainingSeconds;
+            $vipPaidUpgradeEligible = $vipUpgradePriceRialMap !== [];
+        }
+    }
+}
+
+$vipUpgradePriceMap = [];
+foreach ($vipUpgradePriceRialMap as $upgradeLevel => $upgradePriceRial) {
+    $vipUpgradePriceMap[(string)$upgradeLevel] = intdiv($upgradePriceRial, 10);
+}
 $vipGatewaySettings = fragcity_settings('integrations.zarinpal', []);
 $vipGatewayUrlIsSecure = static function ($value): bool {
     if (!is_string($value) || trim($value) === '') {
@@ -646,6 +706,11 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
     data-vip-has-active="<?= $vipHasActiveMembership ? '1' : '0' ?>"
     data-vip-current-level="<?= $vipCurrentLevel ?>"
     data-vip-status-unavailable="<?= $vipStatusUnavailable ? '1' : '0' ?>"
+    data-vip-paid-upgrade-eligible="<?= $vipPaidUpgradeEligible ? '1' : '0' ?>"
+    data-vip-upgrade-duration-days="<?= $vipUpgradeDurationDays ?>"
+    data-vip-upgrade-prices="<?= htmlspecialchars(json_encode($vipUpgradePriceMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+    data-vip-upgrade-prices-rial="<?= htmlspecialchars(json_encode($vipUpgradePriceRialMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+    data-vip-free-trial-claimed="<?= !empty($vipFreeTrialStatus['claimed']) ? '1' : '0' ?>"
     data-vip-logged-in="<?= $isLoggedIn ? '1' : '0' ?>"
     data-vip-test-admin="<?= $isVipTestAdmin ? '1' : '0' ?>"
     data-vip-prices="<?= htmlspecialchars(json_encode($vipPurchasePriceMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
@@ -1029,6 +1094,20 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
                 <summary>وضعیت سطح‌های Bronze، Silver و Gold و خرید VIP چیست؟</summary>
                 <div class="vip-faq-answer">
                     <p>Bronze، Silver و Gold سه سطح قابل‌فروش در فروشگاه رسمی FragCity هستند و قیمت هرکدام بر اساس مدت اشتراک از تنظیمات قیمت‌گذاری خوانده می‌شود. Silver علاوه بر اشتراک پولی، یک هدیه رایگان سه‌روزه و یک‌باره دارد. قیمت‌های این سه سطح، کف قیمت رسمی FragCity هستند. Platinum، Emerald و Diamond نیز برای مشاهده و مقایسه قابل انتخاب‌اند، اما فعلاً برای خرید فعال نیستند. خرید سه سطح اصلی از طریق زرین‌پال انجام می‌شود و VIP فقط پس از تأیید پرداخت و ثبت موفق در VIPCore فعال خواهد شد؛ در صورت غیرفعال‌بودن تنظیمات امن درگاه یا آماده‌نبودن دیتابیس سفارش، دکمه پرداخت در دسترس نخواهد بود.</p>
+                </div>
+            </details>
+
+            <details class="vip-faq-item">
+                <summary>اگر VIP پولی داشته باشم و بخواهم به سطح بالاتر ارتقا بدهم، چقدر باید پرداخت کنم؟</summary>
+                <div class="vip-faq-answer">
+                    <p>در ارتقای اشتراک پولی، مبلغ کامل پلن جدید دوباره دریافت نمی‌شود. ارزش اعتبارِ باقی‌مانده از اشتراک خریداری‌شده، متناسب با زمان باقی‌مانده محاسبه و از قیمت پلن بالاتر کسر می‌شود؛ سطح جدید بلافاصله فعال می‌شود و تاریخ انقضای قبلی حفظ خواهد شد. ارتقا فقط به سطح بالاتر امکان‌پذیر است و خرید مجدد همان سطح یا تنزل سطح انجام نمی‌شود.</p>
+                </div>
+            </details>
+
+            <details class="vip-faq-item">
+                <summary>آیا هدیه رایگان سه‌روزه Silver هم برای ارتقا اعتبار دارد؟</summary>
+                <div class="vip-faq-answer">
+                    <p>خیر. هدیه رایگان Silver هیچ ارزش مالی یا اعتبار ارتقایی ندارد. اگر Silver فعال شما از هدیه سه‌روزه دریافت شده باشد، برای خرید Gold یا سطح بالاتر باید قیمت کامل همان پلن را پرداخت کنید. تخفیف ارتقا فقط بر اساس اشتراک پولیِ ثبت‌شده و اعتبار باقی‌ماندهٔ آن محاسبه می‌شود؛ دریافت هدیه به‌تنهایی سابقه خرید پولی محسوب نمی‌شود.</p>
                 </div>
             </details>
 
