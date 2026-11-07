@@ -37,6 +37,9 @@ jobs:
       - name: Validate profile JavaScript syntax
         run: node --check js/profile.js
 
+      - name: Validate order history JavaScript syntax
+        run: node --check js/orders.js
+
       - name: Test legacy dotted and nested settings lookups
         run: php tools/settings-loader-test.php
 
