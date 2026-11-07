@@ -3962,6 +3962,12 @@ body.vip-comparison-open {
     position: fixed;
     z-index: 12100;
     inset: 0;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    box-sizing: border-box;
     display: grid;
     place-items: center;
     overflow-y: auto;
