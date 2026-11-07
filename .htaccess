@@ -104,7 +104,7 @@ DirectoryIndex index.php
   RewriteRule ^index\.php$ / [R=301,L,NE]
 
   # Enforce one trailing-slash form for all clean page URLs.
-  RewriteRule ^(servers|skins|buy-server|launcher|server-manual|serverguide|status|about|support|login|register|profile|my-servers|vip|leaderboard|forgot-password|reset-password|rules|privacy|deadlock-servers|banlist|donations)$ /$1/ [R=301,L,NE]
+  RewriteRule ^(servers|skins|buy-server|launcher|server-manual|serverguide|status|about|support|login|register|profile|my-servers|orders|vip|leaderboard|forgot-password|reset-password|rules|privacy|deadlock-servers|banlist|donations)$ /$1/ [R=301,L,NE]
 
   # Canonical, extension-free routes.
   RewriteRule ^servers/?$ index.php?page=servers_vps [QSA,L]
@@ -120,6 +120,7 @@ DirectoryIndex index.php
   RewriteRule ^register/?$ index.php?page=register [QSA,L]
   RewriteRule ^profile/?$ index.php?page=profile [QSA,L]
   RewriteRule ^my-servers/?$ index.php?page=myservers [QSA,L]
+  RewriteRule ^orders/?$ index.php?page=orders [QSA,L]
   RewriteRule ^vip/?$ index.php?page=vip [QSA,L]
   RewriteRule ^leaderboard/?$ index.php?page=leaderboard [QSA,L]
   RewriteRule ^forgot-password/?$ index.php?page=forgot_password [QSA,L]
