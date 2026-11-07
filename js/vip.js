@@ -337,13 +337,12 @@
                 && payableToman > 0
                 && walletBalanceToman >= payableToman;
 
+            const replacementNotice = 'عضویت فعلی شما هدیه، آزمایشی یا بدون سابقه خرید پولی است؛ برای تبدیل آن به اشتراک پولی، قیمت کامل سطح و مدت انتخاب‌شده پرداخت می‌شود. هدیه Silver اعتبار ارتقا ندارد.';
             let message = 'برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.';
             if (current && !isFullPriceReplacement) {
                 message = 'این سطح هم‌اکنون به‌صورت اشتراک پولی روی حساب شما فعال است.';
             } else if (!available) {
                 message = 'این سطح در حال حاضر برای خرید فعال نیست.';
-            } else if (mode === 'trial') {
-                message = 'Silver هدیه سه‌روزه است؛ آن را از کارت هدیه خوش‌آمدگویی دریافت کن. این سفارش وارد Checkout نمی‌شود.';
             } else if (blockedByLevel) {
                 message = 'فقط می‌توانی به سطح بالاتر ارتقا بدهی؛ خرید مجدد یا تنزل سطح امکان‌پذیر نیست.';
             } else if (root.dataset.vipStatusUnavailable === '1') {
@@ -352,22 +351,34 @@
                 message = 'برای خرید VIP ابتدا با حساب Steam وارد شوید.';
             } else if (!paidLedgerReady) {
                 message = 'جدول ثبت سفارش‌های پولی VIP آماده نیست؛ تا تکمیل Migration و مجوزهای دیتابیس، پرداخت فعال نمی‌شود.';
+            } else if (mode === 'trial') {
+                message = 'Silver هدیه سه‌روزه است؛ آن را از کارت هدیه خوش‌آمدگویی دریافت کن. این سفارش وارد Checkout نمی‌شود.';
+            } else if (mode === 'paid' && !days) {
+                message = 'یکی از مدت‌های اشتراک را انتخاب کن تا فاکتور و مبلغ نهایی تکمیل شود.';
+            } else if (mode === 'paid' && !isPaidUpgrade && price === null) {
+                message = 'قیمت این مدت در تنظیمات سرور معتبر نیست؛ مبلغی از مرورگر دریافت نمی‌شود.';
             } else if (paidUpgradeCandidate && upgradePrice === null) {
                 message = 'قیمت ارتقا یا اعتبار باقی‌مانده قابل محاسبه نیست؛ لطفاً پس از پایان اشتراک، پلن جدید را با قیمت کامل بخر.';
             } else if (isPaidUpgrade) {
                 message = 'اعتبار باقی‌مانده از اشتراک پولی کسر می‌شود و سطح جدید تا همان تاریخ انقضای فعلی فعال خواهد بود.';
-            } else if (isFullPriceReplacement) {
-                message = 'عضویت فعلی شما هدیه، آزمایشی یا بدون سابقه خرید پولی است؛ برای تبدیل آن به اشتراک پولی، قیمت کامل این سطح و مدت انتخاب‌شده پرداخت می‌شود. هدیه Silver اعتبار ارتقا ندارد.';
-            } else if (mode === 'paid' && !days) {
-                message = 'یکی از مدت‌های اشتراک را انتخاب کن تا فاکتور و مبلغ نهایی تکمیل شود.';
-            } else if (mode === 'paid' && price === null) {
-                message = 'قیمت این مدت در تنظیمات سرور معتبر نیست؛ مبلغی از مرورگر دریافت نمی‌شود.';
+            } else if (!canCreatePaidOrder) {
+                message = 'شرایط ثبت سفارش VIP کامل نیست؛ انتخاب سطح، مدت، قیمت و وضعیت عضویت را بررسی کن.';
             } else if (!checkoutReady) {
-                message = canWalletCheckout
-                    ? 'درگاه آنلاین موقتاً آماده نیست، اما می‌توانی با موجودی کیف پول خرید را کامل کنی.'
-                    : 'درگاه آنلاین یا تنظیمات Checkout آماده نیست؛ وضعیت کیف پول را هم در دکمهٔ پرداخت از کیف پول بررسی کن.';
+                if (canWalletCheckout) {
+                    message = 'تنظیمات امن زرین‌پال یا Checkout آماده نیست؛ پرداخت آنلاین غیرفعال است، اما موجودی کیف پول برای خرید کافی است.';
+                } else if (walletSelectionValid && !walletBalanceAvailable) {
+                    message = 'تنظیمات امن زرین‌پال آماده نیست و موجودی کیف پول نیز قابل بررسی نیست؛ پرداخت تا رفع مشکل غیرفعال می‌ماند.';
+                } else if (walletSelectionValid && walletBalanceAvailable) {
+                    message = 'تنظیمات امن زرین‌پال آماده نیست؛ موجودی کیف پول برای این سفارش کافی نیست.';
+                } else {
+                    message = 'تنظیمات امن زرین‌پال یا Checkout آماده نیست؛ پرداخت آنلاین تا تکمیل تنظیمات غیرفعال می‌ماند.';
+                }
             } else if (canCheckout) {
-                message = 'مبلغ نهایی از تنظیمات سرور محاسبه شده است. پس از تأیید زرین‌پال، VIPCore فعال می‌شود.';
+                message = 'مبلغ نهایی آماده است. پس از تأیید زرین‌پال، VIPCore فعال می‌شود.';
+            }
+
+            if (isFullPriceReplacement && canCreatePaidOrder) {
+                message += ' ' + replacementNotice;
             }
 
             if (invoiceStatus) invoiceStatus.textContent = message;
