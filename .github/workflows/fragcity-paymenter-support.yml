@@ -1,0 +1,75 @@
+name: FragCity Paymenter Support Integration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "api/support.php"
+      - "class/PaymenterSupportApiClient.php"
+      - "pages/support.php"
+      - "js/support.js"
+      - "css/support.css"
+      - "settings/settings.example.json"
+      - "tools/paymenter-support-preflight.php"
+      - "docs/FRAGCITY-PAYMENTER-SUPPORT.md"
+      - ".github/workflows/fragcity-paymenter-support.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "api/support.php"
+      - "class/PaymenterSupportApiClient.php"
+      - "pages/support.php"
+      - "js/support.js"
+      - "css/support.css"
+      - "settings/settings.example.json"
+      - "tools/paymenter-support-preflight.php"
+      - "docs/FRAGCITY-PAYMENTER-SUPPORT.md"
+      - ".github/workflows/fragcity-paymenter-support.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php-and-frontend-checks:
+    name: PHP 8.3, JavaScript and support contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+
+      - name: Lint support PHP files
+        shell: bash
+        run: |
+          set -euo pipefail
+          files=(
+            "api/support.php"
+            "class/PaymenterSupportApiClient.php"
+            "pages/support.php"
+            "tools/paymenter-support-preflight.php"
+          )
+          for file in "\${files[@]}"; do
+            test -f "$file"
+            php -l "$file"
+          done
+
+      - name: Validate settings example JSON
+        run: php -r '$v=json_decode(file_get_contents("settings/settings.example.json"), true, 512, JSON_THROW_ON_ERROR); if (!isset($v["integrations"]["paymenter_support"]["base_url"], $v["integrations"]["paymenter_support"]["admin_api_key"], $v["integrations"]["paymenter_support"]["shared_secret"])) { exit(1); }'
+
+      - name: Ensure the support page does not write local ticket records
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep -Eiq "INSERT[[:space:]]+INTO[[:space:]]+(tickets|ticket_replies)" pages/support.php; then
+            echo "Legacy local ticket writes detected in pages/support.php"
+            exit 1
+          fi
+
+      - name: Check support JavaScript
+        run: node --check js/support.js
