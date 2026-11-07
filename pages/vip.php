@@ -24,6 +24,33 @@ $vipFreeTrialStatus = [
     'group' => null,
 ];
 $vipFreeTrialStatusUnavailable = false;
+$vipWalletBalanceAvailable = false;
+$vipWalletBalanceToman = 0;
+
+if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64)) {
+    try {
+        $walletDatabaseProfile = fragcity_settings('files.index.database_profile', 'main');
+        $walletDatabaseProfile = is_string($walletDatabaseProfile) && trim($walletDatabaseProfile) !== ''
+            ? trim($walletDatabaseProfile)
+            : 'main';
+        $walletPdo = fragcity_create_pdo($walletDatabaseProfile);
+        if (!$walletPdo instanceof PDO) {
+            throw new RuntimeException('wallet_database_unavailable');
+        }
+
+        $walletBalanceQuery = $walletPdo->prepare(
+            'SELECT balance FROM user_wallets WHERE steamid = ? LIMIT 1'
+        );
+        $walletBalanceQuery->execute([$steamid64]);
+        $walletBalanceRow = $walletBalanceQuery->fetch(PDO::FETCH_ASSOC);
+        $vipWalletBalanceToman = is_array($walletBalanceRow)
+            ? max(0, (int)($walletBalanceRow['balance'] ?? 0))
+            : 0;
+        $vipWalletBalanceAvailable = true;
+    } catch (Throwable $walletError) {
+        error_log('[FragCity VIP storefront] Wallet balance lookup failed; type=' . get_class($walletError));
+    }
+}
 
 $vipSettings = fragcity_settings('files.pages.vip', []);
 $vipPurchaseCatalog = is_array($vipSettings['purchase_catalog'] ?? null)
@@ -758,6 +785,8 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
     data-vip-upgrade-duration-days="<?= $vipUpgradeDurationDays ?>"
     data-vip-upgrade-prices="<?= htmlspecialchars(json_encode($vipUpgradePriceMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-upgrade-prices-rial="<?= htmlspecialchars(json_encode($vipUpgradePriceRialMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
+    data-vip-wallet-balance="<?= $vipWalletBalanceToman ?>"
+    data-vip-wallet-balance-available="<?= $vipWalletBalanceAvailable ? '1' : '0' ?>"
     data-vip-free-trial-claimed="<?= !empty($vipFreeTrialStatus['claimed']) ? '1' : '0' ?>"
     data-vip-logged-in="<?= $isLoggedIn ? '1' : '0' ?>"
     data-vip-test-admin="<?= $isVipTestAdmin ? '1' : '0' ?>"
@@ -1098,10 +1127,23 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
                     </button>
                 </form>
                 <?php if ($isLoggedIn): ?>
-                    <button type="button" class="vip-invoice-wallet" data-fc-wallet-charge-open>
-                        <i class="fas fa-wallet" aria-hidden="true"></i>
-                        کیف پول
-                    </button>
+                    <form method="post" action="/pages/zarinpal/zarinpal_vip_request.php" data-vip-wallet-form>
+                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                        <input type="hidden" name="level" value="" data-vip-wallet-level>
+                        <input type="hidden" name="duration_days" value="" data-vip-wallet-duration>
+                        <input type="hidden" name="payment_method" value="wallet">
+                        <button type="submit" class="vip-invoice-wallet" data-vip-wallet-checkout disabled>
+                            <i class="fas fa-wallet" aria-hidden="true"></i>
+                            پرداخت از کیف پول
+                        </button>
+                    </form>
+                    <div class="vip-invoice-wallet-meta">
+                        <small data-vip-wallet-status role="status" aria-live="polite">موجودی کیف پول: <?= number_format($vipWalletBalanceToman) ?> تومان</small>
+                        <button type="button" class="vip-wallet-recharge" data-vip-wallet-recharge data-fc-wallet-charge-open hidden>
+                            <i class="fas fa-plus" aria-hidden="true"></i>
+                            افزایش موجودی
+                        </button>
+                    </div>
                 <?php else: ?>
                     <a class="vip-invoice-wallet" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
                         <i class="fab fa-steam" aria-hidden="true"></i>
