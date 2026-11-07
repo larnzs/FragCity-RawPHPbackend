@@ -622,6 +622,14 @@ foreach ($vipLevels as $level => $tier) {
             : intdiv($priceRial, 10);
     }
 }
+$vipSilver30PriceToman = $vipPurchasePriceMap['2']['30'] ?? null;
+$vipGold30PriceToman = $vipPurchasePriceMap['3']['30'] ?? null;
+$vipBaseUpgradeDifference30Toman = is_int($vipSilver30PriceToman)
+    && is_int($vipGold30PriceToman)
+    && $vipGold30PriceToman > $vipSilver30PriceToman
+        ? $vipGold30PriceToman - $vipSilver30PriceToman
+        : null;
+
 // A paid active membership can be upgraded by paying only the prorated
 // difference for its unused time. A free Silver trial has no paid-order ledger
 // entry, so it never produces an upgrade credit.
@@ -1103,7 +1111,7 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
             <details class="vip-faq-item">
                 <summary>اگر VIP پولی داشته باشم و بخواهم به سطح بالاتر ارتقا بدهم، چقدر باید پرداخت کنم؟</summary>
                 <div class="vip-faq-answer">
-                    <p>در ارتقای اشتراک پولی، مبلغ کامل پلن جدید دوباره دریافت نمی‌شود. ارزش اعتبارِ باقی‌مانده از اشتراک خریداری‌شده، متناسب با زمان باقی‌مانده محاسبه و از قیمت پلن بالاتر کسر می‌شود؛ سطح جدید بلافاصله فعال می‌شود و تاریخ انقضای قبلی حفظ خواهد شد. برای نمونه، با قیمت‌های فعلی، Silver سی‌روزه ۴۹٬۰۰۰ تومان و Gold سی‌روزه ۸۹٬۰۰۰ تومان است؛ ارتقای بلافاصله پس از خرید Silver برابر ۴۰٬۰۰۰ تومان می‌شود و هرچه از زمان اشتراک بگذرد، مبلغ ارتقا متناسب با اعتبار باقی‌مانده کاهش پیدا می‌کند. ارتقا فقط به سطح بالاتر امکان‌پذیر است و خرید مجدد همان سطح یا تنزل سطح انجام نمی‌شود.</p>
+                    <p>در ارتقای اشتراک پولی، مبلغ کامل پلن جدید دوباره دریافت نمی‌شود. ارزش اختلاف قیمت دو سطح، متناسب با زمان باقی‌مانده از اشتراک خریداری‌شده محاسبه می‌شود؛ سطح جدید بلافاصله فعال خواهد شد و تاریخ انقضای قبلی حفظ می‌شود. <?php if ($vipBaseUpgradeDifference30Toman !== null): ?>برای نمونه، طبق قیمت فعلی فروشگاه، اختلاف پایه Silver و Gold سی‌روزه <?= number_format($vipBaseUpgradeDifference30Toman) ?> تومان است؛ در زمان ارتقا، فقط سهم متناسب با اعتبار باقی‌مانده پرداخت می‌شود.<?php else: ?>مبلغ ارتقا بر اساس قیمت‌های معتبر سرور و اعتبار باقی‌مانده محاسبه می‌شود.<?php endif; ?> ارتقا فقط به سطح بالاتر امکان‌پذیر است و خرید مجدد همان سطح یا تنزل سطح انجام نمی‌شود.</p>
                 </div>
             </details>
 
