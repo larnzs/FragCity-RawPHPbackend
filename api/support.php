@@ -119,9 +119,10 @@ try {
 
             $created = $client->createTicket($steamId64, $subject, null, 'medium');
             $ticketId = (int) $created['ticket_id'];
+            $createdForUserId = (int) ($created['owner_user_id'] ?? 0);
 
             try {
-                $client->replyTicket($steamId64, $ticketId, $message);
+                $client->replyToNewTicket($steamId64, $ticketId, $createdForUserId, $message);
             } catch (Throwable $messageError) {
                 error_log(
                     '[FragCity] Paymenter ticket was created but the first message failed; ticket_id='
