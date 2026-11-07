@@ -258,7 +258,7 @@
                     : (price !== null
                         ? formatPrice(price)
                         : (!days && basePrice !== null
-                            ? 'شروع از ' + formatPrice(basePrice) + ' · ۳۰ روز'
+                            ? 'قیمت پایهٔ ۳۰ روزه: ' + formatPrice(basePrice)
                             : '— تومان'));
             }
             invoice.style.setProperty('--vip-invoice-accent', activePlan.dataset.vipColor || '#F97316');
