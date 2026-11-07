@@ -75,27 +75,116 @@ $defaultPriceRial = [
 ];
 
 $packages = is_array($catalog['packages'] ?? null) ? $catalog['packages'] : [];
-$package = is_array($packages[(string)$level] ?? null) ? $packages[(string)$level] : [];
-$durations = is_array($package['durations'] ?? null) ? $package['durations'] : [];
-$durationPackage = is_array($durations[(string)$days] ?? null) ? $durations[(string)$days] : [];
-$rawPrice = $durationPackage['price_rial'] ?? null;
-$validatedPrice = filter_var($rawPrice, FILTER_VALIDATE_INT);
-if ($validatedPrice === false
-    || $validatedPrice < 1
-    || $validatedPrice > 10000000000000
-    || $validatedPrice % 10 !== 0) {
-    // Keep the same official defaults used by the storefront if the
-    // private runtime settings still have the old price format.
-    $validatedPrice = filter_var($defaultPriceRial[$level][$days] ?? null, FILTER_VALIDATE_INT);
+$resolvePriceRial = static function (int $targetLevel, int $durationDays) use ($packages, $defaultPriceRial): ?int {
+    $package = is_array($packages[(string)$targetLevel] ?? null)
+        ? $packages[(string)$targetLevel]
+        : [];
+    $durations = is_array($package['durations'] ?? null) ? $package['durations'] : [];
+    $durationPackage = is_array($durations[(string)$durationDays] ?? null)
+        ? $durations[(string)$durationDays]
+        : [];
+    $rawPrice = $durationPackage['price_rial'] ?? null;
+    $validated = filter_var($rawPrice, FILTER_VALIDATE_INT);
+    if ($validated === false
+        || $validated < 1
+        || $validated > 10000000000000
+        || $validated % 10 !== 0) {
+        // Keep the official catalogue fallback in sync with the storefront.
+        $validated = filter_var($defaultPriceRial[$targetLevel][$durationDays] ?? null, FILTER_VALIDATE_INT);
+    }
+
+    return $validated !== false
+        && $validated > 0
+        && $validated <= 10000000000000
+        && $validated % 10 === 0
+        ? (int)$validated
+        : null;
+};
+
+// Re-check the live entitlement and the immutable free-trial claim ledger on
+// the server. Only an active paid order can generate upgrade credit.
+try {
+    $vipRepository = new VipCoreRepository();
+    $vipStatus = $vipRepository->getStatus($steamId64);
+    $freeTrialStatus = $vipRepository->getFreeTrialStatus($steamId64);
+} catch (Throwable $e) {
+    error_log('[FragCity VIP checkout] VIPCore entitlement lookup failed; type=' . get_class($e));
+    $terminate('وضعیت VIP یا سوابق هدیه در دسترس نیست؛ برای جلوگیری از محاسبه اشتباه، سفارش ساخته نشد.', 503);
 }
 
-if ($validatedPrice === false
-    || $validatedPrice < 1
-    || $validatedPrice > 10000000000000
-    || $validatedPrice % 10 !== 0) {
-    $terminate('قیمت این اشتراک در تنظیمات معتبر نیست؛ هیچ مبلغی از شما دریافت نشده است.', 503);
+$purchaseType = 'new';
+$upgradeContext = null;
+$amountRial = null;
+
+if (!empty($vipStatus['active'])) {
+    $currentLevel = (int)($vipStatus['level'] ?? 0);
+    $currentExpires = (int)($vipStatus['expires'] ?? 0);
+    if ($currentLevel < 1 || $currentExpires < 1 || $level <= $currentLevel) {
+        $terminate('فقط امکان ارتقا به سطح بالاتر وجود دارد؛ خرید مجدد یا تنزل سطح مجاز نیست.', 409);
+    }
+
+    $paidPurchase = is_array($vipStatus['paid_purchase'] ?? null)
+        ? $vipStatus['paid_purchase']
+        : null;
+    if ($paidPurchase !== null
+        && (int)($paidPurchase['level'] ?? 0) === $currentLevel
+        && (int)($paidPurchase['expires'] ?? 0) === $currentExpires) {
+        $paidDurationSeconds = (int)($paidPurchase['duration_seconds'] ?? 0);
+        $paidDays = intdiv(max(0, $paidDurationSeconds), 86400);
+        $remainingSeconds = max(0, $currentExpires - time());
+
+        if (!in_array($paidDurationSeconds, [604800, 1296000, 2592000, 5184000, 7776000], true)
+            || !in_array($paidDays, [7, 15, 30, 60, 90], true)
+            || $remainingSeconds < 1) {
+            $terminate('اطلاعات اشتراک پولی فعلی برای محاسبه ارتقا معتبر نیست؛ لطفاً پس از پایان اشتراک دوباره تلاش کنید.', 409);
+        }
+
+        $currentTierPrice = $resolvePriceRial($currentLevel, $paidDays);
+        $targetTierPrice = $resolvePriceRial($level, $paidDays);
+        if ($currentTierPrice === null || $targetTierPrice === null || $targetTierPrice <= $currentTierPrice) {
+            $terminate('قیمت پایهٔ پلن‌ها برای محاسبه ارتقا معتبر نیست.', 503);
+        }
+
+        $rawUpgradeAmount = ($targetTierPrice - $currentTierPrice)
+            * ($remainingSeconds / $paidDurationSeconds);
+        $amountRial = (int)(round($rawUpgradeAmount / 1000) * 1000);
+        if ($amountRial < 1000 || $amountRial % 10 !== 0) {
+            $terminate('اعتبار باقی‌مانده برای ارتقا کافی نیست؛ می‌توانید پس از پایان اشتراک، پلن جدید را با قیمت کامل بخرید.', 409);
+        }
+
+        // An upgrade keeps the original subscription period and expiry.
+        $days = $paidDays;
+        $durationSeconds = $paidDurationSeconds;
+        $purchaseType = 'upgrade';
+        $upgradeContext = [
+            'from_order_ref' => (string)$paidPurchase['order_ref'],
+            'from_level' => $currentLevel,
+            'from_expires' => $currentExpires,
+            'duration_seconds' => $paidDurationSeconds,
+        ];
+    } else {
+        // A free Silver trial or a legacy/manual membership has no paid-order
+        // ledger. It may be replaced only by a higher tier at its full price.
+        // Reading freeTrialStatus here intentionally confirms this account's
+        // one-time claim state; a trial itself never contributes upgrade credit.
+        $trialWasClaimed = !empty($freeTrialStatus['claimed']);
+        $purchaseType = 'replacement';
+        $durationSeconds = $days * 86400;
+        $amountRial = $resolvePriceRial($level, $days);
+        if ($amountRial === null || $amountRial < 1) {
+            $terminate('قیمت این اشتراک در تنظیمات معتبر نیست؛ هیچ مبلغی از شما دریافت نشده است.', 503);
+        }
+        if ($trialWasClaimed) {
+            error_log('[FragCity VIP checkout] Full-price upgrade from an account with a recorded Silver trial claim.');
+        }
+    }
+} else {
+    $durationSeconds = $days * 86400;
+    $amountRial = $resolvePriceRial($level, $days);
+    if ($amountRial === null || $amountRial < 1) {
+        $terminate('قیمت این اشتراک در تنظیمات معتبر نیست؛ هیچ مبلغی از شما دریافت نشده است.', 503);
+    }
 }
-$amountRial = (int)$validatedPrice;
 
 $zarinpalSettings = fragcity_settings('integrations.zarinpal', []);
 $merchantId = is_array($zarinpalSettings) ? trim((string)($zarinpalSettings['merchant_id'] ?? '')) : '';
@@ -131,18 +220,6 @@ $databaseProfile = is_string($databaseProfile) && trim($databaseProfile) !== '' 
 $pdo = fragcity_create_pdo($databaseProfile);
 if (!$pdo instanceof PDO) {
     $terminate('اتصال دیتابیس سفارش VIP در دسترس نیست.', 503);
-}
-
-// Do not let a second active membership or an unavailable VIPCore status
-// proceed to payment. The paid grant repeats this check before writing.
-try {
-    $vipStatus = (new VipCoreRepository())->getStatus($steamId64);
-    if (!empty($vipStatus['active'])) {
-        $terminate('حساب شما از قبل VIP فعال دارد؛ خرید مجدد یا ارتقای سطح در مدت اشتراک فعال امکان‌پذیر نیست.', 409);
-    }
-} catch (Throwable $e) {
-    error_log('[FragCity VIP checkout] VIPCore pre-check failed; type=' . get_class($e));
-    $terminate('وضعیت VIPCore در دسترس نیست؛ برای جلوگیری از پرداخت اشتباه، سفارش ساخته نشد.', 503);
 }
 
 $orderRef = bin2hex(random_bytes(16));
@@ -202,8 +279,9 @@ try {
     $insert = $pdo->prepare(
         "INSERT INTO vip_orders
             (order_ref, steamid64, player_name, vip_level, duration_days,
-             duration_seconds, amount_rial, status)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')"
+             duration_seconds, amount_rial, status, purchase_type,
+             upgrade_from_order_ref, upgrade_from_level, upgrade_from_expires)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)"
     );
     $insert->execute([
         $orderRef,
@@ -213,6 +291,10 @@ try {
         $days,
         $durationSeconds,
         $amountRial,
+        $purchaseType,
+        $upgradeContext['from_order_ref'] ?? null,
+        $upgradeContext['from_level'] ?? null,
+        $upgradeContext['from_expires'] ?? null,
     ]);
     if ($insert->rowCount() !== 1) {
         throw new RuntimeException('vip_checkout_order_insert_failed');
