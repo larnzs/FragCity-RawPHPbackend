@@ -509,7 +509,7 @@ $mobileMoreNavItems = [
                                         <i class="fa-solid fa-wallet" aria-hidden="true"></i>
                                         موجودی کیف پول
                                     </span>
-                                    <strong dir="rtl"><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                                    <strong dir="rtl" data-fc-wallet-balance><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
                                 </div>
                                 <button
                                     type="button"
@@ -636,7 +636,7 @@ $mobileMoreNavItems = [
                 <span>
                     <i class="fa-solid fa-wallet" aria-hidden="true"></i>
                     موجودی
-                    <strong><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                    <strong data-fc-wallet-balance><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
                 </span>
                 <button type="button" data-fc-wallet-charge-open aria-label="افزایش موجودی کیف پول" title="افزایش موجودی">
                     <i class="fa-solid fa-plus" aria-hidden="true"></i>
