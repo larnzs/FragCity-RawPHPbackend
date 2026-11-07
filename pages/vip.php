@@ -53,7 +53,16 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64)) {
         // unavailable. Surface the existing paid order so the customer can
         // retry provisioning without submitting another debit.
         try {
-            $pendingWalletQuery = $walletPdo->prepare(
+            $vipOrderDatabaseProfile = fragcity_settings('files.pages.zarinpal.vip_request.database_profile', 'main');
+            $vipOrderDatabaseProfile = is_string($vipOrderDatabaseProfile) && trim($vipOrderDatabaseProfile) !== ''
+                ? trim($vipOrderDatabaseProfile)
+                : 'main';
+            $vipOrderPdo = fragcity_create_pdo($vipOrderDatabaseProfile);
+            if (!$vipOrderPdo instanceof PDO) {
+                throw new RuntimeException('vip_order_database_unavailable');
+            }
+
+            $pendingWalletQuery = $vipOrderPdo->prepare(
                 "SELECT order_ref, authority, vip_level, duration_days, amount_rial
                  FROM vip_orders
                  WHERE steamid64 = ?
