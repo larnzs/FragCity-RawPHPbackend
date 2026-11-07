@@ -705,7 +705,7 @@ $vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false
     id="vipStorefront"
     data-vip-has-active="<?= $vipHasActiveMembership ? '1' : '0' ?>"
     data-vip-current-level="<?= $vipCurrentLevel ?>"
-    data-vip-status-unavailable="<?= $vipStatusUnavailable ? '1' : '0' ?>"
+    data-vip-status-unavailable="<?= ($vipStatusUnavailable || $vipFreeTrialStatusUnavailable) ? '1' : '0' ?>"
     data-vip-paid-upgrade-eligible="<?= $vipPaidUpgradeEligible ? '1' : '0' ?>"
     data-vip-upgrade-duration-days="<?= $vipUpgradeDurationDays ?>"
     data-vip-upgrade-prices="<?= htmlspecialchars(json_encode($vipUpgradePriceMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
