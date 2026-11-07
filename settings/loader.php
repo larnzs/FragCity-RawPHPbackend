@@ -27,7 +27,31 @@ if (!function_exists('fragcity_settings')) {
  function fragcity_settings($path=null,$default=null) {
   $value=fragcity_load_settings();
   if($path===null||$path==='')return $value;
-  foreach(explode('.',(string)$path) as $segment){if(!is_array($value)||!array_key_exists($segment,$value))return $default;$value=$value[$segment];}
+
+  // Older settings.json files use literal dotted keys such as "pages.vip"
+  // and "pages.zarinpal.vip_request". Resolve the longest existing key first,
+  // while continuing to support ordinary nested JSON objects.
+  $segments=explode('.',(string)$path);
+  $offset=0;
+  $segmentCount=count($segments);
+
+  while($offset<$segmentCount){
+   if(!is_array($value))return $default;
+   $matched=false;
+
+   for($length=$segmentCount-$offset;$length>=1;$length--){
+    $candidate=implode('.',array_slice($segments,$offset,$length));
+    if(array_key_exists($candidate,$value)){
+     $value=$value[$candidate];
+     $offset+=$length;
+     $matched=true;
+     break;
+    }
+   }
+
+   if(!$matched)return $default;
+  }
+
   return $value;
  }
 }
