@@ -2099,10 +2099,10 @@ button.ticket-row {
 
 
 /* =========================================================
-   Support dashboard: full-bleed horizontal layout
+   Support dashboard: match VIP / server-store content frame
 ========================================================= */
 .support-page {
-    padding-inline: 0;
+    padding-inline: clamp(14px, 2.2vw, 34px);
 }
 
 .support-page > .support-header,
@@ -2112,9 +2112,9 @@ button.ticket-row {
 .support-page > .support-footer,
 .support-page > .support-workspace-heading,
 .support-page > .support-dashboard-layout {
-    width: 100%;
-    max-width: none;
-    margin-inline: 0;
+    width: min(100%, 1440px);
+    max-width: 1440px;
+    margin-inline: auto;
 }
 
 .support-page > .support-dashboard-layout {
