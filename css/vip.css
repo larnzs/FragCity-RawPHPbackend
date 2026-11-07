@@ -3660,3 +3660,86 @@ body.vip-comparison-open {
         transition: none !important;
     }
 }
+
+
+/* Compact three-column layout for the three official, purchasable VIP plans.
+   Container sizing follows the actual catalogue width beside the invoice panel. */
+.vip-store-main-column {
+    container-name: vip-store-main;
+    container-type: inline-size;
+}
+
+@container vip-store-main (min-width: 760px) {
+    .vip-public-plans-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 12px;
+    }
+
+    .vip-public-plans-grid > .vip-plan-item > .vip-plan-card {
+        min-height: 0;
+        padding: 16px 14px 14px;
+        border-radius: 15px;
+    }
+
+    .vip-public-plans-grid .vip-plan-topline {
+        margin-bottom: 13px;
+    }
+
+    .vip-public-plans-grid .vip-plan-title-row {
+        gap: 9px;
+    }
+
+    .vip-public-plans-grid .vip-tier-emblem {
+        flex-basis: 42px;
+        width: 42px;
+        height: 42px;
+        border-radius: 11px;
+        font-size: 1rem;
+    }
+
+    .vip-public-plans-grid .vip-plan-title-row h3 {
+        font-size: 1.12rem;
+    }
+
+    .vip-public-plans-grid .vip-plan-title-row > div > span {
+        font-size: .58rem;
+    }
+
+    .vip-public-plans-grid .vip-plan-summary {
+        min-height: 65px;
+        margin: 10px 0 11px;
+        font-size: .73rem;
+        line-height: 1.65;
+    }
+
+    .vip-public-plans-grid .vip-plan-summary > span {
+        font-size: .76rem;
+    }
+
+    .vip-public-plans-grid .vip-plan-summary > small {
+        font-size: .6rem;
+    }
+
+    .vip-public-plans-grid .vip-plan-price {
+        min-height: 78px;
+        margin-bottom: 11px;
+        padding: 10px 11px;
+    }
+
+    .vip-public-plans-grid .vip-plan-price > strong {
+        font-size: clamp(.88rem, 1.15cqi, 1.05rem);
+    }
+}
+
+@container vip-store-main (max-width: 759px) {
+    .vip-public-plans-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 700px) {
+    .vip-public-plans-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
