@@ -514,7 +514,9 @@
                     await openTicket(ticketId, true);
                 } else {
                     showToast(errorMessage(error), 'error');
-                    if (error.message === 'captcha_invalid') await loadCaptcha();
+                    // CAPTCHA is consumed before API validation; issue a fresh one
+                    // after every failed create attempt, not only an incorrect answer.
+                    await loadCaptcha();
                 }
             } finally {
                 setBusy(createButton, false);
