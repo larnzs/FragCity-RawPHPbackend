@@ -14,6 +14,7 @@ final class VipCoreService
 {
     public const FREE_TRIAL_GROUP = 'SILVER';
     public const FREE_TRIAL_DURATION_SECONDS = 259200;
+    public const PAID_DURATION_SECONDS = [604800, 1296000, 2592000, 5184000, 7776000];
 
     private const GROUPS = [
         'BRONZE' => 1,
@@ -452,4 +453,216 @@ final class VipCoreService
             'server_id' => $this->serverId,
         ];
     }
+
+    /**
+     * Grant a paid public-store membership exactly once per verified website order.
+     * The signed website API is the only caller; the order ledger and vip_users
+     * upsert share one transaction so duplicate callbacks cannot extend expiry.
+     */
+    public function grantPaidMembership(
+        string $orderRef,
+        string $steamId64,
+        string $playerName,
+        int $level,
+        int $durationSeconds
+    ): array {
+        if (!preg_match('/^[a-f0-9]{32}$/D', $orderRef)) {
+            throw new InvalidArgumentException('Invalid VIP payment order reference.');
+        }
+
+        if (!in_array($durationSeconds, self::PAID_DURATION_SECONDS, true)) {
+            throw new InvalidArgumentException('Invalid paid VIP duration.');
+        }
+
+        $accountId = self::accountIdFromSteamId64($steamId64);
+        $group = self::groupForLevel($level);
+        $playerName = trim($playerName);
+
+        if ($playerName === ''
+            || preg_match('//u', $playerName) !== 1
+            || preg_match('/[\x00-\x1F\x7F]/', $playerName)) {
+            throw new InvalidArgumentException('Invalid player name.');
+        }
+
+        $nameLength = function_exists('mb_strlen')
+            ? mb_strlen($playerName, 'UTF-8')
+            : strlen($playerName);
+        if ($nameLength > 64) {
+            $playerName = function_exists('mb_substr')
+                ? mb_substr($playerName, 0, 64, 'UTF-8')
+                : substr($playerName, 0, 64);
+        }
+
+        $findOrder = function () use ($orderRef): array|false {
+            $statement = $this->pdo->prepare(
+                'SELECT order_ref, steamid64, account_id, sid, vip_level,
+                        vip_group, duration_seconds, granted_at, expires
+                 FROM fragcity_vip_paid_orders
+                 WHERE order_ref = :order_ref
+                 LIMIT 1'
+            );
+            $statement->execute([':order_ref' => $orderRef]);
+            return $statement->fetch(PDO::FETCH_ASSOC);
+        };
+
+        $formatExisting = function (array $row) use (
+            $orderRef,
+            $steamId64,
+            $accountId,
+            $level,
+            $group,
+            $durationSeconds
+        ): array {
+            if ((string)($row['steamid64'] ?? '') !== $steamId64
+                || (int)($row['account_id'] ?? -1) !== $accountId
+                || (int)($row['sid'] ?? -1) !== $this->serverId
+                || (int)($row['vip_level'] ?? 0) !== $level
+                || strtoupper(trim((string)($row['vip_group'] ?? ''))) !== $group
+                || (int)($row['duration_seconds'] ?? 0) !== $durationSeconds) {
+                throw new RuntimeException('VIP paid-order reference does not match its original grant.');
+            }
+
+            return [
+                'granted' => true,
+                'already_granted' => true,
+                'order_ref' => $orderRef,
+                'account_id' => $accountId,
+                'level' => $level,
+                'group' => $group,
+                'granted_at' => (int)$row['granted_at'],
+                'expires' => (int)$row['expires'],
+                'duration_seconds' => $durationSeconds,
+                'server_id' => $this->serverId,
+            ];
+        };
+
+        // Fast idempotent path for browser refreshes and repeated callbacks.
+        $existingOrder = $findOrder();
+        if (is_array($existingOrder)) {
+            return $formatExisting($existingOrder);
+        }
+
+        $now = time();
+        $expires = $now + $durationSeconds;
+        $this->pdo->beginTransaction();
+
+        try {
+            // Insert the unique order reference first. A simultaneous callback
+            // for this same order blocks here and later reads the original grant.
+            $ledgerInsert = $this->pdo->prepare(
+                'INSERT INTO fragcity_vip_paid_orders
+                    (order_ref, steamid64, account_id, sid, vip_level,
+                     vip_group, duration_seconds, granted_at, expires)
+                 VALUES
+                    (:order_ref, :steamid64, :account_id, :server_id, :vip_level,
+                     :vip_group, :duration_seconds, :granted_at, :expires)'
+            );
+            $ledgerInsert->execute([
+                ':order_ref' => $orderRef,
+                ':steamid64' => $steamId64,
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+                ':vip_level' => $level,
+                ':vip_group' => $group,
+                ':duration_seconds' => $durationSeconds,
+                ':granted_at' => $now,
+                ':expires' => $expires,
+            ]);
+
+            $existingMembership = $this->pdo->prepare(
+                'SELECT `group`, `expires`
+                 FROM `vip_users`
+                 WHERE `account_id` = :account_id
+                   AND `sid` = :server_id
+                 LIMIT 1 FOR UPDATE'
+            );
+            $existingMembership->execute([
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+            ]);
+            $membership = $existingMembership->fetch(PDO::FETCH_ASSOC);
+
+            if (is_array($membership)) {
+                $currentGroup = strtoupper(trim((string)($membership['group'] ?? '')));
+                $currentExpires = (int)($membership['expires'] ?? 0);
+                if (self::levelForGroup($currentGroup) > 0
+                    && ($currentExpires === 0 || $currentExpires > $now)) {
+                    throw new VipCoreMembershipConflict('membership_already_active');
+                }
+            }
+
+            // Match VIPCore's own INSERT / ON DUPLICATE KEY semantics.
+            $membershipInsert = $this->pdo->prepare(
+                'INSERT INTO `vip_users`
+                    (`account_id`, `name`, `lastvisit`,
+                     `sid`, `group`, `expires`)
+                 VALUES
+                    (:account_id, :name, :lastvisit, :server_id, :vip_group, :expires)
+                 ON DUPLICATE KEY UPDATE
+                    `name` = VALUES(`name`),
+                    `lastvisit` = VALUES(`lastvisit`),
+                    `group` = VALUES(`group`),
+                    `expires` = VALUES(`expires`)'
+            );
+            $membershipInsert->execute([
+                ':account_id' => $accountId,
+                ':name' => $playerName,
+                ':lastvisit' => $now,
+                ':server_id' => $this->serverId,
+                ':vip_group' => $group,
+                ':expires' => $expires,
+            ]);
+
+            $verify = $this->pdo->prepare(
+                'SELECT `group`, `expires`
+                 FROM `vip_users`
+                 WHERE `account_id` = :account_id
+                   AND `sid` = :server_id
+                 LIMIT 1'
+            );
+            $verify->execute([
+                ':account_id' => $accountId,
+                ':server_id' => $this->serverId,
+            ]);
+            $saved = $verify->fetch(PDO::FETCH_ASSOC);
+
+            if (!is_array($saved)
+                || strtoupper(trim((string)($saved['group'] ?? ''))) !== $group
+                || (int)($saved['expires'] ?? 0) !== $expires) {
+                throw new RuntimeException('VIPCore paid membership read-after-write verification failed.');
+            }
+
+            $this->pdo->commit();
+        } catch (Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+
+            // A retry of the same verified order returns the original expiry.
+            if ($e instanceof PDOException) {
+                $driverCode = (int)($e->errorInfo[1] ?? 0);
+                if ((string)$e->getCode() === '23000' && $driverCode === 1062) {
+                    $committedOrder = $findOrder();
+                    if (is_array($committedOrder)) {
+                        return $formatExisting($committedOrder);
+                    }
+                }
+            }
+            throw $e;
+        }
+
+        return [
+            'granted' => true,
+            'already_granted' => false,
+            'order_ref' => $orderRef,
+            'account_id' => $accountId,
+            'level' => $level,
+            'group' => $group,
+            'granted_at' => $now,
+            'expires' => $expires,
+            'duration_seconds' => $durationSeconds,
+            'server_id' => $this->serverId,
+        ];
+    }
+
 }
