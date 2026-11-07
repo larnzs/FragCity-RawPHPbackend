@@ -115,6 +115,7 @@ try {
 $purchaseType = 'new';
 $upgradeContext = null;
 $amountRial = null;
+$tierPriceRial = null;
 
 if (!empty($vipStatus['active'])) {
     $currentLevel = (int)($vipStatus['level'] ?? 0);
@@ -139,15 +140,21 @@ if (!empty($vipStatus['active'])) {
             $terminate('اطلاعات اشتراک پولی فعلی برای محاسبه ارتقا معتبر نیست؛ لطفاً پس از پایان اشتراک دوباره تلاش کنید.', 409);
         }
 
-        $currentTierPrice = $resolvePriceRial($currentLevel, $paidDays);
+        $currentTierPrice = (int)($paidPurchase['tier_price_rial'] ?? 0);
+        if ($currentTierPrice < 1 || $currentTierPrice % 10 !== 0) {
+            // Older paid-order ledger rows predate immutable catalogue snapshots.
+            $currentTierPrice = $resolvePriceRial($currentLevel, $paidDays);
+        }
         $targetTierPrice = $resolvePriceRial($level, $paidDays);
-        if ($currentTierPrice === null || $targetTierPrice === null || $targetTierPrice <= $currentTierPrice) {
+        if ($currentTierPrice === null || $currentTierPrice < 1
+            || $targetTierPrice === null || $targetTierPrice <= $currentTierPrice) {
             $terminate('قیمت پایهٔ پلن‌ها برای محاسبه ارتقا معتبر نیست.', 503);
         }
 
         $rawUpgradeAmount = ($targetTierPrice - $currentTierPrice)
             * ($remainingSeconds / $paidDurationSeconds);
         $amountRial = (int)(round($rawUpgradeAmount / 1000) * 1000);
+        $tierPriceRial = $targetTierPrice;
         if ($amountRial < 1000 || $amountRial % 10 !== 0) {
             $terminate('اعتبار باقی‌مانده برای ارتقا کافی نیست؛ می‌توانید پس از پایان اشتراک، پلن جدید را با قیمت کامل بخرید.', 409);
         }
@@ -171,6 +178,7 @@ if (!empty($vipStatus['active'])) {
         $purchaseType = 'replacement';
         $durationSeconds = $days * 86400;
         $amountRial = $resolvePriceRial($level, $days);
+        $tierPriceRial = $amountRial;
         if ($amountRial === null || $amountRial < 1) {
             $terminate('قیمت این اشتراک در تنظیمات معتبر نیست؛ هیچ مبلغی از شما دریافت نشده است.', 503);
         }
@@ -181,6 +189,7 @@ if (!empty($vipStatus['active'])) {
 } else {
     $durationSeconds = $days * 86400;
     $amountRial = $resolvePriceRial($level, $days);
+    $tierPriceRial = $amountRial;
     if ($amountRial === null || $amountRial < 1) {
         $terminate('قیمت این اشتراک در تنظیمات معتبر نیست؛ هیچ مبلغی از شما دریافت نشده است.', 503);
     }
@@ -279,9 +288,9 @@ try {
     $insert = $pdo->prepare(
         "INSERT INTO vip_orders
             (order_ref, steamid64, player_name, vip_level, duration_days,
-             duration_seconds, amount_rial, status, purchase_type,
+             duration_seconds, amount_rial, tier_price_rial, status, purchase_type,
              upgrade_from_order_ref, upgrade_from_level, upgrade_from_expires)
-         VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)"
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?, ?)"
     );
     $insert->execute([
         $orderRef,
@@ -291,6 +300,7 @@ try {
         $days,
         $durationSeconds,
         $amountRial,
+        $tierPriceRial,
         $purchaseType,
         $upgradeContext['from_order_ref'] ?? null,
         $upgradeContext['from_level'] ?? null,
