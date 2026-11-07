@@ -330,7 +330,12 @@
                 && mode === 'paid'
                 && (isPaidUpgrade || canBuyFullTerm);
             const payableToman = isPaidUpgrade ? upgradePrice : (canBuyFullTerm ? price : null);
-            const canCheckout = canCreatePaidOrder && checkoutReady;
+            // Allow a valid purchase selection to reach the server even when
+            // the UI readiness probe is false. The endpoint repeats every
+            // security/configuration check and fails closed before creating an
+            // order or contacting ZarinPal; this exposes the exact server-side
+            // reason instead of trapping the customer behind a disabled button.
+            const canCheckout = canCreatePaidOrder;
             const canWalletCheckout = canCreatePaidOrder
                 && walletBalanceAvailable
                 && Number.isSafeInteger(payableToman)
@@ -368,7 +373,7 @@
                 message = 'شرایط ثبت سفارش VIP کامل نیست؛ انتخاب سطح، مدت، قیمت و وضعیت عضویت را بررسی کن.';
             } else if (!checkoutReady) {
                 if (canWalletCheckout) {
-                    message = 'تنظیمات امن زرین‌پال یا Checkout آماده نیست؛ پرداخت آنلاین غیرفعال است، اما موجودی کیف پول برای خرید کافی است.';
+                    message = 'تنظیمات امن زرین‌پال یا Checkout آماده نیست؛ دکمه پرداخت آنلاین را بزن تا سرور علت را بررسی و نمایش دهد. تا تأیید تنظیمات، هیچ سفارش یا پرداختی به درگاه ارسال نمی‌شود؛ موجودی کیف پول برای خرید کافی است.';
                 } else if (walletSelectionValid && !walletBalanceAvailable) {
                     message = 'تنظیمات امن زرین‌پال آماده نیست و موجودی کیف پول نیز قابل بررسی نیست؛ پرداخت تا رفع مشکل غیرفعال می‌ماند.';
                 } else if (walletSelectionValid && walletBalanceAvailable) {
@@ -394,7 +399,9 @@
             if (checkoutButton) {
                 checkoutButton.disabled = !canCheckout;
                 checkoutButton.title = canCheckout
-                    ? (isPaidUpgrade ? 'پرداخت مابه‌التفاوت و ارتقای VIP' : 'ساخت سفارش امن و انتقال به درگاه زرین‌پال')
+                    ? (checkoutReady
+                        ? (isPaidUpgrade ? 'پرداخت مابه‌التفاوت و ارتقای VIP' : 'ساخت سفارش امن و انتقال به درگاه زرین‌پال')
+                        : 'برای بررسی تنظیمات، درخواست را ارسال کن؛ سرور در صورت نقص تنظیمات بدون ایجاد سفارش یا پرداخت، خطای دقیق را نمایش می‌دهد.')
                     : message;
             }
 
@@ -808,7 +815,7 @@
 
                 checkoutButton.disabled = true;
                 checkoutButton.classList.add('is-submitting');
-                checkoutButton.textContent = 'در حال انتقال به زرین‌پال...';
+                checkoutButton.textContent = 'در حال بررسی تنظیمات پرداخت...';
             });
         }
 
