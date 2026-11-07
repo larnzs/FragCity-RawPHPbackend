@@ -54,7 +54,7 @@ jobs:
             "pages/support.php"
             "tools/paymenter-support-preflight.php"
           )
-          for file in "\${files[@]}"; do
+          for file in "${files[@]}"; do
             test -f "$file"
             php -l "$file"
           done
