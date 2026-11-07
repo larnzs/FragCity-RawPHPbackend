@@ -3643,3 +3643,20 @@ body.vip-comparison-open {
         overflow: visible;
     }
 }
+
+
+/* Animated disclosure content (height is driven by the VIP storefront controller). */
+.vip-inactive-grid:not([hidden]) {
+    will-change: height, opacity;
+}
+.vip-faq-item[data-animating="1"] .vip-faq-answer {
+    overflow: hidden;
+    will-change: height, opacity, transform;
+}
+@media (prefers-reduced-motion: reduce) {
+    .vip-inactive-grid,
+    .vip-faq-answer {
+        will-change: auto !important;
+        transition: none !important;
+    }
+}
