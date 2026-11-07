@@ -80,6 +80,47 @@ $action = is_string($payload['action'] ?? null)
     ? trim($payload['action'])
     : '';
 
+// A short-lived, one-use challenge. The answer is stored only as a hash in
+// the server-side session and never sent back to the browser.
+if ($action === 'captcha_challenge') {
+    $left = random_int(2, 9);
+    $right = random_int(1, 9);
+    $token = bin2hex(random_bytes(24));
+    $_SESSION['support_ticket_captcha'] = [
+        'token' => $token,
+        'answer_hash' => hash('sha256', (string) ($left + $right)),
+        'expires_at' => time() + 300,
+    ];
+    $respond([
+        'success' => true,
+        'data' => [
+            'question' => $left . ' + ' . $right . ' = ?',
+            'token' => $token,
+        ],
+    ]);
+}
+
+if ($action === 'create_ticket') {
+    $challenge = $_SESSION['support_ticket_captcha'] ?? [];
+    unset($_SESSION['support_ticket_captcha']);
+    $submittedToken = is_string($payload['captcha_token'] ?? null) ? $payload['captcha_token'] : '';
+    $submittedAnswer = is_string($payload['captcha_answer'] ?? null) ? trim($payload['captcha_answer']) : '';
+    $expectedToken = is_array($challenge) ? (string) ($challenge['token'] ?? '') : '';
+    $expectedHash = is_array($challenge) ? (string) ($challenge['answer_hash'] ?? '') : '';
+    $expiresAt = is_array($challenge) ? (int) ($challenge['expires_at'] ?? 0) : 0;
+
+    if (
+        $expectedToken === ''
+        || $expectedHash === ''
+        || $expiresAt < time()
+        || $submittedAnswer === ''
+        || !hash_equals($expectedToken, $submittedToken)
+        || !hash_equals($expectedHash, hash('sha256', $submittedAnswer))
+    ) {
+        $respond(['success' => false, 'error' => 'captcha_invalid'], 422);
+    }
+}
+
 try {
     // Resolve the customer's contact details from FragCity's own database.
     // Neither email, phone nor Paymenter user ID is accepted from the browser.
@@ -95,7 +136,7 @@ try {
 
     try {
         $accountStatement = $pdo->prepare(
-            'SELECT email, phone, paymenter_user_id
+            'SELECT username, email, phone, paymenter_user_id
              FROM users
              WHERE steamid64 = ?
              LIMIT 1'
@@ -145,22 +186,85 @@ try {
             $respond(['success' => true, 'data' => ['ticket' => $ticket]]);
 
         case 'create_ticket':
-            $subject = is_string($payload['subject'] ?? null)
-                ? trim($payload['subject'])
-                : '';
-            $message = is_string($payload['message'] ?? null)
-                ? trim($payload['message'])
-                : '';
+            $subject = is_string($payload['subject'] ?? null) ? trim($payload['subject']) : '';
+            $description = is_string($payload['message'] ?? null) ? trim($payload['message']) : '';
+            $priority = is_string($payload['priority'] ?? null) ? trim($payload['priority']) : 'medium';
+            $department = is_string($payload['department'] ?? null) ? trim($payload['department']) : '';
+
             if (
                 $subject === ''
                 || mb_strlen($subject, 'UTF-8') > 255
-                || $message === ''
-                || mb_strlen($message, 'UTF-8') > 5000
+                || $description === ''
+                || mb_strlen($description, 'UTF-8') > 4200
+                || !in_array($priority, ['low', 'medium', 'high'], true)
             ) {
                 $respond(['success' => false, 'error' => 'validation_failed'], 422);
             }
 
-            $created = $client->createTicket($steamId64, $subject, null, 'medium');
+            $configuredDepartments = fragcity_settings('integrations.paymenter_support.departments', []);
+            if (!is_array($configuredDepartments)) {
+                $configuredDepartments = [];
+            }
+            if ($department !== '' && !in_array($department, $configuredDepartments, true)) {
+                $respond(['success' => false, 'error' => 'validation_failed'], 422);
+            }
+            $department = $department !== '' ? $department : null;
+
+            $cleanOptionalField = static function (mixed $value, int $maxLength): string {
+                if (!is_string($value)) {
+                    return '';
+                }
+                $value = trim(preg_replace('/[\\x00-\\x1F\\x7F]+/u', ' ', $value) ?? '');
+                return mb_strlen($value, 'UTF-8') <= $maxLength ? $value : '';
+            };
+
+            $service = $cleanOptionalField($payload['service'] ?? '', 160);
+            $domain = $cleanOptionalField($payload['domain'] ?? '', 255);
+            if (
+                (is_string($payload['service'] ?? null) && trim($payload['service']) !== '' && $service === '')
+                || (is_string($payload['domain'] ?? null) && trim($payload['domain']) !== '' && $domain === '')
+            ) {
+                $respond(['success' => false, 'error' => 'validation_failed'], 422);
+            }
+
+            $extraFields = $payload['extra_fields'] ?? [];
+            if (!is_array($extraFields) || count($extraFields) > 3) {
+                $respond(['success' => false, 'error' => 'validation_failed'], 422);
+            }
+
+            $messageParts = [
+                'نام: ' . (trim((string) ($customerAccount['username'] ?? '')) ?: 'ثبت نشده'),
+                'آدرس ایمیل: ' . trim((string) ($customerAccount['email'] ?? '')),
+            ];
+            if ($department !== null) {
+                $messageParts[] = 'بخش: ' . $department;
+            }
+            if ($service !== '') {
+                $messageParts[] = 'سرویس مربوطه: ' . $service;
+            }
+            if ($domain !== '') {
+                $messageParts[] = 'آدرس دامنه: ' . $domain;
+            }
+
+            foreach ($extraFields as $extraField) {
+                if (!is_array($extraField)) {
+                    $respond(['success' => false, 'error' => 'validation_failed'], 422);
+                }
+                $label = $cleanOptionalField($extraField['label'] ?? '', 50);
+                $value = $cleanOptionalField($extraField['value'] ?? '', 200);
+                if ($label === '' || $value === '') {
+                    $respond(['success' => false, 'error' => 'validation_failed'], 422);
+                }
+                $messageParts[] = $label . ': ' . $value;
+            }
+
+            $messageParts[] = "توضیحات تکمیلی:\n" . $description;
+            $message = implode("\n", $messageParts);
+            if (mb_strlen($message, 'UTF-8') > 5000) {
+                $respond(['success' => false, 'error' => 'validation_failed'], 422);
+            }
+
+            $created = $client->createTicket($steamId64, $subject, $department, $priority);
             $ticketId = (int) $created['ticket_id'];
             $createdForUserId = (int) ($created['owner_user_id'] ?? 0);
 
@@ -256,6 +360,7 @@ try {
         'paymenter_api_permission_denied' => 502,
         'paymenter_support_invalid_api_query' => 502,
         'paymenter_support_request_failed' => 502,
+        'captcha_invalid' => 422,
         'paymenter_support_validation_failed' => 422,
         'paymenter_support_rate_limited' => 429,
         default => 502,
@@ -275,6 +380,7 @@ try {
         'paymenter_api_permission_denied',
         'paymenter_support_invalid_api_query',
         'paymenter_support_request_failed',
+        'captcha_invalid',
         'paymenter_support_validation_failed',
         'paymenter_support_rate_limited',
         'paymenter_unreachable',
