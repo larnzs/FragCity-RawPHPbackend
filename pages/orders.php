@@ -212,7 +212,6 @@ foreach ($ordersPageRows as $ordersPageRow) {
             <i class="fa-solid <?= $ordersPageCurrentVipActive ? 'fa-crown' : ($ordersPageVipStatusUnavailable ? 'fa-triangle-exclamation' : 'fa-shield-halved') ?>"></i>
         </span>
         <div class="fc-orders__vip-status-copy">
-            <span class="fc-orders__vip-status-kicker">CURRENT MEMBERSHIP</span>
             <h2 id="fcOrdersVipStatusTitle">وضعیت فعلی VIP</h2>
             <?php if ($ordersPageVipStatusUnavailable): ?>
                 <p class="fc-orders__vip-status-description is-unavailable">دریافت وضعیت از VIPCore ممکن نیست؛ برای جلوگیری از نمایش اطلاعات اشتباه، عملیات ابطال در دسترس نیست.</p>
