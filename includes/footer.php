@@ -18,50 +18,93 @@ require_once __DIR__ . '/routes.php';
                 <p class="footer-desc">
                     پلتفرمی برای سرورهای کانتر استرایک ۲، اسکین‌ها و ابزارهای اختصاصی جامعه‌ی بازیکنان.
                 </p>
-                <a
-                    class="footer-telegram-support-button"
-                    href="https://t.me/fragcitysup"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="ارتباط با پشتیبانی تلگرام FragCity"
-                >
-                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
-                    <span>پشتیبانی تلگرام</span>
-                    <strong dir="ltr">@fragcitysup</strong>
-                </a>
-                <a
-                    class="footer-telegram-button"
-                    href="https://t.me/fragcitychannel"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="ورود به کانال تلگرام FragCity"
-                >
-                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
-                    <span>کانال تلگرام</span>
-                    <strong dir="ltr">@fragcitychannel</strong>
-                </a>
-                <a
-                    class="footer-steam-button"
-                    href="https://steamcommunity.com/id/larnz/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="ارتباط با پشتیبانی FragCity در Steam"
-                >
-                    <i class="fa-brands fa-steam" aria-hidden="true"></i>
-                    <span>پشتیبانی در Steam</span>
-                    <strong dir="ltr">larnz</strong>
-                </a>
-                <a
-                    class="footer-discord-button"
-                    href="https://discord.gg/s6rFThCDdY"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="ورود به سرور Discord FragCity"
-                >
-                    <i class="fa-brands fa-discord" aria-hidden="true"></i>
-                    <span>سرور Discord</span>
-                    <strong dir="ltr">FragCity</strong>
-                </a>
+                <div class="footer-contact-buttons" aria-label="راه‌های ارتباطی با FragCity">
+                    <a
+                        class="footer-contact-button footer-contact-button--primary"
+                        href="/support/?tab=tickets"
+                        aria-label="ثبت تیکت پشتیبانی FragCity"
+                    >
+                        <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                        <span class="footer-contact-button-copy">
+                            <span>ثبت تیکت پشتیبانی</span>
+                            <strong>ارسال و پیگیری درخواست</strong>
+                        </span>
+                    </a>
+                    <a
+                        class="footer-contact-button footer-contact-button--telegram"
+                        href="https://t.me/fragcitysup"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="پشتیبانی تلگرام FragCity"
+                    >
+                        <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+                        <span class="footer-contact-button-copy">
+                            <span>پشتیبانی تلگرام</span>
+                            <strong dir="ltr">@fragcitysup</strong>
+                        </span>
+                    </a>
+                    <a
+                        class="footer-contact-button footer-contact-button--telegram"
+                        href="https://t.me/fragcitychannel"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="کانال رسمی تلگرام FragCity"
+                    >
+                        <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+                        <span class="footer-contact-button-copy">
+                            <span>کانال تلگرام</span>
+                            <strong dir="ltr">@fragcitychannel</strong>
+                        </span>
+                    </a>
+                    <a
+                        class="footer-contact-button footer-contact-button--discord"
+                        href="https://discord.gg/s6rFThCDdY"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="ورود به سرور Discord FragCity"
+                    >
+                        <i class="fa-brands fa-discord" aria-hidden="true"></i>
+                        <span class="footer-contact-button-copy">
+                            <span>سرور Discord</span>
+                            <strong dir="ltr">FragCity</strong>
+                        </span>
+                    </a>
+                    <a
+                        class="footer-contact-button footer-contact-button--steam"
+                        href="https://steamcommunity.com/id/larnz/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="پشتیبانی FragCity در Steam"
+                    >
+                        <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                        <span class="footer-contact-button-copy">
+                            <span>پشتیبانی Steam</span>
+                            <strong dir="ltr">larnz</strong>
+                        </span>
+                    </a>
+                    <a
+                        class="footer-contact-button footer-contact-button--teamspeak"
+                        href="ts3server://217.18.90.7?port=2014"
+                        aria-label="اتصال به سرور TeamSpeak FragCity"
+                    >
+                        <i class="fa-solid fa-headset" aria-hidden="true"></i>
+                        <span class="footer-contact-button-copy">
+                            <span>سرور TeamSpeak</span>
+                            <strong dir="ltr">217.18.90.7:2014</strong>
+                        </span>
+                    </a>
+                    <a
+                        class="footer-contact-button footer-contact-button--email"
+                        href="mailto:support@fragcity.ir"
+                        aria-label="ارسال ایمیل به پشتیبانی FragCity"
+                    >
+                        <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                        <span class="footer-contact-button-copy">
+                            <span>ایمیل پشتیبانی</span>
+                            <strong dir="ltr">support@fragcity.ir</strong>
+                        </span>
+                    </a>
+                </div>
             </section>
 
             <nav class="footer-col" aria-label="دسترسی سریع">
