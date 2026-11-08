@@ -1510,3 +1510,285 @@ body:has(.server-store-page) .content-fader {
     border-color: rgba(255, 179, 71, .78);
     box-shadow: inset 0 1px rgba(255, 255, 255, .06), 0 0 0 1px rgba(255, 179, 71, .08);
 }
+
+
+/* Compact storefront controls: four primary resources share one row on wide screens. */
+.server-store-resource-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 9px;
+}
+
+.server-store-resource-card {
+    min-height: 186px;
+    gap: 10px;
+    padding: 12px 11px 11px;
+    border-radius: 10px;
+}
+
+.server-store-resource-head {
+    align-items: center;
+    gap: 8px;
+}
+
+.server-store-resource-icon {
+    flex-basis: 34px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    font-size: .85rem;
+}
+
+.server-store-resource-copy > small {
+    font-size: .54rem;
+}
+
+.server-store-resource-copy > strong {
+    font-size: .91rem;
+}
+
+.server-store-resource-copy > span {
+    font-size: .56rem;
+}
+
+.server-store-range-wrap {
+    gap: 5px;
+}
+
+.server-store-resource-slider-label {
+    font-size: .61rem;
+}
+
+.server-store-range {
+    height: 5px;
+    margin: 5px 0 2px;
+}
+
+.server-store-range::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+}
+
+.server-store-range::-moz-range-thumb {
+    width: 13px;
+    height: 13px;
+}
+
+.server-store-capacity-panel {
+    padding: 12px 11px 11px;
+    border: 1px solid rgba(255, 179, 71, .14);
+    border-radius: 10px;
+    background:
+        radial-gradient(ellipse at 100% 0, rgba(255, 179, 71, .065), transparent 48%),
+        linear-gradient(145deg, rgba(255, 255, 255, .028), rgba(0, 0, 0, .15));
+}
+
+.server-store-capacity-presets {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    margin-top: 0;
+}
+
+.server-store-capacity-presets button {
+    min-height: 24px;
+    padding: 3px 4px;
+    border-radius: 6px;
+    font-size: .58rem;
+}
+
+.server-store-range-help,
+.server-store-capacity-help {
+    display: block;
+    color: #85858B;
+    font-size: .56rem;
+    line-height: 1.6;
+}
+
+.server-store-resource-footnote {
+    margin-top: 10px;
+    font-size: .6rem;
+    line-height: 1.65;
+}
+
+/* Game selector and the forthcoming CS 1.6 panel. */
+.server-store-game-tabs {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 16px;
+    padding: 5px;
+    border: 1px solid rgba(255, 255, 255, .07);
+    border-radius: 11px;
+    background: rgba(255, 255, 255, .025);
+    width: fit-content;
+    max-width: 100%;
+}
+
+.server-store-game-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 36px;
+    padding: 7px 14px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: #A5A5AB;
+    font-size: .72rem;
+    font-weight: 850;
+    cursor: pointer;
+    transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.server-store-game-tab:hover {
+    color: #FFE0B5;
+}
+
+.server-store-game-tab.is-active {
+    border-color: rgba(255, 179, 71, .24);
+    background: rgba(255, 179, 71, .09);
+    color: #FFD08D;
+}
+
+.server-store-game-tab i {
+    font-size: .88rem;
+}
+
+.server-store-game-panel[hidden],
+.server-store-coming-soon[hidden] {
+    display: none !important;
+}
+
+.server-store-coming-soon {
+    display: grid;
+    justify-items: center;
+    gap: 10px;
+    min-height: 300px;
+    align-content: center;
+    padding: 36px 22px;
+    border: 1px solid rgba(255, 179, 71, .14);
+    border-radius: 16px;
+    background:
+        radial-gradient(ellipse at 50% 0, rgba(255, 179, 71, .07), transparent 54%),
+        linear-gradient(145deg, rgba(255, 255, 255, .025), rgba(0, 0, 0, .16));
+    text-align: center;
+}
+
+.server-store-coming-soon__icon {
+    display: grid;
+    width: 52px;
+    height: 52px;
+    place-items: center;
+    border: 1px solid rgba(255, 179, 71, .2);
+    border-radius: 14px;
+    background: rgba(249, 115, 22, .08);
+    color: #FFB347;
+    font-size: 1.2rem;
+}
+
+.server-store-coming-soon__eyebrow {
+    color: #A5A5AB;
+    font: 800 .61rem var(--fc-font-mono, monospace);
+    letter-spacing: .12em;
+}
+
+.server-store-coming-soon h2 {
+    margin: 0;
+    color: #F5F5F6;
+    font-size: 1.15rem;
+    font-weight: 900;
+}
+
+.server-store-coming-soon p {
+    max-width: 540px;
+    margin: 0;
+    color: #A1A1A8;
+    font-size: .76rem;
+    line-height: 1.9;
+}
+
+.server-store-coming-soon__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 4px;
+    padding: 6px 10px;
+    border: 1px solid rgba(255, 179, 71, .18);
+    border-radius: 7px;
+    color: #E8BB82;
+    font-size: .66rem;
+    font-weight: 850;
+}
+
+.server-store-coming-soon__status i {
+    color: #FFB347;
+    font-size: .45rem;
+}
+
+.server-store-fixed-setting {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 179, 71, .16);
+    border-radius: 8px;
+    background: rgba(255, 179, 71, .055);
+}
+
+.server-store-fixed-setting strong {
+    color: #FFD08D;
+    font-size: .78rem;
+    font-weight: 900;
+}
+
+.server-store-fixed-setting span {
+    color: #A7A0A0;
+    font-size: .64rem;
+}
+
+@media (max-width: 1180px) {
+    .server-store-resource-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 960px) {
+    .server-store-resource-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 680px) {
+    .server-store-resource-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .server-store-resource-card {
+        min-height: 168px;
+        padding: 10px 9px;
+    }
+
+    .server-store-game-tabs {
+        width: 100%;
+    }
+
+    .server-store-game-tab {
+        flex: 1 1 0;
+        min-width: 0;
+        padding-inline: 8px;
+        font-size: .65rem;
+    }
+
+    .server-store-coming-soon {
+        min-height: 250px;
+        padding: 26px 16px;
+    }
+}
+
+@media (max-width: 390px) {
+    .server-store-resource-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
