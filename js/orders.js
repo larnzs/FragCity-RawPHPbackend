@@ -1,10 +1,252 @@
 (function () {
     'use strict';
 
+    function initOrderTabs(root) {
+        const tabs = Array.from(root.querySelectorAll('[data-orders-tab]'));
+        const panels = Array.from(root.querySelectorAll('[data-orders-panel]'));
+        const vipOnly = Array.from(root.querySelectorAll('[data-orders-vip-only]'));
+        const serverTab = root.querySelector('[data-orders-tab="servers"]');
+        const serverPanel = root.querySelector('[data-orders-panel="servers"]');
+        const refreshButton = root.querySelector('[data-server-invoices-refresh]');
+        const feedback = root.querySelector('[data-server-invoices-feedback]');
+        const invoiceList = root.querySelector('[data-server-invoices-list]');
+        const emptyState = root.querySelector('[data-server-invoices-empty]');
+        const csrf = root.dataset.ordersCsrf || '';
+        let loaded = false;
+        let loading = false;
+
+        if (!tabs.length || !panels.length || !serverPanel || !invoiceList) return;
+
+        function setFeedback(message, isError) {
+            if (!feedback) return;
+            feedback.textContent = message || '';
+            feedback.classList.toggle('is-error', Boolean(isError));
+            feedback.classList.toggle('is-success', Boolean(message) && !isError);
+        }
+
+        function makeNode(tag, className, content) {
+            const node = document.createElement(tag);
+            if (className) node.className = className;
+            if (content !== undefined && content !== null) node.textContent = String(content);
+            return node;
+        }
+
+        function formatDate(value) {
+            if (!value) return '—';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '—';
+            return new Intl.DateTimeFormat('fa-IR', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            }).format(date);
+        }
+
+        function formatAmount(value) {
+            const number = Number(value);
+            if (!Number.isFinite(number)) return '—';
+            return new Intl.NumberFormat('fa-IR', {
+                maximumFractionDigits: 2
+            }).format(number);
+        }
+
+        function statusDetails(status) {
+            const values = {
+                paid: { label: 'پرداخت‌شده', className: 'success', icon: 'fa-circle-check' },
+                pending: { label: 'در انتظار پرداخت', className: 'pending', icon: 'fa-clock' },
+                cancelled: { label: 'لغوشده', className: 'muted', icon: 'fa-ban' }
+            };
+            return values[String(status || '').toLowerCase()] || {
+                label: 'وضعیت نامشخص',
+                className: 'muted',
+                icon: 'fa-circle-question'
+            };
+        }
+
+        function renderInvoice(invoice) {
+            const card = makeNode('article', 'fc-orders__order-card fc-orders__invoice-card');
+            const main = makeNode('div', 'fc-orders__order-main');
+            const icon = makeNode('span', 'fc-orders__order-icon');
+            const iconGlyph = makeNode('i');
+            iconGlyph.className = 'fa-solid fa-file-invoice';
+            iconGlyph.setAttribute('aria-hidden', 'true');
+            icon.appendChild(iconGlyph);
+
+            const identity = makeNode('div', 'fc-orders__order-identity');
+            const titleRow = makeNode('div', 'fc-orders__order-title-row');
+            titleRow.appendChild(makeNode('h3', '', 'فاکتور سفارش سرور'));
+            titleRow.appendChild(makeNode('span', 'fc-orders__order-id', 'فاکتور #' + invoice.invoice_id));
+            identity.appendChild(titleRow);
+
+            const meta = makeNode('div', 'fc-orders__order-meta');
+            const created = makeNode('span');
+            const createdIcon = makeNode('i');
+            createdIcon.className = 'fa-regular fa-calendar';
+            createdIcon.setAttribute('aria-hidden', 'true');
+            created.append(createdIcon, document.createTextNode(formatDate(invoice.created_at)));
+            meta.appendChild(created);
+            identity.appendChild(meta);
+
+            const status = statusDetails(invoice.status);
+            const statusNode = makeNode('span', 'fc-orders__status fc-orders__status--' + status.className);
+            const statusIcon = makeNode('i');
+            statusIcon.className = 'fa-solid ' + status.icon;
+            statusIcon.setAttribute('aria-hidden', 'true');
+            statusNode.append(statusIcon, document.createTextNode(status.label));
+
+            main.append(icon, identity, statusNode);
+            card.appendChild(main);
+
+            const details = makeNode('div', 'fc-orders__order-details fc-orders__invoice-details');
+            const currency = String(invoice.currency_code || '').trim();
+            const currencyLabel = currency || 'واحد پول نامشخص';
+            const detailValues = [
+                ['تاریخ صدور', formatDate(invoice.created_at)],
+                ['سررسید', formatDate(invoice.due_at)],
+                ['جمع اقلام', invoice.subtotal === null ? '—' : formatAmount(invoice.subtotal) + ' ' + currencyLabel],
+                ['تعداد اقلام', new Intl.NumberFormat('fa-IR').format(Array.isArray(invoice.items) ? invoice.items.length : 0)]
+            ];
+            detailValues.forEach(([label, value]) => {
+                const detail = makeNode('div', 'fc-orders__detail');
+                detail.append(makeNode('span', '', label), makeNode('strong', '', value));
+                details.appendChild(detail);
+            });
+            card.appendChild(details);
+
+            const itemList = makeNode('div', 'fc-orders__invoice-items');
+            if (Array.isArray(invoice.items) && invoice.items.length) {
+                invoice.items.forEach((item) => {
+                    const line = makeNode('div', 'fc-orders__invoice-line');
+                    const description = makeNode('span', 'fc-orders__invoice-description', item.description || 'آیتم فاکتور');
+                    const quantity = Number(item.quantity);
+                    const quantityLabel = Number.isFinite(quantity)
+                        ? new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 3 }).format(quantity)
+                        : '۱';
+                    const quantityNode = makeNode('small', 'fc-orders__invoice-quantity', '× ' + quantityLabel);
+                    const amountNode = makeNode(
+                        'strong',
+                        'fc-orders__invoice-line-amount',
+                        item.line_total === null ? '—' : formatAmount(item.line_total) + ' ' + currencyLabel
+                    );
+                    line.append(description, quantityNode, amountNode);
+                    itemList.appendChild(line);
+                });
+            } else {
+                itemList.appendChild(makeNode('p', 'fc-orders__invoice-no-items', 'جزئیات اقلام این فاکتور در دسترس نیست.'));
+            }
+            card.appendChild(itemList);
+
+            return card;
+        }
+
+        function renderInvoices(invoices) {
+            invoiceList.replaceChildren();
+            if (emptyState) emptyState.hidden = invoices.length !== 0;
+            invoiceList.hidden = invoices.length === 0;
+
+            if (serverTab) {
+                const count = serverTab.querySelector('[data-server-invoice-count]');
+                if (count) count.textContent = new Intl.NumberFormat('fa-IR').format(invoices.length);
+            }
+
+            invoices.forEach((invoice) => invoiceList.appendChild(renderInvoice(invoice)));
+        }
+
+        async function loadInvoices(force) {
+            if (loading || (!force && loaded)) return;
+            loading = true;
+            if (refreshButton) refreshButton.disabled = true;
+            if (emptyState) emptyState.hidden = true;
+            invoiceList.hidden = true;
+            invoiceList.replaceChildren();
+            setFeedback('در حال دریافت فاکتورهای حساب شما از Paymenter...', false);
+
+            try {
+                const response = await fetch('/api/server-invoices.php', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-FragCity-CSRF': csrf
+                    },
+                    body: JSON.stringify({ action: 'list' })
+                });
+
+                let result = {};
+                try {
+                    result = await response.json();
+                } catch (error) {
+                    throw new Error('invalid_response');
+                }
+
+                if (!response.ok || result.success !== true || !Array.isArray(result.data?.invoices)) {
+                    throw new Error(typeof result.error === 'string' ? result.error : 'paymenter_invoice_request_failed');
+                }
+
+                renderInvoices(result.data.invoices);
+                loaded = true;
+                setFeedback(
+                    result.data.invoices.length > 100
+                        ? 'بیش از ۱۰۰ فاکتور موجود است؛ فقط جدیدترین موارد نمایش داده می‌شوند.'
+                        : '',
+                    false
+                );
+            } catch (error) {
+                loaded = false;
+                const messages = {
+                    authentication_required: 'برای مشاهده فاکتورها دوباره وارد حساب FragCity شوید.',
+                    csrf_failed: 'درخواست امنیتی منقضی شده است؛ صفحه را تازه‌سازی کنید.',
+                    paymenter_invoice_identity_not_synced: 'حساب Paymenter شما هنوز با ایمیل حساب FragCity همگام نشده است.',
+                    paymenter_invoices_not_configured: 'اتصال مستقل فاکتورهای Paymenter هنوز تنظیم نشده است.',
+                    paymenter_api_permission_denied: 'دسترسی خواندن فاکتور، اقلام یا اطلاعات مالک در API Key وجود ندارد.',
+                    paymenter_invoice_identity_mismatch: 'اطلاعات مالک فاکتور با حساب FragCity شما مطابقت ندارد؛ برای امنیت، فاکتور نمایش داده نشد.',
+                    paymenter_invoice_owner_unverified: 'مالک فاکتور از پاسخ Paymenter قابل تأیید نیست؛ برای امنیت، فاکتور نمایش داده نشد.',
+                    paymenter_invoice_items_unavailable: 'جزئیات اقلام فاکتور از Paymenter دریافت نشد.',
+                    paymenter_invoice_unreachable: 'ارتباط با Paymenter برقرار نشد. کمی بعد دوباره تلاش کنید.',
+                    paymenter_invoice_curl_required: 'ماژول ارتباط امن سرور در دسترس نیست.',
+                    invalid_response: 'پاسخ دریافتی از سرور معتبر نیست.',
+                    paymenter_invoice_request_failed: 'دریافت فاکتورها با خطا مواجه شد.'
+                };
+                setFeedback(
+                    messages[error && error.message] || messages.paymenter_invoice_request_failed,
+                    true
+                );
+            } finally {
+                loading = false;
+                if (refreshButton) refreshButton.disabled = false;
+            }
+        }
+
+        function selectTab(name) {
+            tabs.forEach((tab) => {
+                const active = tab.dataset.ordersTab === name;
+                tab.classList.toggle('fc-orders__category--active', active);
+                tab.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+            panels.forEach((panel) => {
+                panel.hidden = panel.dataset.ordersPanel !== name;
+            });
+            vipOnly.forEach((node) => {
+                node.hidden = name !== 'vip';
+            });
+
+            if (name === 'servers') loadInvoices(false);
+        }
+
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', () => selectTab(tab.dataset.ordersTab || 'vip'));
+        });
+        if (refreshButton) refreshButton.addEventListener('click', () => loadInvoices(true));
+        selectTab('vip');
+    }
+
     function initOrdersPage() {
         const root = document.getElementById('fcOrders');
         if (!root || root.dataset.ordersControllerReady === '1') return;
         root.dataset.ordersControllerReady = '1';
+
+        initOrderTabs(root);
 
         const statusCard = root.querySelector('#fcOrdersVipStatus');
         const openButton = root.querySelector('[data-vip-revoke-open]');
