@@ -38,6 +38,9 @@ DirectoryIndex index.php
   RewriteCond %{THE_REQUEST} \s/+index\.php\?page=buyserver\s [NC,OR]
   RewriteCond %{THE_REQUEST} \s/\?page=buyserver\s [NC]
   RewriteRule ^(?:index\.php)?$ /buy-server/ [R=301,L,NE]
+  RewriteCond %{THE_REQUEST} \s/+index\.php\?page=minecraft\s [NC,OR]
+  RewriteCond %{THE_REQUEST} \s/\?page=minecraft\s [NC]
+  RewriteRule ^(?:index\.php)?$ /minecraft-hosting/ [R=301,L,NE]
   RewriteCond %{THE_REQUEST} \s/+index\.php\?page=launcher\s [NC,OR]
   RewriteCond %{THE_REQUEST} \s/\?page=launcher\s [NC]
   RewriteRule ^(?:index\.php)?$ /launcher/ [R=301,L,NE]
@@ -104,12 +107,13 @@ DirectoryIndex index.php
   RewriteRule ^index\.php$ / [R=301,L,NE]
 
   # Enforce one trailing-slash form for all clean page URLs.
-  RewriteRule ^(servers|skins|buy-server|launcher|server-manual|serverguide|status|about|support|login|register|profile|my-servers|orders|vip|leaderboard|forgot-password|reset-password|rules|privacy|deadlock-servers|banlist|donations)$ /$1/ [R=301,L,NE]
+  RewriteRule ^(servers|skins|buy-server|minecraft-hosting|launcher|server-manual|serverguide|status|about|support|login|register|profile|my-servers|orders|vip|leaderboard|forgot-password|reset-password|rules|privacy|deadlock-servers|banlist|donations)$ /$1/ [R=301,L,NE]
 
   # Canonical, extension-free routes.
   RewriteRule ^servers/?$ index.php?page=servers_vps [QSA,L]
   RewriteRule ^skins/?$ index.php?page=skins [QSA,L]
   RewriteRule ^buy-server/?$ index.php?page=buyserveropen [QSA,L]
+  RewriteRule ^minecraft-hosting/?$ index.php?page=minecraft [QSA,L]
   RewriteRule ^launcher/?$ index.php?page=launcher [QSA,L]
   RewriteRule ^server-manual/?$ index.php?page=usermanual [QSA,L]
   RewriteRule ^serverguide/?$ index.php?page=serverguide [QSA,L]
