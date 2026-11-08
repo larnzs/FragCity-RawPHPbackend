@@ -2130,3 +2130,20 @@ button.ticket-row {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+
+/* Steam profile icon inside the support social links */
+.social-icon--steam {
+    display: grid;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    color: #C6D4DF;
+    font-size: 1.55rem;
+}
+
+.social-item--steam:hover {
+    border-color: rgba(198, 212, 223, .28);
+    background: rgba(75, 105, 128, .055);
+}
