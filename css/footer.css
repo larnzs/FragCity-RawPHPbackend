@@ -270,3 +270,51 @@
         transition: none !important;
     }
 }
+
+
+/* Official FragCity Telegram channel shortcut */
+.footer-telegram-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    max-width: 100%;
+    margin-top: 15px;
+    padding: 9px 12px;
+    border: 1px solid rgba(42, 171, 238, .22);
+    border-radius: 9px;
+    background: linear-gradient(110deg, rgba(42, 171, 238, .09), rgba(20, 20, 20, .72));
+    color: #C8DCE8;
+    font-size: .72rem;
+    font-weight: 700;
+    line-height: 1.6;
+    text-decoration: none;
+    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.footer-telegram-button > i {
+    flex: 0 0 auto;
+    color: #2AABEE;
+    font-size: 1.12rem;
+}
+
+.footer-telegram-button > strong {
+    overflow: hidden;
+    color: #E7F5FC;
+    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.footer-telegram-button:hover,
+.footer-telegram-button:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(42, 171, 238, .42);
+    background: linear-gradient(110deg, rgba(42, 171, 238, .15), rgba(20, 20, 20, .86));
+    color: #FFFFFF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .footer-telegram-button {
+        transition: none !important;
+    }
+}
