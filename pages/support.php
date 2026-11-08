@@ -107,6 +107,16 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
                     </div>
                     <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
                 </a>
+                <a href="https://steamcommunity.com/id/larnz/" target="_blank" rel="noopener noreferrer" class="social-item social-item--steam" aria-label="پشتیبانی FragCity در Steam">
+                    <span class="social-icon social-icon--steam" aria-hidden="true">
+                        <i class="fa-brands fa-steam"></i>
+                    </span>
+                    <div class="social-info">
+                        <h3>پشتیبانی Steam</h3>
+                        <p><i class="fa-brands fa-steam"></i> larnz | ارتباط مستقیم با پشتیبانی</p>
+                    </div>
+                    <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
+                </a>
             </div>
             <p class="response-time">
                 <i class="fas fa-clock"></i> میانگین زمان پاسخگویی کمتر از ۲ ساعت در ساعات اوج بازی
