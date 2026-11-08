@@ -1161,3 +1161,150 @@ body:has(.server-store-page) .content-fader {
         padding: 14px;
     }
 }
+
+
+/* Capacity selector — the primary choice in the server configurator. */
+.server-store-capacity-panel {
+    padding: clamp(16px, 2vw, 22px);
+    border: 1px solid rgba(255, 179, 71, .14);
+    border-radius: 14px;
+    background:
+        radial-gradient(ellipse at 100% 0, rgba(255, 179, 71, .075), transparent 48%),
+        linear-gradient(145deg, rgba(255, 255, 255, .028), rgba(0, 0, 0, .15));
+}
+
+.server-store-capacity-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 19px;
+}
+
+.server-store-capacity-kicker {
+    display: block;
+    color: #929298;
+    font: 850 .58rem/1.5 var(--fc-font-mono, monospace);
+    letter-spacing: .15em;
+}
+
+.server-store-capacity-value {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 3px;
+}
+
+.server-store-capacity-value output {
+    color: #FFD08D;
+    font: 950 clamp(2rem, 4vw, 2.8rem)/1.1 var(--fc-font-mono, monospace);
+    font-variant-numeric: tabular-nums;
+}
+
+.server-store-capacity-value > span {
+    color: #B6A38B;
+    font-size: .78rem;
+    font-weight: 850;
+}
+
+.server-store-capacity-range-label {
+    padding: 6px 9px;
+    border: 1px solid rgba(255, 255, 255, .07);
+    border-radius: 7px;
+    color: #99999F;
+    font-size: .62rem;
+    white-space: nowrap;
+}
+
+.server-store-capacity-slider-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #D4D4D7;
+    font-size: .7rem;
+    font-weight: 850;
+}
+
+.server-store-capacity-range {
+    height: 9px;
+    margin: 12px 0 8px;
+}
+
+.server-store-capacity-range::-webkit-slider-thumb {
+    width: 22px;
+    height: 22px;
+}
+
+.server-store-capacity-presets {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 7px;
+    margin-top: 18px;
+}
+
+.server-store-capacity-presets button {
+    min-width: 0;
+    min-height: 36px;
+    padding: 5px 7px;
+    border: 1px solid rgba(255, 255, 255, .085);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .025);
+    color: #B8B8BD;
+    font: 800 .68rem/1 var(--fc-font-mono, monospace);
+    font-variant-numeric: tabular-nums;
+    cursor: pointer;
+    transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.server-store-capacity-presets button:hover {
+    transform: translateY(-1px);
+    border-color: rgba(255, 179, 71, .34);
+    color: #FFE0B5;
+}
+
+.server-store-capacity-presets button[aria-pressed="true"] {
+    border-color: rgba(255, 179, 71, .58);
+    background: linear-gradient(145deg, rgba(255, 179, 71, .18), rgba(249, 115, 22, .09));
+    color: #FFD08D;
+    box-shadow: inset 0 1px rgba(255, 255, 255, .06);
+}
+
+.server-store-capacity-help {
+    display: block;
+    margin-top: 13px;
+    color: #85858B;
+    font-size: .63rem;
+    line-height: 1.9;
+}
+
+@media (max-width: 680px) {
+    .server-store-capacity-panel {
+        padding: 14px 12px;
+        border-radius: 11px;
+    }
+
+    .server-store-capacity-head {
+        align-items: flex-start;
+        margin-bottom: 16px;
+    }
+
+    .server-store-capacity-value output {
+        font-size: 2.1rem;
+    }
+
+    .server-store-capacity-range-label {
+        max-width: 125px;
+        white-space: normal;
+        text-align: center;
+        line-height: 1.6;
+    }
+
+    .server-store-capacity-presets {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 7px;
+        margin-top: 15px;
+    }
+
+    .server-store-capacity-presets button {
+        min-height: 34px;
+    }
+}
