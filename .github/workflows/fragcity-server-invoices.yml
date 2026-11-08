@@ -53,6 +53,7 @@ jobs:
           files=(
             "api/server-invoices.php"
             "class/PaymenterInvoiceApiClient.php"
+            "class/PaymenterInvoiceContext.php"
             "pages/orders.php"
             "tools/paymenter-invoices-preflight.php"
             "tools/paymenter-invoices-contract-test.php"
@@ -78,12 +79,15 @@ jobs:
           grep -Fq 'hash_equals($expectedEmail, $paymenterEmail)' "$client"
           grep -Fq "'App\\\\Models\\\\Service'" "$client"
           grep -Fq "'App\\\\Models\\\\ServiceUpgrade'" "$client"
+          grep -Fq "'reference_kind' => $referenceKind" "$client"
           grep -Fq '$isManualLine' "$client"
           grep -Fq 'if ($itemRelationship === [])' "$client"
           grep -Fq "SELECT email, paymenter_user_id, paymenter_sync_status" "$endpoint"
           grep -Fq '$_SESSION[' "$endpoint"
           grep -Fq 'HTTP_X_FRAGCITY_CSRF' "$endpoint"
           grep -Fq "nativeRequest('GET', '/invoices'" "$client"
+          grep -Fq 'PaymenterInvoiceContext::attach' "$endpoint"
+          grep -Fq 'getCustomerServers($steamId64)' "$endpoint"
           if grep -E "nativeRequest\\('(POST|PATCH|PUT|DELETE)'" "$client"; then
             echo "The invoice client must remain read-only."
             exit 1
@@ -101,8 +105,11 @@ jobs:
           grep -Fq 'data-orders-panel="servers"' pages/orders.php
           grep -Fq "fetch('/api/server-invoices.php'" js/orders.js
           grep -Fq 'data-server-invoices-refresh' pages/orders.php
+          grep -Fq "window.addEventListener('content-loaded'" js/orders.js
+          grep -Fq 'window.fragCityServerInvoiceCache' js/orders.js
+          grep -Fq 'renderItemServerContext' js/orders.js
 
-      - name: Test invoice normalization and owner verification
+      - name: Test invoice normalization, owner verification and server mapping
         run: php tools/paymenter-invoices-contract-test.php
 
       - name: Check invoice tab JavaScript
