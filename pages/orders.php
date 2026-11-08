@@ -268,6 +268,19 @@ foreach ($ordersPageRows as $ordersPageRow) {
         </a>
     </header>
 
+    <nav class="fc-orders__categories" aria-label="دسته سفارش‌ها" data-orders-tabs>
+        <button class="fc-orders__category fc-orders__category--active" type="button" data-orders-tab="vip" aria-controls="fcOrdersVipPanel" aria-pressed="true">
+            <span class="fc-orders__category-icon"><i class="fa-solid fa-crown" aria-hidden="true"></i></span>
+            <span><strong>سفارش‌های VIP</strong><small>پرداخت و فعال‌سازی اشتراک</small></span>
+            <span class="fc-orders__category-count"><?= number_format($ordersPageTotal) ?></span>
+        </button>
+        <button class="fc-orders__category" type="button" data-orders-tab="servers" aria-controls="fcOrdersServerPanel" aria-pressed="false">
+            <span class="fc-orders__category-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
+            <span><strong>سفارش‌های سرور</strong><small>فاکتورهای خرید و تمدید سرویس</small></span>
+            <span class="fc-orders__category-count" data-server-invoice-count>فاکتورها</span>
+        </button>
+    </nav>
+
     <section data-orders-vip-only class="fc-orders__vip-status<?= $ordersPageCurrentVipActive ? ' is-active' : '' ?>" id="fcOrdersVipStatus" aria-labelledby="fcOrdersVipStatusTitle">
         <span class="fc-orders__vip-status-icon" aria-hidden="true">
             <i class="fa-solid <?= $ordersPageCurrentVipActive ? 'fa-crown' : ($ordersPageVipStatusUnavailable ? 'fa-triangle-exclamation' : 'fa-shield-halved') ?>"></i>
@@ -357,18 +370,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
         </article>
     </section>
 
-    <nav class="fc-orders__categories" aria-label="دسته سفارش‌ها">
-        <button class="fc-orders__category fc-orders__category--active" type="button" data-orders-tab="vip" aria-controls="fcOrdersVipPanel" aria-pressed="true">
-            <span class="fc-orders__category-icon"><i class="fa-solid fa-crown" aria-hidden="true"></i></span>
-            <span><strong>سفارش‌های VIP</strong><small>پرداخت و فعال‌سازی اشتراک</small></span>
-            <span class="fc-orders__category-count"><?= number_format($ordersPageTotal) ?></span>
-        </button>
-        <button class="fc-orders__category" type="button" data-orders-tab="servers" aria-controls="fcOrdersServerPanel" aria-pressed="false">
-            <span class="fc-orders__category-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
-            <span><strong>سفارش‌های سرور</strong><small>فاکتورهای خرید و تمدید سرویس</small></span>
-            <span class="fc-orders__category-count" data-server-invoice-count>فاکتورها</span>
-        </button>
-    </nav>
+
 
     <section class="fc-orders__content" id="fcOrdersVipPanel" data-orders-panel="vip" aria-labelledby="fcOrdersVipTitle">
         <div class="fc-orders__section-heading">
