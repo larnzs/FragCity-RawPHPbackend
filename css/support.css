@@ -2164,3 +2164,181 @@ button.ticket-row {
     border-color: rgba(88, 101, 242, .3);
     background: rgba(88, 101, 242, .065);
 }
+
+
+/* Correct image sizing for the Telegram and TeamSpeak brand marks */
+.support-page .social-icon,
+.support-page .ts-logo {
+    display: block;
+    object-fit: contain;
+    object-position: center;
+}
+
+.support-page .social-icon {
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+}
+
+.support-page .ts-logo-area {
+    display: grid;
+    place-items: center;
+}
+
+.support-page .ts-logo {
+    width: 82px;
+    height: 82px;
+    padding: 5px;
+}
+
+.social-icon--telegram-support {
+    display: grid;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    color: #2AABEE;
+    font-size: 1.55rem;
+}
+
+.social-item--telegram-support:hover {
+    border-color: rgba(42, 171, 238, .32);
+    background: rgba(42, 171, 238, .055);
+}
+
+/* Bottom support action panel */
+.support-contact-actions {
+    width: min(100%, 1440px);
+    margin: 18px auto 0;
+    padding: 20px;
+    border: 1px solid rgba(249, 115, 22, .16);
+    border-radius: 16px;
+    background:
+        radial-gradient(ellipse at 100% 0, rgba(249, 115, 22, .065), transparent 44%),
+        linear-gradient(145deg, rgba(25, 25, 25, .96), rgba(14, 14, 14, .98));
+    box-shadow: 0 12px 30px rgba(0, 0, 0, .18), inset 0 1px rgba(255, 255, 255, .025);
+}
+
+.support-contact-actions-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, .065);
+}
+
+.support-contact-actions-heading h2 {
+    margin: 3px 0 4px;
+    color: #F5F5F5;
+    font-size: .98rem;
+    font-weight: 900;
+}
+
+.support-contact-actions-heading p {
+    margin: 0;
+    color: #858585;
+    font-size: .68rem;
+    line-height: 1.8;
+}
+
+.support-contact-action-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    padding-top: 15px;
+}
+
+.support-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, .09);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .025);
+    color: #C7C7C7;
+    font: 750 .68rem/1.6 var(--fc-font-sans, 'Vazirmatn', sans-serif);
+    text-decoration: none;
+    transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
+}
+
+.support-action-btn > i {
+    font-size: .95rem;
+}
+
+.support-action-btn:hover,
+.support-action-btn:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, .2);
+    background: rgba(255, 255, 255, .055);
+    color: #FFF;
+}
+
+.support-action-btn > strong {
+    color: #F0F0F0;
+    font: 750 .64rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.support-action-btn--primary {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 10px 16px;
+    border-color: rgba(249, 115, 22, .36);
+    background: linear-gradient(120deg, rgba(249, 115, 22, .2), rgba(217, 90, 11, .1));
+    color: #FFD0A5;
+}
+
+.support-action-btn--primary:hover,
+.support-action-btn--primary:focus-visible {
+    border-color: rgba(249, 115, 22, .58);
+    background: linear-gradient(120deg, rgba(249, 115, 22, .28), rgba(217, 90, 11, .16));
+    color: #FFF;
+}
+
+.support-action-btn--telegram > i { color: #2AABEE; }
+.support-action-btn--discord > i { color: #7289DA; }
+.support-action-btn--steam > i { color: #C6D4DF; }
+.support-action-btn--teamspeak > i { color: #FFB347; }
+
+@media (max-width: 700px) {
+    .support-contact-actions {
+        padding: 15px;
+    }
+
+    .support-contact-actions-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .support-contact-actions-heading .support-action-btn--primary {
+        width: 100%;
+    }
+
+    .support-contact-action-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .support-action-btn {
+        min-width: 0;
+        flex-wrap: wrap;
+        text-align: center;
+    }
+}
+
+@media (max-width: 420px) {
+    .support-contact-action-list {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .support-action-btn,
+    .social-item--telegram-support {
+        transition: none !important;
+    }
+}
