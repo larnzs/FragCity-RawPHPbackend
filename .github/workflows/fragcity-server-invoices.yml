@@ -11,6 +11,7 @@ on:
       - "css/orders.css"
       - "settings/settings.example.json"
       - "tools/paymenter-invoices-preflight.php"
+      - "tools/paymenter-invoices-contract-test.php"
       - "docs/FRAGCITY-PAYMENTER-INVOICES.md"
       - ".github/workflows/fragcity-server-invoices.yml"
   pull_request:
@@ -53,6 +54,7 @@ jobs:
             "class/PaymenterInvoiceApiClient.php"
             "pages/orders.php"
             "tools/paymenter-invoices-preflight.php"
+            "tools/paymenter-invoices-contract-test.php"
           )
           for file in "${files[@]}"; do
             test -f "$file"
@@ -97,6 +99,9 @@ jobs:
           grep -Fq 'data-orders-panel="servers"' pages/orders.php
           grep -Fq "fetch('/api/server-invoices.php'" js/orders.js
           grep -Fq 'data-server-invoices-refresh' pages/orders.php
+
+      - name: Test invoice normalization and owner verification
+        run: php tools/paymenter-invoices-contract-test.php
 
       - name: Check invoice tab JavaScript
         run: node --check js/orders.js
