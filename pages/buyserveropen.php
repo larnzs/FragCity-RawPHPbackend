@@ -420,7 +420,7 @@ $serverStoreDefaultPlayers = 10;
                 <div class="server-store-summary-total">
                     <span>قیمت ماهانه پیکربندی انتخاب‌شده</span>
                     <strong data-server-summary="monthly-price">۷۴۹٬۰۰۰ تومان</strong>
-                    <small>شامل پلن پایه ۵ اسلات، اسلات‌های اضافه و RAM انتخاب‌شده است. هزینه افزونه‌های پولی مانند Tickrate 128 و Bot Guard و هر موردی که جداگانه قیمت‌گذاری شود، در این مبلغ نیست.</small>
+                    <small>شامل پلن پایه ۵ اسلات، اسلات‌های اضافه و RAM انتخاب‌شده است. هزینه اینترنت جداگانه از مشتری دریافت نمی‌شود و در تعرفه ظرفیت لحاظ شده است. افزونه‌های پولی مانند Tickrate 128 و Bot Guard جداگانه محاسبه می‌شوند.</small>
                 </div>
 
                 <button type="button" class="server-store-submit" disabled>
