@@ -39,7 +39,12 @@
         const capacityPricing = {
             baseSlots: Number(capacityPricingPanel.dataset.baseSlots),
             basePrice: Number(capacityPricingPanel.dataset.basePrice),
-            extraSlotPrice: Number(capacityPricingPanel.dataset.extraSlotPrice)
+            extraSlotPrice: Number(capacityPricingPanel.dataset.extraSlotPrice),
+            ramPrices: {
+                1024: Number(capacityPricingPanel.dataset.ramPrice1024),
+                1280: Number(capacityPricingPanel.dataset.ramPrice1280),
+                1536: Number(capacityPricingPanel.dataset.ramPrice1536)
+            }
         };
 
         if (
@@ -48,7 +53,10 @@
             !Number.isFinite(capacityPricing.extraSlotPrice) ||
             capacityPricing.baseSlots < 1 ||
             capacityPricing.basePrice < 0 ||
-            capacityPricing.extraSlotPrice < 0
+            capacityPricing.extraSlotPrice < 0 ||
+            Object.values(capacityPricing.ramPrices).some(function (price) {
+                return !Number.isFinite(price) || price < 0;
+            })
         ) {
             root.dataset.serverStoreInitialized = '0';
             return;
@@ -189,6 +197,8 @@
             const extraSlots = Math.max(0, selectedSlots - capacityPricing.baseSlots);
             const extraSlotsPrice = extraSlots * capacityPricing.extraSlotPrice;
             const capacityPrice = capacityPricing.basePrice + extraSlotsPrice;
+            const ramSurcharge = capacityPricing.ramPrices[memoryMb];
+            const monthlyPrice = capacityPrice + ramSurcharge;
 
             setSummary('capacity-base-price', formatToman(capacityPricing.basePrice));
             setSummary(
@@ -198,7 +208,8 @@
                         ' = ' + formatToman(extraSlotsPrice)
                     : 'بدون اسلات اضافه'
             );
-            setSummary('capacity-price', formatToman(capacityPrice) + ' / ماه');
+            setSummary('memory-price', ramSurcharge > 0 ? '+ ' + formatToman(ramSurcharge) : 'بدون هزینه اضافه');
+            setSummary('monthly-price', formatToman(monthlyPrice) + ' / ماه');
             setSummary('tickrate', tickrate === '128' ? '128 Tick · ارتقای پولی' : '64 Tick');
             setSummary('exec', modeLabel);
             setSummary('mapgroup', mapgroupLabel);
