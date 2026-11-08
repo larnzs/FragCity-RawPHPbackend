@@ -96,6 +96,7 @@ jobs:
           grep -Fq 'data-orders-tab="vip"' pages/orders.php
           grep -Fq 'data-orders-tab="servers"' pages/orders.php
           grep -Fq 'data-orders-tabs' pages/orders.php
+          php -r '$p=file_get_contents("pages/orders.php"); $h=strpos($p, "<header class=\\"fc-orders__header\\">"); $he=$h===false?false:strpos($p,"</header>",$h); $n=strpos($p, "<nav class=\\"fc-orders__categories\\""); $v=strpos($p, "data-orders-vip-only class=\\"fc-orders__vip-status"); if ($he===false || $n===false || $v===false || $n<=$he || $v<=$n || trim(substr($p,$he+strlen("</header>"),$n-($he+strlen("</header>"))))!=="") { fwrite(STDERR,"Order tabs must immediately follow the hero banner and precede VIP-only cards.\\n"); exit(1); }'
           grep -Fq 'data-orders-panel="vip"' pages/orders.php
           grep -Fq 'data-orders-panel="servers"' pages/orders.php
           grep -Fq "fetch('/api/server-invoices.php'" js/orders.js
