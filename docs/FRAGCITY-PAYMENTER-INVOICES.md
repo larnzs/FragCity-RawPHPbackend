@@ -25,7 +25,7 @@ Create a new Admin API Key, for example **FragCity Server Invoices**, and enable
 
 Do not enable Create, Update or Delete for invoices, invoice items or users. Do not enable Orders, Services, Credits, Tickets, Impersonation or any other permissions. The View Users permission is used only to include the user relationship on the invoice response; the website does not call the Users collection endpoint.
 
-The Admin API key is global, so the PHP adapter performs strict per-invoice owner checks after every list request. Do not treat the Paymenter filter as an access-control boundary.
+The Admin API key is global, so the PHP adapter performs strict per-invoice owner checks after every list request. A missing owner relationship, missing included user record or email mismatch fails closed. Do not treat the Paymenter filter as an access-control boundary.
 
 ## Private FragCity settings
 
