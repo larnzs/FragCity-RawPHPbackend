@@ -124,8 +124,8 @@ $serverStoreDefaultMonthlyPrice =
                 </div>
                 <div class="server-store-hero-copy">
                     <span class="server-store-eyebrow" dir="ltr">FRAGCITY / GAME HOSTING</span>
-                    <h1>سرور CS2 خودت رو بساز</h1>
-                    <p>از ۵ تا ۶۴ اسلات انتخاب کن و یک سرور چندحالته بساز؛ مودهای متنوع CS2 در یک سرویس، بدون نیاز به خرید پلن جدا برای هر سبک بازی.</p>
+                    <h1>سرور بازی خودت رو بساز</h1>
+                    <p>بازی موردنظرت را انتخاب کن و ظرفیت و منابع سرورت را متناسب با کامیونیتی خودت تنظیم کن.</p>
                     <div class="server-store-hero-tags">
                         <span><i class="fa-solid fa-users" aria-hidden="true"></i> ۵ تا ۶۴ اسلات</span>
                         <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> همه مودها در یک سرویس</span>
@@ -136,8 +136,8 @@ $serverStoreDefaultMonthlyPrice =
 
             <div class="server-store-hero-product">
                 <span class="server-store-product-kicker">YOUR GAME SERVER</span>
-                <strong>CS2 Multimode</strong>
-                <span class="server-store-product-status"><i class="fa-solid fa-circle" aria-hidden="true"></i> ظرفیت انتخابی ۵ تا ۶۴ اسلات</span>
+                <strong>Counter-Strike Servers</strong>
+                <span class="server-store-product-status"><i class="fa-solid fa-circle" aria-hidden="true"></i> CS2 فعال · CS 1.6 به‌زودی</span>
                 <div class="server-store-product-mark" aria-hidden="true">
                     <i class="fa-solid fa-crosshairs"></i>
                 </div>
@@ -301,7 +301,7 @@ $serverStoreDefaultMonthlyPrice =
                             </div>
 
                             <div class="server-store-field server-store-field--fixed">
-                                <label for="serverStoreTickrateDisplay">Tickrate و Subtick</label>
+                                <span class="server-store-fixed-label">Tickrate و Subtick</span>
                                 <div class="server-store-fixed-setting" id="serverStoreTickrateDisplay">
                                     <strong>64 Tick</strong>
                                     <span>Subtick فعال · ثابت در CS2</span>
@@ -534,6 +534,7 @@ $serverStoreDefaultMonthlyPrice =
                     این صفحه فعلاً برای انتخاب و بررسی پیکربندی است. سفارش‌گیری پس از نهایی‌شدن تعرفه‌ها و اتصال Backend فعال می‌شود.
                 </div>
             </aside>
+        </div>
         </div>
         <section class="server-store-coming-soon" id="serverStorePanelCs16" role="tabpanel" aria-labelledby="serverStoreTabCs16" data-server-game-panel="cs16" hidden>
             <div class="server-store-coming-soon__icon"><i class="fa-solid fa-gamepad" aria-hidden="true"></i></div>
