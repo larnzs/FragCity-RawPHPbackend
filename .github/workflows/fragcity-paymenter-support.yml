@@ -107,15 +107,12 @@ jobs:
           grep -Fq '@fragcitychannel' includes/footer.php
           grep -Fq 'https://t.me/fragcitychannel' pages/support.php
           grep -Fq '@fragcitychannel' pages/support.php
-          grep -Fq 'footer-telegram-button' css/footer.css
           grep -Fq 'https://steamcommunity.com/id/larnz/' includes/footer.php
-          grep -Fq 'footer-steam-button' includes/footer.php
           grep -Fq 'https://steamcommunity.com/id/larnz/' pages/support.php
           grep -Fq 'social-item--steam' pages/support.php
           grep -Fq 'footer-steam-button' css/footer.css
           grep -Fq 'social-icon--steam' css/support.css
           grep -Fq 'https://discord.gg/s6rFThCDdY' includes/footer.php
-          grep -Fq 'footer-discord-button' includes/footer.php
           grep -Fq 'https://discord.gg/s6rFThCDdY' pages/support.php
           grep -Fq 'social-item--discord' pages/support.php
           grep -Fq 'footer-discord-button' css/footer.css
@@ -128,7 +125,25 @@ jobs:
           grep -Fq '/assets/images/logo/teamspeak.png' pages/support.php
           grep -Fq 'https://t.me/fragcitysup' pages/support.php
           grep -Fq '@fragcitysup' pages/support.php
-          grep -Fq 'footer-telegram-support-button' includes/footer.php
+          grep -Fq 'footer-contact-buttons' includes/footer.php
+          grep -Fq 'footer-contact-buttons' css/footer.css
+          grep -Fq 'footer-contact-button--primary' includes/footer.php
+          grep -Fq 'href="/support/?tab=tickets"' includes/footer.php
+          grep -Fq 'https://t.me/fragcitysup' includes/footer.php
+          grep -Fq '@fragcitysup' includes/footer.php
+          grep -Fq 'https://t.me/fragcitychannel' includes/footer.php
+          grep -Fq '@fragcitychannel' includes/footer.php
+          grep -Fq 'https://discord.gg/s6rFThCDdY' includes/footer.php
+          grep -Fq 'https://steamcommunity.com/id/larnz/' includes/footer.php
+          grep -Fq 'ts3server://217.18.90.7?port=2014' includes/footer.php
+          grep -Fq '217.18.90.7:2014' includes/footer.php
+          grep -Fq 'mailto:support@fragcity.ir' includes/footer.php
+          grep -Fq '.footer-contact-button--teamspeak' css/footer.css
+          grep -Fq 'display: grid;' css/footer.css
+          if grep -Eiq 'rubika|روبیکا' pages/support.php includes/footer.php css/footer.css; then
+            echo "Rubika is not an available FragCity contact channel."
+            exit 1
+          fi
           grep -Fq 'support-contact-actions' pages/support.php
           grep -Fq 'support-action-btn--primary' pages/support.php
       - name: Verify fail-closed ticket ownership
