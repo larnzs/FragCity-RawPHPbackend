@@ -40,6 +40,17 @@ require_once __DIR__ . '/routes.php';
                     <span>پشتیبانی در Steam</span>
                     <strong dir="ltr">larnz</strong>
                 </a>
+                <a
+                    class="footer-discord-button"
+                    href="https://discord.gg/s6rFThCDdY"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="ورود به سرور Discord FragCity"
+                >
+                    <i class="fa-brands fa-discord" aria-hidden="true"></i>
+                    <span>سرور Discord</span>
+                    <strong dir="ltr">FragCity</strong>
+                </a>
             </section>
 
             <nav class="footer-col" aria-label="دسترسی سریع">
