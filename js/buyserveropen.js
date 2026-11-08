@@ -61,10 +61,12 @@
             basePrice: Number(capacityPricingPanel.dataset.basePrice),
             extraSlotPrice: Number(capacityPricingPanel.dataset.extraSlotPrice),
             priceRoundingStep: Number(capacityPricingPanel.dataset.priceRoundingStep || 100),
+            // Data attributes ending in digits retain the hyphen in DOMStringMap.
+            // Read them by their exact HTML attribute names to avoid NaN pricing.
             ramPrices: {
-                1024: Number(capacityPricingPanel.dataset.ramPrice1024),
-                1280: Number(capacityPricingPanel.dataset.ramPrice1280),
-                1536: Number(capacityPricingPanel.dataset.ramPrice1536)
+                1024: Number(capacityPricingPanel.getAttribute('data-ram-price-1024')),
+                1280: Number(capacityPricingPanel.getAttribute('data-ram-price-1280')),
+                1536: Number(capacityPricingPanel.getAttribute('data-ram-price-1536'))
             }
         };
 
