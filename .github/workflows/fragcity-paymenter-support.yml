@@ -8,7 +8,9 @@ on:
       - "class/PaymenterSupportApiClient.php"
       - "pages/support.php"
       - "includes/header.php"
+      - "includes/footer.php"
       - "css/header.css"
+      - "css/footer.css"
       - "js/support.js"
       - "css/support.css"
       - "settings/settings.example.json"
@@ -22,7 +24,9 @@ on:
       - "class/PaymenterSupportApiClient.php"
       - "pages/support.php"
       - "includes/header.php"
+      - "includes/footer.php"
       - "css/header.css"
+      - "css/footer.css"
       - "js/support.js"
       - "css/support.css"
       - "settings/settings.example.json"
@@ -57,6 +61,7 @@ jobs:
             "class/PaymenterSupportApiClient.php"
             "pages/support.php"
             "includes/header.php"
+            "includes/footer.php"
             "tools/paymenter-support-preflight.php"
           )
           for file in "${files[@]}"; do
@@ -87,6 +92,22 @@ jobs:
           grep -q 'fc-support-toggle:hover' css/header.css
           grep -q 'fc-support-toggle__label' css/header.css
 
+      - name: Verify Telegram channel links and left header support shortcut
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'class="fc-support-toggle' includes/header.php
+          grep -Fq 'class="shock-brand"' includes/header.php
+          grep -Fq 'shock-brand > .fc-support-toggle' css/header.css
+          if grep -Fq 'shock-user-area-wrapper > .fc-support-toggle' css/header.css; then
+            echo "Support shortcut must no longer be positioned in right-side user actions"
+            exit 1
+          fi
+          grep -Fq 'https://t.me/fragcitychannel' includes/footer.php
+          grep -Fq '@fragcitychannel' includes/footer.php
+          grep -Fq 'https://t.me/fragcitychannel' pages/support.php
+          grep -Fq '@fragcitychannel' pages/support.php
+          grep -Fq 'footer-telegram-button' css/footer.css
       - name: Verify fail-closed ticket ownership
         shell: bash
         run: |
