@@ -29,6 +29,17 @@ require_once __DIR__ . '/routes.php';
                     <span>کانال تلگرام</span>
                     <strong dir="ltr">@fragcitychannel</strong>
                 </a>
+                <a
+                    class="footer-steam-button"
+                    href="https://steamcommunity.com/id/larnz/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="ارتباط با پشتیبانی FragCity در Steam"
+                >
+                    <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                    <span>پشتیبانی در Steam</span>
+                    <strong dir="ltr">larnz</strong>
+                </a>
             </section>
 
             <nav class="footer-col" aria-label="دسترسی سریع">
