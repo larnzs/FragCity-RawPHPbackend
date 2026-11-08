@@ -225,7 +225,7 @@
             return card;
         }
 
-                function renderInvoices(invoices) {
+        function renderInvoices(invoices) {
             invoiceList.replaceChildren();
             if (emptyState) emptyState.hidden = invoices.length !== 0;
             invoiceList.hidden = invoices.length === 0;
