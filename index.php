@@ -550,7 +550,6 @@ $allowedPages = [
     'skins',
     'buyserver',
     'buyserveropen',
-    'minecraft',
     'launcher',
     'usermanual',
     'serverguide',
@@ -589,7 +588,6 @@ $cleanRoutePages = [
     'servers' => 'servers_vps',
     'skins' => 'skins',
     'buy-server' => 'buyserveropen',
-    'minecraft-hosting' => 'minecraft',
     'launcher' => 'launcher',
     'server-manual' => 'usermanual',
     'serverguide' => 'serverguide',
@@ -899,21 +897,14 @@ $pageAssets = [
             '/css/buyserveropen.css?v=' . asset_version(
                 __DIR__ . '/css/buyserveropen.css'
             ),
-        ],
-        'js' => [
-            '/js/buyserveropen.js?v=' . asset_version(
-                __DIR__ . '/js/buyserveropen.js'
-            ),
-        ],
-    ],
-
-    'minecraft' => [
-        'css' => [
             '/css/buyminecraft.css?v=' . asset_version(
                 __DIR__ . '/css/buyminecraft.css'
             ),
         ],
         'js' => [
+            '/js/buyserveropen.js?v=' . asset_version(
+                __DIR__ . '/js/buyserveropen.js'
+            ),
             '/js/buyminecraft.js?v=' . asset_version(
                 __DIR__ . '/js/buyminecraft.js'
             ),
@@ -1062,7 +1053,6 @@ $pageFile = match ($page) {
     'skins', 'skins_vps' => __DIR__ . '/pages/weaponpaints.php',
     'servers', 'servers_vps' => __DIR__ . '/pages/serverlist.php',
     'leaderboard_vps' => __DIR__ . '/pages/leaderboard.php',
-    'minecraft' => __DIR__ . '/pages/buyminecraft.php',
     default => __DIR__ . '/pages/' . $page . '.php',
 };
 
@@ -1093,10 +1083,6 @@ $fcSeoPages = [
     'about' => [
         'title' => 'درباره FragCity | کامیونیتی کانتر استرایک ۲',
         'description' => 'با فرگ‌سیتی، خدمات کانتر استرایک ۲، قابلیت‌های کامیونیتی و ابزارهای گیمینگ آن آشنا شو.',
-    ],
-    'minecraft' => [
-        'title' => 'خرید سرور Minecraft | FragCity',
-        'description' => 'محاسبه قیمت ماهانه سرور Minecraft بر اساس ظرفیت بازیکن و منابع انتخابی در FragCity.',
     ],
     'support' => [
         'title' => 'پشتیبانی و تماس با FragCity',
