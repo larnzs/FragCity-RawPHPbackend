@@ -26,6 +26,9 @@ jobs:
       - name: Validate CS2 server storefront JavaScript syntax
         run: node --check js/buyserveropen.js
 
+      - name: Validate Minecraft storefront JavaScript syntax
+        run: node --check js/buyminecraft.js
+
       - name: Validate VIP storefront JavaScript syntax
         run: node --check js/vip.js
 
