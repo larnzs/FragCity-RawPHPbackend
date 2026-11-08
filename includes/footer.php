@@ -19,6 +19,17 @@ require_once __DIR__ . '/routes.php';
                     پلتفرمی برای سرورهای کانتر استرایک ۲، اسکین‌ها و ابزارهای اختصاصی جامعه‌ی بازیکنان.
                 </p>
                 <a
+                    class="footer-telegram-support-button"
+                    href="https://t.me/fragcitysup"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="ارتباط با پشتیبانی تلگرام FragCity"
+                >
+                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+                    <span>پشتیبانی تلگرام</span>
+                    <strong dir="ltr">@fragcitysup</strong>
+                </a>
+                <a
                     class="footer-telegram-button"
                     href="https://t.me/fragcitychannel"
                     target="_blank"
