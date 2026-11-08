@@ -317,6 +317,17 @@ $mobileMoreNavItems = [
 <header class="shock-header" id="siteHeader">
     <div class="shock-container">
         <div class="shock-brand">
+            <a
+                href="<?= htmlspecialchars(fragcity_page_url('support'), ENT_QUOTES, 'UTF-8') ?>"
+                class="fc-support-toggle <?= $isPageActive(['support']) ?>"
+                data-ajax-nav
+                data-slug="support"
+                aria-label="پشتیبانی"
+                title="پشتیبانی"
+            >
+                <i class="fa-solid fa-headset" aria-hidden="true"></i>
+                <span class="fc-support-toggle__label">پشتیبانی</span>
+            </a>
             <a href="<?= htmlspecialchars(fragcity_page_url('home'), ENT_QUOTES, 'UTF-8') ?>" class="shock-logo-link" data-ajax-nav data-slug="home" aria-label="صفحه اصلی FragCity">
                 <img src="/img/webp/newlogo.webp?v=20261102-2" onerror="this.onerror=null;this.src='/img/logoresponsive.png?v=20261102-2';" alt="FragCity" class="shock-logo-img">
             </a>
@@ -402,17 +413,6 @@ $mobileMoreNavItems = [
                 <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
                 <span class="fc-motion-toggle__label">Performance Mode</span>
             </button>
-            <a
-                href="<?= htmlspecialchars(fragcity_page_url('support'), ENT_QUOTES, 'UTF-8') ?>"
-                class="fc-support-toggle <?= $isPageActive(['support']) ?>"
-                data-ajax-nav
-                data-slug="support"
-                aria-label="پشتیبانی"
-                title="پشتیبانی"
-            >
-                <i class="fa-solid fa-headset" aria-hidden="true"></i>
-                <span class="fc-support-toggle__label">پشتیبانی</span>
-            </a>
             <?php if ($isLoggedIn): ?>
                 <div class="frag-user-area">
                     <div class="frag-dropdown" id="shockUserDropdown">
