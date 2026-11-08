@@ -23,6 +23,9 @@ jobs:
       - name: Validate Server Browser JavaScript syntax
         run: node --check js/serverlist.js
 
+      - name: Validate CS2 server storefront JavaScript syntax
+        run: node --check js/buyserveropen.js
+
       - name: Validate VIP storefront JavaScript syntax
         run: node --check js/vip.js
 
