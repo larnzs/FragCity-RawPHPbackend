@@ -14,7 +14,6 @@ if (!function_exists('fragcity_route_slugs')) {
             'skins_vps' => 'skins',
             'buyserver' => 'buy-server',
             'buyserveropen' => 'buy-server',
-            'minecraft' => 'minecraft-hosting',
             'launcher' => 'launcher',
             'usermanual' => 'server-manual',
             'serverguide' => 'serverguide',
