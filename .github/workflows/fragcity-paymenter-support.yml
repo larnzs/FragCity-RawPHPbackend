@@ -108,6 +108,12 @@ jobs:
           grep -Fq 'https://t.me/fragcitychannel' pages/support.php
           grep -Fq '@fragcitychannel' pages/support.php
           grep -Fq 'footer-telegram-button' css/footer.css
+          grep -Fq 'https://steamcommunity.com/id/larnz/' includes/footer.php
+          grep -Fq 'footer-steam-button' includes/footer.php
+          grep -Fq 'https://steamcommunity.com/id/larnz/' pages/support.php
+          grep -Fq 'social-item--steam' pages/support.php
+          grep -Fq 'footer-steam-button' css/footer.css
+          grep -Fq 'social-icon--steam' css/support.css
       - name: Verify fail-closed ticket ownership
         shell: bash
         run: |
