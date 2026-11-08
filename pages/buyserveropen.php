@@ -86,6 +86,13 @@ foreach ($serverStoreGameModes as $serverStoreMode) {
 }
 $serverStoreDefaultConfig = 'comp.cfg';
 $serverStoreDefaultMapGroup = 'mg_comp';
+
+$serverStoreCapacityPricing = [
+    'base_slots' => 5,
+    'base_price' => 499000,
+    'extra_slot_price' => 45000,
+];
+$serverStoreDefaultPlayers = 10;
 ?>
 <main class="server-store-page" dir="rtl">
     <div class="server-store-container">
@@ -129,12 +136,17 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                             <span class="server-store-section-state">۵ تا ۶۴ اسلات</span>
                         </div>
 
-                        <div class="server-store-capacity-panel">
+                        <div
+                            class="server-store-capacity-panel"
+                            data-base-slots="<?= (int) $serverStoreCapacityPricing['base_slots'] ?>"
+                            data-base-price="<?= (int) $serverStoreCapacityPricing['base_price'] ?>"
+                            data-extra-slot-price="<?= (int) $serverStoreCapacityPricing['extra_slot_price'] ?>"
+                        >
                             <div class="server-store-capacity-head">
                                 <div>
                                     <span class="server-store-capacity-kicker">MAX PLAYER SLOTS</span>
                                     <div class="server-store-capacity-value">
-                                        <output id="serverStorePlayersValue" for="serverStorePlayers" aria-live="polite">32</output>
+                                        <output id="serverStorePlayersValue" for="serverStorePlayers" aria-live="polite"><?= (int) $serverStoreDefaultPlayers ?></output>
                                         <span>اسلات</span>
                                     </div>
                                 </div>
@@ -150,14 +162,14 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                                 min="5"
                                 max="64"
                                 step="1"
-                                value="32"
+                                value="<?= (int) $serverStoreDefaultPlayers ?>"
                                 aria-describedby="serverStorePlayersHelp"
                             >
                             <div class="server-store-range-meta" aria-hidden="true"><span>5 اسلات</span><span>64 اسلات</span></div>
 
                             <div class="server-store-capacity-presets" role="group" aria-label="انتخاب سریع ظرفیت">
                                 <button type="button" data-player-preset="5" aria-pressed="false">5</button>
-                                <button type="button" data-player-preset="10" aria-pressed="false">10</button>
+                                <button type="button" data-player-preset="10" aria-pressed="true">10</button>
                                 <button type="button" data-player-preset="16" aria-pressed="false">16</button>
                                 <button type="button" data-player-preset="20" aria-pressed="false">20</button>
                                 <button type="button" data-player-preset="24" aria-pressed="false">24</button>
@@ -166,8 +178,12 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                                 <button type="button" data-player-preset="64" aria-pressed="false">64</button>
                             </div>
 
+                            <div class="server-store-capacity-pricing-note">
+                                <i class="fa-solid fa-calculator" aria-hidden="true"></i>
+                                <span>۵ اسلات پایه: <strong>۴۹۹٬۰۰۰ تومان</strong> · هر اسلات اضافه: <strong>۴۵٬۰۰۰ تومان در ماه</strong></span>
+                            </div>
                             <small class="server-store-capacity-help" id="serverStorePlayersHelp">
-                                این عدد سقف ظرفیت سرور است، نه تعداد بازیکنان آنلاین یا مصرف قطعی منابع. مقدار دلخواهت را می‌توانی با اسلایدر انتخاب کنی.
+                                این عدد سقف ظرفیت سرور است، نه تعداد بازیکنان آنلاین یا مصرف قطعی منابع. مبلغ بالا فقط هزینه ظرفیت است؛ هزینه منابع و اینترنت هنوز نهایی نشده‌اند.
                             </small>
                         </div>
                     </section>
@@ -364,7 +380,7 @@ $serverStoreDefaultMapGroup = 'mg_comp';
             <aside class="server-store-summary" aria-labelledby="serverSummaryTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
                 <div class="server-store-summary-topline">
                     <span><i class="fa-solid fa-receipt" aria-hidden="true"></i> ORDER SUMMARY</span>
-                    <span class="server-store-summary-badge">پیش‌فاکتور</span>
+                    <span class="server-store-summary-badge">تعرفه ظرفیت</span>
                 </div>
 
                 <h2 id="serverSummaryTitle">خلاصه سفارش</h2>
@@ -380,7 +396,9 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                     <div><span>CPU</span><strong data-server-summary="cpu">100% · 1 vCore</strong></div>
                     <div><span>Storage</span><strong data-server-summary="disk">10 GB · 10240 MB</strong></div>
                     <div><span>نقشه پیش‌فرض</span><strong data-server-summary="map">de_dust2</strong></div>
-                    <div><span>ظرفیت هم‌زمان</span><strong data-server-summary="players">32 اسلات</strong></div>
+                    <div><span>ظرفیت هم‌زمان</span><strong data-server-summary="players">10 اسلات</strong></div>
+                    <div><span>پلن پایه · ۵ اسلات</span><strong data-server-summary="capacity-base-price">۴۹۹٬۰۰۰ تومان</strong></div>
+                    <div><span>اسلات‌های اضافه</span><strong data-server-summary="extra-slots-price">5 × 45,000 = 225,000 تومان</strong></div>
                     <div><span>Tickrate</span><strong data-server-summary="tickrate">64 Tick</strong></div>
                     <div><span>Game Mode CFG</span><strong data-server-summary="exec">Competitive — comp.cfg</strong></div>
                     <div><span>MAPGROUP</span><strong data-server-summary="mapgroup">Casual / Competitive / Practice Mode — mg_comp</strong></div>
@@ -391,9 +409,9 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                 </div>
 
                 <div class="server-store-summary-total">
-                    <span>وضعیت قیمت‌گذاری</span>
-                    <strong>تعرفه نهایی در حال تنظیم</strong>
-                    <small>قیمت دقیق هر انتخاب پیش از فعال‌شدن ثبت سفارش نمایش داده خواهد شد.</small>
+                    <span>هزینه ظرفیت در ماه</span>
+                    <strong data-server-summary="capacity-price">۷۲۴٬۰۰۰ تومان</strong>
+                    <small>این مبلغ فقط هزینه ظرفیت است؛ هزینه RAM، CPU، SSD، اینترنت و افزونه‌ها هنوز در حال بررسی است و جمع کل فاکتور محسوب نمی‌شود.</small>
                 </div>
 
                 <button type="button" class="server-store-submit" disabled>
