@@ -252,7 +252,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
 }
 ?>
 
-<section class="fc-orders" id="fcOrders" data-vip-revoke-csrf="<?= $ordersPageEscape($ordersPageCsrf) ?>">
+<section class="fc-orders" id="fcOrders" data-vip-revoke-csrf="<?= $ordersPageEscape($ordersPageCsrf) ?>" data-orders-csrf="<?= $ordersPageEscape($ordersPageCsrf) ?>">
     <div class="fc-orders__ambient fc-orders__ambient--one" aria-hidden="true"></div>
     <div class="fc-orders__ambient fc-orders__ambient--two" aria-hidden="true"></div>
 
@@ -268,7 +268,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
         </a>
     </header>
 
-    <section class="fc-orders__vip-status<?= $ordersPageCurrentVipActive ? ' is-active' : '' ?>" id="fcOrdersVipStatus" aria-labelledby="fcOrdersVipStatusTitle">
+    <section data-orders-vip-only class="fc-orders__vip-status<?= $ordersPageCurrentVipActive ? ' is-active' : '' ?>" id="fcOrdersVipStatus" aria-labelledby="fcOrdersVipStatusTitle">
         <span class="fc-orders__vip-status-icon" aria-hidden="true">
             <i class="fa-solid <?= $ordersPageCurrentVipActive ? 'fa-crown' : ($ordersPageVipStatusUnavailable ? 'fa-triangle-exclamation' : 'fa-shield-halved') ?>"></i>
         </span>
@@ -336,7 +336,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
         </div>
     </dialog>
 
-    <section class="fc-orders__summary" aria-label="خلاصه سفارش‌ها">
+    <section data-orders-vip-only class="fc-orders__summary" aria-label="خلاصه سفارش‌ها">
         <article class="fc-orders__metric">
             <span class="fc-orders__metric-icon"><i class="fa-solid fa-box" aria-hidden="true"></i></span>
             <span class="fc-orders__metric-label">کل سفارش‌های VIP</span>
@@ -358,19 +358,19 @@ foreach ($ordersPageRows as $ordersPageRow) {
     </section>
 
     <nav class="fc-orders__categories" aria-label="دسته سفارش‌ها">
-        <div class="fc-orders__category fc-orders__category--active" aria-current="page">
+        <button class="fc-orders__category fc-orders__category--active" type="button" data-orders-tab="vip" aria-controls="fcOrdersVipPanel" aria-pressed="true">
             <span class="fc-orders__category-icon"><i class="fa-solid fa-crown" aria-hidden="true"></i></span>
             <span><strong>سفارش‌های VIP</strong><small>پرداخت و فعال‌سازی اشتراک</small></span>
             <span class="fc-orders__category-count"><?= number_format($ordersPageTotal) ?></span>
-        </div>
-        <div class="fc-orders__category fc-orders__category--disabled" aria-disabled="true">
+        </button>
+        <button class="fc-orders__category" type="button" data-orders-tab="servers" aria-controls="fcOrdersServerPanel" aria-pressed="false">
             <span class="fc-orders__category-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
-            <span><strong>سفارش‌های سرور</strong><small>خرید، تمدید و تخصیص منابع</small></span>
-            <span class="fc-orders__coming-soon">به‌زودی</span>
-        </div>
+            <span><strong>سفارش‌های سرور</strong><small>فاکتورهای خرید و تمدید سرویس</small></span>
+            <span class="fc-orders__category-count" data-server-invoice-count>فاکتورها</span>
+        </button>
     </nav>
 
-    <section class="fc-orders__content" aria-labelledby="fcOrdersVipTitle">
+    <section class="fc-orders__content" id="fcOrdersVipPanel" data-orders-panel="vip" aria-labelledby="fcOrdersVipTitle">
         <div class="fc-orders__section-heading">
             <div>
                 <span class="fc-orders__section-kicker">VIP PURCHASE HISTORY</span>
@@ -495,5 +495,28 @@ foreach ($ordersPageRows as $ordersPageRow) {
             </div>
             <p class="fc-orders__footnote">برای حفظ سرعت صفحه، آخرین ۱۰۰ سفارش نمایش داده می‌شود. اطلاعات این بخش مستقیماً از سفارش‌های ثبت‌شده در حساب شما خوانده می‌شود.</p>
         <?php endif; ?>
+    </section>
+
+    <section class="fc-orders__content" id="fcOrdersServerPanel" data-orders-panel="servers" aria-labelledby="fcOrdersServerTitle" hidden>
+        <div class="fc-orders__section-heading">
+            <div>
+                <span class="fc-orders__section-kicker">SERVER INVOICE HISTORY</span>
+                <h2 id="fcOrdersServerTitle">فاکتورهای سفارش سرور</h2>
+                <p>فاکتورهای ثبت‌شده در حساب Paymenter متصل به حساب FragCity شما.</p>
+            </div>
+            <button type="button" class="fc-orders__refresh" data-server-invoices-refresh>
+                <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+                تازه‌سازی فاکتورها
+            </button>
+        </div>
+        <p class="fc-orders__invoice-note">مبالغ از جمع اقلام فاکتور محاسبه می‌شوند؛ Paymenter در این API مبلغ باقی‌مانده و جزئیات تراکنش را ارائه نمی‌کند.</p>
+        <div class="fc-orders__invoice-feedback" data-server-invoices-feedback role="status" aria-live="polite"></div>
+        <div class="fc-orders__list" data-server-invoices-list hidden></div>
+        <div class="fc-orders__empty" data-server-invoices-empty hidden>
+            <span class="fc-orders__empty-icon"><i class="fa-solid fa-file-invoice" aria-hidden="true"></i></span>
+            <span class="fc-orders__empty-kicker">NO SERVER INVOICES</span>
+            <h3>هنوز فاکتوری برای حساب شما ثبت نشده است</h3>
+            <p>بعد از ایجاد فاکتور برای سرویس سرور، اطلاعات آن در همین بخش نمایش داده می‌شود.</p>
+        </div>
     </section>
 </section>
