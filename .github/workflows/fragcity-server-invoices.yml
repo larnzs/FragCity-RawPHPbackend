@@ -1,0 +1,90 @@
+name: FragCity Server Invoice Integration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "api/server-invoices.php"
+      - "class/PaymenterInvoiceApiClient.php"
+      - "pages/orders.php"
+      - "js/orders.js"
+      - "css/orders.css"
+      - "settings/settings.example.json"
+      - "tools/paymenter-invoices-preflight.php"
+      - "docs/FRAGCITY-PAYMENTER-INVOICES.md"
+      - ".github/workflows/fragcity-server-invoices.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "api/server-invoices.php"
+      - "class/PaymenterInvoiceApiClient.php"
+      - "pages/orders.php"
+      - "js/orders.js"
+      - "css/orders.css"
+      - "settings/settings.example.json"
+      - "tools/paymenter-invoices-preflight.php"
+      - "docs/FRAGCITY-PAYMENTER-INVOICES.md"
+      - ".github/workflows/fragcity-server-invoices.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: PHP, JavaScript and invoice ownership contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+
+      - name: Lint invoice integration PHP
+        shell: bash
+        run: |
+          set -euo pipefail
+          for file in             "api/server-invoices.php"             "class/PaymenterInvoiceApiClient.php"             "pages/orders.php"             "tools/paymenter-invoices-preflight.php"; do
+            test -f "$file"
+            php -l "$file"
+          done
+
+      - name: Validate the dedicated private settings shape
+        run: |
+          php -r '$v=json_decode(file_get_contents("settings/settings.example.json"), true, 512, JSON_THROW_ON_ERROR); $s=$v["integrations"]["paymenter_invoices"]??[]; if (!isset($s["base_url"], $s["admin_api_key"])) { exit(1); }'
+
+      - name: Verify server invoice ownership and read-only boundary
+        shell: bash
+        run: |
+          set -euo pipefail
+          client="class/PaymenterInvoiceApiClient.php"
+          endpoint="api/server-invoices.php"
+          grep -Fq "'include' => 'items,user'" "$client"
+          grep -Fq "filter' => ['user_id' => $paymenterUserId]" "$client"
+          grep -Fq 'assertInvoiceOwner($resource, $included, $paymenterUserId, $customerEmail)' "$client"
+          grep -Fq 'hash_equals($expectedEmail, $paymenterEmail)' "$client"
+          grep -Fq "SELECT email, paymenter_user_id, paymenter_sync_status" "$endpoint"
+          grep -Fq '$_SESSION[' "$endpoint"
+          grep -Fq 'HTTP_X_FRAGCITY_CSRF' "$endpoint"
+          if grep -Eiq "POST|PATCH|PUT|DELETE" "$client" | grep -v 'CURLOPT_CUSTOMREQUEST'; then
+            echo "The invoice client must remain read-only."
+            exit 1
+          fi
+
+      - name: Ensure the orders page keeps VIP and lazy-loads server invoices separately
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Fq 'data-orders-tab="vip"' pages/orders.php
+          grep -Fq 'data-orders-tab="servers"' pages/orders.php
+          grep -Fq 'data-orders-panel="vip"' pages/orders.php
+          grep -Fq 'data-orders-panel="servers"' pages/orders.php
+          grep -Fq "fetch('/api/server-invoices.php'" js/orders.js
+          grep -Fq 'data-server-invoices-refresh' pages/orders.php
+
+      - name: Check invoice tab JavaScript
+        run: node --check js/orders.js
