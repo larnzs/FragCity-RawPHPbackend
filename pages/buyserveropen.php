@@ -356,7 +356,7 @@ $serverStoreDefaultMonthlyPrice =
                                 <button type="button" data-player-preset="16" aria-pressed="false">16</button>
                                 <button type="button" data-player-preset="20" aria-pressed="false">20</button>
                                 <button type="button" data-player-preset="24" aria-pressed="false">24</button>
-                                <button type="button" data-player-preset="32" aria-pressed="true">32</button>
+                                <button type="button" data-player-preset="32" aria-pressed="false">32</button>
                                 <button type="button" data-player-preset="48" aria-pressed="false">48</button>
                                 <button type="button" data-player-preset="64" aria-pressed="false">64</button>
                             </div>
