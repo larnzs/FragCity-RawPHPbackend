@@ -511,7 +511,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
                 تازه‌سازی فاکتورها
             </button>
         </div>
-        <p class="fc-orders__invoice-note">آخرین ۱۰۰ فاکتور نمایش داده می‌شود. فقط فاکتورهای سرویس و ارتقای سرور نمایش داده می‌شوند. مبلغ «جمع اقلام سرور» است، نه مانده قابل پرداخت.</p>
+        <p class="fc-orders__invoice-note">آخرین ۱۰۰ فاکتور نمایش داده می‌شود. وقتی ردیف فاکتور به سرویس یا ارتقای مشخصی متصل باشد، مشخصات همان سرور نمایش داده می‌شود؛ ردیف‌های دستیِ بدون اتصال نیز با هشدار جداگانه مشخص می‌شوند. جمع ردیف‌های نمایش‌داده‌شده لزوماً مانده قابل پرداخت نیست.</p>
         <div class="fc-orders__invoice-feedback" data-server-invoices-feedback role="status" aria-live="polite"></div>
         <div class="fc-orders__list" data-server-invoices-list hidden></div>
         <div class="fc-orders__empty" data-server-invoices-empty hidden>
