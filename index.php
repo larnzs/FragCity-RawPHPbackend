@@ -1062,6 +1062,7 @@ $pageFile = match ($page) {
     'skins', 'skins_vps' => __DIR__ . '/pages/weaponpaints.php',
     'servers', 'servers_vps' => __DIR__ . '/pages/serverlist.php',
     'leaderboard_vps' => __DIR__ . '/pages/leaderboard.php',
+    'minecraft' => __DIR__ . '/pages/buyminecraft.php',
     default => __DIR__ . '/pages/' . $page . '.php',
 };
 
