@@ -87,7 +87,12 @@ final class PaymenterInvoiceApiClient
 
         foreach ($resources as $resource) {
             $this->assertInvoiceOwner($resource, $included, $paymenterUserId, $customerEmail);
-            $invoices[] = $this->normaliseInvoice($resource, $included);
+            $invoice = $this->normaliseInvoice($resource, $included);
+            // Paymenter also stores non-server invoices (for example Credits).
+            // Only Service and ServiceUpgrade invoice lines belong in this tab.
+            if ($invoice !== null) {
+                $invoices[] = $invoice;
+            }
         }
 
         return [
@@ -142,7 +147,7 @@ final class PaymenterInvoiceApiClient
      * @param array<string,array<string,mixed>> $included
      * @return array<string,mixed>
      */
-    private function normaliseInvoice(array $resource, array $included): array
+    private function normaliseInvoice(array $resource, array $included): ?array
     {
         $attributes = is_array($resource['attributes'] ?? null)
             ? $resource['attributes']
@@ -157,22 +162,22 @@ final class PaymenterInvoiceApiClient
             throw new RuntimeException('paymenter_invoice_invalid_response');
         }
 
-        $itemReferences = $resource['relationships']['items']['data'] ?? [];
-        if (!is_array($itemReferences)) {
-            throw new RuntimeException('paymenter_invoice_invalid_response');
+        $itemRelationship = $resource['relationships']['items']['data'] ?? null;
+        if (!is_array($itemRelationship) || $itemRelationship === []) {
+            // A missing include can mean the Invoice Items permission is absent.
+            throw new RuntimeException('paymenter_invoice_items_unavailable');
         }
 
         $items = [];
         $subtotal = 0.0;
         $pricingComplete = true;
 
-        foreach ($itemReferences as $reference) {
+        foreach ($itemRelationship as $reference) {
             if (
                 !is_array($reference)
                 || !isset($reference['id'], $reference['type'])
             ) {
-                $pricingComplete = false;
-                continue;
+                throw new RuntimeException('paymenter_invoice_invalid_response');
             }
 
             $itemKey = (string) $reference['type'] . ':' . (string) $reference['id'];
@@ -185,6 +190,17 @@ final class PaymenterInvoiceApiClient
             $itemAttributes = is_array($itemResource['attributes'] ?? null)
                 ? $itemResource['attributes']
                 : [];
+            $referenceType = (string) ($itemAttributes['reference_type'] ?? '');
+
+            // Paymenter InvoiceItem can reference Service, ServiceUpgrade or
+            // non-server resources such as Credit. Keep this tab server-only.
+            if (!in_array($referenceType, [
+                'App\\Models\\Service',
+                'App\\Models\\ServiceUpgrade',
+            ], true)) {
+                continue;
+            }
+
             $quantityRaw = $itemAttributes['quantity'] ?? 1;
             $priceRaw = $itemAttributes['price'] ?? null;
 
@@ -210,6 +226,11 @@ final class PaymenterInvoiceApiClient
                 'unit_price' => $unitPrice,
                 'line_total' => $lineTotal,
             ];
+        }
+
+        // Skip credit-only and every other non-server invoice.
+        if ($items === []) {
+            return null;
         }
 
         return [
