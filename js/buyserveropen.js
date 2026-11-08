@@ -28,9 +28,15 @@
         });
 
         if (missing.length) {
-            console.error('[FragCity] Server store initialization is waiting for required elements:', missing);
+            const missingSignature = missing.join(',');
+            if (root.dataset.serverStoreMissingElements !== missingSignature) {
+                console.error('[FragCity] Server store initialization is waiting for required elements:', missing);
+                root.dataset.serverStoreMissingElements = missingSignature;
+            }
             return false;
         }
+
+        delete root.dataset.serverStoreMissingElements;
 
         const memoryOutput = root.querySelector('#serverStoreMemoryValue');
         const diskOutput = root.querySelector('#serverStoreDiskValue');
@@ -423,21 +429,20 @@
 
     window.initBuyServerPage = initServerStorePage;
 
-    function tryInitializeWhenReady() {
-        const initialized = initServerStorePage();
-
-        // Keep a lightweight observer so AJAX-inserted or late-rendered page
-        // markup is initialized even when a navigation event is missed.
-        if (!initialized || !document.body || !('MutationObserver' in window)) return;
-
-        if (window.__fragCityBuyStoreObserver) {
-            window.__fragCityBuyStoreObserver.disconnect();
+    function ensureInsertionObserver() {
+        if (
+            !document.body ||
+            !('MutationObserver' in window) ||
+            window.__fragCityBuyStoreObserver
+        ) {
+            return;
         }
 
+        // Keep observing across AJAX page swaps. The same JS file is loaded only
+        // once, while each newly inserted storefront root needs its own bindings.
         const observer = new MutationObserver(function () {
             const root = document.querySelector(ROOT_SELECTOR);
-            if (!root) return;
-            if (root.dataset.serverStoreInitialized === '1') return;
+            if (!root || root.dataset.serverStoreInitialized === '1') return;
             initServerStorePage();
         });
 
@@ -446,6 +451,11 @@
             subtree: true
         });
         window.__fragCityBuyStoreObserver = observer;
+    }
+
+    function tryInitializeWhenReady() {
+        initServerStorePage();
+        ensureInsertionObserver();
     }
 
     if (document.readyState === 'loading') {
