@@ -48,7 +48,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          for file in             "api/server-invoices.php"             "class/PaymenterInvoiceApiClient.php"             "pages/orders.php"             "tools/paymenter-invoices-preflight.php"; do
+          files=(
+            "api/server-invoices.php"
+            "class/PaymenterInvoiceApiClient.php"
+            "pages/orders.php"
+            "tools/paymenter-invoices-preflight.php"
+          )
+          for file in "${files[@]}"; do
             test -f "$file"
             php -l "$file"
           done
