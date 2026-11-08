@@ -311,7 +311,7 @@ final class PaymenterInvoiceApiClient
 
         if ($status < 200 || $status >= 300) {
             $safeError = match ($status) {
-                400 => 'paymenter_invoice_invalid_query',
+                400 => 'paymenter_api_permission_denied',
                 401, 403 => 'paymenter_api_permission_denied',
                 404 => 'paymenter_invoice_resource_not_found',
                 422 => 'paymenter_invoice_validation_failed',
