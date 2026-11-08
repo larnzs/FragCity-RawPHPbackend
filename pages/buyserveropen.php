@@ -636,9 +636,7 @@ $serverStoreDefaultMonthlyPrice =
                                     type="text"
                                     value=""
                                     placeholder="My CS2 Server"
-                                    pattern="[A-Za-z0-9 ]{3,32}"
-                                    minlength="3"
-                                    maxlength="32"
+                                    pattern="[A-Za-z0-9 ]+"
                                     required
                                     aria-describedby="serverStoreNameHelp"
                                     autocomplete="off"
