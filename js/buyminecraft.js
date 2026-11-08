@@ -33,10 +33,12 @@
             baseSlots: Number(pricingNode.dataset.baseSlots),
             basePrice: Number(pricingNode.dataset.basePrice),
             extraSlotPrice: Number(pricingNode.dataset.extraSlotPrice),
+            // Data attributes ending in digits retain the hyphen in DOMStringMap.
+            // Read them by their exact HTML attribute names to avoid NaN pricing.
             ramPrices: {
-                1024: Number(pricingNode.dataset.ramPrice1024),
-                1280: Number(pricingNode.dataset.ramPrice1280),
-                1536: Number(pricingNode.dataset.ramPrice1536)
+                1024: Number(pricingNode.getAttribute('data-ram-price-1024')),
+                1280: Number(pricingNode.getAttribute('data-ram-price-1280')),
+                1536: Number(pricingNode.getAttribute('data-ram-price-1536'))
             }
         };
 
