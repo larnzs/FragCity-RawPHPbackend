@@ -242,7 +242,6 @@
                 'servers': 'servers_vps',
                 'skins': 'skins',
                 'buy-server': 'buyserveropen',
-                'minecraft-hosting': 'minecraft',
                 'launcher': 'launcher',
                 'server-manual': 'usermanual',
                 'serverguide': 'serverguide',
