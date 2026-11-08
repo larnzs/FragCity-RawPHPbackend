@@ -90,7 +90,7 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
             </div>
             <div class="social-grid">
                 <a href="https://rubika.ir/fragcity_cs2" target="_blank" rel="noopener noreferrer" class="social-item">
-                    <img src="./assets/images/logo/rubika.png" alt="روبیکا" class="social-icon"
+                    <img src="/assets/images/logo/rubika.png" alt="روبیکا" class="social-icon"
                          onerror="this.src='https://placehold.co/64x64?text=Rubika'">
                     <div class="social-info">
                         <h3>روبیکا</h3>
@@ -99,11 +99,21 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
                     <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
                 </a>
                 <a href="https://t.me/fragcitychannel" target="_blank" rel="noopener noreferrer" class="social-item" aria-label="کانال تلگرام FragCity">
-                    <img src="./assets/images/logo/telegram.png" alt="تلگرام" class="social-icon"
+                    <img src="/assets/images/logo/telegram.png" alt="تلگرام" class="social-icon"
                          onerror="this.src='https://placehold.co/64x64?text=Telegram'">
                     <div class="social-info">
                         <h3>تلگرام</h3>
                         <p><i class="fa-brands fa-telegram"></i> @fragcitychannel | کانال رسمی FragCity</p>
+                    </div>
+                    <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
+                </a>
+                <a href="https://t.me/fragcitysup" target="_blank" rel="noopener noreferrer" class="social-item social-item--telegram-support" aria-label="پشتیبانی تلگرام FragCity">
+                    <span class="social-icon social-icon--telegram-support" aria-hidden="true">
+                        <i class="fa-brands fa-telegram"></i>
+                    </span>
+                    <div class="social-info">
+                        <h3>پشتیبانی تلگرام</h3>
+                        <p><i class="fa-brands fa-telegram"></i> @fragcitysup | ارتباط مستقیم با تیم پشتیبانی</p>
                     </div>
                     <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
                 </a>
@@ -143,21 +153,21 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
             </div>
             <div class="teamspeak-container">
                 <div class="ts-logo-area">
-                    <img src="./assets/images/logo/teamspeak.png" alt="TeamSpeak Logo" class="ts-logo"
+                    <img src="/assets/images/logo/teamspeak.png" alt="TeamSpeak Logo" class="ts-logo"
                          onerror="this.src='https://placehold.co/110x110?text=TS3'">
                 </div>
                 <div class="ts-details">
                     <p>به voice چنل‌های اختصاصی Frag City بپیوندید. هماهنگی تیمی، تاکتیک‌های CS2 و ارتباط مستقیم با ادمین‌ها.</p>
                     <div class="server-badge">
                         <i class="fas fa-server"></i>
-                        <code>ts.fragcity.ir:9987</code>
+                        <code dir="ltr">217.18.90.7:2014</code>
                         <button class="copy-btn" id="copyTsAddress"><i class="far fa-copy"></i> کپی</button>
                     </div>
-                    <a href="ts3server://ts.fragcity.ir?port=9987" class="btn-join">
+                    <a href="ts3server://217.18.90.7?port=2014" class="btn-join">
                         <i class="fas fa-headset"></i> اتصال به TeamSpeak
                     </a>
                     <div class="helper-note">
-                        <i class="fas fa-info-circle"></i> نرم‌افزار TeamSpeak 3 را نصب داشته باشید. در صورت نیاز به راهنما، از طریق روبیکا یا تلگرام با ما تماس بگیرید.
+                        <i class="fas fa-info-circle"></i> نرم‌افزار TeamSpeak 3 را نصب داشته باشید. در صورت نیاز به راهنما، از طریق روبیکا یا تلگرام @fragcitysup با ما تماس بگیرید.
                     </div>
                 </div>
             </div>
@@ -172,6 +182,51 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
                 <a href="mailto:support@fragcity.ir"><i class="fas fa-envelope"></i> support@fragcity.ir</a>
             </div>
         </div>
+
+        <section class="support-contact-actions" aria-label="دسترسی سریع پشتیبانی">
+            <div class="support-contact-actions-heading">
+                <div>
+                    <span class="support-form-eyebrow">NEED HELP?</span>
+                    <h2>از کجا شروع کنیم؟</h2>
+                    <p>برای پیگیری دقیق‌تر، تیکت ثبت کن یا از راه‌های ارتباطی رسمی با ما در تماس باش.</p>
+                </div>
+                <a href="/support/?tab=tickets" class="support-action-btn support-action-btn--primary">
+                    <i class="fas fa-ticket-alt" aria-hidden="true"></i>
+                    ثبت تیکت پشتیبانی
+                </a>
+            </div>
+            <div class="support-contact-action-list">
+                <a href="https://t.me/fragcitysup" target="_blank" rel="noopener noreferrer" class="support-action-btn support-action-btn--telegram">
+                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+                    پشتیبانی تلگرام
+                    <strong dir="ltr">@fragcitysup</strong>
+                </a>
+                <a href="https://t.me/fragcitychannel" target="_blank" rel="noopener noreferrer" class="support-action-btn support-action-btn--telegram">
+                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+                    کانال تلگرام
+                </a>
+                <a href="https://discord.gg/s6rFThCDdY" target="_blank" rel="noopener noreferrer" class="support-action-btn support-action-btn--discord">
+                    <i class="fa-brands fa-discord" aria-hidden="true"></i>
+                    Discord
+                </a>
+                <a href="https://steamcommunity.com/id/larnz/" target="_blank" rel="noopener noreferrer" class="support-action-btn support-action-btn--steam">
+                    <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                    پشتیبانی Steam
+                </a>
+                <a href="ts3server://217.18.90.7?port=2014" class="support-action-btn support-action-btn--teamspeak">
+                    <i class="fas fa-headset" aria-hidden="true"></i>
+                    اتصال به TeamSpeak
+                </a>
+                <a href="https://rubika.ir/fragcity_cs2" target="_blank" rel="noopener noreferrer" class="support-action-btn">
+                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                    روبیکا
+                </a>
+                <a href="mailto:support@fragcity.ir" class="support-action-btn">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                    ایمیل پشتیبانی
+                </a>
+            </div>
+        </section>
 
     <?php elseif ($activeTab === 'tickets'): ?>
         <div class="support-workspace-heading">
