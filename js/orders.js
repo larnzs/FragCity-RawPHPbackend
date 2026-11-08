@@ -186,12 +186,7 @@
 
                 renderInvoices(result.data.invoices);
                 loaded = true;
-                setFeedback(
-                    result.data.invoices.length > 100
-                        ? 'بیش از ۱۰۰ فاکتور موجود است؛ فقط جدیدترین موارد نمایش داده می‌شوند.'
-                        : '',
-                    false
-                );
+                setFeedback('', false);
             } catch (error) {
                 loaded = false;
                 const messages = {
