@@ -24,6 +24,7 @@ on:
       - "css/orders.css"
       - "settings/settings.example.json"
       - "tools/paymenter-invoices-preflight.php"
+      - "tools/paymenter-invoices-contract-test.php"
       - "docs/FRAGCITY-PAYMENTER-INVOICES.md"
       - ".github/workflows/fragcity-server-invoices.yml"
   workflow_dispatch:
