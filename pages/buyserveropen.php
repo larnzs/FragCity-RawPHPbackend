@@ -163,7 +163,7 @@ $serverStoreDefaultMonthlyPrice =
                             <span class="server-store-section-index">01</span>
                             <div>
                                 <h2 id="serverResourcesTitle">ظرفیت و منابع سرور</h2>
-                                <p>چهار منبع اصلی را از همین ردیف انتخاب کن؛ قیمت فاکتور با هر تغییر به‌روزرسانی می‌شود.</p>
+                                <p>چهار منبع اصلی را از همین ردیف تنظیم کن؛ تعرفه‌های فعال در خلاصه سفارش محاسبه می‌شوند.</p>
                             </div>
                             <span class="server-store-section-state">۴ تنظیم قابل انتخاب</span>
                         </div>
@@ -245,7 +245,7 @@ $serverStoreDefaultMonthlyPrice =
                                     <label class="server-store-resource-slider-label" for="serverStoreDisk">فضای دیسک</label>
                                     <input class="server-store-range" id="serverStoreDisk" name="disk" type="range" min="5120" max="10240" step="1024" value="10240" aria-describedby="serverStoreDiskHelp">
                                     <div class="server-store-range-meta" aria-hidden="true"><span>5 GB</span><span>10 GB</span></div>
-                                    <small class="server-store-range-help" id="serverStoreDiskHelp">فضای SSD قابل تخصیص به فایل‌ها و داده‌های سرور.</small>
+                                    <small class="server-store-range-help" id="serverStoreDiskHelp">سقف فضای مجاز برای فایل‌ها و داده‌های سرور.</small>
                                 </div>
                             </article>
 
@@ -262,13 +262,13 @@ $serverStoreDefaultMonthlyPrice =
                                     <label class="server-store-resource-slider-label" for="serverStoreCpu">قدرت پردازنده</label>
                                     <input class="server-store-range" id="serverStoreCpu" name="cpu" type="range" min="100" max="400" step="100" value="100" aria-describedby="serverStoreCpuHelp">
                                     <div class="server-store-range-meta" aria-hidden="true"><span>100%</span><span>400%</span></div>
-                                    <small class="server-store-range-help" id="serverStoreCpuHelp">هر ۱۰۰٪ معادل یک vCore از محدودیت CPU است.</small>
+                                    <small class="server-store-range-help" id="serverStoreCpuHelp">هر ۱۰۰٪ سقف مصرف معادل یک هسته است؛ این مقدار به معنی رزرو یک هسته فیزیکی نیست.</small>
                                 </div>
                             </article>
                         </div>
                         <div class="server-store-resource-footnote">
                             <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                            مقدار RAM و Storage به مگابایت و مقدار CPU به درصد بیان می‌شود. نود و پورت اتصال به‌صورت خودکار تخصیص داده می‌شوند.
+                            RAM و Storage به مگابایت و CPU به درصد بیان می‌شوند. فعلاً قیمت فقط بر اساس ظرفیت و RAM محاسبه می‌شود؛ تعرفه CPU و Storage هنوز نهایی نشده است.
                         </div>
                     </section>
 
@@ -521,7 +521,7 @@ $serverStoreDefaultMonthlyPrice =
                 <div class="server-store-summary-total">
                     <span>قیمت نهایی دوره انتخاب‌شده</span>
                     <strong data-server-summary="period-price">۷۴۹٬۰۰۰ تومان</strong>
-                    <small>قیمت بر اساس پلن پایه، اسلات‌های اضافه، RAM و مدت انتخاب‌شده محاسبه می‌شود. دوره‌های چندماهه شامل تخفیف پلکانی هستند. Bot Guard بدون هزینه اضافه است.</small>
+                    <small>در نسخه فعلی قیمت بر اساس پلن پایه، اسلات‌های اضافه، RAM و مدت انتخاب‌شده محاسبه می‌شود. هزینه CPU و Storage هنوز به فاکتور اضافه نشده است. دوره‌های چندماهه شامل تخفیف پلکانی هستند. Bot Guard رایگان است.</small>
                 </div>
 
                 <button type="button" class="server-store-submit" disabled>
