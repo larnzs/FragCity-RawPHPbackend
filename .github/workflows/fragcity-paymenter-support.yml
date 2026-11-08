@@ -134,7 +134,10 @@ jobs:
           grep -Fq 'footer-teamspeak-button' includes/footer.php
           grep -Fq 'footer-email-button' includes/footer.php
           grep -Fq 'footer-contact-link' css/footer.css
-          grep -Fq 'width: 232px;' css/footer.css
+          grep -Fq 'footer-contact-column--right' includes/footer.php
+          grep -Fq 'footer-contact-column--left' includes/footer.php
+          grep -Fq 'repeat(2, minmax(0, 232px))' css/footer.css
+          grep -Fq 'max-width: 232px;' css/footer.css
           grep -Fq 'https://t.me/fragcitysup' includes/footer.php
           grep -Fq '@fragcitysup' includes/footer.php
           grep -Fq 'https://t.me/fragcitychannel' includes/footer.php
