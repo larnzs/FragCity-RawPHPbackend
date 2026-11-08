@@ -61,7 +61,7 @@ The SteamID64, email, Paymenter user ID and invoice owner are never accepted fro
 
 ## Paymenter v1.5.9 limitations
 
-The Invoice API resource exposes invoice status, currency code, due date and timestamps. It does not expose a computed invoice total, remaining balance or transaction/payment-method history. FragCity therefore calculates and labels the sum of invoice line items as **جمع اقلام**; it does not present that value as a confirmed remaining balance. Taxes or successful transactions may make the payable/remaining amount differ. No pay, refund, edit or cancellation action is provided by this integration.
+The Invoice API resource exposes invoice status, currency code, due date and timestamps. It does not expose a computed invoice total, remaining balance or transaction/payment-method history. FragCity calculates the sum of the server Service/ServiceUpgrade line items only and labels it **جمع اقلام سرور**; it does not present that value as the full invoice total or a confirmed remaining balance. Non-server invoice lines such as Credits are omitted, and taxes or successful transactions may make the payable/remaining amount differ. No pay, refund, edit or cancellation action is provided by this integration.
 
 ## Read-only verification
 
