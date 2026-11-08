@@ -318,7 +318,11 @@ body.mobile-menu-open {
 .shock-brand {
     min-width: 0;
     justify-self: start;
-    direction: rtl;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    direction: ltr;
 }
 
 .shock-logo-link {
@@ -4081,7 +4085,7 @@ body { max-width: 100%; overflow-x: clip; }
 
 /* Header support shortcut: icon-only at rest, matching the Performance Mode
    expand-on-hover/focus interaction without reusing its toggle behavior. */
-.shock-header .shock-user-area-wrapper > .fc-support-toggle {
+.shock-header .shock-brand > .fc-support-toggle {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -4114,7 +4118,7 @@ body { max-width: 100%; overflow-x: clip; }
         border-color 150ms ease;
 }
 
-.shock-header .shock-user-area-wrapper > .fc-support-toggle > i {
+.shock-header .shock-brand > .fc-support-toggle > i {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -4131,7 +4135,7 @@ body { max-width: 100%; overflow-x: clip; }
     transition: color 150ms ease;
 }
 
-.shock-header .shock-user-area-wrapper > .fc-support-toggle > .fc-support-toggle__label {
+.shock-header .shock-brand > .fc-support-toggle > .fc-support-toggle__label {
     display: inline-block;
     flex: 0 0 auto;
     max-width: 0;
@@ -4148,8 +4152,8 @@ body { max-width: 100%; overflow-x: clip; }
         visibility 130ms ease;
 }
 
-.shock-header .shock-user-area-wrapper > .fc-support-toggle:hover,
-.shock-header .shock-user-area-wrapper > .fc-support-toggle:focus-visible {
+.shock-header .shock-brand > .fc-support-toggle:hover,
+.shock-header .shock-brand > .fc-support-toggle:focus-visible {
     width: 110px;
     min-width: 110px;
     max-width: 110px;
@@ -4162,35 +4166,35 @@ body { max-width: 100%; overflow-x: clip; }
     outline: none;
 }
 
-.shock-header .shock-user-area-wrapper > .fc-support-toggle:hover > i,
-.shock-header .shock-user-area-wrapper > .fc-support-toggle:focus-visible > i {
+.shock-header .shock-brand > .fc-support-toggle:hover > i,
+.shock-header .shock-brand > .fc-support-toggle:focus-visible > i {
     color: #D4D4D4;
 }
 
-.shock-header .shock-user-area-wrapper > .fc-support-toggle:hover > .fc-support-toggle__label,
-.shock-header .shock-user-area-wrapper > .fc-support-toggle:focus-visible > .fc-support-toggle__label {
+.shock-header .shock-brand > .fc-support-toggle:hover > .fc-support-toggle__label,
+.shock-header .shock-brand > .fc-support-toggle:focus-visible > .fc-support-toggle__label {
     max-width: 64px;
     opacity: 1;
     visibility: visible;
 }
 
-.shock-header .shock-user-area-wrapper > .fc-support-toggle.active {
+.shock-header .shock-brand > .fc-support-toggle.active {
     border-color: rgba(255, 179, 71, .34);
     background: rgba(249, 115, 22, .075);
     color: #FFB347;
 }
 
-.shock-header .shock-user-area-wrapper > .fc-support-toggle.active > i {
+.shock-header .shock-brand > .fc-support-toggle.active > i {
     color: #FFB347;
 }
 
-.shock-header .shock-user-area-wrapper > .fc-support-toggle:focus-visible {
+.shock-header .shock-brand > .fc-support-toggle:focus-visible {
     outline: 2px solid rgba(255, 179, 71, .55);
     outline-offset: 3px;
 }
 
 @media (max-width: 700px) {
-    .shock-header .shock-user-area-wrapper > .fc-support-toggle {
+    .shock-header .shock-brand > .fc-support-toggle {
         width: 36px;
         min-width: 36px;
         max-width: 36px;
@@ -4199,8 +4203,8 @@ body { max-width: 100%; overflow-x: clip; }
         flex-basis: 36px;
     }
 
-    .shock-header .shock-user-area-wrapper > .fc-support-toggle:hover,
-    .shock-header .shock-user-area-wrapper > .fc-support-toggle:focus-visible {
+    .shock-header .shock-brand > .fc-support-toggle:hover,
+    .shock-header .shock-brand > .fc-support-toggle:focus-visible {
         width: 104px;
         min-width: 104px;
         max-width: 104px;
@@ -4209,8 +4213,8 @@ body { max-width: 100%; overflow-x: clip; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .shock-header .shock-user-area-wrapper > .fc-support-toggle,
-    .shock-header .shock-user-area-wrapper > .fc-support-toggle > .fc-support-toggle__label {
+    .shock-header .shock-brand > .fc-support-toggle,
+    .shock-header .shock-brand > .fc-support-toggle > .fc-support-toggle__label {
         transition: none !important;
     }
 }
