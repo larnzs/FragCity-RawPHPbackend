@@ -1725,6 +1725,14 @@ body:has(.server-store-page) .content-fader {
     font-size: .45rem;
 }
 
+.server-store-fixed-label {
+    display: block;
+    margin-bottom: 3px;
+    color: #B8B8BD;
+    font-size: .65rem;
+    font-weight: 800;
+}
+
 .server-store-fixed-setting {
     display: flex;
     align-items: center;
