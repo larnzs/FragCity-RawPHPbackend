@@ -75,7 +75,8 @@ jobs:
           grep -Fq 'hash_equals($expectedEmail, $paymenterEmail)' "$client"
           grep -Fq "'App\\\\Models\\\\Service'" "$client"
           grep -Fq "'App\\\\Models\\\\ServiceUpgrade'" "$client"
-          grep -Fq 'if ($items === [])' "$client"
+          grep -Fq '$isManualLine' "$client"
+          grep -Fq 'if ($itemRelationship === [])' "$client"
           grep -Fq "SELECT email, paymenter_user_id, paymenter_sync_status" "$endpoint"
           grep -Fq '$_SESSION[' "$endpoint"
           grep -Fq 'HTTP_X_FRAGCITY_CSRF' "$endpoint"
@@ -91,6 +92,7 @@ jobs:
           set -euo pipefail
           grep -Fq 'data-orders-tab="vip"' pages/orders.php
           grep -Fq 'data-orders-tab="servers"' pages/orders.php
+          grep -Fq 'data-orders-tabs' pages/orders.php
           grep -Fq 'data-orders-panel="vip"' pages/orders.php
           grep -Fq 'data-orders-panel="servers"' pages/orders.php
           grep -Fq "fetch('/api/server-invoices.php'" js/orders.js
