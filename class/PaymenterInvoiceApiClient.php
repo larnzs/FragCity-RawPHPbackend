@@ -163,9 +163,16 @@ final class PaymenterInvoiceApiClient
         }
 
         $itemRelationship = $resource['relationships']['items']['data'] ?? null;
-        if (!is_array($itemRelationship) || $itemRelationship === []) {
-            // A missing include can mean the Invoice Items permission is absent.
+        if (!is_array($itemRelationship)) {
+            // Missing relationship data usually means the Invoice Items include
+            // was not authorized or not returned by the Paymenter API.
             throw new RuntimeException('paymenter_invoice_items_unavailable');
+        }
+
+        if ($itemRelationship === []) {
+            // A real invoice may have no line items yet. Skip it without
+            // failing the entire customer's invoice collection.
+            return null;
         }
 
         $items = [];
@@ -192,12 +199,19 @@ final class PaymenterInvoiceApiClient
                 : [];
             $referenceType = (string) ($itemAttributes['reference_type'] ?? '');
 
-            // Paymenter InvoiceItem can reference Service, ServiceUpgrade or
-            // non-server resources such as Credit. Keep this tab server-only.
-            if (!in_array($referenceType, [
+            // Paymenter service invoices use explicit Service or ServiceUpgrade
+            // references. Admin-created invoice lines can be intentionally
+            // generic and have both reference_type/reference_id empty; accept
+            // those as manual server charges for the linked customer. Explicit
+            // non-server types (for example Credit) remain excluded.
+            $referenceId = $itemAttributes['reference_id'] ?? null;
+            $isServiceLine = in_array($referenceType, [
                 'App\\Models\\Service',
                 'App\\Models\\ServiceUpgrade',
-            ], true)) {
+            ], true);
+            $isManualLine = $referenceType === ''
+                && ($referenceId === null || $referenceId === '');
+            if (!$isServiceLine && !$isManualLine) {
                 continue;
             }
 
