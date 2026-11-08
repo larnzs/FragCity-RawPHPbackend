@@ -98,12 +98,12 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
                     </div>
                     <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
                 </a>
-                <a href="https://t.me/fragcity_support" target="_blank" rel="noopener noreferrer" class="social-item">
+                <a href="https://t.me/fragcitychannel" target="_blank" rel="noopener noreferrer" class="social-item" aria-label="کانال تلگرام FragCity">
                     <img src="./assets/images/logo/telegram.png" alt="تلگرام" class="social-icon"
                          onerror="this.src='https://placehold.co/64x64?text=Telegram'">
                     <div class="social-info">
                         <h3>تلگرام</h3>
-                        <p><i class="fas fa-bolt"></i> کانال اطلاع‌رسانی و تیکت پشتیبانی</p>
+                        <p><i class="fa-brands fa-telegram"></i> @fragcitychannel | کانال رسمی FragCity</p>
                     </div>
                     <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
                 </a>
