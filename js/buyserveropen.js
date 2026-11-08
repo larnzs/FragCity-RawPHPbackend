@@ -16,6 +16,7 @@
         const playersInput = root.querySelector('#serverStorePlayers');
         const playersOutput = root.querySelector('#serverStorePlayersValue');
         const playerPresetButtons = Array.from(root.querySelectorAll('[data-player-preset]'));
+        const capacityPricingPanel = root.querySelector('.server-store-capacity-panel');
         const tickrateSelect = root.querySelector('#serverStoreTickrate');
         const execSelect = root.querySelector('#serverStoreExec');
         const mapgroupSelect = root.querySelector('#serverStoreMapgroup');
@@ -27,12 +28,35 @@
         if (
             !memoryInput || !diskInput || !cpuInput ||
             !memoryOutput || !diskOutput || !cpuOutput ||
-            !mapInput || !playersInput || !playersOutput || !tickrateSelect || !execSelect ||
+            !mapInput || !playersInput || !playersOutput || !capacityPricingPanel || !tickrateSelect || !execSelect ||
             !mapgroupSelect || !cooldownSelect || !guardSelect ||
             !guardMinutesField || !guardMinutesInput
         ) {
             root.dataset.serverStoreInitialized = '0';
             return;
+        }
+
+        const capacityPricing = {
+            baseSlots: Number(capacityPricingPanel.dataset.baseSlots),
+            basePrice: Number(capacityPricingPanel.dataset.basePrice),
+            extraSlotPrice: Number(capacityPricingPanel.dataset.extraSlotPrice)
+        };
+
+        if (
+            !Number.isInteger(capacityPricing.baseSlots) ||
+            !Number.isFinite(capacityPricing.basePrice) ||
+            !Number.isFinite(capacityPricing.extraSlotPrice) ||
+            capacityPricing.baseSlots < 1 ||
+            capacityPricing.basePrice < 0 ||
+            capacityPricing.extraSlotPrice < 0
+        ) {
+            root.dataset.serverStoreInitialized = '0';
+            return;
+        }
+
+        const tomanFormatter = new Intl.NumberFormat('fa-IR');
+        function formatToman(amount) {
+            return tomanFormatter.format(amount) + ' تومان';
         }
 
         const allMapGroups = Array.from(mapgroupSelect.options).map(function (option) {
@@ -160,6 +184,21 @@
 
             setSummary('map', mapValue || '—');
             setSummary('players', playersValue ? playersValue + ' اسلات' : '—');
+
+            const selectedSlots = Number(playersValue);
+            const extraSlots = Math.max(0, selectedSlots - capacityPricing.baseSlots);
+            const extraSlotsPrice = extraSlots * capacityPricing.extraSlotPrice;
+            const capacityPrice = capacityPricing.basePrice + extraSlotsPrice;
+
+            setSummary('capacity-base-price', formatToman(capacityPricing.basePrice));
+            setSummary(
+                'extra-slots-price',
+                extraSlots > 0
+                    ? extraSlots + ' × ' + tomanFormatter.format(capacityPricing.extraSlotPrice) +
+                        ' = ' + formatToman(extraSlotsPrice)
+                    : 'بدون اسلات اضافه'
+            );
+            setSummary('capacity-price', formatToman(capacityPrice) + ' / ماه');
             setSummary('tickrate', tickrate === '128' ? '128 Tick · ارتقای پولی' : '64 Tick');
             setSummary('exec', modeLabel);
             setSummary('mapgroup', mapgroupLabel);
