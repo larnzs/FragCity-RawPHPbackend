@@ -101,7 +101,7 @@
 
     document.addEventListener('DOMContentLoaded', initMinecraftStorePage);
     window.addEventListener('content-loaded', function (event) {
-        if (!event.detail || event.detail.page === 'minecraft') {
+        if (!event.detail || event.detail.page === 'buyserveropen') {
             initMinecraftStorePage();
         }
     });
