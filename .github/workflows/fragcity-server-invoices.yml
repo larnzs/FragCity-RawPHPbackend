@@ -6,6 +6,7 @@ on:
     paths:
       - "api/server-invoices.php"
       - "class/PaymenterInvoiceApiClient.php"
+      - "class/PaymenterInvoiceContext.php"
       - "pages/orders.php"
       - "js/orders.js"
       - "css/orders.css"
@@ -19,6 +20,7 @@ on:
     paths:
       - "api/server-invoices.php"
       - "class/PaymenterInvoiceApiClient.php"
+      - "class/PaymenterInvoiceContext.php"
       - "pages/orders.php"
       - "js/orders.js"
       - "css/orders.css"
