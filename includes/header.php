@@ -636,7 +636,13 @@ $mobileMoreNavItems = [
             </summary>
             <div class="mobile-nav-more-menu">
                 <?php foreach ($mobileMoreNavItems as [$slug, $label, $icon, $activePages]): ?>
-                    <a href="<?= htmlspecialchars(fragcity_page_url($slug), ENT_QUOTES, 'UTF-8') ?>"
+                    <a href="<?= htmlspecialchars(
+                        in_array('minecraft_store', $activePages, true)
+                            ? fragcity_page_url('buyserveropen') . '?game=minecraft'
+                            : fragcity_page_url($slug),
+                        ENT_QUOTES,
+                        'UTF-8'
+                    ) ?>"
                        class="mobile-nav-link <?= $isPageActive($activePages) ?>"
                        data-ajax-nav
                        data-slug="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
