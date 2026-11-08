@@ -30,7 +30,7 @@
         if (copyBtn && !copyBtn.dataset.bound) {
             copyBtn.dataset.bound = '1';
             copyBtn.addEventListener('click', async function () {
-                const tsAddress = 'ts.fragcity.ir:9987';
+                const tsAddress = '217.18.90.7:2014';
                 const original = copyBtn.innerHTML;
                 try {
                     await navigator.clipboard.writeText(tsAddress);
