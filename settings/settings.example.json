@@ -85,6 +85,11 @@
       "admin_api_key": "",
       "shared_secret": "",
       "departments": []
+    },
+    "paymenter_invoices": {
+      "_comment": "Dedicated read-only Paymenter Admin API connection for FragCity server invoice history. Use a separate API key from paymenter_support and paymenter_backend; never expose it to browser JavaScript or commit a real key.",
+      "base_url": "",
+      "admin_api_key": ""
     }
   },
   "files": {
@@ -161,31 +166,61 @@
           "1": {
             "_comment": "Bronze: 190000 Rial / 19000 Toman for 30 days. No duration discount; 7-day price rounded to the nearest 1000 Rial.",
             "durations": {
-              "7": { "price_rial": 44000 },
-              "15": { "price_rial": 95000 },
-              "30": { "price_rial": 190000 },
-              "60": { "price_rial": 380000 },
-              "90": { "price_rial": 570000 }
+              "7": {
+                "price_rial": 44000
+              },
+              "15": {
+                "price_rial": 95000
+              },
+              "30": {
+                "price_rial": 190000
+              },
+              "60": {
+                "price_rial": 380000
+              },
+              "90": {
+                "price_rial": 570000
+              }
             }
           },
           "2": {
             "_comment": "Silver: 490000 Rial / 49000 Toman for 30 days. The one-time three-day welcome trial is separate.",
             "durations": {
-              "7": { "price_rial": 114000 },
-              "15": { "price_rial": 245000 },
-              "30": { "price_rial": 490000 },
-              "60": { "price_rial": 980000 },
-              "90": { "price_rial": 1470000 }
+              "7": {
+                "price_rial": 114000
+              },
+              "15": {
+                "price_rial": 245000
+              },
+              "30": {
+                "price_rial": 490000
+              },
+              "60": {
+                "price_rial": 980000
+              },
+              "90": {
+                "price_rial": 1470000
+              }
             }
           },
           "3": {
             "_comment": "Gold: 890000 Rial / 89000 Toman for 30 days.",
             "durations": {
-              "7": { "price_rial": 208000 },
-              "15": { "price_rial": 445000 },
-              "30": { "price_rial": 890000 },
-              "60": { "price_rial": 1780000 },
-              "90": { "price_rial": 2670000 }
+              "7": {
+                "price_rial": 208000
+              },
+              "15": {
+                "price_rial": 445000
+              },
+              "30": {
+                "price_rial": 890000
+              },
+              "60": {
+                "price_rial": 1780000
+              },
+              "90": {
+                "price_rial": 2670000
+              }
             }
           },
           "4": {
