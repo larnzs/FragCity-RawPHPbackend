@@ -230,6 +230,15 @@ final class PaymenterInvoiceApiClient
                 $subtotal += $lineTotal;
             }
 
+            $referenceKind = $isServiceLine
+                ? ($referenceType === 'App\\Models\\ServiceUpgrade' ? 'service_upgrade' : 'service')
+                : 'manual';
+            $safeReferenceId = filter_var(
+                $referenceId,
+                FILTER_VALIDATE_INT,
+                ['options' => ['min_range' => 1]]
+            );
+
             $items[] = [
                 'description' => mb_substr(
                     trim((string) ($itemAttributes['description'] ?? '')),
@@ -239,6 +248,8 @@ final class PaymenterInvoiceApiClient
                 'quantity' => $quantity,
                 'unit_price' => $unitPrice,
                 'line_total' => $lineTotal,
+                'reference_kind' => $referenceKind,
+                'reference_id' => $safeReferenceId === false ? null : (int) $safeReferenceId,
             ];
         }
 
@@ -253,6 +264,7 @@ final class PaymenterInvoiceApiClient
             'currency_code' => strtoupper(trim((string) ($attributes['currency_code'] ?? ''))),
             'due_at' => (string) ($attributes['due_at'] ?? ''),
             'created_at' => (string) ($attributes['created_at'] ?? ''),
+            'updated_at' => (string) ($attributes['updated_at'] ?? ''),
             'items' => $items,
             'subtotal' => $pricingComplete ? round($subtotal, 2) : null,
         ];
