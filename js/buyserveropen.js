@@ -367,7 +367,9 @@
             if (guardMinutesInput) guardMinutesInput.disabled = !guardEnabled;
         }
 
-        const watchedControls = new Set([
+        // Bind each input directly. This avoids any dependency on bubbling
+        // through the form/layout wrappers and keeps every slider responsive.
+        const liveControls = [
             memoryInput,
             diskInput,
             cpuInput,
@@ -381,33 +383,34 @@
             guardSelect,
             guardMinutesInput,
             ...durationInputs
-        ].filter(Boolean));
+        ].filter(Boolean);
 
-        root.addEventListener('input', function (event) {
-            if (watchedControls.has(event.target)) updateSummary();
+        liveControls.forEach(function (control) {
+            control.addEventListener('input', function () {
+                if (control === execSelect && mapgroupSelect) {
+                    syncMapGroups(mapgroupSelect.value);
+                }
+                updateSummary();
+            });
+
+            control.addEventListener('change', function () {
+                if (control === execSelect && mapgroupSelect) {
+                    syncMapGroups(mapgroupSelect.value);
+                }
+                updateSummary();
+            });
         });
 
-        root.addEventListener('change', function (event) {
-            if (event.target === execSelect && mapgroupSelect) {
-                const currentGroup = mapgroupSelect.value;
-                syncMapGroups(currentGroup);
-            }
+        playerPresetButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const requestedCapacity = Number(button.dataset.playerPreset);
+                if (!Number.isInteger(requestedCapacity) || requestedCapacity < 5 || requestedCapacity > 64) {
+                    return;
+                }
 
-            if (watchedControls.has(event.target)) updateSummary();
-        });
-
-        root.addEventListener('click', function (event) {
-            const target = event.target instanceof Element ? event.target : null;
-            const presetButton = target ? target.closest('[data-player-preset]') : null;
-            if (!presetButton || !root.contains(presetButton)) return;
-
-            const requestedCapacity = Number(presetButton.dataset.playerPreset);
-            if (!Number.isInteger(requestedCapacity) || requestedCapacity < 5 || requestedCapacity > 64) {
-                return;
-            }
-
-            playersInput.value = String(requestedCapacity);
-            updateSummary();
+                playersInput.value = String(requestedCapacity);
+                updateSummary();
+            });
         });
 
         const configForm = root.querySelector('#serverStoreConfigForm');
@@ -423,7 +426,17 @@
             syncMapGroups(initialGroup);
         }
 
-        updateSummary();
+        try {
+            updateSummary();
+            root.dataset.serverStoreStatus = 'ready';
+            delete root.dataset.serverStoreError;
+        } catch (error) {
+            root.dataset.serverStoreStatus = 'error';
+            root.dataset.serverStoreError = String(error && error.message ? error.message : error);
+            console.error('[FragCity] Server store invoice update failed:', error);
+            return false;
+        }
+
         return true;
     }
 
