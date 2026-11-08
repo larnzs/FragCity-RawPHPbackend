@@ -24,13 +24,15 @@
         const guardSelect = root.querySelector('#serverStoreGuard');
         const guardMinutesField = root.querySelector('#serverStoreGuardMinutesField');
         const guardMinutesInput = root.querySelector('#serverStoreGuardMinutes');
+        const durationInputs = Array.from(root.querySelectorAll('input[name="duration_days"]'));
+        const durationPriceOutputs = Array.from(root.querySelectorAll('[data-duration-price]'));
 
         if (
             !memoryInput || !diskInput || !cpuInput ||
             !memoryOutput || !diskOutput || !cpuOutput ||
             !mapInput || !playersInput || !playersOutput || !capacityPricingPanel || !tickrateSelect || !execSelect ||
             !mapgroupSelect || !cooldownSelect || !guardSelect ||
-            !guardMinutesField || !guardMinutesInput
+            !guardMinutesField || !guardMinutesInput || durationInputs.length === 0
         ) {
             root.dataset.serverStoreInitialized = '0';
             return;
@@ -40,6 +42,7 @@
             baseSlots: Number(capacityPricingPanel.dataset.baseSlots),
             basePrice: Number(capacityPricingPanel.dataset.basePrice),
             extraSlotPrice: Number(capacityPricingPanel.dataset.extraSlotPrice),
+            priceRoundingStep: Number(capacityPricingPanel.dataset.priceRoundingStep || 100),
             ramPrices: {
                 1024: Number(capacityPricingPanel.dataset.ramPrice1024),
                 1280: Number(capacityPricingPanel.dataset.ramPrice1280),
@@ -54,6 +57,8 @@
             capacityPricing.baseSlots < 1 ||
             capacityPricing.basePrice < 0 ||
             capacityPricing.extraSlotPrice < 0 ||
+            !Number.isInteger(capacityPricing.priceRoundingStep) ||
+            capacityPricing.priceRoundingStep < 1 ||
             Object.values(capacityPricing.ramPrices).some(function (price) {
                 return !Number.isFinite(price) || price < 0;
             })
@@ -199,7 +204,23 @@
             const capacityPrice = capacityPricing.basePrice + extraSlotsPrice;
             const ramSurcharge = capacityPricing.ramPrices[memoryMb];
             const monthlyPrice = capacityPrice + ramSurcharge;
+            const selectedDurationInput = durationInputs.find(function (input) {
+                return input.checked;
+            });
+            const durationDays = Number(selectedDurationInput ? selectedDurationInput.value : 30);
+            const periodPrice = Math.round(
+                (monthlyPrice * durationDays / 30) / capacityPricing.priceRoundingStep
+            ) * capacityPricing.priceRoundingStep;
 
+            durationPriceOutputs.forEach(function (output) {
+                const days = Number(output.dataset.durationPrice);
+                const price = Math.round(
+                    (monthlyPrice * days / 30) / capacityPricing.priceRoundingStep
+                ) * capacityPricing.priceRoundingStep;
+                output.textContent = formatToman(price);
+            });
+
+            setSummary('duration', durationDays + ' روز');
             setSummary('capacity-base-price', formatToman(capacityPricing.basePrice));
             setSummary(
                 'extra-slots-price',
@@ -210,11 +231,12 @@
             );
             setSummary('memory-price', ramSurcharge > 0 ? '+ ' + formatToman(ramSurcharge) : 'بدون هزینه اضافه');
             setSummary('monthly-price', formatToman(monthlyPrice) + ' / ماه');
-            setSummary('tickrate', tickrate === '128' ? '128 Tick · ارتقای پولی' : '64 Tick');
+            setSummary('period-price', formatToman(periodPrice));
+            setSummary('tickrate', tickrate === '128' ? '128 Tick · به‌زودی' : '64 Tick');
             setSummary('exec', modeLabel);
             setSummary('mapgroup', mapgroupLabel);
             setSummary('cooldown', cooldownLabel);
-            setSummary('guard', guardEnabled ? 'فعال · افزونه پولی' : 'غیرفعال');
+            setSummary('guard', guardEnabled ? 'فعال · رایگان' : 'غیرفعال');
             setSummary(
                 'guard-minutes',
                 guardEnabled ? (guardMinutes ? guardMinutes + ' دقیقه' : 'تعیین نشده') : 'فقط هنگام فعال بودن'
