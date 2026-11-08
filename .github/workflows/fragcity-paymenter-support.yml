@@ -114,6 +114,13 @@ jobs:
           grep -Fq 'social-item--steam' pages/support.php
           grep -Fq 'footer-steam-button' css/footer.css
           grep -Fq 'social-icon--steam' css/support.css
+          grep -Fq 'https://discord.gg/s6rFThCDdY' includes/footer.php
+          grep -Fq 'footer-discord-button' includes/footer.php
+          grep -Fq 'https://discord.gg/s6rFThCDdY' pages/support.php
+          grep -Fq 'social-item--discord' pages/support.php
+          grep -Fq 'footer-discord-button' css/footer.css
+          grep -Fq 'social-icon--discord' css/support.css
+          grep -Fq 'fa-brands fa-discord' pages/support.php
       - name: Verify fail-closed ticket ownership
         shell: bash
         run: |
