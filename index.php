@@ -550,6 +550,7 @@ $allowedPages = [
     'skins',
     'buyserver',
     'buyserveropen',
+    'minecraft',
     'launcher',
     'usermanual',
     'serverguide',
@@ -588,6 +589,7 @@ $cleanRoutePages = [
     'servers' => 'servers_vps',
     'skins' => 'skins',
     'buy-server' => 'buyserveropen',
+    'minecraft-hosting' => 'minecraft',
     'launcher' => 'launcher',
     'server-manual' => 'usermanual',
     'serverguide' => 'serverguide',
@@ -905,6 +907,19 @@ $pageAssets = [
         ],
     ],
 
+    'minecraft' => [
+        'css' => [
+            '/css/buyminecraft.css?v=' . asset_version(
+                __DIR__ . '/css/buyminecraft.css'
+            ),
+        ],
+        'js' => [
+            '/js/buyminecraft.js?v=' . asset_version(
+                __DIR__ . '/js/buyminecraft.js'
+            ),
+        ],
+    ],
+
     'banlist' => [
         'css' => [
             '/css/banlist.css?v=' . asset_version(
@@ -1077,6 +1092,10 @@ $fcSeoPages = [
     'about' => [
         'title' => 'درباره FragCity | کامیونیتی کانتر استرایک ۲',
         'description' => 'با فرگ‌سیتی، خدمات کانتر استرایک ۲، قابلیت‌های کامیونیتی و ابزارهای گیمینگ آن آشنا شو.',
+    ],
+    'minecraft' => [
+        'title' => 'خرید سرور Minecraft | FragCity',
+        'description' => 'محاسبه قیمت ماهانه سرور Minecraft بر اساس ظرفیت بازیکن و منابع انتخابی در FragCity.',
     ],
     'support' => [
         'title' => 'پشتیبانی و تماس با FragCity',
