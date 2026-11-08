@@ -65,7 +65,7 @@ The Invoice API resource exposes invoice status, currency code, due date and tim
 
 ## Read-only verification
 
-After configuring the dedicated key and deploying the website changes, run from the Raw PHP repository root:
+After configuring the dedicated key and deploying the website changes, first run the offline contract test (it does not connect to Paymenter), then run the live read-only preflight from the Raw PHP repository root:
 
 ```bash
 php tools/paymenter-invoices-preflight.php 7656119XXXXXXXXXX
