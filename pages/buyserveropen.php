@@ -1,162 +1,4 @@
 <?php
-if (
-    isset($_GET['game']) &&
-    is_string($_GET['game']) &&
-    $_GET['game'] === 'minecraft'
-) {
-?>
-<?php
-$mcStorePricing = [
-    'base_slots' => 5,
-    'base_price' => 499000,
-    'extra_slot_price' => 50000,
-    'ram_prices' => [
-        1024 => 0,
-        1280 => 40000,
-        1536 => 75000,
-    ],
-];
-$mcStoreDefaultPlayers = 10;
-?>
-<main class="mc-store-page" dir="rtl">
-    <div class="mc-store-shell">
-        <section class="mc-store-hero">
-            <div class="mc-store-hero__copy">
-                <span class="mc-store-eyebrow"><i class="fa-solid fa-cubes" aria-hidden="true"></i> MINECRAFT HOSTING</span>
-                <h1>سرور Minecraft خودت رو بساز</h1>
-                <p>ظرفیت بازیکن و منابع مورد نیازت رو انتخاب کن و قیمت ماهانه رو لحظه‌ای ببین.</p>
-            </div>
-            <div class="mc-store-hero__mark" aria-hidden="true">
-                <i class="fa-solid fa-cubes"></i>
-                <span>MC</span>
-            </div>
-        </section>
-
-        <div class="mc-store-layout">
-            <section class="mc-store-panel mc-store-config" aria-labelledby="mcStoreConfigTitle">
-                <div class="mc-store-panel__heading">
-                    <div>
-                        <span class="mc-store-kicker">SERVER CONFIGURATION</span>
-                        <h2 id="mcStoreConfigTitle">پیکربندی سرور</h2>
-                    </div>
-                    <span class="mc-store-step">01 / 02</span>
-                </div>
-
-                <div
-                    class="mc-store-pricing-data"
-                    id="mcStorePricingData"
-                    data-base-slots="<?= (int) $mcStorePricing['base_slots'] ?>"
-                    data-base-price="<?= (int) $mcStorePricing['base_price'] ?>"
-                    data-extra-slot-price="<?= (int) $mcStorePricing['extra_slot_price'] ?>"
-                    data-ram-price-1024="<?= (int) $mcStorePricing['ram_prices'][1024] ?>"
-                    data-ram-price-1280="<?= (int) $mcStorePricing['ram_prices'][1280] ?>"
-                    data-ram-price-1536="<?= (int) $mcStorePricing['ram_prices'][1536] ?>"
-                ></div>
-
-                <div class="mc-store-field mc-store-field--capacity">
-                    <div class="mc-store-field__top">
-                        <label for="mcStorePlayers">ظرفیت بازیکن هم‌زمان</label>
-                        <output id="mcStorePlayersValue" for="mcStorePlayers"><?= (int) $mcStoreDefaultPlayers ?></output>
-                    </div>
-                    <input
-                        class="mc-store-range"
-                        id="mcStorePlayers"
-                        name="players"
-                        type="range"
-                        min="5"
-                        max="64"
-                        step="1"
-                        value="<?= (int) $mcStoreDefaultPlayers ?>"
-                        aria-describedby="mcStorePlayersHelp"
-                    >
-                    <div class="mc-store-range__limits"><span>۵ بازیکن</span><span>۶۴ بازیکن</span></div>
-                    <small id="mcStorePlayersHelp">پلن پایه شامل ۵ اسلات است؛ هر اسلات بیشتر، ۵۰ هزار تومان به قیمت ماهانه اضافه می‌کند.</small>
-                </div>
-
-                <div class="mc-store-fields-grid">
-                    <div class="mc-store-field">
-                        <label for="mcStoreMemory">حافظه RAM</label>
-                        <select class="mc-store-select" id="mcStoreMemory" name="memory">
-                            <option value="1024" selected>۱ گیگابایت</option>
-                            <option value="1280">۱.۲۵ گیگابایت</option>
-                            <option value="1536">۱.۵ گیگابایت</option>
-                        </select>
-                        <small>ارتقای RAM به‌صورت جداگانه محاسبه می‌شود.</small>
-                    </div>
-
-                    <div class="mc-store-field">
-                        <label for="mcStoreCpu">قدرت پردازنده</label>
-                        <select class="mc-store-select" id="mcStoreCpu" name="cpu">
-                            <option value="100" selected>۱ vCore · ۱۰۰٪</option>
-                            <option value="200">۲ vCore · ۲۰۰٪</option>
-                            <option value="300">۳ vCore · ۳۰۰٪</option>
-                            <option value="400">۴ vCore · ۴۰۰٪</option>
-                        </select>
-                        <small>محدوده پردازنده از ۱ تا ۴ vCore.</small>
-                    </div>
-
-                    <div class="mc-store-field mc-store-field--wide">
-                        <label for="mcStoreDisk">فضای ذخیره‌سازی SSD</label>
-                        <select class="mc-store-select" id="mcStoreDisk" name="disk">
-                            <option value="5120">۵ گیگابایت</option>
-                            <option value="6144">۶ گیگابایت</option>
-                            <option value="7168">۷ گیگابایت</option>
-                            <option value="8192">۸ گیگابایت</option>
-                            <option value="9216">۹ گیگابایت</option>
-                            <option value="10240" selected>۱۰ گیگابایت</option>
-                        </select>
-                        <small>فضای SSD قابل انتخاب: ۵ تا ۱۰ گیگابایت.</small>
-                    </div>
-                </div>
-
-                <div class="mc-store-info">
-                    <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                    <p>مقدار CPU و SSD در محدوده‌ی انتخابی قابل تنظیم است. قیمت این صفحه بر اساس ظرفیت بازیکن و سطح RAM محاسبه می‌شود.</p>
-                </div>
-            </section>
-
-            <aside class="mc-store-panel mc-store-summary" aria-labelledby="mcStoreSummaryTitle">
-                <div class="mc-store-panel__heading">
-                    <div>
-                        <span class="mc-store-kicker">MONTHLY SUMMARY</span>
-                        <h2 id="mcStoreSummaryTitle">خلاصه هزینه</h2>
-                    </div>
-                    <span class="mc-store-summary__icon"><i class="fa-solid fa-receipt" aria-hidden="true"></i></span>
-                </div>
-
-                <div class="mc-store-summary__specs">
-                    <div><span>ظرفیت</span><strong data-mc-summary="players">۱۰ بازیکن</strong></div>
-                    <div><span>RAM</span><strong data-mc-summary="memory">۱ گیگابایت</strong></div>
-                    <div><span>CPU</span><strong data-mc-summary="cpu">۱ vCore</strong></div>
-                    <div><span>SSD</span><strong data-mc-summary="disk">۱۰ گیگابایت</strong></div>
-                </div>
-
-                <div class="mc-store-price-breakdown">
-                    <div><span>پلن پایه · ۵ اسلات</span><strong data-mc-summary="base-price">۴۹۹٬۰۰۰ تومان</strong></div>
-                    <div><span>اسلات‌های اضافه</span><strong data-mc-summary="extra-price">۵ × ۵۰٬۰۰۰ = ۲۵۰٬۰۰۰ تومان</strong></div>
-                    <div><span>ارتقای RAM</span><strong data-mc-summary="ram-price">بدون هزینه اضافه</strong></div>
-                </div>
-
-                <div class="mc-store-total">
-                    <span>هزینه ماهانه</span>
-                    <strong data-mc-summary="total-price">۷۴۹٬۰۰۰ تومان</strong>
-                    <small>قیمت نهایی بر اساس ظرفیت و RAM انتخاب‌شده محاسبه می‌شود.</small>
-                </div>
-
-                <div class="mc-store-traffic-note">
-                    <i class="fa-solid fa-network-wired" aria-hidden="true"></i>
-                    <p>هزینه ترافیک جداگانه به این مبلغ اضافه نمی‌شود و در تعرفه ظرفیت لحاظ شده است. مصرف واقعی به تعداد بازیکنان آنلاین، نوع دنیا و افزونه‌ها بستگی دارد.</p>
-                </div>
-            </aside>
-        </div>
-    </div>
-</main>
-
-<?php
-    return;
-}
-?>
-<?php
 /**
  * FragCity CS2 server storefront.
  *
@@ -282,8 +124,8 @@ $serverStoreDefaultMonthlyPrice =
                 </div>
                 <div class="server-store-hero-copy">
                     <span class="server-store-eyebrow" dir="ltr">FRAGCITY / GAME HOSTING</span>
-                    <h1>سرور CS2 خودت رو بساز</h1>
-                    <p>از ۵ تا ۶۴ اسلات انتخاب کن و یک سرور چندحالته بساز؛ مودهای متنوع CS2 در یک سرویس، بدون نیاز به خرید پلن جدا برای هر سبک بازی.</p>
+                    <h1>سرور بازی خودت رو بساز</h1>
+                    <p>بازی موردنظرت را انتخاب کن و ظرفیت و منابع سرورت را متناسب با کامیونیتی خودت تنظیم کن.</p>
                     <div class="server-store-hero-tags">
                         <span><i class="fa-solid fa-users" aria-hidden="true"></i> ۵ تا ۶۴ اسلات</span>
                         <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> همه مودها در یک سرویس</span>
@@ -294,154 +136,145 @@ $serverStoreDefaultMonthlyPrice =
 
             <div class="server-store-hero-product">
                 <span class="server-store-product-kicker">YOUR GAME SERVER</span>
-                <strong>CS2 Multimode</strong>
-                <span class="server-store-product-status"><i class="fa-solid fa-circle" aria-hidden="true"></i> ظرفیت انتخابی ۵ تا ۶۴ اسلات</span>
+                <strong>Counter-Strike Servers</strong>
+                <span class="server-store-product-status"><i class="fa-solid fa-circle" aria-hidden="true"></i> CS2 فعال · CS 1.6 به‌زودی</span>
                 <div class="server-store-product-mark" aria-hidden="true">
                     <i class="fa-solid fa-crosshairs"></i>
                 </div>
             </div>
         </header>
 
+        <div class="server-store-game-tabs" role="tablist" aria-label="انتخاب بازی">
+            <button type="button" class="server-store-game-tab is-active" id="serverStoreTabCs2" role="tab" aria-selected="true" aria-controls="serverStorePanelCs2" tabindex="0" data-server-game-tab="cs2">
+                <i class="fa-solid fa-crosshairs" aria-hidden="true"></i>
+                <span>Counter-Strike 2</span>
+            </button>
+            <button type="button" class="server-store-game-tab" id="serverStoreTabCs16" role="tab" aria-selected="false" aria-controls="serverStorePanelCs16" tabindex="-1" data-server-game-tab="cs16">
+                <i class="fa-solid fa-gamepad" aria-hidden="true"></i>
+                <span>Counter-Strike 1.6</span>
+            </button>
+        </div>
+        <div class="server-store-game-panel" id="serverStorePanelCs2" role="tabpanel" aria-labelledby="serverStoreTabCs2" data-server-game-panel="cs2">
         <div class="server-store-layout">
             <div class="server-store-main">
                 <form id="serverStoreConfigForm" class="server-store-config-form" autocomplete="off">
-                    <section class="server-store-section server-store-capacity-section" aria-labelledby="serverCapacityTitle" data-fc-reveal="up" data-fc-reveal-delay="20">
+                    <section class="server-store-section server-store-resources-section" aria-labelledby="serverResourcesTitle" data-fc-reveal="up" data-fc-reveal-delay="20">
                         <div class="server-store-section-heading">
                             <span class="server-store-section-index">01</span>
                             <div>
-                                <h2 id="serverCapacityTitle">ظرفیت بازیکنان</h2>
-                                <p>تعداد بازیکنانی را انتخاب کن که می‌توانند به‌صورت هم‌زمان وارد سرورت شوند.</p>
+                                <h2 id="serverResourcesTitle">ظرفیت و منابع سرور</h2>
+                                <p>چهار منبع اصلی را از همین ردیف تنظیم کن؛ تعرفه‌های فعال در خلاصه سفارش محاسبه می‌شوند.</p>
                             </div>
-                            <span class="server-store-section-state">۵ تا ۶۴ اسلات</span>
+                            <span class="server-store-section-state">۴ تنظیم قابل انتخاب</span>
                         </div>
 
-                        <div
-                            class="server-store-capacity-panel"
-                            data-base-slots="<?= (int) $serverStoreCapacityPricing['base_slots'] ?>"
-                            data-base-price="<?= (int) $serverStoreCapacityPricing['base_price'] ?>"
-                            data-extra-slot-price="<?= (int) $serverStoreCapacityPricing['extra_slot_price'] ?>"
-                            data-ram-price-1024="<?= (int) $serverStoreRamPricing[1024] ?>"
-                            data-ram-price-1280="<?= (int) $serverStoreRamPricing[1280] ?>"
-                            data-ram-price-1536="<?= (int) $serverStoreRamPricing[1536] ?>"
-                            data-price-rounding-step="<?= (int) $serverStorePriceRoundingStep ?>"
-                        >
-                            <div class="server-store-capacity-head">
-                                <div>
-                                    <span class="server-store-capacity-kicker">MAX PLAYER SLOTS</span>
-                                    <div class="server-store-capacity-value">
-                                        <output id="serverStorePlayersValue" for="serverStorePlayers" aria-live="polite"><?= (int) $serverStoreDefaultPlayers ?></output>
-                                        <span>اسلات</span>
+                        <div class="server-store-resource-grid">
+                            <article
+                                class="server-store-resource-card server-store-resource-card--capacity server-store-capacity-panel"
+                                data-base-slots="<?= (int) $serverStoreCapacityPricing['base_slots'] ?>"
+                                data-base-price="<?= (int) $serverStoreCapacityPricing['base_price'] ?>"
+                                data-extra-slot-price="<?= (int) $serverStoreCapacityPricing['extra_slot_price'] ?>"
+                                data-ram-price-1024="<?= (int) $serverStoreRamPricing[1024] ?>"
+                                data-ram-price-1280="<?= (int) $serverStoreRamPricing[1280] ?>"
+                                data-ram-price-1536="<?= (int) $serverStoreRamPricing[1536] ?>"
+                                data-price-rounding-step="<?= (int) $serverStorePriceRoundingStep ?>"
+                            >
+                                <div class="server-store-resource-head">
+                                    <span class="server-store-resource-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+                                    <div class="server-store-resource-copy">
+                                        <small>PLAYER SLOTS</small>
+                                        <strong><output id="serverStorePlayersValue" for="serverStorePlayers" aria-live="polite"><?= (int) $serverStoreDefaultPlayers ?></output> اسلات</strong>
+                                        <span>ظرفیت اتصال هم‌زمان</span>
                                     </div>
                                 </div>
-                                <span class="server-store-capacity-range-label">قابل تنظیم با گام یک‌تایی</span>
-                            </div>
+                                <div class="server-store-range-wrap">
+                                    <label class="server-store-resource-slider-label" for="serverStorePlayers">تعداد بازیکن</label>
+                                    <input
+                                        class="server-store-range server-store-capacity-range"
+                                        id="serverStorePlayers"
+                                        name="SRCDS_MAXPLAYERS"
+                                        type="range"
+                                        min="5"
+                                        max="64"
+                                        step="1"
+                                        value="<?= (int) $serverStoreDefaultPlayers ?>"
+                                        aria-describedby="serverStorePlayersHelp"
+                                    >
+                                    <div class="server-store-range-meta" aria-hidden="true"><span>5</span><span>64</span></div>
+                                </div>
+                                <div class="server-store-capacity-presets" role="group" aria-label="انتخاب سریع ظرفیت">
+                                    <button type="button" data-player-preset="5" aria-pressed="false">5</button>
+                                    <button type="button" data-player-preset="10" aria-pressed="true">10</button>
+                                    <button type="button" data-player-preset="16" aria-pressed="false">16</button>
+                                    <button type="button" data-player-preset="20" aria-pressed="false">20</button>
+                                    <button type="button" data-player-preset="24" aria-pressed="false">24</button>
+                                    <button type="button" data-player-preset="32" aria-pressed="false">32</button>
+                                    <button type="button" data-player-preset="48" aria-pressed="false">48</button>
+                                    <button type="button" data-player-preset="64" aria-pressed="false">64</button>
+                                </div>
+                                <small class="server-store-range-help" id="serverStorePlayersHelp">۵ اسلات پایه؛ هر اسلات اضافه ۵۰٬۰۰۰ تومان به هزینه ماهانه اضافه می‌کند.</small>
+                            </article>
 
-                            <label class="server-store-capacity-slider-label" for="serverStorePlayers">ظرفیت اتصال هم‌زمان</label>
-                            <input
-                                class="server-store-range server-store-capacity-range"
-                                id="serverStorePlayers"
-                                name="SRCDS_MAXPLAYERS"
-                                type="range"
-                                min="5"
-                                max="64"
-                                step="1"
-                                value="<?= (int) $serverStoreDefaultPlayers ?>"
-                                aria-describedby="serverStorePlayersHelp"
-                            >
-                            <div class="server-store-range-meta" aria-hidden="true"><span>5 اسلات</span><span>64 اسلات</span></div>
+                            <article class="server-store-resource-card">
+                                <div class="server-store-resource-head">
+                                    <span class="server-store-resource-icon"><i class="fa-solid fa-memory" aria-hidden="true"></i></span>
+                                    <div class="server-store-resource-copy">
+                                        <small>RAM</small>
+                                        <strong><output id="serverStoreMemoryValue" for="serverStoreMemory">1 GB</output></strong>
+                                        <span>DDR5 · 6000 MHz · CL30</span>
+                                    </div>
+                                </div>
+                                <div class="server-store-range-wrap">
+                                    <label class="server-store-resource-slider-label" for="serverStoreMemory">حافظه RAM</label>
+                                    <input class="server-store-range" id="serverStoreMemory" name="memory" type="range" min="1024" max="1536" step="256" value="1024" aria-describedby="serverStoreMemoryHelp">
+                                    <div class="server-store-range-meta" aria-hidden="true"><span>1 GB</span><span>1.5 GB</span></div>
+                                    <small class="server-store-range-help" id="serverStoreMemoryHelp">۱.۲۵ گیگابایت: ۴۰ هزار تومان؛ ۱.۵ گیگابایت: ۷۵ هزار تومان افزایش ماهانه.</small>
+                                </div>
+                            </article>
 
-                            <div class="server-store-capacity-presets" role="group" aria-label="انتخاب سریع ظرفیت">
-                                <button type="button" data-player-preset="5" aria-pressed="false">5</button>
-                                <button type="button" data-player-preset="10" aria-pressed="true">10</button>
-                                <button type="button" data-player-preset="16" aria-pressed="false">16</button>
-                                <button type="button" data-player-preset="20" aria-pressed="false">20</button>
-                                <button type="button" data-player-preset="24" aria-pressed="false">24</button>
-                                <button type="button" data-player-preset="32" aria-pressed="false">32</button>
-                                <button type="button" data-player-preset="48" aria-pressed="false">48</button>
-                                <button type="button" data-player-preset="64" aria-pressed="false">64</button>
-                            </div>
+                            <article class="server-store-resource-card">
+                                <div class="server-store-resource-head">
+                                    <span class="server-store-resource-icon"><i class="fa-solid fa-hard-drive" aria-hidden="true"></i></span>
+                                    <div class="server-store-resource-copy">
+                                        <small>SSD STORAGE</small>
+                                        <strong><output id="serverStoreDiskValue" for="serverStoreDisk">10 GB</output></strong>
+                                        <span>فضای ذخیره‌سازی</span>
+                                    </div>
+                                </div>
+                                <div class="server-store-range-wrap">
+                                    <label class="server-store-resource-slider-label" for="serverStoreDisk">فضای دیسک</label>
+                                    <input class="server-store-range" id="serverStoreDisk" name="disk" type="range" min="5120" max="10240" step="1024" value="10240" aria-describedby="serverStoreDiskHelp">
+                                    <div class="server-store-range-meta" aria-hidden="true"><span>5 GB</span><span>10 GB</span></div>
+                                    <small class="server-store-range-help" id="serverStoreDiskHelp">سقف فضای مجاز برای فایل‌ها و داده‌های سرور.</small>
+                                </div>
+                            </article>
 
-                            <div class="server-store-capacity-pricing-note">
-                                <i class="fa-solid fa-calculator" aria-hidden="true"></i>
-                                <span>۵ اسلات پایه: <strong>۴۹۹٬۰۰۰ تومان</strong> · هر اسلات اضافه: <strong>۵۰٬۰۰۰ تومان در ماه</strong></span>
-                            </div>
-                            <small class="server-store-capacity-help" id="serverStorePlayersHelp">
-                                هر اسلات اضافه ظرفیت اتصال هم‌زمان را بیشتر می‌کند و مصرف مورد انتظار اینترنت و CPU را بالا می‌برد؛ به همین دلیل قیمت با هر اسلات افزایش پیدا می‌کند. مصرف واقعی اینترنت به تعداد بازیکنان آنلاین و مدت حضورشان وابسته است.
-                            </small>
+                            <article class="server-store-resource-card">
+                                <div class="server-store-resource-head">
+                                    <span class="server-store-resource-icon"><i class="fa-solid fa-microchip" aria-hidden="true"></i></span>
+                                    <div class="server-store-resource-copy">
+                                        <small>CPU</small>
+                                        <strong><output id="serverStoreCpuValue" for="serverStoreCpu">100% · 1 vCore</output></strong>
+                                        <span>AMD Ryzen 9 7950X · 5.7 GHz</span>
+                                    </div>
+                                </div>
+                                <div class="server-store-range-wrap">
+                                    <label class="server-store-resource-slider-label" for="serverStoreCpu">قدرت پردازنده</label>
+                                    <input class="server-store-range" id="serverStoreCpu" name="cpu" type="range" min="100" max="400" step="100" value="100" aria-describedby="serverStoreCpuHelp">
+                                    <div class="server-store-range-meta" aria-hidden="true"><span>100%</span><span>400%</span></div>
+                                    <small class="server-store-range-help" id="serverStoreCpuHelp">هر ۱۰۰٪ سقف مصرف معادل یک هسته است؛ این مقدار به معنی رزرو یک هسته فیزیکی نیست.</small>
+                                </div>
+                            </article>
+                        </div>
+                        <div class="server-store-resource-footnote">
+                            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                            RAM و Storage به مگابایت و CPU به درصد بیان می‌شوند. فعلاً قیمت فقط بر اساس ظرفیت و RAM محاسبه می‌شود؛ تعرفه CPU و Storage هنوز نهایی نشده است.
                         </div>
                     </section>
 
-                <section class="server-store-section server-store-resources-section" aria-labelledby="serverResourcesTitle" data-fc-reveal="up" data-fc-reveal-delay="40">
-                    <div class="server-store-section-heading">
-                        <span class="server-store-section-index">02</span>
-                        <div>
-                            <h2 id="serverResourcesTitle">منابع قابل تنظیم سرور</h2>
-                            <p>منابع سرور را متناسب با نیاز کامیونیتی خودت انتخاب کن؛ مقدار هر اسلایدر در لحظه به‌روزرسانی می‌شود.</p>
-                        </div>
-                        <span class="server-store-section-state">قابل تنظیم</span>
-                    </div>
-
-                    <div class="server-store-resource-grid">
-                        <article class="server-store-resource-card">
-                            <div class="server-store-resource-head">
-                                <span class="server-store-resource-icon"><i class="fa-solid fa-memory" aria-hidden="true"></i></span>
-                                <div class="server-store-resource-copy">
-                                    <small>RAM</small>
-                                    <strong><output id="serverStoreMemoryValue" for="serverStoreMemory">1 GB</output></strong>
-                                    <span>DDR5 · 6000 MHz · CL30</span>
-                                </div>
-                            </div>
-                            <div class="server-store-range-wrap">
-                                <label class="server-store-resource-slider-label" for="serverStoreMemory">مقدار حافظه</label>
-                                <input class="server-store-range" id="serverStoreMemory" name="memory" type="range" min="1024" max="1536" step="256" value="1024" aria-describedby="serverStoreMemoryHelp">
-                                <div class="server-store-range-meta" aria-hidden="true"><span>1 GB</span><span>1.5 GB</span></div>
-                                <small class="server-store-range-help" id="serverStoreMemoryHelp">۱ گیگابایت پایه است؛ ۱.۲۵ گیگابایت ۴۰ هزار تومان و ۱.۵ گیگابایت ۷۵ هزار تومان به مبلغ ماهانه اضافه می‌کند.</small>
-                            </div>
-                        </article>
-
-                        <article class="server-store-resource-card">
-                            <div class="server-store-resource-head">
-                                <span class="server-store-resource-icon"><i class="fa-solid fa-hard-drive" aria-hidden="true"></i></span>
-                                <div class="server-store-resource-copy">
-                                    <small>SSD STORAGE</small>
-                                    <strong><output id="serverStoreDiskValue" for="serverStoreDisk">10 GB</output></strong>
-                                    <span>فضای ذخیره‌سازی قابل تخصیص</span>
-                                </div>
-                            </div>
-                            <div class="server-store-range-wrap">
-                                <label class="server-store-resource-slider-label" for="serverStoreDisk">فضای دیسک</label>
-                                <input class="server-store-range" id="serverStoreDisk" name="disk" type="range" min="5120" max="10240" step="1024" value="10240" aria-describedby="serverStoreDiskHelp">
-                                <div class="server-store-range-meta" aria-hidden="true"><span>5 GB</span><span>10 GB</span></div>
-                                <small class="server-store-range-help" id="serverStoreDiskHelp">محدوده تخصیص دیسک: ۵ تا ۱۰ گیگابایت.</small>
-                            </div>
-                        </article>
-
-                        <article class="server-store-resource-card">
-                            <div class="server-store-resource-head">
-                                <span class="server-store-resource-icon"><i class="fa-solid fa-microchip" aria-hidden="true"></i></span>
-                                <div class="server-store-resource-copy">
-                                    <small>CPU</small>
-                                    <strong><output id="serverStoreCpuValue" for="serverStoreCpu">100% · 1 vCore</output></strong>
-                                    <span>AMD Ryzen 9 7950X · 5.7 GHz</span>
-                                </div>
-                            </div>
-                            <div class="server-store-range-wrap">
-                                <label class="server-store-resource-slider-label" for="serverStoreCpu">قدرت پردازنده</label>
-                                <input class="server-store-range" id="serverStoreCpu" name="cpu" type="range" min="100" max="400" step="100" value="100" aria-describedby="serverStoreCpuHelp">
-                                <div class="server-store-range-meta" aria-hidden="true"><span>100%</span><span>400%</span></div>
-                                <small class="server-store-range-help" id="serverStoreCpuHelp">هر ۱۰۰٪ محدودیت CPU معادل یک vCore است.</small>
-                            </div>
-                        </article>
-                    </div>
-                    <div class="server-store-resource-footnote">
-                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                        مقدار RAM و Storage به مگابایت و مقدار CPU به درصد بیان می‌شود. نود و پورت اتصال به‌صورت خودکار تخصیص داده می‌شوند.
-                    </div>
-                </section>
-
                 <section class="server-store-section server-store-config-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">03</span>
+                            <span class="server-store-section-index">02</span>
                             <div>
                                 <h2 id="serverGameModeTitle">تنظیمات گیم‌سرور</h2>
                                 <p>مود بازی، نقشه شروع و تنظیمات پایه سرورت را مشخص کن.</p>
@@ -467,13 +300,14 @@ $serverStoreDefaultMonthlyPrice =
                                 <small id="serverStoreMapHelp">نام نقشه‌ای که سرور پس از راه‌اندازی با آن بالا می‌آید؛ مانند de_dust2 یا de_mirage.</small>
                             </div>
 
-                            <div class="server-store-field">
-                                <label for="serverStoreTickrate">Tickrate سرور <span class="server-store-required" aria-hidden="true">*</span></label>
-                                <select class="server-store-select" id="serverStoreTickrate" name="TICKRATE" required aria-describedby="serverStoreTickrateHelp">
-                                    <option value="64" selected>64 Tick · نرخ پایه</option>
-                                    <option value="128" disabled>128 Tick · به‌زودی</option>
-                                </select>
-                                <small id="serverStoreTickrateHelp">در حال حاضر 64 Tick گزینه فعال فروش است؛ انتخاب 128 پس از نهایی‌شدن شرایط ارائه فعال می‌شود.</small>
+                            <div class="server-store-field server-store-field--fixed">
+                                <span class="server-store-fixed-label">Tickrate و Subtick</span>
+                                <div class="server-store-fixed-setting" id="serverStoreTickrateDisplay">
+                                    <strong>64 Tick</strong>
+                                    <span>Subtick فعال · ثابت در CS2</span>
+                                </div>
+                                <input type="hidden" id="serverStoreTickrate" name="TICKRATE" value="64">
+                                <small id="serverStoreTickrateHelp">در معماری CS2 امکان انتخاب 128 Tick از پنل وجود ندارد؛ زمان رویدادها با سیستم Subtick ثبت می‌شود.</small>
                             </div>
 
                             <div class="server-store-field">
@@ -508,7 +342,7 @@ $serverStoreDefaultMonthlyPrice =
 
                     <section class="server-store-section server-store-security-section" aria-labelledby="serverAddonTitle" data-fc-reveal="up" data-fc-reveal-delay="120">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">04</span>
+                            <span class="server-store-section-index">03</span>
                             <div>
                                 <h2 id="serverAddonTitle">محافظت و قوانین اتصال</h2>
                                 <p>قوانین ورود بازیکنان و افزونه محافظت در برابر بات‌ها را تنظیم کن.</p>
@@ -559,7 +393,7 @@ $serverStoreDefaultMonthlyPrice =
                     </section>
                     <section class="server-store-section server-store-duration-section" aria-labelledby="serverDurationTitle" data-fc-reveal="up" data-fc-reveal-delay="140">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">05</span>
+                            <span class="server-store-section-index">04</span>
                             <div>
                                 <h2 id="serverDurationTitle">مدت سرویس</h2>
                                 <p>هرچه مدت اشتراک بیشتر باشد، هزینه مؤثر هر ماه کمتر می‌شود.</p>
@@ -618,7 +452,7 @@ $serverStoreDefaultMonthlyPrice =
 
                     <section class="server-store-section server-store-name-section" aria-labelledby="serverNameTitle" data-fc-reveal="up" data-fc-reveal-delay="160">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">06</span>
+                            <span class="server-store-section-index">05</span>
                             <div>
                                 <h2 id="serverNameTitle">نام سرور</h2>
                                 <p>برای شناسایی راحت‌تر سرورت در پنل، یک نام انتخاب کن.</p>
@@ -675,7 +509,7 @@ $serverStoreDefaultMonthlyPrice =
                     <div><span>پلن پایه · ۵ اسلات</span><strong data-server-summary="capacity-base-price">۴۹۹٬۰۰۰ تومان</strong></div>
                     <div><span>اسلات‌های اضافه</span><strong data-server-summary="extra-slots-price">۵ × ۵۰٬۰۰۰ = ۲۵۰٬۰۰۰ تومان</strong></div>
                     <div><span>هزینه ارتقای RAM</span><strong data-server-summary="memory-price">بدون هزینه اضافه</strong></div>
-                    <div><span>Tickrate</span><strong data-server-summary="tickrate">64 Tick</strong></div>
+                    <div><span>Tickrate / Subtick</span><strong data-server-summary="tickrate">64 Tick · Subtick فعال</strong></div>
                     <div><span>Game Mode CFG</span><strong data-server-summary="exec">Competitive — comp.cfg</strong></div>
                     <div><span>MAPGROUP</span><strong data-server-summary="mapgroup">Casual / Competitive / Practice Mode — mg_comp</strong></div>
                     <div><span>Cooldown</span><strong data-server-summary="cooldown">غیرفعال</strong></div>
@@ -687,7 +521,7 @@ $serverStoreDefaultMonthlyPrice =
                 <div class="server-store-summary-total">
                     <span>قیمت نهایی دوره انتخاب‌شده</span>
                     <strong data-server-summary="period-price">۷۴۹٬۰۰۰ تومان</strong>
-                    <small>قیمت بر اساس پلن پایه، اسلات‌های اضافه، RAM و مدت انتخاب‌شده محاسبه می‌شود. دوره‌های چندماهه شامل تخفیف پلکانی هستند. Bot Guard بدون هزینه اضافه است.</small>
+                    <small>در نسخه فعلی قیمت بر اساس پلن پایه، اسلات‌های اضافه، RAM و مدت انتخاب‌شده محاسبه می‌شود. هزینه CPU و Storage هنوز به فاکتور اضافه نشده است. دوره‌های چندماهه شامل تخفیف پلکانی هستند. Bot Guard رایگان است.</small>
                 </div>
 
                 <button type="button" class="server-store-submit" disabled>
@@ -701,5 +535,13 @@ $serverStoreDefaultMonthlyPrice =
                 </div>
             </aside>
         </div>
+        </div>
+        <section class="server-store-coming-soon" id="serverStorePanelCs16" role="tabpanel" aria-labelledby="serverStoreTabCs16" data-server-game-panel="cs16" hidden>
+            <div class="server-store-coming-soon__icon"><i class="fa-solid fa-gamepad" aria-hidden="true"></i></div>
+            <span class="server-store-coming-soon__eyebrow">FRAGCITY / CLASSIC SERVERS</span>
+            <h2>سرور Counter-Strike 1.6</h2>
+            <p>بخش سرورهای CS 1.6 در حال آماده‌سازی است. منابع پایه، ظرفیت بازیکن و تعرفه‌ها به‌صورت جداگانه برای این بازی تعریف می‌شوند.</p>
+            <span class="server-store-coming-soon__status"><i class="fa-solid fa-circle" aria-hidden="true"></i> به‌زودی</span>
+        </section>
     </div>
 </main>

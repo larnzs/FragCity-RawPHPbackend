@@ -897,16 +897,10 @@ $pageAssets = [
             '/css/buyserveropen.css?v=' . asset_version(
                 __DIR__ . '/css/buyserveropen.css'
             ),
-            '/css/buyminecraft.css?v=' . asset_version(
-                __DIR__ . '/css/buyminecraft.css'
-            ),
         ],
         'js' => [
             '/js/buyserveropen.js?v=' . asset_version(
                 __DIR__ . '/js/buyserveropen.js'
-            ),
-            '/js/buyminecraft.js?v=' . asset_version(
-                __DIR__ . '/js/buyminecraft.js'
             ),
         ],
     ],
