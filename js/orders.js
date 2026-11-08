@@ -63,6 +63,84 @@
             };
         }
 
+        function serviceStatusLabel(server) {
+            const state = String(server?.state || '').toLowerCase();
+            const status = String(server?.service_status || '').toLowerCase();
+            if (state === 'provisioning' || status === 'pending') return 'در حال آماده‌سازی';
+            if (state === 'unavailable') return 'جزئیات سرور در دسترس نیست';
+            if (status === 'suspended' || server?.server_status === 'suspended') return 'معلق';
+            if (status === 'active') return 'فعال';
+            if (status === 'cancelled') return 'لغوشده';
+            return 'وضعیت نامشخص';
+        }
+
+        function renderItemServerContext(item) {
+            const context = makeNode('div', 'fc-orders__invoice-service');
+            const server = item.server && typeof item.server === 'object' ? item.server : null;
+            const kind = String(item.reference_kind || 'manual');
+            const association = String(item.association_status || '');
+
+            if (server) {
+                const heading = makeNode('div', 'fc-orders__invoice-service-heading');
+                const serviceName = server.server_name || server.product_name || 'سرویس سرور';
+                heading.append(
+                    makeNode('strong', '', serviceName),
+                    makeNode('span', 'fc-orders__invoice-service-id', 'سرویس #' + server.service_id)
+                );
+                context.appendChild(heading);
+
+                const productName = String(server.product_name || '').trim();
+                if (productName && productName !== serviceName) {
+                    context.appendChild(makeNode('p', 'fc-orders__invoice-service-meta', 'محصول: ' + productName));
+                }
+
+                const status = serviceStatusLabel(server);
+                context.appendChild(makeNode('p', 'fc-orders__invoice-service-meta', 'وضعیت سرویس: ' + status));
+
+                const host = String(server.host || '').trim();
+                const port = Number(server.port);
+                if (host) {
+                    const address = host + (Number.isInteger(port) && port > 0 ? ':' + port : '');
+                    context.appendChild(makeNode('p', 'fc-orders__invoice-service-meta', 'آدرس اتصال: ' + address));
+                }
+
+                const locationParts = [server.node_name, server.location].filter((value) => String(value || '').trim());
+                if (locationParts.length) {
+                    context.appendChild(makeNode('p', 'fc-orders__invoice-service-meta', 'موقعیت: ' + locationParts.join(' · ')));
+                }
+
+                if (server.expires_at) {
+                    context.appendChild(makeNode('p', 'fc-orders__invoice-service-meta', 'انقضای سرویس: ' + formatDate(server.expires_at)));
+                }
+                return context;
+            }
+
+            if (kind === 'manual' || association === 'manual_unlinked') {
+                context.appendChild(makeNode(
+                    'p',
+                    'fc-orders__invoice-service-warning',
+                    'این ردیف به سرویس مشخصی در Paymenter متصل نشده است؛ بنابراین از اطلاعات موجود نمی‌توان فهمید برای کدام سرور صادر شده.'
+                ));
+            } else if (association === 'lookup_unavailable') {
+                context.appendChild(makeNode(
+                    'p',
+                    'fc-orders__invoice-service-warning',
+                    'شناسه سرویس در فاکتور ثبت شده، اما دریافت جزئیات سرور از سرویس مدیریت سرورها موقتاً ممکن نبود.'
+                ));
+            } else {
+                const serviceId = Number(item.related_service_id);
+                const prefix = kind === 'service_upgrade' ? 'ردیف ارتقای سرویس' : 'سرویس';
+                const suffix = Number.isInteger(serviceId) && serviceId > 0 ? ' #' + serviceId : '';
+                context.appendChild(makeNode(
+                    'p',
+                    'fc-orders__invoice-service-warning',
+                    prefix + suffix + ' به این ردیف متصل است، اما در فهرست سرورهای فعلی شما پیدا نشد.'
+                ));
+            }
+
+            return context;
+        }
+
         function renderInvoice(invoice) {
             const card = makeNode('article', 'fc-orders__order-card fc-orders__invoice-card');
             const main = makeNode('div', 'fc-orders__order-main');
@@ -74,8 +152,8 @@
 
             const identity = makeNode('div', 'fc-orders__order-identity');
             const titleRow = makeNode('div', 'fc-orders__order-title-row');
-            titleRow.appendChild(makeNode('h3', '', 'فاکتور سفارش سرور'));
-            titleRow.appendChild(makeNode('span', 'fc-orders__order-id', 'فاکتور #' + invoice.invoice_id));
+            titleRow.appendChild(makeNode('h3', '', 'فاکتور سرور'));
+            titleRow.appendChild(makeNode('span', 'fc-orders__order-id', 'شناسه فاکتور #' + invoice.invoice_id));
             identity.appendChild(titleRow);
 
             const meta = makeNode('div', 'fc-orders__order-meta');
@@ -103,8 +181,9 @@
             const detailValues = [
                 ['تاریخ صدور', formatDate(invoice.created_at)],
                 ['سررسید', formatDate(invoice.due_at)],
-                ['جمع اقلام سرور', invoice.subtotal === null ? '—' : formatAmount(invoice.subtotal) + ' ' + currencyLabel],
-                ['تعداد اقلام', new Intl.NumberFormat('fa-IR').format(Array.isArray(invoice.items) ? invoice.items.length : 0)]
+                ['آخرین تغییر', formatDate(invoice.updated_at)],
+                ['جمع ردیف‌های نمایش‌داده‌شده', invoice.subtotal === null ? '—' : formatAmount(invoice.subtotal) + ' ' + currencyLabel],
+                ['تعداد ردیف‌ها', new Intl.NumberFormat('fa-IR').format(Array.isArray(invoice.items) ? invoice.items.length : 0)]
             ];
             detailValues.forEach(([label, value]) => {
                 const detail = makeNode('div', 'fc-orders__detail');
@@ -123,13 +202,20 @@
                         ? new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 3 }).format(quantity)
                         : '۱';
                     const quantityNode = makeNode('small', 'fc-orders__invoice-quantity', '× ' + quantityLabel);
-                    const amountNode = makeNode(
+
+                    const amounts = makeNode('div', 'fc-orders__invoice-amounts');
+                    const unitPrice = item.unit_price === null
+                        ? 'قیمت واحد: —'
+                        : 'قیمت واحد: ' + formatAmount(item.unit_price) + ' ' + currencyLabel;
+                    amounts.appendChild(makeNode('small', 'fc-orders__invoice-unit-price', unitPrice));
+                    amounts.appendChild(makeNode(
                         'strong',
                         'fc-orders__invoice-line-amount',
-                        item.line_total === null ? '—' : formatAmount(item.line_total) + ' ' + currencyLabel
-                    );
-                    line.append(description, quantityNode, amountNode);
-                    itemList.appendChild(line);
+                        item.line_total === null ? 'جمع: —' : 'جمع: ' + formatAmount(item.line_total) + ' ' + currencyLabel
+                    ));
+
+                    line.append(description, quantityNode, amounts);
+                    itemList.append(line, renderItemServerContext(item));
                 });
             } else {
                 itemList.appendChild(makeNode('p', 'fc-orders__invoice-no-items', 'جزئیات اقلام این فاکتور در دسترس نیست.'));
@@ -139,7 +225,7 @@
             return card;
         }
 
-        function renderInvoices(invoices) {
+                function renderInvoices(invoices) {
             invoiceList.replaceChildren();
             if (emptyState) emptyState.hidden = invoices.length !== 0;
             invoiceList.hidden = invoices.length === 0;
@@ -152,14 +238,24 @@
             invoices.forEach((invoice) => invoiceList.appendChild(renderInvoice(invoice)));
         }
 
+        const rememberedInvoices = window.fragCityServerInvoiceCache;
+        if (Array.isArray(rememberedInvoices)) {
+            renderInvoices(rememberedInvoices);
+        }
+
         async function loadInvoices(force) {
             if (loading || (!force && loaded)) return;
             loading = true;
             if (refreshButton) refreshButton.disabled = true;
             if (emptyState) emptyState.hidden = true;
-            invoiceList.hidden = true;
-            invoiceList.replaceChildren();
-            setFeedback('در حال دریافت فاکتورهای حساب شما از Paymenter...', false);
+            const hasExistingInvoices = invoiceList.childElementCount > 0;
+            if (!hasExistingInvoices) invoiceList.hidden = true;
+            setFeedback(
+                hasExistingInvoices
+                    ? 'در حال به‌روزرسانی اطلاعات فاکتورها...'
+                    : 'در حال دریافت فاکتورهای حساب شما از Paymenter...',
+                false
+            );
 
             try {
                 const response = await fetch('/api/server-invoices.php', {
@@ -184,6 +280,8 @@
                     throw new Error(typeof result.error === 'string' ? result.error : 'paymenter_invoice_request_failed');
                 }
 
+                window.fragCityServerInvoiceCache = result.data.invoices;
+                window.fragCityServerInvoiceCacheAt = Date.now();
                 renderInvoices(result.data.invoices);
                 loaded = true;
                 setFeedback('', false);
@@ -226,6 +324,7 @@
                 node.hidden = name !== 'vip';
             });
 
+            window.fragCityOrdersActiveTab = name;
             if (name === 'servers') loadInvoices(false);
         }
 
@@ -233,7 +332,8 @@
             tab.addEventListener('click', () => selectTab(tab.dataset.ordersTab || 'vip'));
         });
         if (refreshButton) refreshButton.addEventListener('click', () => loadInvoices(true));
-        selectTab('vip');
+        const rememberedTab = window.fragCityOrdersActiveTab === 'servers' ? 'servers' : 'vip';
+        selectTab(rememberedTab);
     }
 
     function initOrdersPage() {
@@ -523,6 +623,12 @@
             }
         });
     }
+
+    window.addEventListener('content-loaded', function (event) {
+        if (event.detail && event.detail.page === 'orders') {
+            initOrdersPage();
+        }
+    });
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initOrdersPage, { once: true });
