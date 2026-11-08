@@ -61,11 +61,20 @@ if (!function_exists('getUserAvatarHeader')) {
     }
 }
 
-$isPageActive = static function (array $pages) use ($current_page): string {
+$isMinecraftStorePage = $current_page === 'buyserveropen'
+    && isset($_GET['game'])
+    && is_string($_GET['game'])
+    && $_GET['game'] === 'minecraft';
+
+$isPageActive = static function (array $pages) use ($current_page, $isMinecraftStorePage): string {
+    if (in_array('minecraft_store', $pages, true)) {
+        return $isMinecraftStorePage ? 'active' : '';
+    }
+
     return in_array($current_page, $pages, true) ? 'active' : '';
 };
 
-$morePages = ['serverguide', 'launcher', 'status', 'minecraft'];
+$morePages = ['serverguide', 'launcher', 'status', 'minecraft_store'];
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
@@ -311,7 +320,7 @@ $mobileMoreNavItems = [
     ['serverguide', 'راهنمای سرور', 'fa-book-open', ['serverguide']],
     ['launcher', 'دانلود لانچر', 'fa-download', ['launcher']],
     ['status', 'وضعیت سرویس‌ها', 'fa-heart-pulse', ['status']],
-    ['minecraft', 'میزبانی Minecraft', 'fa-cubes', ['minecraft']],
+    ['buyserveropen', 'میزبانی Minecraft', 'fa-cubes', ['minecraft_store']],
 ];
 ?>
 
@@ -399,7 +408,7 @@ $mobileMoreNavItems = [
                     <a href="<?= htmlspecialchars(fragcity_page_url('status'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['status']) ?>" data-ajax-nav data-slug="status">
                         <i class="fas fa-heart-pulse"></i><span>وضعیت سرویس‌ها</span>
                     </a>
-                    <a href="<?= htmlspecialchars(fragcity_page_url('minecraft'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['minecraft']) ?>" data-ajax-nav data-slug="minecraft">
+                    <a href="<?= htmlspecialchars(fragcity_page_url('buyserveropen') . '?game=minecraft', ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['minecraft_store']) ?>" data-ajax-nav data-slug="buyserveropen">
                         <i class="fas fa-cubes" aria-hidden="true"></i><span>میزبانی Minecraft</span>
                     </a>
                 </div>
