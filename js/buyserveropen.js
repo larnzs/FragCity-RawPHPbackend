@@ -14,6 +14,8 @@
         const cpuOutput = root.querySelector('#serverStoreCpuValue');
         const mapInput = root.querySelector('#serverStoreMap');
         const playersInput = root.querySelector('#serverStorePlayers');
+        const playersOutput = root.querySelector('#serverStorePlayersValue');
+        const playerPresetButtons = Array.from(root.querySelectorAll('[data-player-preset]'));
         const tickrateSelect = root.querySelector('#serverStoreTickrate');
         const execSelect = root.querySelector('#serverStoreExec');
         const mapgroupSelect = root.querySelector('#serverStoreMapgroup');
@@ -25,7 +27,7 @@
         if (
             !memoryInput || !diskInput || !cpuInput ||
             !memoryOutput || !diskOutput || !cpuOutput ||
-            !mapInput || !playersInput || !tickrateSelect || !execSelect ||
+            !mapInput || !playersInput || !playersOutput || !tickrateSelect || !execSelect ||
             !mapgroupSelect || !cooldownSelect || !guardSelect ||
             !guardMinutesField || !guardMinutesInput
         ) {
@@ -136,6 +138,12 @@
             syncRangeProgress(memoryInput);
             syncRangeProgress(diskInput);
             syncRangeProgress(cpuInput);
+            syncRangeProgress(playersInput);
+            playersOutput.textContent = String(Number(playersInput.value));
+            playerPresetButtons.forEach(function (button) {
+                const selected = Number(button.dataset.playerPreset) === Number(playersInput.value);
+                button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+            });
 
             setSummary('memory', formatGigabytes(memoryMb) + ' · ' + memoryMb + ' MB');
             setSummary('disk', formatGigabytes(diskMb) + ' · ' + diskMb + ' MB');
@@ -151,7 +159,7 @@
             const guardMinutes = guardMinutesInput.value.trim();
 
             setSummary('map', mapValue || '—');
-            setSummary('players', playersValue ? playersValue + ' نفر' : '—');
+            setSummary('players', playersValue ? playersValue + ' اسلات' : '—');
             setSummary('tickrate', tickrate === '128' ? '128 Tick · ارتقای پولی' : '64 Tick');
             setSummary('exec', modeLabel);
             setSummary('mapgroup', mapgroupLabel);
@@ -177,6 +185,17 @@
             ) {
                 updateSummary();
             }
+        });
+
+        root.addEventListener('click', function (event) {
+            const presetButton = event.target.closest('[data-player-preset]');
+            if (!presetButton || !root.contains(presetButton)) return;
+
+            const requestedCapacity = Number(presetButton.dataset.playerPreset);
+            if (!Number.isInteger(requestedCapacity) || requestedCapacity < 5 || requestedCapacity > 64) return;
+
+            playersInput.value = String(requestedCapacity);
+            updateSummary();
         });
 
         root.addEventListener('change', function (event) {
