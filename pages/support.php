@@ -89,15 +89,6 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
                 <h2>شبکه‌های اجتماعی رسمی</h2>
             </div>
             <div class="social-grid">
-                <a href="https://rubika.ir/fragcity_cs2" target="_blank" rel="noopener noreferrer" class="social-item">
-                    <img src="/assets/images/logo/rubika.png" alt="روبیکا" class="social-icon"
-                         onerror="this.src='https://placehold.co/64x64?text=Rubika'">
-                    <div class="social-info">
-                        <h3>روبیکا</h3>
-                        <p><i class="fas fa-paper-plane"></i> @fragcity_cs2 | پشتیبانی پیام فوری</p>
-                    </div>
-                    <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
-                </a>
                 <a href="https://t.me/fragcitychannel" target="_blank" rel="noopener noreferrer" class="social-item" aria-label="کانال تلگرام FragCity">
                     <img src="/assets/images/logo/telegram.png" alt="تلگرام" class="social-icon"
                          onerror="this.src='https://placehold.co/64x64?text=Telegram'">
@@ -167,7 +158,7 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
                         <i class="fas fa-headset"></i> اتصال به TeamSpeak
                     </a>
                     <div class="helper-note">
-                        <i class="fas fa-info-circle"></i> نرم‌افزار TeamSpeak 3 را نصب داشته باشید. در صورت نیاز به راهنما، از طریق روبیکا یا تلگرام @fragcitysup با ما تماس بگیرید.
+                        <i class="fas fa-info-circle"></i> برای اتصال، نرم‌افزار TeamSpeak 3 را نصب داشته باشید. در صورت نیاز به راهنما، از طریق تلگرام @fragcitysup با ما تماس بگیرید.
                     </div>
                 </div>
             </div>
@@ -216,10 +207,6 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
                 <a href="ts3server://217.18.90.7?port=2014" class="support-action-btn support-action-btn--teamspeak">
                     <i class="fas fa-headset" aria-hidden="true"></i>
                     اتصال به TeamSpeak
-                </a>
-                <a href="https://rubika.ir/fragcity_cs2" target="_blank" rel="noopener noreferrer" class="support-action-btn">
-                    <i class="fas fa-paper-plane" aria-hidden="true"></i>
-                    روبیکا
                 </a>
                 <a href="mailto:support@fragcity.ir" class="support-action-btn">
                     <i class="fas fa-envelope" aria-hidden="true"></i>
