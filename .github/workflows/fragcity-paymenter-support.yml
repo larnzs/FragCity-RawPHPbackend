@@ -121,6 +121,16 @@ jobs:
           grep -Fq 'footer-discord-button' css/footer.css
           grep -Fq 'social-icon--discord' css/support.css
           grep -Fq 'fa-brands fa-discord' pages/support.php
+          grep -Fq '217.18.90.7:2014' pages/support.php
+          grep -Fq 'ts3server://217.18.90.7?port=2014' pages/support.php
+          grep -Fq "const tsAddress = '217.18.90.7:2014';" js/support.js
+          grep -Fq '/assets/images/logo/telegram.png' pages/support.php
+          grep -Fq '/assets/images/logo/teamspeak.png' pages/support.php
+          grep -Fq 'https://t.me/fragcitysup' pages/support.php
+          grep -Fq '@fragcitysup' pages/support.php
+          grep -Fq 'footer-telegram-support-button' includes/footer.php
+          grep -Fq 'support-contact-actions' pages/support.php
+          grep -Fq 'support-action-btn--primary' pages/support.php
       - name: Verify fail-closed ticket ownership
         shell: bash
         run: |
