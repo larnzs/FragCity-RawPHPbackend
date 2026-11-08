@@ -25,7 +25,6 @@ require_once __DIR__ . '/routes.php';
                 >
                     <i class="fa-solid fa-ticket" aria-hidden="true"></i>
                     <span>ثبت تیکت پشتیبانی</span>
-                    <strong>ارسال و پیگیری درخواست</strong>
                 </a>
                 <a
                     class="footer-telegram-support-button footer-contact-link"
