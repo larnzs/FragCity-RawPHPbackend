@@ -117,6 +117,16 @@ if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', (string) ($_SESSION['steamid'] ?
                     </div>
                     <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
                 </a>
+                <a href="https://discord.gg/s6rFThCDdY" target="_blank" rel="noopener noreferrer" class="social-item social-item--discord" aria-label="ورود به سرور Discord FragCity">
+                    <span class="social-icon social-icon--discord" aria-hidden="true">
+                        <i class="fa-brands fa-discord"></i>
+                    </span>
+                    <div class="social-info">
+                        <h3>سرور Discord</h3>
+                        <p><i class="fa-brands fa-discord"></i> FragCity | ورود به کامیونیتی</p>
+                    </div>
+                    <div class="arrow-link"><i class="fas fa-chevron-left"></i></div>
+                </a>
             </div>
             <p class="response-time">
                 <i class="fas fa-clock"></i> میانگین زمان پاسخگویی کمتر از ۲ ساعت در ساعات اوج بازی
