@@ -256,6 +256,19 @@ $serverStoreRamPricing = [
     1536 => 75000,
 ];
 $serverStoreDefaultPlayers = 10;
+$serverStorePriceRoundingStep = 100;
+$serverStoreDurations = [
+    ['days' => 1, 'label' => '۱ روز', 'caption' => '۲۴ ساعت'],
+    ['days' => 3, 'label' => '۳ روز', 'caption' => '۷۲ ساعت'],
+    ['days' => 7, 'label' => '۷ روز', 'caption' => 'یک هفته'],
+    ['days' => 15, 'label' => '۱۵ روز', 'caption' => 'نیم‌ماه'],
+    ['days' => 30, 'label' => '۳۰ روز', 'caption' => 'یک ماه', 'recommended' => true],
+];
+$serverStoreDefaultMonthlyPrice =
+    $serverStoreCapacityPricing['base_price']
+    + (max(0, $serverStoreDefaultPlayers - $serverStoreCapacityPricing['base_slots'])
+        * $serverStoreCapacityPricing['extra_slot_price'])
+    + $serverStoreRamPricing[1024];
 ?>
 <main class="server-store-page" dir="rtl">
     <div class="server-store-container">
@@ -307,6 +320,7 @@ $serverStoreDefaultPlayers = 10;
                             data-ram-price-1024="<?= (int) $serverStoreRamPricing[1024] ?>"
                             data-ram-price-1280="<?= (int) $serverStoreRamPricing[1280] ?>"
                             data-ram-price-1536="<?= (int) $serverStoreRamPricing[1536] ?>"
+                            data-price-rounding-step="<?= (int) $serverStorePriceRoundingStep ?>"
                         >
                             <div class="server-store-capacity-head">
                                 <div>
@@ -454,9 +468,9 @@ $serverStoreDefaultPlayers = 10;
                                 <label for="serverStoreTickrate">Tickrate سرور <span class="server-store-required" aria-hidden="true">*</span></label>
                                 <select class="server-store-select" id="serverStoreTickrate" name="TICKRATE" required aria-describedby="serverStoreTickrateHelp">
                                     <option value="64" selected>64 Tick · نرخ پایه</option>
-                                    <option value="128">128 Tick · ارتقای پولی</option>
+                                    <option value="128" disabled>128 Tick · به‌زودی</option>
                                 </select>
-                                <small id="serverStoreTickrateHelp">Tickrate قابل انتخاب برای سرور. گزینه 128 به‌عنوان ارتقای پولی در سبد خرید FragCity محاسبه می‌شود.</small>
+                                <small id="serverStoreTickrateHelp">در حال حاضر 64 Tick گزینه فعال فروش است؛ انتخاب 128 پس از نهایی‌شدن شرایط ارائه فعال می‌شود.</small>
                             </div>
 
                             <div class="server-store-field">
@@ -512,9 +526,9 @@ $serverStoreDefaultPlayers = 10;
                                 <label for="serverStoreGuard">فعال‌سازی محافظ Bot Guard <span class="server-store-required" aria-hidden="true">*</span></label>
                                 <select class="server-store-select" id="serverStoreGuard" name="ENABLE_GUARD" required aria-describedby="serverStoreGuardHelp">
                                     <option value="0" selected>غیرفعال</option>
-                                    <option value="1">فعال — افزونه پولی</option>
+                                    <option value="1">فعال — بدون هزینه اضافه</option>
                                 </select>
-                                <small id="serverStoreGuardHelp">محافظت در برابر بات‌ها و اتصال‌های مخرب. فعال‌سازی Bot Guard به‌عنوان افزونه پولی در سبد خرید FragCity محاسبه می‌شود.</small>
+                                <small id="serverStoreGuardHelp">محافظت در برابر بات‌ها و اتصال‌های مخرب؛ فعال‌سازی Bot Guard در حال حاضر هزینه جداگانه‌ای ندارد.</small>
                             </div>
 
                             <div class="server-store-field server-store-field--wide" id="serverStoreGuardMinutesField" hidden>
@@ -540,6 +554,53 @@ $serverStoreDefaultPlayers = 10;
                             انتخاب‌ها در این صفحه برای پیش‌نمایش سفارش هستند؛ ثبت سفارش و Provisioning هنوز به Backend متصل نشده‌اند.
                         </div>
                     </section>
+                    <section class="server-store-section server-store-duration-section" aria-labelledby="serverDurationTitle" data-fc-reveal="up" data-fc-reveal-delay="140">
+                        <div class="server-store-section-heading">
+                            <span class="server-store-section-index">05</span>
+                            <div>
+                                <h2 id="serverDurationTitle">مدت سرویس</h2>
+                                <p>مدت اعتبار سرورت را انتخاب کن؛ قیمت با توجه به مدت و پیکربندی فعلی محاسبه می‌شود.</p>
+                            </div>
+                            <span class="server-store-section-state">۱ تا ۳۰ روز</span>
+                        </div>
+
+                        <div class="server-store-duration-grid" role="radiogroup" aria-label="مدت اعتبار سرور">
+                            <?php foreach ($serverStoreDurations as $serverStoreDuration): ?>
+                                <?php
+                                $serverStoreDurationDays = (int) $serverStoreDuration['days'];
+                                $serverStoreDurationPrice = (int) (
+                                    round(
+                                        ($serverStoreDefaultMonthlyPrice * $serverStoreDurationDays / 30)
+                                        / $serverStorePriceRoundingStep
+                                    ) * $serverStorePriceRoundingStep
+                                );
+                                ?>
+                                <label class="server-store-duration-card<?= !empty($serverStoreDuration['recommended']) ? ' server-store-duration-card--recommended' : '' ?>">
+                                    <input
+                                        type="radio"
+                                        name="duration_days"
+                                        value="<?= $serverStoreDurationDays ?>"
+                                        <?= $serverStoreDurationDays === 30 ? 'checked' : '' ?>
+                                    >
+                                    <span class="server-store-duration-card__top">
+                                        <strong><?= htmlspecialchars($serverStoreDuration['label'], ENT_QUOTES, 'UTF-8') ?></strong>
+                                        <?php if (!empty($serverStoreDuration['recommended'])): ?>
+                                            <em>پیشنهادی</em>
+                                        <?php endif; ?>
+                                    </span>
+                                    <strong class="server-store-duration-card__price" data-duration-price="<?= $serverStoreDurationDays ?>">
+                                        <?= number_format($serverStoreDurationPrice) ?> تومان
+                                    </strong>
+                                    <small><?= htmlspecialchars($serverStoreDuration['caption'], ENT_QUOTES, 'UTF-8') ?></small>
+                                </label>
+                            <?php endforeach; ?>
+                        </div>
+
+                        <div class="server-store-duration-note" role="note">
+                            <i class="fa-solid fa-calculator" aria-hidden="true"></i>
+                            <span>مبنای محاسبه، تعرفه ۳۰روزه است؛ دوره‌های کوتاه‌تر به نسبت روزها و بدون تخفیف محاسبه می‌شوند. مبالغ به نزدیک‌ترین ۱۰۰ تومان گرد می‌شوند. هر روز معادل ۲۴ ساعت است.</span>
+                        </div>
+                    </section>
                 </form>
             </div>
 
@@ -558,6 +619,8 @@ $serverStoreDefaultPlayers = 10;
                 </div>
 
                 <div class="server-store-summary-lines">
+                    <div><span>مدت سرویس</span><strong data-server-summary="duration">۳۰ روز</strong></div>
+                    <div><span>قیمت ماهانه پیکربندی</span><strong data-server-summary="monthly-price">۷۴۹٬۰۰۰ تومان</strong></div>
                     <div><span>RAM</span><strong data-server-summary="memory">1 GB · 1024 MB</strong></div>
                     <div><span>CPU</span><strong data-server-summary="cpu">100% · 1 vCore</strong></div>
                     <div><span>Storage</span><strong data-server-summary="disk">10 GB · 10240 MB</strong></div>
@@ -576,9 +639,9 @@ $serverStoreDefaultPlayers = 10;
                 </div>
 
                 <div class="server-store-summary-total">
-                    <span>قیمت ماهانه پیکربندی انتخاب‌شده</span>
-                    <strong data-server-summary="monthly-price">۷۴۹٬۰۰۰ تومان</strong>
-                    <small>شامل پلن پایه ۵ اسلات، اسلات‌های اضافه و RAM انتخاب‌شده است. هزینه اینترنت جداگانه از مشتری دریافت نمی‌شود و در تعرفه ظرفیت لحاظ شده است. افزونه‌های پولی مانند Tickrate 128 و Bot Guard جداگانه محاسبه می‌شوند.</small>
+                    <span>قیمت نهایی دوره انتخاب‌شده</span>
+                    <strong data-server-summary="period-price">۷۴۹٬۰۰۰ تومان</strong>
+                    <small>قیمت بر اساس پلن پایه، اسلات‌های اضافه، RAM و مدت سرویس محاسبه می‌شود. تعرفه ۳۰روزه همان قیمت ماهانه CSV است؛ دوره‌های کوتاه‌تر بدون تخفیف و به نسبت روزها محاسبه می‌شوند. Bot Guard بدون هزینه اضافه است.</small>
                 </div>
 
                 <button type="button" class="server-store-submit" disabled>
