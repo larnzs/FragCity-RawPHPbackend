@@ -97,11 +97,11 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                 <div class="server-store-hero-copy">
                     <span class="server-store-eyebrow" dir="ltr">FRAGCITY / GAME HOSTING</span>
                     <h1>سرور CS2 خودت رو بساز</h1>
-                    <p>یک سرور چندحالته با منابع اختصاصی انتخاب کن و تنظیمات بازی را دقیقاً مطابق سبک کامیونیتی خودت بچین.</p>
+                    <p>از ۵ تا ۶۴ اسلات انتخاب کن و یک سرور چندحالته بساز؛ مودهای متنوع CS2 در یک سرویس، بدون نیاز به خرید پلن جدا برای هر سبک بازی.</p>
                     <div class="server-store-hero-tags">
-                        <span><i class="fa-solid fa-check" aria-hidden="true"></i> منابع مشخص</span>
-                        <span><i class="fa-solid fa-sliders" aria-hidden="true"></i> تنظیمات قابل انتخاب</span>
-                        <span><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> محافظت اختیاری</span>
+                        <span><i class="fa-solid fa-users" aria-hidden="true"></i> ۵ تا ۶۴ اسلات</span>
+                        <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> همه مودها در یک سرویس</span>
+                        <span><i class="fa-solid fa-sliders" aria-hidden="true"></i> منابع قابل تنظیم</span>
                     </div>
                 </div>
             </div>
@@ -109,7 +109,7 @@ $serverStoreDefaultMapGroup = 'mg_comp';
             <div class="server-store-hero-product">
                 <span class="server-store-product-kicker">YOUR GAME SERVER</span>
                 <strong>CS2 Multimode</strong>
-                <span class="server-store-product-status"><i class="fa-solid fa-circle" aria-hidden="true"></i> پلن پیکربندی‌شده</span>
+                <span class="server-store-product-status"><i class="fa-solid fa-circle" aria-hidden="true"></i> ظرفیت انتخابی ۵ تا ۶۴ اسلات</span>
                 <div class="server-store-product-mark" aria-hidden="true">
                     <i class="fa-solid fa-crosshairs"></i>
                 </div>
@@ -118,9 +118,63 @@ $serverStoreDefaultMapGroup = 'mg_comp';
 
         <div class="server-store-layout">
             <div class="server-store-main">
+                <form id="serverStoreConfigForm" class="server-store-config-form" autocomplete="off">
+                    <section class="server-store-section server-store-capacity-section" aria-labelledby="serverCapacityTitle" data-fc-reveal="up" data-fc-reveal-delay="20">
+                        <div class="server-store-section-heading">
+                            <span class="server-store-section-index">01</span>
+                            <div>
+                                <h2 id="serverCapacityTitle">ظرفیت بازیکنان</h2>
+                                <p>تعداد بازیکنانی را انتخاب کن که می‌توانند به‌صورت هم‌زمان وارد سرورت شوند.</p>
+                            </div>
+                            <span class="server-store-section-state">۵ تا ۶۴ اسلات</span>
+                        </div>
+
+                        <div class="server-store-capacity-panel">
+                            <div class="server-store-capacity-head">
+                                <div>
+                                    <span class="server-store-capacity-kicker">MAX PLAYER SLOTS</span>
+                                    <div class="server-store-capacity-value">
+                                        <output id="serverStorePlayersValue" for="serverStorePlayers" aria-live="polite">32</output>
+                                        <span>اسلات</span>
+                                    </div>
+                                </div>
+                                <span class="server-store-capacity-range-label">قابل تنظیم با گام یک‌تایی</span>
+                            </div>
+
+                            <label class="server-store-capacity-slider-label" for="serverStorePlayers">ظرفیت اتصال هم‌زمان</label>
+                            <input
+                                class="server-store-range server-store-capacity-range"
+                                id="serverStorePlayers"
+                                name="SRCDS_MAXPLAYERS"
+                                type="range"
+                                min="5"
+                                max="64"
+                                step="1"
+                                value="32"
+                                aria-describedby="serverStorePlayersHelp"
+                            >
+                            <div class="server-store-range-meta" aria-hidden="true"><span>5 اسلات</span><span>64 اسلات</span></div>
+
+                            <div class="server-store-capacity-presets" role="group" aria-label="انتخاب سریع ظرفیت">
+                                <button type="button" data-player-preset="5" aria-pressed="false">5</button>
+                                <button type="button" data-player-preset="10" aria-pressed="false">10</button>
+                                <button type="button" data-player-preset="16" aria-pressed="false">16</button>
+                                <button type="button" data-player-preset="20" aria-pressed="false">20</button>
+                                <button type="button" data-player-preset="24" aria-pressed="false">24</button>
+                                <button type="button" data-player-preset="32" aria-pressed="true">32</button>
+                                <button type="button" data-player-preset="48" aria-pressed="false">48</button>
+                                <button type="button" data-player-preset="64" aria-pressed="false">64</button>
+                            </div>
+
+                            <small class="server-store-capacity-help" id="serverStorePlayersHelp">
+                                این عدد سقف ظرفیت سرور است، نه تعداد بازیکنان آنلاین یا مصرف قطعی منابع. مقدار دلخواهت را می‌توانی با اسلایدر انتخاب کنی.
+                            </small>
+                        </div>
+                    </section>
+
                 <section class="server-store-section server-store-resources-section" aria-labelledby="serverResourcesTitle" data-fc-reveal="up" data-fc-reveal-delay="40">
                     <div class="server-store-section-heading">
-                        <span class="server-store-section-index">01</span>
+                        <span class="server-store-section-index">02</span>
                         <div>
                             <h2 id="serverResourcesTitle">منابع قابل تنظیم سرور</h2>
                             <p>منابع سرور را متناسب با نیاز کامیونیتی خودت انتخاب کن؛ مقدار هر اسلایدر در لحظه به‌روزرسانی می‌شود.</p>
@@ -186,13 +240,12 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                     </div>
                 </section>
 
-                <form id="serverStoreConfigForm" class="server-store-config-form" autocomplete="off">
-                    <section class="server-store-section server-store-config-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
+                <section class="server-store-section server-store-config-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">02</span>
+                            <span class="server-store-section-index">03</span>
                             <div>
                                 <h2 id="serverGameModeTitle">تنظیمات گیم‌سرور</h2>
-                                <p>مود بازی، نقشه شروع و ظرفیت بازیکنان را مشخص کن.</p>
+                                <p>مود بازی، نقشه شروع و تنظیمات پایه سرورت را مشخص کن.</p>
                             </div>
                             <span class="server-store-section-state">تنظیمات الزامی</span>
                         </div>
@@ -213,24 +266,6 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                                     aria-describedby="serverStoreMapHelp"
                                 >
                                 <small id="serverStoreMapHelp">نام نقشه‌ای که سرور پس از راه‌اندازی با آن بالا می‌آید؛ مانند de_dust2 یا de_mirage.</small>
-                            </div>
-
-                            <div class="server-store-field">
-                                <label for="serverStorePlayers">ظرفیت بازیکن هم‌زمان <span class="server-store-required" aria-hidden="true">*</span></label>
-                                <input
-                                    class="server-store-input"
-                                    id="serverStorePlayers"
-                                    name="SRCDS_MAXPLAYERS"
-                                    type="number"
-                                    min="5"
-                                    max="64"
-                                    step="1"
-                                    value="32"
-                                    required
-                                    inputmode="numeric"
-                                    aria-describedby="serverStorePlayersHelp"
-                                >
-                                <small id="serverStorePlayersHelp">حداکثر تعداد بازیکنانی که می‌توانند هم‌زمان وارد سرور شوند؛ مقدار مجاز بین 5 و 64 است.</small>
                             </div>
 
                             <div class="server-store-field">
@@ -274,7 +309,7 @@ $serverStoreDefaultMapGroup = 'mg_comp';
 
                     <section class="server-store-section server-store-security-section" aria-labelledby="serverAddonTitle" data-fc-reveal="up" data-fc-reveal-delay="120">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">03</span>
+                            <span class="server-store-section-index">04</span>
                             <div>
                                 <h2 id="serverAddonTitle">محافظت و قوانین اتصال</h2>
                                 <p>قوانین ورود بازیکنان و افزونه محافظت در برابر بات‌ها را تنظیم کن.</p>
@@ -337,7 +372,7 @@ $serverStoreDefaultMapGroup = 'mg_comp';
 
                 <div class="server-store-summary-product">
                     <span class="server-store-summary-product-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
-                    <span><strong>CS2 Multimode Server</strong><small>FragCity Game Hosting</small></span>
+                    <span><strong>CS2 Multimode Server</strong><small>تمام مودهای پشتیبانی‌شده در یک سرویس</small></span>
                 </div>
 
                 <div class="server-store-summary-lines">
@@ -345,7 +380,7 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                     <div><span>CPU</span><strong data-server-summary="cpu">100% · 1 vCore</strong></div>
                     <div><span>Storage</span><strong data-server-summary="disk">10 GB · 10240 MB</strong></div>
                     <div><span>نقشه پیش‌فرض</span><strong data-server-summary="map">de_dust2</strong></div>
-                    <div><span>ظرفیت بازیکن</span><strong data-server-summary="players">32 نفر</strong></div>
+                    <div><span>ظرفیت هم‌زمان</span><strong data-server-summary="players">32 اسلات</strong></div>
                     <div><span>Tickrate</span><strong data-server-summary="tickrate">64 Tick</strong></div>
                     <div><span>Game Mode CFG</span><strong data-server-summary="exec">Competitive — comp.cfg</strong></div>
                     <div><span>MAPGROUP</span><strong data-server-summary="mapgroup">Casual / Competitive / Practice Mode — mg_comp</strong></div>
@@ -356,19 +391,19 @@ $serverStoreDefaultMapGroup = 'mg_comp';
                 </div>
 
                 <div class="server-store-summary-total">
-                    <span>مبلغ نهایی</span>
-                    <strong>پس از قیمت‌گذاری</strong>
-                    <small>قیمت به‌صورت شفاف و پیش از ثبت سفارش محاسبه می‌شود.</small>
+                    <span>وضعیت قیمت‌گذاری</span>
+                    <strong>تعرفه نهایی در حال تنظیم</strong>
+                    <small>قیمت دقیق هر انتخاب پیش از فعال‌شدن ثبت سفارش نمایش داده خواهد شد.</small>
                 </div>
 
                 <button type="button" class="server-store-submit" disabled>
                     <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                    ثبت سفارش فعلاً غیرفعال است
+                    ثبت سفارش هنوز فعال نیست
                 </button>
 
                 <div class="server-store-summary-footnote">
                     <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                    پیکربندی فعلاً در حالت پیش‌نمایش است؛ ثبت سفارش پس از اتصال Backend فعال خواهد شد.
+                    این صفحه فعلاً برای انتخاب و بررسی پیکربندی است. سفارش‌گیری پس از نهایی‌شدن تعرفه‌ها و اتصال Backend فعال می‌شود.
                 </div>
             </aside>
         </div>
