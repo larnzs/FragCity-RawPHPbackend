@@ -366,3 +366,51 @@
         transition: none !important;
     }
 }
+
+
+/* Official FragCity Discord community shortcut */
+.footer-discord-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    max-width: 100%;
+    margin-top: 9px;
+    padding: 9px 12px;
+    border: 1px solid rgba(88, 101, 242, .26);
+    border-radius: 9px;
+    background: linear-gradient(110deg, rgba(88, 101, 242, .12), rgba(20, 20, 20, .72));
+    color: #D8DAF7;
+    font-size: .72rem;
+    font-weight: 700;
+    line-height: 1.6;
+    text-decoration: none;
+    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.footer-discord-button > i {
+    flex: 0 0 auto;
+    color: #7289DA;
+    font-size: 1.12rem;
+}
+
+.footer-discord-button > strong {
+    overflow: hidden;
+    color: #E5E7FF;
+    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.footer-discord-button:hover,
+.footer-discord-button:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(88, 101, 242, .48);
+    background: linear-gradient(110deg, rgba(88, 101, 242, .2), rgba(20, 20, 20, .86));
+    color: #FFFFFF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .footer-discord-button {
+        transition: none !important;
+    }
+}
