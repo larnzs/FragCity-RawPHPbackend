@@ -2167,14 +2167,14 @@ button.ticket-row {
 
 
 /* Correct image sizing for the Telegram and TeamSpeak brand marks */
-.support-page .social-icon,
+.support-page img.social-icon,
 .support-page .ts-logo {
     display: block;
     object-fit: contain;
     object-position: center;
 }
 
-.support-page .social-icon {
+.support-page img.social-icon {
     flex: 0 0 42px;
     width: 42px;
     height: 42px;
