@@ -509,7 +509,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
                 تازه‌سازی فاکتورها
             </button>
         </div>
-        <p class="fc-orders__invoice-note">مبالغ از جمع اقلام فاکتور محاسبه می‌شوند؛ Paymenter در این API مبلغ باقی‌مانده و جزئیات تراکنش را ارائه نمی‌کند.</p>
+        <p class="fc-orders__invoice-note">آخرین ۱۰۰ فاکتور نمایش داده می‌شود. مبلغ «جمع اقلام» است؛ Paymenter در این API مبلغ باقی‌مانده و جزئیات تراکنش را ارائه نمی‌کند.</p>
         <div class="fc-orders__invoice-feedback" data-server-invoices-feedback role="status" aria-live="polite"></div>
         <div class="fc-orders__list" data-server-invoices-list hidden></div>
         <div class="fc-orders__empty" data-server-invoices-empty hidden>
