@@ -272,114 +272,286 @@
 }
 
 
-/* Visible, consistent contact buttons in the site footer */
-.site-footer .footer-contact-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: stretch;
-    gap: 8px;
-    width: 100%;
-    margin-top: 15px;
-}
-
-.site-footer .footer-contact-button {
-    display: flex;
+/* Official FragCity Telegram channel shortcut */
+.footer-telegram-button {
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
-    width: 100%;
-    min-width: 0;
-    min-height: 52px;
-    margin: 0;
-    padding: 9px 11px;
-    border: 1px solid rgba(255, 255, 255, .10);
+    gap: 9px;
+    max-width: 100%;
+    margin-top: 15px;
+    padding: 9px 12px;
+    border: 1px solid rgba(42, 171, 238, .22);
     border-radius: 9px;
-    background: #101010;
-    color: #D4D4D4;
-    font-size: .73rem;
+    background: linear-gradient(110deg, rgba(42, 171, 238, .09), rgba(20, 20, 20, .72));
+    color: #C8DCE8;
+    font-size: .72rem;
     font-weight: 700;
-    line-height: 1.5;
-    text-align: right;
+    line-height: 1.6;
     text-decoration: none;
     transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
 }
 
-.site-footer .footer-contact-button > i {
-    flex: 0 0 20px;
-    width: 20px;
-    font-size: 1.18rem;
-    text-align: center;
+.footer-telegram-button > i {
+    flex: 0 0 auto;
+    color: #2AABEE;
+    font-size: 1.12rem;
 }
 
-.site-footer .footer-contact-button-copy {
-    display: flex;
-    flex: 1 1 auto;
-    flex-direction: column;
-    align-items: flex-start;
-    min-width: 0;
-    gap: 2px;
-}
-
-.site-footer .footer-contact-button-copy > span {
-    max-width: 100%;
-    color: #E5E5E5;
-    font-size: .72rem;
-    font-weight: 750;
-    line-height: 1.5;
-}
-
-.site-footer .footer-contact-button-copy > strong {
-    display: block;
-    max-width: 100%;
+.footer-telegram-button > strong {
     overflow: hidden;
-    color: #A3A3A3;
-    font: 650 .63rem/1.45 ui-monospace, SFMono-Regular, Consolas, monospace;
+    color: #E7F5FC;
+    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.site-footer .footer-contact-button:hover,
-.site-footer .footer-contact-button:focus-visible {
+.footer-telegram-button:hover,
+.footer-telegram-button:focus-visible {
     transform: translateY(-1px);
-    border-color: rgba(249, 115, 22, .38);
-    background: #171717;
+    border-color: rgba(42, 171, 238, .42);
+    background: linear-gradient(110deg, rgba(42, 171, 238, .15), rgba(20, 20, 20, .86));
     color: #FFFFFF;
 }
 
-.site-footer .footer-contact-button--primary {
-    grid-column: 1 / -1;
-    min-height: 48px;
-    border-color: rgba(249, 115, 22, .38);
-    background: linear-gradient(110deg, rgba(249, 115, 22, .17), rgba(25, 20, 16, .92));
-    color: #FDBA74;
-}
-
-.site-footer .footer-contact-button--primary > i,
-.site-footer .footer-contact-button--primary .footer-contact-button-copy > span {
-    color: #FB923C;
-}
-
-.site-footer .footer-contact-button--primary .footer-contact-button-copy > strong {
-    color: #C7A58C;
-}
-
-.site-footer .footer-contact-button--telegram > i { color: #2AABEE; }
-.site-footer .footer-contact-button--discord > i { color: #7289DA; }
-.site-footer .footer-contact-button--steam > i { color: #C6D4DF; }
-.site-footer .footer-contact-button--teamspeak > i { color: #FFB347; }
-.site-footer .footer-contact-button--email > i { color: #F97316; }
-
-@media (max-width: 420px) {
-    .site-footer .footer-contact-buttons {
-        grid-template-columns: minmax(0, 1fr);
+@media (prefers-reduced-motion: reduce) {
+    .footer-telegram-button {
+        transition: none !important;
     }
+}
 
-    .site-footer .footer-contact-button--primary {
-        grid-column: auto;
-    }
+
+/* Steam support shortcut, paired with the Telegram channel CTA */
+.footer-steam-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    max-width: 100%;
+    margin-top: 9px;
+    padding: 9px 12px;
+    border: 1px solid rgba(198, 212, 223, .18);
+    border-radius: 9px;
+    background: linear-gradient(110deg, rgba(75, 105, 128, .13), rgba(20, 20, 20, .72));
+    color: #D0D9E0;
+    font-size: .72rem;
+    font-weight: 700;
+    line-height: 1.6;
+    text-decoration: none;
+    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.footer-steam-button > i {
+    flex: 0 0 auto;
+    color: #C6D4DF;
+    font-size: 1.12rem;
+}
+
+.footer-steam-button > strong {
+    overflow: hidden;
+    color: #E7EDF2;
+    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.footer-steam-button:hover,
+.footer-steam-button:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(198, 212, 223, .36);
+    background: linear-gradient(110deg, rgba(75, 105, 128, .2), rgba(20, 20, 20, .86));
+    color: #FFFFFF;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .site-footer .footer-contact-button {
+    .footer-steam-button {
+        transition: none !important;
+    }
+}
+
+
+/* Official FragCity Discord community shortcut */
+.footer-discord-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    max-width: 100%;
+    margin-top: 9px;
+    padding: 9px 12px;
+    border: 1px solid rgba(88, 101, 242, .26);
+    border-radius: 9px;
+    background: linear-gradient(110deg, rgba(88, 101, 242, .12), rgba(20, 20, 20, .72));
+    color: #D8DAF7;
+    font-size: .72rem;
+    font-weight: 700;
+    line-height: 1.6;
+    text-decoration: none;
+    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.footer-discord-button > i {
+    flex: 0 0 auto;
+    color: #7289DA;
+    font-size: 1.12rem;
+}
+
+.footer-discord-button > strong {
+    overflow: hidden;
+    color: #E5E7FF;
+    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.footer-discord-button:hover,
+.footer-discord-button:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(88, 101, 242, .48);
+    background: linear-gradient(110deg, rgba(88, 101, 242, .2), rgba(20, 20, 20, .86));
+    color: #FFFFFF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .footer-discord-button {
+        transition: none !important;
+    }
+}
+
+
+/* Direct FragCity Telegram support contact */
+.footer-telegram-support-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    max-width: 100%;
+    margin-top: 9px;
+    padding: 9px 12px;
+    border: 1px solid rgba(42, 171, 238, .30);
+    border-radius: 9px;
+    background: linear-gradient(110deg, rgba(42, 171, 238, .14), rgba(20, 20, 20, .76));
+    color: #D7EDF8;
+    font-size: .72rem;
+    font-weight: 750;
+    line-height: 1.6;
+    text-decoration: none;
+    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.footer-telegram-support-button > i {
+    flex: 0 0 auto;
+    color: #2AABEE;
+    font-size: 1.12rem;
+}
+
+.footer-telegram-support-button > strong {
+    overflow: hidden;
+    color: #E7F5FC;
+    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.footer-telegram-support-button:hover,
+.footer-telegram-support-button:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(42, 171, 238, .5);
+    background: linear-gradient(110deg, rgba(42, 171, 238, .2), rgba(20, 20, 20, .9));
+    color: #FFF;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .footer-telegram-support-button {
+        transition: none !important;
+    }
+}
+
+
+/* Ticket, TeamSpeak and email shortcuts use the same original button treatment. */
+.footer-ticket-button,
+.footer-teamspeak-button,
+.footer-email-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    max-width: 100%;
+    margin-top: 9px;
+    padding: 9px 12px;
+    border: 1px solid rgba(249, 115, 22, .25);
+    border-radius: 9px;
+    background: linear-gradient(110deg, rgba(249, 115, 22, .10), rgba(20, 20, 20, .74));
+    color: #F4D7C4;
+    font-size: .72rem;
+    font-weight: 700;
+    line-height: 1.6;
+    text-decoration: none;
+    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.footer-ticket-button {
+    margin-top: 15px;
+    border-color: rgba(249, 115, 22, .34);
+    background: linear-gradient(110deg, rgba(249, 115, 22, .17), rgba(20, 20, 20, .76));
+    color: #FDBA74;
+}
+
+.footer-ticket-button > i,
+.footer-teamspeak-button > i {
+    flex: 0 0 auto;
+    color: #F97316;
+    font-size: 1.12rem;
+}
+
+.footer-email-button > i {
+    flex: 0 0 auto;
+    color: #F97316;
+    font-size: 1.12rem;
+}
+
+.footer-ticket-button > strong,
+.footer-teamspeak-button > strong,
+.footer-email-button > strong {
+    overflow: hidden;
+    color: #E7E0D9;
+    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.footer-ticket-button:hover,
+.footer-ticket-button:focus-visible,
+.footer-teamspeak-button:hover,
+.footer-teamspeak-button:focus-visible,
+.footer-email-button:hover,
+.footer-email-button:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(249, 115, 22, .48);
+    background: linear-gradient(110deg, rgba(249, 115, 22, .20), rgba(20, 20, 20, .88));
+    color: #FFFFFF;
+}
+
+/* Keep the original horizontal, brand-colored buttons; normalize only their width. */
+.footer-brand > .footer-contact-link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 360px;
+    min-height: 42px;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+.footer-brand > .footer-contact-link > span {
+    flex: 0 0 auto;
+}
+
+.footer-brand > .footer-contact-link > strong {
+    min-width: 0;
+    margin-inline-start: auto;
+    text-align: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .footer-ticket-button,
+    .footer-teamspeak-button,
+    .footer-email-button {
         transition: none !important;
     }
 }
