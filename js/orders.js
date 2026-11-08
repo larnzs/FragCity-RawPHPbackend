@@ -103,7 +103,7 @@
             const detailValues = [
                 ['تاریخ صدور', formatDate(invoice.created_at)],
                 ['سررسید', formatDate(invoice.due_at)],
-                ['جمع اقلام', invoice.subtotal === null ? '—' : formatAmount(invoice.subtotal) + ' ' + currencyLabel],
+                ['جمع اقلام سرور', invoice.subtotal === null ? '—' : formatAmount(invoice.subtotal) + ' ' + currencyLabel],
                 ['تعداد اقلام', new Intl.NumberFormat('fa-IR').format(Array.isArray(invoice.items) ? invoice.items.length : 0)]
             ];
             detailValues.forEach(([label, value]) => {
