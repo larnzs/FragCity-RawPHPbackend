@@ -12,6 +12,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__) . '/settings/session.php';
 require_once dirname(__DIR__) . '/settings/loader.php';
 require_once dirname(__DIR__) . '/class/PaymenterInvoiceApiClient.php';
+require_once dirname(__DIR__) . '/class/PaymenterInvoiceContext.php';
 
 fragcity_start_session();
 
@@ -125,6 +126,34 @@ try {
 
     $client = new PaymenterInvoiceApiClient();
     $result = $client->listInvoices((int) $paymenterUserId, $customerEmail, 100);
+
+    // Resolve explicit Service / ServiceUpgrade references through the
+    // existing SteamID-scoped HMAC bridge. Invoice history remains available
+    // even when this optional server-summary lookup is temporarily offline.
+    $serverRows = [];
+    $serverDetailsAvailable = false;
+    if (!empty($result['invoices'])) {
+        try {
+            require_once dirname(__DIR__) . '/class/PaymenterApiClient.php';
+            $serverClient = new PaymenterApiClient();
+            $serverRows = $serverClient->getCustomerServers($steamId64);
+            $serverDetailsAvailable = true;
+        } catch (Throwable $contextException) {
+            error_log(
+                '[FragCity] Invoice server context lookup unavailable; steam_hash='
+                . substr(hash('sha256', $steamId64), 0, 16)
+                . '; exception=' . get_class($contextException) . '.'
+            );
+        }
+    }
+
+    $result['invoices'] = PaymenterInvoiceContext::attach(
+        $result['invoices'],
+        $serverRows,
+        $serverDetailsAvailable
+    );
+    $result['server_details_available'] = $serverDetailsAvailable;
+    $result['server_count'] = count($serverRows);
 
     $respond([
         'success' => true,
