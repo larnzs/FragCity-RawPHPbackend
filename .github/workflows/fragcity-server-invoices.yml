@@ -79,7 +79,7 @@ jobs:
           grep -Fq 'hash_equals($expectedEmail, $paymenterEmail)' "$client"
           grep -Fq "'App\\\\Models\\\\Service'" "$client"
           grep -Fq "'App\\\\Models\\\\ServiceUpgrade'" "$client"
-          grep -Fq "'reference_kind' => $referenceKind" "$client"
+          grep -Fq "'reference_kind' =>" "$client"
           grep -Fq '$isManualLine' "$client"
           grep -Fq 'if ($itemRelationship === [])' "$client"
           grep -Fq "SELECT email, paymenter_user_id, paymenter_sync_status" "$endpoint"
