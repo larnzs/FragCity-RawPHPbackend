@@ -1308,3 +1308,37 @@ body:has(.server-store-page) .content-fader {
         min-height: 34px;
     }
 }
+
+
+/* Provisional capacity pricing disclosure. */
+.server-store-capacity-pricing-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 15px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 179, 71, .17);
+    border-radius: 9px;
+    background: rgba(255, 179, 71, .045);
+    color: #C9B99F;
+    font-size: .66rem;
+    line-height: 1.85;
+}
+
+.server-store-capacity-pricing-note > i {
+    flex: 0 0 auto;
+    margin-top: 4px;
+    color: #FFB347;
+}
+
+.server-store-capacity-pricing-note strong {
+    color: #FFD08D;
+    font-weight: 900;
+}
+
+@media (max-width: 680px) {
+    .server-store-capacity-pricing-note {
+        padding: 9px 10px;
+        font-size: .61rem;
+    }
+}
