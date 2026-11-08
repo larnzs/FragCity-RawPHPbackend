@@ -13,6 +13,7 @@
         const diskOutput = root.querySelector('#serverStoreDiskValue');
         const cpuOutput = root.querySelector('#serverStoreCpuValue');
         const mapInput = root.querySelector('#serverStoreMap');
+        const serverNameInput = root.querySelector('#serverStoreName');
         const playersInput = root.querySelector('#serverStorePlayers');
         const playersOutput = root.querySelector('#serverStorePlayersValue');
         const playerPresetButtons = Array.from(root.querySelectorAll('[data-player-preset]'));
@@ -30,7 +31,7 @@
         if (
             !memoryInput || !diskInput || !cpuInput ||
             !memoryOutput || !diskOutput || !cpuOutput ||
-            !mapInput || !playersInput || !playersOutput || !capacityPricingPanel || !tickrateSelect || !execSelect ||
+            !mapInput || !serverNameInput || !playersInput || !playersOutput || !capacityPricingPanel || !tickrateSelect || !execSelect ||
             !mapgroupSelect || !cooldownSelect || !guardSelect ||
             !guardMinutesField || !guardMinutesInput || durationInputs.length === 0
         ) {
@@ -130,6 +131,13 @@
                     : 'فقط حروف انگلیسی، عدد، خط تیره و زیرخط مجاز است.'
             );
 
+            const serverName = serverNameInput.value.trim();
+            serverNameInput.setCustomValidity(
+                serverName.length >= 3 && serverName.length <= 32 && /^[A-Za-z0-9 ]+$/.test(serverName)
+                    ? ''
+                    : 'نام سرور باید ۳ تا ۳۲ کاراکتر و فقط شامل حروف انگلیسی، عدد و فاصله باشد.'
+            );
+
             const players = Number(playersInput.value);
             const validPlayers = Number.isInteger(players) && players >= 5 && players <= 64;
             playersInput.setCustomValidity(
@@ -196,6 +204,7 @@
             const guardMinutes = guardMinutesInput.value.trim();
 
             setSummary('map', mapValue || '—');
+            setSummary('server-name', serverNameInput.value.trim() || 'وارد نشده');
             setSummary('players', playersValue ? playersValue + ' اسلات' : '—');
 
             const selectedSlots = Number(playersValue);
@@ -208,19 +217,50 @@
                 return input.checked;
             });
             const durationDays = Number(selectedDurationInput ? selectedDurationInput.value : 30);
+            const selectedPriceFactor = Number(selectedDurationInput?.dataset.priceFactor || 1);
+            const discountPercent = Number(selectedDurationInput?.dataset.discountPercent || 0);
+            const durationLabel = selectedDurationInput?.dataset.durationLabel || '۱ ماهه';
             const periodPrice = Math.round(
-                (monthlyPrice * durationDays / 30) / capacityPricing.priceRoundingStep
+                (monthlyPrice * selectedPriceFactor) / capacityPricing.priceRoundingStep
             ) * capacityPricing.priceRoundingStep;
+            const undiscountedPeriodPrice = monthlyPrice * (durationDays / 30);
+            const discountAmount = discountPercent > 0
+                ? Math.max(0, undiscountedPeriodPrice - periodPrice)
+                : 0;
 
             durationPriceOutputs.forEach(function (output) {
-                const days = Number(output.dataset.durationPrice);
+                const priceFactor = Number(output.dataset.priceFactor || 1);
                 const price = Math.round(
-                    (monthlyPrice * days / 30) / capacityPricing.priceRoundingStep
+                    (monthlyPrice * priceFactor) / capacityPricing.priceRoundingStep
                 ) * capacityPricing.priceRoundingStep;
                 output.textContent = formatToman(price);
             });
 
-            setSummary('duration', durationDays + ' روز');
+            root.querySelectorAll('[data-duration-caption]').forEach(function (caption) {
+                const days = Number(caption.dataset.durationCaption);
+                if (days > 30) {
+                    const months = days / 30;
+                    const factor = Number(caption.closest('.server-store-duration-card')
+                        ?.querySelector('input[name="duration_days"]')?.dataset.priceFactor || months);
+                    const total = Math.round(
+                        (monthlyPrice * factor) / capacityPricing.priceRoundingStep
+                    ) * capacityPricing.priceRoundingStep;
+                    const monthlyEquivalent = Math.round(
+                        (total / months) / capacityPricing.priceRoundingStep
+                    ) * capacityPricing.priceRoundingStep;
+                    caption.textContent = 'ماهی ' + formatToman(monthlyEquivalent);
+                } else if (days === 30) {
+                    caption.textContent = 'قیمت پایه ماهانه';
+                }
+            });
+
+            setSummary('duration', durationLabel + ' · ' + durationDays + ' روز');
+            setSummary(
+                'discount',
+                discountPercent > 0
+                    ? discountPercent + '٪ · ' + formatToman(discountAmount) + ' صرفه‌جویی'
+                    : 'بدون تخفیف'
+            );
             setSummary('capacity-base-price', formatToman(capacityPricing.basePrice));
             setSummary(
                 'extra-slots-price',
@@ -252,6 +292,7 @@
                 event.target === diskInput ||
                 event.target === cpuInput ||
                 event.target === mapInput ||
+                event.target === serverNameInput ||
                 event.target === playersInput ||
                 event.target === guardMinutesInput
             ) {
