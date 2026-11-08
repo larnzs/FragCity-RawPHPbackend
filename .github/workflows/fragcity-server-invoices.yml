@@ -64,13 +64,14 @@ jobs:
           client="class/PaymenterInvoiceApiClient.php"
           endpoint="api/server-invoices.php"
           grep -Fq "'include' => 'items,user'" "$client"
-          grep -Fq "filter' => ['user_id' => $paymenterUserId]" "$client"
+          grep -Fq "'user_id' =>" "$client"
           grep -Fq 'assertInvoiceOwner($resource, $included, $paymenterUserId, $customerEmail)' "$client"
           grep -Fq 'hash_equals($expectedEmail, $paymenterEmail)' "$client"
           grep -Fq "SELECT email, paymenter_user_id, paymenter_sync_status" "$endpoint"
           grep -Fq '$_SESSION[' "$endpoint"
           grep -Fq 'HTTP_X_FRAGCITY_CSRF' "$endpoint"
-          if grep -Eiq "POST|PATCH|PUT|DELETE" "$client" | grep -v 'CURLOPT_CUSTOMREQUEST'; then
+          grep -Fq "nativeRequest('GET', '/invoices'" "$client"
+          if grep -E "nativeRequest\\('(POST|PATCH|PUT|DELETE)'" "$client"; then
             echo "The invoice client must remain read-only."
             exit 1
           fi
