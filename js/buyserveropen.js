@@ -353,7 +353,7 @@
             );
             setSummary('monthly-price', formatToman(monthlyPrice) + ' / ماه');
             setSummary('period-price', formatToman(periodPrice));
-            setSummary('tickrate', tickrate === '128' ? '128 Tick · به‌زودی' : '64 Tick');
+            setSummary('tickrate', '64 Tick · Subtick فعال');
             setSummary('exec', modeLabel);
             setSummary('mapgroup', mapgroupLabel);
             setSummary('cooldown', cooldownLabel);
@@ -412,6 +412,26 @@
 
                 playersInput.value = String(requestedCapacity);
                 updateSummary();
+            });
+        });
+
+        const gameTabButtons = Array.from(root.querySelectorAll('[data-server-game-tab]'));
+        const gamePanels = Array.from(root.querySelectorAll('[data-server-game-panel]'));
+
+        gameTabButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                const selectedGame = button.dataset.serverGameTab;
+
+                gameTabButtons.forEach(function (tab) {
+                    const selected = tab === button;
+                    tab.classList.toggle('is-active', selected);
+                    tab.setAttribute('aria-selected', selected ? 'true' : 'false');
+                    tab.tabIndex = selected ? 0 : -1;
+                });
+
+                gamePanels.forEach(function (panel) {
+                    panel.hidden = panel.dataset.serverGamePanel !== selectedGame;
+                });
             });
         });
 
