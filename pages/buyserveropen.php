@@ -258,11 +258,14 @@ $serverStoreRamPricing = [
 $serverStoreDefaultPlayers = 10;
 $serverStorePriceRoundingStep = 100;
 $serverStoreDurations = [
-    ['days' => 1, 'label' => '۱ روز', 'caption' => '۲۴ ساعت'],
-    ['days' => 3, 'label' => '۳ روز', 'caption' => '۷۲ ساعت'],
-    ['days' => 7, 'label' => '۷ روز', 'caption' => 'یک هفته'],
-    ['days' => 15, 'label' => '۱۵ روز', 'caption' => 'نیم‌ماه'],
-    ['days' => 30, 'label' => '۳۰ روز', 'caption' => 'یک ماه', 'recommended' => true],
+    // Short-term factors are scaled from the competitor reference: 174,582 / 902,000 and 552,843 / 902,000.
+    ['days' => 1, 'label' => '۱ روزه', 'caption' => '۲۴ ساعت', 'price_factor' => 174582 / 902000],
+    ['days' => 15, 'label' => '۱۵ روزه', 'caption' => 'نیم‌ماه', 'price_factor' => 552843 / 902000],
+    ['days' => 30, 'label' => '۱ ماهه', 'caption' => 'قیمت پایه ماهانه', 'price_factor' => 1, 'recommended' => true],
+    ['days' => 60, 'label' => '۲ ماهه', 'caption' => '۵٪ تخفیف', 'discount_percent' => 5, 'price_factor' => 2 * (1 - 5 / 100)],
+    ['days' => 90, 'label' => '۳ ماهه', 'caption' => '۷٪ تخفیف', 'discount_percent' => 7, 'price_factor' => 3 * (1 - 7 / 100)],
+    ['days' => 180, 'label' => '۶ ماهه', 'caption' => '۱۰٪ تخفیف', 'discount_percent' => 10, 'price_factor' => 6 * (1 - 10 / 100)],
+    ['days' => 360, 'label' => '۱۲ ماهه', 'caption' => '۱۵٪ تخفیف · بیشترین صرفه‌جویی', 'discount_percent' => 15, 'price_factor' => 12 * (1 - 15 / 100), 'best_value' => true],
 ];
 $serverStoreDefaultMonthlyPrice =
     $serverStoreCapacityPricing['base_price']
@@ -559,46 +562,89 @@ $serverStoreDefaultMonthlyPrice =
                             <span class="server-store-section-index">05</span>
                             <div>
                                 <h2 id="serverDurationTitle">مدت سرویس</h2>
-                                <p>مدت اعتبار سرورت را انتخاب کن؛ قیمت با توجه به مدت و پیکربندی فعلی محاسبه می‌شود.</p>
+                                <p>هرچه مدت اشتراک بیشتر باشد، هزینه مؤثر هر ماه کمتر می‌شود.</p>
                             </div>
-                            <span class="server-store-section-state">۱ تا ۳۰ روز</span>
+                            <span class="server-store-section-state">۱ روز تا ۱۲ ماه</span>
                         </div>
 
                         <div class="server-store-duration-grid" role="radiogroup" aria-label="مدت اعتبار سرور">
                             <?php foreach ($serverStoreDurations as $serverStoreDuration): ?>
                                 <?php
                                 $serverStoreDurationDays = (int) $serverStoreDuration['days'];
+                                $serverStoreDurationFactor = (float) $serverStoreDuration['price_factor'];
                                 $serverStoreDurationPrice = (int) (
                                     round(
-                                        ($serverStoreDefaultMonthlyPrice * $serverStoreDurationDays / 30)
+                                        ($serverStoreDefaultMonthlyPrice * $serverStoreDurationFactor)
                                         / $serverStorePriceRoundingStep
                                     ) * $serverStorePriceRoundingStep
                                 );
+                                $serverStoreDurationFactorAttribute = number_format($serverStoreDurationFactor, 10, '.', '');
                                 ?>
-                                <label class="server-store-duration-card<?= !empty($serverStoreDuration['recommended']) ? ' server-store-duration-card--recommended' : '' ?>">
+                                <label class="server-store-duration-card<?= !empty($serverStoreDuration['recommended']) ? ' server-store-duration-card--recommended' : '' ?><?= !empty($serverStoreDuration['best_value']) ? ' server-store-duration-card--best-value' : '' ?>">
                                     <input
                                         type="radio"
                                         name="duration_days"
                                         value="<?= $serverStoreDurationDays ?>"
+                                        data-price-factor="<?= $serverStoreDurationFactorAttribute ?>"
+                                        data-duration-label="<?= htmlspecialchars($serverStoreDuration['label'], ENT_QUOTES, 'UTF-8') ?>"
+                                        data-discount-percent="<?= (int) ($serverStoreDuration['discount_percent'] ?? 0) ?>"
                                         <?= $serverStoreDurationDays === 30 ? 'checked' : '' ?>
                                     >
                                     <span class="server-store-duration-card__top">
                                         <strong><?= htmlspecialchars($serverStoreDuration['label'], ENT_QUOTES, 'UTF-8') ?></strong>
-                                        <?php if (!empty($serverStoreDuration['recommended'])): ?>
+                                        <?php if (!empty($serverStoreDuration['discount_percent'])): ?>
+                                            <em><?= (int) $serverStoreDuration['discount_percent'] ?>٪ تخفیف</em>
+                                        <?php elseif (!empty($serverStoreDuration['recommended'])): ?>
                                             <em>پیشنهادی</em>
                                         <?php endif; ?>
                                     </span>
-                                    <strong class="server-store-duration-card__price" data-duration-price="<?= $serverStoreDurationDays ?>">
-                                        <?= number_format($serverStoreDurationPrice) ?> تومان
-                                    </strong>
-                                    <small><?= htmlspecialchars($serverStoreDuration['caption'], ENT_QUOTES, 'UTF-8') ?></small>
+                                    <strong
+                                        class="server-store-duration-card__price"
+                                        data-duration-price="<?= $serverStoreDurationDays ?>"
+                                        data-price-factor="<?= $serverStoreDurationFactorAttribute ?>"
+                                    ><?= number_format($serverStoreDurationPrice) ?> تومان</strong>
+                                    <small
+                                        data-duration-caption="<?= $serverStoreDurationDays ?>"
+                                    ><?= htmlspecialchars($serverStoreDuration['caption'], ENT_QUOTES, 'UTF-8') ?></small>
                                 </label>
                             <?php endforeach; ?>
                         </div>
 
                         <div class="server-store-duration-note" role="note">
                             <i class="fa-solid fa-calculator" aria-hidden="true"></i>
-                            <span>مبنای محاسبه، تعرفه ۳۰روزه است؛ دوره‌های کوتاه‌تر به نسبت روزها و بدون تخفیف محاسبه می‌شوند. مبالغ به نزدیک‌ترین ۱۰۰ تومان گرد می‌شوند. هر روز معادل ۲۴ ساعت است.</span>
+                            <span>تعرفه ۱ روزه و ۱۵ روزه با ضرایب کوتاه‌مدت محاسبه می‌شود؛ تعرفه ۱ ماهه مبنای قیمت است. خرید ۲، ۳، ۶ و ۱۲ ماهه به‌ترتیب شامل ۵٪، ۷٪، ۱۰٪ و ۱۵٪ تخفیف است. قیمت‌ها با تغییر ظرفیت و RAM به‌صورت لحظه‌ای به‌روزرسانی می‌شوند.</span>
+                        </div>
+                    </section>
+
+                    <section class="server-store-section server-store-name-section" aria-labelledby="serverNameTitle" data-fc-reveal="up" data-fc-reveal-delay="160">
+                        <div class="server-store-section-heading">
+                            <span class="server-store-section-index">06</span>
+                            <div>
+                                <h2 id="serverNameTitle">نام سرور</h2>
+                                <p>برای شناسایی راحت‌تر سرورت در پنل، یک نام انتخاب کن.</p>
+                            </div>
+                            <span class="server-store-section-state">الزامی</span>
+                        </div>
+
+                        <div class="server-store-field-grid">
+                            <div class="server-store-field server-store-field--wide">
+                                <label for="serverStoreName">نام نمایشی سرور <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <input
+                                    class="server-store-input"
+                                    id="serverStoreName"
+                                    name="server_name"
+                                    type="text"
+                                    value=""
+                                    placeholder="My CS2 Server"
+                                    pattern="[A-Za-z0-9 ]{3,32}"
+                                    minlength="3"
+                                    maxlength="32"
+                                    required
+                                    aria-describedby="serverStoreNameHelp"
+                                    autocomplete="off"
+                                >
+                                <small id="serverStoreNameHelp">پیشنهاد نام: FragCity Public یا My Community. فقط حروف انگلیسی، اعداد و فاصله مجاز است. این نام فقط برای شناسایی سرور در فهرست «سرورهای من» استفاده می‌شود و بعد از خرید می‌توانی نام دلخواهت را از بخش تنظیمات سرور تغییر بدهی.</small>
+                            </div>
                         </div>
                     </section>
                 </form>
@@ -619,7 +665,9 @@ $serverStoreDefaultMonthlyPrice =
                 </div>
 
                 <div class="server-store-summary-lines">
-                    <div><span>مدت سرویس</span><strong data-server-summary="duration">۳۰ روز</strong></div>
+                    <div><span>مدت سرویس</span><strong data-server-summary="duration">۱ ماهه</strong></div>
+                    <div><span>نام نمایشی سرور</span><strong data-server-summary="server-name">وارد نشده</strong></div>
+                    <div><span>تخفیف دوره</span><strong data-server-summary="discount">بدون تخفیف</strong></div>
                     <div><span>قیمت ماهانه پیکربندی</span><strong data-server-summary="monthly-price">۷۴۹٬۰۰۰ تومان</strong></div>
                     <div><span>RAM</span><strong data-server-summary="memory">1 GB · 1024 MB</strong></div>
                     <div><span>CPU</span><strong data-server-summary="cpu">100% · 1 vCore</strong></div>
@@ -641,7 +689,7 @@ $serverStoreDefaultMonthlyPrice =
                 <div class="server-store-summary-total">
                     <span>قیمت نهایی دوره انتخاب‌شده</span>
                     <strong data-server-summary="period-price">۷۴۹٬۰۰۰ تومان</strong>
-                    <small>قیمت بر اساس پلن پایه، اسلات‌های اضافه، RAM و مدت سرویس محاسبه می‌شود. تعرفه ۳۰روزه همان قیمت ماهانه CSV است؛ دوره‌های کوتاه‌تر بدون تخفیف و به نسبت روزها محاسبه می‌شوند. Bot Guard بدون هزینه اضافه است.</small>
+                    <small>قیمت بر اساس پلن پایه، اسلات‌های اضافه، RAM و مدت انتخاب‌شده محاسبه می‌شود. دوره‌های چندماهه شامل تخفیف پلکانی هستند. Bot Guard بدون هزینه اضافه است.</small>
                 </div>
 
                 <button type="button" class="server-store-submit" disabled>
