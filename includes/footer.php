@@ -18,6 +18,8 @@ require_once __DIR__ . '/routes.php';
                 <p class="footer-desc">
                     پلتفرمی برای سرورهای کانتر استرایک ۲، اسکین‌ها و ابزارهای اختصاصی جامعه‌ی بازیکنان.
                 </p>
+                <div class="footer-contact-columns" aria-label="راه‌های ارتباطی با FragCity">
+                    <div class="footer-contact-column footer-contact-column--right" aria-label="راه‌های ارتباطی، ستون راست">
                 <a
                     class="footer-ticket-button footer-contact-link"
                     href="/support/?tab=tickets"
@@ -59,6 +61,8 @@ require_once __DIR__ . '/routes.php';
                     <span>سرور Discord</span>
                     <strong dir="ltr">FragCity</strong>
                 </a>
+                    </div>
+                    <div class="footer-contact-column footer-contact-column--left" aria-label="راه‌های ارتباطی، ستون چپ">
                 <a
                     class="footer-steam-button footer-contact-link"
                     href="https://steamcommunity.com/id/larnz/"
@@ -88,6 +92,8 @@ require_once __DIR__ . '/routes.php';
                     <span>ایمیل پشتیبانی</span>
                     <strong dir="ltr">support@fragcity.ir</strong>
                 </a>
+                    </div>
+                </div>
             </section>
 
             <nav class="footer-col" aria-label="دسترسی سریع">
