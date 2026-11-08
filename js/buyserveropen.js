@@ -133,9 +133,9 @@
 
             const serverName = serverNameInput.value.trim();
             serverNameInput.setCustomValidity(
-                serverName.length >= 3 && serverName.length <= 32 && /^[A-Za-z0-9 ]+$/.test(serverName)
+                serverName.length > 0 && /^[A-Za-z0-9 ]+$/.test(serverName)
                     ? ''
-                    : 'نام سرور باید ۳ تا ۳۲ کاراکتر و فقط شامل حروف انگلیسی، عدد و فاصله باشد.'
+                    : 'نام سرور الزامی است و فقط می‌تواند شامل حروف انگلیسی، عدد و فاصله باشد.'
             );
 
             const players = Number(playersInput.value);
