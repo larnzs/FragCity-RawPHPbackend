@@ -106,3 +106,28 @@
     .rules-card-body{padding:14px 15px;font-size:.8rem;line-height:1.95}
 }
 @media(prefers-reduced-motion:reduce){.rules-card{transition:none}.rules-card:hover{transform:none}}
+
+/* FAQ at the end of the rules page */
+.rules-faq{
+    width:min(100%,1420px);
+    margin:38px auto 0;
+    padding-top:28px;
+    border-top:1px solid rgba(255,255,255,.07);
+}
+.rules-faq-heading{margin-bottom:17px}
+.rules-faq-heading>span{display:inline-block;margin-bottom:5px;color:#f97316;font:850 .66rem/1.5 var(--fc-font-sans,sans-serif);letter-spacing:.15em}
+.rules-faq-heading h2{margin:0;color:#f5f5f5;font-size:clamp(1.15rem,2.2vw,1.45rem);font-weight:900}
+.rules-faq-heading p{margin:6px 0 0;color:#99928b;font-size:.8rem;line-height:1.85}
+.rules-faq-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.rules-faq-item{min-width:0;align-self:start;overflow:hidden;border:1px solid rgba(255,255,255,.085);border-radius:13px;background:linear-gradient(145deg,rgba(28,28,28,.96),rgba(17,17,17,.96));transition:border-color .18s ease,background .18s ease}
+.rules-faq-item[open]{border-color:rgba(249,115,22,.3);background:linear-gradient(145deg,rgba(31,25,20,.98),rgba(17,17,17,.98))}
+.rules-faq-item summary{display:flex;align-items:center;min-height:54px;padding:13px 16px;cursor:pointer;list-style:none;color:#ece8e3;font-size:.82rem;font-weight:800;line-height:1.8}
+.rules-faq-item summary::-webkit-details-marker{display:none}
+.rules-faq-item summary::after{content:"+";display:grid;flex:0 0 24px;width:24px;height:24px;place-items:center;margin-inline-start:12px;margin-right:auto;border:1px solid rgba(249,115,22,.24);border-radius:7px;background:rgba(249,115,22,.08);color:#ffb347;font-size:1rem;line-height:1;transition:transform .18s ease,background .18s ease}
+.rules-faq-item[open] summary::after{content:"−";transform:rotate(180deg);background:rgba(249,115,22,.15)}
+.rules-faq-answer{padding:0 16px 15px;color:#aaa39c;font-size:.78rem;line-height:1.95}
+.rules-faq-answer p{margin:0}
+.rules-faq-answer .page-support-link{color:#ffb347!important;text-decoration:none;border-bottom:1px solid rgba(255,179,71,.3)}
+.rules-faq-answer .page-support-link:hover{color:#ffd39c!important;border-color:currentColor}
+@media(max-width:700px){.rules-faq{margin-top:30px;padding-top:23px}.rules-faq-grid{grid-template-columns:1fr}.rules-faq-item summary{font-size:.78rem}}
+@media(prefers-reduced-motion:reduce){.rules-faq-item,.rules-faq-item summary::after{transition:none}}
