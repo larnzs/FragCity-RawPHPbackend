@@ -272,7 +272,7 @@ $serverStoreDefaultMonthlyPrice =
                         </div>
                     </section>
 
-                    <section class="server-store-section server-store-name-section" aria-labelledby="serverNameTitle" data-fc-reveal="up" data-fc-reveal-delay="160">
+                    <section class="server-store-section server-store-name-section" aria-labelledby="serverNameTitle" data-fc-reveal="up" data-fc-reveal-delay="40">
                         <div class="server-store-section-heading">
                             <span class="server-store-section-index">02</span>
                             <div>
