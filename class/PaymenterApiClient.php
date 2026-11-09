@@ -399,6 +399,8 @@ final class PaymenterApiClient
                 'cs2_product_out_of_stock',
                 'cs2_product_user_limit',
                 'cs2_plan_invalid',
+                'cs2_config_option_mapping_invalid',
+                'cs2_config_option_price_missing',
                 'fragcity_user_not_linked',
                 'paid_option_pricing_not_configured',
                 'invalid_order_payload',
