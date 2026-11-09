@@ -114,6 +114,7 @@ final class PaymenterApiClient
         $steamId64 = trim((string) ($order['steamid64'] ?? ''));
         $payment = $order['payment'] ?? [];
         $resources = $order['resources'] ?? [];
+        $featureLimits = $order['feature_limits'] ?? [];
         $egg = $order['egg'] ?? [];
 
         if (
@@ -122,6 +123,7 @@ final class PaymenterApiClient
             || !is_array($payment)
             || ($payment['provider'] ?? null) !== 'zarinpal'
             || !is_array($resources)
+            || !is_array($featureLimits)
             || !is_array($egg)
         ) {
             throw new RuntimeException('validation_failed');
@@ -151,6 +153,9 @@ final class PaymenterApiClient
         $memoryMb = filter_var($resources['memory_mb'] ?? null, FILTER_VALIDATE_INT);
         $diskMb = filter_var($resources['disk_mb'] ?? null, FILTER_VALIDATE_INT);
         $cpuPercent = filter_var($resources['cpu_percent'] ?? null, FILTER_VALIDATE_INT);
+        $databases = filter_var($featureLimits['databases'] ?? 0, FILTER_VALIDATE_INT);
+        $additionalAllocations = filter_var($featureLimits['additional_allocations'] ?? 0, FILTER_VALIDATE_INT);
+        $backups = filter_var($featureLimits['backups'] ?? 0, FILTER_VALIDATE_INT);
         if (
             !in_array($memoryMb, [1024, 1280, 1536], true)
             || $diskMb === false
@@ -158,6 +163,9 @@ final class PaymenterApiClient
             || $diskMb > 10240
             || (($diskMb - 5120) % 1024) !== 0
             || !in_array($cpuPercent, [100, 200, 300, 400], true)
+            || !in_array($databases, [0, 1, 2, 3, 5, 10], true)
+            || !in_array($additionalAllocations, [0, 1, 2, 3, 5], true)
+            || !in_array($backups, [0, 1, 2, 3, 5, 10], true)
         ) {
             throw new RuntimeException('validation_failed');
         }
@@ -178,6 +186,11 @@ final class PaymenterApiClient
                 'memory_mb' => $memoryMb,
                 'disk_mb' => $diskMb,
                 'cpu_percent' => $cpuPercent,
+            ],
+            'feature_limits' => [
+                'databases' => $databases,
+                'additional_allocations' => $additionalAllocations,
+                'backups' => $backups,
             ],
             'egg' => $egg,
         ];
