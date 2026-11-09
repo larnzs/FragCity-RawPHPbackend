@@ -1948,3 +1948,96 @@ body:has(.server-store-page) .content-fader {
         max-width: 100%;
     }
 }
+
+
+/* Unified Paymenter Egg configuration: keep every startup variable in one compact panel. */
+.server-store-resource-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.server-store-egg-settings-panel {
+    padding: 13px;
+    border: 1px solid rgba(255, 179, 71, .16);
+    border-radius: 13px;
+    background:
+        radial-gradient(ellipse at 100% 0, rgba(255, 179, 71, .055), transparent 45%),
+        linear-gradient(145deg, rgba(255, 255, 255, .022), rgba(0, 0, 0, .13));
+}
+
+.server-store-field-grid.server-store-field-grid--egg {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    justify-content: stretch;
+    align-items: stretch;
+    gap: 9px;
+}
+
+.server-store-field-grid--egg .server-store-field {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    padding: 10px;
+    gap: 6px;
+}
+
+.server-store-field-grid--egg .server-store-field--wide,
+.server-store-field-grid--egg .server-store-field--compact {
+    grid-column: auto;
+    max-width: none;
+}
+
+.server-store-field-grid--egg .server-store-select,
+.server-store-field-grid--egg .server-store-input {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+.server-store-field-grid--egg .server-store-field > small {
+    font-size: .57rem;
+    line-height: 1.65;
+}
+
+.server-store-field-grid--egg .server-store-egg-capacity-card {
+    grid-column: span 2;
+    width: 100%;
+    min-width: 0;
+    min-height: 100%;
+}
+
+.server-store-egg-settings-panel .server-store-config-note {
+    margin-top: 11px;
+}
+
+@media (max-width: 1180px) {
+    .server-store-field-grid.server-store-field-grid--egg {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .server-store-resource-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .server-store-resource-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .server-store-egg-settings-panel {
+        padding: 10px;
+    }
+}
+
+@media (max-width: 420px) {
+    .server-store-field-grid.server-store-field-grid--egg {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .server-store-field-grid--egg .server-store-egg-capacity-card {
+        grid-column: auto;
+    }
+
+    .server-store-resource-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
