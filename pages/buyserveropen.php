@@ -107,7 +107,7 @@ $serverStoreSevenDayReferencePrice = $serverStoreOneDayReferencePrice
     + (($serverStoreFifteenDayReferencePrice - $serverStoreOneDayReferencePrice) * (7 - 1) / (15 - 1));
 $serverStoreDurations = [
     ['days' => 1, 'label' => '۱ روزه', 'caption' => '۲۴ ساعت', 'price_factor' => $serverStoreOneDayReferencePrice / $serverStoreMonthlyReferencePrice],
-    ['days' => 7, 'label' => '۷ روزه', 'caption' => 'یک هفته · تعرفه محاسبه‌شده', 'price_factor' => $serverStoreSevenDayReferencePrice / $serverStoreMonthlyReferencePrice],
+    ['days' => 7, 'label' => '۱ هفته', 'caption' => '۷ روز · تعرفه محاسبه‌شده', 'price_factor' => $serverStoreSevenDayReferencePrice / $serverStoreMonthlyReferencePrice],
     ['days' => 15, 'label' => '۱۵ روزه', 'caption' => 'نیم‌ماه', 'price_factor' => $serverStoreFifteenDayReferencePrice / $serverStoreMonthlyReferencePrice],
     ['days' => 30, 'label' => '۳۰ روزه', 'caption' => 'قیمت پایه ماهانه', 'price_factor' => 1, 'recommended' => true],
 ];
