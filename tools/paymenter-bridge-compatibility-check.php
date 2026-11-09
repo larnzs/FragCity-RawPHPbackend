@@ -34,6 +34,7 @@ $expectedRoutes = [
     '/api/v1/fragcity/bridge/servers/list',
     '/api/v1/fragcity/bridge/servers/password',
     '/api/v1/fragcity/bridge/servers/username',
+    '/api/v1/fragcity/bridge/orders/cs2',
 ];
 
 foreach ($expectedRoutes as $route) {
@@ -59,7 +60,14 @@ foreach ($unsupportedClientTerms as $term) {
         $unsupportedClientAbsent = false;
     }
 }
-$checkResult('Paymenter API client matches the legacy five-route bridge contract', $unsupportedClientAbsent);
+$checkResult('Paymenter API client retains the supported customer bridge methods', $unsupportedClientAbsent);
+$checkResult('CS2 order client sends a verified ZarinPal receipt and resource/Egg configuration',
+    str_contains($client, 'createCs2ServerOrder')
+    && str_contains($client, "'amount_toman' => $amountToman")
+    && str_contains($client, "'amount_rial' => $amountRial")
+    && str_contains($client, "'memory_mb' => $memoryMb")
+    && str_contains($client, "'cpu_percent' => $cpuPercent")
+    && str_contains($client, "'egg' => $egg"));
 
 $unsupportedEndpointTerms = [
     'connect_' . 'client_api',
