@@ -326,11 +326,7 @@ final class PaymenterApiClient
                 'panel_username_update_failed',
                 'panel_username_rate_limited',
                 'paymenter_checkout_unavailable',
-                'cs2_checkout_manifest_unavailable',
                 'cs2_product_invalid',
-                'cs2_product_out_of_stock',
-                'cs2_product_user_limit',
-                'cs2_plan_invalid',
                 'fragcity_user_not_linked',
             ];
 
