@@ -50,7 +50,6 @@ between signing and sending it.
     "additional_allocations": 0,
     "backups": 0
   },
-  },
   "egg": {
     "SRCDS_MAP": "de_dust2",
     "SRCDS_MAXPLAYERS": "10",
