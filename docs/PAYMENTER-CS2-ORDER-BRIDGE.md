@@ -37,7 +37,7 @@ Create and attach these Config Options in **Paymenter Admin â†’ Configuration â†
 | Player Slots | `SRCDS_MAXPLAYERS` | Slider | Child values `5` through `64` |
 | Tickrate | `TICKRATE` | Select | `64`, `128` |
 
-The parent Config Option's Environment Variable is the service property key. The selected child's Environment Variable is the exact value. Use the numeric value in the child field, not the UI label.
+The parent Config Option's Environment Variable is the service property key. The selected child's Environment Variable is the exact value. Use the numeric value in the child field, not the UI label. Paymenter v1.5.9 selects the first child row as the initial value, so sort the base choices first: RAM `1024`, SSD `5120`, CPU `100`, Player Slots `5`, Tickrate `64`.
 
 Paymenter's native Checkout calculates every selected child's price for the selected Plan and saves the selections as native Service Config records. Paymenter's `ExtensionHelper::getServiceProperties()` then merges them into the properties passed to the server extension. The inherited Pterodactyl extension consumes `memory`, `disk` and `cpu` as resource limits and passes `SRCDS_MAXPLAYERS` and `TICKRATE` to the Egg.
 
