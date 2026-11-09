@@ -61,7 +61,7 @@ between signing and sending it.
 The amounts are integer values. `amount_rial` must equal `amount_toman * 10`.
 Allowed durations are 1, 7, 15 and 30 days. Resources are transmitted in the
 same units consumed by Paymenter/Pterodactyl: memory and disk in MB, CPU as a
-percentage. The 8 Egg fields are the exact environment values, not UI labels. The selected `EXEC` CFG and `MAPGROUP` must also be a compatible pair according to the GameModeManager manifest.
+percentage. The 8 Egg fields are the exact environment values, not UI labels. `SRCDS_MAXPLAYERS` and `TICKRATE` are validated from this payload, then resolved to native Paymenter Config Option child rows and persisted as `ServiceConfig`; they are not duplicated as service properties. The selected `EXEC` CFG and `MAPGROUP` must also be a compatible pair according to the GameModeManager manifest.
 
 Generate `order_ref` once for the local FragCity purchase record and reuse it
 for every callback/API retry. Do not generate a new order reference on retry.
@@ -99,9 +99,12 @@ payment amount include the configured surcharge.
 
 ## Renewal caveat
 
-The first invoice uses the verified FragCity price. Paymenter's later recurring
-invoice calculation uses the selected native Plan and Service Config values.
-The current resource limits and Egg values are stored on the Service, but the
-FragCity CPU/RAM/disk/slot price adjustments are not yet represented as
-Paymenter recurring Config Options. Automatic renewal pricing needs a separate
-implementation and test before being enabled.
+The first invoice uses the verified FragCity price. The bridge now persists
+RAM, SSD, CPU, Player Slots and Tickrate as native Paymenter ServiceConfig
+selections and verifies that every selected child has a price for the chosen
+Plan and Rial currency. Player Slots uses values 5–64; the five-slot child is
+the included base capacity and larger values represent paid additional slots.
+Tickrate is limited to 64 for now; 128 remains rejected until its surcharge is
+included in the authoritative FragCity quote and the Egg startup behavior is
+verified. Automatic renewal billing still needs an end-to-end comparison
+against the Raw PHP quote before it is enabled.
