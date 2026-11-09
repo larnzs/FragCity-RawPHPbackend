@@ -1950,13 +1950,13 @@ body:has(.server-store-page) .content-fader {
 }
 
 
-/* Unified Paymenter Egg configuration: keep every startup variable in one compact panel. */
+/* Restore the earlier compact, balanced configurator layout. */
 .server-store-resource-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .server-store-egg-settings-panel {
-    padding: 13px;
+    padding: 16px;
     border: 1px solid rgba(255, 179, 71, .16);
     border-radius: 13px;
     background:
@@ -1964,19 +1964,93 @@ body:has(.server-store-page) .content-fader {
         linear-gradient(145deg, rgba(255, 255, 255, .022), rgba(0, 0, 0, .13));
 }
 
-.server-store-field-grid.server-store-field-grid--egg {
+.server-store-egg-capacity-row {
+    margin-bottom: 13px;
+}
+
+.server-store-egg-capacity-row .server-store-capacity-panel {
+    display: grid;
+    grid-template-columns: minmax(150px, .8fr) minmax(220px, 1.25fr) minmax(210px, 1fr);
+    align-items: center;
+    gap: 18px;
+    min-height: 0;
+    padding: 17px 18px;
+}
+
+.server-store-egg-capacity-row .server-store-resource-head {
+    gap: 12px;
+}
+
+.server-store-egg-capacity-row .server-store-resource-icon {
+    flex-basis: 42px;
+    width: 42px;
+    height: 42px;
+    font-size: 1rem;
+}
+
+.server-store-egg-capacity-row .server-store-resource-copy > small {
+    font-size: .62rem;
+}
+
+.server-store-egg-capacity-row .server-store-resource-copy > strong {
+    font-size: 1.12rem;
+}
+
+.server-store-egg-capacity-row .server-store-resource-copy > span {
+    font-size: .68rem;
+}
+
+.server-store-egg-capacity-row .server-store-range-wrap {
+    gap: 8px;
+    margin: 0;
+}
+
+.server-store-egg-capacity-row .server-store-resource-slider-label {
+    font-size: .72rem;
+}
+
+.server-store-egg-capacity-row .server-store-range {
+    height: 7px;
+    margin: 8px 0 4px;
+}
+
+.server-store-egg-capacity-row .server-store-range::-webkit-slider-thumb {
+    width: 19px;
+    height: 19px;
+}
+
+.server-store-egg-capacity-row .server-store-capacity-presets {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    justify-content: stretch;
-    align-items: stretch;
-    gap: 9px;
+    gap: 6px;
+    margin: 0;
+}
+
+.server-store-egg-capacity-row .server-store-capacity-presets button {
+    min-height: 31px;
+    padding: 5px 7px;
+    border-radius: 7px;
+    font-size: .67rem;
+}
+
+.server-store-egg-capacity-row .server-store-range-help {
+    grid-column: 1 / -1;
+    font-size: .65rem;
+    line-height: 1.7;
+}
+
+.server-store-field-grid.server-store-field-grid--egg {
+    grid-template-columns: repeat(2, minmax(0, 410px));
+    justify-content: start;
+    align-items: start;
+    gap: 12px 14px;
 }
 
 .server-store-field-grid--egg .server-store-field {
     width: 100%;
     min-width: 0;
     max-width: none;
-    padding: 10px;
-    gap: 6px;
+    padding: 13px 14px;
+    gap: 8px;
 }
 
 .server-store-field-grid--egg .server-store-field--wide,
@@ -1990,29 +2064,78 @@ body:has(.server-store-page) .content-fader {
     width: 100%;
     max-width: none;
     min-width: 0;
+    min-height: 46px;
+    font-size: .78rem;
+}
+
+.server-store-field-grid--egg .server-store-field > label {
+    font-size: .75rem;
 }
 
 .server-store-field-grid--egg .server-store-field > small {
-    font-size: .57rem;
-    line-height: 1.65;
-}
-
-.server-store-field-grid--egg .server-store-egg-capacity-card {
-    grid-column: span 2;
-    width: 100%;
-    min-width: 0;
-    min-height: 100%;
+    font-size: .64rem;
+    line-height: 1.8;
 }
 
 .server-store-egg-settings-panel .server-store-config-note {
-    margin-top: 11px;
+    margin-top: 14px;
 }
 
 @media (max-width: 1180px) {
+    .server-store-egg-capacity-row .server-store-capacity-panel {
+        grid-template-columns: minmax(140px, .8fr) minmax(200px, 1.2fr);
+    }
+
+    .server-store-egg-capacity-row .server-store-capacity-presets {
+        grid-column: 1 / -1;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
+
     .server-store-field-grid.server-store-field-grid--egg {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+}
 
+@media (max-width: 760px) {
+    .server-store-egg-settings-panel {
+        padding: 11px;
+    }
+
+    .server-store-egg-capacity-row .server-store-capacity-panel {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
+        padding: 14px 12px;
+    }
+
+    .server-store-egg-capacity-row .server-store-capacity-presets {
+        grid-column: auto;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 680px) {
+    .server-store-field-grid.server-store-field-grid--egg {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Desktop-only default scale: equivalent to the tested 125% Chrome zoom. */
+@media (min-width: 1200px) and (hover: hover) and (pointer: fine) {
+    html {
+        zoom: 1.25;
+    }
+}
+
+/* Do not add page zoom on touch/mobile layouts. */
+@media (max-width: 767px), (hover: none) {
+    html {
+        zoom: 1;
+    }
+}
+
+
+/* Keep the former resource-grid breakpoints while desktop scale is enabled. */
+@media (max-width: 1180px) {
     .server-store-resource-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -2022,21 +2145,9 @@ body:has(.server-store-page) .content-fader {
     .server-store-resource-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-
-    .server-store-egg-settings-panel {
-        padding: 10px;
-    }
 }
 
 @media (max-width: 420px) {
-    .server-store-field-grid.server-store-field-grid--egg {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .server-store-field-grid--egg .server-store-egg-capacity-card {
-        grid-column: auto;
-    }
-
     .server-store-resource-grid {
         grid-template-columns: minmax(0, 1fr);
     }
