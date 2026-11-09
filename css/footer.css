@@ -139,24 +139,35 @@
 .trust-badges {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
+    align-items: flex-start;
+    gap: 18px;
+    width: 100%;
 }
 
 .enamad-badge,
 .zarinpal-box {
-    display: inline-flex;
-    flex: 0 0 58px;
+    display: flex;
+    flex: 0 0 116px;
     align-items: center;
     justify-content: center;
-    width: 58px;
-    height: 58px;
+    width: 116px;
+    min-width: 116px;
+    height: 138px;
     margin: 0;
-    padding: 5px;
-    overflow: hidden;
-    border: 1px solid #222222;
-    border-radius: 6px;
-    background: #050505;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.enamad-badge > a {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
 }
 
 .enamad-badge img,
@@ -166,8 +177,8 @@
     height: auto !important;
     min-width: 0 !important;
     min-height: 0 !important;
-    max-width: 46px !important;
-    max-height: 46px !important;
+    max-width: 116px !important;
+    max-height: 138px !important;
     object-fit: contain !important;
     object-position: center;
 }
@@ -178,7 +189,7 @@
     height: 100%;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .footer-bottom {
