@@ -173,8 +173,6 @@
 .enamad-badge img,
 #zarinpal img {
     display: block;
-    width: auto !important;
-    height: auto !important;
     min-width: 0 !important;
     min-height: 0 !important;
     width: 94px !important;
