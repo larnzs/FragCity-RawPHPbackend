@@ -101,10 +101,9 @@ the authoritative storefront quote.
 
 The first invoice uses the verified FragCity price. The bridge now persists
 RAM, SSD, CPU, Player Slots and Tickrate as native Paymenter ServiceConfig
-selections and verifies that every selected child has a price for the chosen
-Plan and Rial currency. Player Slots uses values 5–64; the five-slot child is
-the included base capacity and larger values represent paid additional slots.
-Tickrate is limited to 64 for now; 128 remains rejected until its surcharge is
-included in the authoritative FragCity quote and the Egg startup behavior is
-verified. Automatic renewal billing still needs an end-to-end comparison
-against the Raw PHP quote before it is enabled.
+selections and verifies each selected child against the exact chosen Plan and
+Rial currency. Player Slots uses values 5–64; the five-slot child is the
+included base capacity and larger values represent paid additional slots.
+Both Tickrate children (64 and 128) must be zero-priced, including setup fees.
+Automatic renewal billing still needs an end-to-end comparison against the Raw
+PHP quote before it is enabled.
