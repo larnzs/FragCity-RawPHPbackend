@@ -898,11 +898,6 @@ $pageAssets = [
                 __DIR__ . '/css/buyserveropen.css'
             ),
         ],
-        'js' => [
-            '/js/buyserveropen.js?v=' . asset_version(
-                __DIR__ . '/js/buyserveropen.js'
-            ),
-        ],
     ],
 
     'banlist' => [
