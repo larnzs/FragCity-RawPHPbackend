@@ -338,9 +338,9 @@ $serverStoreDefaultMonthlyPrice =
                                     <label for="serverStoreTickrate"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Tickrate سرور</label>
                                     <select class="server-store-select" id="serverStoreTickrate" name="TICKRATE" required aria-describedby="serverStoreTickrateHelp">
                                         <option value="64" selected>64 Tick · Subtick</option>
-                                        <option value="128">128 Tick · آزمایشی</option>
+                                        <option value="128">128 Tick · رایگان</option>
                                     </select>
-                                    <small id="serverStoreTickrateHelp">گزینه ۱۲۸ فقط در نودی قابل اعمال است که Startup آن واقعاً از آرگومان -tickrate 128 پشتیبانی کند. تا زمان تأیید خروجی سرور، این انتخاب آزمایشی است.</small>
+                                    <small id="serverStoreTickrateHelp">هر دو گزینه ۶۴ و ۱۲۸ فعلاً رایگان هستند. مقدار انتخابی از طریق آرگومان -tickrate در دستور Startup به CS2 ارسال می‌شود.</small>
                                 </div>
 
                                 <div class="server-store-field">
