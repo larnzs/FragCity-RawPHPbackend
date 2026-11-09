@@ -1,117 +1,125 @@
 # FragCity ↔ Paymenter Backend Integration
 
-**Status:** The signed FragCity account bridge now requires client first and last names. Purchase/provisioning operations remain pending verification.
+**Status:** Native Paymenter Checkout and the private account/server bridge are implemented on the feature branch. Production deployment and an end-to-end sandbox purchase still require verification.
 
 ## 1. Product boundary
 
-FragCity's Raw PHP website owns the complete customer and administrator experience:
+FragCity owns the customer identity and website experience:
+- Steam OpenID authentication and FragCity account data.
+- Account synchronization to Paymenter through a private signed bridge.
+- Customer-facing server inventory, panel identity and server controls.
+- The storefront entry page that sends an authenticated customer to Paymenter's native CS2 Product Checkout.
 
-- Public server catalogue and custom checkout UI.
-- Customer account, server dashboard and all customer-facing controls.
-- Custom administrator dashboard and product/node presentation.
-- Zarinpal request, callback and server-side payment verification.
-- Product pricing, hardware profiles, allowed customer selections and the external order state machine.
+Paymenter owns all commerce and provisioning:
+- Product catalogue, Plans, recurring prices and native Config Options.
+- Checkout, Cart validation and pricing.
+- Order, Service, native Service Config, Invoice and Invoice Transaction records.
+- Payment Gateway handling, invoice settlement, recurring renewal and upgrades.
+- Queueing its normal Pterodactyl server creation job.
 
-Paymenter is a private backend supervisor. Its own customer-facing theme and admin UI are not part of the FragCity customer workflow. It is used for the commercial records and lifecycle that are useful to FragCity:
-
-- Paymenter users, orders, services, invoices, invoice items and tickets.
-- Service status and expiry/billing lifecycle.
-- The FragCity CS2 server extension and Pterodactyl provisioning.
-- Internal service actions/monitoring where Paymenter provides a safe supported path.
-
-Pterodactyl/Wings own the actual server record, node allocation, Docker container and execution lifecycle. FragCity's `My Servers` page is the customer-facing inventory and credential-management surface. For an owned service it can link the customer to that server's Pterodactyl panel page; panel identity and password changes are authorized through the signed FragCity → Paymenter → Pterodactyl backend path. Customers never receive an Application API key.
+The FragCity CS2 server extension owns game-specific Egg fields, client identity synchronization and the hand-off to Paymenter's inherited Pterodactyl provisioner. Pterodactyl/Wings own the actual server, node allocation, Docker container and runtime.
 
 ## 2. Source-of-truth boundaries
 
 | Data | Authoritative owner |
 |---|---|
 | FragCity login identity and Steam account | FragCity website |
-| Public product catalogue, hardware labels, allowed checkout options and display prices | FragCity website |
-| Zarinpal authority, verified amount and payment reference | FragCity website payment ledger |
-| External purchase intent and retry/outbox state | FragCity website |
-| Paymenter user/order/service/invoice/ticket records | Paymenter |
+| Paymenter user link for each SteamID64 | FragCityAPI bridge |
+| Product, Plans, billing periods and base prices | Paymenter |
+| RAM, SSD, CPU, Player Slots and Tickrate options and child prices | Native Paymenter Product Config Options |
+| Remaining CS2-specific fields such as map, CFG, MAPGROUP and cooldown | FragCityCS2 extension Checkout manifest |
+| ZarinPal authority and verified receipt | ZarinPal Gateway extension in Paymenter |
+| Order, Service, Invoice and Service Config records | Paymenter |
 | Pterodactyl server UUID, node, allocations and container lifecycle | Pterodactyl |
 | CS2 plugin configuration and game-mode settings | Private files of each game instance, managed through FragCity backend |
 
-Do not recreate retired Windows Agent tables or use them as the new provisioning source.
+Do not recreate retired Windows Agent tables or use them as the new provisioning source. Do not introduce direct SQL writes to Paymenter Core tables.
 
 ## 2.1. Registration and credential synchronization
 
 - New FragCity identities are created only after a validated Steam OpenID callback. A browser-supplied SteamID64 by itself is not proof of account ownership.
-- The Steam registration-completion form and the authenticated account-completion form collect mandatory client first name and last name, a valid email address, the required mobile number and a password confirmation.
-- The FragCity database stores `username`, `first_name` and `last_name` separately. Username is mandatory, lowercased, 3–50 characters, starts and ends with an ASCII letter or digit, and allows only ASCII letters, digits, underscores and hyphens. Both client names are mandatory (1–191 characters after trimming).
-- A normal password login synchronizes the verified password and current account details, including username and both mandatory client names, to Paymenter through the private HMAC bridge.
-- An existing Steam/remember-me session has no plaintext password available. If its Paymenter link or required contact details are missing, the user is sent to the authenticated account-completion form to choose/confirm a password.
-- The FragCity website stores only its password hash. The plaintext password exists only in request memory and in the short-lived HTTPS/HMAC server-to-server body to Paymenter; neither side writes it to logs or stores it in plaintext.
-- Paymenter stores its own password hash and has no native username column. The bridge stores the selected FragCity username as the Paymenter User Property `fragcity_username`; `first_name`, `last_name`, `email` and `password` use Paymenter's native user fields.
-- Before the official Paymenter Pterodactyl server provisioner runs, `FragCityCS2` reads `fragcity_username` and creates or updates the Pterodactyl client through the Application API. The Pterodactyl native `username`, `first_name`, `last_name` and `email` receive the corresponding FragCity values. It also sets Pterodactyl `external_id` to the Paymenter user ID, then delegates server creation to the inherited official implementation.
-- Pterodactyl's Application API allows the password field to be omitted when creating a client user. The Pterodactyl panel password is intentionally independent from FragCity and Paymenter. Customers set or replace it in the FragCity `My Servers` page after re-entering their current FragCity password; the signed Bridge sends the new panel password to Paymenter, and the FragCityCS2 extension updates the Pterodactyl user through the Application API.
-- The current panel password is never readable or returned: Pterodactyl stores only a password hash. FragCity and Paymenter persist no Pterodactyl plaintext password or password hash. Paymenter stores only a `fragcity_panel_password_set_at` timestamp marker. The page displays the panel URL, username, email, server UUID/identifier, status and resource details; it provides a set/change-password form rather than a recoverable password display.
-- The signed customer bridge endpoints are `POST /api/v1/fragcity/bridge/servers/list` and `POST /api/v1/fragcity/bridge/servers/password`. Both resolve the SteamID64 through `fragcity_user_links`, and password changes are additionally scoped to a service owned by that linked Paymenter user.
-- Email and mobile are required for account synchronization. The mobile number is stored in Paymenter as the `fragcity_phone` user property because Paymenter v1.5.9 does not provide a native phone field.
+- The Steam registration-completion form and authenticated account-completion form collect mandatory client first name and last name, a valid email address, the required mobile number and password confirmation.
+- The normal password login synchronizes the verified account details to Paymenter through the private HMAC bridge.
+- Paymenter has no native username column. The bridge stores the FragCity username as the Paymenter User Property `fragcity_username`; first name, last name, email and password use Paymenter's native user fields.
+- Before the official server provisioner runs, `FragCityCS2` reads `fragcity_username` and creates or updates the Pterodactyl client using its native Application API. It also sets Pterodactyl `external_id` to the Paymenter user ID.
+- Panel passwords are independent from FragCity and Paymenter passwords. Customers set or replace the panel password from FragCity's My Servers page; the signed bridge authorizes the operation against the linked Paymenter user and owned service.
 
-## 3. Paymenter v1.5.9 API findings
+## 3. Native Paymenter Config Options
 
-The pinned API routes expose Admin API resources under `/api/v1/admin` for users, products, services, orders, invoices, invoice items, tickets, ticket messages and credits. These routes use a Paymenter Admin API key as a Bearer token. The API key must be enabled, have type `admin`, and carry only the permissions required by the integration. IP allowlisting should be used once the website's outbound IP is confirmed.
+Create these options using **Paymenter Admin → Configuration → Config Options**, then attach them to the CS2 Product. FragCityAPI must not create the Config Option rows, resolve their IDs or convert their values.
 
-The public resources do not expose every operation required by FragCity:
+| Config Option | Parent Environment Variable | Suggested Type | Child Environment Variables |
+| --- | --- | --- | --- |
+| RAM | `memory` | Select or Slider | `1024`, `1280`, `1536` MB |
+| SSD Storage | `disk` | Select or Slider | `5120`, `6144`, `7168`, `8192`, `9216`, `10240` MB |
+| CPU | `cpu` | Select or Slider | `100`, `200`, `300`, `400` percent |
+| Player Slots | `SRCDS_MAXPLAYERS` | Slider | Exact child values from `5` through `64` |
+| Tickrate | `TICKRATE` | Select | `64`, `128` |
 
-- The Service create request accepts core service fields, but not arbitrary per-service Egg properties or Config Option rows.
-- There is no Invoice Transaction resource in the standard API routes.
-- Creating a Service record alone does not trigger server creation.
+The parent Config Option's Environment Variable is the service property key. The selected child Environment Variable is the exact value. Set all child prices on every recurring Plan. Base RAM and 5 slots should be zero-priced where included in the base plan; add RAM and slot surcharges to the correct child values. CPU/SSD may be zero-priced while they have no surcharge. Any 128 Tick surcharge belongs on the 128 Tick child price.
 
-The Paymenter source shows the supported lifecycle: a paid invoice is processed by `ProcessPaidInvoiceService`; a pending server Service is sent to `CreateJob`; that job invokes the configured server extension. The supported `ExtensionHelper::addPayment()` path creates an invoice transaction; Paymenter's invoice settlement flow can then mark the invoice paid and run its normal paid-invoice processing.
+Paymenter's own Cart/Checkout validates selections, adds their child prices to the selected Plan, and persists the selection as a native Service Config. Paymenter's `ExtensionHelper::getServiceProperties()` then exposes those Config Values to the server extension. The inherited Pterodactyl extension consumes `memory`, `disk` and `cpu` as resource limits and passes `SRCDS_MAXPLAYERS` and `TICKRATE` to the Egg.
 
-Therefore, do not make direct SQL writes into Paymenter's database and do not mark invoices paid by simply changing a status field. Use a dedicated `FragCityAPI` add-on extension for the authenticated server-to-server Bridge. The previous locale-only `extensions/Others/FragCity` add-on has been removed and must not be reused. Do not fork or patch Paymenter core.
+The FragCityCS2 extension still supplies the remaining CS2-specific Checkout fields: `SRCDS_MAP`, `EXEC`, `MAPGROUP`, `COOLDOWN`, `ENABLE_GUARD` and `GUARD_BAN_MINUTES`. Player Slots and Tickrate are intentionally excluded from its custom `checkout_fields` manifest.
 
-Primary source references:
+## 4. Customer checkout and payment flow
 
-- [Paymenter v1.5.9 API routes](https://github.com/Paymenter/Paymenter/blob/v1.5.9/routes/api.php)
-- [Admin API middleware](https://github.com/Paymenter/Paymenter/blob/v1.5.9/app/Http/Middleware/Api/AdminApi.php)
-- [Create Service request](https://github.com/Paymenter/Paymenter/blob/v1.5.9/app/Http/Requests/Api/Admin/Services/CreateServiceRequest.php)
-- [ExtensionHelper](https://github.com/Paymenter/Paymenter/blob/v1.5.9/app/Helpers/ExtensionHelper.php)
-- [Invoice observer](https://github.com/Paymenter/Paymenter/blob/v1.5.9/app/Observers/InvoiceObserver.php)
-- [Paid invoice processor](https://github.com/Paymenter/Paymenter/blob/v1.5.9/app/Services/Invoice/ProcessPaidInvoiceService.php)
-- [Server create job](https://github.com/Paymenter/Paymenter/blob/v1.5.9/app/Jobs/Server/CreateJob.php)
+1. The customer logs into FragCity. The registration/login flow synchronizes the user's identity and SteamID64 with Paymenter.
+2. The customer opens the FragCity CS2 storefront and submits the checkout form.
+3. FragCity PHP sends a signed server-to-server request containing only the SteamID64 to `POST /api/v1/fragcity/bridge/checkout-url`.
+4. Paymenter confirms the SteamID64 link and configured CS2 Product, then returns a one-time SSO URL. The token expires after two minutes and is consumed once.
+5. Paymenter establishes the customer's native web session and redirects to that Product's `products.checkout` route.
+6. Paymenter displays its native Plans and Config Options, validates the selected values and calculates the current invoice total. FragCity's local storefront preview values are not sent to Checkout.
+7. Paymenter's native Cart creates the Order, Service, Service Properties, Service Config records and Invoice.
+8. The customer selects the ZarinPal Gateway. The gateway requests a ZarinPal authority for that exact invoice and redirects the customer to ZarinPal.
+9. The Paymenter Gateway callback verifies the authority server-to-server with ZarinPal. Only after a successful verification does it call Paymenter's supported `ExtensionHelper::addPayment()`.
+10. Paymenter's invoice observer settles the invoice and queues the normal server CreateJob. `FragCityCS2` validates its game-specific values and delegates provisioning to the inherited Pterodactyl extension.
 
-## 4. Intended purchase flow
+No browser request creates Paymenter Orders or Services. FragCity no longer submits prices, Plan IDs, resource values or Egg values to a custom order API.
 
-1. FragCity calculates the price server-side from its own published product/option catalogue. Browser-submitted prices are never trusted.
-2. FragCity creates a local pending purchase intent with a unique external UUID, customer identity, selected options, immutable price/currency snapshot and status.
-3. FragCity creates a Zarinpal payment request using the stored amount and associates the returned Authority with that intent.
-4. Zarinpal returns the customer to FragCity. The website backend verifies the Authority directly with Zarinpal and compares the verified amount against the immutable intent. A browser redirect or `Status=OK` alone is never payment proof.
-5. In one local database transaction, FragCity records the payment as verified and creates an outbox/provisioning task. Duplicate callbacks must not credit or provision twice.
-6. A retryable server-to-server call sends the verified purchase to the authenticated FragCity endpoint inside Paymenter. No browser request may call this endpoint.
-7. The Paymenter extension validates the signature, timestamp, nonce, external purchase UUID, configured product/plan, amount/currency and allowed environment variables. It creates/links the Paymenter user, Order, pending Service, Invoice, Invoice Item and allowed Service Configs; then it records the verified payment through Paymenter's supported payment helper.
-8. Paymenter processes the paid invoice and queues its regular server creation job. The FragCity server extension passes only allowlisted values to the Pterodactyl Egg.
-9. FragCity records the resulting Paymenter IDs and displays a normalized provisioning state. A reconciliation task repairs any local/remote mismatch.
+## 5. Paymenter extensions
 
-The purchase UUID must be unique in both systems. A timeout after Paymenter accepted a request must be safe to retry without creating a second Service or charging twice.
+### FragCityAPI
 
-## 5. First implementation slice: read-only API connectivity
+The bridge supports:
+- `POST /api/v1/fragcity/bridge/ping`
+- `POST /api/v1/fragcity/bridge/users/sync`
+- `POST /api/v1/fragcity/bridge/checkout-url`
+- `GET /extensions/fragcity-api/checkout-login/{token}` (one-time SSO token)
+- `POST /api/v1/fragcity/bridge/servers/list`
+- `POST /api/v1/fragcity/bridge/servers/password`
+- `POST /api/v1/fragcity/bridge/servers/username`
 
-The website-side client is `class/PaymenterApiClient.php`. The CLI-only check is `tools/paymenter-api-preflight.php`. It makes exactly one read-only request:
+All POST bridge endpoints require HMAC-SHA256, a timestamp within five minutes, a unique nonce and HTTPS. The SSO GET route requires a random, single-use token generated only by the signed POST endpoint.
 
-`GET /api/v1/admin/products?per_page=1`
+Configure:
+- `shared_secret`: same private value as FragCity's `integrations.paymenter_backend.shared_secret`.
+- `allowed_ips`: optional exact source IP allowlist.
+- `cs2_product_id`: the enabled Paymenter Product using the `FragCityCS2` server extension.
 
-The minimum API permission for this preflight is `admin.products.view`. Store the base URL and API key only in the private runtime `settings/settings.json` under `integrations.paymenter_backend`. Do not put a real key in `settings/settings.example.json`, Git, JavaScript, a URL or a log.
+There are no Product Plan ID or currency settings in FragCityAPI. There is no custom order creation endpoint.
 
-Run the preflight from the website repository root after adding the private runtime values:
+### FragCityCS2
 
-```bash
-php tools/paymenter-api-preflight.php
-```
+This extension is assigned to the CS2 Product's Server Extension setting. It provides the remaining game-specific Egg Checkout/Product settings, aligns the Pterodactyl client identity and delegates server lifecycle operations to Paymenter's inherited Pterodactyl implementation.
 
-Expected output contains a PASS line, HTTP 200 and a count for the one-item sample page. This check does not create or modify any Paymenter records or CS2 servers.
+### ZarinPal Gateway
 
-## 6. Next implementation slices
+Enable **ZarinPal Gateway** under **Paymenter Admin → Extensions → Gateways**. Configure the Merchant ID, exact Paymenter Currency Code, unit (Toman or Rial) and Sandbox mode. Toman is converted to Rial exactly once by the gateway. The gateway verifies each invoice payment before recording it in Paymenter.
 
-1. Read-only Paymenter connection and least-privilege API key.
-2. Create a dedicated Paymenter add-on at `extensions/Others/FragCityAPI` for the signed Bridge route; do not reintroduce localization code or edit Paymenter core.
-3. Idempotent provisioning transaction and user/product/plan mapping.
-4. Zarinpal server-purchase payment intent + verify + outbox/retry.
-5. One test customer, one test product, one test CS2 server; verify environment, node, limits and lifecycle.
-6. Website `My Servers` inventory, customer server cards and independent Pterodactyl panel-password management (initial implementation now added; production verification remains pending).
-7. RCON/live controls and separate schema-driven CFG/JSON file settings, with backups, validation and explicit reload/restart semantics.
+## 6. Deployment and verification
 
-No live purchase, real payment or production server operation is enabled by this document.
+1. Install the updated `FragCityAPI`, `FragCityCS2` and `ZarinPal` extension folders into the matching Paymenter paths.
+2. Run `composer dump-autoload` and `php artisan optimize:clear` in the Paymenter installation.
+3. Enable FragCityAPI under **Admin → Extensions → Others** and configure the HMAC secret, allowlist and CS2 Product ID.
+4. Enable FragCityCS2 under **Admin → Extensions → Servers** and configure its inherited Pterodactyl host/API settings.
+5. Create the five native Product Config Options listed above and attach them to the CS2 Product. Configure every child price on all four CS2 Plans.
+6. Confirm the remaining game-specific fields from the FragCityCS2 manifest appear in native Product Checkout.
+7. Enable ZarinPal Gateway and configure its Merchant ID, Paymenter currency code/unit and sandbox/production mode.
+8. From a test FragCity account, confirm the SSO redirect signs the user into Paymenter and opens the correct CS2 Product Checkout.
+9. Complete a ZarinPal sandbox purchase. Verify Paymenter creates the expected Order, Invoice, Service, Service Config values, limits and Egg environment, then confirm Pterodactyl finishes creating the server.
+10. Test renewal and Config Option upgrades, including a capacity change and RAM change. Verify Paymenter's recurring price calculation and the Pterodactyl limit/update behavior.
+
+Use a persistent shared Laravel Cache backend in production: both short-lived SSO tokens and ZarinPal callback state are stored in Cache and must be available across Paymenter web nodes.
+
+The old `POST /api/v1/fragcity/bridge/orders/cs2` endpoint and `PaymenterApiClient::createCs2ServerOrder()` method are removed on the native-checkout feature branch. Historical database migration files/tables are intentionally retained for compatibility and audit history; they are no longer written by the active checkout flow.
