@@ -31,10 +31,10 @@ $checkResult = static function (string $name, bool $passed) use (&$checks): void
 $expectedRoutes = [
     '/api/v1/fragcity/bridge/ping',
     '/api/v1/fragcity/bridge/users/sync',
+    '/api/v1/fragcity/bridge/checkout-url',
     '/api/v1/fragcity/bridge/servers/list',
     '/api/v1/fragcity/bridge/servers/password',
     '/api/v1/fragcity/bridge/servers/username',
-    '/api/v1/fragcity/bridge/orders/cs2',
 ];
 
 foreach ($expectedRoutes as $route) {
@@ -61,13 +61,16 @@ foreach ($unsupportedClientTerms as $term) {
     }
 }
 $checkResult('Paymenter API client retains the supported customer bridge methods', $unsupportedClientAbsent);
-$checkResult('CS2 order client sends a verified ZarinPal receipt and resource/Egg configuration',
-    str_contains($client, 'createCs2ServerOrder')
-    && str_contains($client, "'amount_toman' => $amountToman")
-    && str_contains($client, "'amount_rial' => $amountRial")
-    && str_contains($client, "'memory_mb' => $memoryMb")
-    && str_contains($client, "'cpu_percent' => $cpuPercent")
-    && str_contains($client, "'egg' => $egg"));
+$checkResult('CS2 checkout client requests a native Paymenter SSO URL using only the SteamID64',
+    str_contains($client, 'createPaymenterCheckoutUrl')
+    && str_contains($client, '/api/v1/fragcity/bridge/checkout-url')
+    && !str_contains($client, 'createCs2ServerOrder')
+    && !str_contains($client, '/api/v1/fragcity/bridge/orders/cs2'));
+
+$checkResult('CS2 storefront hands off to Paymenter native Checkout and does not submit a local order payload',
+    str_contains($read('pages/buyserveropen.php'), 'start_paymenter_checkout')
+    && str_contains($read('pages/buyserveropen.php'), 'createPaymenterCheckoutUrl')
+    && !str_contains($read('pages/buyserveropen.php'), 'name="SRCDS_MAXPLAYERS"'));
 
 $unsupportedEndpointTerms = [
     'connect_' . 'client_api',
