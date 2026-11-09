@@ -114,22 +114,9 @@ require_once __DIR__ . '/routes.php';
             <section class="footer-col footer-trust" aria-label="نشان‌های اعتماد">
                 <p class="footer-heading">نشان‌های اعتماد</p>
                 <div class="trust-badges">
-                    <a
-                        referrerpolicy="origin"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href="https://trustseal.enamad.ir/?id=733184&Code=LIGY7RCe6ngk9p2DzpzyW37m4vJArgsa"
-                        class="enamad-badge"
-                        aria-label="مشاهده نماد اعتماد الکترونیکی"
-                    >
-                        <img
-                            referrerpolicy="origin"
-                            src="https://trustseal.enamad.ir/logo.aspx?id=733184&Code=LIGY7RCe6ngk9p2DzpzyW37m4vJArgsa"
-                            alt="نماد اعتماد الکترونیکی"
-                            code="LIGY7RCe6ngk9p2DzpzyW37m4vJArgsa"
-                            loading="lazy"
-                        >
-                    </a>
+                    <div class="enamad-badge">
+                        <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=733184&Code=LIGY7RCe6ngk9p2DzpzyW37m4vJArgsa'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=733184&Code=LIGY7RCe6ngk9p2DzpzyW37m4vJArgsa' alt='' style='cursor:pointer' code='LIGY7RCe6ngk9p2DzpzyW37m4vJArgsa'></a>
+                    </div>
 
                     <div id="zarinpal" class="zarinpal-box">
                         <script src="https://www.zarinpal.com/webservice/TrustCode" type="text/javascript"></script>
