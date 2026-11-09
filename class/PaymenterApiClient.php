@@ -100,116 +100,47 @@ final class PaymenterApiClient
     }
 
     /**
-     * Submit a CS2 server order after the website has verified its ZarinPal payment.
+     * Create a short-lived one-time URL for the authenticated FragCity customer
+     * to enter Paymenter's native CS2 product checkout.
      *
-     * This method is private server-side transport only. Never call it from
-     * browser JavaScript, and never pass an unverified browser callback here.
-     *
-     * @param array<string,mixed> $order
-     * @return array{order_id:int,invoice_id:int,service_id:int,status:string,replayed:bool,provisioning:string,currency_code:string,currency_unit:string}
+     * This does not create or price an order. Paymenter owns its native Cart,
+     * Config Options, Plan pricing, Service, Invoice and server provisioning.
      */
-    public function createCs2ServerOrder(array $order): array
+    public function createPaymenterCheckoutUrl(string $steamId64): string
     {
-        $orderRef = strtolower(trim((string) ($order['order_ref'] ?? '')));
-        $steamId64 = trim((string) ($order['steamid64'] ?? ''));
-        $payment = $order['payment'] ?? [];
-        $resources = $order['resources'] ?? [];
-        $egg = $order['egg'] ?? [];
-
-        if (
-            !preg_match('/^[a-f0-9]{32}$/D', $orderRef)
-            || !preg_match('/^[0-9]{17}$/D', $steamId64)
-            || !is_array($payment)
-            || ($payment['provider'] ?? null) !== 'zarinpal'
-            || !is_array($resources)
-            || !is_array($egg)
-        ) {
-            throw new RuntimeException('validation_failed');
+        if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
+            throw new RuntimeException('invalid_steamid');
         }
 
-        $amountToman = filter_var($payment['amount_toman'] ?? null, FILTER_VALIDATE_INT);
-        $amountRial = filter_var($payment['amount_rial'] ?? null, FILTER_VALIDATE_INT);
-        $durationDays = filter_var($order['duration_days'] ?? null, FILTER_VALIDATE_INT);
-        $authority = trim((string) ($payment['authority'] ?? ''));
-        $refId = trim((string) ($payment['ref_id'] ?? ''));
-        $serverName = trim((string) ($order['server_name'] ?? ''));
+        $response = $this->post(
+            '/api/v1/fragcity/bridge/checkout-url',
+            ['steamid64' => $steamId64]
+        );
+        $url = $response['data']['checkout_url'] ?? null;
 
-        if (
-            $amountToman === false
-            || $amountRial === false
-            || $amountToman < 1
-            || $amountToman > intdiv(PHP_INT_MAX, 10)
-            || $amountRial !== $amountToman * 10
-            || !in_array($durationDays, [1, 7, 15, 30], true)
-            || !preg_match('/^[A-Za-z0-9_-]{1,128}$/D', $authority)
-            || !preg_match('/^[A-Za-z0-9_-]{1,64}$/D', $refId)
-            || !preg_match('/^[A-Za-z0-9 ]{1,64}$/D', $serverName)
-        ) {
-            throw new RuntimeException('validation_failed');
+        if (!is_string($url) || $url === '') {
+            throw new RuntimeException('paymenter_invalid_response');
         }
 
-        $memoryMb = filter_var($resources['memory_mb'] ?? null, FILTER_VALIDATE_INT);
-        $diskMb = filter_var($resources['disk_mb'] ?? null, FILTER_VALIDATE_INT);
-        $cpuPercent = filter_var($resources['cpu_percent'] ?? null, FILTER_VALIDATE_INT);
+        $urlParts = parse_url($url);
+        $baseParts = parse_url($this->baseUrl);
         if (
-            !in_array($memoryMb, [1024, 1280, 1536], true)
-            || $diskMb === false
-            || $diskMb < 5120
-            || $diskMb > 10240
-            || (($diskMb - 5120) % 1024) !== 0
-            || !in_array($cpuPercent, [100, 200, 300, 400], true)
-        ) {
-            throw new RuntimeException('validation_failed');
-        }
-
-        $payload = [
-            'order_ref' => $orderRef,
-            'steamid64' => $steamId64,
-            'payment' => [
-                'provider' => 'zarinpal',
-                'authority' => $authority,
-                'ref_id' => $refId,
-                'amount_toman' => $amountToman,
-                'amount_rial' => $amountRial,
-            ],
-            'duration_days' => $durationDays,
-            'server_name' => $serverName,
-            'resources' => [
-                'memory_mb' => $memoryMb,
-                'disk_mb' => $diskMb,
-                'cpu_percent' => $cpuPercent,
-            ],
-            'egg' => $egg,
-        ];
-
-        $response = $this->post('/api/v1/fragcity/bridge/orders/cs2', $payload);
-        $data = $response['data'] ?? null;
-
-        if (
-            !is_array($data)
-            || !isset($data['order_id'], $data['invoice_id'], $data['service_id'])
-            || !is_numeric($data['order_id'])
-            || !is_numeric($data['invoice_id'])
-            || !is_numeric($data['service_id'])
-            || (int) $data['order_id'] < 1
-            || (int) $data['invoice_id'] < 1
-            || (int) $data['service_id'] < 1
-            || ($data['status'] ?? null) !== 'accepted'
+            !is_array($urlParts)
+            || !is_array($baseParts)
+            || strtolower((string) ($urlParts['scheme'] ?? '')) !== 'https'
+            || strtolower((string) ($urlParts['host'] ?? '')) !== strtolower((string) ($baseParts['host'] ?? ''))
+            || isset($urlParts['user'])
+            || isset($urlParts['pass'])
+            || isset($urlParts['query'])
+            || isset($urlParts['fragment'])
+            || !str_contains((string) ($urlParts['path'] ?? ''), '/extensions/fragcity-api/checkout-login/')
         ) {
             throw new RuntimeException('paymenter_invalid_response');
         }
 
-        return [
-            'order_id' => (int) $data['order_id'],
-            'invoice_id' => (int) $data['invoice_id'],
-            'service_id' => (int) $data['service_id'],
-            'status' => 'accepted',
-            'replayed' => (bool) ($data['replayed'] ?? false),
-            'provisioning' => (string) ($data['provisioning'] ?? 'queued_by_paymenter'),
-            'currency_code' => (string) ($data['currency_code'] ?? ''),
-            'currency_unit' => (string) ($data['currency_unit'] ?? ''),
-        ];
+        return $url;
     }
+
 
     /**
      * Retrieve CS2 services owned by the authenticated FragCity Steam account.
@@ -393,21 +324,13 @@ final class PaymenterApiClient
                 'panel_username_already_in_use',
                 'panel_username_update_failed',
                 'panel_username_rate_limited',
-                'cs2_checkout_not_configured',
+                'paymenter_checkout_unavailable',
                 'cs2_checkout_manifest_unavailable',
                 'cs2_product_invalid',
                 'cs2_product_out_of_stock',
                 'cs2_product_user_limit',
                 'cs2_plan_invalid',
                 'fragcity_user_not_linked',
-                'paid_option_pricing_not_configured',
-                'invalid_order_payload',
-                'invalid_egg_variable',
-                'egg_validation_failed',
-                'egg_combination_invalid',
-                'order_reference_conflict',
-                'zarinpal_payment_already_used',
-                'order_processing_incomplete',
             ];
 
             if (!in_array($error, $safeErrors, true)) {
