@@ -61,7 +61,7 @@ between signing and sending it.
 The amounts are integer values. `amount_rial` must equal `amount_toman * 10`.
 Allowed durations are 1, 7, 15 and 30 days. Resources are transmitted in the
 same units consumed by Paymenter/Pterodactyl: memory and disk in MB, CPU as a
-percentage. The 8 Egg fields are the exact environment values, not UI labels. `SRCDS_MAXPLAYERS` and `TICKRATE` are validated from this payload, then resolved to native Paymenter Config Option child rows and persisted as `ServiceConfig`; they are not duplicated as service properties. The selected `EXEC` CFG and `MAPGROUP` must also be a compatible pair according to the GameModeManager manifest.
+percentage. The payload carries eight Egg environment values: six Checkout fields plus `SRCDS_MAXPLAYERS` and `TICKRATE`, which are native Config Option selections. All values are exact Egg values, not UI labels. The two Config Option selections are resolved to native Paymenter child rows and persisted as `ServiceConfig`; they are not duplicated as service properties. The selected `EXEC` CFG and `MAPGROUP` must also be a compatible pair according to the GameModeManager manifest.
 
 Generate `order_ref` once for the local FragCity purchase record and reuse it
 for every callback/API retry. Do not generate a new order reference on retry.
@@ -91,11 +91,11 @@ the same `order_ref` and a fresh HMAC nonce.
 
 ## Current paid-option gate
 
-The manifest describes 128 Tick and Bot Guard as paid add-ons, but the current
-storefront quote does not yet include those surcharges. Paymenter rejects
-`TICKRATE=128` and `ENABLE_GUARD=1` instead of silently provisioning them
-for free. Enable them only after the backend pricing contract and verified
-payment amount include the configured surcharge.
+Tickrate 64 and 128 are both free options. Paymenter accepts either value only
+through the native Tickrate Config Option, which must have a zero-price child
+row for every supported Plan and Rial currency. Bot Guard remains a paid
+add-on; `ENABLE_GUARD=1` is still rejected until its surcharge is included in
+the authoritative storefront quote.
 
 ## Renewal caveat
 
