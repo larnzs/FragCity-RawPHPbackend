@@ -272,9 +272,39 @@ $serverStoreDefaultMonthlyPrice =
                         </div>
                     </section>
 
-                <section class="server-store-section server-store-config-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
+                    <section class="server-store-section server-store-name-section" aria-labelledby="serverNameTitle" data-fc-reveal="up" data-fc-reveal-delay="160">
                         <div class="server-store-section-heading">
                             <span class="server-store-section-index">02</span>
+                            <div>
+                                <h2 id="serverNameTitle">نام سرور</h2>
+                                <p>برای شناسایی راحت‌تر سرورت در پنل، یک نام انتخاب کن.</p>
+                            </div>
+                            <span class="server-store-section-state">الزامی</span>
+                        </div>
+
+                        <div class="server-store-field-grid">
+                            <div class="server-store-field server-store-field--wide">
+                                <label for="serverStoreName"><i class="fa-solid fa-tag" aria-hidden="true"></i> نام نمایشی سرور <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <input
+                                    class="server-store-input"
+                                    id="serverStoreName"
+                                    name="server_name"
+                                    type="text"
+                                    value=""
+                                    placeholder="My CS2 Server"
+                                    pattern="[A-Za-z0-9 ]+"
+                                    required
+                                    aria-describedby="serverStoreNameHelp"
+                                    autocomplete="off"
+                                >
+                                <small id="serverStoreNameHelp">پیشنهاد نام: FragCity Public یا My Community. فقط حروف انگلیسی، اعداد و فاصله مجاز است. این نام فقط برای شناسایی سرور در فهرست «سرورهای من» استفاده می‌شود و بعد از خرید می‌توانی نام دلخواهت را از بخش تنظیمات سرور تغییر بدهی.</small>
+                            </div>
+                        </div>
+                    </section>
+
+                <section class="server-store-section server-store-config-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
+                        <div class="server-store-section-heading">
+                            <span class="server-store-section-index">03</span>
                             <div>
                                 <h2 id="serverGameModeTitle">تنظیمات گیم‌سرور</h2>
                                 <p>مود بازی، نقشه شروع و تنظیمات پایه سرورت را مشخص کن.</p>
@@ -284,7 +314,7 @@ $serverStoreDefaultMonthlyPrice =
 
                         <div class="server-store-field-grid">
                             <div class="server-store-field">
-                                <label for="serverStoreMap">نقشه پیش‌فرض <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <label for="serverStoreMap"><i class="fa-solid fa-map" aria-hidden="true"></i> نقشه پیش‌فرض <span class="server-store-required" aria-hidden="true">*</span></label>
                                 <input
                                     class="server-store-input"
                                     id="serverStoreMap"
@@ -300,18 +330,17 @@ $serverStoreDefaultMonthlyPrice =
                                 <small id="serverStoreMapHelp">نام نقشه‌ای که سرور پس از راه‌اندازی با آن بالا می‌آید؛ مانند de_dust2 یا de_mirage.</small>
                             </div>
 
-                            <div class="server-store-field server-store-field--fixed">
-                                <span class="server-store-fixed-label">Tickrate و Subtick</span>
-                                <div class="server-store-fixed-setting" id="serverStoreTickrateDisplay">
-                                    <strong>64 Tick</strong>
-                                    <span>Subtick فعال · ثابت در CS2</span>
-                                </div>
-                                <input type="hidden" id="serverStoreTickrate" name="TICKRATE" value="64">
-                                <small id="serverStoreTickrateHelp">در معماری CS2 امکان انتخاب 128 Tick از پنل وجود ندارد؛ زمان رویدادها با سیستم Subtick ثبت می‌شود.</small>
+                            <div class="server-store-field server-store-field--compact">
+                                <label for="serverStoreTickrate"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Tickrate سرور</label>
+                                <select class="server-store-select" id="serverStoreTickrate" name="TICKRATE" required aria-describedby="serverStoreTickrateHelp">
+                                    <option value="64" selected>64 Tick · Subtick</option>
+                                    <option value="128">128 Tick · آزمایشی</option>
+                                </select>
+                                <small id="serverStoreTickrateHelp">گزینه ۱۲۸ فقط در نودی قابل اعمال است که Startup آن واقعاً از آرگومان -tickrate 128 پشتیبانی کند. تا زمان تأیید خروجی سرور، این انتخاب آزمایشی است.</small>
                             </div>
 
                             <div class="server-store-field">
-                                <label for="serverStoreExec">حالت بازی (Game Mode CFG) <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <label for="serverStoreExec"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> حالت بازی (Game Mode CFG) <span class="server-store-required" aria-hidden="true">*</span></label>
                                 <select class="server-store-select" id="serverStoreExec" name="EXEC" required aria-describedby="serverStoreExecHelp">
                                     <?php foreach ($serverStoreGameModes as $serverStoreMode): ?>
                                         <option
@@ -325,7 +354,7 @@ $serverStoreDefaultMonthlyPrice =
                             </div>
 
                             <div class="server-store-field server-store-field--wide">
-                                <label for="serverStoreMapgroup">گروه نقشه (MAPGROUP) <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <label for="serverStoreMapgroup"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> گروه نقشه (MAPGROUP) <span class="server-store-required" aria-hidden="true">*</span></label>
                                 <select class="server-store-select" id="serverStoreMapgroup" name="MAPGROUP" required aria-describedby="serverStoreMapgroupHelp">
                                     <?php foreach ($serverStoreMapGroupLabels as $serverStoreMapGroupValue => $serverStoreMapGroupLabel): ?>
                                         <option
@@ -342,7 +371,7 @@ $serverStoreDefaultMonthlyPrice =
 
                     <section class="server-store-section server-store-security-section" aria-labelledby="serverAddonTitle" data-fc-reveal="up" data-fc-reveal-delay="120">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">03</span>
+                            <span class="server-store-section-index">04</span>
                             <div>
                                 <h2 id="serverAddonTitle">محافظت و قوانین اتصال</h2>
                                 <p>قوانین ورود بازیکنان و افزونه محافظت در برابر بات‌ها را تنظیم کن.</p>
@@ -351,7 +380,7 @@ $serverStoreDefaultMonthlyPrice =
 
                         <div class="server-store-field-grid">
                             <div class="server-store-field">
-                                <label for="serverStoreCooldown">اخراج بازیکنان دارای Cooldown <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <label for="serverStoreCooldown"><i class="fa-solid fa-clock" aria-hidden="true"></i> اخراج بازیکنان دارای Cooldown <span class="server-store-required" aria-hidden="true">*</span></label>
                                 <select class="server-store-select" id="serverStoreCooldown" name="COOLDOWN" required aria-describedby="serverStoreCooldownHelp">
                                     <option value="0" selected>غیرفعال</option>
                                     <option value="1">فعال</option>
@@ -360,7 +389,7 @@ $serverStoreDefaultMonthlyPrice =
                             </div>
 
                             <div class="server-store-field">
-                                <label for="serverStoreGuard">فعال‌سازی محافظ Bot Guard <span class="server-store-required" aria-hidden="true">*</span></label>
+                                <label for="serverStoreGuard"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> فعال‌سازی محافظ Bot Guard <span class="server-store-required" aria-hidden="true">*</span></label>
                                 <select class="server-store-select" id="serverStoreGuard" name="ENABLE_GUARD" required aria-describedby="serverStoreGuardHelp">
                                     <option value="0" selected>غیرفعال</option>
                                     <option value="1">فعال — بدون هزینه اضافه</option>
@@ -369,7 +398,7 @@ $serverStoreDefaultMonthlyPrice =
                             </div>
 
                             <div class="server-store-field server-store-field--wide" id="serverStoreGuardMinutesField" hidden>
-                                <label for="serverStoreGuardMinutes">مدت مسدودسازی Bot Guard (دقیقه)</label>
+                                <label for="serverStoreGuardMinutes"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> مدت مسدودسازی Bot Guard (دقیقه)</label>
                                 <input
                                     class="server-store-input"
                                     id="serverStoreGuardMinutes"
@@ -393,7 +422,7 @@ $serverStoreDefaultMonthlyPrice =
                     </section>
                     <section class="server-store-section server-store-duration-section" aria-labelledby="serverDurationTitle" data-fc-reveal="up" data-fc-reveal-delay="140">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">04</span>
+                            <span class="server-store-section-index">05</span>
                             <div>
                                 <h2 id="serverDurationTitle">مدت سرویس</h2>
                                 <p>هرچه مدت اشتراک بیشتر باشد، هزینه مؤثر هر ماه کمتر می‌شود.</p>
@@ -450,35 +479,7 @@ $serverStoreDefaultMonthlyPrice =
                         </div>
                     </section>
 
-                    <section class="server-store-section server-store-name-section" aria-labelledby="serverNameTitle" data-fc-reveal="up" data-fc-reveal-delay="160">
-                        <div class="server-store-section-heading">
-                            <span class="server-store-section-index">05</span>
-                            <div>
-                                <h2 id="serverNameTitle">نام سرور</h2>
-                                <p>برای شناسایی راحت‌تر سرورت در پنل، یک نام انتخاب کن.</p>
-                            </div>
-                            <span class="server-store-section-state">الزامی</span>
-                        </div>
 
-                        <div class="server-store-field-grid">
-                            <div class="server-store-field server-store-field--wide">
-                                <label for="serverStoreName">نام نمایشی سرور <span class="server-store-required" aria-hidden="true">*</span></label>
-                                <input
-                                    class="server-store-input"
-                                    id="serverStoreName"
-                                    name="server_name"
-                                    type="text"
-                                    value=""
-                                    placeholder="My CS2 Server"
-                                    pattern="[A-Za-z0-9 ]+"
-                                    required
-                                    aria-describedby="serverStoreNameHelp"
-                                    autocomplete="off"
-                                >
-                                <small id="serverStoreNameHelp">پیشنهاد نام: FragCity Public یا My Community. فقط حروف انگلیسی، اعداد و فاصله مجاز است. این نام فقط برای شناسایی سرور در فهرست «سرورهای من» استفاده می‌شود و بعد از خرید می‌توانی نام دلخواهت را از بخش تنظیمات سرور تغییر بدهی.</small>
-                            </div>
-                        </div>
-                    </section>
                 </form>
             </div>
 
@@ -489,14 +490,22 @@ $serverStoreDefaultMonthlyPrice =
                 </div>
 
                 <h2 id="serverSummaryTitle">خلاصه سفارش</h2>
-                <p class="server-store-summary-description">خلاصه انتخاب‌هایت اینجا به‌روزرسانی می‌شود. پیش از فعال‌شدن خرید، همه موارد را بررسی کن.</p>
+                <p class="server-store-summary-description">قیمت نهایی بر اساس تنظیمات فعلی سرورت.</p>
 
                 <div class="server-store-summary-product">
                     <span class="server-store-summary-product-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
                     <span><strong>CS2 Multimode Server</strong><small>تمام مودهای پشتیبانی‌شده در یک سرویس</small></span>
                 </div>
 
-                <div class="server-store-summary-lines">
+                <div class="server-store-summary-total">
+                    <span>قیمت نهایی دوره انتخاب‌شده</span>
+                    <strong data-server-summary="period-price">۷۴۹٬۰۰۰ تومان</strong>
+                    <small>در نسخه فعلی قیمت بر اساس پلن پایه، اسلات‌های اضافه، RAM و مدت انتخاب‌شده محاسبه می‌شود. هزینه CPU و Storage هنوز به فاکتور اضافه نشده است. دوره‌های چندماهه شامل تخفیف پلکانی هستند. Bot Guard رایگان است.</small>
+                </div>
+
+                <details class="server-store-summary-details">
+                    <summary><i class="fa-solid fa-list-check" aria-hidden="true"></i> مشاهده مقادیر فاکتور <i class="fa-solid fa-chevron-down server-store-summary-chevron" aria-hidden="true"></i></summary>
+                                    <div class="server-store-summary-lines">
                     <div><span>مدت سرویس</span><strong data-server-summary="duration">۱ ماهه</strong></div>
                     <div><span>نام نمایشی سرور</span><strong data-server-summary="server-name">وارد نشده</strong></div>
                     <div><span>تخفیف دوره</span><strong data-server-summary="discount">بدون تخفیف</strong></div>
@@ -517,12 +526,7 @@ $serverStoreDefaultMonthlyPrice =
                     <div><span>مدت مسدودسازی</span><strong data-server-summary="guard-minutes">فقط هنگام فعال بودن</strong></div>
                     <div><span>نود و پورت</span><strong>تخصیص خودکار</strong></div>
                 </div>
-
-                <div class="server-store-summary-total">
-                    <span>قیمت نهایی دوره انتخاب‌شده</span>
-                    <strong data-server-summary="period-price">۷۴۹٬۰۰۰ تومان</strong>
-                    <small>در نسخه فعلی قیمت بر اساس پلن پایه، اسلات‌های اضافه، RAM و مدت انتخاب‌شده محاسبه می‌شود. هزینه CPU و Storage هنوز به فاکتور اضافه نشده است. دوره‌های چندماهه شامل تخفیف پلکانی هستند. Bot Guard رایگان است.</small>
-                </div>
+                </details>
 
                 <button type="button" class="server-store-submit" disabled>
                     <i class="fa-solid fa-lock" aria-hidden="true"></i>
