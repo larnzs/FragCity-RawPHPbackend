@@ -272,7 +272,7 @@ $serverStoreDefaultMonthlyPrice =
 
                         <div class="server-store-egg-settings-panel">
                             <div class="server-store-egg-capacity-row">
-                            <article
+                                <article
                                     class="server-store-resource-card server-store-resource-card--capacity server-store-capacity-panel"
                                     data-base-slots="<?= (int) $serverStoreCapacityPricing['base_slots'] ?>"
                                     data-base-price="<?= (int) $serverStoreCapacityPricing['base_price'] ?>"
