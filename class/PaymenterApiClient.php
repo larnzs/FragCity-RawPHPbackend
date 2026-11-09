@@ -129,11 +129,12 @@ final class PaymenterApiClient
             || !is_array($baseParts)
             || strtolower((string) ($urlParts['scheme'] ?? '')) !== 'https'
             || strtolower((string) ($urlParts['host'] ?? '')) !== strtolower((string) ($baseParts['host'] ?? ''))
+            || (int) ($urlParts['port'] ?? 443) !== (int) ($baseParts['port'] ?? 443)
             || isset($urlParts['user'])
             || isset($urlParts['pass'])
             || isset($urlParts['query'])
             || isset($urlParts['fragment'])
-            || !str_contains((string) ($urlParts['path'] ?? ''), '/extensions/fragcity-api/checkout-login/')
+            || !str_starts_with((string) ($urlParts['path'] ?? ''), '/extensions/fragcity-api/checkout-login/')
         ) {
             throw new RuntimeException('paymenter_invalid_response');
         }
