@@ -25,7 +25,7 @@ declare(strict_types=1);
                 <div class="about-brand-orbit about-brand-orbit-two"></div>
                 <div class="about-logo-frame">
                     <img
-                        src="/assets/images/logo/main.png"
+                        src="/img/logoresponsive.png"
                         alt="لوگوی FragCity"
                         class="about-logo"
                         width="220"
