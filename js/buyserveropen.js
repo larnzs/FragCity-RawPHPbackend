@@ -297,7 +297,7 @@
             const discountPercent = selectedDurationInput
                 ? Math.max(0, Number(selectedDurationInput.dataset.discountPercent) || 0)
                 : 0;
-            const durationLabel = selectedDurationInput?.dataset.durationLabel || '۱ ماهه';
+            const durationLabel = selectedDurationInput?.dataset.durationLabel || '۳۰ روزه';
 
             const periodPrice = roundToPricingStep(monthlyPrice * selectedPriceFactor);
             const undiscountedPeriodPrice = monthlyPrice * (durationDays / 30);
@@ -357,7 +357,7 @@
             setSummary('exec', modeLabel);
             setSummary('mapgroup', mapgroupLabel);
             setSummary('cooldown', cooldownLabel);
-            setSummary('guard', guardEnabled ? 'فعال · رایگان' : 'غیرفعال');
+            setSummary('guard', guardEnabled ? 'فعال · افزونه پولی' : 'غیرفعال');
             setSummary(
                 'guard-minutes',
                 guardEnabled
