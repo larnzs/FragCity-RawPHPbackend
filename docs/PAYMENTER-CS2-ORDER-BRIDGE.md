@@ -45,6 +45,12 @@ between signing and sending it.
     "disk_mb": 10240,
     "cpu_percent": 100
   },
+  "feature_limits": {
+    "databases": 0,
+    "additional_allocations": 0,
+    "backups": 0
+  },
+  },
   "egg": {
     "SRCDS_MAP": "de_dust2",
     "SRCDS_MAXPLAYERS": "10",
@@ -61,7 +67,7 @@ between signing and sending it.
 The amounts are integer values. `amount_rial` must equal `amount_toman * 10`.
 Allowed durations are 1, 7, 15 and 30 days. Resources are transmitted in the
 same units consumed by Paymenter/Pterodactyl: memory and disk in MB, CPU as a
-percentage. The payload carries eight Egg environment values: six Checkout fields plus `SRCDS_MAXPLAYERS` and `TICKRATE`, which are native Config Option selections. All values are exact Egg values, not UI labels. The two Config Option selections are resolved to native Paymenter child rows and persisted as `ServiceConfig`; they are not duplicated as service properties. The selected `EXEC` CFG and `MAPGROUP` must also be a compatible pair according to the GameModeManager manifest.
+percentage. The payload carries eight Egg environment values: six Checkout fields plus `SRCDS_MAXPLAYERS` and `TICKRATE`; the latter two are native Config Option selections. The separate `feature_limits` object carries Databases, Additional Allocations and Backups as Pterodactyl provisioning limits, not Egg variables. All Config Option selections are resolved to native Paymenter child rows and persisted as `ServiceConfig`, not duplicated as service properties. The selected `EXEC` CFG and `MAPGROUP` must also be a compatible pair according to the GameModeManager manifest.
 
 Generate `order_ref` once for the local FragCity purchase record and reuse it
 for every callback/API retry. Do not generate a new order reference on retry.
@@ -97,7 +103,11 @@ row for every supported Plan and Rial currency. Bot Guard remains a paid
 add-on; `ENABLE_GUARD=1` is still rejected until its surcharge is included in
 the authoritative storefront quote.
 
+Databases, Additional Allocations and Backups are also included/free for now. Every selected child must have a zero-price and zero-setup-fee row for the chosen Plan and Rial currency.
+
 ## Renewal caveat
+
+The optional `feature_limits` object defaults to zero when omitted for backward compatibility. When supplied, the bridge persists its three selections as native `ServiceConfig` rows and FragCityCS2 maps them to Pterodactyl's `feature_limits` during initial provisioning.
 
 The first invoice uses the verified FragCity price. The bridge now persists
 RAM, SSD, CPU, Player Slots and Tickrate as native Paymenter ServiceConfig
