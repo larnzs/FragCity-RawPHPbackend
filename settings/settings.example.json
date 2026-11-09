@@ -141,15 +141,15 @@
       "database_profile": "main"
     },
     "pages.zarinpal.buyserver_request": {
-      "_comment": "Website DB profile for the legacy buy-server payment request page. This does not enable server provisioning by itself.",
+      "_comment": "Retired legacy buy-server payment request route (HTTP 410). CS2 purchases now use the ZarinPal Gateway inside Paymenter; this compatibility profile is unused.",
       "database_profile": "main"
     },
     "pages.zarinpal.buyserver_callback": {
-      "_comment": "Website DB profile for the legacy buy-server payment callback. Keep server purchase disabled until the new Pterodactyl billing lifecycle is implemented.",
+      "_comment": "Retired legacy buy-server payment callback (HTTP 410). Paymenter verifies CS2 invoice payments through its native ZarinPal Gateway; this compatibility profile is unused.",
       "database_profile": "main"
     },
     "pages.buyserveropen": {
-      "_comment": "Website DB profile used by the public buy-server information page. This page is not a Pterodactyl provisioning API.",
+      "_comment": "Website DB profile retained for the CS2 storefront entry page. The page creates a short-lived SSO redirect to Paymenter native Checkout; it does not create or price a server.",
       "database_profile": "main"
     },
     "pages.serverlist": {
