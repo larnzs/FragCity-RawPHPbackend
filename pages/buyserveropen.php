@@ -271,55 +271,52 @@ $serverStoreDefaultMonthlyPrice =
                         </div>
 
                         <div class="server-store-egg-settings-panel">
-                            <div class="server-store-egg-capacity-row">
-                                <article
-                                    class="server-store-resource-card server-store-resource-card--capacity server-store-capacity-panel"
-                                    data-base-slots="<?= (int) $serverStoreCapacityPricing['base_slots'] ?>"
-                                    data-base-price="<?= (int) $serverStoreCapacityPricing['base_price'] ?>"
-                                    data-extra-slot-price="<?= (int) $serverStoreCapacityPricing['extra_slot_price'] ?>"
-                                    data-ram-price-1024="<?= (int) $serverStoreRamPricing[1024] ?>"
-                                    data-ram-price-1280="<?= (int) $serverStoreRamPricing[1280] ?>"
-                                    data-ram-price-1536="<?= (int) $serverStoreRamPricing[1536] ?>"
-                                    data-price-rounding-step="<?= (int) $serverStorePriceRoundingStep ?>"
-                                >
-                                    <div class="server-store-resource-head">
-                                        <span class="server-store-resource-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
-                                        <div class="server-store-resource-copy">
-                                            <small>PLAYER SLOTS</small>
-                                            <strong><output id="serverStorePlayersValue" for="serverStorePlayers" aria-live="polite"><?= (int) $serverStoreDefaultPlayers ?></output> اسلات</strong>
-                                            <span>ظرفیت اتصال هم‌زمان</span>
-                                        </div>
-                                    </div>
-                                    <div class="server-store-range-wrap">
-                                        <label class="server-store-resource-slider-label" for="serverStorePlayers">تعداد بازیکن</label>
-                                        <input
-                                            class="server-store-range server-store-capacity-range"
-                                            id="serverStorePlayers"
-                                            name="SRCDS_MAXPLAYERS"
-                                            type="range"
-                                            min="5"
-                                            max="64"
-                                            step="1"
-                                            value="<?= (int) $serverStoreDefaultPlayers ?>"
-                                            aria-describedby="serverStorePlayersHelp"
-                                        >
-                                        <div class="server-store-range-meta" aria-hidden="true"><span>5</span><span>64</span></div>
-                                    </div>
-                                    <div class="server-store-capacity-presets" role="group" aria-label="انتخاب سریع ظرفیت">
-                                        <button type="button" data-player-preset="5" aria-pressed="false">5</button>
-                                        <button type="button" data-player-preset="10" aria-pressed="true">10</button>
-                                        <button type="button" data-player-preset="16" aria-pressed="false">16</button>
-                                        <button type="button" data-player-preset="20" aria-pressed="false">20</button>
-                                        <button type="button" data-player-preset="24" aria-pressed="false">24</button>
-                                        <button type="button" data-player-preset="32" aria-pressed="false">32</button>
-                                        <button type="button" data-player-preset="48" aria-pressed="false">48</button>
-                                        <button type="button" data-player-preset="64" aria-pressed="false">64</button>
-                                    </div>
-                                    <small class="server-store-range-help" id="serverStorePlayersHelp">۵ اسلات پایه؛ هر اسلات اضافه ۵۰٬۰۰۰ تومان به هزینه ماهانه اضافه می‌کند.</small>
-                                </article>
-                            </div>
                             <div class="server-store-field-grid server-store-field-grid--egg">
-
+                            <article
+                                class="server-store-resource-card server-store-resource-card--capacity server-store-capacity-panel server-store-egg-capacity-card"
+                                data-base-slots="<?= (int) $serverStoreCapacityPricing['base_slots'] ?>"
+                                data-base-price="<?= (int) $serverStoreCapacityPricing['base_price'] ?>"
+                                data-extra-slot-price="<?= (int) $serverStoreCapacityPricing['extra_slot_price'] ?>"
+                                data-ram-price-1024="<?= (int) $serverStoreRamPricing[1024] ?>"
+                                data-ram-price-1280="<?= (int) $serverStoreRamPricing[1280] ?>"
+                                data-ram-price-1536="<?= (int) $serverStoreRamPricing[1536] ?>"
+                                data-price-rounding-step="<?= (int) $serverStorePriceRoundingStep ?>"
+                            >
+                                <div class="server-store-resource-head">
+                                    <span class="server-store-resource-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+                                    <div class="server-store-resource-copy">
+                                        <small>PLAYER SLOTS</small>
+                                        <strong><output id="serverStorePlayersValue" for="serverStorePlayers" aria-live="polite"><?= (int) $serverStoreDefaultPlayers ?></output> اسلات</strong>
+                                        <span>ظرفیت اتصال هم‌زمان</span>
+                                    </div>
+                                </div>
+                                <div class="server-store-range-wrap">
+                                    <label class="server-store-resource-slider-label" for="serverStorePlayers">تعداد بازیکن</label>
+                                    <input
+                                        class="server-store-range server-store-capacity-range"
+                                        id="serverStorePlayers"
+                                        name="SRCDS_MAXPLAYERS"
+                                        type="range"
+                                        min="5"
+                                        max="64"
+                                        step="1"
+                                        value="<?= (int) $serverStoreDefaultPlayers ?>"
+                                        aria-describedby="serverStorePlayersHelp"
+                                    >
+                                    <div class="server-store-range-meta" aria-hidden="true"><span>5</span><span>64</span></div>
+                                </div>
+                                <div class="server-store-capacity-presets" role="group" aria-label="انتخاب سریع ظرفیت">
+                                    <button type="button" data-player-preset="5" aria-pressed="false">5</button>
+                                    <button type="button" data-player-preset="10" aria-pressed="true">10</button>
+                                    <button type="button" data-player-preset="16" aria-pressed="false">16</button>
+                                    <button type="button" data-player-preset="20" aria-pressed="false">20</button>
+                                    <button type="button" data-player-preset="24" aria-pressed="false">24</button>
+                                    <button type="button" data-player-preset="32" aria-pressed="false">32</button>
+                                    <button type="button" data-player-preset="48" aria-pressed="false">48</button>
+                                    <button type="button" data-player-preset="64" aria-pressed="false">64</button>
+                                </div>
+                                <small class="server-store-range-help" id="serverStorePlayersHelp">۵ اسلات پایه؛ هر اسلات اضافه ۵۰٬۰۰۰ تومان به هزینه ماهانه اضافه می‌کند.</small>
+                            </article>
                                 <div class="server-store-field">
                                     <label for="serverStoreMap"><i class="fa-solid fa-map" aria-hidden="true"></i> نقشه پیش‌فرض <span class="server-store-required" aria-hidden="true">*</span></label>
                                     <input
