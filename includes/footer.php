@@ -21,14 +21,6 @@ require_once __DIR__ . '/routes.php';
                 <div class="footer-contact-columns" aria-label="راه‌های ارتباطی با FragCity">
                     <div class="footer-contact-column footer-contact-column--right" aria-label="راه‌های ارتباطی، ستون راست">
                 <a
-                    class="footer-ticket-button footer-contact-link"
-                    href="/support/?tab=tickets"
-                    aria-label="ثبت تیکت پشتیبانی FragCity"
-                >
-                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
-                    <span>ثبت تیکت پشتیبانی</span>
-                </a>
-                <a
                     class="footer-telegram-support-button footer-contact-link"
                     href="https://t.me/fragcitysup"
                     target="_blank"
@@ -61,8 +53,6 @@ require_once __DIR__ . '/routes.php';
                     <span>سرور Discord</span>
                     <strong dir="ltr">FragCity</strong>
                 </a>
-                    </div>
-                    <div class="footer-contact-column footer-contact-column--left" aria-label="راه‌های ارتباطی، ستون چپ">
                 <a
                     class="footer-steam-button footer-contact-link"
                     href="https://steamcommunity.com/id/larnz/"
@@ -74,6 +64,17 @@ require_once __DIR__ . '/routes.php';
                     <span>پشتیبانی در Steam</span>
                     <strong dir="ltr">larnz</strong>
                 </a>
+                    </div>
+                    <div class="footer-contact-column footer-contact-column--left" aria-label="راه‌های ارتباطی، ستون چپ">
+                <a
+                    class="footer-ticket-button footer-contact-link"
+                    href="/support/?tab=tickets"
+                    aria-label="ثبت تیکت پشتیبانی FragCity"
+                >
+                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                    <span>ثبت تیکت پشتیبانی</span>
+                </a>
+
                 <a
                     class="footer-teamspeak-button footer-contact-link"
                     href="ts3server://217.18.90.7?port=2014"
