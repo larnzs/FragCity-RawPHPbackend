@@ -68,6 +68,10 @@ $checkResult('CS2 order client sends a verified ZarinPal receipt and resource/Eg
     && str_contains($client, "'memory_mb' => $memoryMb")
     && str_contains($client, "'cpu_percent' => $cpuPercent")
     && str_contains($client, "'egg' => $egg"));
+$checkResult('CS2 order client surfaces native Config Option mapping and pricing errors safely',
+    str_contains($client, "'cs2_config_option_mapping_invalid'")
+    && str_contains($client, "'cs2_config_option_price_missing'")
+);
 
 $unsupportedEndpointTerms = [
     'connect_' . 'client_api',
