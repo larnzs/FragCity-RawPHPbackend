@@ -404,6 +404,7 @@ final class PaymenterApiClient
                 'invalid_order_payload',
                 'invalid_egg_variable',
                 'egg_validation_failed',
+                'egg_combination_invalid',
                 'order_reference_conflict',
                 'zarinpal_payment_already_used',
                 'order_processing_incomplete',
