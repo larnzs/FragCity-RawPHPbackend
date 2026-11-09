@@ -5490,3 +5490,75 @@ html.fc-no-animation .sl-hero-guy {
     padding: 5px 8px;
     font-size: .68rem;
 }
+
+/* =========================================================
+   Server directory — full-width canvas and full-height filters
+   ========================================================= */
+@media (min-width: 901px) {
+    .sl-page-shell {
+        width: 100%;
+        max-width: none;
+        margin-inline: auto;
+        padding-inline: clamp(18px, 1.55vw, 30px);
+    }
+
+    .sl-browser-layout {
+        grid-template-columns: minmax(280px, 310px) minmax(0, 1fr);
+        align-items: stretch;
+        gap: 18px;
+    }
+
+    .sl-filter-sidebar {
+        position: relative;
+        top: auto;
+        align-self: stretch;
+        max-height: none;
+        height: auto;
+        overflow: visible;
+    }
+
+    .sl-browser-main {
+        min-height: 100%;
+        align-self: stretch;
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1240px) {
+    .sl-browser-layout {
+        grid-template-columns: minmax(250px, 270px) minmax(0, 1fr);
+        gap: 14px;
+    }
+}
+
+@media (max-width: 900px) {
+    .sl-page-shell {
+        width: 100%;
+        max-width: none;
+        padding-inline: 20px;
+    }
+
+    .sl-browser-layout {
+        grid-template-columns: minmax(0, 1fr);
+        align-items: stretch;
+    }
+
+    .sl-filter-sidebar {
+        position: static;
+        top: auto;
+        max-height: none;
+        height: auto;
+        overflow: visible;
+    }
+}
+
+@media (max-width: 760px) {
+    .sl-page-shell {
+        padding-inline: 16px;
+    }
+}
+
+@media (max-width: 560px) {
+    .sl-page-shell {
+        padding-inline: 10px;
+    }
+}
