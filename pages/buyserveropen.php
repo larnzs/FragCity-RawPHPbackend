@@ -416,7 +416,7 @@ $serverStoreDefaultMonthlyPrice =
 
                     <section class="server-store-section server-store-duration-section" aria-labelledby="serverDurationTitle" data-fc-reveal="up" data-fc-reveal-delay="140">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">05</span>
+                            <span class="server-store-section-index">04</span>
                             <div>
                                 <h2 id="serverDurationTitle">مدت سرویس</h2>
                                 <p>هرچه مدت اشتراک بیشتر باشد، هزینه مؤثر هر ماه کمتر می‌شود.</p>
