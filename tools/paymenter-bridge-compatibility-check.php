@@ -67,6 +67,10 @@ $checkResult('CS2 order client sends a verified ZarinPal receipt and resource/Eg
     && str_contains($client, "'amount_rial' => $amountRial")
     && str_contains($client, "'memory_mb' => $memoryMb")
     && str_contains($client, "'cpu_percent' => $cpuPercent")
+    && str_contains($client, "'feature_limits' => [")
+    && str_contains($client, "'databases' => $databases")
+    && str_contains($client, "'additional_allocations' => $additionalAllocations")
+    && str_contains($client, "'backups' => $backups")
     && str_contains($client, "'egg' => $egg"));
 $checkResult('CS2 order client surfaces native Config Option mapping and pricing errors safely',
     str_contains($client, "'cs2_config_option_mapping_invalid'")
