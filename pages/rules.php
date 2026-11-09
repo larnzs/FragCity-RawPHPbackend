@@ -117,5 +117,43 @@
             </div>
         </div>
     </div>
+
+    <section class="rules-faq" aria-labelledby="rulesFaqTitle">
+        <div class="rules-faq-heading">
+            <span>راهنمای سریع</span>
+            <h2 id="rulesFaqTitle">پرسش‌های متداول درباره قوانین</h2>
+            <p>پاسخ چند سؤال رایج درباره رعایت قوانین و پیگیری درخواست‌ها.</p>
+        </div>
+
+        <div class="rules-faq-grid">
+            <details class="rules-faq-item">
+                <summary>استفاده از سرورها به معنی پذیرش قوانین است؟</summary>
+                <div class="rules-faq-answer">
+                    <p>بله. مطابق بخش «قبول قوانین»، استفاده از وب‌سایت، سرورها و خدمات FragCity به منزله پذیرش مقررات اعلام‌شده است. در صورت نپذیرفتن آن‌ها، نباید از خدمات استفاده کنید.</p>
+                </div>
+            </details>
+
+            <details class="rules-faq-item">
+                <summary>برای پیگیری مسدودیت یا ثبت اعتراض چه کار کنم؟</summary>
+                <div class="rules-faq-answer">
+                    <p>درخواست خود را از طریق <a class="page-support-link" href="/support/">صفحه پشتیبانی FragCity</a> ارسال کنید تا موضوع توسط تیم مدیریت بررسی شود.</p>
+                </div>
+            </details>
+
+            <details class="rules-faq-item">
+                <summary>آیا قوانین ممکن است در آینده تغییر کنند؟</summary>
+                <div class="rules-faq-answer">
+                    <p>بله. طبق بخش «تغییرات در قوانین»، FragCity ممکن است مقررات را به‌روزرسانی کند. نسخه جاری همین صفحه ملاک استفاده از خدمات است.</p>
+                </div>
+            </details>
+
+            <details class="rules-faq-item">
+                <summary>در صورت مشاهده تخلف یا رفتار نامناسب چگونه اطلاع بدهم؟</summary>
+                <div class="rules-faq-answer">
+                    <p>جزئیات موضوع و اطلاعات مرتبط را از طریق <a class="page-support-link" href="/support/">پشتیبانی</a> ارسال کنید تا امکان بررسی دقیق فراهم باشد.</p>
+                </div>
+            </details>
+        </div>
+    </section>
 </div>
 
