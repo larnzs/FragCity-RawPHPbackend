@@ -353,7 +353,7 @@
             );
             setSummary('monthly-price', formatToman(monthlyPrice) + ' / ماه');
             setSummary('period-price', formatToman(periodPrice));
-            setSummary('tickrate', '64 Tick · Subtick فعال');
+            setSummary('tickrate', tickrate === '128' ? '128 Tick · آزمایشی / نیازمند تأیید نود' : '64 Tick · Subtick فعال');
             setSummary('exec', modeLabel);
             setSummary('mapgroup', mapgroupLabel);
             setSummary('cooldown', cooldownLabel);
