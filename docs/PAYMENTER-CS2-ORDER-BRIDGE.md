@@ -61,7 +61,7 @@ between signing and sending it.
 The amounts are integer values. `amount_rial` must equal `amount_toman * 10`.
 Allowed durations are 1, 7, 15 and 30 days. Resources are transmitted in the
 same units consumed by Paymenter/Pterodactyl: memory and disk in MB, CPU as a
-percentage. The 8 Egg fields are the exact environment values, not UI labels.
+percentage. The 8 Egg fields are the exact environment values, not UI labels. The selected `EXEC` CFG and `MAPGROUP` must also be a compatible pair according to the GameModeManager manifest.
 
 Generate `order_ref` once for the local FragCity purchase record and reuse it
 for every callback/API retry. Do not generate a new order reference on retry.
