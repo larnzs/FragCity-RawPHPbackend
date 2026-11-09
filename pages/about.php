@@ -9,12 +9,14 @@ declare(strict_types=1);
                 <span class="about-eyebrow"><i class="fas fa-server" aria-hidden="true"></i> GAME SERVER HOSTING</span>
                 <h1 id="aboutTitle">درباره <span>FragCity</span></h1>
                 <p class="about-hero-lead">
-                    فرگ‌سیتی ارائه‌دهنده خدمات میزبانی و مدیریت سرورهای بازی آنلاین با تمرکز بر
-                    <strong>Counter-Strike 2</strong> است. ما زیرساخت اجرای سرور بازی را فراهم می‌کنیم
-                    تا مشتری بتواند متناسب با نیاز خود سرویس سفارش دهد، آن را پیکربندی کند و مدیریت نماید.
+                    فرگ‌سیتی ارائه‌دهنده خدمات میزبانی و مدیریت سرورهای بازی آنلاین است. در حال حاضر
+                    تمرکز خدمات ما بر <strong>Counter-Strike 2</strong> و <strong>Counter-Strike 1.6</strong>
+                    قرار دارد. زیرساخت لازم را فراهم می‌کنیم تا مشتری بتواند متناسب با نیاز خود سرور بازی
+                    سفارش دهد، آن را پیکربندی کند و مدیریت نماید. با توسعه خدمات FragCity، امکان اضافه‌شدن
+                    بازی‌های دیگر نیز در آینده وجود دارد.
                 </p>
                 <div class="about-hero-tags" aria-label="حوزه‌های اصلی فعالیت">
-                    <span><i class="fas fa-network-wired" aria-hidden="true"></i> میزبانی سرور CS2</span>
+                    <span><i class="fas fa-network-wired" aria-hidden="true"></i> میزبانی سرور CS2 و CS1.6</span>
                     <span><i class="fas fa-sliders-h" aria-hidden="true"></i> مدیریت و شخصی‌سازی</span>
                     <span><i class="fas fa-headset" aria-hidden="true"></i> پشتیبانی فنی</span>
                 </div>
@@ -46,8 +48,8 @@ declare(strict_types=1);
                 <p>
                     پس از ثبت سفارش، یک نمونه سرور بازی با منابع پردازشی، فضای ذخیره‌سازی و ظرفیت
                     متناسب با پلن انتخاب‌شده در اختیار مشتری قرار می‌گیرد. مشتری می‌تواند تنظیمات
-                    سرور، نقشه‌ها، حالت‌های بازی و افزونه‌های سازگار با Counter-Strike 2 را مطابق
-                    امکانات سرویس خود مدیریت و شخصی‌سازی کند.
+                    سرور، نقشه‌ها، حالت‌های بازی و افزونه‌های سازگار با بازی انتخابی خود، از جمله
+                    Counter-Strike 2 و Counter-Strike 1.6 را مطابق امکانات سرویس مدیریت و شخصی‌سازی کند.
                 </p>
                 <p>
                     خدمات مجموعه شامل راه‌اندازی و پیکربندی اولیه، مدیریت فنی، پشتیبانی و ارائه
@@ -73,9 +75,10 @@ declare(strict_types=1);
         <section class="about-platform-note" aria-label="نحوه اتصال بازیکنان به سرورها">
             <i class="fas fa-gamepad" aria-hidden="true"></i>
             <p>
-                بازیکنان برای ورود به سرورها از نسخه اصلی بازی Counter-Strike 2 و روش‌های اتصال
-                خود بازی استفاده می‌کنند. FragCity بازی مستقل، شبکه جداگانه برای اتصال بازیکنان
-                یا سامانه Matchmaking مستقل ارائه نمی‌کند؛ تمرکز مجموعه بر میزبانی و مدیریت سرورهای بازی است.
+                بازیکنان برای ورود به سرورها از نسخه اصلی بازی مربوط به سرویس خود و روش‌های اتصال
+                همان بازی استفاده می‌کنند. در حال حاضر سرورهای Counter-Strike 2 و Counter-Strike 1.6
+                در حوزه خدمات FragCity قرار دارند. FragCity بازی مستقل یا شبکه جداگانه برای اتصال
+                بازیکنان و Matchmaking مستقل ارائه نمی‌کند؛ تمرکز مجموعه بر میزبانی و مدیریت سرورهای بازی است.
             </p>
         </section>
 
@@ -89,7 +92,7 @@ declare(strict_types=1);
                 <article class="about-service-card">
                     <span class="about-service-icon"><i class="fas fa-server" aria-hidden="true"></i></span>
                     <h3>میزبانی سرور بازی</h3>
-                    <p>ارائه و راه‌اندازی سرورهای آنلاین Counter-Strike 2 با منابع و ظرفیت متناسب با پلن انتخابی.</p>
+                    <p>ارائه و راه‌اندازی سرورهای آنلاین Counter-Strike 2 و Counter-Strike 1.6 با منابع و ظرفیت متناسب با پلن انتخابی.</p>
                 </article>
 
                 <article class="about-service-card">
@@ -131,14 +134,14 @@ declare(strict_types=1);
                 <details class="about-faq-item">
                     <summary>آیا FragCity یک بازی یا شبکه مستقل مانند پلتفرم‌های بازی است؟</summary>
                     <div class="about-faq-answer">
-                        <p>خیر. FragCity بازی مستقل یا شبکه جداگانه برای اتصال بازیکنان و Matchmaking ارائه نمی‌کند. بازیکنان از طریق Counter-Strike 2 به سرورهای میزبانی‌شده متصل می‌شوند.</p>
+                        <p>خیر. FragCity بازی مستقل یا شبکه جداگانه برای اتصال بازیکنان و Matchmaking ارائه نمی‌کند. بازیکنان از طریق نسخه اصلی بازی مربوط، از جمله CS2 یا CS1.6، به سرورهای میزبانی‌شده متصل می‌شوند.</p>
                     </div>
                 </details>
 
                 <details class="about-faq-item">
                     <summary>پس از تهیه سرور چه امکاناتی در اختیار مشتری قرار می‌گیرد؟</summary>
                     <div class="about-faq-answer">
-                        <p>با توجه به پلن، مشتری می‌تواند سرور خود را مدیریت و شخصی‌سازی کند؛ از جمله تنظیمات، نقشه‌ها، حالت‌های بازی و افزونه‌های سازگار با CS2.</p>
+                        <p>با توجه به پلن و نوع بازی، مشتری می‌تواند سرور خود را مدیریت و شخصی‌سازی کند؛ از جمله تنظیمات، نقشه‌ها، حالت‌های بازی و افزونه‌های سازگار با CS2 یا CS1.6.</p>
                     </div>
                 </details>
 
