@@ -271,9 +271,9 @@ $serverStoreDefaultMonthlyPrice =
                         </div>
 
                         <div class="server-store-egg-settings-panel">
-                            <div class="server-store-field-grid server-store-field-grid--egg">
+                            <div class="server-store-egg-capacity-row">
                             <article
-                                class="server-store-resource-card server-store-resource-card--capacity server-store-capacity-panel server-store-egg-capacity-card"
+                                class="server-store-resource-card server-store-resource-card--capacity server-store-capacity-panel"
                                 data-base-slots="<?= (int) $serverStoreCapacityPricing['base_slots'] ?>"
                                 data-base-price="<?= (int) $serverStoreCapacityPricing['base_price'] ?>"
                                 data-extra-slot-price="<?= (int) $serverStoreCapacityPricing['extra_slot_price'] ?>"
@@ -317,6 +317,9 @@ $serverStoreDefaultMonthlyPrice =
                                 </div>
                                 <small class="server-store-range-help" id="serverStorePlayersHelp">۵ اسلات پایه؛ هر اسلات اضافه ۵۰٬۰۰۰ تومان به هزینه ماهانه اضافه می‌کند.</small>
                             </article>
+                            </div>
+                            <div class="server-store-field-grid server-store-field-grid--egg">
+
                                 <div class="server-store-field">
                                     <label for="serverStoreMap"><i class="fa-solid fa-map" aria-hidden="true"></i> نقشه پیش‌فرض <span class="server-store-required" aria-hidden="true">*</span></label>
                                     <input
