@@ -99,15 +99,17 @@ $serverStoreRamPricing = [
 ];
 $serverStoreDefaultPlayers = 10;
 $serverStorePriceRoundingStep = 100;
+$serverStoreOneDayReferencePrice = 174582;
+$serverStoreFifteenDayReferencePrice = 552843;
+$serverStoreMonthlyReferencePrice = 902000;
+// The 7-day reference price is linearly interpolated between the 1-day and 15-day benchmarks.
+$serverStoreSevenDayReferencePrice = $serverStoreOneDayReferencePrice
+    + (($serverStoreFifteenDayReferencePrice - $serverStoreOneDayReferencePrice) * (7 - 1) / (15 - 1));
 $serverStoreDurations = [
-    // Short-term factors are scaled from the competitor reference: 174,582 / 902,000 and 552,843 / 902,000.
-    ['days' => 1, 'label' => '۱ روزه', 'caption' => '۲۴ ساعت', 'price_factor' => 174582 / 902000],
-    ['days' => 15, 'label' => '۱۵ روزه', 'caption' => 'نیم‌ماه', 'price_factor' => 552843 / 902000],
-    ['days' => 30, 'label' => '۱ ماهه', 'caption' => 'قیمت پایه ماهانه', 'price_factor' => 1, 'recommended' => true],
-    ['days' => 60, 'label' => '۲ ماهه', 'caption' => '۵٪ تخفیف', 'discount_percent' => 5, 'price_factor' => 2 * (1 - 5 / 100)],
-    ['days' => 90, 'label' => '۳ ماهه', 'caption' => '۷٪ تخفیف', 'discount_percent' => 7, 'price_factor' => 3 * (1 - 7 / 100)],
-    ['days' => 180, 'label' => '۶ ماهه', 'caption' => '۱۰٪ تخفیف', 'discount_percent' => 10, 'price_factor' => 6 * (1 - 10 / 100)],
-    ['days' => 360, 'label' => '۱۲ ماهه', 'caption' => '۱۵٪ تخفیف · بیشترین صرفه‌جویی', 'discount_percent' => 15, 'price_factor' => 12 * (1 - 15 / 100), 'best_value' => true],
+    ['days' => 1, 'label' => '۱ روزه', 'caption' => '۲۴ ساعت', 'price_factor' => $serverStoreOneDayReferencePrice / $serverStoreMonthlyReferencePrice],
+    ['days' => 7, 'label' => '۷ روزه', 'caption' => 'یک هفته · تعرفه محاسبه‌شده', 'price_factor' => $serverStoreSevenDayReferencePrice / $serverStoreMonthlyReferencePrice],
+    ['days' => 15, 'label' => '۱۵ روزه', 'caption' => 'نیم‌ماه', 'price_factor' => $serverStoreFifteenDayReferencePrice / $serverStoreMonthlyReferencePrice],
+    ['days' => 30, 'label' => '۳۰ روزه', 'caption' => 'قیمت پایه ماهانه', 'price_factor' => 1, 'recommended' => true],
 ];
 $serverStoreDefaultMonthlyPrice =
     $serverStoreCapacityPricing['base_price']
@@ -125,7 +127,7 @@ $serverStoreDefaultMonthlyPrice =
                 <div class="server-store-hero-copy">
                     <span class="server-store-eyebrow" dir="ltr">FRAGCITY / GAME HOSTING</span>
                     <h1>سرور بازی خودت رو بساز</h1>
-                    <p>بازی موردنظرت را انتخاب کن و ظرفیت و منابع سرورت را متناسب با کامیونیتی خودت تنظیم کن.</p>
+                    <p>بازی موردنظرت را انتخاب کن و منابع سرورت را متناسب با کامیونیتی خودت تنظیم کن.</p>
                     <div class="server-store-hero-tags">
                         <span><i class="fa-solid fa-users" aria-hidden="true"></i> ۵ تا ۶۴ اسلات</span>
                         <span><i class="fa-solid fa-gamepad" aria-hidden="true"></i> همه مودها در یک سرویس</span>
@@ -163,57 +165,13 @@ $serverStoreDefaultMonthlyPrice =
                             <span class="server-store-section-index">01</span>
                             <div>
                                 <h2 id="serverResourcesTitle">ظرفیت و منابع سرور</h2>
-                                <p>چهار منبع اصلی را از همین ردیف تنظیم کن؛ تعرفه‌های فعال در خلاصه سفارش محاسبه می‌شوند.</p>
+                                <p>منابع RAM، SSD و CPU سرور را تنظیم کن؛ تعرفه‌های فعال در خلاصه سفارش محاسبه می‌شوند.</p>
                             </div>
-                            <span class="server-store-section-state">۴ تنظیم قابل انتخاب</span>
+                            <span class="server-store-section-state">۳ منبع قابل انتخاب</span>
                         </div>
 
                         <div class="server-store-resource-grid">
-                            <article
-                                class="server-store-resource-card server-store-resource-card--capacity server-store-capacity-panel"
-                                data-base-slots="<?= (int) $serverStoreCapacityPricing['base_slots'] ?>"
-                                data-base-price="<?= (int) $serverStoreCapacityPricing['base_price'] ?>"
-                                data-extra-slot-price="<?= (int) $serverStoreCapacityPricing['extra_slot_price'] ?>"
-                                data-ram-price-1024="<?= (int) $serverStoreRamPricing[1024] ?>"
-                                data-ram-price-1280="<?= (int) $serverStoreRamPricing[1280] ?>"
-                                data-ram-price-1536="<?= (int) $serverStoreRamPricing[1536] ?>"
-                                data-price-rounding-step="<?= (int) $serverStorePriceRoundingStep ?>"
-                            >
-                                <div class="server-store-resource-head">
-                                    <span class="server-store-resource-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
-                                    <div class="server-store-resource-copy">
-                                        <small>PLAYER SLOTS</small>
-                                        <strong><output id="serverStorePlayersValue" for="serverStorePlayers" aria-live="polite"><?= (int) $serverStoreDefaultPlayers ?></output> اسلات</strong>
-                                        <span>ظرفیت اتصال هم‌زمان</span>
-                                    </div>
-                                </div>
-                                <div class="server-store-range-wrap">
-                                    <label class="server-store-resource-slider-label" for="serverStorePlayers">تعداد بازیکن</label>
-                                    <input
-                                        class="server-store-range server-store-capacity-range"
-                                        id="serverStorePlayers"
-                                        name="SRCDS_MAXPLAYERS"
-                                        type="range"
-                                        min="5"
-                                        max="64"
-                                        step="1"
-                                        value="<?= (int) $serverStoreDefaultPlayers ?>"
-                                        aria-describedby="serverStorePlayersHelp"
-                                    >
-                                    <div class="server-store-range-meta" aria-hidden="true"><span>5</span><span>64</span></div>
-                                </div>
-                                <div class="server-store-capacity-presets" role="group" aria-label="انتخاب سریع ظرفیت">
-                                    <button type="button" data-player-preset="5" aria-pressed="false">5</button>
-                                    <button type="button" data-player-preset="10" aria-pressed="true">10</button>
-                                    <button type="button" data-player-preset="16" aria-pressed="false">16</button>
-                                    <button type="button" data-player-preset="20" aria-pressed="false">20</button>
-                                    <button type="button" data-player-preset="24" aria-pressed="false">24</button>
-                                    <button type="button" data-player-preset="32" aria-pressed="false">32</button>
-                                    <button type="button" data-player-preset="48" aria-pressed="false">48</button>
-                                    <button type="button" data-player-preset="64" aria-pressed="false">64</button>
-                                </div>
-                                <small class="server-store-range-help" id="serverStorePlayersHelp">۵ اسلات پایه؛ هر اسلات اضافه ۵۰٬۰۰۰ تومان به هزینه ماهانه اضافه می‌کند.</small>
-                            </article>
+
 
                             <article class="server-store-resource-card">
                                 <div class="server-store-resource-head">
@@ -302,124 +260,160 @@ $serverStoreDefaultMonthlyPrice =
                         </div>
                     </section>
 
-                <section class="server-store-section server-store-config-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
+                    <section class="server-store-section server-store-config-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
                         <div class="server-store-section-heading">
                             <span class="server-store-section-index">03</span>
                             <div>
                                 <h2 id="serverGameModeTitle">تنظیمات گیم‌سرور</h2>
-                                <p>مود بازی، نقشه شروع و تنظیمات پایه سرورت را مشخص کن.</p>
+                                <p>تمام مقادیر موردنیاز Egg در Paymenter را یکجا تنظیم کن؛ ظرفیت بازیکن هم در همین بخش قرار دارد.</p>
                             </div>
-                            <span class="server-store-section-state">تنظیمات الزامی</span>
+                            <span class="server-store-section-state">PAYMENTER EGG</span>
                         </div>
 
-                        <div class="server-store-field-grid">
-                            <div class="server-store-field">
-                                <label for="serverStoreMap"><i class="fa-solid fa-map" aria-hidden="true"></i> نقشه پیش‌فرض <span class="server-store-required" aria-hidden="true">*</span></label>
-                                <input
-                                    class="server-store-input"
-                                    id="serverStoreMap"
-                                    name="SRCDS_MAP"
-                                    type="text"
-                                    value="de_dust2"
-                                    placeholder="de_dust2"
-                                    pattern="[A-Za-z0-9_-]+"
-                                    maxlength="64"
-                                    required
-                                    aria-describedby="serverStoreMapHelp"
-                                >
-                                <small id="serverStoreMapHelp">نام نقشه‌ای که سرور پس از راه‌اندازی با آن بالا می‌آید؛ مانند de_dust2 یا de_mirage.</small>
+                        <div class="server-store-egg-settings-panel">
+                            <div class="server-store-field-grid server-store-field-grid--egg">
+                            <article
+                                class="server-store-resource-card server-store-resource-card--capacity server-store-capacity-panel server-store-egg-capacity-card"
+                                data-base-slots="<?= (int) $serverStoreCapacityPricing['base_slots'] ?>"
+                                data-base-price="<?= (int) $serverStoreCapacityPricing['base_price'] ?>"
+                                data-extra-slot-price="<?= (int) $serverStoreCapacityPricing['extra_slot_price'] ?>"
+                                data-ram-price-1024="<?= (int) $serverStoreRamPricing[1024] ?>"
+                                data-ram-price-1280="<?= (int) $serverStoreRamPricing[1280] ?>"
+                                data-ram-price-1536="<?= (int) $serverStoreRamPricing[1536] ?>"
+                                data-price-rounding-step="<?= (int) $serverStorePriceRoundingStep ?>"
+                            >
+                                <div class="server-store-resource-head">
+                                    <span class="server-store-resource-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
+                                    <div class="server-store-resource-copy">
+                                        <small>PLAYER SLOTS</small>
+                                        <strong><output id="serverStorePlayersValue" for="serverStorePlayers" aria-live="polite"><?= (int) $serverStoreDefaultPlayers ?></output> اسلات</strong>
+                                        <span>ظرفیت اتصال هم‌زمان</span>
+                                    </div>
+                                </div>
+                                <div class="server-store-range-wrap">
+                                    <label class="server-store-resource-slider-label" for="serverStorePlayers">تعداد بازیکن</label>
+                                    <input
+                                        class="server-store-range server-store-capacity-range"
+                                        id="serverStorePlayers"
+                                        name="SRCDS_MAXPLAYERS"
+                                        type="range"
+                                        min="5"
+                                        max="64"
+                                        step="1"
+                                        value="<?= (int) $serverStoreDefaultPlayers ?>"
+                                        aria-describedby="serverStorePlayersHelp"
+                                    >
+                                    <div class="server-store-range-meta" aria-hidden="true"><span>5</span><span>64</span></div>
+                                </div>
+                                <div class="server-store-capacity-presets" role="group" aria-label="انتخاب سریع ظرفیت">
+                                    <button type="button" data-player-preset="5" aria-pressed="false">5</button>
+                                    <button type="button" data-player-preset="10" aria-pressed="true">10</button>
+                                    <button type="button" data-player-preset="16" aria-pressed="false">16</button>
+                                    <button type="button" data-player-preset="20" aria-pressed="false">20</button>
+                                    <button type="button" data-player-preset="24" aria-pressed="false">24</button>
+                                    <button type="button" data-player-preset="32" aria-pressed="false">32</button>
+                                    <button type="button" data-player-preset="48" aria-pressed="false">48</button>
+                                    <button type="button" data-player-preset="64" aria-pressed="false">64</button>
+                                </div>
+                                <small class="server-store-range-help" id="serverStorePlayersHelp">۵ اسلات پایه؛ هر اسلات اضافه ۵۰٬۰۰۰ تومان به هزینه ماهانه اضافه می‌کند.</small>
+                            </article>
+                                <div class="server-store-field">
+                                    <label for="serverStoreMap"><i class="fa-solid fa-map" aria-hidden="true"></i> نقشه پیش‌فرض <span class="server-store-required" aria-hidden="true">*</span></label>
+                                    <input
+                                        class="server-store-input"
+                                        id="serverStoreMap"
+                                        name="SRCDS_MAP"
+                                        type="text"
+                                        value="de_dust2"
+                                        placeholder="de_dust2"
+                                        pattern="[A-Za-z0-9_-]+"
+                                        maxlength="64"
+                                        required
+                                        aria-describedby="serverStoreMapHelp"
+                                    >
+                                    <small id="serverStoreMapHelp">نام نقشه‌ای که سرور پس از راه‌اندازی با آن بالا می‌آید؛ مانند de_dust2 یا de_mirage.</small>
+                                </div>
+
+                                <div class="server-store-field server-store-field--compact">
+                                    <label for="serverStoreTickrate"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Tickrate سرور</label>
+                                    <select class="server-store-select" id="serverStoreTickrate" name="TICKRATE" required aria-describedby="serverStoreTickrateHelp">
+                                        <option value="64" selected>64 Tick · Subtick</option>
+                                        <option value="128">128 Tick · آزمایشی</option>
+                                    </select>
+                                    <small id="serverStoreTickrateHelp">گزینه ۱۲۸ فقط در نودی قابل اعمال است که Startup آن واقعاً از آرگومان -tickrate 128 پشتیبانی کند. تا زمان تأیید خروجی سرور، این انتخاب آزمایشی است.</small>
+                                </div>
+
+                                <div class="server-store-field">
+                                    <label for="serverStoreExec"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> حالت بازی (Game Mode CFG) <span class="server-store-required" aria-hidden="true">*</span></label>
+                                    <select class="server-store-select" id="serverStoreExec" name="EXEC" required aria-describedby="serverStoreExecHelp">
+                                        <?php foreach ($serverStoreGameModes as $serverStoreMode): ?>
+                                            <option
+                                                value="<?= htmlspecialchars($serverStoreMode['config'], ENT_QUOTES, 'UTF-8') ?>"
+                                                data-map-groups="<?= htmlspecialchars(implode('|', $serverStoreMode['map_groups']), ENT_QUOTES, 'UTF-8') ?>"
+                                                <?= $serverStoreMode['config'] === $serverStoreDefaultConfig ? 'selected' : '' ?>
+                                            ><?= htmlspecialchars($serverStoreMode['label'], ENT_QUOTES, 'UTF-8') ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <small id="serverStoreExecHelp">فایل CFG مربوط به GameModeManager؛ فقط مودهای تعریف‌شده در GameModes قابل انتخاب‌اند.</small>
+                                </div>
+
+                                <div class="server-store-field">
+                                    <label for="serverStoreMapgroup"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> گروه نقشه (MAPGROUP) <span class="server-store-required" aria-hidden="true">*</span></label>
+                                    <select class="server-store-select" id="serverStoreMapgroup" name="MAPGROUP" required aria-describedby="serverStoreMapgroupHelp">
+                                        <?php foreach ($serverStoreMapGroupLabels as $serverStoreMapGroupValue => $serverStoreMapGroupLabel): ?>
+                                            <option
+                                                value="<?= htmlspecialchars($serverStoreMapGroupValue, ENT_QUOTES, 'UTF-8') ?>"
+                                                data-game-modes="<?= htmlspecialchars(implode('|', $serverStoreMapGroupModes[$serverStoreMapGroupValue] ?? []), ENT_QUOTES, 'UTF-8') ?>"
+                                                <?= $serverStoreMapGroupValue === $serverStoreDefaultMapGroup ? 'selected' : '' ?>
+                                            ><?= htmlspecialchars($serverStoreMapGroupLabel, ENT_QUOTES, 'UTF-8') ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                    <small id="serverStoreMapgroupHelp">شناسه Map Group مرتبط با مود بازی؛ گزینه‌ها براساس CFG انتخاب‌شده فیلتر می‌شوند.</small>
+                                </div>
+
+                                <div class="server-store-field">
+                                    <label for="serverStoreCooldown"><i class="fa-solid fa-clock" aria-hidden="true"></i> اخراج بازیکنان دارای Cooldown <span class="server-store-required" aria-hidden="true">*</span></label>
+                                    <select class="server-store-select" id="serverStoreCooldown" name="COOLDOWN" required aria-describedby="serverStoreCooldownHelp">
+                                        <option value="0" selected>غیرفعال</option>
+                                        <option value="1">فعال</option>
+                                    </select>
+                                    <small id="serverStoreCooldownHelp">معادل sv_kick_players_with_cooldown.</small>
+                                </div>
+
+                                <div class="server-store-field">
+                                    <label for="serverStoreGuard"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> فعال‌سازی محافظ Bot Guard <span class="server-store-required" aria-hidden="true">*</span></label>
+                                    <select class="server-store-select" id="serverStoreGuard" name="ENABLE_GUARD" required aria-describedby="serverStoreGuardHelp">
+                                        <option value="0" selected>غیرفعال</option>
+                                        <option value="1">فعال — افزونه پولی</option>
+                                    </select>
+                                    <small id="serverStoreGuardHelp">افزونه محافظت در برابر بات‌ها و اتصال‌های مخرب؛ در صورت فعال‌سازی، هزینه آن به‌عنوان افزونه پولی در سبد خرید FragCity محاسبه می‌شود.</small>
+                                </div>
+
+                                <div class="server-store-field" id="serverStoreGuardMinutesField" hidden>
+                                    <label for="serverStoreGuardMinutes"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> مدت مسدودسازی Bot Guard (دقیقه)</label>
+                                    <input
+                                        class="server-store-input"
+                                        id="serverStoreGuardMinutes"
+                                        name="GUARD_BAN_MINUTES"
+                                        type="number"
+                                        min="1"
+                                        step="1"
+                                        value="60"
+                                        inputmode="numeric"
+                                        disabled
+                                        aria-describedby="serverStoreGuardMinutesHelp"
+                                    >
+                                    <small id="serverStoreGuardMinutesHelp">مدت مسدودسازی در صورت انتخاب رفتار Kick یا Block توسط مدیر محصول. فقط در صورت فعال بودن Bot Guard کاربرد دارد.</small>
+                                </div>
                             </div>
 
-                            <div class="server-store-field server-store-field--compact">
-                                <label for="serverStoreTickrate"><i class="fa-solid fa-gauge-high" aria-hidden="true"></i> Tickrate سرور</label>
-                                <select class="server-store-select" id="serverStoreTickrate" name="TICKRATE" required aria-describedby="serverStoreTickrateHelp">
-                                    <option value="64" selected>64 Tick · Subtick</option>
-                                    <option value="128">128 Tick · آزمایشی</option>
-                                </select>
-                                <small id="serverStoreTickrateHelp">گزینه ۱۲۸ فقط در نودی قابل اعمال است که Startup آن واقعاً از آرگومان -tickrate 128 پشتیبانی کند. تا زمان تأیید خروجی سرور، این انتخاب آزمایشی است.</small>
-                            </div>
-
-                            <div class="server-store-field">
-                                <label for="serverStoreExec"><i class="fa-solid fa-gamepad" aria-hidden="true"></i> حالت بازی (Game Mode CFG) <span class="server-store-required" aria-hidden="true">*</span></label>
-                                <select class="server-store-select" id="serverStoreExec" name="EXEC" required aria-describedby="serverStoreExecHelp">
-                                    <?php foreach ($serverStoreGameModes as $serverStoreMode): ?>
-                                        <option
-                                            value="<?= htmlspecialchars($serverStoreMode['config'], ENT_QUOTES, 'UTF-8') ?>"
-                                            data-map-groups="<?= htmlspecialchars(implode('|', $serverStoreMode['map_groups']), ENT_QUOTES, 'UTF-8') ?>"
-                                            <?= $serverStoreMode['config'] === $serverStoreDefaultConfig ? 'selected' : '' ?>
-                                        ><?= htmlspecialchars($serverStoreMode['label'], ENT_QUOTES, 'UTF-8') ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <small id="serverStoreExecHelp">فایل CFG مربوط به GameModeManager. فقط مودهای تعریف‌شده در GameModes فهرست می‌شوند؛ فایل‌های Settings، Warmup و custom در دسترس Checkout نیستند.</small>
-                            </div>
-
-                            <div class="server-store-field server-store-field--wide">
-                                <label for="serverStoreMapgroup"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> گروه نقشه (MAPGROUP) <span class="server-store-required" aria-hidden="true">*</span></label>
-                                <select class="server-store-select" id="serverStoreMapgroup" name="MAPGROUP" required aria-describedby="serverStoreMapgroupHelp">
-                                    <?php foreach ($serverStoreMapGroupLabels as $serverStoreMapGroupValue => $serverStoreMapGroupLabel): ?>
-                                        <option
-                                            value="<?= htmlspecialchars($serverStoreMapGroupValue, ENT_QUOTES, 'UTF-8') ?>"
-                                            data-game-modes="<?= htmlspecialchars(implode('|', $serverStoreMapGroupModes[$serverStoreMapGroupValue] ?? []), ENT_QUOTES, 'UTF-8') ?>"
-                                            <?= $serverStoreMapGroupValue === $serverStoreDefaultMapGroup ? 'selected' : '' ?>
-                                        ><?= htmlspecialchars($serverStoreMapGroupLabel, ENT_QUOTES, 'UTF-8') ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                                <small id="serverStoreMapgroupHelp">شناسه Map Group مرتبط با مود بازی. گزینه‌ها بر اساس CFG انتخاب‌شده و مقادیر MapGroups در GameModeManager فیلتر می‌شوند.</small>
+                            <div class="server-store-config-note" role="note">
+                                <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                                انتخاب‌ها در این صفحه برای پیش‌نمایش سفارش هستند؛ ثبت سفارش و Provisioning هنوز به Backend متصل نشده‌اند.
                             </div>
                         </div>
                     </section>
 
-                    <section class="server-store-section server-store-security-section" aria-labelledby="serverAddonTitle" data-fc-reveal="up" data-fc-reveal-delay="120">
-                        <div class="server-store-section-heading">
-                            <span class="server-store-section-index">04</span>
-                            <div>
-                                <h2 id="serverAddonTitle">محافظت و قوانین اتصال</h2>
-                                <p>قوانین ورود بازیکنان و افزونه محافظت در برابر بات‌ها را تنظیم کن.</p>
-                            </div>
-                        </div>
-
-                        <div class="server-store-field-grid">
-                            <div class="server-store-field">
-                                <label for="serverStoreCooldown"><i class="fa-solid fa-clock" aria-hidden="true"></i> اخراج بازیکنان دارای Cooldown <span class="server-store-required" aria-hidden="true">*</span></label>
-                                <select class="server-store-select" id="serverStoreCooldown" name="COOLDOWN" required aria-describedby="serverStoreCooldownHelp">
-                                    <option value="0" selected>غیرفعال</option>
-                                    <option value="1">فعال</option>
-                                </select>
-                                <small id="serverStoreCooldownHelp">معادل sv_kick_players_with_cooldown.</small>
-                            </div>
-
-                            <div class="server-store-field">
-                                <label for="serverStoreGuard"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> فعال‌سازی محافظ Bot Guard <span class="server-store-required" aria-hidden="true">*</span></label>
-                                <select class="server-store-select" id="serverStoreGuard" name="ENABLE_GUARD" required aria-describedby="serverStoreGuardHelp">
-                                    <option value="0" selected>غیرفعال</option>
-                                    <option value="1">فعال — بدون هزینه اضافه</option>
-                                </select>
-                                <small id="serverStoreGuardHelp">محافظت در برابر بات‌ها و اتصال‌های مخرب؛ فعال‌سازی Bot Guard در حال حاضر هزینه جداگانه‌ای ندارد.</small>
-                            </div>
-
-                            <div class="server-store-field server-store-field--wide" id="serverStoreGuardMinutesField" hidden>
-                                <label for="serverStoreGuardMinutes"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i> مدت مسدودسازی Bot Guard (دقیقه)</label>
-                                <input
-                                    class="server-store-input"
-                                    id="serverStoreGuardMinutes"
-                                    name="GUARD_BAN_MINUTES"
-                                    type="number"
-                                    min="1"
-                                    step="1"
-                                    value="60"
-                                    inputmode="numeric"
-                                    disabled
-                                    aria-describedby="serverStoreGuardMinutesHelp"
-                                >
-                                <small id="serverStoreGuardMinutesHelp">مدت مسدودسازی در صورت انتخاب رفتار Kick یا Block توسط مدیر محصول. فقط در صورت فعال بودن Bot Guard کاربرد دارد.</small>
-                            </div>
-                        </div>
-
-                        <div class="server-store-config-note" role="note">
-                            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                            انتخاب‌ها در این صفحه برای پیش‌نمایش سفارش هستند؛ ثبت سفارش و Provisioning هنوز به Backend متصل نشده‌اند.
-                        </div>
-                    </section>
                     <section class="server-store-section server-store-duration-section" aria-labelledby="serverDurationTitle" data-fc-reveal="up" data-fc-reveal-delay="140">
                         <div class="server-store-section-heading">
                             <span class="server-store-section-index">05</span>
@@ -427,7 +421,7 @@ $serverStoreDefaultMonthlyPrice =
                                 <h2 id="serverDurationTitle">مدت سرویس</h2>
                                 <p>هرچه مدت اشتراک بیشتر باشد، هزینه مؤثر هر ماه کمتر می‌شود.</p>
                             </div>
-                            <span class="server-store-section-state">۱ روز تا ۱۲ ماه</span>
+                            <span class="server-store-section-state">۱ روز تا ۳۰ روز</span>
                         </div>
 
                         <div class="server-store-duration-grid" role="radiogroup" aria-label="مدت اعتبار سرور">
@@ -475,7 +469,7 @@ $serverStoreDefaultMonthlyPrice =
 
                         <div class="server-store-duration-note" role="note">
                             <i class="fa-solid fa-calculator" aria-hidden="true"></i>
-                            <span>تعرفه ۱ روزه و ۱۵ روزه با ضرایب کوتاه‌مدت محاسبه می‌شود؛ تعرفه ۱ ماهه مبنای قیمت است. خرید ۲، ۳، ۶ و ۱۲ ماهه به‌ترتیب شامل ۵٪، ۷٪، ۱۰٪ و ۱۵٪ تخفیف است. قیمت‌ها با تغییر ظرفیت و RAM به‌صورت لحظه‌ای به‌روزرسانی می‌شوند.</span>
+                            <span>تعرفه ۷ روزه با درون‌یابی خطی بین قیمت‌های مرجع ۱ روزه و ۱۵ روزه محاسبه شده است؛ قیمت پلن‌ها با تغییر ظرفیت بازیکن و RAM به‌صورت لحظه‌ای به‌روزرسانی می‌شود.</span>
                         </div>
                     </section>
 
