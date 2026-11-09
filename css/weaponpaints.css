@@ -13955,3 +13955,37 @@ body:has(.wp-app.has-floating-pagination) .wp-app {
         padding: 22px 17px 18px;
     }
 }
+
+/* =========================================================
+   WeaponPaints — reclaim unused horizontal viewport space
+   Keep the compact mobile gutters; let desktop/tablet use the
+   full content canvas instead of the old 1550px capped rail.
+========================================================= */
+@media (min-width: 761px) {
+    .wp-app .wp-workspace-layout {
+        width: 100% !important;
+        max-width: none !important;
+        margin-inline: 0 !important;
+        padding-inline: clamp(18px, 1.6vw, 30px) !important;
+        box-sizing: border-box !important;
+    }
+
+    .wp-app .wp-workspace-main,
+    .wp-app .wp-workspace-main > .wp-header,
+    .wp-app .wp-workspace-main > .wp-main,
+    .wp-app .wp-workspace-main .wp-main {
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .wp-app.has-floating-pagination .wp-workspace-main > .wp-main,
+    .wp-app.has-floating-pagination .wp-workspace-main .wp-main {
+        width: 100% !important;
+        max-width: none !important;
+        left: auto !important;
+        right: auto !important;
+        margin-inline: 0 !important;
+    }
+}
