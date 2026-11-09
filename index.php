@@ -1075,8 +1075,8 @@ $fcSeoPages = [
         'description' => 'وضعیت گزارش‌شده و اطلاعات سرویس‌های فرگ‌سیتی را مشاهده کن.',
     ],
     'about' => [
-        'title' => 'درباره FragCity | میزبانی سرور بازی CS2',
-        'description' => 'با خدمات میزبانی، اجاره، مدیریت و پشتیبانی سرورهای بازی Counter-Strike 2 در FragCity آشنا شوید.',
+        'title' => 'درباره FragCity | میزبانی سرور بازی',
+        'description' => 'FragCity ارائه‌دهنده خدمات میزبانی و مدیریت سرورهای بازی آنلاین با تمرکز فعلی بر Counter-Strike 2 و Counter-Strike 1.6 است.',
     ],
     'support' => [
         'title' => 'پشتیبانی و تماس با FragCity',
