@@ -18,6 +18,7 @@ $read = static function (string $relative) use ($root): string {
 $client = $read('class/PaymenterApiClient.php');
 $sync = $read('class/PaymenterAccountSyncService.php');
 $endpoint = $read('api/myservers.php');
+$storeApi = $read('api/server-store.php');
 $page = $read('pages/myservers.php');
 $javascript = $read('js/myservers.js');
 $header = $read('includes/header.php');
@@ -65,6 +66,21 @@ foreach ($unsupportedClientTerms as $term) {
     }
 }
 $checkResult('Paymenter API client retains the supported customer bridge methods', $unsupportedClientAbsent);
+$checkResult('Server storefront catalog and wallet API keep the HMAC bridge server-side',
+    str_contains($storeApi, "getCs2Catalog()")
+    && str_contains($storeApi, "getCustomerWalletBalance(\$steamId64)")
+    && str_contains($storeApi, "\$_SESSION['steamid']")
+    && str_contains($storeApi, "\$_SERVER['HTTP_X_FRAGCITY_CSRF']")
+    && str_contains($storeApi, "paymenter_sync_status")
+    && !str_contains($storeApi, "shared_secret' =>")
+    && !str_contains($storeApi, "admin_api_key' =>")
+);
+$checkResult('Storefront catalog response omits Paymenter internal product and Config Option IDs',
+    str_contains($storeApi, "'config_options' => \$safeOptions")
+    && str_contains($storeApi, "'plans' => \$safePlans")
+    && !str_contains($storeApi, "'id' => (int) (\$plan['id']")
+    && !str_contains($storeApi, "'id' => (int) (\$option['id']")
+);
 $checkResult('CS2 order client sends a verified ZarinPal receipt and resource/Egg configuration',
     str_contains($client, 'createCs2ServerOrder')
     && str_contains($client, "'amount_toman' => $amountToman")
