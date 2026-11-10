@@ -2,9 +2,9 @@
 /**
  * FragCity CS2 server storefront.
  *
- * Checkout values mirror the FragCityCS2 Paymenter manifest. This page collects
- * a local configuration preview only; order creation and provisioning remain
- * disabled until the signed server-order backend is implemented.
+ * Checkout selections are hydrated from the live FragCityCS2 Paymenter catalogue.
+ * Prices are server-quoted by Paymenter and the form submits only through the
+ * authenticated same-origin FragCity checkout API.
  */
 $serverStoreGameModes = [
     ['label' => 'Casual — casual.cfg', 'config' => 'casual.cfg', 'map_groups' => ['mg_active', 'mg_comp']],
