@@ -87,6 +87,8 @@ $checkResult('Paymenter Wallet top-ups and wallet purchases use the private HMAC
 $checkResult('CS2 catalogue and Paymenter wallet bridge methods are available server-side',
     str_contains($client, 'getCs2Catalog')
     && str_contains($client, 'getCustomerWalletBalance')
+    && str_contains($client, 'wallet_enabled')
+    && str_contains($client, 'minimum_deposit')
     && str_contains($client, "'/api/v1/fragcity/bridge/catalog/cs2'")
     && str_contains($client, "'/api/v1/fragcity/bridge/wallet/balance'")
 );
