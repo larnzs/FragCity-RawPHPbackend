@@ -1,20 +1,20 @@
 /*
  * FragCity Footer
- * Flat, pure-black footer with a restrained orange accent.
+ * Navy, clean multi-column layout with compact contact shortcuts.
  */
 
 .site-footer {
-    --footer-bg: #000000;
-    --footer-border: #171717;
-    --footer-heading: #F5F5F5;
-    --footer-text: #A3A3A3;
-    --footer-muted: #737373;
-    --footer-accent: #F97316;
+    --footer-bg: #0e1d31;
+    --footer-border: rgba(133, 163, 198, .22);
+    --footer-heading: #f1f6ff;
+    --footer-text: #a9c3e4;
+    --footer-muted: #91aacb;
+    --footer-accent: #32b9ea;
 
     width: 100%;
     margin: 0;
-    border-top: 1px solid var(--footer-border);
-    background: #000000 !important;
+    border-top: 1px solid rgba(133, 163, 198, .12);
+    background: linear-gradient(112deg, #0d1b2e 0%, #10243a 100%) !important;
     color: var(--footer-text);
     font-family: "Vazirmatn", "Segoe UI", sans-serif;
 }
@@ -25,16 +25,17 @@
 }
 
 .footer-content {
-    width: min(1280px, calc(100% - 48px));
+    width: min(1600px, calc(100% - clamp(36px, 8vw, 108px)));
     margin: 0 auto;
-    padding: 30px 0 0;
+    padding: 40px 0 0;
 }
 
 .footer-grid {
     display: grid;
-    grid-template-columns: minmax(250px, 1.5fr) minmax(150px, .8fr) minmax(140px, .8fr);
+    grid-template-columns: minmax(220px, 1.3fr) repeat(4, minmax(125px, .82fr));
     align-items: start;
-    gap: clamp(24px, 4vw, 56px);
+    gap: clamp(22px, 3.1vw, 48px);
+    direction: rtl;
 }
 
 .footer-col {
@@ -48,11 +49,15 @@
     backdrop-filter: none !important;
 }
 
+.footer-brand {
+    text-align: right;
+}
+
 .footer-brand-link {
     display: inline-flex;
     align-items: center;
     max-width: 100%;
-    margin: 0 0 12px;
+    margin: 0 0 15px;
     text-decoration: none;
 }
 
@@ -60,43 +65,33 @@
     display: block;
     width: auto;
     max-width: 190px;
-    height: 40px;
+    height: 42px;
     object-fit: contain;
     object-position: right center;
 }
 
 .footer-desc {
-    max-width: 350px;
+    max-width: 340px;
     margin: 0;
     color: var(--footer-muted);
     font-size: .78rem;
     font-weight: 400;
-    line-height: 1.9;
+    line-height: 1.95;
 }
 
 .footer-heading {
-    margin: 1px 0 13px;
+    margin: 1px 0 17px;
     color: var(--footer-heading);
     font-size: .82rem;
-    font-weight: 750;
+    font-weight: 800;
     line-height: 1.7;
-}
-
-.footer-heading::after {
-    display: block;
-    width: 20px;
-    height: 2px;
-    margin-top: 7px;
-    border-radius: 2px;
-    background: var(--footer-accent);
-    content: "";
 }
 
 .footer-links {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 9px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -110,55 +105,47 @@
 .footer-links a {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
     min-height: 27px;
-    color: #A3A3A3;
-    font-size: .77rem;
+    color: #a9c3e4;
+    font-size: .76rem;
     font-weight: 450;
-    line-height: 1.7;
+    line-height: 1.8;
     text-decoration: none;
-    transition: color 140ms ease;
+    transition: color 150ms ease, transform 150ms ease;
 }
 
 .footer-links a:hover,
 .footer-links a:focus-visible {
-    color: #FDBA74;
+    transform: translateX(-2px);
+    color: #e2f6ff;
 }
 
-.footer-link-soon {
-    display: inline-flex;
-    align-items: center;
-    padding: 1px 6px;
-    border: 1px solid #292929;
-    border-radius: 4px;
-    color: #777777;
-    font-size: .58rem;
-    line-height: 1.5;
-}
-
+/* Keep the official trust badges, but place them quietly beneath the brand copy. */
 .trust-badges {
     display: flex;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    gap: 18px;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
     width: 100%;
+    margin-top: 18px;
+    direction: rtl;
 }
 
 .enamad-badge,
 .zarinpal-box {
     display: flex;
-    flex: 0 0 58px;
+    flex: 0 0 54px;
     align-items: center;
     justify-content: center;
-    width: 58px;
-    min-width: 58px;
-    height: 58px;
+    width: 54px;
+    min-width: 54px;
+    height: 54px;
     margin: 0;
-    padding: 0;
-    overflow: visible;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
+    padding: 5px;
+    overflow: hidden;
+    border: 1px solid rgba(148, 176, 209, .09);
+    border-radius: 12px;
+    background: rgba(31, 52, 78, .72);
 }
 
 .enamad-badge > a {
@@ -167,7 +154,7 @@
     height: 100%;
     align-items: center;
     justify-content: center;
-    overflow: visible;
+    overflow: hidden;
 }
 
 .enamad-badge img,
@@ -177,8 +164,8 @@
     min-height: 0 !important;
     width: auto !important;
     height: auto !important;
-    max-width: 46px !important;
-    max-height: 46px !important;
+    max-width: 44px !important;
+    max-height: 44px !important;
     object-fit: contain !important;
     object-position: center;
 }
@@ -189,68 +176,134 @@
     height: 100%;
     align-items: center;
     justify-content: center;
-    overflow: visible;
+    overflow: hidden;
 }
 
 .footer-bottom {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    min-height: 48px;
-    margin-top: 25px;
-    border-top: 1px solid #141414;
-    color: #606060;
-    font-size: .69rem;
-    line-height: 1.6;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 74px;
+    margin-top: 40px;
+    border-top: 1px solid var(--footer-border);
+    color: #91a9c7;
+    direction: ltr;
 }
 
-.footer-bottom p {
+.footer-copyright {
     margin: 0;
+    color: #a9bdd7;
+    font-size: .7rem;
+    line-height: 1.8;
     text-align: right;
+    direction: rtl;
+}
+
+.footer-social-links {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 8px;
+    direction: ltr;
+}
+
+.footer-social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(143, 171, 205, .06);
+    border-radius: 11px;
+    background: rgba(31, 50, 75, .78);
+    color: #91a9c7;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+}
+
+.footer-social-icon:hover,
+.footer-social-icon:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(50, 185, 234, .28);
+    background: rgba(38, 68, 98, .95);
+    color: #5bcdf5;
 }
 
 .site-footer a:focus-visible {
-    outline: 2px solid rgba(249, 115, 22, .75);
+    outline: 2px solid rgba(50, 185, 234, .75);
     outline-offset: 3px;
-    border-radius: 3px;
+    border-radius: 4px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
     .footer-content {
-        width: calc(100% - 40px);
-        padding-top: 26px;
+        width: calc(100% - 56px);
     }
 
     .footer-grid {
-        grid-template-columns: minmax(0, 1fr) minmax(140px, .75fr);
-        gap: 25px 32px;
+        grid-template-columns: minmax(210px, 1.2fr) repeat(2, minmax(130px, .9fr));
+        gap: 30px 34px;
     }
 
     .footer-brand {
-        grid-column: 1 / -1;
-        max-width: 600px;
+        grid-row: span 2;
     }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 760px) {
     .footer-content {
-        width: calc(100% - 32px);
-        padding-top: 22px;
+        width: calc(100% - 40px);
+        padding-top: 30px;
     }
 
     .footer-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 22px 18px;
+        gap: 28px 24px;
     }
 
-    .footer-brand,
-    .footer-trust {
+    .footer-brand {
         grid-column: 1 / -1;
+        grid-row: auto;
+        max-width: 560px;
     }
 
     .footer-logo {
-        height: 31px;
-        max-width: 160px;
+        height: 38px;
+    }
+
+    .footer-desc {
+        max-width: 460px;
+    }
+
+    .footer-heading {
+        margin-bottom: 12px;
+    }
+
+    .footer-links {
+        gap: 7px;
+    }
+
+    .footer-bottom {
+        min-height: 68px;
+        margin-top: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-content {
+        width: calc(100% - 32px);
+        padding-top: 26px;
+    }
+
+    .footer-grid {
+        gap: 24px 16px;
+    }
+
+    .footer-logo {
+        height: 34px;
+        max-width: 165px;
     }
 
     .footer-desc {
@@ -258,339 +311,50 @@
     }
 
     .footer-heading {
-        margin-bottom: 10px;
-        font-size: .78rem;
-    }
-
-    .footer-links {
-        gap: 6px;
+        font-size: .77rem;
     }
 
     .footer-links a {
-        font-size: .73rem;
+        font-size: .72rem;
     }
 
     .footer-bottom {
-        min-height: 43px;
-        margin-top: 20px;
+        align-items: flex-start;
+        flex-direction: column-reverse;
+        gap: 15px;
+        padding: 18px 0;
+        direction: rtl;
+    }
+
+    .footer-social-links {
+        flex-wrap: wrap;
+        gap: 7px;
+    }
+
+    .footer-social-icon {
+        width: 35px;
+        height: 35px;
+        border-radius: 10px;
+    }
+
+    .footer-copyright {
+        font-size: .66rem;
+    }
+}
+
+@media (max-width: 350px) {
+    .footer-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .footer-brand {
+        grid-column: auto;
     }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .footer-links a {
-        transition: none !important;
-    }
-}
-
-
-/* Official FragCity Telegram channel shortcut */
-.footer-telegram-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    max-width: 100%;
-    margin-top: 15px;
-    padding: 9px 12px;
-    border: 1px solid rgba(42, 171, 238, .22);
-    border-radius: 9px;
-    background: linear-gradient(110deg, rgba(42, 171, 238, .09), rgba(20, 20, 20, .72));
-    color: #C8DCE8;
-    font-size: .72rem;
-    font-weight: 700;
-    line-height: 1.6;
-    text-decoration: none;
-    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
-}
-
-.footer-telegram-button > i {
-    flex: 0 0 auto;
-    color: #2AABEE;
-    font-size: 1.12rem;
-}
-
-.footer-telegram-button > strong {
-    overflow: hidden;
-    color: #E7F5FC;
-    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.footer-telegram-button:hover,
-.footer-telegram-button:focus-visible {
-    transform: translateY(-1px);
-    border-color: rgba(42, 171, 238, .42);
-    background: linear-gradient(110deg, rgba(42, 171, 238, .15), rgba(20, 20, 20, .86));
-    color: #FFFFFF;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .footer-telegram-button {
-        transition: none !important;
-    }
-}
-
-
-/* Steam support shortcut, paired with the Telegram channel CTA */
-.footer-steam-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    max-width: 100%;
-    margin-top: 9px;
-    padding: 9px 12px;
-    border: 1px solid rgba(198, 212, 223, .18);
-    border-radius: 9px;
-    background: linear-gradient(110deg, rgba(75, 105, 128, .13), rgba(20, 20, 20, .72));
-    color: #D0D9E0;
-    font-size: .72rem;
-    font-weight: 700;
-    line-height: 1.6;
-    text-decoration: none;
-    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
-}
-
-.footer-steam-button > i {
-    flex: 0 0 auto;
-    color: #C6D4DF;
-    font-size: 1.12rem;
-}
-
-.footer-steam-button > strong {
-    overflow: hidden;
-    color: #E7EDF2;
-    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.footer-steam-button:hover,
-.footer-steam-button:focus-visible {
-    transform: translateY(-1px);
-    border-color: rgba(198, 212, 223, .36);
-    background: linear-gradient(110deg, rgba(75, 105, 128, .2), rgba(20, 20, 20, .86));
-    color: #FFFFFF;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .footer-steam-button {
-        transition: none !important;
-    }
-}
-
-
-/* Official FragCity Discord community shortcut */
-.footer-discord-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    max-width: 100%;
-    margin-top: 9px;
-    padding: 9px 12px;
-    border: 1px solid rgba(88, 101, 242, .26);
-    border-radius: 9px;
-    background: linear-gradient(110deg, rgba(88, 101, 242, .12), rgba(20, 20, 20, .72));
-    color: #D8DAF7;
-    font-size: .72rem;
-    font-weight: 700;
-    line-height: 1.6;
-    text-decoration: none;
-    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
-}
-
-.footer-discord-button > i {
-    flex: 0 0 auto;
-    color: #7289DA;
-    font-size: 1.12rem;
-}
-
-.footer-discord-button > strong {
-    overflow: hidden;
-    color: #E5E7FF;
-    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.footer-discord-button:hover,
-.footer-discord-button:focus-visible {
-    transform: translateY(-1px);
-    border-color: rgba(88, 101, 242, .48);
-    background: linear-gradient(110deg, rgba(88, 101, 242, .2), rgba(20, 20, 20, .86));
-    color: #FFFFFF;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .footer-discord-button {
-        transition: none !important;
-    }
-}
-
-
-/* Direct FragCity Telegram support contact */
-.footer-telegram-support-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    max-width: 100%;
-    margin-top: 9px;
-    padding: 9px 12px;
-    border: 1px solid rgba(42, 171, 238, .30);
-    border-radius: 9px;
-    background: linear-gradient(110deg, rgba(42, 171, 238, .14), rgba(20, 20, 20, .76));
-    color: #D7EDF8;
-    font-size: .72rem;
-    font-weight: 750;
-    line-height: 1.6;
-    text-decoration: none;
-    transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease;
-}
-
-.footer-telegram-support-button > i {
-    flex: 0 0 auto;
-    color: #2AABEE;
-    font-size: 1.12rem;
-}
-
-.footer-telegram-support-button > strong {
-    overflow: hidden;
-    color: #E7F5FC;
-    font: 750 .68rem/1.5 ui-monospace, SFMono-Regular, Consolas, monospace;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.footer-telegram-support-button:hover,
-.footer-telegram-support-button:focus-visible {
-    transform: translateY(-1px);
-    border-color: rgba(42, 171, 238, .5);
-    background: linear-gradient(110deg, rgba(42, 171, 238, .2), rgba(20, 20, 20, .9));
-    color: #FFF;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .footer-telegram-support-button {
-        transition: none !important;
-    }
-}
-
-
-/* Compact, minimal footer contact buttons with a shared width. */
-.footer-ticket-button,
-.footer-teamspeak-button,
-.footer-email-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 9px;
-    max-width: 100%;
-    margin-top: 9px;
-    padding: 9px 12px;
-    border: 1px solid rgba(249, 115, 22, .20);
-    border-radius: 8px;
-    background: rgba(249, 115, 22, .045);
-    color: #D8C2B2;
-    font-size: .72rem;
-    font-weight: 700;
-    line-height: 1.5;
-    text-decoration: none;
-    transition: border-color .16s ease, background .16s ease, color .16s ease;
-}
-
-.footer-ticket-button {
-    margin-top: 15px;
-    border-color: rgba(249, 115, 22, .28);
-    color: #FDBA74;
-}
-
-.footer-ticket-button > i,
-.footer-teamspeak-button > i,
-.footer-email-button > i {
-    flex: 0 0 auto;
-    color: #F97316;
-    font-size: 1.05rem;
-}
-
-.footer-ticket-button:hover,
-.footer-ticket-button:focus-visible,
-.footer-teamspeak-button:hover,
-.footer-teamspeak-button:focus-visible,
-.footer-email-button:hover,
-.footer-email-button:focus-visible {
-    border-color: rgba(249, 115, 22, .40);
-    background: rgba(249, 115, 22, .09);
-    color: #FFFFFF;
-}
-
-/* Two compact, aligned contact columns: four actions on each side. */
-.footer-brand > .footer-contact-columns {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 232px));
-    align-items: start;
-    gap: 10px;
-    width: 100%;
-    max-width: 474px;
-    margin-top: 14px;
-    direction: rtl;
-}
-
-.footer-contact-column {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    min-width: 0;
-    gap: 8px;
-}
-
-.footer-contact-column > .footer-contact-link {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 232px;
-    height: 38px;
-    min-height: 38px;
-    box-sizing: border-box;
-    gap: 8px;
-    margin: 0;
-    padding: 6px 10px;
-    white-space: nowrap;
-}
-
-.footer-contact-column > .footer-contact-link > i {
-    flex: 0 0 17px;
-    width: 17px;
-    font-size: 1rem;
-    text-align: center;
-}
-
-.footer-contact-column > .footer-contact-link > span {
-    flex: 0 1 auto;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.footer-contact-column > .footer-contact-link > strong {
-    flex: 0 1 auto;
-    min-width: 0;
-    margin-inline-start: auto;
-    overflow: hidden;
-    font-size: .62rem;
-    text-align: left;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-@media (max-width: 560px) {
-    .footer-brand > .footer-contact-columns {
-        grid-template-columns: minmax(0, 232px);
-        max-width: 232px;
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .footer-ticket-button,
-    .footer-teamspeak-button,
-    .footer-email-button {
+    .footer-links a,
+    .footer-social-icon {
         transition: none !important;
     }
 }
