@@ -57,6 +57,8 @@
         const numberFormatter = new Intl.NumberFormat('fa-IR', { maximumFractionDigits: 2 });
 
         let currentQuote = null;
+        let catalogLoaded = false;
+        let catalogFailed = false;
         let currentQuoteKey = '';
         let quoteSequence = 0;
         let quoteTimer = null;
@@ -87,12 +89,143 @@
         }
 
         function readRangeValue(input, fallback) {
+            if (input && input.dataset.catalogValues) {
+                try {
+                    const values = JSON.parse(input.dataset.catalogValues);
+                    const index = Number(input.value);
+                    if (Array.isArray(values) && Number.isInteger(index) && values[index] !== undefined) {
+                        return Number(values[index]);
+                    }
+                } catch (error) {
+                    console.error('[FragCity] Invalid Paymenter option values:', error);
+                }
+            }
             const value = Number(input.value);
             const min = Number(input.min);
             const max = Number(input.max);
             if (!Number.isFinite(value)) return fallback;
             if (!Number.isFinite(min) || !Number.isFinite(max) || max < min) return value;
             return Math.min(max, Math.max(min, value));
+        }
+
+        function setRangeToCatalogValue(input, requestedValue) {
+            if (!input || !input.dataset.catalogValues) return false;
+            const values = JSON.parse(input.dataset.catalogValues);
+            if (!Array.isArray(values) || !values.length) return false;
+            const exact = values.findIndex(function (value) { return Number(value) === Number(requestedValue); });
+            let index = exact;
+            if (index < 0) {
+                index = values.reduce(function (bestIndex, value, candidateIndex) {
+                    return Math.abs(Number(value) - Number(requestedValue)) < Math.abs(Number(values[bestIndex]) - Number(requestedValue))
+                        ? candidateIndex
+                        : bestIndex;
+                }, 0);
+            }
+            input.value = String(index);
+            return true;
+        }
+
+        function normalizeOptionToken(value) {
+            return String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        }
+
+        function findCatalogOption(options, aliases) {
+            const normalizedAliases = aliases.map(normalizeOptionToken);
+            const matches = options.filter(function (option) {
+                return normalizedAliases.includes(normalizeOptionToken(option.env_variable))
+                    || normalizedAliases.includes(normalizeOptionToken(option.name));
+            });
+            return matches.length === 1 ? matches[0] : null;
+        }
+
+        function catalogNumericValues(option) {
+            if (!option || !Array.isArray(option.children)) return [];
+            return Array.from(new Set(option.children.map(function (child) {
+                const raw = child && child.env_variable !== undefined ? String(child.env_variable).trim() : '';
+                return /^\\d+$/.test(raw) ? Number(raw) : null;
+            }).filter(function (value) {
+                return Number.isSafeInteger(value) && value > 0;
+            }))).sort(function (a, b) { return a - b; });
+        }
+
+        function bindRangeToCatalog(input, option, formatter) {
+            const values = catalogNumericValues(option);
+            if (!values.length) throw new Error('cs2_config_option_mapping_invalid');
+            const preferred = Number(input.value);
+            input.dataset.catalogValues = JSON.stringify(values);
+            input.min = '0';
+            input.max = String(values.length - 1);
+            input.step = '1';
+            setRangeToCatalogValue(input, preferred);
+            const meta = input.closest('.server-store-range-wrap')?.querySelector('.server-store-range-meta');
+            if (meta && meta.children.length >= 2) {
+                meta.children[0].textContent = formatter(values[0]);
+                meta.children[meta.children.length - 1].textContent = formatter(values[values.length - 1]);
+            }
+        }
+
+        function applyPaymenterCatalog(catalog) {
+            if (!catalog || !Array.isArray(catalog.config_options) || !Array.isArray(catalog.plans)) {
+                throw new Error('paymenter_invalid_response');
+            }
+            const options = catalog.config_options;
+            bindRangeToCatalog(memoryInput, findCatalogOption(options, ['memory', 'memory_mb', 'ram', 'ram_mb']), formatGigabytes);
+            bindRangeToCatalog(diskInput, findCatalogOption(options, ['disk', 'disk_mb', 'storage', 'storage_mb', 'ssd']), formatGigabytes);
+            bindRangeToCatalog(cpuInput, findCatalogOption(options, ['cpu', 'cpu_percent']), function (value) { return value + '%'; });
+            bindRangeToCatalog(playersInput, findCatalogOption(options, ['SRCDS_MAXPLAYERS']), function (value) { return String(value); });
+
+            const tickrateOption = findCatalogOption(options, ['TICKRATE']);
+            const tickrateValues = catalogNumericValues(tickrateOption).map(String);
+            if (!tickrateValues.length) throw new Error('cs2_config_option_mapping_invalid');
+            Array.from(tickrateSelect.options).forEach(function (option) {
+                option.disabled = !tickrateValues.includes(option.value);
+                option.hidden = option.disabled;
+            });
+            if (!tickrateValues.includes(tickrateSelect.value)) tickrateSelect.value = tickrateValues[0];
+
+            const availableDurations = new Set(catalog.plans.filter(function (plan) {
+                return plan && plan.available === true;
+            }).map(function (plan) { return Number(plan.duration_days); }));
+            durationInputs.forEach(function (input) {
+                input.disabled = !availableDurations.has(Number(input.value));
+                const card = input.closest('.server-store-duration-card');
+                if (card) card.classList.toggle('is-unavailable', input.disabled);
+            });
+            if (durationInputs.every(function (input) { return input.disabled || !input.checked; })) {
+                const firstAvailable = durationInputs.find(function (input) { return !input.disabled; });
+                if (firstAvailable) firstAvailable.checked = true;
+            }
+            if (!durationInputs.some(function (input) { return input.checked && !input.disabled; })) {
+                const firstAvailable = durationInputs.find(function (input) { return !input.disabled; });
+                if (firstAvailable) firstAvailable.checked = true;
+            }
+
+            catalogLoaded = true;
+            catalogFailed = false;
+        }
+
+        async function loadPaymenterCatalog() {
+            try {
+                const url = new URL(apiUrl, window.location.origin);
+                url.searchParams.set('action', 'catalog');
+                const response = await fetch(url.href, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    cache: 'no-store',
+                    headers: { 'Accept': 'application/json' }
+                });
+                const body = await response.json();
+                if (!response.ok || body.success !== true || !body.data) {
+                    throw new Error(body.error || 'server_catalog_unavailable');
+                }
+                applyPaymenterCatalog(body.data);
+                updateSummary();
+            } catch (error) {
+                catalogFailed = true;
+                setQuoteStatus(humanizeError(error && error.message ? error.message : 'server_catalog_unavailable'), 'error');
+                submitButton.disabled = true;
+                console.error('[FragCity] Paymenter storefront catalog could not be loaded:', error);
+            }
         }
 
         function syncRangeProgress(input) {
@@ -328,6 +461,10 @@
             setSummary('period-price', 'در حال استعلام از Paymenter…');
             if (quoteLines) quoteLines.replaceChildren();
 
+            if (!catalogLoaded) {
+                setQuoteStatus(catalogFailed ? 'کاتالوگ Paymenter در دسترس نیست؛ سفارش غیرفعال است.' : 'در حال دریافت گزینه‌های مجاز از Paymenter…', catalogFailed ? 'error' : 'loading');
+                return;
+            }
             const selection = buildSelectionPayload();
             const key = selectionKey(selection);
             currentQuoteKey = key;
@@ -390,7 +527,7 @@
                 } finally {
                     if (sequence === quoteSequence) quoteBusy = false;
                 }
-            }, 450);
+            }, 700);
         }
 
         function humanizeError(error) {
@@ -603,6 +740,9 @@
 
             playerPresetButtons.forEach(function (button) {
                 button.setAttribute('aria-pressed', Number(button.dataset.playerPreset) === players ? 'true' : 'false');
+                button.disabled = playersInput.dataset.catalogValues
+                    ? !JSON.parse(playersInput.dataset.catalogValues).map(Number).includes(Number(button.dataset.playerPreset))
+                    : false;
             });
 
             setSummary('memory', formatGigabytes(memoryMb) + ' · ' + memoryMb + ' MB');
@@ -697,7 +837,8 @@
         if (!authenticated) {
             setQuoteStatus('برای دریافت قیمت قطعی و خرید، ابتدا با حساب Steam وارد شوید.', 'warning');
         }
-        updateSummary();
+        setQuoteStatus('در حال دریافت گزینه‌های مجاز از Paymenter…', 'loading');
+        loadPaymenterCatalog();
         if (walletBalanceOutput) walletBalanceOutput.textContent = 'برای مشاهده موجودی، روش کیف پول را انتخاب کنید.';
         if (authenticated) loadWalletBalance();
         root.dataset.serverStoreStatus = 'ready';
