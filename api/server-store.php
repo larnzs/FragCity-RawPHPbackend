@@ -7,7 +7,8 @@ declare(strict_types=1);
  * Public action:
  *   GET  /api/server-store.php?action=catalog
  *
- * Authenticated action:
+ * Authenticated actions:
+ *   POST /api/server-store.php  {"action":"quote", ...selection}
  *   POST /api/server-store.php  {"action":"wallet_balance"}
  *
  * The browser never calls Paymenter directly and never receives its HMAC
@@ -268,6 +269,199 @@ if ($action === 'catalog') {
             @flock($cacheHandle, LOCK_UN);
             fclose($cacheHandle);
         }
+    }
+}
+
+if ($action === 'quote') {
+    if ($method !== 'POST') {
+        $respond(['success' => false, 'error' => 'method_not_allowed'], 405);
+    }
+
+    if (($_SESSION['user_logged_in'] ?? false) !== true) {
+        $respond(['success' => false, 'error' => 'authentication_required'], 401);
+    }
+
+    $steamId64 = is_string($_SESSION['steamid'] ?? null)
+        ? (string) $_SESSION['steamid']
+        : '';
+    if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
+        $respond(['success' => false, 'error' => 'invalid_session'], 401);
+    }
+
+    $sessionCsrf = $_SESSION['auth_csrf_token'] ?? '';
+    $submittedCsrf = (string) ($_SERVER['HTTP_X_FRAGCITY_CSRF'] ?? '');
+    if (
+        !is_string($sessionCsrf)
+        || !preg_match('/^[a-f0-9]{64}$/D', $sessionCsrf)
+        || !hash_equals($sessionCsrf, $submittedCsrf)
+    ) {
+        $respond(['success' => false, 'error' => 'csrf_failed'], 419);
+    }
+
+    $durationDays = filter_var($payload['duration_days'] ?? null, FILTER_VALIDATE_INT);
+    $serverName = is_string($payload['server_name'] ?? null)
+        ? trim($payload['server_name'])
+        : '';
+    $resourcesInput = is_array($payload['resources'] ?? null) ? $payload['resources'] : [];
+    $eggInput = is_array($payload['egg'] ?? null) ? $payload['egg'] : [];
+
+    $memoryMb = filter_var($resourcesInput['memory_mb'] ?? null, FILTER_VALIDATE_INT);
+    $diskMb = filter_var($resourcesInput['disk_mb'] ?? null, FILTER_VALIDATE_INT);
+    $cpuPercent = filter_var($resourcesInput['cpu_percent'] ?? null, FILTER_VALIDATE_INT);
+
+    $allowedEggKeys = [
+        'SRCDS_MAP',
+        'SRCDS_MAXPLAYERS',
+        'TICKRATE',
+        'EXEC',
+        'MAPGROUP',
+        'COOLDOWN',
+        'ENABLE_GUARD',
+        'GUARD_BAN_MINUTES',
+    ];
+    if (array_diff(array_keys($eggInput), $allowedEggKeys) !== []) {
+        $respond(['success' => false, 'error' => 'invalid_egg_variable'], 422);
+    }
+
+    $egg = [];
+    foreach ($allowedEggKeys as $key) {
+        if (array_key_exists($key, $eggInput)) {
+            $egg[$key] = is_scalar($eggInput[$key]) ? (string) $eggInput[$key] : '';
+        }
+    }
+
+    if (
+        !in_array($durationDays, [1, 7, 15, 30], true)
+        || !preg_match('/^[A-Za-z0-9 ]{1,64}$/D', $serverName)
+        || $memoryMb === false || $memoryMb < 1 || $memoryMb > 1048576
+        || $diskMb === false || $diskMb < 1 || $diskMb > 1048576
+        || $cpuPercent === false || $cpuPercent < 1 || $cpuPercent > 6400
+        || (string) ($egg['ENABLE_GUARD'] ?? '0') !== '0'
+    ) {
+        $respond(['success' => false, 'error' => 'validation_failed'], 422);
+    }
+
+    foreach (['SRCDS_MAP', 'SRCDS_MAXPLAYERS', 'TICKRATE', 'EXEC', 'MAPGROUP', 'COOLDOWN'] as $requiredKey) {
+        if (!isset($egg[$requiredKey]) || $egg[$requiredKey] === '') {
+            $respond(['success' => false, 'error' => 'validation_failed'], 422);
+        }
+    }
+
+    try {
+        $indexSettings = fragcity_settings('files.index', []);
+        $databaseProfile = is_array($indexSettings)
+            ? (string) ($indexSettings['database_profile'] ?? 'main')
+            : 'main';
+        $pdo = fragcity_create_pdo($databaseProfile);
+        if (!$pdo instanceof PDO) {
+            throw new RuntimeException('fragcity_account_unavailable');
+        }
+
+        $accountStatement = $pdo->prepare(
+            'SELECT paymenter_user_id, paymenter_sync_status
+             FROM users
+             WHERE steamid64 = ?
+             LIMIT 1'
+        );
+        $accountStatement->execute([$steamId64]);
+        $account = $accountStatement->fetch(PDO::FETCH_ASSOC);
+
+        if (
+            !is_array($account)
+            || (int) ($account['paymenter_user_id'] ?? 0) < 1
+            || (string) ($account['paymenter_sync_status'] ?? '') !== 'synced'
+        ) {
+            $respond(['success' => false, 'error' => 'paymenter_account_not_linked'], 409);
+        }
+
+        require_once dirname(__DIR__) . '/class/PaymenterApiClient.php';
+        $quote = (new PaymenterApiClient())->quoteCs2ServerOrder([
+            'steamid64' => $steamId64,
+            'duration_days' => (int) $durationDays,
+            'server_name' => $serverName,
+            'resources' => [
+                'memory_mb' => (int) $memoryMb,
+                'disk_mb' => (int) $diskMb,
+                'cpu_percent' => (int) $cpuPercent,
+            ],
+            // Feature limits are not yet configurable in the storefront.
+            // Keep them pinned to the documented zero-cost defaults server-side.
+            'feature_limits' => [
+                'databases' => 0,
+                'additional_allocations' => 0,
+                'backups' => 0,
+            ],
+            'egg' => $egg,
+        ]);
+
+        $respond([
+            'success' => true,
+            'data' => [
+                'currency_code' => $quote['currency_code'],
+                'currency_unit' => 'rial',
+                'amount_toman' => $quote['amount_toman'],
+                'amount_rial' => $quote['amount_rial'],
+                'recurring_subtotal_toman' => intdiv(max(0, $quote['recurring_subtotal_rial']), 10),
+                'setup_fee_toman' => intdiv(max(0, $quote['setup_fee_total_rial']), 10),
+                'tax_toman' => intdiv(max(0, $quote['tax_rial']), 10),
+                'duration_days' => $quote['duration_days'],
+                'price_lines' => array_map(
+                    static function (array $line): array {
+                        return [
+                            'option' => (string) ($line['option'] ?? ''),
+                            'value' => (string) ($line['value'] ?? ''),
+                            'recurring_toman' => number_format(((float) ($line['recurring_price'] ?? 0)) / 10, 0, '.', ''),
+                            'setup_fee_toman' => number_format(((float) ($line['setup_fee'] ?? 0)) / 10, 0, '.', ''),
+                        ];
+                    },
+                    $quote['price_lines']
+                ),
+                'expires_in_seconds' => $quote['expires_in_seconds'],
+            ],
+        ], 200, ['Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0']);
+    } catch (Throwable $e) {
+        $message = $e->getMessage();
+        $safeErrors = [
+            'fragcity_user_not_linked',
+            'linked_paymenter_user_missing',
+            'cs2_checkout_not_configured',
+            'cs2_checkout_manifest_unavailable',
+            'cs2_product_invalid',
+            'cs2_product_out_of_stock',
+            'cs2_product_user_limit',
+            'cs2_plan_invalid',
+            'cs2_plan_price_missing',
+            'cs2_config_option_mapping_invalid',
+            'cs2_config_option_price_missing',
+            'cs2_quote_amount_mismatch',
+            'egg_combination_invalid',
+            'invalid_egg_variable',
+            'egg_validation_failed',
+            'paid_option_pricing_not_configured',
+            'paymenter_unreachable',
+            'paymenter_invalid_response',
+            'bridge_not_configured',
+            'source_ip_not_allowed',
+            'invalid_signature_headers',
+            'invalid_signature',
+            'request_replayed',
+        ];
+        $safeError = in_array($message, $safeErrors, true)
+            ? $message
+            : 'cs2_quote_unavailable';
+
+        error_log(
+            '[FragCity] CS2 quote failed; steam_hash='
+            . substr(hash('sha256', $steamId64), 0, 16)
+            . '; error=' . $safeError . '.'
+        );
+
+        $status = match ($safeError) {
+            'fragcity_user_not_linked', 'linked_paymenter_user_missing' => 409,
+            'cs2_checkout_not_configured', 'cs2_checkout_manifest_unavailable' => 503,
+            default => 502,
+        };
+        $respond(['success' => false, 'error' => $safeError], $status, ['Cache-Control' => 'no-store']);
     }
 }
 
