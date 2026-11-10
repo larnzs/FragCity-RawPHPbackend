@@ -2,7 +2,7 @@
 // includes/footer.php
 require_once __DIR__ . '/routes.php';
 ?>
-<footer class="site-footer" id="siteFooter" aria-label="FragCity footer">
+<footer class="site-footer" id="siteFooter" aria-label="پاورقی FragCity">
     <div class="footer-content">
         <div class="footer-grid">
             <section class="footer-col footer-brand" aria-label="درباره FragCity">
@@ -16,117 +16,84 @@ require_once __DIR__ . '/routes.php';
                 </a>
 
                 <p class="footer-desc">
-                    پلتفرمی برای سرورهای کانتر استرایک ۲، اسکین‌ها و ابزارهای اختصاصی جامعه‌ی بازیکنان.
+                    پلتفرم میزبانی و مدیریت سرورهای بازی؛ همراه با خدمات اختصاصی CS2، اسکین‌ها و ابزارهای جامعه FragCity.
                 </p>
-                <div class="footer-contact-columns" aria-label="راه‌های ارتباطی با FragCity">
-                    <div class="footer-contact-column footer-contact-column--right" aria-label="راه‌های ارتباطی، ستون راست">
-                <a
-                    class="footer-telegram-support-button footer-contact-link"
-                    href="https://t.me/fragcitysup"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="ارتباط با پشتیبانی تلگرام FragCity"
-                >
-                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
-                    <span>پشتیبانی تلگرام</span>
-                    <strong dir="ltr">@fragcitysup</strong>
-                </a>
-                <a
-                    class="footer-telegram-button footer-contact-link"
-                    href="https://t.me/fragcitychannel"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="ورود به کانال تلگرام FragCity"
-                >
-                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
-                    <span>کانال تلگرام</span>
-                    <strong dir="ltr">@fragcitychannel</strong>
-                </a>
-                <a
-                    class="footer-discord-button footer-contact-link"
-                    href="https://discord.gg/s6rFThCDdY"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="ورود به سرور Discord FragCity"
-                >
-                    <i class="fa-brands fa-discord" aria-hidden="true"></i>
-                    <span>سرور Discord</span>
-                    <strong dir="ltr">FragCity</strong>
-                </a>
-                <a
-                    class="footer-steam-button footer-contact-link"
-                    href="https://steamcommunity.com/id/larnz/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="ارتباط با پشتیبانی FragCity در Steam"
-                >
-                    <i class="fa-brands fa-steam" aria-hidden="true"></i>
-                    <span>پشتیبانی در Steam</span>
-                    <strong dir="ltr">larnz</strong>
-                </a>
-                    </div>
-                    <div class="footer-contact-column footer-contact-column--left" aria-label="راه‌های ارتباطی، ستون چپ">
-                <a
-                    class="footer-ticket-button footer-contact-link"
-                    href="/support/?tab=tickets"
-                    aria-label="ثبت تیکت پشتیبانی FragCity"
-                >
-                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
-                    <span>ثبت تیکت پشتیبانی</span>
-                </a>
 
-                <a
-                    class="footer-teamspeak-button footer-contact-link"
-                    href="ts3server://217.18.90.7?port=2014"
-                    aria-label="اتصال به سرور TeamSpeak FragCity"
-                >
-                    <i class="fa-solid fa-headset" aria-hidden="true"></i>
-                    <span>سرور TeamSpeak</span>
-                    <strong dir="ltr">217.18.90.7:2014</strong>
-                </a>
-                <a
-                    class="footer-email-button footer-contact-link"
-                    href="mailto:support@fragcity.ir"
-                    aria-label="ارسال ایمیل به پشتیبانی FragCity"
-                >
-                    <i class="fa-solid fa-envelope" aria-hidden="true"></i>
-                    <span>ایمیل پشتیبانی</span>
-                    <strong dir="ltr">support@fragcity.ir</strong>
-                </a>
-                    </div>
-                </div>
-            </section>
-
-            <nav class="footer-col" aria-label="دسترسی سریع">
-                <p class="footer-heading">دسترسی سریع</p>
-                <ul class="footer-links">
-                    <li><a href="<?= htmlspecialchars(fragcity_page_url('servers_vps'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="servers_vps">لیست سرورها</a></li>
-                    <li><a href="<?= htmlspecialchars(fragcity_page_url('serverguide'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="serverguide">راهنمای سرور CS2</a></li>
-                    <li><a href="<?= htmlspecialchars(fragcity_page_url('buyserveropen'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="buyserveropen">خرید سرور</a></li>
-                    <li><a href="<?= htmlspecialchars(fragcity_page_url('buyserveropen') . '?game=minecraft', ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="buyserveropen">میزبانی Minecraft</a></li>
-                    <li><a href="<?= htmlspecialchars(fragcity_page_url('vip'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="vip">عضویت VIP</a></li>
-                    <li><a href="<?= htmlspecialchars(fragcity_page_url('status'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="status">وضعیت سرویس‌ها</a></li>
-                    <li><a href="<?= htmlspecialchars(fragcity_page_url('about'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="about">درباره FragCity</a></li>
-                    <li><a href="<?= htmlspecialchars(fragcity_page_url('support'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="support">پشتیبانی</a></li>
-                </ul>
-            </nav>
-
-            <section class="footer-col footer-trust" aria-label="نشان‌های اعتماد">
-                <p class="footer-heading">نشان‌های اعتماد</p>
-                <div class="trust-badges">
+                <div class="trust-badges" aria-label="نشان‌های اعتماد FragCity">
                     <div class="enamad-badge">
                         <a referrerpolicy='origin' target='_blank' href='https://trustseal.enamad.ir/?id=733184&Code=LIGY7RCe6ngk9p2DzpzyW37m4vJArgsa'><img referrerpolicy='origin' src='https://trustseal.enamad.ir/logo.aspx?id=733184&Code=LIGY7RCe6ngk9p2DzpzyW37m4vJArgsa' alt='' style='cursor:pointer' code='LIGY7RCe6ngk9p2DzpzyW37m4vJArgsa'></a>
                     </div>
-
                     <div id="zarinpal" class="zarinpal-box">
                         <script src="https://www.zarinpal.com/webservice/TrustCode" type="text/javascript"></script>
                     </div>
                 </div>
             </section>
+
+            <nav class="footer-col" aria-label="درباره ما">
+                <p class="footer-heading">درباره ما</p>
+                <ul class="footer-links">
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('about'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="about">داستان ما</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('status'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="status">وضعیت سرویس‌ها</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('support'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="support">ارتباط با ما</a></li>
+                </ul>
+            </nav>
+
+            <nav class="footer-col" aria-label="محصولات">
+                <p class="footer-heading">محصولات</p>
+                <ul class="footer-links">
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('servers'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="servers">سرورهای بازی</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('skins'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="skins">اسکین‌ها</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('vip'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="vip">عضویت VIP</a></li>
+                    <li><a href="https://billing.fragcity.ir" target="_blank" rel="noopener noreferrer">فروشگاه</a></li>
+                </ul>
+            </nav>
+
+            <nav class="footer-col" aria-label="راهنما و قوانین">
+                <p class="footer-heading">راهنما و قوانین</p>
+                <ul class="footer-links">
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('serverguide'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="serverguide">راهنمای سرور CS2</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('rules'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="rules">قوانین استفاده</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('privacy'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="privacy">حریم خصوصی</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('login'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="login">ورود / ثبت‌نام</a></li>
+                </ul>
+            </nav>
+
+            <nav class="footer-col" aria-label="ارتباطات">
+                <p class="footer-heading">ارتباطات</p>
+                <ul class="footer-links">
+                    <li><a href="<?= htmlspecialchars(fragcity_page_url('support'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="support">ثبت تیکت پشتیبانی</a></li>
+                    <li><a href="https://t.me/fragcitysup" target="_blank" rel="noopener noreferrer">پشتیبانی تلگرام</a></li>
+                    <li><a href="https://t.me/fragcitychannel" target="_blank" rel="noopener noreferrer">کانال تلگرام</a></li>
+                    <li><a href="https://discord.gg/s6rFThCDdY" target="_blank" rel="noopener noreferrer">سرور Discord</a></li>
+                </ul>
+            </nav>
         </div>
 
         <div class="footer-bottom">
-            <p>Fragcity 2026</p>
+            <p class="footer-copyright">© <?= date('Y') ?> تمامی حقوق این سایت متعلق به تیم توسعه FragCity می‌باشد.</p>
+            <nav class="footer-social-links" aria-label="راه‌های ارتباطی سریع">
+                <a class="footer-social-icon" href="https://t.me/fragcitychannel" target="_blank" rel="noopener noreferrer" aria-label="کانال تلگرام FragCity" title="کانال تلگرام">
+                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+                </a>
+                <a class="footer-social-icon" href="https://t.me/fragcitysup" target="_blank" rel="noopener noreferrer" aria-label="پشتیبانی تلگرام FragCity" title="پشتیبانی تلگرام">
+                    <i class="fa-brands fa-telegram" aria-hidden="true"></i>
+                </a>
+                <a class="footer-social-icon" href="https://discord.gg/s6rFThCDdY" target="_blank" rel="noopener noreferrer" aria-label="سرور Discord FragCity" title="Discord">
+                    <i class="fa-brands fa-discord" aria-hidden="true"></i>
+                </a>
+                <a class="footer-social-icon" href="https://steamcommunity.com/id/larnz/" target="_blank" rel="noopener noreferrer" aria-label="پشتیبانی Steam FragCity" title="Steam">
+                    <i class="fa-brands fa-steam" aria-hidden="true"></i>
+                </a>
+                <a class="footer-social-icon" href="/support/?tab=tickets" aria-label="ثبت تیکت پشتیبانی" title="ثبت تیکت">
+                    <i class="fa-solid fa-ticket" aria-hidden="true"></i>
+                </a>
+                <a class="footer-social-icon" href="ts3server://217.18.90.7?port=2014" aria-label="اتصال به سرور TeamSpeak" title="TeamSpeak">
+                    <i class="fa-solid fa-headset" aria-hidden="true"></i>
+                </a>
+                <a class="footer-social-icon" href="mailto:support@fragcity.ir" aria-label="ایمیل پشتیبانی FragCity" title="ایمیل">
+                    <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                </a>
+            </nav>
         </div>
     </div>
 </footer>
