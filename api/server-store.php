@@ -119,7 +119,7 @@ if ($action === 'catalog') {
                 }
 
                 $days = filter_var($plan['duration_days'] ?? null, FILTER_VALIDATE_INT);
-                if ($days === false || !in_array($days, [1, 7, 15, 30], true)) {
+                if ($days === false || !in_array($days, [3, 7, 15, 30], true)) {
                     continue;
                 }
 
@@ -333,7 +333,7 @@ if ($action === 'quote') {
     }
 
     if (
-        !in_array($durationDays, [1, 7, 15, 30], true)
+        !in_array($durationDays, [3, 7, 15, 30], true)
         || $memoryMb === false || $memoryMb < 1 || $memoryMb > 1048576
         || $diskMb === false || $diskMb < 1 || $diskMb > 1048576
         || $cpuPercent === false || $cpuPercent < 1 || $cpuPercent > 6400
@@ -520,7 +520,7 @@ if ($action === 'checkout') {
         || $expectedAmountRial === false
         || $expectedAmountRial < 10
         || $expectedAmountRial % 10 !== 0
-        || !in_array($durationDays, [1, 7, 15, 30], true)
+        || !in_array($durationDays, [3, 7, 15, 30], true)
         || !preg_match('/^[A-Za-z0-9 ]{1,64}$/D', $serverName)
         || $memoryMb === false || $memoryMb < 1 || $memoryMb > 1048576
         || $diskMb === false || $diskMb < 1 || $diskMb > 1048576
