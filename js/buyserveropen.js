@@ -227,6 +227,7 @@
             bindRangeToCatalog(playersInput, findCatalogOption(options, ['SRCDS_MAXPLAYERS']), function (value) { return String(value); });
 
             const tickrateOption = findCatalogOption(options, ['TICKRATE']);
+            if (!tickrateOption || tickrateOption.upgradable !== true) throw new Error('cs2_config_option_mapping_invalid');
             const tickrateValues = catalogNumericValues(tickrateOption).map(String);
             if (!tickrateValues.length) throw new Error('cs2_config_option_mapping_invalid');
             Array.from(tickrateSelect.options).forEach(function (option) {
