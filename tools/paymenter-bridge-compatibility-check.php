@@ -30,6 +30,8 @@ $checkResult = static function (string $name, bool $passed) use (&$checks): void
 
 $expectedRoutes = [
     '/api/v1/fragcity/bridge/ping',
+    '/api/v1/fragcity/bridge/catalog/cs2',
+    '/api/v1/fragcity/bridge/wallet/balance',
     '/api/v1/fragcity/bridge/users/sync',
     '/api/v1/fragcity/bridge/servers/list',
     '/api/v1/fragcity/bridge/servers/password',
@@ -75,6 +77,18 @@ $checkResult('CS2 order client sends a verified ZarinPal receipt and resource/Eg
 $checkResult('CS2 order client surfaces native Config Option mapping and pricing errors safely',
     str_contains($client, "'cs2_config_option_mapping_invalid'")
     && str_contains($client, "'cs2_config_option_price_missing'")
+);
+$checkResult('CS2 catalogue and Paymenter wallet bridge methods are available server-side',
+    str_contains($client, 'getCs2Catalog')
+    && str_contains($client, 'getCustomerWalletBalance')
+    && str_contains($client, "'/api/v1/fragcity/bridge/catalog/cs2'")
+    && str_contains($client, "'/api/v1/fragcity/bridge/wallet/balance'")
+);
+$checkResult('Resource values are bounded locally and allowlisted by Paymenter Config Option children',
+    str_contains($client, '$memoryMb > 1048576')
+    && str_contains($client, '$diskMb > 1048576')
+    && str_contains($client, '$cpuPercent > 6400')
+    && !str_contains($client, '!in_array($memoryMb, [1024, 1280, 1536], true)')
 );
 
 $unsupportedEndpointTerms = [
