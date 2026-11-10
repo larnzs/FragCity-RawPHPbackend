@@ -23,8 +23,32 @@ The same private HMAC client also provides:
 
 - `POST /api/v1/fragcity/bridge/catalog/cs2` — returns the configured CS2 Product, duration Plans, Rial Plan prices, every attached Config Option and child value with the per-duration price/setup fee, plus Egg Checkout fields and GameModeManager metadata.
 - `POST /api/v1/fragcity/bridge/wallet/balance` — accepts the SteamID64 from the authenticated server-side website session and returns only that linked Paymenter user's configured Rial credit balance.
+- `POST /api/v1/fragcity/bridge/wallet/topups/zarinpal` — applies a ZarinPal deposit already verified by the FragCity PHP backend through a native Paymenter Credit invoice.
 
 The browser never calls either endpoint. The PHP backend calls them through `PaymenterApiClient::getCs2Catalog()` and `PaymenterApiClient::getCustomerWalletBalance()`.
+
+## Wallet deposit and wallet checkout
+
+A verified ZarinPal deposit is submitted by
+`PaymenterApiClient::createCustomerWalletTopup()`. The website sends a stable
+32-character `topup_ref`, the authenticated SteamID64 and the server-verified
+ZarinPal Authority, RefID and amount pair. Paymenter validates the amount
+conversion and its Credits settings, then creates/settles a native Credit
+invoice. Do not call this method from the browser or before ZarinPal Verify
+succeeds.
+
+CS2 orders can also use Paymenter Wallet:
+`PaymenterApiClient::createCs2ServerOrder()` receives only
+`payment.provider=wallet`; it must not send an amount or payment receipt.
+Paymenter recomputes the Plan + selected Config Option price, locks the user's
+Credit row, checks the actual balance, debits it in the same DB transaction as
+Order/Service/Invoice creation, and records a successful credit Invoice
+Transaction. The browser never chooses the debit amount.
+
+Both ZarinPal server purchases and wallet top-ups use the shared
+`fragcity_payment_receipts` ledger. It is backfilled from existing server
+orders by the extension migration and prevents one Authority or RefID from
+being reused across a server purchase and a wallet deposit.
 
 ## Endpoint
 
