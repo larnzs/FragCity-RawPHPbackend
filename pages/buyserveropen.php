@@ -89,7 +89,7 @@ $serverStoreDefaultMapGroup = 'mg_comp';
 
 $serverStoreDefaultPlayers = 10;
 $serverStoreDurations = [
-    ['days' => 1, 'label' => '۱ روزه', 'caption' => '۲۴ ساعت'],
+    ['days' => 3, 'label' => '۳ روزه', 'caption' => '۷۲ ساعت'],
     ['days' => 7, 'label' => '۱ هفته', 'caption' => '۷ روز'],
     ['days' => 15, 'label' => '۱۵ روزه', 'caption' => 'نیم‌ماه'],
     ['days' => 30, 'label' => '۳۰ روزه', 'caption' => 'یک ماه', 'recommended' => true],
@@ -362,7 +362,7 @@ $serverStoreDurations = [
                                 <h2 id="serverDurationTitle">مدت سرویس</h2>
                                 <p>هرچه مدت اشتراک بیشتر باشد، هزینه مؤثر هر ماه کمتر می‌شود.</p>
                             </div>
-                            <span class="server-store-section-state">۱ روز تا ۳۰ روز</span>
+                            <span class="server-store-section-state">۳ روز تا ۳۰ روز</span>
                         </div>
 
                         <div class="server-store-duration-grid" role="radiogroup" aria-label="مدت اعتبار سرور">

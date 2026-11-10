@@ -34,7 +34,7 @@ Wallet checkout calls Paymenter with `payment.provider=wallet` and no debit amou
 
 Before enabling this storefront in production:
 - Apply `database/migrations/20261110_fragcity_cs2_checkout_orders.sql` to the same website database profile configured by `files.index.database_profile`.
-- Deploy `FragCityAPI` **1.11.0** (with `POST /api/v1/fragcity/bridge/quotes/cs2`) before deploying this website branch.
+- Deploy `FragCityAPI` **1.12.0** (with `POST /api/v1/fragcity/bridge/quotes/cs2`) before deploying this website branch.
 - Ensure all eight Product Config Options are Upgradable and have price rows for every allowed child value/Plan/Rial currency. Free values must have explicit zero-price/zero-setup-fee rows.
 - Keep Bot Guard unavailable until its surcharge is included in the quote. Do not enable renewals until recurring totals have been checked end-to-end.
 ## FragCity website API boundary
@@ -144,7 +144,7 @@ between signing and sending it.
 ```
 
 The amounts are integer values. `amount_rial` must equal `amount_toman * 10`.
-Allowed durations are 1, 7, 15 and 30 days. Resources are transmitted in the
+Allowed durations are 3, 7, 15 and 30 days. Resources are transmitted in the
 same units consumed by Paymenter/Pterodactyl: memory and disk in MB, CPU as a
 percentage. Paymenter independently recalculates the first invoice amount from
 the selected Product Plan and each matching native Config Option Child price,
