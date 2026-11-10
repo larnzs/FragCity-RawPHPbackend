@@ -148,7 +148,7 @@ $checkResult('CS2 server name is backend-generated and no longer required in the
 $checkResult('CS2 storefront and bridge consistently support the new 3-day base term',
     str_contains($storePage, "['days' => 3, 'label' => '۳ روزه', 'caption' => '۷۲ ساعت']")
     && !str_contains($storePage, "['days' => 1, 'label' => '۱ روزه'")
-    && substr_count($storeApi, '[3, 7, 15, 30]') === 2
+    && substr_count($storeApi, '[3, 7, 15, 30]') === 3
     && substr_count($client, '[3, 7, 15, 30]') === 2
     && str_contains($storeApi, "'duration_days' => \$quote['duration_days']")
 );
@@ -173,16 +173,16 @@ $checkResult('Storefront catalog response omits Paymenter internal product and C
 );
 $checkResult('CS2 order client sends a verified ZarinPal receipt and resource/Egg configuration',
     str_contains($client, 'createCs2ServerOrder')
-    && str_contains($client, "'amount_toman' => $amountToman")
-    && str_contains($client, "'amount_rial' => $amountRial")
-    && str_contains($client, "'memory_mb' => $memoryMb")
-    && str_contains($client, "'cpu_percent' => $cpuPercent")
+    && str_contains($client, "'amount_toman' => \$amountToman")
+    && str_contains($client, "'amount_rial' => \$amountRial")
+    && str_contains($client, "'memory_mb' => \$memoryMb")
+    && str_contains($client, "'cpu_percent' => \$cpuPercent")
     && str_contains($client, "'feature_limits' => [")
-    && str_contains($client, "'databases' => $databases")
-    && str_contains($client, "'additional_allocations' => $additionalAllocations")
-    && str_contains($client, "'backups' => $backups")
+    && str_contains($client, "'databases' => \$databases")
+    && str_contains($client, "'additional_allocations' => \$additionalAllocations")
+    && str_contains($client, "'backups' => \$backups")
     && str_contains($client, "'expected_amount_rial' => (int) \$expectedAmountRial")
-    && str_contains($client, "'egg' => $egg"));
+    && str_contains($client, "'egg' => \$egg"));
 $checkResult('CS2 order client surfaces native Config Option mapping and pricing errors safely',
     str_contains($client, "'cs2_config_option_mapping_invalid'")
     && str_contains($client, "'cs2_config_option_price_missing'")
