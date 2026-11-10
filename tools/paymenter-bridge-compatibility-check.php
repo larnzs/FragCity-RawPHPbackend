@@ -40,6 +40,7 @@ $expectedRoutes = [
     '/api/v1/fragcity/bridge/servers/password',
     '/api/v1/fragcity/bridge/servers/username',
     '/api/v1/fragcity/bridge/orders/cs2',
+    '/api/v1/fragcity/bridge/quotes/cs2',
 ];
 
 foreach ($expectedRoutes as $route) {
@@ -75,6 +76,17 @@ $checkResult('Server storefront catalog and wallet API keep the HMAC bridge serv
     && !str_contains($storeApi, "shared_secret' =>")
     && !str_contains($storeApi, "admin_api_key' =>")
 );
+$checkResult('CS2 quotes are calculated by Paymenter, never from browser-submitted prices',
+    str_contains($client, 'quoteCs2ServerOrder')
+    && str_contains($client, "'/api/v1/fragcity/bridge/quotes/cs2'")
+    && str_contains($storeApi, "if (\$action === 'quote')")
+    && str_contains($storeApi, "quoteCs2ServerOrder")
+    && str_contains($storeApi, "\$_SESSION['steamid']")
+    && str_contains($storeApi, "\$_SERVER['HTTP_X_FRAGCITY_CSRF']")
+    && !str_contains($storeApi, "'amount_toman' => \$payload")
+    && !str_contains($storeApi, "'amount_rial' => \$payload")
+);
+
 $checkResult('Storefront catalog response omits Paymenter internal product and Config Option IDs',
     str_contains($storeApi, "'config_options' => \$safeOptions")
     && str_contains($storeApi, "'plans' => \$safePlans")
