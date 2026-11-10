@@ -358,7 +358,10 @@ $mobileMoreNavItems = [
             </a>
 
             <a href="https://billing.fragcity.ir"
-               class="shock-nav-item">
+               class="shock-nav-item"
+               target="_blank"
+               rel="noopener noreferrer"
+               aria-label="فروشگاه">
                 <i class="fas fa-store" aria-hidden="true"></i>
                 <span>فروشگاه</span>
             </a>
@@ -392,6 +395,7 @@ $mobileMoreNavItems = [
                         title="بیشتر"
                         aria-expanded="false"
                         aria-controls="shockMoreMenu">
+                    <i class="fas fa-ellipsis" aria-hidden="true"></i>
                     <span>بیشتر</span>
                     <i class="fas fa-chevron-down frag-arrow" aria-hidden="true"></i>
                 </button>
