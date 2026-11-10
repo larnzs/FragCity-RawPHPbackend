@@ -145,6 +145,14 @@ $checkResult('CS2 server name is backend-generated and no longer required in the
     && !str_contains($storeApi, "payload['server_name']")
 );
 
+$checkResult('CS2 storefront and bridge consistently support the new 3-day base term',
+    str_contains($storePage, "['days' => 3, 'label' => '۳ روزه', 'caption' => '۷۲ ساعت']")
+    && !str_contains($storePage, "['days' => 1, 'label' => '۱ روزه'")
+    && substr_count($storeApi, '[3, 7, 15, 30]') === 2
+    && substr_count($client, '[3, 7, 15, 30]') === 2
+    && str_contains($storeApi, "'duration_days' => \$quote['duration_days']")
+);
+
 $checkResult('Player Slots validation uses the selected Paymenter child value rather than the slider index',
     str_contains($storeJs, 'const players = readRangeValue(playersInput, 10);')
     && !str_contains($storeJs, 'const players = Number(playersInput.value);')
