@@ -17,6 +17,15 @@ Paymenter authenticates the website request with the existing HMAC bridge
 headers. Paymenter does not call ZarinPal itself; it trusts only the signed
 FragCity backend after the website has completed verification.
 
+## Read-only catalogue and wallet bridge
+
+The same private HMAC client also provides:
+
+- `POST /api/v1/fragcity/bridge/catalog/cs2` — returns the configured CS2 Product, duration Plans, Rial Plan prices, every attached Config Option and child value with the per-duration price/setup fee, plus Egg Checkout fields and GameModeManager metadata.
+- `POST /api/v1/fragcity/bridge/wallet/balance` — accepts the SteamID64 from the authenticated server-side website session and returns only that linked Paymenter user's configured Rial credit balance.
+
+The browser never calls either endpoint. The PHP backend calls them through `PaymenterApiClient::getCs2Catalog()` and `PaymenterApiClient::getCustomerWalletBalance()`.
+
 ## Endpoint
 
 `POST /api/v1/fragcity/bridge/orders/cs2`
@@ -66,7 +75,11 @@ between signing and sending it.
 The amounts are integer values. `amount_rial` must equal `amount_toman * 10`.
 Allowed durations are 1, 7, 15 and 30 days. Resources are transmitted in the
 same units consumed by Paymenter/Pterodactyl: memory and disk in MB, CPU as a
-percentage. The payload carries eight Egg environment values: six Checkout fields plus `SRCDS_MAXPLAYERS` and `TICKRATE`; the latter two are native Config Option selections. The separate `feature_limits` object carries Databases, Additional Allocations and Backups as Pterodactyl provisioning limits, not Egg variables. All Config Option selections are resolved to native Paymenter child rows and persisted as `ServiceConfig`, not duplicated as service properties. The selected `EXEC` CFG and `MAPGROUP` must also be a compatible pair according to the GameModeManager manifest.
+percentage. Paymenter independently recalculates the first invoice amount from
+the selected Product Plan and each matching native Config Option Child price,
+including setup fees and the applicable Paymenter customer tax policy. It
+rejects the order unless this exact total equals the verified ZarinPal Rial
+amount and converts exactly to the Toman amount. The payload carries eight Egg environment values: six Checkout fields plus `SRCDS_MAXPLAYERS` and `TICKRATE`; the latter two are native Config Option selections. The separate `feature_limits` object carries Databases, Additional Allocations and Backups as Pterodactyl provisioning limits, not Egg variables. All Config Option selections are resolved to native Paymenter child rows and persisted as `ServiceConfig`, not duplicated as service properties. The selected `EXEC` CFG and `MAPGROUP` must also be a compatible pair according to the GameModeManager manifest.
 
 Generate `order_ref` once for the local FragCity purchase record and reuse it
 for every callback/API retry. Do not generate a new order reference on retry.
