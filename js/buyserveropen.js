@@ -165,6 +165,47 @@
             }
         }
 
+        function checkoutField(catalog, name) {
+            return Array.isArray(catalog.checkout_fields)
+                ? catalog.checkout_fields.find(function (field) { return field && field.name === name; })
+                : null;
+        }
+
+        function checkoutOptionEntries(field) {
+            if (!field || field.options === undefined || field.options === null) return [];
+            if (Array.isArray(field.options)) {
+                return field.options.map(function (option) {
+                    return option && typeof option === 'object'
+                        ? { value: String(option.value ?? ''), label: String(option.label ?? option.value ?? '') }
+                        : { value: String(option), label: String(option) };
+                }).filter(function (option) { return option.value !== ''; });
+            }
+            if (typeof field.options === 'object') {
+                return Object.entries(field.options).map(function (entry) {
+                    return { value: String(entry[0]), label: String(entry[1]) };
+                }).filter(function (option) { return option.value !== ''; });
+            }
+            return [];
+        }
+
+        function replaceSelectOptions(select, entries, defaultValue) {
+            if (!select) throw new Error('cs2_checkout_manifest_unavailable');
+            const currentValue = select.value;
+            select.replaceChildren();
+            entries.forEach(function (entry) {
+                const option = document.createElement('option');
+                option.value = entry.value;
+                option.textContent = entry.label;
+                select.appendChild(option);
+            });
+            if (!entries.length) throw new Error('cs2_checkout_manifest_unavailable');
+            const preferred = [currentValue, defaultValue].find(function (candidate) {
+                return candidate && entries.some(function (entry) { return entry.value === candidate; });
+            });
+            select.value = preferred || entries[0].value;
+            select.disabled = false;
+        }
+
         function applyPaymenterCatalog(catalog) {
             if (!catalog || !Array.isArray(catalog.config_options) || !Array.isArray(catalog.plans)
                 || !catalog.game_mode_manager || !Array.isArray(catalog.game_mode_manager.cfg_options)
@@ -175,11 +216,20 @@
             const gameModeManifest = catalog.game_mode_manager;
             const cfgOptions = gameModeManifest.cfg_options;
             const mapGroupOptions = gameModeManifest.map_group_options;
-            const existingMapLabels = new Map(Array.from(mapgroupSelect.options).map(function (option) {
-                return [option.value, option.textContent.trim()];
+            const execField = checkoutField(catalog, 'EXEC');
+            const mapGroupField = checkoutField(catalog, 'MAPGROUP');
+            const cooldownField = checkoutField(catalog, 'COOLDOWN');
+            const mapField = checkoutField(catalog, 'SRCDS_MAP');
+            const guardField = checkoutField(catalog, 'ENABLE_GUARD');
+            const allowedExecs = new Set(checkoutOptionEntries(execField).map(function (option) { return option.value; }));
+            const mapGroupEntries = checkoutOptionEntries(mapGroupField);
+            const allowedMapGroups = new Set(mapGroupEntries.map(function (option) { return option.value; }));
+            const existingMapLabels = new Map(mapGroupEntries.map(function (option) {
+                return [option.value, option.label];
             }));
             const validCfgs = cfgOptions.filter(function (mode) {
                 return mode && typeof mode.config === 'string' && typeof mode.name === 'string'
+                    && allowedExecs.has(mode.config)
                     && Array.isArray(mode.mapGroups) && mode.mapGroups.length > 0;
             });
             if (!validCfgs.length) throw new Error('cs2_checkout_manifest_unavailable');
@@ -209,7 +259,7 @@
                     label: existingMapLabels.get(groupId) || groupId,
                     configs: labels.map(function (label) { return cfgNameToId.get(label); }).filter(Boolean)
                 };
-            }).filter(function (group) { return group.configs.length > 0; });
+            }).filter(function (group) { return allowedMapGroups.has(group.value) && group.configs.length > 0; });
             if (!allMapGroups.length) throw new Error('cs2_checkout_manifest_unavailable');
 
             const defaultMode = validCfgs.find(function (mode) { return mode.config === execSelect.value; }) || validCfgs[0];
@@ -217,8 +267,17 @@
                 ? 'mg_comp'
                 : defaultMode.mapGroups[0];
             syncMapGroups(preferredGroup);
-            if (mapInput && defaultMode.defaultMap && (!mapInput.value.trim() || mapInput.value === 'de_dust2')) {
-                mapInput.value = String(defaultMode.defaultMap);
+            if (mapInput) {
+                const defaultMap = String(mapField && mapField.default ? mapField.default : defaultMode.defaultMap || '');
+                if (defaultMap && (!mapInput.value.trim() || mapInput.value === 'de_dust2')) {
+                    mapInput.value = defaultMap;
+                }
+            }
+            const cooldownOptions = checkoutOptionEntries(cooldownField);
+            replaceSelectOptions(cooldownSelect, cooldownOptions, cooldownField && cooldownField.default ? String(cooldownField.default) : '0');
+            const guardValues = checkoutOptionEntries(guardField);
+            if (!guardValues.some(function (option) { return option.value === '0'; })) {
+                throw new Error('cs2_checkout_manifest_unavailable');
             }
 
             bindRangeToCatalog(memoryInput, findCatalogOption(options, ['memory', 'memory_mb', 'ram', 'ram_mb']), formatGigabytes);
