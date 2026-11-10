@@ -492,12 +492,12 @@ $serverStoreDurations = [
                     </label>
                     <label class="server-store-payment-option">
                         <input type="radio" name="payment_method" value="wallet" form="serverStoreConfigForm">
-                        <span><strong>کیف پول Paymenter</strong><small>موجودی کیف پول در Paymenter به‌صورت اتمیک بررسی و کسر می‌شود.</small></span>
+                        <span><strong>کیف پول Paymenter</strong><small id="serverStoreWalletBalance">برای مشاهده موجودی، روش کیف پول را انتخاب کنید.</small><small>موجودی در Paymenter به‌صورت اتمیک بررسی و کسر می‌شود.</small></span>
                     </label>
                 </div>
 
                 <div id="serverStoreQuoteStatus" class="server-store-quote-status" role="status" aria-live="polite">
-                    برای دریافت قیمت قطعی، ابتدا وارد حساب FragCity شوید.
+                    برای دریافت قیمت قطعی، ابتدا وارد حساب FragCity شوید. <a href="/index.php?page=login">ورود با Steam</a>
                 </div>
                 <div id="serverStoreQuoteLines" class="server-store-quote-lines" aria-live="polite"></div>
 
