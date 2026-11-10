@@ -136,6 +136,12 @@ $checkResult('Buy Server JavaScript uses live Paymenter values and no local pric
     && !str_contains($storeJs, 'monthlyPrice')
 );
 
+$checkResult('Player Slots validation uses the selected Paymenter child value rather than the slider index',
+    str_contains($storeJs, 'const players = readRangeValue(playersInput, 10);')
+    && !str_contains($storeJs, 'const players = Number(playersInput.value);')
+    && str_contains($storeJs, 'input.dataset.catalogValues = JSON.stringify(values);')
+);
+
 $checkResult('Storefront catalog response omits Paymenter internal product and Config Option IDs',
     str_contains($storeApi, "'config_options' => \$safeOptions")
     && str_contains($storeApi, "'plans' => \$safePlans")

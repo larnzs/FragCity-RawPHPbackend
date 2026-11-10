@@ -147,12 +147,12 @@
 .enamad-badge,
 .zarinpal-box {
     display: flex;
-    flex: 0 0 100px;
+    flex: 0 0 58px;
     align-items: center;
     justify-content: center;
-    width: 100px;
-    min-width: 100px;
-    height: 120px;
+    width: 58px;
+    min-width: 58px;
+    height: 58px;
     margin: 0;
     padding: 0;
     overflow: visible;
@@ -175,10 +175,10 @@
     display: block;
     min-width: 0 !important;
     min-height: 0 !important;
-    width: 94px !important;
-    height: 112px !important;
-    max-width: 94px !important;
-    max-height: 112px !important;
+    width: auto !important;
+    height: auto !important;
+    max-width: 46px !important;
+    max-height: 46px !important;
     object-fit: contain !important;
     object-position: center;
 }
