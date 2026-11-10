@@ -136,6 +136,15 @@ $checkResult('Buy Server JavaScript uses live Paymenter values and no local pric
     && !str_contains($storeJs, 'monthlyPrice')
 );
 
+$checkResult('CS2 server name is backend-generated and no longer required in the storefront',
+    !str_contains($storePage, 'serverStoreName')
+    && !str_contains($storePage, 'data-server-summary="server-name"')
+    && !str_contains($storeJs, 'serverNameInput')
+    && !str_contains($storeJs, 'server_name:')
+    && substr_count($storeApi, "\$serverName = 'FragCity CS2';") === 2
+    && !str_contains($storeApi, "payload['server_name']")
+);
+
 $checkResult('Player Slots validation uses the selected Paymenter child value rather than the slider index',
     str_contains($storeJs, 'const players = readRangeValue(playersInput, 10);')
     && !str_contains($storeJs, 'const players = Number(playersInput.value);')
