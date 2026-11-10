@@ -665,6 +665,9 @@ if ($action === 'checkout') {
             if ($existingStatus === 'gateway_request_unknown' || $existingStatus === 'payment_requesting') {
                 $respond(['success' => false, 'error' => 'payment_request_status_unknown'], 409, ['Cache-Control' => 'no-store']);
             }
+            if (in_array($existingStatus, ['payment_failed', 'gateway_request_failed', 'cancelled'], true)) {
+                $respond(['success' => false, 'error' => 'checkout_retry_with_new_reference'], 409, ['Cache-Control' => 'no-store']);
+            }
             if ($existingStatus !== 'wallet_processing' || $paymentMethod !== 'wallet') {
                 $respond(['success' => false, 'error' => 'checkout_not_retryable'], 409, ['Cache-Control' => 'no-store']);
             }
