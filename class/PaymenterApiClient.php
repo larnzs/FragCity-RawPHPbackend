@@ -160,6 +160,83 @@ final class PaymenterApiClient
     }
 
     /**
+     * Apply a verified ZarinPal wallet deposit to the linked Paymenter account.
+     * This method must only be called by the authenticated website backend
+     * after the payment provider's server-side Verify API has succeeded.
+     *
+     * @param array<string,mixed> $topup
+     * @return array{topup_ref:string,invoice_id:int,status:string,replayed:bool,currency_code:string,currency_unit:string,wallet_balance:string}
+     */
+    public function createCustomerWalletTopup(array $topup): array
+    {
+        $topupRef = strtolower(trim((string) ($topup['topup_ref'] ?? '')));
+        $steamId64 = trim((string) ($topup['steamid64'] ?? ''));
+        $payment = $topup['payment'] ?? [];
+
+        if (
+            !preg_match('/^[a-f0-9]{32}$/D', $topupRef)
+            || !preg_match('/^[0-9]{17}$/D', $steamId64)
+            || !is_array($payment)
+            || ($payment['provider'] ?? null) !== 'zarinpal'
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        $amountToman = filter_var($payment['amount_toman'] ?? null, FILTER_VALIDATE_INT);
+        $amountRial = filter_var($payment['amount_rial'] ?? null, FILTER_VALIDATE_INT);
+        $authority = trim((string) ($payment['authority'] ?? ''));
+        $refId = trim((string) ($payment['ref_id'] ?? ''));
+
+        if (
+            $amountToman === false
+            || $amountRial === false
+            || $amountToman < 1
+            || $amountToman > intdiv(PHP_INT_MAX, 10)
+            || $amountRial !== $amountToman * 10
+            || !preg_match('/^[A-Za-z0-9_-]{1,128}$/D', $authority)
+            || !preg_match('/^[A-Za-z0-9_-]{1,64}$/D', $refId)
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        $response = $this->post('/api/v1/fragcity/bridge/wallet/topups/zarinpal', [
+            'topup_ref' => $topupRef,
+            'steamid64' => $steamId64,
+            'payment' => [
+                'provider' => 'zarinpal',
+                'authority' => $authority,
+                'ref_id' => $refId,
+                'amount_toman' => $amountToman,
+                'amount_rial' => $amountRial,
+            ],
+        ]);
+
+        $data = $response['data'] ?? null;
+        if (
+            !is_array($data)
+            || ($data['topup_ref'] ?? null) !== $topupRef
+            || !isset($data['invoice_id'])
+            || !is_numeric($data['invoice_id'])
+            || (int) $data['invoice_id'] < 1
+            || ($data['status'] ?? null) !== 'accepted'
+            || !is_numeric($data['wallet_balance'] ?? null)
+            || (float) $data['wallet_balance'] < 0
+        ) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return [
+            'topup_ref' => $topupRef,
+            'invoice_id' => (int) $data['invoice_id'],
+            'status' => 'accepted',
+            'replayed' => (bool) ($data['replayed'] ?? false),
+            'currency_code' => strtoupper((string) ($data['currency_code'] ?? '')),
+            'currency_unit' => (string) ($data['currency_unit'] ?? ''),
+            'wallet_balance' => number_format((float) $data['wallet_balance'], 2, '.', ''),
+        ];
+    }
+
+    /**
      * Submit a CS2 server order after the website has verified its ZarinPal payment.
      *
      * This method is private server-side transport only. Never call it from
@@ -475,6 +552,13 @@ final class PaymenterApiClient
                 'cs2_plan_price_missing',
                 'cs2_quote_amount_mismatch',
                 'wallet_balance_unavailable',
+                'wallet_topup_not_configured',
+                'wallet_topup_amount_invalid',
+                'wallet_topup_pending_invoice_exists',
+                'wallet_maximum_credit_exceeded',
+                'wallet_topup_reference_conflict',
+                'wallet_topup_processing_incomplete',
+                'wallet_topup_creation_failed',
                 'cs2_product_invalid',
                 'cs2_product_out_of_stock',
                 'cs2_product_user_limit',
