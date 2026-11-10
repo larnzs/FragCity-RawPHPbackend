@@ -2,9 +2,9 @@
 /**
  * FragCity CS2 server storefront.
  *
- * Checkout values mirror the FragCityCS2 Paymenter manifest. This page collects
- * a local configuration preview only; order creation and provisioning remain
- * disabled until the signed server-order backend is implemented.
+ * Checkout selections are hydrated from the live FragCityCS2 Paymenter catalogue.
+ * Prices are server-quoted by Paymenter and the form submits only through the
+ * authenticated same-origin FragCity checkout API.
  */
 $serverStoreGameModes = [
     ['label' => 'Casual — casual.cfg', 'config' => 'casual.cfg', 'map_groups' => ['mg_active', 'mg_comp']],
@@ -87,37 +87,15 @@ foreach ($serverStoreGameModes as $serverStoreMode) {
 $serverStoreDefaultConfig = 'comp.cfg';
 $serverStoreDefaultMapGroup = 'mg_comp';
 
-$serverStoreCapacityPricing = [
-    'base_slots' => 5,
-    'base_price' => 499000,
-    'extra_slot_price' => 50000,
-];
-$serverStoreRamPricing = [
-    1024 => 0,
-    1280 => 40000,
-    1536 => 75000,
-];
 $serverStoreDefaultPlayers = 10;
-$serverStorePriceRoundingStep = 100;
-$serverStoreOneDayReferencePrice = 174582;
-$serverStoreFifteenDayReferencePrice = 552843;
-$serverStoreMonthlyReferencePrice = 902000;
-// The 7-day reference price is linearly interpolated between the 1-day and 15-day benchmarks.
-$serverStoreSevenDayReferencePrice = $serverStoreOneDayReferencePrice
-    + (($serverStoreFifteenDayReferencePrice - $serverStoreOneDayReferencePrice) * (7 - 1) / (15 - 1));
 $serverStoreDurations = [
-    ['days' => 1, 'label' => '۱ روزه', 'caption' => '۲۴ ساعت', 'price_factor' => $serverStoreOneDayReferencePrice / $serverStoreMonthlyReferencePrice],
-    ['days' => 7, 'label' => '۱ هفته', 'caption' => '۷ روز · تعرفه محاسبه‌شده', 'price_factor' => $serverStoreSevenDayReferencePrice / $serverStoreMonthlyReferencePrice],
-    ['days' => 15, 'label' => '۱۵ روزه', 'caption' => 'نیم‌ماه', 'price_factor' => $serverStoreFifteenDayReferencePrice / $serverStoreMonthlyReferencePrice],
-    ['days' => 30, 'label' => '۳۰ روزه', 'caption' => 'قیمت پایه ماهانه', 'price_factor' => 1, 'recommended' => true],
+    ['days' => 1, 'label' => '۱ روزه', 'caption' => '۲۴ ساعت'],
+    ['days' => 7, 'label' => '۱ هفته', 'caption' => '۷ روز'],
+    ['days' => 15, 'label' => '۱۵ روزه', 'caption' => 'نیم‌ماه'],
+    ['days' => 30, 'label' => '۳۰ روزه', 'caption' => 'یک ماه', 'recommended' => true],
 ];
-$serverStoreDefaultMonthlyPrice =
-    $serverStoreCapacityPricing['base_price']
-    + (max(0, $serverStoreDefaultPlayers - $serverStoreCapacityPricing['base_slots'])
-        * $serverStoreCapacityPricing['extra_slot_price'])
-    + $serverStoreRamPricing[1024];
 ?>
-<main class="server-store-page" dir="rtl">
+<main class="server-store-page" dir="rtl" data-api-url="/api/server-store.php" data-authenticated="<?= (($_SESSION['user_logged_in'] ?? false) === true) ? '1' : '0' ?>" data-csrf-token="<?= htmlspecialchars((string) ($authCsrfToken ?? $_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
     <div class="server-store-container">
         <header class="server-store-hero" data-fc-reveal="up">
             <div class="server-store-hero-main">
@@ -165,7 +143,7 @@ $serverStoreDefaultMonthlyPrice =
                             <span class="server-store-section-index">01</span>
                             <div>
                                 <h2 id="serverResourcesTitle">ظرفیت و منابع سرور</h2>
-                                <p>منابع RAM، SSD و CPU سرور را تنظیم کن؛ تعرفه‌های فعال در خلاصه سفارش محاسبه می‌شوند.</p>
+                                <p>RAM، SSD، CPU و ظرفیت بازیکن را انتخاب کن؛ قیمت قطعی مستقیماً از Paymenter استعلام می‌شود.</p>
                             </div>
                             <span class="server-store-section-state">۳ منبع قابل انتخاب</span>
                         </div>
@@ -186,7 +164,7 @@ $serverStoreDefaultMonthlyPrice =
                                     <label class="server-store-resource-slider-label" for="serverStoreMemory">حافظه RAM</label>
                                     <input class="server-store-range" id="serverStoreMemory" name="memory" type="range" min="1024" max="1536" step="256" value="1024" aria-describedby="serverStoreMemoryHelp">
                                     <div class="server-store-range-meta" aria-hidden="true"><span>1 GB</span><span>1.5 GB</span></div>
-                                    <small class="server-store-range-help" id="serverStoreMemoryHelp">۱.۲۵ گیگابایت: ۴۰ هزار تومان؛ ۱.۵ گیگابایت: ۷۵ هزار تومان افزایش ماهانه.</small>
+                                    <small class="server-store-range-help" id="serverStoreMemoryHelp">مقادیر مجاز و قیمت هر سطح از گزینه‌های پیکربندی Paymenter خوانده و هنگام ثبت سفارش دوباره بررسی می‌شود.</small>
                                 </div>
                             </article>
 
@@ -226,7 +204,7 @@ $serverStoreDefaultMonthlyPrice =
                         </div>
                         <div class="server-store-resource-footnote">
                             <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                            RAM و Storage به مگابایت و CPU به درصد بیان می‌شوند. فعلاً قیمت فقط بر اساس ظرفیت و RAM محاسبه می‌شود؛ تعرفه CPU و Storage هنوز نهایی نشده است.
+                            RAM و Storage به مگابایت و CPU به درصد بیان می‌شوند. قیمت هر سه منبع RAM، Storage و CPU در Quote رسمی Paymenter لحاظ می‌شود؛ هیچ قیمت محلی در مرورگر محاسبه نمی‌شود.
                         </div>
                     </section>
 
@@ -274,13 +252,6 @@ $serverStoreDefaultMonthlyPrice =
                             <div class="server-store-field-grid server-store-field-grid--egg">
                             <article
                                 class="server-store-resource-card server-store-resource-card--capacity server-store-capacity-panel server-store-egg-capacity-card"
-                                data-base-slots="<?= (int) $serverStoreCapacityPricing['base_slots'] ?>"
-                                data-base-price="<?= (int) $serverStoreCapacityPricing['base_price'] ?>"
-                                data-extra-slot-price="<?= (int) $serverStoreCapacityPricing['extra_slot_price'] ?>"
-                                data-ram-price-1024="<?= (int) $serverStoreRamPricing[1024] ?>"
-                                data-ram-price-1280="<?= (int) $serverStoreRamPricing[1280] ?>"
-                                data-ram-price-1536="<?= (int) $serverStoreRamPricing[1536] ?>"
-                                data-price-rounding-step="<?= (int) $serverStorePriceRoundingStep ?>"
                             >
                                 <div class="server-store-resource-head">
                                     <span class="server-store-resource-icon"><i class="fa-solid fa-users" aria-hidden="true"></i></span>
@@ -315,7 +286,7 @@ $serverStoreDefaultMonthlyPrice =
                                     <button type="button" data-player-preset="48" aria-pressed="false">48</button>
                                     <button type="button" data-player-preset="64" aria-pressed="false">64</button>
                                 </div>
-                                <small class="server-store-range-help" id="serverStorePlayersHelp">۵ اسلات پایه؛ هر اسلات اضافه ۵۰٬۰۰۰ تومان به هزینه ماهانه اضافه می‌کند.</small>
+                                <small class="server-store-range-help" id="serverStorePlayersHelp">ظرفیت مجاز ۵ تا ۶۴ بازیکن است؛ قیمت دقیق این گزینه از Paymenter محاسبه می‌شود.</small>
                             </article>
                                 <div class="server-store-field">
                                     <label for="serverStoreMap"><i class="fa-solid fa-map" aria-hidden="true"></i> نقشه پیش‌فرض <span class="server-store-required" aria-hidden="true">*</span></label>
@@ -384,9 +355,9 @@ $serverStoreDefaultMonthlyPrice =
                                     <label for="serverStoreGuard"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> فعال‌سازی محافظ Bot Guard <span class="server-store-required" aria-hidden="true">*</span></label>
                                     <select class="server-store-select" id="serverStoreGuard" name="ENABLE_GUARD" required aria-describedby="serverStoreGuardHelp">
                                         <option value="0" selected>غیرفعال</option>
-                                        <option value="1">فعال — افزونه پولی</option>
+                                        <option value="1" disabled>فعلاً در دسترس نیست — تعرفه تعریف نشده</option>
                                     </select>
-                                    <small id="serverStoreGuardHelp">افزونه محافظت در برابر بات‌ها و اتصال‌های مخرب؛ در صورت فعال‌سازی، هزینه آن به‌عنوان افزونه پولی در سبد خرید FragCity محاسبه می‌شود.</small>
+                                    <small id="serverStoreGuardHelp">این افزونه تا زمان تعریف قیمت رسمی در Paymenter قابل خرید نیست و فعلاً غیرفعال می‌ماند.</small>
                                 </div>
 
                                 <div class="server-store-field" id="serverStoreGuardMinutesField" hidden>
@@ -409,7 +380,7 @@ $serverStoreDefaultMonthlyPrice =
 
                             <div class="server-store-config-note" role="note">
                                 <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                                انتخاب‌ها در این صفحه برای پیش‌نمایش سفارش هستند؛ ثبت سفارش و Provisioning هنوز به Backend متصل نشده‌اند.
+                                پیکربندی و قیمت پیش از پرداخت توسط Paymenter اعتبارسنجی می‌شود. Bot Guard تا زمان تعریف تعرفه رسمی در Paymenter غیرفعال است.
                             </div>
                         </div>
                     </section>
@@ -428,21 +399,12 @@ $serverStoreDefaultMonthlyPrice =
                             <?php foreach ($serverStoreDurations as $serverStoreDuration): ?>
                                 <?php
                                 $serverStoreDurationDays = (int) $serverStoreDuration['days'];
-                                $serverStoreDurationFactor = (float) $serverStoreDuration['price_factor'];
-                                $serverStoreDurationPrice = (int) (
-                                    round(
-                                        ($serverStoreDefaultMonthlyPrice * $serverStoreDurationFactor)
-                                        / $serverStorePriceRoundingStep
-                                    ) * $serverStorePriceRoundingStep
-                                );
-                                $serverStoreDurationFactorAttribute = number_format($serverStoreDurationFactor, 10, '.', '');
                                 ?>
                                 <label class="server-store-duration-card<?= !empty($serverStoreDuration['recommended']) ? ' server-store-duration-card--recommended' : '' ?><?= !empty($serverStoreDuration['best_value']) ? ' server-store-duration-card--best-value' : '' ?>">
                                     <input
                                         type="radio"
                                         name="duration_days"
                                         value="<?= $serverStoreDurationDays ?>"
-                                        data-price-factor="<?= $serverStoreDurationFactorAttribute ?>"
                                         data-duration-label="<?= htmlspecialchars($serverStoreDuration['label'], ENT_QUOTES, 'UTF-8') ?>"
                                         data-discount-percent="<?= (int) ($serverStoreDuration['discount_percent'] ?? 0) ?>"
                                         <?= $serverStoreDurationDays === 30 ? 'checked' : '' ?>
@@ -459,7 +421,7 @@ $serverStoreDefaultMonthlyPrice =
                                         class="server-store-duration-card__price"
                                         data-duration-price="<?= $serverStoreDurationDays ?>"
                                         data-price-factor="<?= $serverStoreDurationFactorAttribute ?>"
-                                    ><?= number_format($serverStoreDurationPrice) ?> تومان</strong>
+                                    >برای مشاهده قیمت انتخاب کنید</strong>
                                     <small
                                         data-duration-caption="<?= $serverStoreDurationDays ?>"
                                     ><?= htmlspecialchars($serverStoreDuration['caption'], ENT_QUOTES, 'UTF-8') ?></small>
@@ -469,7 +431,7 @@ $serverStoreDefaultMonthlyPrice =
 
                         <div class="server-store-duration-note" role="note">
                             <i class="fa-solid fa-calculator" aria-hidden="true"></i>
-                            <span>تعرفه ۷ روزه با درون‌یابی خطی بین قیمت‌های مرجع ۱ روزه و ۱۵ روزه محاسبه شده است؛ قیمت پلن‌ها با تغییر ظرفیت بازیکن و RAM به‌صورت لحظه‌ای به‌روزرسانی می‌شود.</span>
+                            <span>قیمت هر مدت و هر پیکربندی مستقیماً از Plan و Config Optionهای Paymenter استعلام می‌شود؛ قیمت نمایش‌داده‌شده از محاسبه محلی مرورگر به دست نمی‌آید.</span>
                         </div>
                     </section>
 
@@ -480,11 +442,11 @@ $serverStoreDefaultMonthlyPrice =
             <aside class="server-store-summary" aria-labelledby="serverSummaryTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
                 <div class="server-store-summary-topline">
                     <span><i class="fa-solid fa-receipt" aria-hidden="true"></i> ORDER SUMMARY</span>
-                    <span class="server-store-summary-badge">تعرفه ظرفیت</span>
+                    <span class="server-store-summary-badge">Paymenter Quote</span>
                 </div>
 
                 <h2 id="serverSummaryTitle">خلاصه سفارش</h2>
-                <p class="server-store-summary-description">قیمت نهایی بر اساس تنظیمات فعلی سرورت.</p>
+                <p class="server-store-summary-description">مبلغ قطعی پس از اعتبارسنجی تنظیمات در Paymenter نمایش داده می‌شود.</p>
 
                 <div class="server-store-summary-product">
                     <span class="server-store-summary-product-icon"><i class="fa-solid fa-server" aria-hidden="true"></i></span>
@@ -493,8 +455,8 @@ $serverStoreDefaultMonthlyPrice =
 
                 <div class="server-store-summary-total">
                     <span>قیمت نهایی دوره انتخاب‌شده</span>
-                    <strong data-server-summary="period-price">۷۴۹٬۰۰۰ تومان</strong>
-                    <small>در نسخه فعلی قیمت بر اساس پلن پایه، اسلات‌های اضافه، RAM و مدت انتخاب‌شده محاسبه می‌شود. هزینه CPU و Storage هنوز به فاکتور اضافه نشده است. دوره‌های چندماهه شامل تخفیف پلکانی هستند. Bot Guard رایگان است.</small>
+                    <strong data-server-summary="period-price">در انتظار استعلام قیمت</strong>
+                    <small>این مبلغ شامل Plan، تمام Config Optionهای قیمت‌دار، هزینه راه‌اندازی و مالیات حساب کاربری در Paymenter است. مبلغ نهایی پیش از پرداخت دوباره محاسبه می‌شود.</small>
                 </div>
 
                 <details class="server-store-summary-details">
@@ -503,15 +465,15 @@ $serverStoreDefaultMonthlyPrice =
                     <div><span>مدت سرویس</span><strong data-server-summary="duration">۱ ماهه</strong></div>
                     <div><span>نام نمایشی سرور</span><strong data-server-summary="server-name">وارد نشده</strong></div>
                     <div><span>تخفیف دوره</span><strong data-server-summary="discount">بدون تخفیف</strong></div>
-                    <div><span>قیمت ماهانه پیکربندی</span><strong data-server-summary="monthly-price">۷۴۹٬۰۰۰ تومان</strong></div>
+                    <div><span>قیمت ماهانه پیکربندی</span><strong data-server-summary="monthly-price">طبق تعرفه Paymenter</strong></div>
                     <div><span>RAM</span><strong data-server-summary="memory">1 GB · 1024 MB</strong></div>
                     <div><span>CPU</span><strong data-server-summary="cpu">100% · 1 vCore</strong></div>
                     <div><span>Storage</span><strong data-server-summary="disk">10 GB · 10240 MB</strong></div>
                     <div><span>نقشه پیش‌فرض</span><strong data-server-summary="map">de_dust2</strong></div>
                     <div><span>ظرفیت هم‌زمان</span><strong data-server-summary="players">10 اسلات</strong></div>
-                    <div><span>پلن پایه · ۵ اسلات</span><strong data-server-summary="capacity-base-price">۴۹۹٬۰۰۰ تومان</strong></div>
-                    <div><span>اسلات‌های اضافه</span><strong data-server-summary="extra-slots-price">۵ × ۵۰٬۰۰۰ = ۲۵۰٬۰۰۰ تومان</strong></div>
-                    <div><span>هزینه ارتقای RAM</span><strong data-server-summary="memory-price">بدون هزینه اضافه</strong></div>
+                    <div><span>پلن پایه · ۵ اسلات</span><strong data-server-summary="capacity-base-price">طبق Config Optionهای Paymenter</strong></div>
+                    <div><span>اسلات‌های اضافه</span><strong data-server-summary="extra-slots-price">در Quote رسمی مشخص می‌شود</strong></div>
+                    <div><span>هزینه ارتقای RAM</span><strong data-server-summary="memory-price">در Quote رسمی مشخص می‌شود</strong></div>
                     <div><span>Tickrate / Subtick</span><strong data-server-summary="tickrate">64 Tick · Subtick فعال</strong></div>
                     <div><span>Game Mode CFG</span><strong data-server-summary="exec">Competitive — comp.cfg</strong></div>
                     <div><span>MAPGROUP</span><strong data-server-summary="mapgroup">Casual / Competitive / Practice Mode — mg_comp</strong></div>
@@ -522,14 +484,31 @@ $serverStoreDefaultMonthlyPrice =
                 </div>
                 </details>
 
-                <button type="button" class="server-store-submit" disabled>
+                <div class="server-store-checkout" aria-labelledby="serverStorePaymentTitle">
+                    <h3 id="serverStorePaymentTitle">روش پرداخت</h3>
+                    <label class="server-store-payment-option">
+                        <input type="radio" name="payment_method" value="zarinpal" form="serverStoreConfigForm" checked>
+                        <span><strong>پرداخت آنلاین با زرین‌پال</strong><small>پرداخت امن؛ ثبت سفارش پس از تأیید سروربه‌سر انجام می‌شود.</small></span>
+                    </label>
+                    <label class="server-store-payment-option">
+                        <input type="radio" name="payment_method" value="wallet" form="serverStoreConfigForm">
+                        <span><strong>کیف پول Paymenter</strong><small id="serverStoreWalletBalance">برای مشاهده موجودی، روش کیف پول را انتخاب کنید.</small><small>موجودی در Paymenter به‌صورت اتمیک بررسی و کسر می‌شود.</small></span>
+                    </label>
+                </div>
+
+                <div id="serverStoreQuoteStatus" class="server-store-quote-status" role="status" aria-live="polite">
+                    برای دریافت قیمت قطعی، ابتدا وارد حساب FragCity شوید. <a href="/index.php?page=login">ورود با Steam</a>
+                </div>
+                <div id="serverStoreQuoteLines" class="server-store-quote-lines" aria-live="polite"></div>
+
+                <button type="submit" form="serverStoreConfigForm" id="serverStoreSubmit" class="server-store-submit" disabled>
                     <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                    ثبت سفارش هنوز فعال نیست
+                    ابتدا قیمت قطعی را دریافت کنید
                 </button>
 
                 <div class="server-store-summary-footnote">
                     <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
-                    این صفحه فعلاً برای انتخاب و بررسی پیکربندی است. سفارش‌گیری پس از نهایی‌شدن تعرفه‌ها و اتصال Backend فعال می‌شود.
+                    پرداخت و ساخت سرویس فقط پس از Quote معتبر Paymenter انجام می‌شود. پس از تأیید پرداخت، Provisioning در Paymenter صف‌بندی خواهد شد.
                 </div>
             </aside>
         </div>

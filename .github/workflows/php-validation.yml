@@ -43,6 +43,9 @@ jobs:
       - name: Validate order history JavaScript syntax
         run: node --check js/orders.js
 
+      - name: Validate Paymenter bridge and CS2 storefront contracts
+        run: php tools/paymenter-bridge-compatibility-check.php
+
       - name: Test legacy dotted and nested settings lookups
         run: php tools/settings-loader-test.php
 

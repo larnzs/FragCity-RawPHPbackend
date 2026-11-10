@@ -101,6 +101,99 @@ final class PaymenterApiClient
      *   limits:array{minimum_deposit:string,maximum_deposit:string,maximum_credit:string}
      * }
      */
+    /**
+     * Request a read-only, authoritative CS2 checkout quote from Paymenter.
+     * Selection values are sent; prices, tax and totals are resolved by Paymenter.
+     *
+     * @param array<string,mixed> $quote
+     * @return array<string,mixed>
+     */
+    public function quoteCs2ServerOrder(array $quote): array
+    {
+        $steamId64 = trim((string) ($quote['steamid64'] ?? ''));
+        $durationDays = filter_var($quote['duration_days'] ?? null, FILTER_VALIDATE_INT);
+        $serverName = trim((string) ($quote['server_name'] ?? ''));
+        $resources = $quote['resources'] ?? [];
+        $featureLimits = $quote['feature_limits'] ?? [];
+        $egg = $quote['egg'] ?? [];
+
+        if (
+            !preg_match('/^[0-9]{17}$/D', $steamId64)
+            || !in_array($durationDays, [1, 7, 15, 30], true)
+            || !preg_match('/^[A-Za-z0-9 ]{1,64}$/D', $serverName)
+            || !is_array($resources)
+            || !is_array($featureLimits)
+            || !is_array($egg)
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        foreach (['memory_mb', 'disk_mb', 'cpu_percent'] as $key) {
+            if (filter_var($resources[$key] ?? null, FILTER_VALIDATE_INT) === false) {
+                throw new RuntimeException('validation_failed');
+            }
+        }
+
+        foreach (['databases', 'additional_allocations', 'backups'] as $key) {
+            if (filter_var($featureLimits[$key] ?? 0, FILTER_VALIDATE_INT) === false) {
+                throw new RuntimeException('validation_failed');
+            }
+        }
+
+        $payload = [
+            'steamid64' => $steamId64,
+            'duration_days' => (int) $durationDays,
+            'server_name' => $serverName,
+            'resources' => [
+                'memory_mb' => (int) $resources['memory_mb'],
+                'disk_mb' => (int) $resources['disk_mb'],
+                'cpu_percent' => (int) $resources['cpu_percent'],
+            ],
+            'feature_limits' => [
+                'databases' => (int) ($featureLimits['databases'] ?? 0),
+                'additional_allocations' => (int) ($featureLimits['additional_allocations'] ?? 0),
+                'backups' => (int) ($featureLimits['backups'] ?? 0),
+            ],
+            'egg' => $egg,
+        ];
+
+        $response = $this->post('/api/v1/fragcity/bridge/quotes/cs2', $payload);
+        $data = $response['data'] ?? null;
+        $amountRial = is_array($data)
+            ? filter_var($data['amount_rial'] ?? null, FILTER_VALIDATE_INT)
+            : false;
+        $amountToman = is_array($data)
+            ? filter_var($data['amount_toman'] ?? null, FILTER_VALIDATE_INT)
+            : false;
+
+        if (
+            !is_array($data)
+            || $amountRial === false
+            || $amountToman === false
+            || $amountRial < 10
+            || $amountRial % 10 !== 0
+            || $amountToman !== intdiv($amountRial, 10)
+            || strtoupper((string) ($data['currency_code'] ?? '')) === ''
+            || ($data['currency_unit'] ?? null) !== 'rial'
+            || !is_array($data['price_lines'] ?? null)
+        ) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return [
+            'currency_code' => strtoupper((string) $data['currency_code']),
+            'currency_unit' => 'rial',
+            'amount_rial' => $amountRial,
+            'amount_toman' => $amountToman,
+            'recurring_subtotal_rial' => (int) ($data['recurring_subtotal_rial'] ?? 0),
+            'setup_fee_total_rial' => (int) ($data['setup_fee_total_rial'] ?? 0),
+            'tax_rial' => (int) ($data['tax_rial'] ?? 0),
+            'duration_days' => (int) $data['duration_days'],
+            'price_lines' => $data['price_lines'],
+            'expires_in_seconds' => max(1, (int) ($data['expires_in_seconds'] ?? 60)),
+        ];
+    }
+
     public function getCustomerWalletBalance(string $steamId64): array
     {
         if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
@@ -360,6 +453,9 @@ final class PaymenterApiClient
         $amountRial = $isZarinpal
             ? filter_var($payment['amount_rial'] ?? null, FILTER_VALIDATE_INT)
             : 0;
+        $expectedAmountRial = array_key_exists('expected_amount_rial', $order)
+            ? filter_var($order['expected_amount_rial'], FILTER_VALIDATE_INT)
+            : null;
         $durationDays = filter_var($order['duration_days'] ?? null, FILTER_VALIDATE_INT);
         $authority = $isZarinpal ? trim((string) ($payment['authority'] ?? '')) : '';
         $refId = $isZarinpal ? trim((string) ($payment['ref_id'] ?? '')) : '';
@@ -375,6 +471,7 @@ final class PaymenterApiClient
                 || !preg_match('/^[A-Za-z0-9_-]{1,128}$/D', $authority)
                 || !preg_match('/^[A-Za-z0-9_-]{1,64}$/D', $refId)
             ))
+            || ($expectedAmountRial !== null && ($expectedAmountRial === false || $expectedAmountRial < 10 || $expectedAmountRial % 10 !== 0))
             || !in_array($durationDays, [1, 7, 15, 30], true)
             || !preg_match('/^[A-Za-z0-9 ]{1,64}$/D', $serverName)
         ) {
@@ -418,6 +515,7 @@ final class PaymenterApiClient
             'order_ref' => $orderRef,
             'steamid64' => $steamId64,
             'payment' => $paymentPayload,
+            ...($expectedAmountRial !== null ? ['expected_amount_rial' => (int) $expectedAmountRial] : []),
             'duration_days' => $durationDays,
             'server_name' => $serverName,
             'resources' => [

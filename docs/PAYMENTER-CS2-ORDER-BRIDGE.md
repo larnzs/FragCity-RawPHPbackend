@@ -19,6 +19,24 @@ FragCity backend after the website has completed verification.
 
 ## Read-only catalogue and wallet bridge
 
+## Authoritative price quote and storefront checkout
+
+The live storefront now uses a two-step contract before accepting payment:
+
+1. `POST /api/server-store.php` with `{"action":"quote", ...selection}`. FragCity derives SteamID64 from the PHP session, checks CSRF and the synced Paymenter account link, then calls Paymenter's read-only `POST /api/v1/fragcity/bridge/quotes/cs2`. Paymenter resolves the exact configured Product, duration Plan and all eight native Config Option child rows; includes recurring prices, setup fees and the customer's `Settings::tax($user)`; and returns an exact Rial total plus whole-Toman equivalent. The browser never sends a price, currency, tax, Product ID, Plan ID or Config Option ID.
+2. `POST /api/server-store.php` with `{"action":"checkout", ...selection, "expected_amount_rial": ...}`. The website obtains a fresh quote again and compares it with the amount the customer just reviewed. If it changed, checkout stops and the new quote must be reviewed. Paymenter then recalculates the same total again inside the order transaction and rejects a mismatch.
+
+The public catalogue is also used to build RAM, SSD, CPU, Player Slots, Tickrate, Game Mode and Map Group selectors. This controls the UI only; Paymenter still performs the authoritative mapping and price validation on quote and order.
+
+The website stores each checkout in `fragcity_cs2_checkout_orders` with a stable 32-character `checkout_ref`, selection hash, amount, ZarinPal Authority/RefID and Paymenter Order/Invoice/Service IDs. Exact retries reuse the same reference. A transport-unknown ZarinPal request or a verified payment waiting for Paymenter is deliberately locked instead of issuing a second payment.
+
+Wallet checkout calls Paymenter with `payment.provider=wallet` and no debit amount. For ZarinPal, the website makes the request using the stored Rial amount, redirects to the provider, then `/pages/zarinpal/zarinpal_cs2_callback.php` verifies the Authority and exact amount through the provider's server-side Verify endpoint before creating the Paymenter order. The callback query parameter `Status` is not trusted as payment evidence and cannot mutate the order state by itself.
+
+Before enabling this storefront in production:
+- Apply `database/migrations/20261110_fragcity_cs2_checkout_orders.sql` to the same website database profile configured by `files.index.database_profile`.
+- Deploy `FragCityAPI` **1.11.0** (with `POST /api/v1/fragcity/bridge/quotes/cs2`) before deploying this website branch.
+- Ensure all eight Product Config Options are Upgradable and have price rows for every allowed child value/Plan/Rial currency. Free values must have explicit zero-price/zero-setup-fee rows.
+- Keep Bot Guard unavailable until its surcharge is included in the quote. Do not enable renewals until recurring totals have been checked end-to-end.
 ## FragCity website API boundary
 
 The customer-facing website uses `POST /api/server-store.php` only as its

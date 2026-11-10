@@ -23,6 +23,10 @@ $page = $read('pages/myservers.php');
 $javascript = $read('js/myservers.js');
 $header = $read('includes/header.php');
 $index = $read('index.php');
+$storePage = $read('pages/buyserveropen.php');
+$storeJs = $read('js/buyserveropen.js');
+$storeCallback = $read('pages/zarinpal/zarinpal_cs2_callback.php');
+$storeMigration = $read('database/migrations/20261110_fragcity_cs2_checkout_orders.sql');
 
 $checks = [];
 $checkResult = static function (string $name, bool $passed) use (&$checks): void {
@@ -40,6 +44,7 @@ $expectedRoutes = [
     '/api/v1/fragcity/bridge/servers/password',
     '/api/v1/fragcity/bridge/servers/username',
     '/api/v1/fragcity/bridge/orders/cs2',
+    '/api/v1/fragcity/bridge/quotes/cs2',
 ];
 
 foreach ($expectedRoutes as $route) {
@@ -75,6 +80,62 @@ $checkResult('Server storefront catalog and wallet API keep the HMAC bridge serv
     && !str_contains($storeApi, "shared_secret' =>")
     && !str_contains($storeApi, "admin_api_key' =>")
 );
+$checkResult('CS2 quotes are calculated by Paymenter, never from browser-submitted prices',
+    str_contains($client, 'quoteCs2ServerOrder')
+    && str_contains($client, "'/api/v1/fragcity/bridge/quotes/cs2'")
+    && str_contains($storeApi, "if (\$action === 'quote')")
+    && str_contains($storeApi, "quoteCs2ServerOrder")
+    && str_contains($storeApi, "\$_SESSION['steamid']")
+    && str_contains($storeApi, "\$_SERVER['HTTP_X_FRAGCITY_CSRF']")
+    && !str_contains($storeApi, "'amount_toman' => \$payload")
+    && !str_contains($storeApi, "'amount_rial' => \$payload")
+);
+
+$checkResult('CS2 storefront quote and checkout stay behind the authenticated FragCity PHP API',
+    str_contains($storeApi, "if (\$action === 'quote')")
+    && str_contains($storeApi, "if (\$action === 'checkout')")
+    && str_contains($storeApi, "quoteCs2ServerOrder")
+    && str_contains($storeApi, "createCs2ServerOrder")
+    && str_contains($storeApi, "\$_SESSION['steamid']")
+    && str_contains($storeApi, "\$_SERVER['HTTP_X_FRAGCITY_CSRF']")
+    && str_contains($storeApi, "fragcity_cs2_checkout_orders")
+    && str_contains($storeApi, "'expected_amount_rial' => \$quote['amount_rial']")
+);
+$checkResult('ZarinPal CS2 callback verifies the stored Rial amount before submitting the Paymenter order',
+    str_contains($storeCallback, "'amount' => (int) \$order['amount_rial']")
+    && str_contains($storeCallback, "'authority' => \$authority")
+    && str_contains($storeCallback, "\$gatewayCode !== 100 && \$gatewayCode !== 101")
+    && str_contains($storeCallback, "payment_verified")
+    && str_contains($storeCallback, "createCs2ServerOrder")
+    && !str_contains($storeCallback, "SET status = 'cancelled'")
+);
+$checkResult('CS2 storefront checkout ledger has stable, unique reference and receipt fields',
+    str_contains($storeMigration, 'CREATE TABLE IF NOT EXISTS fragcity_cs2_checkout_orders')
+    && str_contains($storeMigration, 'UNIQUE KEY uq_fragcity_cs2_checkout_order_ref (order_ref)')
+    && str_contains($storeMigration, 'UNIQUE KEY uq_fragcity_cs2_checkout_authority (authority)')
+    && str_contains($storeMigration, 'UNIQUE KEY uq_fragcity_cs2_checkout_ref_id (ref_id)')
+);
+$checkResult('Buy Server page renders a disabled-until-quote secure checkout',
+    str_contains($storePage, 'data-api-url="/api/server-store.php"')
+    && str_contains($storePage, 'data-csrf-token=')
+    && str_contains($storePage, 'id="serverStoreQuoteStatus"')
+    && str_contains($storePage, 'id="serverStoreQuoteLines"')
+    && str_contains($storePage, 'id="serverStoreSubmit"')
+    && str_contains($storePage, 'name="payment_method"')
+    && !str_contains($storePage, 'serverStoreCapacityPricing')
+    && !str_contains($storePage, 'serverStoreRamPricing')
+);
+$checkResult('Buy Server JavaScript uses live Paymenter values and no local price calculation',
+    str_contains($storeJs, "searchParams.set('action', 'catalog')")
+    && str_contains($storeJs, "action: 'quote'")
+    && str_contains($storeJs, "action: 'checkout'")
+    && str_contains($storeJs, 'expected_amount_rial: Number(quote.amount_rial)')
+    && str_contains($storeJs, 'game_mode_manager')
+    && str_contains($storeJs, 'quoteCs2ServerOrder') === false
+    && !str_contains($storeJs, 'extraSlotPrice')
+    && !str_contains($storeJs, 'monthlyPrice')
+);
+
 $checkResult('Storefront catalog response omits Paymenter internal product and Config Option IDs',
     str_contains($storeApi, "'config_options' => \$safeOptions")
     && str_contains($storeApi, "'plans' => \$safePlans")
@@ -91,6 +152,7 @@ $checkResult('CS2 order client sends a verified ZarinPal receipt and resource/Eg
     && str_contains($client, "'databases' => $databases")
     && str_contains($client, "'additional_allocations' => $additionalAllocations")
     && str_contains($client, "'backups' => $backups")
+    && str_contains($client, "'expected_amount_rial' => (int) \$expectedAmountRial")
     && str_contains($client, "'egg' => $egg"));
 $checkResult('CS2 order client surfaces native Config Option mapping and pricing errors safely',
     str_contains($client, "'cs2_config_option_mapping_invalid'")
