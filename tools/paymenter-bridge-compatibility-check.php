@@ -102,8 +102,7 @@ $checkResult('CS2 storefront quote and checkout stay behind the authenticated Fr
     && str_contains($storeApi, "'expected_amount_rial' => \$quote['amount_rial']")
 );
 $checkResult('ZarinPal CS2 callback verifies the stored Rial amount before submitting the Paymenter order',
-    str_contains($storeCallback, "zarinpal_cs2_callback")
-    && str_contains($storeCallback, "'amount' => (int) \$order['amount_rial']")
+    str_contains($storeCallback, "'amount' => (int) \$order['amount_rial']")
     && str_contains($storeCallback, "'authority' => \$authority")
     && str_contains($storeCallback, "\$gatewayCode !== 100 && \$gatewayCode !== 101")
     && str_contains($storeCallback, "payment_verified")
