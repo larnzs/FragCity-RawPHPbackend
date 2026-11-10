@@ -2041,3 +2041,170 @@ body:has(.server-store-page) .content-fader {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+
+
+/* Paymenter-backed CS2 checkout and live quote state. */
+.server-store-checkout {
+    display: grid;
+    gap: 9px;
+    margin-top: 16px;
+}
+
+.server-store-checkout h3 {
+    margin: 0 0 2px;
+    color: #E7E0D7;
+    font-size: .76rem;
+    font-weight: 900;
+}
+
+.server-store-payment-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, .09);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .025);
+    cursor: pointer;
+}
+
+.server-store-payment-option:has(input:checked) {
+    border-color: rgba(255, 179, 71, .48);
+    background: rgba(255, 179, 71, .055);
+}
+
+.server-store-payment-option input {
+    flex: 0 0 auto;
+    margin: 3px 0 0;
+    accent-color: #F97316;
+}
+
+.server-store-payment-option > span {
+    display: grid;
+    gap: 3px;
+    min-width: 0;
+}
+
+.server-store-payment-option strong {
+    color: #E8E2DA;
+    font-size: .68rem;
+    font-weight: 850;
+}
+
+.server-store-payment-option small {
+    color: #96918B;
+    font-size: .59rem;
+    line-height: 1.75;
+}
+
+#serverStoreWalletBalance {
+    color: #FFBD68;
+}
+
+.server-store-quote-status {
+    margin-top: 13px;
+    padding: 10px 12px;
+    border: 1px solid rgba(255, 255, 255, .08);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .025);
+    color: #B9B3AA;
+    font-size: .63rem;
+    line-height: 1.85;
+    overflow-wrap: anywhere;
+}
+
+.server-store-quote-status[data-state="loading"] {
+    border-color: rgba(255, 179, 71, .22);
+    color: #F3C98E;
+}
+
+.server-store-quote-status[data-state="success"] {
+    border-color: rgba(34, 197, 94, .24);
+    color: #A6DDB5;
+}
+
+.server-store-quote-status[data-state="warning"] {
+    border-color: rgba(245, 158, 11, .24);
+    color: #F2C58A;
+}
+
+.server-store-quote-status[data-state="error"] {
+    border-color: rgba(239, 68, 68, .28);
+    color: #F0A4A4;
+}
+
+.server-store-quote-status a {
+    color: #FFB347;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.server-store-quote-lines {
+    display: grid;
+    gap: 0;
+    margin-top: 8px;
+}
+
+.server-store-quote-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 2px;
+    border-bottom: 1px solid rgba(255, 255, 255, .055);
+    color: #96918B;
+    font-size: .6rem;
+    line-height: 1.7;
+}
+
+.server-store-quote-line strong {
+    max-width: 62%;
+    color: #DADADD;
+    font-size: .6rem;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+.server-store-quote-line.is-total {
+    margin-top: 4px;
+    padding: 11px 9px;
+    border: 1px solid rgba(255, 179, 71, .2);
+    border-radius: 8px;
+    background: rgba(255, 179, 71, .045);
+    color: #F1D0A0;
+    font-weight: 900;
+}
+
+.server-store-quote-line.is-total strong {
+    color: #FFD08D;
+    font-size: .72rem;
+}
+
+.server-store-submit:enabled {
+    border-color: rgba(255, 179, 71, .55);
+    background: linear-gradient(110deg, #F97316, #C65B12);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(249, 115, 22, .14);
+}
+
+.server-store-submit:enabled:hover {
+    filter: brightness(1.08);
+    transform: translateY(-1px);
+}
+
+.server-store-submit:disabled {
+    opacity: .72;
+}
+
+.server-store-duration-card.is-unavailable {
+    opacity: .38;
+    filter: grayscale(.65);
+    cursor: not-allowed;
+}
+
+.server-store-duration-card.is-unavailable * {
+    cursor: not-allowed;
+}
