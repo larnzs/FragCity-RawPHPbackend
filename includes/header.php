@@ -309,7 +309,7 @@ $headerFaceitEloLabel = $headerFaceitElo !== null
 $mobileNavItems = [
     ['servers_vps', 'لیست سرورها', 'fa-server', ['servers_vps', 'servers']],
     ['skins', 'انتخاب اسکین', 'fa-palette', ['skins', 'skins_vps']],
-    ['buyserveropen', 'خرید سرور', 'fa-shopping-cart', ['buyserveropen', 'buyserver']],
+    ['store', 'فروشگاه', 'fa-store', []],
     ['leaderboard', 'لیدربورد', 'fa-trophy', ['leaderboard', 'leaderboard_vps']],
     ['banlist', 'لیست محرومیت‌ها', 'fa-gavel', ['banlist']],
     ['vip', 'VIP', 'fa-crown', ['vip']],
@@ -357,11 +357,10 @@ $mobileMoreNavItems = [
                 <span>انتخاب اسکین</span>
             </a>
 
-            <a href="<?= htmlspecialchars(fragcity_page_url('buyserveropen'), ENT_QUOTES, 'UTF-8') ?>"
-               class="shock-nav-item <?= $isPageActive(['buyserveropen', 'buyserver']) ?>"
-               data-ajax-nav data-slug="buyserveropen">
-                <i class="fas fa-shopping-cart" aria-hidden="true"></i>
-                <span>خرید سرور</span>
+            <a href="https://billing.fragcity.ir"
+               class="shock-nav-item">
+                <i class="fas fa-store" aria-hidden="true"></i>
+                <span>فروشگاه</span>
             </a>
 
             <a href="<?= htmlspecialchars(fragcity_page_url('leaderboard'), ENT_QUOTES, 'UTF-8') ?>"
@@ -615,10 +614,9 @@ $mobileMoreNavItems = [
             <span class="fc-motion-toggle__state" aria-hidden="true"></span>
         </button>
         <?php foreach ($mobileNavItems as [$slug, $label, $icon, $activePages]): ?>
-            <a href="<?= htmlspecialchars(fragcity_page_url($slug), ENT_QUOTES, 'UTF-8') ?>"
+            <a href="<?= htmlspecialchars($slug === 'store' ? 'https://billing.fragcity.ir' : fragcity_page_url($slug), ENT_QUOTES, 'UTF-8') ?>"
                class="mobile-nav-link <?= $slug === 'vip' ? 'mobile-nav-link--vip ' : '' ?><?= $isPageActive($activePages) ?>"
-               data-ajax-nav
-               data-slug="<?= htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') ?>">
+               <?= $slug === 'store' ? '' : 'data-ajax-nav data-slug="' . htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') . '"' ?>>
                 <i class="fas <?= htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
                 <span><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></span>
             </a>
