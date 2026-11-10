@@ -74,7 +74,7 @@ $isPageActive = static function (array $pages) use ($current_page, $isMinecraftS
     return in_array($current_page, $pages, true) ? 'active' : '';
 };
 
-$morePages = ['serverguide', 'launcher', 'status', 'minecraft_store'];
+$morePages = ['serverguide', 'launcher', 'status'];
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
@@ -320,7 +320,6 @@ $mobileMoreNavItems = [
     ['serverguide', 'راهنمای سرور', 'fa-book-open', ['serverguide']],
     ['launcher', 'دانلود لانچر', 'fa-download', ['launcher']],
     ['status', 'وضعیت سرویس‌ها', 'fa-heart-pulse', ['status']],
-    ['buyserveropen', 'میزبانی Minecraft', 'fa-cubes', ['minecraft_store']],
 ];
 ?>
 
@@ -407,9 +406,6 @@ $mobileMoreNavItems = [
                     </a>
                     <a href="<?= htmlspecialchars(fragcity_page_url('status'), ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['status']) ?>" data-ajax-nav data-slug="status">
                         <i class="fas fa-heart-pulse"></i><span>وضعیت سرویس‌ها</span>
-                    </a>
-                    <a href="<?= htmlspecialchars(fragcity_page_url('buyserveropen') . '?game=minecraft', ENT_QUOTES, 'UTF-8') ?>" class="frag-drop-link <?= $isPageActive(['minecraft_store']) ?>" data-ajax-nav data-slug="buyserveropen">
-                        <i class="fas fa-cubes" aria-hidden="true"></i><span>میزبانی Minecraft</span>
                     </a>
                 </div>
             </div>
