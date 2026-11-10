@@ -93,7 +93,13 @@ final class PaymenterApiClient
      * Return the linked customer's Paymenter wallet balance in the configured
      * CS2 currency. The Paymenter user ID is resolved only on the private bridge.
      *
-     * @return array{currency_code:string,currency_unit:string,balance:string}
+     * @return array{
+     *   currency_code:string,
+     *   currency_unit:string,
+     *   balance:string,
+     *   wallet_enabled:bool,
+     *   limits:array{minimum_deposit:string,maximum_deposit:string,maximum_credit:string}
+     * }
      */
     public function getCustomerWalletBalance(string $steamId64): array
     {
@@ -113,6 +119,11 @@ final class PaymenterApiClient
             || !is_string($data['currency_unit'] ?? null)
             || !is_numeric($data['balance'] ?? null)
             || (float) $data['balance'] < 0
+            || !is_bool($data['wallet_enabled'] ?? null)
+            || !is_array($data['limits'] ?? null)
+            || !is_numeric($data['limits']['minimum_deposit'] ?? null)
+            || !is_numeric($data['limits']['maximum_deposit'] ?? null)
+            || !is_numeric($data['limits']['maximum_credit'] ?? null)
         ) {
             throw new RuntimeException('paymenter_invalid_response');
         }
@@ -121,6 +132,12 @@ final class PaymenterApiClient
             'currency_code' => strtoupper($data['currency_code']),
             'currency_unit' => $data['currency_unit'],
             'balance' => number_format((float) $data['balance'], 2, '.', ''),
+            'wallet_enabled' => $data['wallet_enabled'],
+            'limits' => [
+                'minimum_deposit' => number_format((float) $data['limits']['minimum_deposit'], 2, '.', ''),
+                'maximum_deposit' => number_format((float) $data['limits']['maximum_deposit'], 2, '.', ''),
+                'maximum_credit' => number_format((float) $data['limits']['maximum_credit'], 2, '.', ''),
+            ],
         ];
     }
 
