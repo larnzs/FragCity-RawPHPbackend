@@ -95,13 +95,17 @@ try {
         // Status=OK only authorizes a server-to-server Verify call. It is not
         // accepted as evidence of payment and never changes the order by itself.
         if ($gatewayStatus !== 'OK') {
-            $cancel = $pdo->prepare(
-                "UPDATE fragcity_cs2_checkout_orders
-                 SET status = 'cancelled', last_error = 'gateway_cancelled'
-                 WHERE id = ? AND status = 'awaiting_payment'"
+            // The callback query string is controlled by the browser. Never
+            // cancel or fail an order from Status= N/NO alone: an edited URL
+            // must not be able to invalidate a payment that ZarinPal accepted.
+            // A later callback with Status=OK will perform the authoritative
+            // server-to-server Verify request against the stored amount.
+            $render(
+                'پرداخت تأیید نشده',
+                'زرین‌پال این بازگشت را به‌عنوان پرداخت موفق اعلام نکرده است. وضعیت سفارش بدون تغییر حفظ شد؛ اگر پرداخت انجام داده‌اید، صفحه را از لینک بازگشت درگاه دوباره باز کنید یا با پشتیبانی تماس بگیرید.',
+                false,
+                409
             );
-            $cancel->execute([(int) $order['id']]);
-            $render('پرداخت لغو شد', 'پرداخت از طرف شما لغو شد یا زرین‌پال آن را تأیید نکرد. وجهی برای این سفارش در Paymenter ثبت نشد.', false, 409);
         }
 
         $zarinpalSettings = fragcity_settings('integrations.zarinpal', []);
