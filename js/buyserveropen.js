@@ -149,6 +149,7 @@
         }
 
         function bindRangeToCatalog(input, option, formatter) {
+            if (!option || option.upgradable !== true) throw new Error('cs2_config_option_mapping_invalid');
             const values = catalogNumericValues(option);
             if (!values.length) throw new Error('cs2_config_option_mapping_invalid');
             const preferred = Number(input.value);
@@ -165,10 +166,61 @@
         }
 
         function applyPaymenterCatalog(catalog) {
-            if (!catalog || !Array.isArray(catalog.config_options) || !Array.isArray(catalog.plans)) {
+            if (!catalog || !Array.isArray(catalog.config_options) || !Array.isArray(catalog.plans)
+                || !catalog.game_mode_manager || !Array.isArray(catalog.game_mode_manager.cfg_options)
+                || !catalog.game_mode_manager.map_group_options || typeof catalog.game_mode_manager.map_group_options !== 'object') {
                 throw new Error('paymenter_invalid_response');
             }
             const options = catalog.config_options;
+            const gameModeManifest = catalog.game_mode_manager;
+            const cfgOptions = gameModeManifest.cfg_options;
+            const mapGroupOptions = gameModeManifest.map_group_options;
+            const existingMapLabels = new Map(Array.from(mapgroupSelect.options).map(function (option) {
+                return [option.value, option.textContent.trim()];
+            }));
+            const validCfgs = cfgOptions.filter(function (mode) {
+                return mode && typeof mode.config === 'string' && typeof mode.name === 'string'
+                    && Array.isArray(mode.mapGroups) && mode.mapGroups.length > 0;
+            });
+            if (!validCfgs.length) throw new Error('cs2_checkout_manifest_unavailable');
+
+            execSelect.replaceChildren();
+            validCfgs.forEach(function (mode) {
+                const option = document.createElement('option');
+                option.value = mode.config;
+                option.textContent = mode.name;
+                option.dataset.mapGroups = mode.mapGroups.join('|');
+                option.dataset.defaultMap = String(mode.defaultMap || '');
+                execSelect.appendChild(option);
+            });
+            execSelect.disabled = false;
+            execSelect.value = validCfgs.some(function (mode) { return mode.config === 'comp.cfg'; })
+                ? 'comp.cfg'
+                : validCfgs[0].config;
+
+            const cfgNameToId = new Map(validCfgs.map(function (mode) {
+                return [mode.name, mode.config];
+            }));
+            allMapGroups = Object.entries(mapGroupOptions).map(function (entry) {
+                const groupId = entry[0];
+                const labels = Array.isArray(entry[1]) ? entry[1] : [];
+                return {
+                    value: groupId,
+                    label: existingMapLabels.get(groupId) || groupId,
+                    configs: labels.map(function (label) { return cfgNameToId.get(label); }).filter(Boolean)
+                };
+            }).filter(function (group) { return group.configs.length > 0; });
+            if (!allMapGroups.length) throw new Error('cs2_checkout_manifest_unavailable');
+
+            const defaultMode = validCfgs.find(function (mode) { return mode.config === execSelect.value; }) || validCfgs[0];
+            const preferredGroup = Array.isArray(defaultMode.mapGroups) && defaultMode.mapGroups.includes('mg_comp')
+                ? 'mg_comp'
+                : defaultMode.mapGroups[0];
+            syncMapGroups(preferredGroup);
+            if (mapInput && defaultMode.defaultMap && (!mapInput.value.trim() || mapInput.value === 'de_dust2')) {
+                mapInput.value = String(defaultMode.defaultMap);
+            }
+
             bindRangeToCatalog(memoryInput, findCatalogOption(options, ['memory', 'memory_mb', 'ram', 'ram_mb']), formatGigabytes);
             bindRangeToCatalog(diskInput, findCatalogOption(options, ['disk', 'disk_mb', 'storage', 'storage_mb', 'ssd']), formatGigabytes);
             bindRangeToCatalog(cpuInput, findCatalogOption(options, ['cpu', 'cpu_percent']), function (value) { return value + '%'; });
@@ -239,7 +291,7 @@
             input.style.setProperty('--range-progress', Math.min(100, Math.max(0, progress)) + '%');
         }
 
-        const allMapGroups = mapgroupSelect
+        let allMapGroups = mapgroupSelect
             ? Array.from(mapgroupSelect.options).map(function (option) {
                 return {
                     value: option.value,
