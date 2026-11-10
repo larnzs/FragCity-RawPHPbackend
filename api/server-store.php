@@ -154,7 +154,7 @@ if ($action === 'catalog') {
                     $prices = [];
                     foreach (($child['prices'] ?? []) as $days => $price) {
                         $dayKey = (string) $days;
-                        if (!in_array($dayKey, ['1', '7', '15', '30'], true) || !is_array($price)) {
+                        if (!in_array($dayKey, ['3', '7', '15', '30'], true) || !is_array($price)) {
                             continue;
                         }
                         $prices[$dayKey] = [
