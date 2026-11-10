@@ -465,6 +465,436 @@ if ($action === 'quote') {
     }
 }
 
+if ($action === 'checkout') {
+    if ($method !== 'POST') {
+        $respond(['success' => false, 'error' => 'method_not_allowed'], 405);
+    }
+
+    if (($_SESSION['user_logged_in'] ?? false) !== true) {
+        $respond(['success' => false, 'error' => 'authentication_required'], 401);
+    }
+
+    $steamId64 = is_string($_SESSION['steamid'] ?? null) ? (string) $_SESSION['steamid'] : '';
+    $sessionCsrf = $_SESSION['auth_csrf_token'] ?? '';
+    $submittedCsrf = (string) ($_SERVER['HTTP_X_FRAGCITY_CSRF'] ?? '');
+    if (
+        !preg_match('/^[0-9]{17}$/D', $steamId64)
+        || !is_string($sessionCsrf)
+        || !preg_match('/^[a-f0-9]{64}$/D', $sessionCsrf)
+        || !hash_equals($sessionCsrf, $submittedCsrf)
+    ) {
+        $respond(['success' => false, 'error' => 'authentication_or_csrf_failed'], 419);
+    }
+
+    $checkoutRef = is_string($payload['checkout_ref'] ?? null)
+        ? strtolower(trim($payload['checkout_ref']))
+        : '';
+    $paymentMethod = is_string($payload['payment_method'] ?? null)
+        ? strtolower(trim($payload['payment_method']))
+        : '';
+    $expectedAmountRial = filter_var($payload['expected_amount_rial'] ?? null, FILTER_VALIDATE_INT);
+
+    $durationDays = filter_var($payload['duration_days'] ?? null, FILTER_VALIDATE_INT);
+    $serverName = is_string($payload['server_name'] ?? null) ? trim($payload['server_name']) : '';
+    $resourcesInput = is_array($payload['resources'] ?? null) ? $payload['resources'] : [];
+    $eggInput = is_array($payload['egg'] ?? null) ? $payload['egg'] : [];
+    $memoryMb = filter_var($resourcesInput['memory_mb'] ?? null, FILTER_VALIDATE_INT);
+    $diskMb = filter_var($resourcesInput['disk_mb'] ?? null, FILTER_VALIDATE_INT);
+    $cpuPercent = filter_var($resourcesInput['cpu_percent'] ?? null, FILTER_VALIDATE_INT);
+
+    $allowedEggKeys = [
+        'SRCDS_MAP',
+        'SRCDS_MAXPLAYERS',
+        'TICKRATE',
+        'EXEC',
+        'MAPGROUP',
+        'COOLDOWN',
+        'ENABLE_GUARD',
+        'GUARD_BAN_MINUTES',
+    ];
+    if (
+        !preg_match('/^[a-f0-9]{32}$/D', $checkoutRef)
+        || !in_array($paymentMethod, ['wallet', 'zarinpal'], true)
+        || $expectedAmountRial === false
+        || $expectedAmountRial < 10
+        || $expectedAmountRial % 10 !== 0
+        || !in_array($durationDays, [1, 7, 15, 30], true)
+        || !preg_match('/^[A-Za-z0-9 ]{1,64}$/D', $serverName)
+        || $memoryMb === false || $memoryMb < 1 || $memoryMb > 1048576
+        || $diskMb === false || $diskMb < 1 || $diskMb > 1048576
+        || $cpuPercent === false || $cpuPercent < 1 || $cpuPercent > 6400
+        || array_diff(array_keys($eggInput), $allowedEggKeys) !== []
+        || (string) ($eggInput['ENABLE_GUARD'] ?? '0') !== '0'
+    ) {
+        $respond(['success' => false, 'error' => 'validation_failed'], 422);
+    }
+
+    $egg = [];
+    foreach ($allowedEggKeys as $key) {
+        if (array_key_exists($key, $eggInput)) {
+            if (!is_scalar($eggInput[$key])) {
+                $respond(['success' => false, 'error' => 'validation_failed'], 422);
+            }
+            $egg[$key] = (string) $eggInput[$key];
+        }
+    }
+    foreach (['SRCDS_MAP', 'SRCDS_MAXPLAYERS', 'TICKRATE', 'EXEC', 'MAPGROUP', 'COOLDOWN'] as $requiredKey) {
+        if (!isset($egg[$requiredKey]) || $egg[$requiredKey] === '') {
+            $respond(['success' => false, 'error' => 'validation_failed'], 422);
+        }
+    }
+
+    $orderInput = [
+        'duration_days' => (int) $durationDays,
+        'server_name' => $serverName,
+        'resources' => [
+            'memory_mb' => (int) $memoryMb,
+            'disk_mb' => (int) $diskMb,
+            'cpu_percent' => (int) $cpuPercent,
+        ],
+        'feature_limits' => [
+            'databases' => 0,
+            'additional_allocations' => 0,
+            'backups' => 0,
+        ],
+        'egg' => $egg,
+    ];
+
+    try {
+        $indexSettings = fragcity_settings('files.index', []);
+        $databaseProfile = is_array($indexSettings)
+            ? (string) ($indexSettings['database_profile'] ?? 'main')
+            : 'main';
+        $pdo = fragcity_create_pdo($databaseProfile);
+        if (!$pdo instanceof PDO) {
+            throw new RuntimeException('fragcity_account_unavailable');
+        }
+
+        $accountStatement = $pdo->prepare(
+            'SELECT paymenter_user_id, paymenter_sync_status, username, email, phone
+             FROM users WHERE steamid64 = ? LIMIT 1'
+        );
+        $accountStatement->execute([$steamId64]);
+        $account = $accountStatement->fetch(PDO::FETCH_ASSOC);
+        if (
+            !is_array($account)
+            || (int) ($account['paymenter_user_id'] ?? 0) < 1
+            || (string) ($account['paymenter_sync_status'] ?? '') !== 'synced'
+        ) {
+            $respond(['success' => false, 'error' => 'paymenter_account_not_linked'], 409);
+        }
+
+        require_once dirname(__DIR__) . '/class/PaymenterApiClient.php';
+        $paymenter = new PaymenterApiClient();
+        $quoteInput = $orderInput + ['steamid64' => $steamId64];
+        $quote = $paymenter->quoteCs2ServerOrder($quoteInput);
+        if ($quote['amount_rial'] !== $expectedAmountRial) {
+            $respond([
+                'success' => false,
+                'error' => 'quote_changed',
+                'data' => [
+                    'amount_rial' => $quote['amount_rial'],
+                    'amount_toman' => $quote['amount_toman'],
+                    'currency_unit' => 'toman',
+                    'duration_days' => $quote['duration_days'],
+                    'price_lines' => $quote['price_lines'],
+                ],
+            ], 409, ['Cache-Control' => 'no-store']);
+        }
+
+        $canonicalOrder = [
+            'order_ref' => $checkoutRef,
+            'steamid64' => $steamId64,
+            'duration_days' => (int) $durationDays,
+            'server_name' => $serverName,
+            'resources' => $orderInput['resources'],
+            'feature_limits' => $orderInput['feature_limits'],
+            'egg' => $egg,
+            'expected_amount_rial' => $quote['amount_rial'],
+        ];
+        $payloadJson = json_encode(
+            $canonicalOrder,
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+        );
+        $payloadHash = hash('sha256', $payloadJson);
+        $amountToman = (int) $quote['amount_toman'];
+        $amountRial = (int) $quote['amount_rial'];
+        $currencyCode = (string) $quote['currency_code'];
+
+        $pdo->beginTransaction();
+        $lookup = $pdo->prepare(
+            'SELECT * FROM fragcity_cs2_checkout_orders
+             WHERE order_ref = ? LIMIT 1 FOR UPDATE'
+        );
+        $lookup->execute([$checkoutRef]);
+        $existing = $lookup->fetch(PDO::FETCH_ASSOC);
+
+        if (is_array($existing)) {
+            if (
+                !hash_equals((string) $existing['payload_hash'], $payloadHash)
+                || (string) $existing['steamid64'] !== $steamId64
+                || (string) $existing['payment_method'] !== $paymentMethod
+                || (int) $existing['amount_rial'] !== $amountRial
+            ) {
+                $pdo->rollBack();
+                $respond(['success' => false, 'error' => 'checkout_reference_conflict'], 409);
+            }
+
+            $existingStatus = (string) $existing['status'];
+            if ($existingStatus === 'accepted') {
+                $pdo->commit();
+                $respond([
+                    'success' => true,
+                    'status' => 'accepted',
+                    'replayed' => true,
+                    'data' => [
+                        'order_id' => (int) $existing['paymenter_order_id'],
+                        'invoice_id' => (int) $existing['paymenter_invoice_id'],
+                        'service_id' => (int) $existing['paymenter_service_id'],
+                        'provisioning' => 'queued_by_paymenter',
+                    ],
+                ]);
+            }
+            if ($paymentMethod === 'zarinpal' && $existingStatus === 'awaiting_payment') {
+                $authority = (string) ($existing['authority'] ?? '');
+                $settings = fragcity_settings('integrations.zarinpal', []);
+                $startPayBase = is_array($settings)
+                    ? rtrim(trim((string) ($settings['startpay_base_url'] ?? '')), '/') . '/'
+                    : '';
+                $pdo->commit();
+                if ($authority === '' || $startPayBase === '/') {
+                    $respond(['success' => false, 'error' => 'checkout_payment_url_unavailable'], 503);
+                }
+                $respond([
+                    'success' => true,
+                    'status' => 'awaiting_payment',
+                    'replayed' => true,
+                    'payment_url' => $startPayBase . rawurlencode($authority),
+                    'data' => ['amount_toman' => $amountToman, 'amount_rial' => $amountRial],
+                ], 200, ['Cache-Control' => 'no-store']);
+            }
+            if ($paymentMethod === 'wallet' && $existingStatus === 'wallet_processing') {
+                // Paymenter order_ref idempotency makes retrying the exact same
+                // payload safe even if the previous response was lost.
+                $pdo->commit();
+            } else {
+                $pdo->commit();
+                $respond([
+                    'success' => false,
+                    'error' => match ($existingStatus) {
+                        'payment_verified' => 'payment_verified_provisioning_pending',
+                        'gateway_request_unknown' => 'payment_request_status_unknown',
+                        'payment_requesting' => 'checkout_in_progress',
+                        'cancelled' => 'checkout_cancelled_use_new_reference',
+                        default => 'checkout_not_retryable',
+                    },
+                ], 409, ['Cache-Control' => 'no-store']);
+            }
+        } else {
+            $initialStatus = $paymentMethod === 'wallet' ? 'wallet_processing' : 'payment_requesting';
+            $insert = $pdo->prepare(
+                'INSERT INTO fragcity_cs2_checkout_orders
+                    (order_ref, steamid64, payload_hash, payload_json, payment_method,
+                     amount_toman, amount_rial, currency_code, status)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+            );
+            $insert->execute([
+                $checkoutRef,
+                $steamId64,
+                $payloadHash,
+                $payloadJson,
+                $paymentMethod,
+                $amountToman,
+                $amountRial,
+                $currencyCode,
+                $initialStatus,
+            ]);
+            $pdo->commit();
+        }
+
+        if ($paymentMethod === 'wallet') {
+            try {
+                $result = $paymenter->createCs2ServerOrder([
+                    ...$canonicalOrder,
+                    'payment' => ['provider' => 'wallet'],
+                ]);
+                $save = $pdo->prepare(
+                    "UPDATE fragcity_cs2_checkout_orders
+                     SET status = 'accepted', paymenter_order_id = ?, paymenter_invoice_id = ?,
+                         paymenter_service_id = ?, accepted_at = CURRENT_TIMESTAMP, last_error = NULL
+                     WHERE order_ref = ? AND status = 'wallet_processing'"
+                );
+                $save->execute([
+                    $result['order_id'], $result['invoice_id'], $result['service_id'], $checkoutRef,
+                ]);
+                if ($save->rowCount() !== 1) {
+                    throw new RuntimeException('checkout_state_save_failed');
+                }
+                $respond([
+                    'success' => true,
+                    'status' => 'accepted',
+                    'replayed' => (bool) $result['replayed'],
+                    'data' => [
+                        'order_id' => $result['order_id'],
+                        'invoice_id' => $result['invoice_id'],
+                        'service_id' => $result['service_id'],
+                        'provisioning' => $result['provisioning'],
+                        'amount_toman' => $amountToman,
+                    ],
+                ], 200, ['Cache-Control' => 'no-store']);
+            } catch (Throwable $e) {
+                $safeError = preg_match('/^[a-z0-9_]{1,96}$/D', $e->getMessage())
+                    ? $e->getMessage()
+                    : 'paymenter_order_unavailable';
+                $saveError = $pdo->prepare(
+                    "UPDATE fragcity_cs2_checkout_orders SET last_error = ?
+                     WHERE order_ref = ? AND status = 'wallet_processing'"
+                );
+                $saveError->execute([$safeError, $checkoutRef]);
+                error_log('[FragCity] CS2 wallet checkout failed; order=' . $checkoutRef . '; error=' . $safeError . '.');
+                $respond([
+                    'success' => false,
+                    'error' => $safeError,
+                    'retryable' => true,
+                    'message' => 'نتیجه ثبت سفارش از Paymenter قطعی نشد. همان درخواست را دوباره ارسال کنید؛ برداشت تکراری انجام نمی‌شود.',
+                ], 502, ['Cache-Control' => 'no-store']);
+            }
+        }
+
+        $zarinpalSettings = fragcity_settings('integrations.zarinpal', []);
+        $merchantId = is_array($zarinpalSettings) ? trim((string) ($zarinpalSettings['merchant_id'] ?? '')) : '';
+        $requestUrl = is_array($zarinpalSettings) ? trim((string) ($zarinpalSettings['request_url'] ?? '')) : '';
+        $startPayBase = is_array($zarinpalSettings)
+            ? rtrim(trim((string) ($zarinpalSettings['startpay_base_url'] ?? '')), '/') . '/'
+            : '';
+        $siteBaseUrl = rtrim(trim((string) fragcity_settings('app.site_base_url', '')), '/');
+        $validHttpsUrl = static function (string $url): bool {
+            $parts = parse_url($url);
+            return is_array($parts)
+                && strtolower((string) ($parts['scheme'] ?? '')) === 'https'
+                && !empty($parts['host'])
+                && !isset($parts['user'])
+                && !isset($parts['pass'])
+                && !isset($parts['query'])
+                && !isset($parts['fragment']);
+        };
+        if (
+            $merchantId === ''
+            || !$validHttpsUrl($requestUrl)
+            || !$validHttpsUrl($startPayBase)
+            || !$validHttpsUrl($siteBaseUrl)
+            || !function_exists('curl_init')
+        ) {
+            $save = $pdo->prepare(
+                "UPDATE fragcity_cs2_checkout_orders SET status = 'gateway_request_failed',
+                    last_error = 'zarinpal_not_configured'
+                 WHERE order_ref = ? AND status = 'payment_requesting'"
+            );
+            $save->execute([$checkoutRef]);
+            $respond(['success' => false, 'error' => 'zarinpal_not_configured'], 503);
+        }
+
+        $requestBody = json_encode([
+            'merchant_id' => $merchantId,
+            'amount' => $amountRial,
+            'callback_url' => $siteBaseUrl . '/pages/zarinpal/zarinpal_cs2_callback.php',
+            'description' => 'FragCity CS2 server ' . $checkoutRef,
+            'metadata' => [
+                'email' => trim((string) ($account['email'] ?? '')),
+                'mobile' => trim((string) ($account['phone'] ?? '')),
+            ],
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
+
+        $curl = curl_init($requestUrl);
+        if ($curl === false) {
+            $save = $pdo->prepare(
+                "UPDATE fragcity_cs2_checkout_orders SET status = 'gateway_request_unknown',
+                    last_error = 'zarinpal_curl_init_failed'
+                 WHERE order_ref = ? AND status = 'payment_requesting'"
+            );
+            $save->execute([$checkoutRef]);
+            $respond(['success' => false, 'error' => 'zarinpal_request_unknown'], 502);
+        }
+
+        curl_setopt_array($curl, [
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $requestBody,
+            CURLOPT_HTTPHEADER => ['Content-Type: application/json', 'Accept: application/json'],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
+        ]);
+        $gatewayBody = curl_exec($curl);
+        $curlError = curl_errno($curl);
+        $httpStatus = (int) curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+
+        if (!is_string($gatewayBody) || $curlError !== 0 || $httpStatus < 200 || $httpStatus >= 300) {
+            $save = $pdo->prepare(
+                "UPDATE fragcity_cs2_checkout_orders SET status = 'gateway_request_unknown',
+                    last_error = 'zarinpal_transport_unknown'
+                 WHERE order_ref = ? AND status = 'payment_requesting'"
+            );
+            $save->execute([$checkoutRef]);
+            $respond([
+                'success' => false,
+                'error' => 'zarinpal_request_unknown',
+                'message' => 'وضعیت درخواست درگاه قطعی نیست؛ برای جلوگیری از پرداخت تکراری، درخواست جدید ساخته نشد.',
+            ], 502, ['Cache-Control' => 'no-store']);
+        }
+
+        $gatewayResponse = json_decode($gatewayBody, true, 32);
+        $gatewayCode = is_array($gatewayResponse)
+            ? filter_var($gatewayResponse['data']['code'] ?? null, FILTER_VALIDATE_INT)
+            : false;
+        $authority = is_array($gatewayResponse) ? ($gatewayResponse['data']['authority'] ?? null) : null;
+        if (
+            $gatewayCode !== 100
+            || !is_string($authority)
+            || !preg_match('/^[A-Za-z0-9_-]{1,128}$/D', $authority)
+        ) {
+            $save = $pdo->prepare(
+                "UPDATE fragcity_cs2_checkout_orders SET status = 'gateway_request_failed',
+                    last_error = 'zarinpal_request_rejected'
+                 WHERE order_ref = ? AND status = 'payment_requesting'"
+            );
+            $save->execute([$checkoutRef]);
+            $respond(['success' => false, 'error' => 'zarinpal_request_rejected'], 502);
+        }
+
+        $save = $pdo->prepare(
+            "UPDATE fragcity_cs2_checkout_orders SET authority = ?, status = 'awaiting_payment',
+                last_error = NULL
+             WHERE order_ref = ? AND status = 'payment_requesting'"
+        );
+        $save->execute([$authority, $checkoutRef]);
+        if ($save->rowCount() !== 1) {
+            throw new RuntimeException('checkout_authority_not_saved');
+        }
+
+        $respond([
+            'success' => true,
+            'status' => 'awaiting_payment',
+            'payment_url' => $startPayBase . rawurlencode($authority),
+            'data' => ['amount_toman' => $amountToman, 'amount_rial' => $amountRial],
+        ], 200, ['Cache-Control' => 'no-store']);
+    } catch (Throwable $e) {
+        if ($pdo instanceof PDO && $pdo->inTransaction()) {
+            $pdo->rollBack();
+        }
+        $message = $e->getMessage();
+        $safeError = preg_match('/^[a-z0-9_]{1,96}$/D', $message)
+            ? $message
+            : 'cs2_checkout_unavailable';
+        error_log('[FragCity] CS2 checkout failed; steam_hash=' . substr(hash('sha256', $steamId64), 0, 16) . '; error=' . $safeError . '.');
+        $respond(['success' => false, 'error' => $safeError], 502, ['Cache-Control' => 'no-store']);
+    }
+}
+
 if ($action === 'wallet_balance') {
     if ($method !== 'POST') {
         $respond(['success' => false, 'error' => 'method_not_allowed'], 405);
