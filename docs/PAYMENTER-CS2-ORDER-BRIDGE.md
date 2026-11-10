@@ -34,7 +34,7 @@ Wallet checkout calls Paymenter with `payment.provider=wallet` and no debit amou
 
 Before enabling this storefront in production:
 - Apply `database/migrations/20261110_fragcity_cs2_checkout_orders.sql` to the same website database profile configured by `files.index.database_profile`.
-- Deploy `FragCityAPI` **1.12.0** (with `POST /api/v1/fragcity/bridge/quotes/cs2`) before deploying this website branch.
+- Deploy `FragCityAPI` **1.13.0** (with `POST /api/v1/fragcity/bridge/quotes/cs2`) before deploying this website branch.
 - Ensure all eight Product Config Options are Upgradable and have price rows for every allowed child value/Plan/Rial currency. Free values must have explicit zero-price/zero-setup-fee rows.
 - Keep Bot Guard unavailable until its surcharge is included in the quote. Do not enable renewals until recurring totals have been checked end-to-end.
 ## FragCity website API boundary
