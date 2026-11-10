@@ -1,20 +1,20 @@
 /*
  * FragCity Footer
- * Navy, clean multi-column layout with compact contact shortcuts.
+ * Pure-black FragCity layout with graphite surfaces and orange accents.
  */
 
 .site-footer {
-    --footer-bg: #0e1d31;
-    --footer-border: rgba(133, 163, 198, .22);
-    --footer-heading: #f1f6ff;
-    --footer-text: #a9c3e4;
-    --footer-muted: #91aacb;
-    --footer-accent: #32b9ea;
+    --footer-bg: #000000;
+    --footer-border: #242424;
+    --footer-heading: #F5F5F5;
+    --footer-text: #A3A3A3;
+    --footer-muted: #858585;
+    --footer-accent: #F97316;
 
     width: 100%;
     margin: 0;
-    border-top: 1px solid rgba(133, 163, 198, .12);
-    background: linear-gradient(112deg, #0d1b2e 0%, #10243a 100%) !important;
+    border-top: 1px solid #171717;
+    background: #000000 !important;
     color: var(--footer-text);
     font-family: "Vazirmatn", "Segoe UI", sans-serif;
 }
@@ -106,7 +106,7 @@
     display: inline-flex;
     align-items: center;
     min-height: 27px;
-    color: #a9c3e4;
+    color: #A3A3A3;
     font-size: .76rem;
     font-weight: 450;
     line-height: 1.8;
@@ -117,7 +117,7 @@
 .footer-links a:hover,
 .footer-links a:focus-visible {
     transform: translateX(-2px);
-    color: #e2f6ff;
+    color: #FDBA74;
 }
 
 /* Keep the official trust badges, but place them quietly beneath the brand copy. */
@@ -143,9 +143,9 @@
     margin: 0;
     padding: 5px;
     overflow: hidden;
-    border: 1px solid rgba(148, 176, 209, .09);
+    border: 1px solid #292929;
     border-radius: 12px;
-    background: rgba(31, 52, 78, .72);
+    background: #111111;
 }
 
 .enamad-badge > a {
@@ -187,13 +187,13 @@
     min-height: 74px;
     margin-top: 40px;
     border-top: 1px solid var(--footer-border);
-    color: #91a9c7;
+    color: #858585;
     direction: ltr;
 }
 
 .footer-copyright {
     margin: 0;
-    color: #a9bdd7;
+    color: #A3A3A3;
     font-size: .7rem;
     line-height: 1.8;
     text-align: right;
@@ -214,10 +214,10 @@
     justify-content: center;
     width: 38px;
     height: 38px;
-    border: 1px solid rgba(143, 171, 205, .06);
+    border: 1px solid #242424;
     border-radius: 11px;
-    background: rgba(31, 50, 75, .78);
-    color: #91a9c7;
+    background: #171717;
+    color: #A3A3A3;
     font-size: 1rem;
     text-decoration: none;
     transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
@@ -226,13 +226,13 @@
 .footer-social-icon:hover,
 .footer-social-icon:focus-visible {
     transform: translateY(-2px);
-    border-color: rgba(50, 185, 234, .28);
-    background: rgba(38, 68, 98, .95);
-    color: #5bcdf5;
+    border-color: rgba(249, 115, 22, .42);
+    background: #21140d;
+    color: #FDBA74;
 }
 
 .site-footer a:focus-visible {
-    outline: 2px solid rgba(50, 185, 234, .75);
+    outline: 2px solid rgba(249, 115, 22, .75);
     outline-offset: 3px;
     border-radius: 4px;
 }
