@@ -19,6 +19,24 @@ FragCity backend after the website has completed verification.
 
 ## Read-only catalogue and wallet bridge
 
+## FragCity website API boundary
+
+The customer-facing website uses `POST /api/server-store.php` only as its
+same-origin PHP boundary:
+
+- `GET /api/server-store.php?action=catalog` reads the Paymenter HMAC catalogue,
+  caches the safe presentation payload briefly on the website host, and omits
+  Paymenter internal Product / Plan / Config Option IDs from the browser response.
+- `POST /api/server-store.php` with `{"action":"wallet_balance"}` requires an
+  authenticated FragCity session and the session CSRF header. It derives
+  SteamID64 from the session, requires the local Paymenter account link to be
+  synced, and returns only that customer's Paymenter Wallet balance and limits.
+
+Neither action exposes the HMAC secret. Browser code must never call
+`billing.fragcity.ir` or a `/api/v1/fragcity/bridge/*` URL directly. The
+catalogue is public display data; every submitted selection is independently
+mapped and priced again by Paymenter when creating the paid CS2 order.
+
 The same private HMAC client also provides:
 
 - `POST /api/v1/fragcity/bridge/catalog/cs2` — returns the configured CS2 Product, duration Plans, Rial Plan prices, every attached Config Option and child value with the per-duration price/setup fee, plus Egg Checkout fields and GameModeManager metadata.
