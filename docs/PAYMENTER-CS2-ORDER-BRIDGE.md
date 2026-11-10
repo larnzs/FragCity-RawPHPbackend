@@ -23,19 +23,30 @@ The same private HMAC client also provides:
 
 - `POST /api/v1/fragcity/bridge/catalog/cs2` — returns the configured CS2 Product, duration Plans, Rial Plan prices, every attached Config Option and child value with the per-duration price/setup fee, plus Egg Checkout fields and GameModeManager metadata.
 - `POST /api/v1/fragcity/bridge/wallet/balance` — accepts the SteamID64 from the authenticated server-side website session and returns only that linked Paymenter user's configured Rial credit balance, whether Paymenter Credits are enabled, and the configured deposit/balance limits.
+- `POST /api/v1/fragcity/bridge/wallet/topups/prepare` — reserves the linked customer's maximum-credit capacity before the website creates a ZarinPal deposit request.
 - `POST /api/v1/fragcity/bridge/wallet/topups/zarinpal` — applies a ZarinPal deposit already verified by the FragCity PHP backend through a native Paymenter Credit invoice.
 
 The browser never calls either endpoint. The PHP backend calls them through `PaymenterApiClient::getCs2Catalog()` and `PaymenterApiClient::getCustomerWalletBalance()`.
 
 ## Wallet deposit and wallet checkout
 
-A verified ZarinPal deposit is submitted by
-`PaymenterApiClient::createCustomerWalletTopup()`. The website sends a stable
-32-character `topup_ref`, the authenticated SteamID64 and the server-verified
-ZarinPal Authority, RefID and amount pair. Paymenter validates the amount
-conversion and its Credits settings, then creates/settles a native Credit
-invoice. Do not call this method from the browser or before ZarinPal Verify
-succeeds.
+Before creating a ZarinPal deposit request, the website backend must call
+`PaymenterApiClient::prepareCustomerWalletTopup()` with a stable 32-character
+`topup_ref`, the authenticated SteamID64 and the requested Toman/Rial amount.
+Paymenter validates its native Credits settings and reserves the required
+maximum-credit capacity for 20 minutes. Only after a `prepared` response may
+FragCity create the external ZarinPal request. Keep the same `topup_ref` for
+the callback and every retry; an exact retry returns the existing reservation.
+
+After the FragCity backend verifies the ZarinPal callback with the provider's
+server-side Verify API, it calls
+`PaymenterApiClient::createCustomerWalletTopup()` using that same reference,
+the authenticated SteamID64 and the verified Authority, RefID and amount pair.
+Paymenter settles a native Credit invoice and its normal paid-invoice processor
+increments the Wallet. Never call either method from browser JavaScript, and
+never call the settlement method before ZarinPal Verify succeeds. A reservation
+that expires may be marked expired; a genuinely verified receipt is still
+reconciled by Paymenter rather than silently discarded.
 
 CS2 orders can also use Paymenter Wallet:
 `PaymenterApiClient::createCs2ServerOrder()` receives only
