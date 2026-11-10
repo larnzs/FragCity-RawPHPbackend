@@ -62,6 +62,8 @@
         let quoteTimer = null;
         let quoteBusy = false;
         let checkoutBusy = false;
+        let checkoutCompleted = false;
+        let checkoutLocked = false;
         let walletEnabled = false;
         let walletBalanceToman = null;
         let checkoutRef = '';
@@ -288,7 +290,7 @@
                 'قیمت قطعی از Paymenter دریافت شد · اعتبار نمایشی کوتاه‌مدت است و هنگام ثبت سفارش دوباره محاسبه می‌شود.',
                 'success'
             );
-            submitButton.disabled = !authenticated || !walletMethodAllowed();
+            submitButton.disabled = !authenticated || !walletMethodAllowed() || checkoutCompleted || checkoutLocked;
             submitButton.innerHTML = '<i class="fa-solid fa-lock" aria-hidden="true"></i> ثبت سفارش · ' + formatToman(quote.amount_toman);
         }
 
@@ -468,7 +470,7 @@
                     const online = paymentInputs.find(function (input) { return input.value === 'zarinpal'; });
                     if (online) online.checked = true;
                 }
-                if (currentQuote) submitButton.disabled = !walletMethodAllowed();
+                if (currentQuote) submitButton.disabled = !walletMethodAllowed() || checkoutCompleted || checkoutLocked;
             } catch (error) {
                 walletInput.disabled = true;
                 walletEnabled = false;
@@ -533,8 +535,12 @@
                     return;
                 }
                 if (!response.ok || body.success !== true) {
-                    setQuoteStatus(humanizeError(body.error || 'checkout_unavailable'), 'error');
-                    submitButton.disabled = !(currentQuote && walletMethodAllowed());
+                    const errorCode = body.error || 'checkout_unavailable';
+                    setQuoteStatus(humanizeError(errorCode), 'error');
+                    if (['payment_verified_provisioning_pending', 'payment_request_status_unknown', 'zarinpal_request_unknown', 'checkout_in_progress', 'checkout_not_retryable', 'checkout_cancelled_use_new_reference'].includes(errorCode)) {
+                        checkoutLocked = true;
+                    }
+                    submitButton.disabled = checkoutLocked || !(currentQuote && walletMethodAllowed());
                     return;
                 }
 
@@ -552,6 +558,8 @@
                         ' · وضعیت ساخت: در صف Provisioning',
                         'success'
                     );
+                    checkoutCompleted = true;
+                    submitButton.disabled = true;
                     submitButton.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i> سفارش ثبت شد';
                     clearCheckoutReference();
                     return;
@@ -563,11 +571,17 @@
                 setQuoteStatus(humanizeError(error && error.message ? error.message : 'checkout_unavailable'), 'error');
                 // Keep the same checkout reference. Paymenter and the website
                 // ledger both make an exact retry safe after a lost response.
-                submitButton.disabled = !(currentQuote && walletMethodAllowed());
+                submitButton.disabled = checkoutLocked || !(currentQuote && walletMethodAllowed());
             } finally {
                 checkoutBusy = false;
-                if (currentQuote && submitButton.textContent.indexOf('سفارش ثبت شد') === -1) {
+                if (checkoutCompleted) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i> سفارش ثبت شد';
+                } else if (currentQuote && !checkoutLocked) {
+                    submitButton.disabled = !walletMethodAllowed();
                     submitButton.innerHTML = '<i class="fa-solid fa-lock" aria-hidden="true"></i> ثبت سفارش · ' + formatToman(currentQuote.amount_toman);
+                } else if (checkoutLocked) {
+                    submitButton.disabled = true;
                 }
             }
         }
