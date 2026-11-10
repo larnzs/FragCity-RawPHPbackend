@@ -119,7 +119,7 @@ final class PaymenterApiClient
 
         if (
             !preg_match('/^[0-9]{17}$/D', $steamId64)
-            || !in_array($durationDays, [1, 7, 15, 30], true)
+            || !in_array($durationDays, [3, 7, 15, 30], true)
             || !preg_match('/^[A-Za-z0-9 ]{1,64}$/D', $serverName)
             || !is_array($resources)
             || !is_array($featureLimits)
@@ -472,7 +472,7 @@ final class PaymenterApiClient
                 || !preg_match('/^[A-Za-z0-9_-]{1,64}$/D', $refId)
             ))
             || ($expectedAmountRial !== null && ($expectedAmountRial === false || $expectedAmountRial < 10 || $expectedAmountRial % 10 !== 0))
-            || !in_array($durationDays, [1, 7, 15, 30], true)
+            || !in_array($durationDays, [3, 7, 15, 30], true)
             || !preg_match('/^[A-Za-z0-9 ]{1,64}$/D', $serverName)
         ) {
             throw new RuntimeException('validation_failed');
