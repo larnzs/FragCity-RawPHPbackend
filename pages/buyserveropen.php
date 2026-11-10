@@ -208,39 +208,9 @@ $serverStoreDurations = [
                         </div>
                     </section>
 
-                    <section class="server-store-section server-store-name-section" aria-labelledby="serverNameTitle" data-fc-reveal="up" data-fc-reveal-delay="40">
-                        <div class="server-store-section-heading">
-                            <span class="server-store-section-index">02</span>
-                            <div>
-                                <h2 id="serverNameTitle">نام سرور</h2>
-                                <p>برای شناسایی راحت‌تر سرورت در پنل، یک نام انتخاب کن.</p>
-                            </div>
-                            <span class="server-store-section-state">الزامی</span>
-                        </div>
-
-                        <div class="server-store-field-grid">
-                            <div class="server-store-field server-store-field--wide">
-                                <label for="serverStoreName"><i class="fa-solid fa-tag" aria-hidden="true"></i> نام نمایشی سرور <span class="server-store-required" aria-hidden="true">*</span></label>
-                                <input
-                                    class="server-store-input"
-                                    id="serverStoreName"
-                                    name="server_name"
-                                    type="text"
-                                    value=""
-                                    placeholder="My CS2 Server"
-                                    pattern="[A-Za-z0-9 ]+"
-                                    required
-                                    aria-describedby="serverStoreNameHelp"
-                                    autocomplete="off"
-                                >
-                                <small id="serverStoreNameHelp">پیشنهاد نام: FragCity Public یا My Community. فقط حروف انگلیسی، اعداد و فاصله مجاز است. این نام فقط برای شناسایی سرور در فهرست «سرورهای من» استفاده می‌شود و بعد از خرید می‌توانی نام دلخواهت را از بخش تنظیمات سرور تغییر بدهی.</small>
-                            </div>
-                        </div>
-                    </section>
-
                     <section class="server-store-section server-store-config-section" aria-labelledby="serverGameModeTitle" data-fc-reveal="up" data-fc-reveal-delay="80">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">03</span>
+                            <span class="server-store-section-index">02</span>
                             <div>
                                 <h2 id="serverGameModeTitle">تنظیمات گیم‌سرور</h2>
                                 <p>تمام مقادیر موردنیاز Egg در Paymenter را یکجا تنظیم کن؛ ظرفیت بازیکن هم در همین بخش قرار دارد.</p>
@@ -387,7 +357,7 @@ $serverStoreDurations = [
 
                     <section class="server-store-section server-store-duration-section" aria-labelledby="serverDurationTitle" data-fc-reveal="up" data-fc-reveal-delay="140">
                         <div class="server-store-section-heading">
-                            <span class="server-store-section-index">04</span>
+                            <span class="server-store-section-index">03</span>
                             <div>
                                 <h2 id="serverDurationTitle">مدت سرویس</h2>
                                 <p>هرچه مدت اشتراک بیشتر باشد، هزینه مؤثر هر ماه کمتر می‌شود.</p>
@@ -463,7 +433,6 @@ $serverStoreDurations = [
                     <summary><i class="fa-solid fa-list-check" aria-hidden="true"></i> مشاهده مقادیر فاکتور <i class="fa-solid fa-chevron-down server-store-summary-chevron" aria-hidden="true"></i></summary>
                                     <div class="server-store-summary-lines">
                     <div><span>مدت سرویس</span><strong data-server-summary="duration">۱ ماهه</strong></div>
-                    <div><span>نام نمایشی سرور</span><strong data-server-summary="server-name">وارد نشده</strong></div>
                     <div><span>تخفیف دوره</span><strong data-server-summary="discount">بدون تخفیف</strong></div>
                     <div><span>قیمت ماهانه پیکربندی</span><strong data-server-summary="monthly-price">طبق تعرفه Paymenter</strong></div>
                     <div><span>RAM</span><strong data-server-summary="memory">1 GB · 1024 MB</strong></div>

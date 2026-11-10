@@ -36,7 +36,6 @@
         const cpuOutput = root.querySelector('#serverStoreCpuValue');
         const playersOutput = root.querySelector('#serverStorePlayersValue');
         const mapInput = root.querySelector('#serverStoreMap');
-        const serverNameInput = root.querySelector('#serverStoreName');
         const playerPresetButtons = Array.from(root.querySelectorAll('[data-player-preset]'));
         const tickrateSelect = root.querySelector('#serverStoreTickrate');
         const execSelect = root.querySelector('#serverStoreExec');
@@ -408,7 +407,6 @@
         function buildSelectionPayload() {
             return {
                 duration_days: selectedDuration(),
-                server_name: serverNameInput ? serverNameInput.value.trim() : '',
                 resources: {
                     memory_mb: readRangeValue(memoryInput, 1024),
                     disk_mb: readRangeValue(diskInput, 10240),
@@ -549,12 +547,6 @@
                 mapInput.setCustomValidity(/^[A-Za-z0-9_-]{1,64}$/.test(mapValue)
                     ? ''
                     : 'نام نقشه فقط می‌تواند شامل حروف انگلیسی، عدد، خط تیره و زیرخط باشد.');
-            }
-            if (serverNameInput) {
-                const name = serverNameInput.value.trim();
-                serverNameInput.setCustomValidity(name.length > 0 && /^[A-Za-z0-9 ]{1,64}$/.test(name)
-                    ? ''
-                    : 'نام سرور الزامی است و فقط می‌تواند شامل حروف انگلیسی، عدد و فاصله باشد.');
             }
             const players = readRangeValue(playersInput, 10);
             playersInput.setCustomValidity(Number.isInteger(players) && players >= 5 && players <= 64
@@ -869,7 +861,6 @@
             setSummary('cpu', cpuPercent + '% · ' + cpuVcores + ' ' + cpuUnit);
             setSummary('players', players + ' اسلات');
             setSummary('map', mapInput ? mapInput.value.trim() || '—' : '—');
-            setSummary('server-name', serverNameInput ? serverNameInput.value.trim() || 'وارد نشده' : 'وارد نشده');
             setSummary('duration', selectedDuration() + ' روز');
             setSummary('tickrate', tickrateSelect && tickrateSelect.value === '128' ? '128 Tick' : '64 Tick · Subtick');
             setSummary('exec', execSelect?.selectedOptions[0]?.textContent.trim() || '—');
@@ -890,7 +881,7 @@
         }
 
         const liveControls = [
-            memoryInput, diskInput, cpuInput, playersInput, mapInput, serverNameInput,
+            memoryInput, diskInput, cpuInput, playersInput, mapInput,
             tickrateSelect, execSelect, mapgroupSelect, cooldownSelect, ...durationInputs
         ].filter(Boolean);
 
