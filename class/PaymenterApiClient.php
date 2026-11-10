@@ -65,6 +65,66 @@ final class PaymenterApiClient
     }
 
     /**
+     * Read the configured CS2 product, plans, prices, native Config Options
+     * and checkout field manifest from Paymenter's private FragCity bridge.
+     *
+     * @return array<string,mixed>
+     */
+    public function getCs2Catalog(): array
+    {
+        $response = $this->post('/api/v1/fragcity/bridge/catalog/cs2', []);
+        $data = $response['data'] ?? null;
+
+        if (
+            !is_array($data)
+            || !is_array($data['product'] ?? null)
+            || !isset($data['product']['id'])
+            || !is_array($data['plans'] ?? null)
+            || !is_array($data['config_options'] ?? null)
+            || !is_array($data['checkout_fields'] ?? null)
+        ) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return $data;
+    }
+
+    /**
+     * Return the linked customer's Paymenter wallet balance in the configured
+     * CS2 currency. The Paymenter user ID is resolved only on the private bridge.
+     *
+     * @return array{currency_code:string,currency_unit:string,balance:string}
+     */
+    public function getCustomerWalletBalance(string $steamId64): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
+            throw new RuntimeException('invalid_steamid');
+        }
+
+        $response = $this->post(
+            '/api/v1/fragcity/bridge/wallet/balance',
+            ['steamid64' => $steamId64]
+        );
+        $data = $response['data'] ?? null;
+
+        if (
+            !is_array($data)
+            || !is_string($data['currency_code'] ?? null)
+            || !is_string($data['currency_unit'] ?? null)
+            || !is_numeric($data['balance'] ?? null)
+            || (float) $data['balance'] < 0
+        ) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return [
+            'currency_code' => strtoupper($data['currency_code']),
+            'currency_unit' => $data['currency_unit'],
+            'balance' => number_format((float) $data['balance'], 2, '.', ''),
+        ];
+    }
+
+    /**
      * Create or synchronize the Paymenter account associated with a SteamID64.
      *
      * @param array{
@@ -157,12 +217,15 @@ final class PaymenterApiClient
         $additionalAllocations = filter_var($featureLimits['additional_allocations'] ?? 0, FILTER_VALIDATE_INT);
         $backups = filter_var($featureLimits['backups'] ?? 0, FILTER_VALIDATE_INT);
         if (
-            !in_array($memoryMb, [1024, 1280, 1536], true)
+            $memoryMb === false
+            || $memoryMb < 1
+            || $memoryMb > 1048576
             || $diskMb === false
-            || $diskMb < 5120
-            || $diskMb > 10240
-            || (($diskMb - 5120) % 1024) !== 0
-            || !in_array($cpuPercent, [100, 200, 300, 400], true)
+            || $diskMb < 1
+            || $diskMb > 1048576
+            || $cpuPercent === false
+            || $cpuPercent < 1
+            || $cpuPercent > 6400
             || !in_array($databases, [0, 1, 2, 3, 5, 10], true)
             || !in_array($additionalAllocations, [0, 1, 2, 3, 5], true)
             || !in_array($backups, [0, 1, 2, 3, 5, 10], true)
@@ -408,6 +471,10 @@ final class PaymenterApiClient
                 'panel_username_rate_limited',
                 'cs2_checkout_not_configured',
                 'cs2_checkout_manifest_unavailable',
+                'cs2_catalog_unavailable',
+                'cs2_plan_price_missing',
+                'cs2_quote_amount_mismatch',
+                'wallet_balance_unavailable',
                 'cs2_product_invalid',
                 'cs2_product_out_of_stock',
                 'cs2_product_user_limit',
