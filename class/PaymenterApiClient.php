@@ -177,6 +177,74 @@ final class PaymenterApiClient
     }
 
     /**
+     * Reserve the customer's Paymenter wallet capacity before creating a
+     * ZarinPal payment request. Call this before redirecting the customer to
+     * the gateway, then settle the same topup_ref after server-side Verify.
+     *
+     * @param array<string,mixed> $topup
+     * @return array{topup_ref:string,status:string,invoice_id:?int,expires_at:?string,replayed:bool,currency_code:string,currency_unit:string}
+     */
+    public function prepareCustomerWalletTopup(array $topup): array
+    {
+        $topupRef = strtolower(trim((string) ($topup['topup_ref'] ?? '')));
+        $steamId64 = trim((string) ($topup['steamid64'] ?? ''));
+        $amountToman = filter_var($topup['amount_toman'] ?? null, FILTER_VALIDATE_INT);
+        $amountRial = filter_var($topup['amount_rial'] ?? null, FILTER_VALIDATE_INT);
+
+        if (
+            !preg_match('/^[a-f0-9]{32}$/D', $topupRef)
+            || !preg_match('/^[0-9]{17}$/D', $steamId64)
+            || $amountToman === false
+            || $amountRial === false
+            || $amountToman < 1
+            || $amountToman > intdiv(PHP_INT_MAX, 10)
+            || $amountRial !== $amountToman * 10
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        $response = $this->post('/api/v1/fragcity/bridge/wallet/topups/prepare', [
+            'topup_ref' => $topupRef,
+            'steamid64' => $steamId64,
+            'amount_toman' => $amountToman,
+            'amount_rial' => $amountRial,
+        ]);
+
+        $data = $response['data'] ?? null;
+        $status = is_array($data) ? (string) ($data['status'] ?? '') : '';
+        $invoiceIdRaw = is_array($data) ? ($data['invoice_id'] ?? null) : null;
+        $invoiceId = $invoiceIdRaw === null
+            ? null
+            : filter_var($invoiceIdRaw, FILTER_VALIDATE_INT);
+        $expiresAt = is_array($data) && is_string($data['expires_at'] ?? null)
+            ? $data['expires_at']
+            : null;
+
+        if (
+            !is_array($data)
+            || ($data['topup_ref'] ?? null) !== $topupRef
+            || !in_array($status, ['prepared', 'accepted'], true)
+            || !is_string($data['currency_code'] ?? null)
+            || strtoupper($data['currency_code']) === ''
+            || ($data['currency_unit'] ?? null) !== 'rial'
+            || ($status === 'prepared' && ($invoiceId !== null || $expiresAt === null))
+            || ($status === 'accepted' && ($invoiceId === false || $invoiceId === null || $invoiceId < 1))
+        ) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return [
+            'topup_ref' => $topupRef,
+            'status' => $status,
+            'invoice_id' => $invoiceId === false ? null : $invoiceId,
+            'expires_at' => $expiresAt,
+            'replayed' => (bool) ($data['replayed'] ?? false),
+            'currency_code' => strtoupper($data['currency_code']),
+            'currency_unit' => 'rial',
+        ];
+    }
+
+    /**
      * Apply a verified ZarinPal wallet deposit to the linked Paymenter account.
      * This method must only be called by the authenticated website backend
      * after the payment provider's server-side Verify API has succeeded.
@@ -586,6 +654,9 @@ final class PaymenterApiClient
                 'wallet_balance_unavailable',
                 'wallet_topup_not_configured',
                 'wallet_topup_amount_invalid',
+                'wallet_topup_reservation_missing',
+                'wallet_topup_reservation_expired',
+                'wallet_topup_reservation_failed',
                 'wallet_topup_pending_invoice_exists',
                 'wallet_maximum_credit_exceeded',
                 'wallet_topup_reference_conflict',
