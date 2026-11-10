@@ -586,9 +586,121 @@ if ($action === 'checkout') {
 
         require_once dirname(__DIR__) . '/class/PaymenterApiClient.php';
         $paymenter = new PaymenterApiClient();
-        $quoteInput = $orderInput + ['steamid64' => $steamId64];
-        $quote = $paymenter->quoteCs2ServerOrder($quoteInput);
-        if ($quote['amount_rial'] !== $expectedAmountRial) {
+
+        // Reconcile an existing reference before requesting a fresh quote.
+        // This preserves the original ZarinPal amount/Authority and lets an
+        // interrupted wallet request replay the exact Paymenter order, even if
+        // catalogue prices changed after the first attempt.
+        $isExistingWalletRetry = false;
+        $existingOrderStatement = $pdo->prepare(
+            'SELECT * FROM fragcity_cs2_checkout_orders WHERE order_ref = ? LIMIT 1'
+        );
+        $existingOrderStatement->execute([$checkoutRef]);
+        $existingOrder = $existingOrderStatement->fetch(PDO::FETCH_ASSOC);
+
+        if (is_array($existingOrder)) {
+            $savedPayload = json_decode((string) ($existingOrder['payload_json'] ?? ''), true);
+            $selectionMatches = is_array($savedPayload)
+                && (string) ($savedPayload['order_ref'] ?? '') === $checkoutRef
+                && (string) ($savedPayload['steamid64'] ?? '') === $steamId64
+                && (int) ($savedPayload['duration_days'] ?? 0) === (int) $durationDays
+                && (string) ($savedPayload['server_name'] ?? '') === $serverName
+                && ($savedPayload['resources'] ?? null) === $orderInput['resources']
+                && ($savedPayload['feature_limits'] ?? null) === $orderInput['feature_limits']
+                && ($savedPayload['egg'] ?? null) === $egg;
+
+            if (
+                !$selectionMatches
+                || (string) ($existingOrder['steamid64'] ?? '') !== $steamId64
+                || (string) ($existingOrder['payment_method'] ?? '') !== $paymentMethod
+            ) {
+                $respond(['success' => false, 'error' => 'checkout_reference_conflict'], 409, ['Cache-Control' => 'no-store']);
+            }
+
+            $existingStatus = (string) ($existingOrder['status'] ?? '');
+            if ($existingStatus === 'accepted') {
+                $respond([
+                    'success' => true,
+                    'status' => 'accepted',
+                    'replayed' => true,
+                    'data' => [
+                        'order_id' => (int) $existingOrder['paymenter_order_id'],
+                        'invoice_id' => (int) $existingOrder['paymenter_invoice_id'],
+                        'service_id' => (int) $existingOrder['paymenter_service_id'],
+                        'provisioning' => 'queued_by_paymenter',
+                    ],
+                ], 200, ['Cache-Control' => 'no-store']);
+            }
+
+            if ($paymentMethod === 'zarinpal' && $existingStatus === 'awaiting_payment') {
+                $authority = (string) ($existingOrder['authority'] ?? '');
+                $zarinpalSettings = fragcity_settings('integrations.zarinpal', []);
+                $startPayBase = is_array($zarinpalSettings)
+                    ? rtrim(trim((string) ($zarinpalSettings['startpay_base_url'] ?? '')), '/') . '/'
+                    : '';
+                $urlParts = parse_url($startPayBase);
+                if (
+                    $authority === ''
+                    || !is_array($urlParts)
+                    || strtolower((string) ($urlParts['scheme'] ?? '')) !== 'https'
+                    || empty($urlParts['host'])
+                ) {
+                    $respond(['success' => false, 'error' => 'checkout_payment_url_unavailable'], 503, ['Cache-Control' => 'no-store']);
+                }
+                $respond([
+                    'success' => true,
+                    'status' => 'awaiting_payment',
+                    'replayed' => true,
+                    'payment_url' => $startPayBase . rawurlencode($authority),
+                    'data' => [
+                        'amount_toman' => (int) $existingOrder['amount_toman'],
+                        'amount_rial' => (int) $existingOrder['amount_rial'],
+                    ],
+                ], 200, ['Cache-Control' => 'no-store']);
+            }
+
+            if ($existingStatus === 'payment_verified') {
+                $respond(['success' => false, 'error' => 'payment_verified_provisioning_pending'], 409, ['Cache-Control' => 'no-store']);
+            }
+            if ($existingStatus === 'gateway_request_unknown' || $existingStatus === 'payment_requesting') {
+                $respond(['success' => false, 'error' => 'payment_request_status_unknown'], 409, ['Cache-Control' => 'no-store']);
+            }
+            if ($existingStatus !== 'wallet_processing' || $paymentMethod !== 'wallet') {
+                $respond(['success' => false, 'error' => 'checkout_not_retryable'], 409, ['Cache-Control' => 'no-store']);
+            }
+
+            $savedExpectedAmount = filter_var($savedPayload['expected_amount_rial'] ?? null, FILTER_VALIDATE_INT);
+            $storedAmountRial = (int) ($existingOrder['amount_rial'] ?? 0);
+            if (
+                $savedExpectedAmount === false
+                || $savedExpectedAmount < 10
+                || $savedExpectedAmount !== $storedAmountRial
+                || $storedAmountRial % 10 !== 0
+                || intdiv($storedAmountRial, 10) !== (int) ($existingOrder['amount_toman'] ?? -1)
+                || !hash_equals((string) ($existingOrder['payload_hash'] ?? ''), hash('sha256', (string) $existingOrder['payload_json']))
+            ) {
+                $respond(['success' => false, 'error' => 'checkout_record_invalid'], 409, ['Cache-Control' => 'no-store']);
+            }
+
+            $canonicalOrder = $savedPayload;
+            $payloadJson = (string) $existingOrder['payload_json'];
+            $payloadHash = (string) $existingOrder['payload_hash'];
+            $amountToman = (int) $existingOrder['amount_toman'];
+            $amountRial = $storedAmountRial;
+            $currencyCode = (string) $existingOrder['currency_code'];
+            $quote = [
+                'amount_rial' => $amountRial,
+                'amount_toman' => $amountToman,
+                'currency_code' => $currencyCode,
+                'price_lines' => [],
+            ];
+            $isExistingWalletRetry = true;
+        }
+
+        if (!$isExistingWalletRetry) {
+            $quoteInput = $orderInput + ['steamid64' => $steamId64];
+            $quote = $paymenter->quoteCs2ServerOrder($quoteInput);
+            if ($quote['amount_rial'] !== $expectedAmountRial) {
             $respond([
                 'success' => false,
                 'error' => 'quote_changed',
@@ -602,24 +714,25 @@ if ($action === 'checkout') {
             ], 409, ['Cache-Control' => 'no-store']);
         }
 
-        $canonicalOrder = [
-            'order_ref' => $checkoutRef,
-            'steamid64' => $steamId64,
-            'duration_days' => (int) $durationDays,
-            'server_name' => $serverName,
-            'resources' => $orderInput['resources'],
-            'feature_limits' => $orderInput['feature_limits'],
-            'egg' => $egg,
-            'expected_amount_rial' => $quote['amount_rial'],
-        ];
-        $payloadJson = json_encode(
-            $canonicalOrder,
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
-        );
-        $payloadHash = hash('sha256', $payloadJson);
-        $amountToman = (int) $quote['amount_toman'];
-        $amountRial = (int) $quote['amount_rial'];
-        $currencyCode = (string) $quote['currency_code'];
+            $canonicalOrder = [
+                'order_ref' => $checkoutRef,
+                'steamid64' => $steamId64,
+                'duration_days' => (int) $durationDays,
+                'server_name' => $serverName,
+                'resources' => $orderInput['resources'],
+                'feature_limits' => $orderInput['feature_limits'],
+                'egg' => $egg,
+                'expected_amount_rial' => $quote['amount_rial'],
+            ];
+            $payloadJson = json_encode(
+                $canonicalOrder,
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR
+            );
+            $payloadHash = hash('sha256', $payloadJson);
+            $amountToman = (int) $quote['amount_toman'];
+            $amountRial = (int) $quote['amount_rial'];
+            $currencyCode = (string) $quote['currency_code'];
+        }
 
         $pdo->beginTransaction();
         $lookup = $pdo->prepare(
