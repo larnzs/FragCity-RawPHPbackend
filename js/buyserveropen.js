@@ -725,6 +725,13 @@
                 }
                 if (!response.ok || body.success !== true) {
                     const errorCode = body.error || 'checkout_unavailable';
+                    if (errorCode === 'checkout_retry_with_new_reference') {
+                        clearCheckoutReference();
+                        checkoutLocked = false;
+                        setQuoteStatus('پرداخت قبلی توسط زرین‌پال تأیید نشد. شناسه سفارش جدید ساخته می‌شود؛ قیمت دوباره استعلام خواهد شد.', 'warning');
+                        scheduleQuote();
+                        return;
+                    }
                     setQuoteStatus(humanizeError(errorCode), 'error');
                     if (['payment_verified_provisioning_pending', 'payment_request_status_unknown', 'zarinpal_request_unknown', 'checkout_in_progress', 'checkout_not_retryable', 'checkout_cancelled_use_new_reference'].includes(errorCode)) {
                         checkoutLocked = true;
