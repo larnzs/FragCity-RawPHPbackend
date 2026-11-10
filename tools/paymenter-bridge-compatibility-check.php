@@ -32,6 +32,7 @@ $expectedRoutes = [
     '/api/v1/fragcity/bridge/ping',
     '/api/v1/fragcity/bridge/catalog/cs2',
     '/api/v1/fragcity/bridge/wallet/balance',
+    '/api/v1/fragcity/bridge/wallet/topups/zarinpal',
     '/api/v1/fragcity/bridge/users/sync',
     '/api/v1/fragcity/bridge/servers/list',
     '/api/v1/fragcity/bridge/servers/password',
@@ -77,6 +78,11 @@ $checkResult('CS2 order client sends a verified ZarinPal receipt and resource/Eg
 $checkResult('CS2 order client surfaces native Config Option mapping and pricing errors safely',
     str_contains($client, "'cs2_config_option_mapping_invalid'")
     && str_contains($client, "'cs2_config_option_price_missing'")
+);
+$checkResult('Paymenter Wallet top-ups and wallet purchases use the private HMAC bridge',
+    str_contains($client, 'createCustomerWalletTopup')
+    && str_contains($client, '/api/v1/fragcity/bridge/wallet/topups/zarinpal')
+    && str_contains($client, 'wallet_insufficient_credit')
 );
 $checkResult('CS2 catalogue and Paymenter wallet bridge methods are available server-side',
     str_contains($client, 'getCs2Catalog')
