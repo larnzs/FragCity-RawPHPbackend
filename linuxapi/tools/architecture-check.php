@@ -247,7 +247,7 @@ $check(
     str_contains($index, "'/v1/vipcore'")
         && str_contains($linuxConfig, "'name' => 'GLOBAL_vip'")
         && str_contains($linuxConfig, "'username' => 'plugins'")
-        && substr_count($linuxConfig, "'password' => $pluginsDbPassword") >= 3
+        && substr_count($linuxConfig, "'password' => \$pluginsDbPassword") >= 3
         && !str_contains($linuxConfig, 'fragcity_vip_api')
         && str_contains($linuxConfig, "'duration_seconds' => 3600")
         && str_contains($apiClient, "'/v1/vipcore'")
@@ -313,7 +313,7 @@ $check(
     str_contains($index, "'/v1/ranks'")
         && str_contains($linuxConfig, "'name' => 'GLOBAL_ranks'")
         && str_contains($linuxConfig, "'username' => 'plugins'")
-        && substr_count($linuxConfig, "'password' => $pluginsDbPassword") >= 3
+        && substr_count($linuxConfig, "'password' => \$pluginsDbPassword") >= 3
         && !str_contains($linuxConfig, 'fragcity_ranks_api')
         && str_contains($apiClient, "'/v1/ranks'")
         && str_contains($ranksRepository, "'/v1/ranks'")
@@ -511,7 +511,7 @@ $check(
         && str_contains($linuxConfig, "'GLOBAL_simpleadmin'")
         && str_contains($linuxConfig, "Reuses the root database connection above; only the schema name changes.")
         && str_contains($linuxConfig, "'username' => 'plugins'")
-        && str_contains($linuxConfig, "'password' => $pluginsDbPassword")
+        && str_contains($linuxConfig, "'password' => \$pluginsDbPassword")
         && !str_contains($linuxConfig, 'column-level SELECT')
         && !str_contains($linuxConfig, "'fragcity_simpleadmin_api'")
         && !str_contains($linuxConfig, "'REPLACE_WITH_A_UNIQUE_READ_ONLY_DATABASE_PASSWORD'")
@@ -1125,7 +1125,7 @@ $check(
         && is_file($root . '/img/logoresponsive.png')
         && str_contains($siteHeaderMarkup, 'fa-server')
         && str_contains($siteHeaderMarkup, 'fa-palette')
-        && str_contains($siteHeaderMarkup, 'shock-nav-item--icon-only')
+        && str_contains($siteHeaderMarkup, 'fa-shopping-cart') && str_contains($siteHeaderMarkup, 'fa-trophy')
         && str_contains($siteHeaderMarkup, 'aria-label="بیشتر"')
         && str_contains($siteHeaderStylesheet, '.shock-nav-item--icon-only')
         && str_contains($siteHeaderStylesheet, '@media (max-width: 1100px)')
@@ -1254,7 +1254,7 @@ $check(
         && str_contains($websiteIndex, "'serverguide' => [")
         && str_contains($websiteIndex, '/css/serverguide.css?v=')
         && str_contains($websiteIndex, '/js/serverguide.js?v=')
-        && str_contains($siteHeaderMarkup, 'shock-nav-item--guide')
+        && str_contains($siteHeaderMarkup, 'data-slug="serverguide"')
         && str_contains($siteHeaderMarkup, 'fa-book-open')
         && str_contains($siteHeaderMarkup, "['serverguide', 'راهنمای سرور', 'fa-book-open', ['serverguide']]")
         && str_contains($homePage, 'home-button-guide')
