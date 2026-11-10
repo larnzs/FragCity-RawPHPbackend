@@ -9,7 +9,10 @@ declare(strict_types=1);
  *
  * Authenticated actions:
  *   POST /api/server-store.php  {"action":"quote", ...selection}
+ *   POST /api/server-store.php  {"action":"checkout", ...selection, checkout_ref, payment_method, expected_amount_rial}
  *   POST /api/server-store.php  {"action":"wallet_balance"}
+ *
+ * Verified ZarinPal callbacks are handled by pages/zarinpal/zarinpal_cs2_callback.php.
  *
  * The browser never calls Paymenter directly and never receives its HMAC
  * secret. Customer identity is always derived from the FragCity PHP session.
