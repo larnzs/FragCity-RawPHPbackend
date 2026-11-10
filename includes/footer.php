@@ -72,25 +72,25 @@ require_once __DIR__ . '/routes.php';
         <div class="footer-bottom">
             <p class="footer-copyright">© <?= date('Y') ?> تمامی حقوق این سایت متعلق به تیم توسعه FragCity می‌باشد.</p>
             <nav class="footer-social-links" aria-label="راه‌های ارتباطی سریع">
-                <a class="footer-social-icon" href="https://t.me/fragcitychannel" target="_blank" rel="noopener noreferrer" aria-label="کانال تلگرام FragCity" title="کانال تلگرام">
+                <a class="footer-social-icon footer-social-icon--telegram" href="https://t.me/fragcitychannel" target="_blank" rel="noopener noreferrer" aria-label="کانال تلگرام FragCity" title="کانال تلگرام">
                     <i class="fa-brands fa-telegram" aria-hidden="true"></i>
                 </a>
-                <a class="footer-social-icon" href="https://t.me/fragcitysup" target="_blank" rel="noopener noreferrer" aria-label="پشتیبانی تلگرام FragCity" title="پشتیبانی تلگرام">
+                <a class="footer-social-icon footer-social-icon--telegram" href="https://t.me/fragcitysup" target="_blank" rel="noopener noreferrer" aria-label="پشتیبانی تلگرام FragCity" title="پشتیبانی تلگرام">
                     <i class="fa-brands fa-telegram" aria-hidden="true"></i>
                 </a>
-                <a class="footer-social-icon" href="https://discord.gg/s6rFThCDdY" target="_blank" rel="noopener noreferrer" aria-label="سرور Discord FragCity" title="Discord">
+                <a class="footer-social-icon footer-social-icon--discord" href="https://discord.gg/s6rFThCDdY" target="_blank" rel="noopener noreferrer" aria-label="سرور Discord FragCity" title="Discord">
                     <i class="fa-brands fa-discord" aria-hidden="true"></i>
                 </a>
-                <a class="footer-social-icon" href="https://steamcommunity.com/id/larnz/" target="_blank" rel="noopener noreferrer" aria-label="پشتیبانی Steam FragCity" title="Steam">
+                <a class="footer-social-icon footer-social-icon--steam" href="https://steamcommunity.com/id/larnz/" target="_blank" rel="noopener noreferrer" aria-label="پشتیبانی Steam FragCity" title="Steam">
                     <i class="fa-brands fa-steam" aria-hidden="true"></i>
                 </a>
-                <a class="footer-social-icon" href="/support/?tab=tickets" aria-label="ثبت تیکت پشتیبانی" title="ثبت تیکت">
+                <a class="footer-social-icon footer-social-icon--ticket" href="/support/?tab=tickets" aria-label="ثبت تیکت پشتیبانی" title="ثبت تیکت">
                     <i class="fa-solid fa-ticket" aria-hidden="true"></i>
                 </a>
-                <a class="footer-social-icon" href="ts3server://217.18.90.7?port=2014" aria-label="اتصال به سرور TeamSpeak" title="TeamSpeak">
+                <a class="footer-social-icon footer-social-icon--teamspeak" href="ts3server://217.18.90.7?port=2014" aria-label="اتصال به سرور TeamSpeak" title="TeamSpeak">
                     <i class="fa-solid fa-headset" aria-hidden="true"></i>
                 </a>
-                <a class="footer-social-icon" href="mailto:support@fragcity.ir" aria-label="ایمیل پشتیبانی FragCity" title="ایمیل">
+                <a class="footer-social-icon footer-social-icon--email" href="mailto:support@fragcity.ir" aria-label="ایمیل پشتیبانی FragCity" title="ایمیل">
                     <i class="fa-solid fa-envelope" aria-hidden="true"></i>
                 </a>
             </nav>
