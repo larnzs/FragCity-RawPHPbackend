@@ -4218,3 +4218,131 @@ body { max-width: 100%; overflow-x: clip; }
         transition: none !important;
     }
 }
+
+/* =========================================================
+   Desktop navigation — icon first, label expands like Support
+   ========================================================= */
+@media (min-width: 901px) {
+    .shock-header .shock-nav > a.shock-nav-item,
+    .shock-header .shock-nav > .frag-dropdown > .shock-nav-item {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+        width: max-content !important;
+        min-width: 46px !important;
+        max-width: 46px !important;
+        height: 46px !important;
+        min-height: 46px !important;
+        flex: 0 1 auto !important;
+        gap: 0 !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+        border-radius: 10px !important;
+        white-space: nowrap !important;
+        transition:
+            max-width 190ms ease,
+            gap 190ms ease,
+            padding 190ms ease,
+            color 150ms ease,
+            background-color 150ms ease,
+            border-color 150ms ease,
+            box-shadow 150ms ease !important;
+    }
+
+    .shock-header .shock-nav > a.shock-nav-item > i,
+    .shock-header .shock-nav > .frag-dropdown > .shock-nav-item > i {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex: 0 0 18px !important;
+        width: 18px !important;
+        min-width: 18px !important;
+        max-width: 18px !important;
+        height: 18px !important;
+        margin: 0 !important;
+        font-size: .98rem !important;
+        line-height: 1 !important;
+        text-align: center !important;
+        transition: color 150ms ease, opacity 150ms ease, width 190ms ease !important;
+    }
+
+    .shock-header .shock-nav > a.shock-nav-item > span,
+    .shock-header .shock-nav > .frag-dropdown > .shock-nav-item > span {
+        display: inline-block !important;
+        flex: 0 0 auto !important;
+        max-width: 0 !important;
+        overflow: hidden !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        white-space: nowrap !important;
+        transition:
+            max-width 190ms ease,
+            opacity 130ms ease,
+            visibility 130ms ease !important;
+    }
+
+    .shock-header .shock-nav > a.shock-nav-item:hover,
+    .shock-header .shock-nav > a.shock-nav-item:focus-visible,
+    .shock-header .shock-nav > .frag-dropdown:hover > .shock-nav-item,
+    .shock-header .shock-nav > .frag-dropdown:focus-within > .shock-nav-item,
+    .shock-header .shock-nav > .frag-dropdown.open > .shock-nav-item {
+        max-width: 220px !important;
+        gap: 8px !important;
+        padding-inline: 12px !important;
+    }
+
+    .shock-header .shock-nav > a.shock-nav-item:hover > span,
+    .shock-header .shock-nav > a.shock-nav-item:focus-visible > span,
+    .shock-header .shock-nav > .frag-dropdown:hover > .shock-nav-item > span,
+    .shock-header .shock-nav > .frag-dropdown:focus-within > .shock-nav-item > span,
+    .shock-header .shock-nav > .frag-dropdown.open > .shock-nav-item > span {
+        max-width: 150px !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    /* The More control uses the ellipsis at rest and reveals its chevron
+       alongside the label only while expanded. */
+    .shock-header .shock-nav > .frag-dropdown > .shock-nav-item > .frag-arrow {
+        flex: 0 0 0 !important;
+        width: 0 !important;
+        min-width: 0 !important;
+        max-width: 0 !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        overflow: hidden !important;
+        transition:
+            flex-basis 190ms ease,
+            width 190ms ease,
+            opacity 130ms ease,
+            visibility 130ms ease !important;
+    }
+
+    .shock-header .shock-nav > .frag-dropdown:hover > .shock-nav-item > .frag-arrow,
+    .shock-header .shock-nav > .frag-dropdown:focus-within > .shock-nav-item > .frag-arrow,
+    .shock-header .shock-nav > .frag-dropdown.open > .shock-nav-item > .frag-arrow {
+        flex-basis: 10px !important;
+        width: 10px !important;
+        min-width: 10px !important;
+        max-width: 10px !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+
+    .shock-header .shock-nav > a.shock-nav-item:focus-visible,
+    .shock-header .shock-nav > .frag-dropdown > .shock-nav-item:focus-visible {
+        outline: 2px solid rgba(255, 179, 71, .55) !important;
+        outline-offset: 3px !important;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shock-header .shock-nav > a.shock-nav-item,
+    .shock-header .shock-nav > .frag-dropdown > .shock-nav-item,
+    .shock-header .shock-nav > a.shock-nav-item > span,
+    .shock-header .shock-nav > .frag-dropdown > .shock-nav-item > span,
+    .shock-header .shock-nav > .frag-dropdown > .shock-nav-item > .frag-arrow {
+        transition: none !important;
+    }
+}
