@@ -237,7 +237,8 @@ final class PaymenterApiClient
     }
 
     /**
-     * Submit a CS2 server order after the website has verified its ZarinPal payment.
+     * Submit a CS2 server order using either a verified ZarinPal receipt or
+     * the linked customer's Paymenter Wallet balance.
      *
      * This method is private server-side transport only. Never call it from
      * browser JavaScript, and never pass an unverified browser callback here.
@@ -258,7 +259,7 @@ final class PaymenterApiClient
             !preg_match('/^[a-f0-9]{32}$/D', $orderRef)
             || !preg_match('/^[0-9]{17}$/D', $steamId64)
             || !is_array($payment)
-            || ($payment['provider'] ?? null) !== 'zarinpal'
+            || !in_array(($payment['provider'] ?? null), ['zarinpal', 'wallet'], true)
             || !is_array($resources)
             || !is_array($featureLimits)
             || !is_array($egg)
@@ -266,22 +267,30 @@ final class PaymenterApiClient
             throw new RuntimeException('validation_failed');
         }
 
-        $amountToman = filter_var($payment['amount_toman'] ?? null, FILTER_VALIDATE_INT);
-        $amountRial = filter_var($payment['amount_rial'] ?? null, FILTER_VALIDATE_INT);
+        $paymentProvider = (string) $payment['provider'];
+        $isZarinpal = $paymentProvider === 'zarinpal';
+        $amountToman = $isZarinpal
+            ? filter_var($payment['amount_toman'] ?? null, FILTER_VALIDATE_INT)
+            : 0;
+        $amountRial = $isZarinpal
+            ? filter_var($payment['amount_rial'] ?? null, FILTER_VALIDATE_INT)
+            : 0;
         $durationDays = filter_var($order['duration_days'] ?? null, FILTER_VALIDATE_INT);
-        $authority = trim((string) ($payment['authority'] ?? ''));
-        $refId = trim((string) ($payment['ref_id'] ?? ''));
+        $authority = $isZarinpal ? trim((string) ($payment['authority'] ?? '')) : '';
+        $refId = $isZarinpal ? trim((string) ($payment['ref_id'] ?? '')) : '';
         $serverName = trim((string) ($order['server_name'] ?? ''));
 
         if (
-            $amountToman === false
-            || $amountRial === false
-            || $amountToman < 1
-            || $amountToman > intdiv(PHP_INT_MAX, 10)
-            || $amountRial !== $amountToman * 10
+            ($isZarinpal && (
+                $amountToman === false
+                || $amountRial === false
+                || $amountToman < 1
+                || $amountToman > intdiv(PHP_INT_MAX, 10)
+                || $amountRial !== $amountToman * 10
+                || !preg_match('/^[A-Za-z0-9_-]{1,128}$/D', $authority)
+                || !preg_match('/^[A-Za-z0-9_-]{1,64}$/D', $refId)
+            ))
             || !in_array($durationDays, [1, 7, 15, 30], true)
-            || !preg_match('/^[A-Za-z0-9_-]{1,128}$/D', $authority)
-            || !preg_match('/^[A-Za-z0-9_-]{1,64}$/D', $refId)
             || !preg_match('/^[A-Za-z0-9 ]{1,64}$/D', $serverName)
         ) {
             throw new RuntimeException('validation_failed');
@@ -310,16 +319,20 @@ final class PaymenterApiClient
             throw new RuntimeException('validation_failed');
         }
 
-        $payload = [
-            'order_ref' => $orderRef,
-            'steamid64' => $steamId64,
-            'payment' => [
-                'provider' => 'zarinpal',
+        $paymentPayload = ['provider' => $paymentProvider];
+        if ($isZarinpal) {
+            $paymentPayload += [
                 'authority' => $authority,
                 'ref_id' => $refId,
                 'amount_toman' => $amountToman,
                 'amount_rial' => $amountRial,
-            ],
+            ];
+        }
+
+        $payload = [
+            'order_ref' => $orderRef,
+            'steamid64' => $steamId64,
+            'payment' => $paymentPayload,
             'duration_days' => $durationDays,
             'server_name' => $serverName,
             'resources' => [
@@ -551,6 +564,8 @@ final class PaymenterApiClient
                 'cs2_catalog_unavailable',
                 'cs2_plan_price_missing',
                 'cs2_quote_amount_mismatch',
+                'wallet_insufficient_credit',
+                'wallet_not_enabled',
                 'wallet_balance_unavailable',
                 'wallet_topup_not_configured',
                 'wallet_topup_amount_invalid',
