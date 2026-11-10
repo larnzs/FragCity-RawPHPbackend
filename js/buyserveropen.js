@@ -142,7 +142,7 @@
             if (!option || !Array.isArray(option.children)) return [];
             return Array.from(new Set(option.children.map(function (child) {
                 const raw = child && child.env_variable !== undefined ? String(child.env_variable).trim() : '';
-                return /^\\d+$/.test(raw) ? Number(raw) : null;
+                return /^\d+$/.test(raw) ? Number(raw) : null;
             }).filter(function (value) {
                 return Number.isSafeInteger(value) && value > 0;
             }))).sort(function (a, b) { return a - b; });
