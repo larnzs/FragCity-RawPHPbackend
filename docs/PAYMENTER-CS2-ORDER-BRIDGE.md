@@ -22,7 +22,7 @@ FragCity backend after the website has completed verification.
 The same private HMAC client also provides:
 
 - `POST /api/v1/fragcity/bridge/catalog/cs2` — returns the configured CS2 Product, duration Plans, Rial Plan prices, every attached Config Option and child value with the per-duration price/setup fee, plus Egg Checkout fields and GameModeManager metadata.
-- `POST /api/v1/fragcity/bridge/wallet/balance` — accepts the SteamID64 from the authenticated server-side website session and returns only that linked Paymenter user's configured Rial credit balance.
+- `POST /api/v1/fragcity/bridge/wallet/balance` — accepts the SteamID64 from the authenticated server-side website session and returns only that linked Paymenter user's configured Rial credit balance, whether Paymenter Credits are enabled, and the configured deposit/balance limits.
 - `POST /api/v1/fragcity/bridge/wallet/topups/zarinpal` — applies a ZarinPal deposit already verified by the FragCity PHP backend through a native Paymenter Credit invoice.
 
 The browser never calls either endpoint. The PHP backend calls them through `PaymenterApiClient::getCs2Catalog()` and `PaymenterApiClient::getCustomerWalletBalance()`.
