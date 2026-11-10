@@ -556,7 +556,7 @@
                     ? ''
                     : 'نام سرور الزامی است و فقط می‌تواند شامل حروف انگلیسی، عدد و فاصله باشد.');
             }
-            const players = Number(playersInput.value);
+            const players = readRangeValue(playersInput, 10);
             playersInput.setCustomValidity(Number.isInteger(players) && players >= 5 && players <= 64
                 ? ''
                 : 'ظرفیت باید یک عدد صحیح بین ۵ تا ۶۴ باشد.');
