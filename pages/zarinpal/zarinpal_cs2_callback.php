@@ -92,22 +92,10 @@ try {
     }
 
     if ($status === 'awaiting_payment') {
-        // Status=OK only authorizes a server-to-server Verify call. It is not
-        // accepted as evidence of payment and never changes the order by itself.
-        if ($gatewayStatus !== 'OK') {
-            // The callback query string is controlled by the browser. Never
-            // cancel or fail an order from Status= N/NO alone: an edited URL
-            // must not be able to invalidate a payment that ZarinPal accepted.
-            // A later callback with Status=OK will perform the authoritative
-            // server-to-server Verify request against the stored amount.
-            $render(
-                'پرداخت تأیید نشده',
-                'زرین‌پال این بازگشت را به‌عنوان پرداخت موفق اعلام نکرده است. وضعیت سفارش بدون تغییر حفظ شد؛ اگر پرداخت انجام داده‌اید، صفحه را از لینک بازگشت درگاه دوباره باز کنید یا با پشتیبانی تماس بگیرید.',
-                false,
-                409
-            );
-        }
-
+        // Always verify the saved Authority and exact amount with ZarinPal,
+        // regardless of the browser-controlled Status query parameter. This
+        // also recovers a genuinely paid order if someone edits Status=N to OK
+        // or OK to N before opening the callback URL.
         $zarinpalSettings = fragcity_settings('integrations.zarinpal', []);
         $merchantId = is_array($zarinpalSettings)
             ? trim((string) ($zarinpalSettings['merchant_id'] ?? ''))
