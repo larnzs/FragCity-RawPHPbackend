@@ -142,6 +142,12 @@ $checkResult('Player Slots validation uses the selected Paymenter child value ra
     && str_contains($storeJs, 'input.dataset.catalogValues = JSON.stringify(values);')
 );
 
+$checkResult('Player Slot quick presets resolve actual catalog values into slider indexes',
+    str_contains($storeJs, 'setRangeToCatalogValue(playersInput, value)')
+    && str_contains($storeJs, 'playersInput.value = String(value);')
+    && str_contains($storeJs, 'button.dataset.playerPreset')
+);
+
 $checkResult('Storefront catalog response omits Paymenter internal product and Config Option IDs',
     str_contains($storeApi, "'config_options' => \$safeOptions")
     && str_contains($storeApi, "'plans' => \$safePlans")

@@ -907,7 +907,10 @@
             button.addEventListener('click', function () {
                 const value = Number(button.dataset.playerPreset);
                 if (!Number.isInteger(value) || value < 5 || value > 64) return;
-                playersInput.value = String(value);
+                // Catalog-backed sliders store an option index, not the raw Player Slots value.
+                if (!setRangeToCatalogValue(playersInput, value)) {
+                    playersInput.value = String(value);
+                }
                 updateSummary();
             });
         });
