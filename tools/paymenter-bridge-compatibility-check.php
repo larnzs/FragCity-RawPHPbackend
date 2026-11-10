@@ -153,6 +153,11 @@ $checkResult('CS2 storefront and bridge consistently support the new 3-day base 
     && str_contains($storeApi, "'duration_days' => \$quote['duration_days']")
 );
 
+$checkResult('CS2 catalogue preserves Config Option Child prices for the 3-day Plan',
+    str_contains($storeApi, "in_array(\$dayKey, ['3', '7', '15', '30'], true)")
+    && !str_contains($storeApi, "in_array(\$dayKey, ['1', '7', '15', '30'], true)")
+);
+
 $checkResult('Player Slots validation uses the selected Paymenter child value rather than the slider index',
     str_contains($storeJs, 'const players = readRangeValue(playersInput, 10);')
     && !str_contains($storeJs, 'const players = Number(playersInput.value);')
