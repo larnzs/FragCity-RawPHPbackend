@@ -44,7 +44,7 @@ require_once __DIR__ . '/routes.php';
                     <li><a href="<?= htmlspecialchars(fragcity_page_url('servers'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="servers">سرورهای بازی</a></li>
                     <li><a href="<?= htmlspecialchars(fragcity_page_url('skins'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="skins">اسکین‌ها</a></li>
                     <li><a href="<?= htmlspecialchars(fragcity_page_url('vip'), ENT_QUOTES, 'UTF-8') ?>" data-ajax-nav data-slug="vip">عضویت VIP</a></li>
-                    <li><a href="https://billing.fragcity.ir" target="_blank" rel="noopener noreferrer">فروشگاه</a></li>
+                    <li><a href="<?= htmlspecialchars(fragcity_billing_sso_url('/'), ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer">فروشگاه</a></li>
                 </ul>
             </nav>
 
