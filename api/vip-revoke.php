@@ -68,6 +68,7 @@ try {
     $code = $e->getMessage();
     $safeMessages = [
         'vip_membership_not_active' => 'در حال حاضر اشتراک VIP فعالی برای ابطال وجود ندارد.',
+        'vip_revoke_cooldown' => 'ابطال VIP فقط یک ساعت پس از پرداخت امکان‌پذیر است.',
         'vip_paid_membership_not_migrated' => 'سابقه خرید این عضویت هنوز به Paymenter منتقل نشده و امکان محاسبه امن بازپرداخت وجود ندارد.',
         'vip_revoke_cooldown_unavailable' => 'زمان پرداخت برای بررسی مهلت ابطال در دسترس نیست.',
         'vip_refund_upgrade_chain_invalid' => 'تاریخچه ارتقای این عضویت کامل نیست؛ بازپرداخت خودکار متوقف شد.',
@@ -87,6 +88,7 @@ try {
     );
     $httpStatus = match ($publicCode) {
         'vip_membership_not_active',
+        'vip_revoke_cooldown',
         'vip_paid_membership_not_migrated',
         'vip_refund_upgrade_chain_invalid',
         'vip_refund_paid_order_not_found',
