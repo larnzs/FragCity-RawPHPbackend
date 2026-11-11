@@ -656,6 +656,151 @@ final class PaymenterApiClient
     }
 
     /**
+     * Retrieve the authoritative Paymenter VIP catalogue and current Wallet state.
+     *
+     * @return array<string,mixed>
+     */
+    public function getVipStoreCatalog(string $steamId64): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
+            throw new RuntimeException('invalid_steamid');
+        }
+
+        $response = $this->post('/api/v1/fragcity/bridge/catalog/vip', [
+            'steamid64' => $steamId64,
+        ]);
+        $data = $response['data'] ?? null;
+
+        if (
+            !is_array($data)
+            || !is_array($data['prices'] ?? null)
+            || !is_array($data['duration_days'] ?? null)
+            || !is_string($data['currency_code'] ?? null)
+            || !is_numeric($data['wallet_balance'] ?? null)
+            || !is_bool($data['wallet_enabled'] ?? null)
+            || !is_array($data['current_membership'] ?? null)
+        ) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return $data;
+    }
+
+    /**
+     * Submit a VIP wallet purchase. The amount is only a quote assertion;
+     * Paymenter independently resolves product/config-option prices and tax.
+     *
+     * @param array<string,mixed> $order
+     * @return array<string,mixed>
+     */
+    public function createVipStoreOrder(array $order): array
+    {
+        $orderRef = strtolower(trim((string) ($order['order_ref'] ?? '')));
+        $steamId64 = trim((string) ($order['steamid64'] ?? ''));
+        $level = filter_var($order['level'] ?? null, FILTER_VALIDATE_INT);
+        $durationDays = filter_var($order['duration_days'] ?? null, FILTER_VALIDATE_INT);
+        $amountRial = filter_var($order['expected_amount_rial'] ?? null, FILTER_VALIDATE_INT);
+
+        if (
+            !preg_match('/^[a-f0-9]{32}$/D', $orderRef)
+            || !preg_match('/^[0-9]{17}$/D', $steamId64)
+            || !in_array($level, [1, 2, 3], true)
+            || !in_array($durationDays, [7, 15, 30, 60, 90], true)
+            || $amountRial === false
+            || $amountRial < 10
+            || $amountRial % 10 !== 0
+        ) {
+            throw new RuntimeException('validation_failed');
+        }
+
+        $response = $this->post('/api/v1/fragcity/bridge/orders/vip', [
+            'order_ref' => $orderRef,
+            'steamid64' => $steamId64,
+            'level' => $level,
+            'duration_days' => $durationDays,
+            'expected_amount_rial' => $amountRial,
+        ]);
+        $data = $response['data'] ?? null;
+
+        if (
+            !is_array($data)
+            || (string) ($data['order_ref'] ?? '') !== $orderRef
+            || !is_numeric($data['invoice_id'] ?? null)
+            || (int) $data['invoice_id'] < 1
+            || !in_array((string) ($data['status'] ?? ''), ['paid', 'provisioned'], true)
+            || !is_bool($data['provision_pending'] ?? null)
+            || !is_numeric($data['amount_rial'] ?? null)
+        ) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return [
+            'order_ref' => $orderRef,
+            'invoice_id' => (int) $data['invoice_id'],
+            'vip_level' => (int) ($data['vip_level'] ?? $level),
+            'duration_days' => (int) ($data['duration_days'] ?? $durationDays),
+            'amount_rial' => number_format((float) $data['amount_rial'], 2, '.', ''),
+            'amount_toman' => number_format((float) ($data['amount_toman'] ?? ((float) $data['amount_rial'] / 10)), 2, '.', ''),
+            'status' => (string) $data['status'],
+            'provision_pending' => (bool) $data['provision_pending'],
+            'expires' => (int) ($data['expires'] ?? 0),
+            'replayed' => (bool) ($data['replayed'] ?? false),
+            'message' => (string) ($data['message'] ?? ''),
+        ];
+    }
+
+    /**
+     * List the authenticated Steam account's VIP purchase history from Paymenter.
+     *
+     * @return list<array<string,mixed>>
+     */
+    public function getVipStoreOrders(string $steamId64): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
+            throw new RuntimeException('invalid_steamid');
+        }
+
+        $response = $this->post('/api/v1/fragcity/bridge/orders/vip/list', [
+            'steamid64' => $steamId64,
+        ]);
+        $orders = $response['data']['orders'] ?? null;
+        if (!is_array($orders)) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return array_values(array_filter($orders, static fn ($order): bool => is_array($order)));
+    }
+
+    /**
+     * Revoke the current VIP and credit unused paid value to Paymenter Wallet.
+     *
+     * @return array<string,mixed>
+     */
+    public function revokeVipStoreMembership(string $steamId64): array
+    {
+        if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
+            throw new RuntimeException('invalid_steamid');
+        }
+
+        $response = $this->post('/api/v1/fragcity/bridge/orders/vip/revoke', [
+            'steamid64' => $steamId64,
+        ]);
+        $data = $response['data'] ?? null;
+
+        if (
+            !is_array($data)
+            || ($data['revoked'] ?? false) !== true
+            || !is_string($data['refund_ref'] ?? null)
+            || !is_numeric($data['refund_amount_rial'] ?? null)
+            || !is_numeric($data['wallet_balance'] ?? null)
+        ) {
+            throw new RuntimeException('paymenter_invalid_response');
+        }
+
+        return $data;
+    }
+
+    /**
      * @param array<string,mixed> $payload
      * @return array<string,mixed>
      */
@@ -775,6 +920,40 @@ final class PaymenterApiClient
                 'order_reference_conflict',
                 'zarinpal_payment_already_used',
                 'order_processing_incomplete',
+                'vip_store_not_configured',
+                'vipcore_not_configured',
+                'vipcore_unavailable',
+                'vipcore_invalid_response',
+                'vip_catalog_unavailable',
+                'vip_product_invalid',
+                'vip_plan_invalid',
+                'vip_level_option_invalid',
+                'vip_price_missing',
+                'vip_price_invalid',
+                'vip_price_not_whole_toman',
+                'vip_wallet_not_enabled',
+                'vip_wallet_insufficient',
+                'vip_quote_amount_mismatch',
+                'vip_upgrade_duration_mismatch',
+                'vip_upgrade_price_invalid',
+                'vip_upgrade_amount_too_small',
+                'vip_paid_membership_upgrade_required',
+                'vip_paid_membership_not_migrated',
+                'vip_membership_already_active',
+                'vip_upgrade_source_changed',
+                'vip_order_reference_conflict',
+                'vip_order_not_retryable',
+                'vip_player_name_missing',
+                'vip_player_name_invalid',
+                'vip_membership_not_active',
+                'vip_revoke_cooldown',
+                'vip_revoke_cooldown_unavailable',
+                'vip_refund_upgrade_chain_invalid',
+                'vip_refund_paid_order_not_found',
+                'vip_refund_window_invalid',
+                'vip_revocation_response_invalid',
+                'vip_revocation_order_mismatch',
+                'vip_refund_failed',
             ];
 
             if (!in_array($error, $safeErrors, true)) {
