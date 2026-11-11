@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../settings/loader.php';
 require_once __DIR__ . '/../class/VipCoreRepository.php';
+require_once __DIR__ . '/../class/PaymenterApiClient.php';
 
 $steamid64 = (string) ($_SESSION['steamid'] ?? '');
 $isLoggedIn = ($_SESSION['user_logged_in'] ?? false) === true;
@@ -27,99 +28,38 @@ $vipFreeTrialStatusUnavailable = false;
 $vipWalletBalanceAvailable = false;
 $vipWalletBalanceToman = 0.0;
 $vipWalletPendingOrder = null;
+$vipPaymenterCatalog = null;
+$vipPaymenterCatalogAvailable = false;
+$vipPaymenterCatalogError = false;
 $vipFormatWalletToman = static function ($value, bool $grouped = true): string {
     $formatted = number_format(max(0.0, (float)$value), 8, '.', $grouped ? ',' : '');
     $formatted = rtrim(rtrim($formatted, '0'), '.');
     return $formatted === '' ? '0' : $formatted;
 };
 
-if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64)) {
-    try {
-        $walletDatabaseProfile = fragcity_settings('files.index.database_profile', 'main');
-        $walletDatabaseProfile = is_string($walletDatabaseProfile) && trim($walletDatabaseProfile) !== ''
-            ? trim($walletDatabaseProfile)
-            : 'main';
-        $walletPdo = fragcity_create_pdo($walletDatabaseProfile);
-        if (!$walletPdo instanceof PDO) {
-            throw new RuntimeException('wallet_database_unavailable');
-        }
-
-        $walletBalanceQuery = $walletPdo->prepare(
-            'SELECT balance FROM user_wallets WHERE steamid = ? LIMIT 1'
-        );
-        $walletBalanceQuery->execute([$steamid64]);
-        $walletBalanceRow = $walletBalanceQuery->fetch(PDO::FETCH_ASSOC);
-        $vipWalletBalanceToman = is_array($walletBalanceRow)
-            ? max(0.0, (float)($walletBalanceRow['balance'] ?? 0))
-            : 0.0;
-        $vipWalletBalanceAvailable = true;
-
-        // A wallet debit may be committed while VIPCore is temporarily
-        // unavailable. Surface the existing paid order so the customer can
-        // retry provisioning without submitting another debit.
-        try {
-            $vipOrderDatabaseProfile = fragcity_settings('files.pages.zarinpal.vip_request.database_profile', 'main');
-            $vipOrderDatabaseProfile = is_string($vipOrderDatabaseProfile) && trim($vipOrderDatabaseProfile) !== ''
-                ? trim($vipOrderDatabaseProfile)
-                : 'main';
-            $vipOrderPdo = fragcity_create_pdo($vipOrderDatabaseProfile);
-            if (!$vipOrderPdo instanceof PDO) {
-                throw new RuntimeException('vip_order_database_unavailable');
-            }
-
-            $pendingWalletQuery = $vipOrderPdo->prepare(
-                "SELECT order_ref, authority, vip_level, duration_days, amount_rial
-                 FROM vip_orders
-                 WHERE steamid64 = ?
-                   AND status = 'paid'
-                   AND LEFT(authority, 7) = 'WALLET_'
-                 ORDER BY id DESC
-                 LIMIT 1"
-            );
-            $pendingWalletQuery->execute([$steamid64]);
-            $pendingWalletRow = $pendingWalletQuery->fetch(PDO::FETCH_ASSOC);
-
-            if (is_array($pendingWalletRow)) {
-                $pendingAuthority = (string)($pendingWalletRow['authority'] ?? '');
-                $pendingOrderRef = (string)($pendingWalletRow['order_ref'] ?? '');
-                $pendingLevel = (int)($pendingWalletRow['vip_level'] ?? 0);
-                $pendingDays = (int)($pendingWalletRow['duration_days'] ?? 0);
-                $pendingAmountRial = (int)($pendingWalletRow['amount_rial'] ?? 0);
-
-                if (preg_match('/^WALLET_[a-f0-9]{32}$/D', $pendingAuthority)
-                    && preg_match('/^[a-f0-9]{32}$/D', $pendingOrderRef)
-                    && in_array($pendingLevel, [1, 2, 3], true)
-                    && in_array($pendingDays, [7, 15, 30, 60, 90], true)
-                    && $pendingAmountRial >= 10
-                    && $pendingAmountRial % 10 === 0) {
-                    $vipWalletPendingOrder = [
-                        'callback_url' => '/pages/zarinpal/zarinpal_vip_callback.php?Authority='
-                            . rawurlencode($pendingAuthority) . '&Status=OK',
-                        'level' => $pendingLevel,
-                        'duration_days' => $pendingDays,
-                        'amount_toman' => intdiv($pendingAmountRial, 10),
-                        'order_ref' => $pendingOrderRef,
-                    ];
-                }
-            }
-        } catch (Throwable $pendingWalletError) {
-            error_log('[FragCity VIP storefront] Pending wallet order lookup failed; type=' . get_class($pendingWalletError));
-        }
-    } catch (Throwable $walletError) {
-        error_log('[FragCity VIP storefront] Wallet balance lookup failed; type=' . get_class($walletError));
+// Paymenter is the only source of VIP prices and Wallet balance. The private
+// HMAC client runs server-side; the browser never receives the bridge secret.
+try {
+    $paymenterClient = new PaymenterApiClient();
+    $vipPaymenterCatalog = $paymenterClient->getVipStoreCatalog(
+        $isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64) ? $steamid64 : null
+    );
+    $vipPaymenterCatalogAvailable = true;
+    if ($isLoggedIn) {
+        $walletBalanceRial = max(0.0, (float)($vipPaymenterCatalog['wallet_balance'] ?? 0));
+        $vipWalletBalanceToman = $walletBalanceRial / 10;
+        $vipWalletBalanceAvailable = ($vipPaymenterCatalog['wallet_enabled'] ?? false) === true;
     }
+} catch (Throwable $e) {
+    $vipPaymenterCatalogError = true;
+    error_log('[FragCity VIP storefront] Paymenter VIP catalogue lookup failed; type=' . get_class($e));
 }
 
-$vipSettings = fragcity_settings('files.pages.vip', []);
-$vipPurchaseCatalog = is_array($vipSettings['purchase_catalog'] ?? null)
-    ? $vipSettings['purchase_catalog']
-    : [];
-$vipPurchasePackages = is_array($vipPurchaseCatalog['packages'] ?? null)
-    ? $vipPurchaseCatalog['packages']
-    : [];
-$vipCurrency = (string) ($vipPurchaseCatalog['currency'] ?? 'تومان');
+$vipPurchaseCatalog = is_array($vipPaymenterCatalog) ? $vipPaymenterCatalog : [];
+$vipPurchasePackages = [];
+$vipCurrency = 'تومان';
 
-if ($isLoggedIn && $steamid64 !== '') {
+if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64)) {
     try {
         $vipStatus = (new VipCoreRepository())->getStatus($steamid64);
         $vipPaidPurchase = is_array($vipStatus['paid_purchase'] ?? null)
@@ -144,7 +84,7 @@ if ($isLoggedIn && $steamid64 !== '') {
     }
 }
 
-if ($isLoggedIn && $steamid64 !== '') {
+if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64)) {
     try {
         $vipFreeTrialStatus = (new VipCoreRepository())->getFreeTrialStatus($steamid64);
     } catch (Throwable $e) {
