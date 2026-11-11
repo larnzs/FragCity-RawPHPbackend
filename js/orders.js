@@ -336,12 +336,97 @@
         selectTab(rememberedTab);
     }
 
+    function initVipOrderRetries(root) {
+        const buttons = Array.from(root.querySelectorAll('[data-vip-order-retry]'));
+        buttons.forEach((button) => {
+            if (button.dataset.vipOrderRetryBound === '1') return;
+            button.dataset.vipOrderRetryBound = '1';
+
+            button.addEventListener('click', async () => {
+                if (button.disabled) return;
+                const card = button.closest('[data-order-ref]');
+                const description = card ? card.querySelector('.fc-orders__order-description') : null;
+                const orderRef = String(button.dataset.orderRef || '');
+                const level = Number(button.dataset.vipLevel || 0);
+                const days = Number(button.dataset.durationDays || 0);
+                const amountRial = Number(button.dataset.amountRial || 0);
+
+                if (!/^[a-f0-9]{32}$/.test(orderRef)
+                    || ![1, 2, 3].includes(level)
+                    || ![7, 15, 30, 60, 90].includes(days)
+                    || !Number.isSafeInteger(amountRial)
+                    || amountRial < 10
+                    || amountRial % 10 !== 0) {
+                    if (description) description.textContent = 'اطلاعات سفارش برای تلاش مجدد معتبر نیست؛ صفحه را تازه‌سازی کن.';
+                    return;
+                }
+
+                button.disabled = true;
+                button.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> در حال پیگیری...';
+                if (description) description.textContent = 'همان سفارش با شناسه قبلی به Paymenter ارسال می‌شود؛ مبلغ دوباره کسر نخواهد شد.';
+
+                const body = new URLSearchParams({
+                    csrf_token: root.dataset.ordersCsrf || '',
+                    order_ref: orderRef,
+                    level: String(level),
+                    duration_days: String(days),
+                    expected_amount_rial: String(amountRial)
+                });
+
+                try {
+                    const response = await fetch('/api/vip-store.php', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        cache: 'no-store',
+                        redirect: 'error',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: body.toString()
+                    });
+                    const result = await response.json();
+                    if (!response.ok || result.success !== true || !result.data) {
+                        const message = typeof result.message === 'string'
+                            ? result.message
+                            : 'Paymenter نتوانست فعال‌سازی این سفارش را تکمیل کند.';
+                        throw new Error(message);
+                    }
+
+                    if (result.data.status === 'provisioned' && result.data.provision_pending === false) {
+                        if (description) description.textContent = 'عضویت VIP توسط VIPCore تأیید شد؛ صفحه در حال تازه‌سازی است.';
+                        button.remove();
+                        window.location.reload();
+                        return;
+                    }
+
+                    if (description) {
+                        description.textContent = result.message
+                            || 'پرداخت قبلاً ثبت شده است؛ فعال‌سازی هنوز در انتظار تکمیل است. دوباره همین دکمه را امتحان کن.';
+                    }
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa-solid fa-rotate" aria-hidden="true"></i> تلاش مجدد برای فعال‌سازی';
+                } catch (error) {
+                    if (description) {
+                        description.textContent = error instanceof Error
+                            ? error.message + ' شناسه سفارش تغییر نمی‌کند؛ دوباره امتحان کن.'
+                            : 'پاسخ Paymenter دریافت نشد؛ همان سفارش را دوباره پیگیری کن.';
+                    }
+                    button.disabled = false;
+                    button.innerHTML = '<i class="fa-solid fa-rotate" aria-hidden="true"></i> تلاش مجدد برای فعال‌سازی';
+                }
+            });
+        });
+    }
+
     function initOrdersPage() {
         const root = document.getElementById('fcOrders');
         if (!root || root.dataset.ordersControllerReady === '1') return;
         root.dataset.ordersControllerReady = '1';
 
         initOrderTabs(root);
+        initVipOrderRetries(root);
 
         const statusCard = root.querySelector('#fcOrdersVipStatus');
         const openButton = root.querySelector('[data-vip-revoke-open]');
@@ -366,10 +451,16 @@
             membership_not_active: 'در حال حاضر اشتراک VIP فعالی برای ابطال وجود ندارد.',
             vipcore_disabled: 'اتصال VIPCore روی سرور فعال نیست.',
             vipcore_not_configured: 'تنظیمات اتصال VIPCore کامل نیست.',
-            vipcore_unavailable: 'دیتابیس VIPCore یا جدول تاریخچه ابطال در دسترس نیست.',
-            vip_refund_migration_required: 'پیش از ابطال، Migration بازپرداخت کیف پول را روی دیتابیس اصلی سایت اجرا کنید.',
+            vipcore_unavailable: 'سرویس VIPCore در دسترس نیست.',
+            vipcore_invalid_response: 'پاسخ سرویس VIPCore قابل تأیید نیست.',
+            vip_paid_membership_not_migrated: 'سابقه خرید قدیمی هنوز به Ledger جدید Paymenter منتقل نشده؛ برای جلوگیری از بازپرداخت حدسی، ابطال خودکار متوقف شد.',
             vip_revoke_cooldown: 'ابطال VIP فقط یک ساعت پس از پرداخت سفارش فعال می‌شود.',
             vip_revoke_cooldown_status_unavailable: 'زمان پرداخت سفارش برای بررسی محدودیت ابطال در دسترس نیست؛ فعلاً امکان ابطال وجود ندارد.',
+            vip_revoke_cooldown_unavailable: 'زمان پرداخت سفارش برای بررسی محدودیت ابطال در دسترس نیست.',
+            vip_refund_upgrade_chain_invalid: 'تاریخچه ارتقای این عضویت کامل نیست؛ بازپرداخت خودکار متوقف شد.',
+            vip_refund_paid_order_not_found: 'سفارش پرداخت‌شده‌ی منطبق پیدا نشد.',
+            vip_refund_window_invalid: 'بازه محاسبه بازپرداخت معتبر نیست.',
+            vip_revoke_failed: 'ابطال یا بازپرداخت در Paymenter کامل نشد.',
             vip_revoke_unavailable: 'ابطال وضعیت VIP انجام نشد. ارتباط سرویس را بررسی کنید و دوباره تلاش کنید.'
         };
 
