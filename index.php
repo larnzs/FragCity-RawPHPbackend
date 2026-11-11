@@ -413,7 +413,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                 $_SESSION['username'] = $username;
                 unset($_SESSION['auth_error'], $_SESSION['steam_temp']);
 
-                header('Location: index.php', true, 303);
+                // Finish the pending Billing SSO flow after account completion.
+                // The return target was created by Paymenter and stored in the
+                // server-side FragCity session; never accept a browser URL here.
+                $ssoReturnUrl = safe_local_redirect(
+                    $_SESSION['login_return_url'] ?? '',
+                    'index.php'
+                );
+                unset($_SESSION['login_return_url']);
+
+                header('Location: ' . $ssoReturnUrl, true, 303);
                 exit;
             } catch (PDOException $e) {
                 error_log('[FragCity] Account completion update failed (SQLSTATE ' . $e->getCode() . ').');
@@ -526,11 +535,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['auth_action'])) {
                 exit;
             }
 
+            // A new Steam registration may have started from Paymenter.
+            // Resume only the local one-time SSO endpoint stored in the session.
+            $ssoReturnUrl = safe_local_redirect(
+                $_SESSION['login_return_url'] ?? '',
+                'index.php'
+            );
+
             unset($_SESSION['remember_login_requested']);
             unset($_SESSION['steam_temp']);
             unset($_SESSION['login_return_url']);
 
-            header('Location: index.php', true, 303);
+            header('Location: ' . $ssoReturnUrl, true, 303);
             exit;
         }
 
