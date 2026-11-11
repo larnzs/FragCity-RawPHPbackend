@@ -660,15 +660,15 @@ final class PaymenterApiClient
      *
      * @return array<string,mixed>
      */
-    public function getVipStoreCatalog(string $steamId64): array
+    public function getVipStoreCatalog(?string $steamId64 = null): array
     {
-        if (!preg_match('/^[0-9]{17}$/D', $steamId64)) {
+        $steamId64 = trim((string) $steamId64);
+        if ($steamId64 !== '' && !preg_match('/^[0-9]{17}$/D', $steamId64)) {
             throw new RuntimeException('invalid_steamid');
         }
 
-        $response = $this->post('/api/v1/fragcity/bridge/catalog/vip', [
-            'steamid64' => $steamId64,
-        ]);
+        $payload = $steamId64 !== '' ? ['steamid64' => $steamId64] : [];
+        $response = $this->post('/api/v1/fragcity/bridge/catalog/vip', $payload);
         $data = $response['data'] ?? null;
 
         if (
