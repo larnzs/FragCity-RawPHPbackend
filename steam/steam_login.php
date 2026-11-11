@@ -232,6 +232,21 @@ try {
             ) {
                 unset($_SESSION['remember_login_requested'], $_SESSION['steam_temp']);
                 $_SESSION['auth_error'] = 'برای ورود به حساب Steam دیگر، ابتدا از حساب فعلی FragCity خارج شوید.';
+                // When Steam login was initiated by Paymenter, return to the
+                // local SSO hand-off endpoint instead of stopping at the dashboard.
+                $pendingPaymenterState = $_SESSION['paymenter_sso_state'] ?? '';
+                if (
+                    is_string($pendingPaymenterState)
+                    && preg_match('/\\A[a-f0-9]{64}\\z/D', $pendingPaymenterState)
+                ) {
+                    header(
+                        'Location: /api/paymenter-sso.php?state=' . rawurlencode($pendingPaymenterState),
+                        true,
+                        303
+                    );
+                    exit;
+                }
+
                 header('Location: ' . $dashboardPage, true, 303);
                 exit;
             }
