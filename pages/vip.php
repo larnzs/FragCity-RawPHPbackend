@@ -57,6 +57,9 @@ try {
 
 $vipPurchaseCatalog = is_array($vipPaymenterCatalog) ? $vipPaymenterCatalog : [];
 $vipPurchasePackages = [];
+$vipWalletPendingOrder = is_array($vipPurchaseCatalog['pending_order'] ?? null)
+    ? $vipPurchaseCatalog['pending_order']
+    : null;
 $vipCurrency = 'تومان';
 
 if ($isLoggedIn && preg_match('/^[0-9]{17}$/D', $steamid64)) {
@@ -710,11 +713,7 @@ $vipCheckoutIntegrationReady = $vipPaymenterCatalogAvailable
     data-vip-upgrade-prices-rial="<?= htmlspecialchars(json_encode($vipUpgradePriceRialMap, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-wallet-balance="<?= htmlspecialchars($vipFormatWalletToman($vipWalletBalanceToman, false), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-wallet-balance-available="<?= $vipWalletBalanceAvailable ? '1' : '0' ?>"
-    data-vip-wallet-pending-callback="<?= htmlspecialchars((string)($vipWalletPendingOrder['callback_url'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
-    data-vip-wallet-pending-level="<?= (int)($vipWalletPendingOrder['level'] ?? 0) ?>"
-    data-vip-wallet-pending-duration-days="<?= (int)($vipWalletPendingOrder['duration_days'] ?? 0) ?>"
-    data-vip-wallet-pending-amount-toman="<?= (int)($vipWalletPendingOrder['amount_toman'] ?? 0) ?>"
-    data-vip-wallet-pending-order-ref="<?= htmlspecialchars((string)($vipWalletPendingOrder['order_ref'] ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+    data-vip-wallet-pending-order="<?= htmlspecialchars(json_encode($vipWalletPendingOrder, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>"
     data-vip-free-trial-claimed="<?= !empty($vipFreeTrialStatus['claimed']) ? '1' : '0' ?>"
     data-vip-logged-in="<?= $isLoggedIn ? '1' : '0' ?>"
     data-vip-test-admin="<?= $isVipTestAdmin ? '1' : '0' ?>"
