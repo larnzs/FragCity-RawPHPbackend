@@ -607,52 +607,31 @@ foreach ($vipFeaturesData as $featureLevel => $features) {
 }
 
 $vipAllowedPurchaseDurations = [7, 15, 30, 60, 90];
-// Default official FragCity floor prices (Rial). Runtime settings may override these per duration.
-$vipDefaultPriceRialMap = [
-    '1' => ['7' => 44000, '15' => 95000, '30' => 190000, '60' => 380000, '90' => 570000],
-    '2' => ['7' => 114000, '15' => 245000, '30' => 490000, '60' => 980000, '90' => 1470000],
-    '3' => ['7' => 208000, '15' => 445000, '30' => 890000, '60' => 1780000, '90' => 2670000],
-];
-$vipPurchasePriceMap = []; // Toman values for storefront display only.
-$vipPurchasePriceRialMap = []; // Rial values are the canonical amounts for the payment provider.
-foreach ($vipLevels as $level => $tier) {
-    if (empty($tier['available']) || ($tier['purchase_mode'] ?? '') !== 'paid') {
-        continue;
-    }
-    $package = is_array($vipPurchasePackages[(string) $level] ?? null)
-        ? $vipPurchasePackages[(string) $level]
-        : [];
-    foreach ($vipAllowedPurchaseDurations as $days) {
-        $durationPackage = is_array($package['durations'][(string) $days] ?? null)
-            ? $package['durations'][(string) $days]
-            : [];
-        $rawPrice = $durationPackage['price_rial'] ?? null;
-        $validatedPrice = filter_var($rawPrice, FILTER_VALIDATE_INT);
-        if ($validatedPrice === false
-            || $validatedPrice < 1
-            || $validatedPrice > 10000000000000
-            || $validatedPrice % 10 !== 0) {
-            // Older private runtime settings may not yet contain price_rial.
-            // Keep the published official catalogue prices visible until an
-            // explicit valid Rial override is configured.
-            $validatedPrice = filter_var(
-                $vipDefaultPriceRialMap[(string) $level][(string) $days] ?? null,
-                FILTER_VALIDATE_INT
-            );
-        }
-        $priceRial = $validatedPrice !== false
-            && $validatedPrice > 0
-            && $validatedPrice <= 10000000000000
-            && $validatedPrice % 10 === 0
-            ? $validatedPrice
-            : null;
+$vipPurchasePriceMap = [];
+$vipPurchasePriceRialMap = [];
+$vipRemotePrices = is_array($vipPaymenterCatalog['prices'] ?? null)
+    ? $vipPaymenterCatalog['prices']
+    : [];
 
-        $vipPurchasePriceRialMap[(string) $level][(string) $days] = $priceRial;
-        $vipPurchasePriceMap[(string) $level][(string) $days] = $priceRial === null
+foreach ([1, 2, 3] as $level) {
+    foreach ($vipAllowedPurchaseDurations as $days) {
+        $entry = $vipRemotePrices[(string) $level][(string) $days] ?? null;
+        $rawAmount = is_array($entry) ? ($entry['amount_rial'] ?? null) : null;
+        $amountRial = filter_var($rawAmount, FILTER_VALIDATE_INT);
+        if ($amountRial === false
+            || $amountRial < 10
+            || $amountRial > 10000000000000
+            || $amountRial % 10 !== 0) {
+            $amountRial = null;
+        }
+
+        $vipPurchasePriceRialMap[(string) $level][(string) $days] = $amountRial;
+        $vipPurchasePriceMap[(string) $level][(string) $days] = $amountRial === null
             ? null
-            : intdiv($priceRial, 10);
+            : intdiv($amountRial, 10);
     }
 }
+
 $vipSilver30PriceToman = $vipPurchasePriceMap['2']['30'] ?? null;
 $vipGold30PriceToman = $vipPurchasePriceMap['3']['30'] ?? null;
 $vipBaseUpgradeDifference30Toman = is_int($vipSilver30PriceToman)
@@ -661,113 +640,59 @@ $vipBaseUpgradeDifference30Toman = is_int($vipSilver30PriceToman)
         ? $vipGold30PriceToman - $vipSilver30PriceToman
         : null;
 
-// Match the live Silver row against the immutable free-trial claim ledger.
-// A claim whose expiry is the current VIP expiry is the active free trial,
-// never a paid membership eligible for upgrade credit.
+// Match the active Silver row against the immutable Linux free-trial ledger.
 $vipCurrentMembershipIsFreeTrial = $vipHasActiveMembership
     && $vipCurrentLevel === 2
     && !empty($vipFreeTrialStatus['claimed'])
     && strtoupper((string)($vipFreeTrialStatus['group'] ?? '')) === 'SILVER'
     && (int)($vipFreeTrialStatus['expires'] ?? 0) === (int)($userVip['vip_expire'] ?? 0);
 
-// A paid active membership can be upgraded by paying only the prorated
-// difference for its unused time. A free Silver trial has no paid-order ledger
-// entry, so it never produces an upgrade credit.
-$vipPaidUpgradeEligible = false;
-$vipUpgradeDurationDays = 0;
-$vipUpgradePriceRialMap = [];
-$vipUpgradeRemainingSeconds = 0;
-if ($isLoggedIn
+// Upgrade quotes are calculated by Paymenter against its configured Product,
+// native Config Option, current tax and immutable Paymenter VIP order ledger.
+$vipPaidUpgradeEligible = $isLoggedIn
     && !$vipStatusUnavailable
     && $vipHasActiveMembership
     && !$vipCurrentMembershipIsFreeTrial
     && is_array($vipPaidPurchase)
     && (int)($vipPaidPurchase['level'] ?? 0) === $vipCurrentLevel
     && (int)($vipPaidPurchase['expires'] ?? 0) === (int)($userVip['vip_expire'] ?? 0)
-    && in_array($vipCurrentLevel, [1, 2], true)) {
-    // Keep this true even when the remaining-value quote is unavailable;
-    // otherwise the UI could incorrectly fall back to a full-term replacement.
-    $vipPaidUpgradeEligible = true;
-    $paidDurationSeconds = (int)($vipPaidPurchase['duration_seconds'] ?? 0);
-    $paidExpires = (int)($vipPaidPurchase['expires'] ?? 0);
-    $candidateDays = intdiv(max(0, $paidDurationSeconds), 86400);
-    $now = time();
-    $remainingSeconds = max(0, $paidExpires - $now);
-    $validPaidDuration = in_array($paidDurationSeconds, array_map(
-        static fn (int $days): int => $days * 86400,
-        $vipAllowedPurchaseDurations
-    ), true);
-
-    if ($validPaidDuration && $paidExpires > $now && $remainingSeconds > 0) {
-        $currentTierPrice = filter_var(
-            $vipPaidPurchase['tier_price_rial'] ?? null,
-            FILTER_VALIDATE_INT
-        );
-        if ($currentTierPrice === false
-            || $currentTierPrice < 1
-            || $currentTierPrice > 10000000000000
-            || $currentTierPrice % 10 !== 0) {
-            // Legacy paid-order rows do not have a catalogue price snapshot.
-            $currentTierPrice = $vipPurchasePriceRialMap[(string)$vipCurrentLevel][(string)$candidateDays] ?? null;
-        }
-        if (is_int($currentTierPrice) && $currentTierPrice > 0) {
-            foreach ([1, 2, 3] as $targetLevel) {
-                if ($targetLevel <= $vipCurrentLevel) {
-                    continue;
-                }
-                $targetTierPrice = $vipPurchasePriceRialMap[(string)$targetLevel][(string)$candidateDays] ?? null;
-                if (!is_int($targetTierPrice) || $targetTierPrice <= $currentTierPrice) {
-                    continue;
-                }
-
-                $rawDifference = ($targetTierPrice - $currentTierPrice)
-                    * ($remainingSeconds / $paidDurationSeconds);
-                // Rial quotes are rounded to 1,000 Rial (100 Toman), matching
-                // the catalogue's smallest published price increment.
-                $upgradePriceRial = (int)(round($rawDifference / 1000) * 1000);
-                if ($upgradePriceRial >= 1000) {
-                    $vipUpgradePriceRialMap[(string)$targetLevel] = $upgradePriceRial;
-                }
-            }
-
-            $vipUpgradeDurationDays = $candidateDays;
-            $vipUpgradeRemainingSeconds = $remainingSeconds;
-        }
-    }
-}
-
+    && in_array($vipCurrentLevel, [1, 2], true);
+$vipUpgradeDurationDays = 0;
+$vipUpgradePriceRialMap = [];
 $vipUpgradePriceMap = [];
-foreach ($vipUpgradePriceRialMap as $upgradeLevel => $upgradePriceRial) {
-    $vipUpgradePriceMap[(string)$upgradeLevel] = intdiv($upgradePriceRial, 10);
+$vipUpgradeRemainingSeconds = 0;
+$vipRemoteUpgradePrices = is_array($vipPaymenterCatalog['upgrade_prices'] ?? null)
+    ? $vipPaymenterCatalog['upgrade_prices']
+    : [];
+
+foreach ($vipRemoteUpgradePrices as $upgradeLevel => $upgradeQuote) {
+    $levelKey = (string) $upgradeLevel;
+    $amountRial = is_array($upgradeQuote)
+        ? filter_var($upgradeQuote['amount_rial'] ?? null, FILTER_VALIDATE_INT)
+        : false;
+    if (!in_array((int) $levelKey, [2, 3], true)
+        || $amountRial === false
+        || $amountRial < 10
+        || $amountRial % 10 !== 0) {
+        continue;
+    }
+    $vipUpgradePriceRialMap[$levelKey] = $amountRial;
+    $vipUpgradePriceMap[$levelKey] = intdiv($amountRial, 10);
+    $vipUpgradeDurationDays = (int) ($upgradeQuote['duration_days'] ?? 0);
+    $vipUpgradeRemainingSeconds = max(
+        $vipUpgradeRemainingSeconds,
+        (int) ($upgradeQuote['remaining_seconds'] ?? 0)
+    );
 }
 
-// A current level without a matching paid-order grant is a trial, test grant
-// or legacy/manual membership. It can be converted into a paid subscription
-// at the same level, or replaced with a higher paid tier at full price.
 $vipCurrentMembershipReplaceable = $vipHasActiveMembership
     && $vipPaidLedgerAvailable
     && !$vipHasPaidCurrentMembership;
-$vipGatewaySettings = fragcity_settings('integrations.zarinpal', []);
-$vipGatewayUrlIsSecure = static function ($value): bool {
-    if (!is_string($value) || trim($value) === '') {
-        return false;
-    }
-    $parts = parse_url(trim($value));
-    return is_array($parts)
-        && strtolower((string)($parts['scheme'] ?? '')) === 'https'
-        && !empty($parts['host'])
-        && !isset($parts['user'])
-        && !isset($parts['pass'])
-        && !isset($parts['query'])
-        && !isset($parts['fragment']);
-};
-$vipCheckoutIntegrationReady = ($vipPurchaseCatalog['checkout_enabled'] ?? false) === true
-    && is_array($vipGatewaySettings)
-    && trim((string)($vipGatewaySettings['merchant_id'] ?? '')) !== ''
-    && $vipGatewayUrlIsSecure($vipGatewaySettings['request_url'] ?? null)
-    && $vipGatewayUrlIsSecure($vipGatewaySettings['verify_url'] ?? null)
-    && $vipGatewayUrlIsSecure($vipGatewaySettings['startpay_base_url'] ?? null)
-    && $vipGatewayUrlIsSecure(fragcity_settings('app.site_base_url', ''));
+
+$vipCheckoutIntegrationReady = $vipPaymenterCatalogAvailable
+    && count(array_filter($vipPurchasePriceMap, static fn ($levels): bool =>
+        is_array($levels) && count(array_filter($levels, static fn ($price): bool => is_int($price))) > 0
+    )) > 0;
 ?>
 <main
     class="vip-page"
