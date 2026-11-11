@@ -469,11 +469,8 @@
             const payableRial = isPaidUpgrade
                 ? getUpgradePriceRial(level)
                 : (canBuyFullTerm ? getConfiguredPriceRial(level, days) : null);
-            // Allow a valid purchase selection to reach the server even when
-            // the UI readiness probe is false. The endpoint repeats every
-            // security/configuration check and fails closed before creating an
-            // order or contacting ZarinPal; this exposes the exact server-side
-            // reason instead of trapping the customer behind a disabled button.
+            // The server re-resolves Product, Plan, Config Option, tax and
+            // Wallet balance in Paymenter. Browser values are quote assertions only.
             const canCheckout = canCreatePaidOrder;
             const canWalletCheckout = canCreatePaidOrder
                 && walletBalanceAvailable
@@ -978,7 +975,7 @@
 
                 checkoutButton.disabled = true;
                 checkoutButton.classList.add('is-submitting');
-                checkoutButton.textContent = 'در حال بررسی تنظیمات پرداخت...';
+                checkoutButton.textContent = 'پرداخت VIP فقط از Billing انجام می‌شود';
             });
         }
 
@@ -1477,14 +1474,50 @@
             }
         });
 
-        const initialCurrentPlan = plans.find(function (plan) {
-            return plan.dataset.vipCurrent === '1'
-                && (plan.dataset.vipSelectable === '1' || root.dataset.vipTestAdmin === '1');
-        });
-        if (initialCurrentPlan) {
-            selectPlan(initialCurrentPlan, false);
+        if (walletDebitCommitted && walletPendingCheckout) {
+            // A payment can be committed while VIPCore provisioning is still
+            // pending. Re-select that exact tier after a page reload, even if
+            // the current membership state has meanwhile changed.
+            const pendingPlan = plans.find((plan) =>
+                Number(plan.dataset.level || 0) === Number(walletPendingCheckout.level)
+            );
+            if (pendingPlan) {
+                const previousSelectable = pendingPlan.dataset.vipSelectable;
+                pendingPlan.dataset.vipSelectable = '1';
+                selectPlan(pendingPlan, false);
+                if (previousSelectable === undefined) {
+                    delete pendingPlan.dataset.vipSelectable;
+                } else {
+                    pendingPlan.dataset.vipSelectable = previousSelectable;
+                }
+                selectedDurationDays = String(walletPendingCheckout.duration_days);
+                root.dataset.vipSelectedDurationDays = selectedDurationDays;
+                root.dataset.vipSelectedTierLevel = String(walletPendingCheckout.level);
+                durationOptions.forEach(function (option) {
+                    const selected = Number(option.dataset.durationDays || 0) === Number(walletPendingCheckout.duration_days);
+                    option.classList.toggle('is-selected', selected);
+                    option.setAttribute('aria-pressed', selected ? 'true' : 'false');
+                });
+                renderInvoice();
+            } else {
+                // Keep the hidden payment payload recoverable even if the tier
+                // card was removed from the current public catalogue.
+                if (walletCheckoutButton) {
+                    walletCheckoutButton.disabled = false;
+                    walletCheckoutButton.textContent = 'پیگیری فعال‌سازی VIP';
+                }
+                if (walletCheckoutForm) walletCheckoutForm.hidden = false;
+            }
         } else {
-            renderInvoice();
+            const initialCurrentPlan = plans.find(function (plan) {
+                return plan.dataset.vipCurrent === '1'
+                    && (plan.dataset.vipSelectable === '1' || root.dataset.vipTestAdmin === '1');
+            });
+            if (initialCurrentPlan) {
+                selectPlan(initialCurrentPlan, false);
+            } else {
+                renderInvoice();
+            }
         }
     }
 
