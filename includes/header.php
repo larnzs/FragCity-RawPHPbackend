@@ -359,8 +359,6 @@ $mobileMoreNavItems = [
 
             <a href="https://billing.fragcity.ir"
                class="shock-nav-item"
-               target="_blank"
-               rel="noopener noreferrer"
                aria-label="فروشگاه">
                 <i class="fas fa-store" aria-hidden="true"></i>
                 <span>فروشگاه</span>
@@ -620,7 +618,7 @@ $mobileMoreNavItems = [
         <?php foreach ($mobileNavItems as [$slug, $label, $icon, $activePages]): ?>
             <a href="<?= htmlspecialchars($slug === 'store' ? 'https://billing.fragcity.ir' : fragcity_page_url($slug), ENT_QUOTES, 'UTF-8') ?>"
                class="mobile-nav-link <?= $slug === 'vip' ? 'mobile-nav-link--vip ' : '' ?><?= $isPageActive($activePages) ?>"
-               <?= $slug === 'store' ? 'target="_blank" rel="noopener noreferrer"' : 'data-ajax-nav data-slug="' . htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') . '"' ?>>
+               <?= $slug === 'store' ? '' : 'data-ajax-nav data-slug="' . htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') . '"' ?>>
                 <i class="fas <?= htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>
                 <span><?= htmlspecialchars($label, ENT_QUOTES, 'UTF-8') ?></span>
             </a>
