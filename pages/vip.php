@@ -1045,32 +1045,24 @@ $vipCheckoutIntegrationReady = $vipPaymenterCatalogAvailable
             </div>
 
             <div class="vip-invoice-actions">
-                <form method="post" action="/pages/zarinpal/zarinpal_vip_request.php" data-vip-checkout-form>
-                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
-                    <input type="hidden" name="level" value="" data-vip-checkout-level>
-                    <input type="hidden" name="duration_days" value="" data-vip-checkout-duration>
-                    <button type="submit" class="vip-invoice-checkout" data-vip-checkout disabled>
-                        <i class="fas fa-lock" aria-hidden="true"></i>
-                        پرداخت و فعال‌سازی
-                    </button>
-                </form>
                 <?php if ($isLoggedIn): ?>
-                    <form method="post" action="/pages/zarinpal/zarinpal_vip_request.php" data-vip-wallet-form>
+                    <form method="post" action="/api/vip-store.php" data-vip-wallet-form>
                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars((string)($_SESSION['auth_csrf_token'] ?? ''), ENT_QUOTES, 'UTF-8') ?>">
+                        <input type="hidden" name="order_ref" value="<?= htmlspecialchars(bin2hex(random_bytes(16)), ENT_QUOTES, 'UTF-8') ?>" data-vip-order-ref>
                         <input type="hidden" name="level" value="" data-vip-wallet-level>
                         <input type="hidden" name="duration_days" value="" data-vip-wallet-duration>
-                        <input type="hidden" name="payment_method" value="wallet">
+                        <input type="hidden" name="expected_amount_rial" value="" data-vip-wallet-amount-rial>
                         <button type="submit" class="vip-invoice-wallet" data-vip-wallet-checkout disabled>
                             <i class="fas fa-wallet" aria-hidden="true"></i>
-                            پرداخت از طریق کیف پول
+                            پرداخت از طریق کیف پول Paymenter
                         </button>
                     </form>
                     <div class="vip-invoice-wallet-meta">
-                        <small data-vip-wallet-status role="status" aria-live="polite">موجودی کیف پول: <?= htmlspecialchars($vipFormatWalletToman($vipWalletBalanceToman), ENT_QUOTES, 'UTF-8') ?> تومان</small>
-                        <button type="button" class="vip-wallet-recharge" data-vip-wallet-recharge data-fc-wallet-charge-open hidden>
+                        <small data-vip-wallet-status role="status" aria-live="polite">موجودی کیف پول Paymenter: <?= htmlspecialchars($vipFormatWalletToman($vipWalletBalanceToman), ENT_QUOTES, 'UTF-8') ?> تومان</small>
+                        <a class="vip-wallet-recharge" href="https://billing.fragcity.ir" rel="noopener">
                             <i class="fas fa-plus" aria-hidden="true"></i>
-                            افزایش موجودی
-                        </button>
+                            شارژ کیف پول در Billing
+                        </a>
                     </div>
                 <?php else: ?>
                     <a class="vip-invoice-wallet" href="/login/" data-auth-modal-open aria-haspopup="dialog" aria-controls="fcLoginModal">
@@ -1080,7 +1072,7 @@ $vipCheckoutIntegrationReady = $vipPaymenterCatalogAvailable
                 <?php endif; ?>
             </div>
 
-            <small class="vip-invoice-checkout-note">مبلغ در صفحه به تومان نمایش داده می‌شود و سفارش با مبلغ مرجع ریالی از سمت سرور ساخته می‌شود. در پرداخت آنلاین، VIP پس از تأیید زرین‌پال و در پرداخت کیف پول، پس از برداشت موفق و ثبت در VIPCore فعال خواهد شد.</small>
+            <small class="vip-invoice-checkout-note">قیمت و موجودی از Paymenter دریافت می‌شود. با تأیید خرید، یک Invoice واقعی در Billing ساخته و مبلغ از Wallet خود Paymenter کسر می‌شود؛ سپس عضویت از طریق Linux API در VIPCore فعال خواهد شد. برای شارژ موجودی از Billing استفاده کن.</small>
         </aside>
     </div>
 
