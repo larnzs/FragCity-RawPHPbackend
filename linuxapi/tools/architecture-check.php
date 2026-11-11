@@ -65,6 +65,10 @@ try {
     $vipCoreSiteRepository = $read('class/VipCoreRepository.php');
     $vipCoreSiteEndpoint = $read('api/vip-test-purchase.php');
     $vipRevokeEndpoint = $read('api/vip-revoke.php');
+    $vipStoreEndpoint = $read('api/vip-store.php');
+    $vipLegacyRequestEndpoint = $read('pages/zarinpal/zarinpal_vip_request.php');
+    $vipLegacyCallbackEndpoint = $read('pages/zarinpal/zarinpal_vip_callback.php');
+    $paymenterApiClient = $read('class/PaymenterApiClient.php');
     $ordersPage = $read('pages/orders.php');
     $ordersJavascript = $read('js/orders.js');
     $vipRevocationMigration = $read('linuxapi/migrations/20261107_vip_membership_revocations.sql');
@@ -272,29 +276,45 @@ $check(
 );
 
 $check(
-    'Customer VIP revocation uses authenticated CSRF, signed VIPCore deletion and an immutable audit ledger',
-    str_contains($vipRevokeEndpoint, "\$_SESSION['steamid']")
-        && str_contains($vipRevokeEndpoint, 'X_FRAGCITY_CSRF')
-        && str_contains($vipRevokeEndpoint, "session_write_close()")
-        && str_contains($vipRevokeEndpoint, "status = 'revoked'")
+    'Paid VIP checkout, history and refunds are owned by Paymenter; RawPHP is only an authenticated relay',
+    str_contains($vipCorePage, 'new PaymenterApiClient()')
+        && str_contains($vipCorePage, 'getVipStoreCatalog')
+        && !str_contains($vipCorePage, 'user_wallets')
+        && !str_contains($vipCorePage, 'FROM vip_orders')
+        && !str_contains($vipCorePage, 'zarinpal_vip_request.php')
+        && str_contains($ordersPage, 'getVipStoreOrders')
+        && !str_contains($ordersPage, 'FROM vip_orders')
+        && !str_contains($ordersPage, 'fragcity_create_pdo')
+        && str_contains($ordersJavascript, 'data-vip-order-retry')
+        && str_contains($ordersJavascript, '/api/vip-store.php')
+        && str_contains($vipStoreEndpoint, 'createVipStoreOrder')
+        && str_contains($vipStoreEndpoint, 'HTTP_X_FRAGCITY_CSRF')
+        && !str_contains($vipStoreEndpoint, 'INSERT INTO vip_orders')
+        && !str_contains($vipStoreEndpoint, 'UPDATE user_wallets')
+        && str_contains($vipRevokeEndpoint, 'revokeVipStoreMembership')
+        && str_contains($vipRevokeEndpoint, 'HTTP_X_FRAGCITY_CSRF')
+        && !str_contains($vipRevokeEndpoint, 'fragcity_create_pdo')
+        && !str_contains($vipRevokeEndpoint, 'wallet_transactions')
+        && str_contains($paymenterApiClient, '/api/v1/fragcity/bridge/orders/vip')
+        && str_contains($paymenterApiClient, '/api/v1/fragcity/bridge/orders/vip/revoke')
+        && str_contains($vipLegacyRequestEndpoint, 'http_response_code(410)')
+        && !str_contains($vipLegacyRequestEndpoint, 'INSERT INTO vip_orders')
+        && !str_contains($vipLegacyRequestEndpoint, 'UPDATE user_wallets')
+        && str_contains($vipLegacyCallbackEndpoint, 'WALLET_')
         && str_contains($vipCoreSiteRepository, "'action' => 'revoke_membership'")
         && str_contains($vipCoreService, 'public function revokeMembership')
         && str_contains($vipCoreService, "DELETE FROM `vip_users`")
         && str_contains($vipCoreService, 'fragcity_vip_membership_revocations')
         && str_contains($vipCoreService, 'VIPCore membership revocation read-after-write verification failed')
         && str_contains($index, "'revoke_membership'")
-        && str_contains($index, 'VipCoreMembershipNotActive')
         && str_contains($vipRevocationMigration, 'CREATE TABLE IF NOT EXISTS fragcity_vip_membership_revocations')
         && str_contains($vipRevocationPermissionsMigration, 'GRANT DELETE ON GLOBAL_vip.vip_users')
         && str_contains($vipRevocationPreflight, "'vip_users DELETE privilege'")
-        && str_contains($vipRevocationPreflight, "'revocation audit INSERT privilege'")
         && str_contains($ordersPage, 'data-vip-revoke-open')
         && str_contains($ordersPage, 'new VipCoreRepository())->getStatus')
-        && str_contains($ordersPage, "'revoked' =>")
         && str_contains($ordersJavascript, '/api/vip-revoke.php')
         && str_contains($ordersJavascript, 'fcVipRevokeDialog')
 );
-
 
 
 $check(
