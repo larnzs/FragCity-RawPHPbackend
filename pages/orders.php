@@ -18,6 +18,7 @@ if (($_SESSION['user_logged_in'] ?? false) !== true) {
 
 require_once dirname(__DIR__) . '/settings/loader.php';
 require_once dirname(__DIR__) . '/class/VipCoreRepository.php';
+require_once dirname(__DIR__) . '/class/PaymenterApiClient.php';
 
 $ordersPageSteamId = (string)($_SESSION['steamid'] ?? '');
 $ordersPageRows = [];
@@ -103,38 +104,18 @@ if (!preg_match('/^[0-9]{17}$/D', $ordersPageSteamId)) {
     $ordersPageErrorMessage = 'شناسه حساب Steam معتبر نیست. یک‌بار خارج شوید و دوباره وارد شوید.';
 } else {
     try {
-        $ordersDatabaseProfile = fragcity_settings(
-            'files.pages.zarinpal.vip_request.database_profile',
-            'main'
-        );
-        $ordersDatabaseProfile = is_string($ordersDatabaseProfile)
-            && trim($ordersDatabaseProfile) !== ''
-            ? trim($ordersDatabaseProfile)
-            : 'main';
-
-        $ordersPdo = fragcity_create_pdo($ordersDatabaseProfile);
-        if (!$ordersPdo instanceof PDO) {
-            throw new RuntimeException('vip_orders_database_unavailable');
-        }
-
-        $ordersQuery = $ordersPdo->prepare(
-            'SELECT id, order_ref, vip_level, duration_days, amount_rial,
-                    authority, ref_id, status, purchase_type,
-                    upgrade_from_level, created_at, paid_at, provisioned_at
-             FROM vip_orders
-             WHERE steamid64 = ?
-             ORDER BY id DESC
-             LIMIT 100'
-        );
-        $ordersQuery->execute([$ordersPageSteamId]);
-        $ordersPageRows = $ordersQuery->fetchAll(PDO::FETCH_ASSOC);
-        if (!is_array($ordersPageRows)) {
-            $ordersPageRows = [];
+        $paymenterClient = new PaymenterApiClient();
+        $paymenterOrders = $paymenterClient->getVipStoreOrders($ordersPageSteamId);
+        foreach ($paymenterOrders as $paymenterOrder) {
+            if (!is_array($paymenterOrder)) {
+                continue;
+            }
+            $ordersPageRows[] = $paymenterOrder;
         }
     } catch (Throwable $e) {
         $ordersPageError = true;
-        $ordersPageErrorMessage = 'دریافت سفارش‌ها در حال حاضر امکان‌پذیر نیست. چند لحظه بعد صفحه را تازه‌سازی کنید.';
-        error_log('[FragCity Orders] VIP order history lookup failed; type=' . get_class($e));
+        $ordersPageErrorMessage = 'دریافت سفارش‌ها از Billing در حال حاضر امکان‌پذیر نیست. چند لحظه بعد صفحه را تازه‌سازی کنید.';
+        error_log('[FragCity Orders] Paymenter VIP order history lookup failed; type=' . get_class($e));
     }
 }
 
@@ -172,9 +153,7 @@ if ($ordersPageCurrentVipActive) {
     }
 }
 
-// Paid VIP cancellation becomes available one hour after the actual payment.
-// Keep this server-rendered countdown informational only; the API repeats the
-// check against the same paid_at timestamp before deleting vip_users.
+// The Paymenter order ledger is the only source for cancellation cooldowns.
 $ordersPageRevokeAvailableAt = 0;
 $ordersPageRevokeRemainingSeconds = 0;
 $ordersPageRevokeCooldownUnavailable = false;
@@ -188,37 +167,23 @@ if ($ordersPageCurrentVipActive
     && is_array($ordersPageVipStatus['paid_purchase'] ?? null)) {
     $ordersPageRevokeCooldownRequired = true;
     try {
-        $revokeOrderRef = (string)($ordersPageVipStatus['paid_purchase']['order_ref'] ?? '');
+        $revokeOrderRef = strtolower((string) ($ordersPageVipStatus['paid_purchase']['order_ref'] ?? ''));
         if (!preg_match('/^[a-f0-9]{32}$/D', $revokeOrderRef)) {
             throw new RuntimeException('vip_paid_order_reference_invalid_for_revocation_cooldown');
         }
 
-        $revokeTimeProfile = fragcity_settings(
-            'files.pages.zarinpal.vip_request.database_profile',
-            'main'
-        );
-        $revokeTimeProfile = is_string($revokeTimeProfile) && trim($revokeTimeProfile) !== ''
-            ? trim($revokeTimeProfile)
-            : 'main';
-        $revokeTimePdo = fragcity_create_pdo($revokeTimeProfile);
-        if (!$revokeTimePdo instanceof PDO) {
-            throw new RuntimeException('vip_paid_order_database_unavailable_for_revocation_cooldown');
+        $matchingPaymenterOrder = null;
+        foreach ($ordersPageRows as $candidateOrder) {
+            if (strtolower((string) ($candidateOrder['order_ref'] ?? '')) === $revokeOrderRef) {
+                $matchingPaymenterOrder = $candidateOrder;
+                break;
+            }
         }
-
-        $revokeTimeQuery = $revokeTimePdo->prepare(
-            'SELECT UNIX_TIMESTAMP(COALESCE(paid_at, provisioned_at, created_at))
-             FROM vip_orders
-             WHERE order_ref = ? AND steamid64 = ?
-             LIMIT 1'
-        );
-        $revokeTimeQuery->execute([
-            $revokeOrderRef,
-            $ordersPageSteamId,
-        ]);
-        $revokePurchaseTimestamp = (int)$revokeTimeQuery->fetchColumn();
-
-        if ($revokePurchaseTimestamp < 1) {
-            throw new RuntimeException('vip_paid_order_timestamp_missing_for_revocation_cooldown');
+        $revokePurchaseTimestamp = is_array($matchingPaymenterOrder)
+            ? strtotime((string) ($matchingPaymenterOrder['paid_at'] ?? ''))
+            : false;
+        if (!is_int($revokePurchaseTimestamp) || $revokePurchaseTimestamp < 1) {
+            throw new RuntimeException('paymenter_paid_order_timestamp_missing');
         }
 
         $ordersPageRevokeAvailableAt = $revokePurchaseTimestamp + 3600;
@@ -226,7 +191,7 @@ if ($ordersPageCurrentVipActive
     } catch (Throwable $e) {
         $ordersPageRevokeCooldownUnavailable = true;
         error_log(
-            '[FragCity Orders] VIP revocation cooldown lookup failed; steam_hash='
+            '[FragCity Orders] Paymenter VIP revocation cooldown lookup failed; steam_hash='
             . substr(hash('sha256', $ordersPageSteamId), 0, 16)
             . '; type=' . get_class($e)
         );
@@ -422,11 +387,9 @@ foreach ($ordersPageRows as $ordersPageRow) {
                     $orderDays = max(0, (int)($order['duration_days'] ?? 0));
                     $orderAmountRial = max(0, (int)($order['amount_rial'] ?? 0));
                     $orderAmountToman = intdiv($orderAmountRial, 10);
-                    $orderAuthority = trim((string)($order['authority'] ?? ''));
-                    $isWalletOrder = str_starts_with($orderAuthority, 'WALLET_');
-                    $paymentLabel = $isWalletOrder
-                        ? 'کیف پول FragCity'
-                        : ($orderAuthority !== '' ? 'زرین‌پال' : 'روش پرداخت نامشخص');
+                    $paymentLabel = (string)($order['payment_method'] ?? '') === 'paymenter_wallet'
+                        ? 'کیف پول Paymenter'
+                        : 'Billing Paymenter';
                     $purchaseType = (string)($order['purchase_type'] ?? 'new');
                     $purchaseTypeLabel = match ($purchaseType) {
                         'upgrade' => 'ارتقای اشتراک',
@@ -437,10 +400,7 @@ foreach ($ordersPageRows as $ordersPageRow) {
                     $orderPaidLabel = $ordersPageDate($order['paid_at'] ?? '');
                     $orderProvisionedLabel = $ordersPageDate($order['provisioned_at'] ?? '');
                     $canRetryActivation = $orderStatus === 'paid'
-                        && preg_match('/^[A-Za-z0-9_-]{1,128}$/D', $orderAuthority);
-                    $retryActivationUrl = $canRetryActivation
-                        ? '/pages/zarinpal/zarinpal_vip_callback.php?Authority=' . rawurlencode($orderAuthority) . '&Status=OK'
-                        : '';
+                        && preg_match('/^[a-f0-9]{32}$/D', $orderRef);
                     ?>
                     <article class="fc-orders__order-card" data-order-ref="<?= $ordersPageEscape($orderRef) ?>" data-order-status="<?= $ordersPageEscape($orderStatus) ?>">
                         <div class="fc-orders__order-main">
@@ -484,10 +444,18 @@ foreach ($ordersPageRows as $ordersPageRow) {
                         <div class="fc-orders__order-footer">
                             <p class="fc-orders__order-description"><?= $ordersPageEscape($statusInfo['description']) ?></p>
                             <?php if ($canRetryActivation): ?>
-                                <a class="fc-orders__retry" href="<?= $ordersPageEscape($retryActivationUrl) ?>">
+                                <button
+                                    class="fc-orders__retry"
+                                    type="button"
+                                    data-vip-order-retry
+                                    data-order-ref="<?= $ordersPageEscape($orderRef) ?>"
+                                    data-vip-level="<?= $orderLevel ?>"
+                                    data-duration-days="<?= $orderDays ?>"
+                                    data-amount-rial="<?= $orderAmountRial ?>"
+                                >
                                     <i class="fa-solid fa-rotate" aria-hidden="true"></i>
                                     تلاش مجدد برای فعال‌سازی
-                                </a>
+                                </button>
                             <?php elseif ($orderStatus === 'provisioned'): ?>
                                 <span class="fc-orders__verified"><i class="fa-solid fa-shield-check" aria-hidden="true"></i> تأییدشده توسط VIPCore</span>
                             <?php endif; ?>
