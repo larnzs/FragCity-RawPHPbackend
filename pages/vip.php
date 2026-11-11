@@ -1058,7 +1058,7 @@ $vipCheckoutIntegrationReady = $vipPaymenterCatalogAvailable
                     </form>
                     <div class="vip-invoice-wallet-meta">
                         <small data-vip-wallet-status role="status" aria-live="polite">موجودی کیف پول Paymenter: <?= htmlspecialchars($vipFormatWalletToman($vipWalletBalanceToman), ENT_QUOTES, 'UTF-8') ?> تومان</small>
-                        <a class="vip-wallet-recharge" href="https://billing.fragcity.ir" rel="noopener">
+                        <a class="vip-wallet-recharge" href="<?= htmlspecialchars(fragcity_billing_sso_url('/account/credits'), ENT_QUOTES, 'UTF-8') ?>" rel="noopener">
                             <i class="fas fa-plus" aria-hidden="true"></i>
                             شارژ کیف پول در Billing
                         </a>

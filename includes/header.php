@@ -357,7 +357,7 @@ $mobileMoreNavItems = [
                 <span>انتخاب اسکین</span>
             </a>
 
-            <a href="https://billing.fragcity.ir"
+            <a href="<?= htmlspecialchars(fragcity_billing_sso_url('/'), ENT_QUOTES, 'UTF-8') ?>"
                class="shock-nav-item"
                aria-label="فروشگاه">
                 <i class="fas fa-store" aria-hidden="true"></i>
@@ -616,7 +616,7 @@ $mobileMoreNavItems = [
             <span class="fc-motion-toggle__state" aria-hidden="true"></span>
         </button>
         <?php foreach ($mobileNavItems as [$slug, $label, $icon, $activePages]): ?>
-            <a href="<?= htmlspecialchars($slug === 'store' ? 'https://billing.fragcity.ir' : fragcity_page_url($slug), ENT_QUOTES, 'UTF-8') ?>"
+            <a href="<?= htmlspecialchars($slug === 'store' ? fragcity_billing_sso_url('/') : fragcity_page_url($slug), ENT_QUOTES, 'UTF-8') ?>"
                class="mobile-nav-link <?= $slug === 'vip' ? 'mobile-nav-link--vip ' : '' ?><?= $isPageActive($activePages) ?>"
                <?= $slug === 'store' ? '' : 'data-ajax-nav data-slug="' . htmlspecialchars($slug, ENT_QUOTES, 'UTF-8') . '"' ?>>
                 <i class="fas <?= htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') ?>" aria-hidden="true"></i>

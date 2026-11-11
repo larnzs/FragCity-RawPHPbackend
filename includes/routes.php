@@ -48,3 +48,31 @@ if (!function_exists('fragcity_page_url')) {
         return $slug === '' ? '/' : '/' . rawurlencode($slug) . '/';
     }
 }
+
+if (!function_exists('fragcity_billing_sso_url')) {
+    /**
+     * Build the Billing entry point for the one-time FragCity SSO bridge.
+     * Only local Paymenter return paths are accepted.
+     */
+    function fragcity_billing_sso_url(string $returnTo = '/'): string
+    {
+        $returnTo = trim($returnTo);
+        if (
+            $returnTo === ''
+            || !str_starts_with($returnTo, '/')
+            || str_starts_with($returnTo, '//')
+            || str_contains($returnTo, chr(92))
+            || preg_match('/[\\r\\n\\x00-\\x1F\\x7F]/', $returnTo)
+            || preg_match('/^[a-z][a-z0-9+.-]*:/i', $returnTo)
+        ) {
+            $returnTo = '/';
+        }
+
+        $parts = parse_url($returnTo);
+        if (!is_array($parts) || isset($parts['scheme']) || isset($parts['host']) || isset($parts['user']) || isset($parts['pass'])) {
+            $returnTo = '/';
+        }
+
+        return 'https://billing.fragcity.ir/auth/fragcity/sso/start?redirect=' . rawurlencode($returnTo);
+    }
+}

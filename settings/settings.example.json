@@ -75,7 +75,7 @@
       "status_page_slug": "fragcity"
     },
     "paymenter_backend": {
-      "_comment": "Private HMAC connection to the FragCityAPI add-on in Paymenter. Generate a random secret with openssl rand -hex 32 and configure the same value in Paymenter Admin -> Extensions -> Others -> FragCity API. Backend-only; never expose it to browser JavaScript or commit a real value.",
+      "_comment": "Private HMAC connection to the FragCityAPI add-on in Paymenter. Generate a random secret with openssl rand -hex 32 and configure the same value in Paymenter Admin -> Extensions -> Others -> FragCity API. The same base_url and shared_secret also secure the short-lived one-time browser SSO hand-off. Backend-only; never expose it to browser JavaScript or commit a real value.",
       "base_url": "",
       "shared_secret": ""
     },

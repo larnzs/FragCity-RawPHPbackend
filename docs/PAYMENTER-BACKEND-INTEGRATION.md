@@ -50,6 +50,23 @@ Do not recreate retired Windows Agent tables or use them as the new provisioning
 - The signed customer bridge endpoints are `POST /api/v1/fragcity/bridge/servers/list` and `POST /api/v1/fragcity/bridge/servers/password`. Both resolve the SteamID64 through `fragcity_user_links`, and password changes are additionally scoped to a service owned by that linked Paymenter user.
 - Email and mobile are required for account synchronization. The mobile number is stored in Paymenter as the `fragcity_phone` user property because Paymenter v1.5.9 does not provide a native phone field.
 
+
+## 2.2. Browser SSO between FragCity and Paymenter
+
+- Paymenter starts the flow at `GET /auth/fragcity/sso/start` and stores a random 256-bit state in its own browser session.
+- The browser is redirected to the main site's `/api/paymenter-sso.php`. This endpoint accepts no user identity from the URL; it derives the SteamID64 and Paymenter user ID from the authenticated FragCity session and the existing `fragcity_user_links` mapping.
+- If the customer is not signed in to FragCity, the endpoint preserves the SSO state in the server-side PHP session and sends the browser to the existing login page. Both the validated Steam OpenID callback and the normal username/password login resume the same local return path. Account completion and new Steam registration also resume it after the existing Paymenter account synchronization succeeds.
+- A valid FragCity remember-me cookie may restore the existing FragCity session. That preference is forwarded to Paymenter; a normal non-remembered FragCity session becomes a normal Paymenter session.
+- The site produces a 90-second HMAC-SHA256 ticket and auto-submits it to `POST /auth/fragcity/sso/callback` as a form POST. Ticket content includes only the issuer, audience, SteamID64, Paymenter user ID, issue/expiry time, one-time ID, Paymenter state and remember preference.
+- Paymenter verifies the exact website Origin, its own session-bound state, the shared-secret signature, expiry, issuer/audience and the database link between the SteamID64 and Paymenter user ID. A unique hash of the one-time ticket ID prevents replay.
+- Paymenter creates its session using its native login action. Its built-in two-factor challenge remains in force. An already-authenticated, different Paymenter user is never silently replaced.
+
+The bridge reuses `integrations.paymenter_backend.base_url` and `integrations.paymenter_backend.shared_secret` from the private FragCity runtime settings. Do not add a second SSO secret, expose the HMAC secret in JavaScript, send the website PHP session ID to Paymenter, or pass passwords in the SSO ticket.
+
+The Billing links in the FragCity desktop/mobile navigation, footer and VIP wallet recharge action use the SSO start route. Paymenter's own login form has a matching **Steam / FragCity account** button. The button supports both Steam login and the site's existing username/password login.
+
+Paymenter v1.5.9 hard-codes Google, GitHub and Discord in **Settings → Social Login** and does not expose an extension hook for adding a provider there. To keep core untouched, the FragCity SSO enable switch and canonical website origin are configured under **Admin → Extensions → Others → FragCity API**. The provider button is rendered by the FragCity theme.
+
 ## 3. Paymenter v1.5.9 API findings
 
 The pinned API routes expose Admin API resources under `/api/v1/admin` for users, products, services, orders, invoices, invoice items, tickets, ticket messages and credits. These routes use a Paymenter Admin API key as a Bearer token. The API key must be enabled, have type `admin`, and carry only the permissions required by the integration. IP allowlisting should be used once the website's outbound IP is confirmed.
