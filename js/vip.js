@@ -47,6 +47,12 @@
         const walletDurationInput = walletCheckoutForm
             ? walletCheckoutForm.querySelector('[data-vip-wallet-duration]')
             : null;
+        const walletOrderRefInput = walletCheckoutForm
+            ? walletCheckoutForm.querySelector('[data-vip-order-ref]')
+            : null;
+        const walletExpectedAmountInput = walletCheckoutForm
+            ? walletCheckoutForm.querySelector('[data-vip-wallet-amount-rial]')
+            : null;
         const walletStatus = invoice ? invoice.querySelector('[data-vip-wallet-status]') : null;
         const walletRechargeButton = invoice ? invoice.querySelector('[data-vip-wallet-recharge]') : null;
         const walletBalanceToman = Math.max(0, Number(root.dataset.vipWalletBalance || 0));
@@ -96,18 +102,41 @@
             document.body.appendChild(walletPaymentModal);
         }
 
-        const initialWalletPendingCallback = String(root.dataset.vipWalletPendingCallback || '');
-        const initialWalletPendingValid = /^\/pages\/zarinpal\/zarinpal_vip_callback\.php\?Authority=WALLET_[a-f0-9]{32}&Status=OK$/.test(initialWalletPendingCallback);
-        let walletPendingCallbackUrl = initialWalletPendingValid ? initialWalletPendingCallback : '';
-        let walletPendingCheckout = initialWalletPendingValid ? {
-            level: Number(root.dataset.vipWalletPendingLevel || 0),
-            duration_days: Number(root.dataset.vipWalletPendingDurationDays || 0),
-            amount_toman: Number(root.dataset.vipWalletPendingAmountToman || 0),
-            order_ref: String(root.dataset.vipWalletPendingOrderRef || '')
-        } : null;
-        let walletDebitCommitted = initialWalletPendingValid;
+        let walletPendingCheckout = null;
+        let walletDebitCommitted = false;
         let walletCheckoutResponseReceived = false;
         let walletPaymentPreviousFocus = null;
+        try {
+            const pendingOrder = JSON.parse(root.dataset.vipWalletPendingOrder || 'null');
+            if (
+                pendingOrder
+                && pendingOrder.status === 'paid'
+                && /^[a-f0-9]{32}$/.test(String(pendingOrder.order_ref || ''))
+                && [1, 2, 3].includes(Number(pendingOrder.vip_level))
+                && [7, 15, 30, 60, 90].includes(Number(pendingOrder.duration_days))
+                && Number.isSafeInteger(Math.round(Number(pendingOrder.amount_rial)))
+                && Number(pendingOrder.amount_rial) >= 10
+            ) {
+                walletPendingCheckout = {
+                    order_ref: String(pendingOrder.order_ref),
+                    level: Number(pendingOrder.vip_level),
+                    duration_days: Number(pendingOrder.duration_days),
+                    expected_amount_rial: String(Math.round(Number(pendingOrder.amount_rial))),
+                    amount_rial: String(pendingOrder.amount_rial),
+                    amount_toman: Number(pendingOrder.amount_toman || (Number(pendingOrder.amount_rial) / 10)),
+                    invoice_id: Number(pendingOrder.invoice_id || 0),
+                    status: 'paid'
+                };
+                walletDebitCommitted = true;
+                if (walletOrderRefInput) walletOrderRefInput.value = walletPendingCheckout.order_ref;
+                if (walletLevelInput) walletLevelInput.value = String(walletPendingCheckout.level);
+                if (walletDurationInput) walletDurationInput.value = String(walletPendingCheckout.duration_days);
+                if (walletExpectedAmountInput) walletExpectedAmountInput.value = walletPendingCheckout.expected_amount_rial;
+            }
+        } catch (error) {
+            walletPendingCheckout = null;
+            walletDebitCommitted = false;
+        }
         const comparisonModal = document.getElementById('vipComparisonModal');
         const comparisonDialog = comparisonModal
             ? comparisonModal.querySelector('#vipComparisonDialog')
@@ -138,6 +167,26 @@
             }
         } catch (error) {
             upgradePriceMap = {};
+        }
+
+        let priceRialMap = {};
+        try {
+            priceRialMap = JSON.parse(root.dataset.vipPricesRial || '{}');
+            if (!priceRialMap || typeof priceRialMap !== 'object' || Array.isArray(priceRialMap)) {
+                priceRialMap = {};
+            }
+        } catch (error) {
+            priceRialMap = {};
+        }
+
+        let upgradePriceRialMap = {};
+        try {
+            upgradePriceRialMap = JSON.parse(root.dataset.vipUpgradePricesRial || '{}');
+            if (!upgradePriceRialMap || typeof upgradePriceRialMap !== 'object' || Array.isArray(upgradePriceRialMap)) {
+                upgradePriceRialMap = {};
+            }
+        } catch (error) {
+            upgradePriceRialMap = {};
         }
 
         if (!plans.length) return;
@@ -287,6 +336,30 @@
             return Number.isSafeInteger(price) && price >= 100 ? price : null;
         }
 
+        function getConfiguredPriceRial(level, days) {
+            const tierPrices = priceRialMap[String(level)];
+            if (!tierPrices || typeof tierPrices !== 'object') return null;
+            const price = Number(tierPrices[String(days)]);
+            return Number.isSafeInteger(price) && price >= 10 && price % 10 === 0 ? price : null;
+        }
+
+        function getUpgradePriceRial(level) {
+            const price = Number(upgradePriceRialMap[String(level)]);
+            return Number.isSafeInteger(price) && price >= 10 && price % 10 === 0 ? price : null;
+        }
+
+        function newVipOrderRef() {
+            const bytes = new Uint8Array(16);
+            if (window.crypto && typeof window.crypto.getRandomValues === 'function') {
+                window.crypto.getRandomValues(bytes);
+                return Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join('');
+            }
+            // PHP creates the initial server-side token. This fallback is only
+            // for minting the next UI token after a successful completed order.
+            return String(Date.now().toString(16)).padStart(12, '0').slice(-12)
+                + Math.random().toString(16).slice(2, 22).padEnd(20, '0').slice(0, 20);
+        }
+
         function formatPrice(price) {
             return new Intl.NumberFormat('fa-IR').format(price) + ' ' + (root.dataset.vipCurrency || 'تومان');
         }
@@ -393,6 +466,9 @@
                 && mode === 'paid'
                 && (isPaidUpgrade || canBuyFullTerm);
             const payableToman = isPaidUpgrade ? upgradePrice : (canBuyFullTerm ? price : null);
+            const payableRial = isPaidUpgrade
+                ? getUpgradePriceRial(level)
+                : (canBuyFullTerm ? getConfiguredPriceRial(level, days) : null);
             // Allow a valid purchase selection to reach the server even when
             // the UI readiness probe is false. The endpoint repeats every
             // security/configuration check and fails closed before creating an
@@ -403,10 +479,14 @@
                 && walletBalanceAvailable
                 && Number.isSafeInteger(payableToman)
                 && payableToman > 0
+                && Number.isSafeInteger(payableRial)
+                && payableRial >= 10
                 && walletBalanceToman >= payableToman;
             const walletSelectionValid = canCreatePaidOrder
                 && Number.isSafeInteger(payableToman)
-                && payableToman > 0;
+                && payableToman > 0
+                && Number.isSafeInteger(payableRial)
+                && payableRial >= 10;
 
             const replacementNotice = 'عضویت فعلی شما هدیه، آزمایشی یا بدون سابقه خرید پولی است؛ برای تبدیل آن به اشتراک پولی، قیمت کامل سطح و مدت انتخاب‌شده پرداخت می‌شود. هدیه Silver اعتبار ارتقا ندارد.';
             let message = 'برای ساخت فاکتور، یک سطح قابل خرید را انتخاب کن.';
@@ -436,16 +516,16 @@
                 message = 'شرایط ثبت سفارش VIP کامل نیست؛ انتخاب سطح، مدت، قیمت و وضعیت عضویت را بررسی کن.';
             } else if (!checkoutReady) {
                 if (canWalletCheckout) {
-                    message = 'تنظیمات امن زرین‌پال یا Checkout آماده نیست؛ دکمه پرداخت آنلاین را بزن تا سرور علت را بررسی و نمایش دهد. تا تأیید تنظیمات، هیچ سفارش یا پرداختی به درگاه ارسال نمی‌شود؛ موجودی کیف پول برای خرید کافی است.';
+                    message = 'قیمت در Paymenter تأیید شده است. خرید VIP فقط از موجودی کیف پول Paymenter انجام می‌شود.';
                 } else if (walletSelectionValid && !walletBalanceAvailable) {
-                    message = 'تنظیمات امن زرین‌پال آماده نیست و موجودی کیف پول نیز قابل بررسی نیست؛ پرداخت تا رفع مشکل غیرفعال می‌ماند.';
+                    message = 'موجودی کیف پول Paymenter قابل بررسی نیست؛ خرید تا بازیابی Billing غیرفعال می‌ماند.';
                 } else if (walletSelectionValid && walletBalanceAvailable) {
-                    message = 'تنظیمات امن زرین‌پال آماده نیست؛ موجودی کیف پول برای این سفارش کافی نیست.';
+                    message = 'موجودی کیف پول Paymenter برای این سفارش کافی نیست؛ از Billing کیف پولت را شارژ کن.';
                 } else {
-                    message = 'تنظیمات امن زرین‌پال یا Checkout آماده نیست؛ پرداخت آنلاین تا تکمیل تنظیمات غیرفعال می‌ماند.';
+                    message = 'کاتالوگ VIP در Paymenter آماده نیست؛ قیمت‌گذاری و خرید تا رفع مشکل غیرفعال می‌ماند.';
                 }
             } else if (canCheckout) {
-                message = 'مبلغ نهایی آماده است. پس از تأیید زرین‌پال، VIPCore فعال می‌شود.';
+                message = 'مبلغ نهایی از Paymenter دریافت شده است. با تأیید خرید، مبلغ از Wallet همان Billing کسر و VIPCore فعال می‌شود.';
             }
 
             if (isFullPriceReplacement && canCreatePaidOrder) {
@@ -463,22 +543,34 @@
                 checkoutButton.disabled = !canCheckout;
                 checkoutButton.title = canCheckout
                     ? (checkoutReady
-                        ? (isPaidUpgrade ? 'پرداخت مابه‌التفاوت و ارتقای VIP' : 'ساخت سفارش امن و انتقال به درگاه زرین‌پال')
+                        ? (isPaidUpgrade ? 'پرداخت مابه‌التفاوت از Wallet Paymenter' : 'پرداخت و فعال‌سازی از Wallet Paymenter')
                         : 'برای بررسی تنظیمات، درخواست را ارسال کن؛ سرور در صورت نقص تنظیمات بدون ایجاد سفارش یا پرداخت، خطای دقیق را نمایش می‌دهد.')
                     : message;
             }
 
-            if (walletLevelInput) walletLevelInput.value = walletSelectionValid ? String(level) : '';
-            if (walletDurationInput) {
+            if (walletLevelInput && !walletDebitCommitted) walletLevelInput.value = walletSelectionValid ? String(level) : '';
+            if (walletDurationInput && !walletDebitCommitted) {
                 walletDurationInput.value = walletSelectionValid
                     ? String(isPaidUpgrade ? upgradeDurationDays : days)
                     : '';
             }
+            if (walletExpectedAmountInput && !walletDebitCommitted) {
+                walletExpectedAmountInput.value = walletSelectionValid ? String(payableRial) : '';
+            }
+            if (walletOrderRefInput && !walletOrderRefInput.value) {
+                walletOrderRefInput.value = newVipOrderRef();
+            }
+            if (walletDebitCommitted && walletPendingCheckout) {
+                if (walletLevelInput) walletLevelInput.value = String(walletPendingCheckout.level);
+                if (walletDurationInput) walletDurationInput.value = String(walletPendingCheckout.duration_days);
+                if (walletExpectedAmountInput) walletExpectedAmountInput.value = String(walletPendingCheckout.expected_amount_rial);
+                if (walletOrderRefInput) walletOrderRefInput.value = String(walletPendingCheckout.order_ref);
+            }
             if (walletCheckoutButton) {
-                if (walletDebitCommitted && walletPendingCallbackUrl) {
+                if (walletDebitCommitted && walletPendingCheckout) {
                     walletCheckoutButton.disabled = false;
                     walletCheckoutButton.textContent = 'پیگیری فعال‌سازی VIP';
-                    walletCheckoutButton.title = 'برداشت قبلاً انجام شده؛ فقط فعال‌سازی سفارش قبلی را پیگیری کن.';
+                    walletCheckoutButton.title = 'سفارش قبلاً در Paymenter ثبت شده؛ همان شناسه سفارش دوباره ارسال می‌شود و برداشت تکرار نمی‌شود.';
                 } else {
                     walletCheckoutButton.disabled = !canWalletCheckout;
                     if (!walletSelectionValid) {
@@ -498,9 +590,11 @@
                 }
             }
             if (walletStatus) {
-                walletStatus.textContent = walletBalanceAvailable
-                    ? 'موجودی کیف پول: ' + formatWalletBalance(walletBalanceToman)
-                    : 'موجودی کیف پول فعلاً قابل بررسی نیست.';
+                walletStatus.textContent = walletDebitCommitted && walletPendingCheckout
+                    ? 'این سفارش قبلاً در Paymenter پرداخت شده؛ فقط فعال‌سازی آن را پیگیری کن.'
+                    : (walletBalanceAvailable
+                        ? 'موجودی کیف پول Paymenter: ' + formatWalletBalance(walletBalanceToman)
+                        : 'موجودی کیف پول Paymenter فعلاً قابل بررسی نیست.');
                 if (walletSelectionValid && walletBalanceAvailable && !canWalletCheckout) {
                     walletStatus.textContent += ' · مبلغ سفارش: ' + formatPrice(payableToman) + ' · موجودی ناکافی';
                 } else if (walletSelectionValid && canWalletCheckout) {
@@ -890,47 +984,43 @@
 
         function showWalletPaymentModal() {
             if (!walletPaymentModal) return false;
-
             walletPaymentPreviousFocus = document.activeElement;
-            if (walletPaymentTitle) walletPaymentTitle.textContent = 'تأیید پرداخت از کیف پول';
-            if (walletPaymentMessage) {
-                walletPaymentMessage.textContent = 'با تأیید شما، مبلغ فاکتور به‌صورت مستقیم از موجودی کیف پول کسر و عضویت VIP فعال می‌شود.';
+
+            const pending = walletDebitCommitted && walletPendingCheckout !== null;
+            const tierNames = { 1: 'Bronze', 2: 'Silver', 3: 'Gold' };
+            if (walletPaymentTitle) {
+                walletPaymentTitle.textContent = pending
+                    ? 'تکمیل فعال‌سازی سفارش Paymenter'
+                    : 'تأیید پرداخت از Wallet Paymenter';
             }
-            if (walletPaymentTier) walletPaymentTier.textContent = invoiceTier ? invoiceTier.textContent : '—';
-            if (walletPaymentDuration) walletPaymentDuration.textContent = invoiceDuration ? invoiceDuration.textContent : '—';
-            if (walletPaymentAmount) walletPaymentAmount.textContent = invoiceTotal ? invoiceTotal.textContent : '—';
+            if (walletPaymentMessage) {
+                walletPaymentMessage.textContent = pending
+                    ? 'پرداخت قبلاً در Billing ثبت شده است. فقط همان سفارش با همان شناسه پیگیری می‌شود؛ مبلغ دوباره کسر نخواهد شد.'
+                    : 'با تأیید شما، Paymenter موجودی Wallet را قفل و بررسی می‌کند، Invoice واقعی می‌سازد و مبلغ را یک‌بار کسر می‌کند.';
+            }
+            if (pending && walletPendingCheckout) {
+                if (walletPaymentTier) walletPaymentTier.textContent = tierNames[Number(walletPendingCheckout.level)] || 'VIP';
+                if (walletPaymentDuration) walletPaymentDuration.textContent = Number(walletPendingCheckout.duration_days) + ' روز';
+                if (walletPaymentAmount) walletPaymentAmount.textContent = formatPrice(Number(walletPendingCheckout.amount_toman));
+            } else {
+                if (walletPaymentTier) walletPaymentTier.textContent = invoiceTier ? invoiceTier.textContent : '—';
+                if (walletPaymentDuration) walletPaymentDuration.textContent = invoiceDuration ? invoiceDuration.textContent : '—';
+                if (walletPaymentAmount) walletPaymentAmount.textContent = invoiceTotal ? invoiceTotal.textContent : '—';
+            }
             if (walletPaymentBalance) {
-                walletPaymentBalance.textContent = walletBalanceAvailable
-                    ? formatWalletBalance(walletBalanceToman)
-                    : 'قابل بررسی نیست';
+                walletPaymentBalance.textContent = pending
+                    ? 'پرداخت این سفارش قبلاً ثبت شده است'
+                    : (walletBalanceAvailable ? formatWalletBalance(walletBalanceToman) : 'قابل بررسی نیست');
             }
             if (walletPaymentStatus) {
-                walletPaymentStatus.textContent = 'پس از تأیید، موجودی از دیتابیس بررسی و برداشت به‌صورت اتمیک ثبت می‌شود.';
+                walletPaymentStatus.textContent = pending
+                    ? 'شناسه سفارش قبلی ثابت نگه داشته می‌شود؛ تلاش دوباره باعث برداشت مجدد نمی‌شود.'
+                    : 'موجودی، قیمت و مالیات نهایی در Paymenter بررسی می‌شوند.';
             }
-            const activationPending = walletDebitCommitted && walletPendingCallbackUrl !== '';
-            if (activationPending && walletPendingCheckout) {
-                const savedTierNames = { 1: 'Bronze', 2: 'Silver', 3: 'Gold' };
-                if (walletPaymentTier) {
-                    walletPaymentTier.textContent = savedTierNames[Number(walletPendingCheckout.level)] || 'VIP';
-                }
-                if (walletPaymentDuration && Number(walletPendingCheckout.duration_days) > 0) {
-                    walletPaymentDuration.textContent = Number(walletPendingCheckout.duration_days) + ' روز';
-                }
-                if (walletPaymentAmount && Number.isSafeInteger(Number(walletPendingCheckout.amount_toman))) {
-                    walletPaymentAmount.textContent = formatPrice(Number(walletPendingCheckout.amount_toman));
-                }
-                if (walletPaymentBalance) walletPaymentBalance.textContent = 'برداشت این سفارش قبلاً ثبت شده است';
-            }
+
             walletPaymentModal.classList.remove('is-processing', 'is-error', 'is-pending');
-            if (activationPending) {
+            if (pending) {
                 walletPaymentModal.classList.add('is-pending');
-                if (walletPaymentTitle) walletPaymentTitle.textContent = 'فعال‌سازی VIP در انتظار تکمیل';
-                if (walletPaymentMessage) {
-                    walletPaymentMessage.textContent = 'برداشت قبلاً ثبت شده است. فقط وضعیت فعال‌سازی سفارش قبلی بررسی می‌شود و مبلغ دوباره کسر نخواهد شد.';
-                }
-                if (walletPaymentStatus) {
-                    walletPaymentStatus.textContent = 'برای تکمیل فعال‌سازی، درخواست قبلی را دوباره بررسی کن.';
-                }
                 if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
                 if (walletPaymentRetry) {
                     walletPaymentRetry.hidden = false;
@@ -961,7 +1051,8 @@
             document.body.classList.add('vip-wallet-modal-open');
             requestAnimationFrame(function () {
                 walletPaymentModal.classList.add('is-visible');
-                if (walletPaymentConfirm) walletPaymentConfirm.focus();
+                if (pending && walletPaymentRetry) walletPaymentRetry.focus();
+                else if (walletPaymentConfirm) walletPaymentConfirm.focus();
                 else if (walletPaymentDialog) walletPaymentDialog.focus();
             });
             return true;
@@ -989,26 +1080,15 @@
 
         function parseWalletJson(response) {
             return response.json().catch(function () {
-                throw new Error('پاسخ سرور قابل خواندن نیست؛ برای جلوگیری از برداشت تکراری، وضعیت کیف پول را بررسی کن.');
+                throw new Error('پاسخ سرور قابل خواندن نیست؛ از همان سفارش برای تلاش مجدد استفاده کن.');
             });
         }
 
-        function getSameOriginPath(value) {
-            try {
-                const url = new URL(String(value || ''), window.location.href);
-                return url.origin === window.location.origin ? url.pathname + url.search : '';
-            } catch (error) {
-                return '';
-            }
-        }
-
-        function showWalletSuccess(result) {
+        function showWalletSuccess(data) {
             const tierNames = { 1: 'Bronze', 2: 'Silver', 3: 'Gold' };
-            const amountText = Number.isSafeInteger(Number(result.amount_toman))
-                ? formatPrice(Number(result.amount_toman))
-                : (walletPendingCheckout && Number.isSafeInteger(Number(walletPendingCheckout.amount_toman))
-                    ? formatPrice(Number(walletPendingCheckout.amount_toman))
-                    : '');
+            const amountText = Number.isFinite(Number(data.amount_toman))
+                ? formatPrice(Number(data.amount_toman))
+                : '';
             if (walletPaymentModal) walletPaymentModal.classList.remove('is-processing');
             hideWalletPaymentModal();
             if (walletCheckoutButton) {
@@ -1020,14 +1100,12 @@
                 window.FragCitySuccessModal.open({
                     kind: 'payment',
                     title: 'خرید VIP با موفقیت فعال شد',
-                    message: 'مبلغ با موفقیت از کیف پول کسر شد و عضویت VIP روی حساب Steam شما فعال شد.',
-                    tier: tierNames[Number(walletPendingCheckout && walletPendingCheckout.level)] || '',
-                    duration: Number(walletPendingCheckout && walletPendingCheckout.duration_days) > 0
-                        ? Number(walletPendingCheckout.duration_days) + ' روز'
-                        : '',
+                    message: 'Invoice و پرداخت در Paymenter ثبت شد و عضویت VIP در VIPCore فعال است.',
+                    tier: tierNames[Number(data.vip_level)] || '',
+                    duration: Number(data.duration_days) > 0 ? Number(data.duration_days) + ' روز' : '',
                     amount: amountText,
-                    amountLabel: 'مبلغ کسرشده از کیف پول',
-                    reference: result.reference || (walletPendingCheckout && walletPendingCheckout.order_ref) || '',
+                    amountLabel: 'مبلغ پرداخت‌شده از Wallet Paymenter',
+                    reference: String(data.order_ref || ''),
                     returnUrl: '/index.php?page=vip',
                     actionLabel: 'مشاهده وضعیت VIP',
                     dismissible: true
@@ -1037,75 +1115,83 @@
             }
         }
 
-        async function retryWalletActivation() {
-            if (!walletDebitCommitted || !walletPendingCallbackUrl) return;
-            if (walletPaymentRetry) {
-                walletPaymentRetry.disabled = true;
-                walletPaymentRetry.textContent = 'در حال تلاش مجدد...';
+        function setPendingPaymentState(message) {
+            walletDebitCommitted = true;
+            if (walletPendingCheckout) {
+                walletPendingCheckout.status = 'paid';
             }
-            setWalletPaymentState('processing', 'مبلغ قبلاً از کیف پول کسر شده است؛ فقط فعال‌سازی VIP دوباره بررسی می‌شود و برداشت تکرار نخواهد شد.');
-
-            try {
-                const response = await fetch(walletPendingCallbackUrl, {
-                    method: 'GET',
-                    credentials: 'same-origin',
-                    cache: 'no-store',
-                    redirect: 'error',
-                    headers: { 'Accept': 'application/json' }
-                });
-                const result = await parseWalletJson(response);
-                if (result && result.success === true) {
-                    showWalletSuccess(result);
-                    return;
-                }
-                throw new Error(result && typeof result.message === 'string'
-                    ? result.message
-                    : 'فعال‌سازی VIP هنوز کامل نشده است.');
-            } catch (error) {
-                setWalletPaymentState('pending', error instanceof Error
-                    ? error.message + ' مبلغ کسر شده است؛ از ثبت خرید جدید خودداری کن.'
-                    : 'فعال‌سازی VIP هنوز کامل نشده است. مبلغ کسر شده است؛ از ثبت خرید جدید خودداری کن.');
-                if (walletPaymentMessage) {
-                    walletPaymentMessage.textContent = 'سفارش پرداخت‌شده حفظ شده است. می‌توانی فقط فعال‌سازی را دوباره امتحان کنی؛ مبلغ دوباره کسر نمی‌شود.';
-                }
-                if (walletPaymentRetry) {
-                    walletPaymentRetry.hidden = false;
-                    walletPaymentRetry.disabled = false;
-                    walletPaymentRetry.textContent = 'تلاش مجدد برای فعال‌سازی';
-                }
-                if (walletCheckoutButton) {
-                    walletCheckoutButton.disabled = false;
-                    walletCheckoutButton.classList.remove('is-submitting');
-                    walletCheckoutButton.textContent = 'پیگیری فعال‌سازی VIP';
-                }
-                if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
-                if (walletPaymentCancel) {
-                    walletPaymentCancel.hidden = false;
-                    walletPaymentCancel.textContent = 'بستن';
-                }
-                if (walletPaymentClose) walletPaymentClose.hidden = false;
+            setWalletPaymentState('pending', message);
+            if (walletPaymentTitle) walletPaymentTitle.textContent = 'پرداخت ثبت شد؛ فعال‌سازی در انتظار تکمیل';
+            if (walletPaymentMessage) {
+                walletPaymentMessage.textContent = 'Paymenter مبلغ را دریافت و Invoice را ثبت کرده است. فقط همین سفارش با همان شناسه دوباره پیگیری می‌شود؛ خرید تازه نساز.';
+            }
+            if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
+            if (walletPaymentRetry) {
+                walletPaymentRetry.hidden = false;
+                walletPaymentRetry.disabled = false;
+                walletPaymentRetry.textContent = 'تلاش مجدد برای فعال‌سازی';
+            }
+            if (walletPaymentCancel) {
+                walletPaymentCancel.hidden = false;
+                walletPaymentCancel.textContent = 'بستن';
+            }
+            if (walletPaymentClose) walletPaymentClose.hidden = false;
+            if (walletCheckoutButton) {
+                walletCheckoutButton.disabled = false;
+                walletCheckoutButton.classList.remove('is-submitting');
+                walletCheckoutButton.textContent = 'پیگیری فعال‌سازی VIP';
             }
         }
 
-        async function processWalletCheckout() {
+        async function retryWalletActivation() {
+            if (!walletDebitCommitted || !walletPendingCheckout) return;
+            await processWalletCheckout(true);
+        }
+
+        async function processWalletCheckout(isRetry) {
             if (!walletCheckoutForm || !walletCheckoutButton || !walletPaymentModal || !walletPaymentConfirm) return;
-            if (walletPaymentConfirm.disabled || !walletLevelInput || !walletDurationInput
-                || !walletLevelInput.value || !walletDurationInput.value) return;
+
+            if (!isRetry) {
+                if (walletPaymentConfirm.disabled || !walletLevelInput || !walletDurationInput
+                    || !walletExpectedAmountInput || !walletOrderRefInput
+                    || !walletLevelInput.value || !walletDurationInput.value
+                    || !walletExpectedAmountInput.value || !/^[a-f0-9]{32}$/.test(walletOrderRefInput.value)) {
+                    renderInvoice();
+                    return;
+                }
+
+                walletPendingCheckout = {
+                    order_ref: String(walletOrderRefInput.value),
+                    level: Number(walletLevelInput.value),
+                    duration_days: Number(walletDurationInput.value),
+                    expected_amount_rial: String(walletExpectedAmountInput.value),
+                    amount_toman: Number(walletExpectedAmountInput.value) / 10,
+                    status: 'submitting'
+                };
+            } else if (!walletPendingCheckout) {
+                return;
+            }
+
+            // Freeze the original payload across retries. A timeout is ambiguous:
+            // the server may already have committed the debit, so never mint a
+            // new reference or change level/duration/amount for this attempt.
+            walletOrderRefInput.value = walletPendingCheckout.order_ref;
+            walletLevelInput.value = String(walletPendingCheckout.level);
+            walletDurationInput.value = String(walletPendingCheckout.duration_days);
+            walletExpectedAmountInput.value = String(walletPendingCheckout.expected_amount_rial);
 
             walletPaymentConfirm.disabled = true;
             walletPaymentConfirm.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> در حال پرداخت...';
             if (walletPaymentCancel) walletPaymentCancel.hidden = true;
             if (walletPaymentClose) walletPaymentClose.hidden = true;
-            setWalletPaymentState('processing', 'در حال بررسی موجودی واقعی و ثبت برداشت امن در دیتابیس...');
+            setWalletPaymentState('processing', isRetry
+                ? 'در حال ارسال دوباره همان سفارش به Paymenter؛ برداشت دوباره انجام نمی‌شود.'
+                : 'در حال بررسی موجودی و ثبت Invoice در Paymenter...');
             walletCheckoutButton.disabled = true;
             walletCheckoutButton.classList.add('is-submitting');
-            walletCheckoutButton.textContent = 'در حال پرداخت از کیف پول...';
+            walletCheckoutButton.textContent = 'در حال ارتباط با Paymenter...';
 
-            walletDebitCommitted = false;
             walletCheckoutResponseReceived = false;
-            walletPendingCheckout = null;
-            walletPendingCallbackUrl = '';
-
             try {
                 const response = await fetch(walletCheckoutForm.action, {
                     method: 'POST',
@@ -1119,81 +1205,72 @@
                     body: new FormData(walletCheckoutForm)
                 });
                 walletCheckoutResponseReceived = true;
-                const checkoutResult = await parseWalletJson(response);
-                if (!response.ok || !checkoutResult || checkoutResult.success !== true) {
-                    throw new Error(checkoutResult && typeof checkoutResult.message === 'string'
-                        ? checkoutResult.message
-                        : 'پرداخت از کیف پول انجام نشد.');
+                const result = await parseWalletJson(response);
+                if (!response.ok || !result || result.success !== true || !result.data) {
+                    throw Object.assign(new Error(
+                        result && typeof result.message === 'string'
+                            ? result.message
+                            : 'پرداخت از Wallet Paymenter انجام نشد.'
+                    ), { knownFailure: true });
                 }
 
+                const data = result.data;
+                if (
+                    String(data.order_ref || '') !== walletPendingCheckout.order_ref
+                    || !['paid', 'provisioned'].includes(String(data.status || ''))
+                ) {
+                    throw new Error('Paymenter پاسخ سفارش را با شناسه درخواستی تطبیق نداد.');
+                }
+
+                walletPendingCheckout = Object.assign({}, walletPendingCheckout, data);
                 walletDebitCommitted = true;
-                walletPendingCheckout = checkoutResult;
-                walletPendingCallbackUrl = getSameOriginPath(checkoutResult.callback_url);
-                if (!walletPendingCallbackUrl) {
-                    throw new Error('برداشت کیف پول ثبت شد، اما آدرس امن فعال‌سازی دریافت نشد.');
-                }
 
-                setWalletPaymentState('processing', 'برداشت کیف پول ثبت شد. در حال ارتباط با VIPCore برای فعال‌سازی اشتراک...');
-                await retryWalletActivation();
-            } catch (error) {
-                if (walletDebitCommitted) {
-                    setWalletPaymentState('pending', error instanceof Error
-                        ? error.message + ' برداشت انجام شده است؛ پرداخت را دوباره تکرار نکن.'
-                        : 'برداشت انجام شده است؛ پرداخت را دوباره تکرار نکن.');
-                    if (walletPaymentMessage) {
-                        walletPaymentMessage.textContent = 'سفارش در دیتابیس ثبت شده است. فقط فعال‌سازی را دوباره امتحان کن؛ مبلغ دوباره کسر نمی‌شود.';
-                    }
-                    if (walletPaymentRetry) {
-                        walletPaymentRetry.hidden = false;
-                        walletPaymentRetry.disabled = false;
-                        walletPaymentRetry.textContent = 'تلاش مجدد برای فعال‌سازی';
-                    }
-                    if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
-                    if (walletPaymentCancel) {
-                        walletPaymentCancel.hidden = false;
-                        walletPaymentCancel.textContent = 'بستن';
-                    }
-                    if (walletPaymentClose) walletPaymentClose.hidden = false;
+                if (data.provision_pending === true || data.status === 'paid') {
+                    setPendingPaymentState(
+                        result.message || data.message || 'پرداخت ثبت شده است؛ فعال‌سازی VIP در اولین تلاش بعدی تکمیل می‌شود.'
+                    );
                     return;
                 }
 
-                if (!walletCheckoutResponseReceived) {
-                    setWalletPaymentState('pending', 'پاسخ سرور دریافت نشد و وضعیت برداشت نامشخص است.');
-                    if (walletPaymentMessage) {
-                        walletPaymentMessage.textContent = 'برای جلوگیری از کسر دوباره، خرید را مجدداً ارسال نکن. صفحه را تازه‌سازی و موجودی کیف پول و وضعیت سفارش را بررسی کن؛ اگر مبلغ کم شده ولی VIP فعال نیست، از گزینه پشتیبانی پیگیری کن.';
+                if (data.status === 'provisioned' && data.provision_pending === false) {
+                    walletDebitCommitted = false;
+                    showWalletSuccess(data);
+                    return;
+                }
+
+                setPendingPaymentState('سفارش پرداخت شده است؛ وضعیت فعال‌سازی هنوز نهایی نیست.');
+            } catch (error) {
+                if (walletCheckoutResponseReceived && error && error.knownFailure === true) {
+                    walletDebitCommitted = false;
+                    setWalletPaymentState('error', error.message || 'Paymenter سفارش را نپذیرفت.');
+                    if (walletPaymentConfirm) {
+                        walletPaymentConfirm.hidden = false;
+                        walletPaymentConfirm.disabled = false;
+                        walletPaymentConfirm.innerHTML = '<i class="fas fa-wallet" aria-hidden="true"></i> تلاش دوباره';
                     }
-                    if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
                     if (walletPaymentCancel) {
                         walletPaymentCancel.hidden = false;
                         walletPaymentCancel.textContent = 'بستن';
                     }
                     if (walletPaymentClose) walletPaymentClose.hidden = false;
                     if (walletCheckoutButton) {
-                        walletCheckoutButton.disabled = true;
+                        walletCheckoutButton.disabled = false;
                         walletCheckoutButton.classList.remove('is-submitting');
-                        walletCheckoutButton.textContent = 'وضعیت برداشت نامشخص';
+                        walletCheckoutButton.textContent = 'تلاش مجدد برای پرداخت';
                     }
                     return;
                 }
 
-                setWalletPaymentState('error', error instanceof Error
-                    ? error.message
-                    : 'پرداخت از کیف پول انجام نشد.');
-                if (walletPaymentConfirm) walletPaymentConfirm.hidden = true;
-                if (walletPaymentCancel) {
-                    walletPaymentCancel.hidden = false;
-                    walletPaymentCancel.textContent = 'بستن';
-                }
-                if (walletPaymentClose) walletPaymentClose.hidden = false;
-                if (walletCheckoutButton) {
-                    walletCheckoutButton.disabled = false;
-                    walletCheckoutButton.classList.remove('is-submitting');
-                    renderInvoice();
-                }
+                // Network/parse errors are ambiguous. Keep the same order_ref and
+                // permit only an idempotent retry of this exact payload.
+                setPendingPaymentState(
+                    error instanceof Error
+                        ? error.message + ' با همان شناسه سفارش دوباره امتحان کن.'
+                        : 'پاسخ Paymenter دریافت نشد. با همان شناسه سفارش دوباره امتحان کن.'
+                );
             } finally {
                 if (walletPaymentConfirm && !walletDebitCommitted && !walletPaymentModal.classList.contains('is-processing')) {
                     walletPaymentConfirm.disabled = false;
-                    walletPaymentConfirm.innerHTML = '<i class="fas fa-wallet" aria-hidden="true"></i> تأیید و پرداخت';
                 }
             }
         }
@@ -1201,7 +1278,7 @@
         if (walletCheckoutForm && walletCheckoutButton) {
             walletCheckoutForm.addEventListener('submit', function (event) {
                 event.preventDefault();
-                if (walletDebitCommitted && walletPendingCallbackUrl) {
+                if (walletDebitCommitted && walletPendingCheckout) {
                     showWalletPaymentModal();
                     return;
                 }
@@ -1218,7 +1295,9 @@
         }
 
         if (walletPaymentConfirm) {
-            walletPaymentConfirm.addEventListener('click', processWalletCheckout);
+            walletPaymentConfirm.addEventListener('click', function () {
+                processWalletCheckout(false);
+            });
         }
         if (walletPaymentRetry) {
             walletPaymentRetry.addEventListener('click', retryWalletActivation);
