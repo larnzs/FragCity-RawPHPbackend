@@ -129,3 +129,39 @@ php linuxapi/tools/architecture-check.php
 5. در تست محلی، مراقب باش آدرس API به سرور واقعی اشاره می‌کند و می‌تواند دادهٔ واقعی را تغییر دهد.
 
 این مستندات تغییرات معماری داخل Git را توضیح می‌دهد؛ به معنی deploy شدن تغییرات جدید روی cPanel یا Debian نیست.
+
+
+## Paymenter — read-only identity and Steam profile API
+
+Paymenter may request the profile of a linked account through
+\`POST /api/paymenter-profile.php\`. This endpoint reads only the main website
+database selected by \`files.index.database_profile\` and uses the existing
+\`integrations.paymenter_backend.shared_secret\` HMAC connection.
+
+The request body contains both \`paymenter_user_id\` and \`steamid64\`. Both
+values are checked against the same \`users\` row, and the account must have
+\`paymenter_sync_status = 'synced'\`. Paymenter must derive these values from its
+own authenticated \`fragcity_user_links\` record; they must never come from
+browser parameters or form values.
+
+The response is an allow-list, not a dump of the \`users\` row. It includes
+account identity fields (username, first/last name, email and phone), public
+Steam profile fields, and safe avatar URLs. Password hashes, password reset
+data, remember-me tokens, CSRF tokens, roles and other internal/security fields
+are never returned.
+
+### One-time schema setup
+
+Back up the main \`kyonxcbt_fragcity_services\` database, then run
+\`database/migrations/20261112_paymenter_profile_api_nonces.sql\` once in
+phpMyAdmin against that database. The table stores only hashes of recently used
+request nonces and is used to reject replayed HMAC requests. Do not run this on
+the WeaponPaints database.
+
+The API returns HTTP 503 with a safe error if the nonce table or the Steam
+profile columns are not installed. It never falls back to a different database.
+
+The existing \`api/paymenter-sso.php\` remains the browser login hand-off. The
+profile endpoint does not authenticate a browser and does not replace SSO; it
+lets the already-linked Paymenter account retrieve its own main-site profile
+after authentication.
