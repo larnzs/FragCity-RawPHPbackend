@@ -34,6 +34,8 @@ jobs:
 
       - name: Validate shared Motion Controller JavaScript syntax
         run: node --check js/motion.js
+      - name: Validate Paymenter wallet modal JavaScript syntax
+        run: node --check js/wallet-modal.js
       - name: Validate global navigation JavaScript syntax
         run: node --check js/header.js
 
