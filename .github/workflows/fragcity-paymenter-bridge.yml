@@ -8,6 +8,9 @@ on:
       - "class/PaymenterApiClient.php"
       - "class/PaymenterAccountSyncService.php"
       - "includes/header.php"
+      - "pages/zarinpal/zarinpal_wallet_request.php"
+      - "pages/zarinpal/zarinpal_wallet_callback.php"
+      - "js/wallet-modal.js"
       - "index.php"
       - "js/myservers.js"
       - "pages/myservers.php"
@@ -53,6 +56,8 @@ jobs:
             "class/PaymenterApiClient.php"
             "class/PaymenterAccountSyncService.php"
             "includes/header.php"
+            "pages/zarinpal/zarinpal_wallet_request.php"
+            "pages/zarinpal/zarinpal_wallet_callback.php"
             "index.php"
             "pages/myservers.php"
             "tools/paymenter-bridge-compatibility-check.php"
@@ -73,3 +78,6 @@ jobs:
 
       - name: Check My Servers JavaScript
         run: node --check js/myservers.js
+
+      - name: Check Paymenter wallet modal JavaScript
+        run: node --check js/wallet-modal.js
