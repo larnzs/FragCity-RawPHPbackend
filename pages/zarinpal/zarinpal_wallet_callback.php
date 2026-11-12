@@ -37,7 +37,7 @@ if (
 } else {
     try {
         $transactionQuery = $pdo->prepare(
-            'SELECT id, steamid, amount, type, status, ref_id
+            'SELECT id, steamid, amount, type, status, ref_id, description
              FROM wallet_transactions
              WHERE authority = ?
              LIMIT 1'
@@ -51,8 +51,9 @@ if (
             (string) ($transaction['type'] ?? '') !== 'deposit'
             || !preg_match('/^[0-9]{17}$/D', (string) ($transaction['steamid'] ?? ''))
             || (int) ($transaction['amount'] ?? 0) < 1
+            || !preg_match('/(?:^|\\s)ref:([a-f0-9]{32})(?:\\s|$)/iD', (string) ($transaction['description'] ?? ''), $topupMatches)
         ) {
-            $error_message = 'اطلاعات تراکنش معتبر نیست.';
+            $error_message = 'این تراکنش به روش جدید کیف پول Paymenter ثبت نشده یا اطلاعات آن معتبر نیست.';
         } elseif ((string) ($transaction['status'] ?? '') === 'success') {
             $is_success = true;
             $amount = (int) $transaction['amount'];
@@ -140,13 +141,40 @@ if (
                     throw new RuntimeException('zarinpal_verify_reference_invalid');
                 }
 
-                // The gateway verification is external. Lock and re-check the
-                // local transaction before crediting; concurrent callbacks then
-                // serialize on this row and only one can change pending -> success.
-                $pdo->beginTransaction();
+                // ZarinPal is verified server-to-server above. Only now may
+                // Paymenter apply the deposit to its native Credits balance.
+                // Paymenter enforces the same top-up reference and receipt pair,
+                // making concurrent/replayed callbacks safe and idempotent.
+                $steamId = (string) $transaction['steamid'];
+                $creditAmountToman = (int) $transaction['amount'];
+                $topupRef = strtolower((string) $topupMatches[1]);
 
+                require_once dirname(__DIR__, 2) . '/class/PaymenterApiClient.php';
+                $settlement = (new PaymenterApiClient())->createCustomerWalletTopup([
+                    'topup_ref' => $topupRef,
+                    'steamid64' => $steamId,
+                    'payment' => [
+                        'provider' => 'zarinpal',
+                        'authority' => $authority,
+                        'ref_id' => $gatewayRefId,
+                        'amount_toman' => $creditAmountToman,
+                        'amount_rial' => $creditAmountToman * 10,
+                    ],
+                ]);
+
+                if (
+                    ($settlement['status'] ?? '') !== 'accepted'
+                    || ($settlement['topup_ref'] ?? '') !== $topupRef
+                    || (int) ($settlement['invoice_id'] ?? 0) < 1
+                ) {
+                    throw new RuntimeException('paymenter_wallet_topup_not_accepted');
+                }
+
+                // This table is an audit/attempt record only. No legacy
+                // user_wallets balance is read or incremented here.
+                $pdo->beginTransaction();
                 $lockTransaction = $pdo->prepare(
-                    'SELECT id, steamid, amount, type, status, ref_id
+                    'SELECT id, steamid, amount, type, status, ref_id, description
                      FROM wallet_transactions
                      WHERE id = ?
                      LIMIT 1
@@ -155,69 +183,24 @@ if (
                 $lockTransaction->execute([(int) $transaction['id']]);
                 $lockedTransaction = $lockTransaction->fetch(PDO::FETCH_ASSOC);
 
-                if (!is_array($lockedTransaction)) {
-                    throw new RuntimeException('wallet_transaction_disappeared');
+                if (
+                    !is_array($lockedTransaction)
+                    || (string) ($lockedTransaction['steamid'] ?? '') !== $steamId
+                    || (int) ($lockedTransaction['amount'] ?? 0) !== $creditAmountToman
+                    || (string) ($lockedTransaction['type'] ?? '') !== 'deposit'
+                    || !preg_match('/(?:^|\\s)ref:([a-f0-9]{32})(?:\\s|$)/iD', (string) ($lockedTransaction['description'] ?? ''), $lockedMatches)
+                    || !hash_equals($topupRef, strtolower((string) $lockedMatches[1]))
+                ) {
+                    throw new RuntimeException('wallet_transaction_state_changed');
                 }
 
                 $lockedStatus = (string) ($lockedTransaction['status'] ?? '');
                 if ($lockedStatus === 'success') {
-                    // Another callback already credited this verified payment.
-                    $pdo->commit();
-                    $is_success = true;
-                    $amount = (int) $lockedTransaction['amount'];
-                    $ref_id = (string) ($lockedTransaction['ref_id'] ?? '');
-                } elseif (
-                    $lockedStatus !== 'pending'
-                    || (string) ($lockedTransaction['type'] ?? '') !== 'deposit'
-                    || (string) ($lockedTransaction['steamid'] ?? '') !== (string) $transaction['steamid']
-                    || (int) ($lockedTransaction['amount'] ?? 0) !== (int) $transaction['amount']
-                ) {
-                    throw new RuntimeException('wallet_transaction_state_changed');
-                } else {
-                    $steamId = (string) $lockedTransaction['steamid'];
-                    $creditAmount = (int) $lockedTransaction['amount'];
-
-                    // A stable user-row lock also serializes simultaneous first
-                    // deposits for the same user before a wallet row exists.
-                    $userLock = $pdo->prepare(
-                        'SELECT steamid64
-                         FROM users
-                         WHERE steamid64 = ?
-                         LIMIT 1
-                         FOR UPDATE'
-                    );
-                    $userLock->execute([$steamId]);
-                    if ($userLock->fetchColumn() === false) {
-                        throw new RuntimeException('wallet_owner_not_found');
+                    $existingRefId = (string) ($lockedTransaction['ref_id'] ?? '');
+                    if (!hash_equals($existingRefId, $gatewayRefId)) {
+                        throw new RuntimeException('wallet_transaction_reference_conflict');
                     }
-
-                    $walletLock = $pdo->prepare(
-                        'SELECT steamid
-                         FROM user_wallets
-                         WHERE steamid = ?
-                         LIMIT 1
-                         FOR UPDATE'
-                    );
-                    $walletLock->execute([$steamId]);
-
-                    if ($walletLock->fetch(PDO::FETCH_ASSOC)) {
-                        $credit = $pdo->prepare(
-                            'UPDATE user_wallets
-                             SET balance = balance + ?
-                             WHERE steamid = ?'
-                        );
-                        $credit->execute([$creditAmount, $steamId]);
-                        if ($credit->rowCount() !== 1) {
-                            throw new RuntimeException('wallet_balance_update_failed');
-                        }
-                    } else {
-                        $createWallet = $pdo->prepare(
-                            'INSERT INTO user_wallets (steamid, balance)
-                             VALUES (?, ?)'
-                        );
-                        $createWallet->execute([$steamId, $creditAmount]);
-                    }
-
+                } elseif ($lockedStatus === 'pending') {
                     $markSuccess = $pdo->prepare(
                         "UPDATE wallet_transactions
                          SET status = 'success', ref_id = ?
@@ -230,12 +213,14 @@ if (
                     if ($markSuccess->rowCount() !== 1) {
                         throw new RuntimeException('wallet_transaction_success_transition_failed');
                     }
-
-                    $pdo->commit();
-                    $is_success = true;
-                    $amount = $creditAmount;
-                    $ref_id = $gatewayRefId;
+                } else {
+                    throw new RuntimeException('wallet_transaction_state_changed');
                 }
+
+                $pdo->commit();
+                $is_success = true;
+                $amount = $creditAmountToman;
+                $ref_id = $gatewayRefId;
             }
         }
     } catch (Throwable $e) {
@@ -289,7 +274,7 @@ if (
             'auto_open' => true,
             'kind' => 'payment',
             'title' => 'پرداخت با موفقیت انجام شد',
-            'message' => 'پرداخت شما تأیید شد و مبلغ شارژ با موفقیت به کیف پول FragCity اضافه شد.',
+            'message' => 'پرداخت شما تأیید شد و اعتبار با موفقیت به کیف پول Paymenter شما اضافه شد.',
             'amount' => number_format($amount) . ' تومان',
             'amount_label' => 'مبلغ شارژ کیف پول',
             'reference' => $ref_id,
