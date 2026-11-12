@@ -645,7 +645,7 @@ $mobileMoreNavItems = [
                     موجودی
                     <strong data-fc-wallet-balance aria-live="polite"><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
                 </span>
-                <button type="button" data-fc-wallet-charge-open aria-label="افزایش موجودی کیف پول" title="افزایش موجودی">
+                <button type="button" data-fc-wallet-charge-open disabled aria-label="افزایش موجودی کیف پول" title="افزایش موجودی">
                     <i class="fa-solid fa-plus" aria-hidden="true"></i>
                 </button>
             </div>
