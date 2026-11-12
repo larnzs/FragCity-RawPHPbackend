@@ -27,6 +27,9 @@ $storePage = $read('pages/buyserveropen.php');
 $storeJs = $read('js/buyserveropen.js');
 $storeCallback = $read('pages/zarinpal/zarinpal_cs2_callback.php');
 $storeMigration = $read('database/migrations/20261110_fragcity_cs2_checkout_orders.sql');
+$walletRequest = $read('pages/zarinpal/zarinpal_wallet_request.php');
+$walletCallback = $read('pages/zarinpal/zarinpal_wallet_callback.php');
+$walletModal = $read('js/wallet-modal.js');
 
 $checks = [];
 $checkResult = static function (string $name, bool $passed) use (&$checks): void {
@@ -210,6 +213,38 @@ $checkResult('CS2 catalogue and Paymenter wallet bridge methods are available se
     && str_contains($client, 'minimum_deposit')
     && str_contains($client, "'/api/v1/fragcity/bridge/catalog/cs2'")
     && str_contains($client, "'/api/v1/fragcity/bridge/wallet/balance'")
+);
+
+$checkResult('FragCity wallet balance and successful deposits no longer use the legacy local wallet ledger',
+    !str_contains($header, 'SELECT balance FROM user_wallets')
+    && !str_contains($walletCallback, 'UPDATE user_wallets')
+    && !str_contains($walletCallback, 'INSERT INTO user_wallets')
+    && str_contains($walletCallback, 'createCustomerWalletTopup')
+);
+
+$checkResult('Wallet top-up reserves Paymenter credit capacity before creating a ZarinPal payment',
+    str_contains($walletRequest, 'prepareCustomerWalletTopup')
+    && str_contains($walletRequest, "'/class/PaymenterApiClient.php'")
+    && str_contains($walletRequest, "'amount_rial' => $amount * 10")
+    && str_contains($walletRequest, 'paymenter_sync_status')
+    && str_contains($walletRequest, "status = 'pending'")
+);
+
+$checkResult('Wallet callback verifies ZarinPal before asking Paymenter to credit native Credits',
+    strpos($walletCallback, 'createCustomerWalletTopup') > strpos($walletCallback, '$gatewayCode !== 100 && $gatewayCode !== 101')
+    && str_contains($walletCallback, "'amount_rial' => $creditAmountToman * 10")
+    && str_contains($walletCallback, "status = 'success', ref_id = ?")
+    && str_contains($walletCallback, 'topupRef')
+);
+
+$checkResult('Wallet header and charge modal read Paymenter balance/limits through the authenticated website API',
+    str_contains($header, 'data-fc-wallet-balance')
+    && !str_contains($header, 'SELECT balance FROM user_wallets')
+    && str_contains($walletModal, "body: JSON.stringify({ action: 'wallet_balance' })")
+    && str_contains($walletModal, "'X-FragCity-CSRF': csrf")
+    && str_contains($walletModal, 'minimum_deposit')
+    && !str_contains($walletModal, '/api/v1/fragcity/bridge/')
+    && !str_contains($walletModal, 'shared_secret')
 );
 $checkResult('Resource values are bounded locally and allowlisted by Paymenter Config Option children',
     str_contains($client, '$memoryMb > 1048576')
