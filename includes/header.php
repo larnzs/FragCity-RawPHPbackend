@@ -78,29 +78,9 @@ $morePages = ['serverguide', 'launcher', 'status'];
 $avatarSrc = $isLoggedIn ? getUserAvatarHeader((string) $displaySteamID) : '';
 $steamShort = $displaySteamID !== '' ? substr((string) $displaySteamID, -8) : '';
 
-// Read the same wallet balance source used by the former wallet page.
-$headerWalletBalance = 0.0;
-if ($isLoggedIn && trim((string)$displaySteamID) !== '') {
-    try {
-        require_once dirname(__DIR__) . '/class/customer_db.php';
-        $headerWalletDb = new CustomerDB();
-        $headerWalletRows = $headerWalletDb->select(
-            'SELECT balance FROM user_wallets WHERE steamid = ? LIMIT 1',
-            [(string)$displaySteamID]
-        );
-        $headerWalletBalance = max(0.0, (float)($headerWalletRows[0]['balance'] ?? 0));
-    } catch (Throwable $walletError) {
-        error_log('[FragCity] Header wallet balance unavailable.');
-    }
-}
-$headerWalletBalanceLabel = rtrim(
-    rtrim(number_format($headerWalletBalance, 8, '.', ','), '0'),
-    '.'
-);
-if ($headerWalletBalanceLabel === '') {
-    $headerWalletBalanceLabel = '0';
-}
-$headerWalletBalanceLabel .= ' تومان';
+// Wallet balance is loaded from the authenticated Paymenter bridge.
+// Never read or display the retired local user_wallets balance.
+$headerWalletBalanceLabel = 'در حال دریافت موجودی...';
 
 $headerSteamId64 = preg_match('/^[0-9]{17}$/D', (string)$displaySteamID)
     ? (string)$displaySteamID : '';
@@ -530,12 +510,13 @@ $mobileMoreNavItems = [
                                         <i class="fa-solid fa-wallet" aria-hidden="true"></i>
                                         موجودی کیف پول
                                     </span>
-                                    <strong dir="rtl" data-fc-wallet-balance><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                                    <strong dir="rtl" data-fc-wallet-balance aria-live="polite"><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
                                 </div>
                                 <button
                                     type="button"
                                     class="frag-drop-wallet-card__add"
                                     data-fc-wallet-charge-open
+                                    disabled
                                     aria-label="افزایش موجودی کیف پول"
                                     title="افزایش موجودی"
                                 >
@@ -662,7 +643,7 @@ $mobileMoreNavItems = [
                 <span>
                     <i class="fa-solid fa-wallet" aria-hidden="true"></i>
                     موجودی
-                    <strong data-fc-wallet-balance><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
+                    <strong data-fc-wallet-balance aria-live="polite"><?= htmlspecialchars($headerWalletBalanceLabel, ENT_QUOTES, 'UTF-8') ?></strong>
                 </span>
                 <button type="button" data-fc-wallet-charge-open aria-label="افزایش موجودی کیف پول" title="افزایش موجودی">
                     <i class="fa-solid fa-plus" aria-hidden="true"></i>
@@ -759,7 +740,7 @@ $mobileMoreNavItems = [
                 <input
                     type="hidden"
                     name="csrf_token"
-                    value="<?= htmlspecialchars((string) ($authCsrfToken ?? ''), ENT_QUOTES, 'UTF-8') ?>"
+                    value="<?= htmlspecialchars((string) ($headerCsrfToken), ENT_QUOTES, 'UTF-8') ?>"
                 >
                 <label for="fcWalletChargeAmount">مبلغ شارژ (تومان)</label>
                 <div class="fc-wallet-charge-modal__input-wrap">
@@ -775,7 +756,7 @@ $mobileMoreNavItems = [
                         required
                     >
                 </div>
-                <p class="fc-wallet-charge-modal__hint">حداقل مبلغ شارژ ۱,۰۰۰ تومان است.</p>
+                <p class="fc-wallet-charge-modal__hint" role="status" aria-live="polite">در حال دریافت محدودیت‌های شارژ از Paymenter...</p>
                 <div class="fc-wallet-charge-modal__actions">
                     <button type="submit" class="fc-wallet-charge-modal__submit">
                         <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
