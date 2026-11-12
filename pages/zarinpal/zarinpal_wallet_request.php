@@ -128,9 +128,12 @@ if (
     terminateRequest('تنظیمات امن درگاه پرداخت یا آدرس سایت کامل نیست.', 503);
 }
 
+$transactionId = 0;
+$topupRef = '';
 try {
     $userStatement = $pdo->prepare(
-        'SELECT phone, email FROM users WHERE steamid64 = ? LIMIT 1'
+        'SELECT phone, email, paymenter_user_id, paymenter_sync_status
+         FROM users WHERE steamid64 = ? LIMIT 1'
     );
     $userStatement->execute([$steamId]);
     $user = $userStatement->fetch(PDO::FETCH_ASSOC);
@@ -138,22 +141,85 @@ try {
         terminateRequest('حساب کاربری در دیتابیس پیدا نشد.', 404);
     }
 
+    if (
+        (int) ($user['paymenter_user_id'] ?? 0) < 1
+        || (string) ($user['paymenter_sync_status'] ?? '') !== 'synced'
+    ) {
+        terminateRequest('حساب شما هنوز به Paymenter متصل نشده است. ابتدا وارد Billing شوید و دوباره تلاش کنید.', 409);
+    }
+
+    // Do not create a second live gateway request while an earlier wallet
+    // deposit is still pending. Paymenter also reserves the maximum-credit
+    // capacity for 20 minutes, but the local guard prevents duplicate intents.
+    $pendingStatement = $pdo->prepare(
+        "SELECT id FROM wallet_transactions
+         WHERE steamid = ? AND type = 'deposit' AND status = 'pending'
+           AND created_at >= DATE_SUB(CURRENT_TIMESTAMP, INTERVAL 20 MINUTE)
+         LIMIT 1"
+    );
+    $pendingStatement->execute([$steamId]);
+    if ($pendingStatement->fetchColumn() !== false) {
+        terminateRequest('یک درخواست شارژ فعال برای حساب شما وجود دارد. ابتدا همان پرداخت را تکمیل کنید یا پس از پایان مهلت دوباره تلاش کنید.', 409);
+    }
+
     $mobile = trim((string) ($user['phone'] ?? ''));
     $email = trim((string) ($user['email'] ?? ''));
+    $topupRef = bin2hex(random_bytes(16));
 
+    // This row is only a local payment-attempt receipt. It is never used as
+    // a balance ledger; Paymenter owns the actual wallet and credit balance.
     $insert = $pdo->prepare(
         "INSERT INTO wallet_transactions
             (steamid, amount, type, description, authority, status)
-         VALUES (?, ?, 'deposit', 'شارژ کیف پول', '', 'pending')"
+         VALUES (?, ?, 'deposit', ?, '', 'pending')"
     );
-    $insert->execute([$steamId, $amount]);
+    $insert->execute([
+        $steamId,
+        $amount,
+        'شارژ کیف پول Paymenter | ref:' . $topupRef,
+    ]);
     $transactionId = (int) $pdo->lastInsertId();
     if ($transactionId < 1) {
         throw new RuntimeException('wallet_transaction_insert_failed');
     }
+
+    require_once dirname(__DIR__, 2) . '/class/PaymenterApiClient.php';
+    $paymenter = new PaymenterApiClient();
+    $reservation = $paymenter->prepareCustomerWalletTopup([
+        'topup_ref' => $topupRef,
+        'steamid64' => $steamId,
+        'amount_toman' => $amount,
+        'amount_rial' => $amount * 10,
+    ]);
+
+    if (($reservation['status'] ?? '') !== 'prepared') {
+        throw new RuntimeException('wallet_topup_reservation_unavailable');
+    }
 } catch (Throwable $e) {
-    error_log('[FragCity] Wallet deposit request could not be prepared (' . get_class($e) . ', code ' . (string) $e->getCode() . ').');
-    terminateRequest('ثبت درخواست شارژ کیف پول انجام نشد.', 503);
+    if ($transactionId > 0) {
+        try {
+            $fail = $pdo->prepare(
+                "UPDATE wallet_transactions SET status = 'failed'
+                 WHERE id = ? AND status = 'pending'"
+            );
+            $fail->execute([$transactionId]);
+        } catch (Throwable) {
+            // The original Paymenter/database error remains the primary failure.
+        }
+    }
+
+    $reason = $e->getMessage();
+    error_log('[FragCity] Paymenter wallet top-up preparation failed (' . get_class($e) . ', code ' . (string) $e->getCode() . ', reason ' . preg_replace('/[^a-z0-9_]/i', '', $reason) . ').');
+    $message = match ($reason) {
+        'wallet_topup_not_configured' => 'کیف پول Paymenter در حال حاضر برای شارژ تنظیم نشده است.',
+        'wallet_topup_amount_invalid' => 'مبلغ واردشده با حداقل یا حداکثر شارژ تعیین‌شده در Paymenter مطابقت ندارد.',
+        'wallet_maximum_credit_exceeded' => 'با این شارژ، سقف اعتبار مجاز کیف پول شما رد می‌شود.',
+        'wallet_topup_pending_invoice_exists' => 'یک فاکتور شارژ پرداخت‌نشده در Billing دارید. ابتدا آن را تعیین تکلیف کنید.',
+        'fragcity_user_not_linked', 'linked_paymenter_user_missing' => 'حساب FragCity شما به حساب Billing متصل نیست. یک‌بار وارد Billing شوید و دوباره تلاش کنید.',
+        'paymenter_unreachable', 'paymenter_invalid_response', 'bridge_not_configured' => 'ارتباط امن با Paymenter برقرار نشد. هیچ مبلغی از کیف پول کسر نشده است.',
+        default => 'آماده‌سازی شارژ از طریق Paymenter انجام نشد. هیچ اعتباری به کیف پول اضافه نشده است.',
+    };
+    terminateRequest($message, 503);
 }
 
 $callbackUrl = $siteBaseUrl . '/pages/zarinpal/zarinpal_wallet_callback.php';
