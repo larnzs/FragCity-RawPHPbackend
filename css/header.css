@@ -4346,3 +4346,30 @@ body { max-width: 100%; overflow-x: clip; }
         transition: none !important;
     }
 }
+
+
+/* Wallet controls stay inert until Paymenter confirms the live balance and
+   top-up limits. */
+#shockUserDropdown .frag-drop-wallet-card__add:disabled,
+.mobile-wallet-balance-row > button:disabled {
+    opacity: .42;
+    cursor: not-allowed;
+    filter: saturate(.45);
+    box-shadow: none;
+    transform: none;
+}
+#shockUserDropdown .frag-drop-wallet-card__add:disabled:hover,
+.mobile-wallet-balance-row > button:disabled:hover {
+    border-color: rgba(255, 255, 255, .12);
+    background: rgba(255, 255, 255, .04);
+    color: #A3A3A3;
+    box-shadow: none;
+}
+.fc-wallet-charge-modal__submit:disabled {
+    opacity: .48;
+    cursor: not-allowed;
+    filter: saturate(.4);
+}
+.fc-wallet-charge-modal__hint[data-state="error"] {
+    color: #FCA5A5;
+}
