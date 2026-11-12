@@ -225,14 +225,14 @@ $checkResult('FragCity wallet balance and successful deposits no longer use the 
 $checkResult('Wallet top-up reserves Paymenter credit capacity before creating a ZarinPal payment',
     str_contains($walletRequest, 'prepareCustomerWalletTopup')
     && str_contains($walletRequest, "'/class/PaymenterApiClient.php'")
-    && str_contains($walletRequest, "'amount_rial' => $amount * 10")
+    && str_contains($walletRequest, "'amount_rial' => \$amount * 10")
     && str_contains($walletRequest, 'paymenter_sync_status')
     && str_contains($walletRequest, "status = 'pending'")
 );
 
 $checkResult('Wallet callback verifies ZarinPal before asking Paymenter to credit native Credits',
     strpos($walletCallback, 'createCustomerWalletTopup') > strpos($walletCallback, '$gatewayCode !== 100 && $gatewayCode !== 101')
-    && str_contains($walletCallback, "'amount_rial' => $creditAmountToman * 10")
+    && str_contains($walletCallback, "'amount_rial' => \$creditAmountToman * 10")
     && str_contains($walletCallback, "status = 'success', ref_id = ?")
     && str_contains($walletCallback, 'topupRef')
 );
