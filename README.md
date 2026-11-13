@@ -67,7 +67,7 @@ FragCity قرار نیست صرفاً برنامهٔ C# فعلی را به Linux
 |---|---|
 | [راهنمای مادر Copy/Paste](docs/FRAGCITY-MASTER-COPY-PASTE-RUNBOOK.md) | **مرجع اجرایی واحد:** از نصب Debian بدون GUI تا نصب Panel/Docker و ادامهٔ Wings؛ فرمان‌ها، خروجی‌های واقعی و مراحل بعدی |
 | [Requirements](docs/REQUIREMENTS.md) | نیازهای عملکردی/امنیتی/عملیاتی و معیار پذیرش |
-| [Architecture](docs/ARCHITECTURE.md) | معماری اجزا، مرز مسئولیت‌ها و مدل نودها |
+| [Pterodactyl Customer Panel Proposal](docs/PROPOSAL-PTERODACTYL-CUSTOMER-PANEL.md) | پیشنهاد انتقال پنل عملیاتی مشتری به Pterodactyl، Extension/Theme، ریسک‌های 2.0 و مراحل پذیرش |\n| [Architecture](docs/ARCHITECTURE.md) | معماری اجزا، مرز مسئولیت‌ها و مدل نودها |
 | [Repository Inventory](docs/REPOSITORIES.md) | جدول ریپوهای داخلی و متن‌باز، نقش، وضعیت و ریسک |
 | [Roadmap](docs/ROADMAP.md) | فازهای اجرا، وابستگی‌ها و نقاط توقف |
 | [Platform PoC](docs/PLATFORM-POC.md) | گزینه‌ها، نسخه‌های کاندید و ماتریس آزمون |
