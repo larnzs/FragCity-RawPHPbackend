@@ -4421,7 +4421,7 @@ body { max-width: 100%; overflow-x: clip; }
         padding: 0;
     }
 
-    .shock-header .shock-brand > .fc-header-cart-link__label {
+    .shock-header .shock-brand .fc-header-cart-link__label {
         display: none;
     }
 }
