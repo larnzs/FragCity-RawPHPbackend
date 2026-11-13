@@ -324,7 +324,7 @@ $mobileMoreNavItems = [
                class="fc-header-cart-link"
                aria-label="سبد خرید"
                title="سبد خرید">
-                <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+                <i class="fa-solid fa-shopping-cart" aria-hidden="true"></i>
                 <span class="fc-header-cart-link__label">سبد خرید</span>
             </a>
         </div>
