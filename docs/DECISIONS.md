@@ -215,3 +215,38 @@
 **First implementation gate:** Begin with a read-only HTTPS Paymenter Admin API client and CLI preflight using a least-privilege key. Do not enable order, invoice, payment or provisioning writes until this connectivity test passes and the Bridge request contract is reviewed.
 
 **References:** [FragCity ↔ Paymenter Backend Integration](PAYMENTER-BACKEND-INTEGRATION.md), [Paymenter API routes v1.5.9](https://github.com/Paymenter/Paymenter/blob/v1.5.9/routes/api.php), [Paymenter ExtensionHelper v1.5.9](https://github.com/Paymenter/Paymenter/blob/v1.5.9/app/Helpers/ExtensionHelper.php).
+
+
+## ADR-019 — اصول نگهداری بلندمدت، نسخه‌بندی، بازیابی و ماژولار بودن
+
+**وضعیت:** اصول مورد تأیید کاربر؛ اجرای جزئیات در فازهای بعدی.
+
+**تصمیم:** FragCity باید به‌صورت یک پلتفرم چندساله، قابل بازسازی و قابل توسعه طراحی شود. کد اختصاصی، پکیج‌های انتشار، وابستگی‌ها، تنظیمات و داده‌ها باید نسخه‌پذیر و قابل بازیابی باشند.
+
+**اصول لازم‌الاجرا:**
+1. سورس اختصاصی در GitHub و Releaseهای قابل دانلود با Commit، نسخه، changelog، manifest و SHA-256 نگهداری شوند.
+2. وابستگی‌ها و نسخه ابزارهای build pin شوند و lockfileها commit شوند.
+3. تا وقتی API/SDK/Theme رسمی پاسخ‌گوست، Core پروژه‌های بالادست مستقیماً تغییر نکند و Fork کامل انتخاب پیش‌فرض نباشد.
+4. هسته، Provider زیرساخت و ماژول‌های اختصاصی هر بازی مرز مستقل داشته باشند؛ هر ماژول نسخه، قرارداد، permission، تست و دستورالعمل ارتقای خودش را داشته باشد.
+5. افزودن Node جدید باید از طریق نصب تکرارپذیر، configuration و health check انجام شود و نیازمند تغییر کد نباشد.
+6. Backup شامل دیتابیس، تنظیمات، پکیج‌های Release و اطلاعات لازم برای بازیابی باشد؛ secretها رمزنگاری‌شده و بیرون Git نگهداری شوند.
+7. Backup بدون آزمون Restore کافی نیست؛ قبل از Migration/Update باید Rollback Plan قابل اجرا وجود داشته باشد.
+8. تغییرات از مسیر Development → Test → Build → Release → Staging → Production عبور کنند.
+
+**اثر:** قبل از توسعهٔ گستردهٔ پنل مشتری، ساختار مستندات معماری، بسته‌بندی، تست و بازیابی باید در GitHub برقرار باشد. مرجع اصول تفصیلی: [Architecture](ARCHITECTURE.md#11-اصول-نگهداری-بلندمدت-ماژولار-بودن-و-بازیابی).
+
+## ADR-020 — پیشنهاد استفاده از Pterodactyl به‌عنوان پنل مشتری
+
+**وضعیت:** پیشنهاد فنی بررسی‌شده؛ در انتظار تأیید نهایی کاربر. تا آن زمان ADR-018 تصمیم پذیرفته‌شدهٔ قبلی باقی می‌ماند.
+
+**پیشنهاد:** رابط عملیاتی مشتری و ادمین سرور در خود Pterodactyl پیاده‌سازی شود؛ وب‌سایت FragCity برای بازاریابی/محتوا، Paymenter برای فروش/پرداخت/صورتحساب/تمدید/Provisioning و Pterodactyl برای مدیریت عملیاتی سرور استفاده شود.
+
+**روش سفارشی‌سازی:** ابتدا Pterodactyl upstream نصب شود و کد FragCity در Theme و Extension مستقل قرار گیرد. از Extension SDK برای صفحات، تب‌ها، APIها، مجوزها و جایگزینی اجزای پشتیبانی‌شده استفاده شود؛ Theme برای ظاهر و design tokens باشد. ویرایش Core یا Fork کامل فقط با ADR جداگانه و اثبات blocker واقعی مجاز شود.
+
+**کنسول:** از Client API و WebSocket رسمی Pterodactyl استفاده شود؛ RCON اختصاصی برای این مسیر کنار گذاشته شود. هیچ کلید API یا اعتبارنامه Wings نباید به مرورگر برسد. SSO یک موضوع مستقل با طراحی امنیتی جداست.
+
+**ریسک و محدودیت:** در تاریخ ۱۳ نوامبر ۲۰۲۶، Pterodactyl 2.0 هنوز Open Beta است و راهنمای Upgrade برخی سناریوها مانند چند Node و Extensions را در Known Limitations آزموده‌نشده اعلام می‌کند. همچنین Nest endpoints در Application API 2.0 حذف شده‌اند؛ درحالی‌که Paymenter upstream Pterodactyl extension فعلاً `/api/application/nests` و `/api/application/nests/{id}/eggs` را فراخوانی می‌کند. بنابراین 2.0 نباید بدون سازگارسازی Paymenter و تست کامل روی محیط جداگانه وارد Production شود.
+
+**شرط پذیرش نهایی:** آزمون Extension/Theme، Console/WS، permission isolation، provisioning، SSO، چند Node، backup/restore و rollback باید موفق باشد و وضعیت Stable نسخهٔ انتخابی مجدداً بررسی شود.
+
+**مراجع:** [Pterodactyl Extensions](https://docs.pterodactyl.io/v2/extensions)، [Pterodactyl Backend Extensions](https://docs.pterodactyl.io/v2/extensions/backend)، [Pterodactyl Frontend Extensions](https://docs.pterodactyl.io/v2/extensions/frontend)، [Pterodactyl Themes](https://docs.pterodactyl.io/v2/guides/customization/themes)، [Pterodactyl Upgrade Guide](https://docs.pterodactyl.io/v2/upgrading/upgrading-from-v1)، [Paymenter Pterodactyl Extension](https://github.com/Paymenter/Paymenter/blob/master/extensions/Servers/Pterodactyl/Pterodactyl.php).
