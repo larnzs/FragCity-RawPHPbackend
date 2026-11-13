@@ -4373,3 +4373,73 @@ body { max-width: 100%; overflow-x: clip; }
 .fc-wallet-charge-modal__hint[data-state="error"] {
     color: #FCA5A5;
 }
+
+/* Billing cart shortcut: same compact graphite/orange treatment as Paymenter. */
+.shock-header .shock-brand > .fc-header-cart-link {
+    position: relative;
+    display: inline-flex;
+    min-width: 42px;
+    min-height: 40px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 7px 11px;
+    border: 1px solid rgba(255, 179, 71, 0.22);
+    border-radius: 10px;
+    background: rgba(249, 115, 22, 0.075);
+    color: #FFD09F;
+    font-size: 0.75rem;
+    font-weight: 850;
+    line-height: 1;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.shock-header .shock-brand > .fc-header-cart-link:hover,
+.shock-header .shock-brand > .fc-header-cart-link:focus-visible {
+    transform: translateY(-1px);
+    border-color: rgba(255, 179, 71, 0.42);
+    outline: none;
+    background: rgba(249, 115, 22, 0.14);
+    color: #FFF0DC;
+}
+
+.shock-header .shock-brand > .fc-header-cart-link > i {
+    font-size: 0.9rem;
+}
+
+@media (max-width: 700px) {
+    .shock-header .shock-brand {
+        gap: 8px;
+    }
+
+    .shock-header .shock-brand > .fc-header-cart-link {
+        width: 38px;
+        min-width: 38px;
+        min-height: 36px;
+        padding: 0;
+    }
+
+    .shock-header .shock-brand > .fc-header-cart-link__label {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .shock-header .shock-brand > .fc-support-toggle {
+        width: 36px;
+        min-width: 36px;
+        max-width: 36px;
+        flex-basis: 36px;
+        height: 36px;
+        min-height: 36px;
+    }
+
+    .shock-header .shock-brand > .fc-header-cart-link {
+        width: 36px;
+        min-width: 36px;
+        min-height: 36px;
+    }
+}
+
